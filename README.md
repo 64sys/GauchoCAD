@@ -1,5 +1,5 @@
-# GambasCADE
-Visual generation of building type plants for use in structural calculation programs
+# GauchoCAD
+A little cad program written in Gambas
 
 Welcome
 
