@@ -1,0 +1,35 @@
+' Gambas class file
+
+' Tool maintained by Terco
+Inherits ToolsBase
+Create Static
+Public Const GENDER As String = ("Erase")
+
+Public Function Start(Optional ElemToBuild As Variant, Optional _Mode As Integer = 0) As Boolean
+    ' Llamada por FCAD al inicio de la aplicacion de esta herramienta
+    
+    ' Aprovechamos para establecer los helpers (comentarios de ayuda en pantalla)
+    Me.PointsDone = 0
+    Me.PointsTotal = 0
+  
+    clsDrawingAids.HelperTrabajo = ("Delete ")
+    
+    
+    ' chequeamos si hubo seleccion previa
+    Me.SelectionCount = clsEntities.GetSelectionCount()
+    
+    If Me.SelectionCount = 0 Then                                     ' we have no elements in the selection
+        
+        clsDrawingAids.Helper.texto = clsDrawingAids.HelperTrabajo & (": Select entities")
+        modCAD.clsJobPrevious = Me
+        modCAD.clsJob = clsDefaultJob  
+                
+        Else                                                                 
+        ' just delete them
+        clsEntities.DeleteSelected()
+        
+        Me.Finish() ' allways call this
+        
+    Endif
+    
+End

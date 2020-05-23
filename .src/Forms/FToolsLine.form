@@ -1,0 +1,38 @@
+# Gambas Form File 3.0
+
+{ Form Form
+  MoveScaled(0,0,41,6)
+  Action = "cadLine"
+  Arrangement = Arrange.Horizontal
+  AutoResize = True
+  { ToggleButton1 ToggleButton toolbasic
+    Name = "ToggleButton1"
+    MoveScaled(0,0,6,6)
+    Picture = Picture["png/32x32/menuline.png"]
+    Radio = True
+  }
+  { ToggleButton2 ToggleButton toolbasic
+    Name = "ToggleButton2"
+    MoveScaled(6,0,6,6)
+    Radio = True
+  }
+  { ToggleButton3 ToggleButton toolbasic
+    Name = "ToggleButton3"
+    MoveScaled(12,0,6,6)
+    Radio = True
+  }
+  { ToggleButton4 ToggleButton toolbasic
+    Name = "ToggleButton4"
+    MoveScaled(18,0,6,6)
+    Radio = True
+  }
+}
+
+# Gambas Action File 3.0
+
+{ Actions
+  { Action cadLine
+    Text = ""
+    Picture = "$Form"
+  }
+}

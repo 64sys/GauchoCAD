@@ -1,0 +1,58 @@
+' Gambas class file
+
+' Element maintained by Terco
+' V3
+Inherits EntityBase
+Public Const GENDER As String = ("Line")
+Public Const DrawingOrder As Integer = 1        ' 1 = draws first
+Public Const HelperTrabajo As String = ("a line")
+Public Const ParamType As String = "PP"                             ' that is Point, Point; could be Color Text, etc
+Public Const ParamHelper As String = ("Start point;End point")      ' a little text that is shown at the prompt waiting for user input during build
+
+Public Sub Draw()
+
+    If Not Me.DrawAble Or Not Me.Visible Then Return
+    
+    If modCAD.drwDrawingClass = modCAD.drwPaintClass Then
+        
+            paint.LineWidth = Me.LineWidth / appmain.hFcad.ScaleZoom / modCAD.ScaleLines 
+            If Me.flxDash Then paint.Dash = Me.flxDash
+            If Me.Selected And Not modCAD.ToolActive Then
+                paint.brush = Paint.Color(modCAD.ColorForSelected)
+            Else
+                paint.brush = Paint.Color(Me.ColorToPaint)
+            Endif
+            paint.MoveTo(Me.p[0], Me.p[1])
+            paint.LineTo(Me.p[2], Me.p[3])
+            paint.Stroke
+    End If        
+    
+    If modCAD.drwDrawingClass = modCAD.drwOpenGLClass Then
+            
+            GLplus.Lines(Me.p, Me.ColorToPaint, Me.LineWidth)
+            
+
+    Endif
+
+End
+
+
+'' Creo los puntos de interes
+'' Build point of interest
+
+Public Function BuildPOI() As Integer
+
+    Me.MyPoi.Clear
+    ' P1
+    Me.MyPoi.Insert([Me.p[0], Me.p[1]])
+
+    ' P2
+    Me.MyPoi.Insert([Me.p[2], Me.p[3]])
+    
+    ' MID
+    Me.MyPoi.Insert([(Me.p[2] + Me.p[0]) / 2, (Me.p[3] + Me.p[1]) / 2])
+    
+    Return Me.MyPoi.Count / 2            ' marcamos 3 puntos para esta entidad
+    
+    
+End

@@ -1,0 +1,154 @@
+' Gambas class file
+
+' Element maintained by Terco
+' V2
+Public Const GAMBASCADENTITY As String = ("EntityBase")
+Public Const USEWITH As String = "clsEntityBuilder"
+Public Const DrawingOrder As Integer = 0        ' 1 = draws first
+Public Const PointsToDraw As Integer = 1             ' minimal point requered for drawing something usefull
+Public Const OrtogonalIgnorado As Boolean = False
+Public Const OrtogonalForzado As Boolean = False
+Public Const ParamDefault As String = (" ")
+
+' SAVE from this vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+' IMPORTANT: ALL CHANGES HERE MUST BE TRANSLATED TO cadLoad/Save and clsEntities.CopyElementData()                                                                                    |
+Public P As New Float[]                     ' X,Y pairs
+Public Level As New Float[]                 ' the future Z or elevation
+Public StringData As String                 ' split with "|" separator if neccesary, that's is Entity specific.
+Public StringData2 As String                 ' split with "|" separator if neccesary, that's is Entity specific.
+Public StringData3 As String                 ' split with "|" separator if neccesary, that's is Entity specific.
+Public fParam As New Float[]                ' array of floats
+Public Layer As String = "0"                    ' Capa o Layer
+Public Block As String                     ' Para tener la posibilidade de juntar cosas en un block
+Public _Color As Integer                   ' 0=by layer, 1=by block, 10+=16 bit color code  ;  ths is not the color to be draw, ColorToPaint is, set in Finish()
+Public LineType As Integer                  ' 0=continuous, 1=dashed from flxDash
+Public LineWidth As Integer = 1             ' this is it
+Public RefPointX As Float                   ' new
+Public RefPointY As Float
+' SAVE to here  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+' NOT SAVED
+' construction and usage vars
+Public BlockNumber As Integer
+Public ColorToPaint As Integer            ' this is the color to be painted, gets ready in Finish from the _color param
+Public Selected As Boolean
+Public ForDeletion As Boolean = True      ' this must be falsed in Finish
+Public DrawAble As Boolean = False        ' True si durante la construccion ya tiene suficientes elementos para poder hacer una representacion digna
+Public Visible As Boolean = True          ' si esta entidad puede ser mostrada independientmente
+Public Finished As Boolean = False        ' colocar en true cuando se llegue a completar
+Public StepsDone As Integer                ' esto lo cambia cls ElementBuilder durante la construccion
+Public Group As Integer = 0               ' Pertenecemos a un grupo?
+Public flxDash As New Integer[]           ' tipo de linea, continua, puntos, etc
+Public B As New Float[]                   ' Backup point
+Public Psel As New Boolean[]              ' selected points
+Public BoundingPoligon As New Float[]     ' this is a poligon built at element's contruction that defines a poligon used for detecting points inside me
+Public MyPoi As New Single[]                 ' point of interest
+
+Public Sub _new()
+
+End
+
+Public Function _compare(cosas As Object) As Integer
+
+    Return Sgn(Me.DrawingOrder - cosas.DrawingOrder)
+
+End
+
+Public Sub CreateBoundingPoligon()
+
+End
+
+Public Sub Draw()
+
+    If Not Me.DrawAble Or Not Me.Visible Then Return
+
+    ' AQUI VAN LAS RUTINAS DE DIBUJO
+
+End
+
+'' Determines if the entity was selected by a rectanle surrounding al points
+'' by default, if ALL points are selected, it can.
+Public Function SelFull() As Boolean
+
+    Dim i As Integer, puedo As Boolean
+
+    puedo = True                     ' supongamos que puedo, por ahora
+    For i = 0 To Me.PSel.Max
+        If Not Me.PSel[i] Then puedo = False
+    Next
+
+    If puedo Then
+
+        Return True
+    Else
+        Return False
+    End If
+
+End
+
+'' Determines if the entity can be stretched
+'' by default, if ANY point is selected, it can.
+Public Function SelPartial() As Boolean
+
+    Dim i As Integer, puedo As Boolean
+
+    puedo = False
+    For i = 0 To Me.PSel.Max
+        If Me.PSel[i] Then puedo = True
+    Next
+
+    If puedo Then
+
+        Return True
+    Else
+        Return False
+    End If
+
+End
+
+Public Sub PointClick(Xr As Float, Zr As Float) As Boolean
+
+    ' this could be overriden in the child
+
+    If Me.BoundingPoligon.Count = 0 Then Return False
+
+    If puntos.isInside(Me.BoundingPoligon, Me.BoundingPoligon.Count / 2, xr, zr) Then
+
+        Return True
+    Else
+
+        Return False
+    End If
+
+End
+
+'' Creo los puntos de interes
+'' Build point of interest
+
+Public Function BuildPOI() As Integer
+
+End
+
+' This function will return False if the element couldn't be created for some reason: bad or incomple user input
+' True means all is good, False will instruct the clsEntityBuilder to delete it
+Public Sub Finish(ParamsDone As Integer) As Boolean
+
+    'Print "Finish en EntityBase"
+    CreateBoundingPoligon
+
+    ' tareas finales de armado del objeto
+    Me.b.resize(Me.P.count)
+    Me.psel.resize(Me.p.count / 2)
+    Me.ForDeletion = False
+    Me.DrawAble = True
+    Me.Selected = False
+    Me.Finished = True
+
+    If Not True Then
+
+        Me.ForDeletion = True
+        Me.DrawAble = False
+
+    End If
+
+End

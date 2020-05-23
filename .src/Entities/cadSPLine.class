@@ -1,0 +1,94 @@
+' Gambas class file
+
+' Represents a poli line
+' Element maintained by Terco
+' V2
+Inherits EntityBase
+Public Const GENDER As String = ("SPLine")          
+Public Const PointsToDraw As Integer = 0             ' minimal point requered for drawing something usefull
+Public Const HelperTrabajo As String = ("SPLine")
+Public Const ParamType As String = "PPPP"                             ' that is Point, Point, Float; could be Color Text, etc
+Public Const ParamHelper As String = ("First Point;Next Point;Next Point;Last Point")      ' a little text that is shown at the prompt waiting for user input during build
+Public Const ParamDefault As String = ("")
+
+
+
+ Public Sub Draw()
+
+
+    ' FIXME: requiere reparacion -> OpenGL
+    Return
+    
+    If Not Me.DrawAble Or Not Me.Visible Then Return
+
+    
+    Dim i As Integer
+    
+    
+    paint.LineWidth = Me.LineWidth / appmain.hFcad.ScaleZoom / modCAD.ScaleLines
+    If Me.flxDash Then paint.Dash = Me.flxDash
+    If Me.Selected And Not modCAD.ToolActive Then
+        paint.brush = Paint.Color(modCAD.ColorForSelected)
+    Else
+        paint.brush = Paint.Color(Me.ColorToPaint)
+    Endif
+    
+    
+    If Me.StepsDone = 1 Then
+        paint.moveto(Me.p[0], Me.p[1])
+        paint.lineto(Me.p[2], Me.p[3])
+        
+    Else If Me.StepsDone = 2 Then
+        paint.moveto(Me.p[0], Me.p[1])
+        paint.lineto(Me.p[2], Me.p[3])
+        paint.lineto(Me.p[4], Me.p[5])
+        
+    Else If Me.StepsDone >= 3 Then 'If Me.P.Count / 2 < 5 Then
+        paint.moveto(Me.p[0], Me.p[1])
+        paint.curveto(Me.p[2], Me.p[3], Me.p[4], Me.p[5], Me.p[6], Me.p[7])
+    ' 
+    ' Else
+    '     
+    '     'For i = 2 To Me.P.Max - 6 Step 2
+    '         paint.moveto(Me.p[i], Me.p[i + 1])
+    '         paint.curveto(Me.p[i + 2], Me.p[i + 3], Me.p[i + 4], Me.p[i + 5], Me.p[i + 6], Me.p[i + 7])
+    '         
+    '     'Next
+    End If    
+    
+   
+    ' 
+    paint.Stroke
+    
+ 
+End
+
+'' Creo los puntos de interes
+'' Build point of interest
+
+Public Function BuildPOI() As Integer
+    
+    
+    Dim I, poiCount As Integer
+    
+    Me.MyPoi.Clear
+    ' P0
+    Me.MyPoi.Insert([Me.p[0], Me.p[1]])
+    
+    For i = 0 To Me.P.Max - 2 Step 2
+    
+        ' MID
+        Me.MyPoi.Insert([(Me.p[i + 2] + Me.p[i]) / 2, (Me.p[i + 3] + Me.p[i + 1]) / 2])
+        
+        ' Pi+1
+        Me.MyPoi.Insert([Me.p[i + 2], Me.p[i + 3]])
+        
+        ' FIXME: this limit is for idiot plines
+        If i >= 100 Then Break
+        
+    Next
+    
+    Return Me.MyPoi.Count / 2
+    
+End
+

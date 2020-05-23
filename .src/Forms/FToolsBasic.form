@@ -1,0 +1,153 @@
+# Gambas Form File 3.0
+
+{ Form Form
+  MoveScaled(0,0,72,6)
+  Arrangement = Arrange.Horizontal
+  { tgbCircle ToggleButton toolbasic
+    Name = "tgbCircle"
+    MoveScaled(0,0,6,6)
+    ToolTip = ("Circle")
+    Action = "cadCircle"
+    Picture = Picture["png/32x32/menucircle.png"]
+    Radio = True
+  }
+  { tgbLine ToggleButton toolbasic
+    Name = "tgbLine"
+    MoveScaled(6,0,6,6)
+    ToolTip = ("Line")
+    Action = "cadLine"
+    Picture = Picture["png/32x32/menuline.png"]
+    Radio = True
+  }
+  { tgbPLine ToggleButton toolbasic
+    Name = "tgbPLine"
+    MoveScaled(12,0,6,6)
+    ToolTip = ("pLine")
+    Action = "cadPLine"
+    Picture = Picture["png/32x32/pline.png"]
+    Radio = True
+  }
+  { tgbRectangle ToggleButton toolbasic
+    Name = "tgbRectangle"
+    MoveScaled(18,0,6,6)
+    ToolTip = ("Rectangle")
+    Expand = True
+    Action = "cadRectangle"
+    Picture = Picture["svg/circle.svg"]
+    Radio = True
+  }
+  { tgbEllipse ToggleButton toolbasic
+    Name = "tgbEllipse"
+    MoveScaled(24,0,6,6)
+    ToolTip = ("Ellipse")
+    Action = "cadEllipse"
+    Picture = Picture["png/32x32/menuellipse.png"]
+    Radio = True
+  }
+  { tgbBeam ToggleButton toolbasic
+    Name = "tgbBeam"
+    MoveScaled(30,0,6,6)
+    ToolTip = ("Beam")
+    Action = "cadBeam"
+    Radio = True
+  }
+  { tgbColumn ToggleButton toolbasic
+    Name = "tgbColumn"
+    MoveScaled(36,0,6,6)
+    ToolTip = ("Column")
+    Action = "cadColumn"
+    Radio = True
+  }
+  { tgbCWall ToggleButton toolbasic
+    Name = "tgbCWall"
+    MoveScaled(42,0,6,6)
+    ToolTip = ("CWall")
+    Action = "cadCWall"
+    Radio = True
+  }
+  { tgbDim ToggleButton toolbasic
+    Name = "tgbDim"
+    MoveScaled(48,0,6,6)
+    ToolTip = ("Dim")
+    Action = "cadDim"
+    Picture = Picture["png/32x32/cotas.png"]
+    Radio = True
+  }
+  { tgbLantern ToggleButton toolbasic
+    Name = "tgbLantern"
+    MoveScaled(54,0,6,6)
+    ToolTip = ("Lantern")
+    Action = "cadLantern"
+    Radio = True
+  }
+  { tgbShellball ToggleButton toolbasic
+    Name = "tgbShellball"
+    MoveScaled(60,0,6,6)
+    ToolTip = ("Shellball")
+    Action = "cadShellball"
+    AutoResize = True
+    Radio = True
+  }
+  { tgbText ToggleButton toolbasic
+    Name = "tgbText"
+    MoveScaled(66,0,6,6)
+    ToolTip = ("Text")
+    Action = "cadText"
+    AutoResize = True
+    Picture = Picture["png/32x32/menutext.png"]
+    Radio = True
+  }
+}
+
+# Gambas Action File 3.0
+
+{ Actions
+  { Action cadBeam
+    Text = "Beam"
+    Picture = "$ToggleButton"
+  }
+  { Action cadCWall
+    Text = "CWall"
+    Picture = "$ToggleButton"
+  }
+  { Action cadCircle
+    Text = "Circle"
+    Picture = "png/32x32/menucircle.png"
+  }
+  { Action cadColumn
+    Text = "Column"
+    Picture = "$ToggleButton"
+  }
+  { Action cadDim
+    Text = "Dim"
+    Picture = "png/32x32/cotas.png"
+  }
+  { Action cadEllipse
+    Text = "Ellipse"
+    Picture = "png/32x32/menuellipse.png"
+  }
+  { Action cadLantern
+    Text = "Lantern"
+    Picture = "$ToggleButton"
+  }
+  { Action cadLine
+    Text = "Line"
+    Picture = "png/32x32/menuline.png"
+  }
+  { Action cadPLine
+    Text = "pLine"
+    Picture = "png/32x32/pline.png"
+  }
+  { Action cadRectangle
+    Text = "Rectangle"
+    Picture = "svg/circle.svg"
+  }
+  { Action cadShellball
+    Text = "Shellball"
+    Picture = "$ToggleButton"
+  }
+  { Action cadText
+    Text = "Text"
+    Picture = "png/32x32/menutext.png"
+  }
+}

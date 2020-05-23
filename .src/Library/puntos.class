@@ -1,0 +1,439 @@
+' Gambas class file
+
+' Tool maintained by Terco
+
+' Some of this gotten from
+' http://www.dcs.gla.ac.uk/~pat/52233/slides/Geometry1x1.pdf
+
+' Tools helpers
+
+' Operations on the element's vertices
+
+Create Static
+Create Private
+'Fast
+
+
+Public ScreenDensity As Float = 1080 / 29.5  ' pixele by cm wich gives a 1:100 scale in my monitor
+
+Public HookSize As Integer = 16                       ' for use with poi
+
+
+Public GridSpacing As Float = 0.5
+Public GridActive As Boolean           ' use with F7: 0 = no grid, 1 = dots, 2 = lines
+
+
+
+'' Returns the index in the array of pairs that is near the given point using HookSize parameter
+Public Function FindPOI(xr As Float, yr As Float, arr As Single[], hook As Single) As Single[]
+
+    Dim i As Integer
+    
+    ' Xr = Xreal(x)
+    ' Yr = Yreal(y)
+    ' hook = Metros(HookSize)
+   
+    
+    For i = 0 To arr.Max Step 2
+        
+        If ((arr[i] - hook) < Xr And (arr[i] + hook) > Xr) Or ((arr[i] - hook) > Xr And (arr[i] + hook < Xr)) Then 
+            
+            If ((arr[i + 1] - hook) < yr And (arr[i + 1] + hook) > yr) Or ((arr[i + 1] - hook) > yr And (arr[i + 1] + hook) < yr) Then 
+                
+                Return [arr[i], arr[i + 1], i]
+            
+            End If
+
+        Endif
+
+    Next
+   
+
+    Return [0, 0, -1]           ' no points near
+
+End
+
+Public Function Near(xyzReal As Float) As Float
+    ' return the nearest point to the grid
+    ' this is a world to world points (not pixels)
+
+    ' Example:
+    ' if                    GridSpacing = 0.2
+    ' we pass               xyzReal = 1.35
+    ' function will give    NearReal = 1.40
+
+    Dim n As Integer, r As Float
+
+    If Not Gridactive Then Return xyzReal
+
+    r = xyzReal / GridSpacing
+    n = Int(r)
+    r = r - Int(r)
+
+    If r > 0.5 Then n += 1
+
+    Return n * GridSpacing
+
+End
+
+' Public Function Xpix(Xr As Float) As Integer ' Return the screen X axis position from a point in the world
+' 
+'     Return Pixels(Xr) + PanX
+' 
+' End
+' 
+' Public Function Ypix(Yr As Float) As Integer ' same for Y
+'     ' ubica en el grafico una posicion en el mundo real
+' 
+'     Return ViewportHeight - Pixels(Yr) - PanY
+' 
+' End
+
+
+' Public Function Xreal(ScreenX As Integer) As Float  ' converts a point in the screen to the point in the world
+' 
+'     
+'     Return Metros(ScreenX - PanX)
+' 
+' 
+' End
+' 
+' Public Function Yreal(ScreenY As Integer) As Float ' same for Z
+' 
+'     Return Metros(-ScreenY - pany) 
+' End
+
+Public Function distancia(x1 As Float, y1 As Float, x2 As Float, y2 As Float) As Float
+    ' returns distance between points
+
+    Return ((x2 - x1) ^ 2 + (y2 - y1) ^ 2) ^ 0.5
+
+End
+
+Public Function InBetween(x As Float, x1 As Float, x2 As Float) As Boolean
+    ' determine if a number is between the other two
+    ' this is valid for negative values
+
+    If (x1 < X And x2 > X) Or (x1 > X And x2 < X) Then Return True Else Return False
+
+End
+
+'' determines if a XZ point is in the area of other by proximity parameter
+'' this is valid for negative values
+'' Integer version
+Public Function iAround(p1x As Integer, p1z As Integer, p2x As Integer, p2z As Integer, prox As Integer) As Boolean
+
+    If InBetween(p1x, p2x - prox, p2x + prox) And InBetween(p1z, p2z - prox, p2z + prox) Then Return True Else Return False
+
+End
+
+'' determines if a XZ point is in the area of other by proximity parameter
+'' this is valid for negative values
+'' Float version
+Public Function Around(p1x As Float, p1z As Float, p2x As Float, p2z As Float, prox As Float) As Boolean
+
+    ' determines if a XZ point is in the area of other by proximity parameter
+    ' this is valid for negative values
+
+    If InBetween(p1x, p2x - prox, p2x + prox) And InBetween(p1z, p2z - prox, p2z + prox) Then Return True Else Return False
+
+End
+
+Public Function doIntersect(p1x As Float, p1y As Float, q1x As Float, q1y As Float, p2x As Float, p2y As Float, q2x As Float, q2y As Float) As Boolean
+
+    Dim o1, o2, o3, o4 As Integer
+    ' Find the four orientations needed For
+    ' general And special cases
+    o1 = orientation(p1x, p1y, q1x, q1y, p2x, p2y)
+    o2 = orientation(p1x, p1y, q1x, q1y, q2x, q2y)
+    o3 = orientation(p2x, p2y, q2x, q2y, p1x, p1y)
+    o4 = orientation(p2x, p2y, q2x, q2y, q1x, q1y)
+
+    ' General Case
+    If (o1 <> o2 And o3 <> o4) Then
+        Return True
+    Endif
+
+    ' Special Cases
+    ' p1x , p1y, q1x ,q1y And p2x , p2y are colinear And
+    ' p2x , p2y lies On segment p1x , p1yq1x ,q1y
+    If (o1 = 0 And onSegment(p1x, p1y, p2x, p2y, q1x, q1y)) Then
+        Return True
+    Endif
+
+    ' p1x , p1y, q1x ,q1y And p2x , p2y are colinear And
+    ' q2x ,q2y lies On segment p1x , p1yq1x ,q1y
+    If (o2 = 0 And onSegment(p1x, p1y, q2x, q2y, q1x, q1y)) Then
+        Return True
+    Endif
+
+    ' p2x , p2y, q2x ,q2y And p1x , p1y are colinear And
+    ' p1x , p1y lies On segment p2x , p2yq2x ,q2y
+    If (o3 = 0 And onSegment(p2x, p2y, p1x, p1y, q2x, q2y)) Then
+        Return True
+    Endif
+
+    ' p2x , p2y, q2x ,q2y And q1x ,q1y are colinear And
+    ' q1x ,q1y lies On segment p2x , p2yq2x ,q2y
+    If (o4 = 0 And onSegment(p2x, p2y, q1x, q1y, q2x, q2y)) Then
+        Return True
+    Endif
+
+    ' Doesn 't fall in any of the above cases
+    Return False
+
+End
+
+' To find orientation Of ordered triplet(p, q, r).
+' The function returns following values
+' 0 - - > p, q And r are colinear
+' 2 - - > Clockwise                     WHAT OUT: WE ARE USING AND INVERTED Y AXIS, SO THIS WILL RETURN 2 to clockwise
+' 1 - - > Counterclockwise              functions on the internet are the other way
+Public Function orientation(px As Float, py As Float, qx As Float, qy As Float, rx As Float, ry As Float) As Integer
+
+    Dim v As Float
+
+    v = (qy - py) * (rx - qx) - (qx - px) * (ry - qy)
+    'Print v
+    '
+
+    If (v = 0) Then Return 0 ' colinear
+
+    If (v > 0) Then Return 2
+
+    If (v < 0) Then Return 1
+
+End
+
+' Given three colinear points p, q, r,
+' the function checks If point q lies
+' On Line segment 'pr'
+Public Function onSegment(px As Float, py As Float, qx As Float, qy As Float, rx As Float, ry As Float) As Boolean
+
+    If (qx <= Max(px, rx) And
+            qx >= Min(px, rx) And
+            qy <= Max(py, ry) And
+            qy >= Min(py, ry)) Then
+        Return True
+    Endif
+
+    Return False
+
+End
+
+' Returns True If the point p lies
+' inside the polygon[] With n vertices
+Public Function isInside(polygon As Float[], Vertices As Integer, px As Float, py As Float) As Boolean
+
+    ' There must be at least 3 vertices In polygon[]
+    If (Vertices < 3) Then
+        Return False
+    Endif
+
+    ' Create a point For Line segment From p To infinite
+    Dim extremeX, extremeY As Float   '= New Point(INF, p.y)
+
+    extremeX = 10E10
+    extremeY = py
+
+    ' Count intersections Of the above Line
+    ' With sides Of polygon
+    Dim count As Integer = 0, i As Integer = 0
+    Dim next1 As Integer
+    For i = 0 To polygon.Max - 1 Step 2
+
+        Next1 = i + 2
+        If i = polygon.max - 1 Then next1 = 0
+
+        ' Check If the Line segment From 'p' to
+        ' 'extreme' intersects with the line
+        ' segment From 'polygon[i]' to 'polygon[next]'
+
+        If (doIntersect(polygon[i], polygon[i + 1], polygon[Next1], polygon[Next1 + 1], px, py, extremeX, extremeY)) Then
+            ' If the point 'p' is colinear with line
+            ' segment 'i-next', then check if it lies
+            ' On segment.If it lies, Return True, otherwise False
+
+            If (orientation(polygon[i], polygon[i + 1], px, py, polygon[Next1], polygon[next1 + 1]) = 0) Then
+
+                Return onSegment(polygon[i], polygon[i + 1], px, py, polygon[Next1], polygon[next1 + 1])
+
+            Endif
+
+            Inc count
+
+        Endif
+
+    Next
+
+    ' Return True If count Is Odd, False otherwise
+    Return (count Mod 2 = 1) ' Same As (count % 2 = 1)
+
+End
+
+Public Function RotateFromPointWithAngle(CenterX As Float, CenterZ As Float, angle As Float, Px As Float, Pz As Float) As Float[]
+
+    Dim s, c, xnew, ynew As Float
+
+    s = Sin(angle)
+    c = Cos(angle)
+
+    ' translate point back To origin:
+    px -= CenterX
+    pz -= CenterZ
+
+    ' rotate point
+    xnew = px * c - pz * s
+    ynew = px * s + pz * c
+
+    ' translate point back:
+    px = xnew + CenterX
+    pz = ynew + CenterZ
+
+    Return [px, pz]
+
+End
+
+Public Function RotateWithSinCos(Px As Float, Pz As Float, S As Float, C As Float) As Float[]
+
+    Dim xnew, ynew As Float
+
+    ' translate point back To origin:
+
+    ' rotate point
+    xnew = px * c - pz * s
+    ynew = px * s + pz * c
+
+    Return [xnew, ynew]
+
+End
+
+Public Function RotateFromPointWithSinCos(CenterX As Float, CenterZ As Float, S As Float, C As Float, Px As Float, Pz As Float) As Float[]
+
+    Dim xnew, ynew As Float
+
+    ' translate point back To origin:
+    px -= CenterX
+    pz -= CenterZ
+
+    ' rotate point
+    xnew = px * c - pz * s
+    ynew = px * s + pz * c
+
+    ' translate point back:
+    px = xnew + CenterX
+    pz = ynew + CenterZ
+
+    Return [px, pz]
+
+End
+
+' / / C + + Implementation.To find the point Of
+' / / intersection Of two lines
+' #include < bits / stdc + + .h >
+' using namespace std;
+'
+' / / This pair Is Used To store the X And Y
+' / / coordinates Of a point respectively
+' #define pdd pair < double, double >
+'
+' / / Function used To display X And Y coordinates
+' / / Of a point
+' void displayPoint(pdd P)
+' {
+'     cout < < "(" < < P.first < < ", " < < P.second
+'          < < ")" < < endl;
+' }
+'
+Public Function lineLineIntersection(A As Float[], B As Float[], C As Float[], D As Float[]) As Float[]
+
+    '     / / Line AB represented As A1x + b1y = c1
+    Dim a1 As Float = B[1] - A[1]
+    Dim b1 As Float = A[0] - B[0]
+    Dim c1 As Float = a1 * (A[0]) + b1 * (A[1])
+    '
+    '     / / Line CD represented As A2x + b2y = c2
+    Dim a2 As Float = D[1] - C[1]
+    Dim b2 As Float = C[0] - D[0]
+    Dim c2 As Float = a2 * (C[0]) + b2 * (C[1])
+    '
+    Dim determinant As Float = a1 * b2 - a2 * b1
+    '
+    If (determinant = 0) Then
+        '
+        '         / / The lines are parallel.This Is Simplified
+        '         / / by returning a pair Of FLT_MAX
+        Return A
+        '
+    Else
+        '
+        Dim x As Float = (b2 * c1 - b1 * c2) / determinant
+        Dim y As Float = (a1 * c2 - a2 * c1) / determinant
+        Return [x, y]
+    End If
+
+End
+
+Public Function lineLineIntersection2(A As Float[], B As Float[], C As Float[], D As Float[]) As Float[]
+
+    '     / / Line AB represented As A1x + b1y = c1
+    Dim a1 As Float = B[1] - A[1]
+    Dim b1 As Float = A[0] - B[0]
+    Dim c1 As Float = a1 * (A[0]) + b1 * (A[1])
+    '
+    '     / / Line CD represented As A2x + b2y = c2
+    Dim a2 As Float = D[1] - C[1]
+    Dim b2 As Float = C[0] - D[0]
+    Dim c2 As Float = a2 * (C[0]) + b2 * (C[1])
+    '
+    Dim determinant As Float = a1 * b2 - a2 * b1
+    '
+    If (determinant = 0) Then
+        '
+        '         / / The lines are parallel.This Is Simplified
+        '         / / by returning a pair Of FLT_MAX
+        Return A
+        '
+    Else
+        '
+        Dim x As Float = (b2 * c1 - b1 * c2) / determinant
+        Dim y As Float = (a1 * c2 - a2 * c1) / determinant
+        Return [x, y]
+    End If
+
+End
+
+Public Function ReboundVector(vector As Float[], wall As Float[]) As Float[]
+
+    Dim alfa, beta, gamma, l As Float
+
+    alfa = Ang(vector[0], vector[1])
+    beta = Ang(wall[0], wall[1])
+    gamma = beta * 2 - alfa
+
+    l = distancia(0, 0, vector[0], vector[1])
+    Return [Cos(gamma) * l, Sin(gamma) * l]
+
+End
+
+Public Sub Normalize(v As Float[])
+
+    Dim l As Float, i As Integer
+
+    For i = 0 To v.Max
+        l += v[i] * v[i] 
+    Next
+    l = Sqr(l)
+    For i = 0 To v.Max
+        v[i] /= l
+    Next
+    
+
+End
+
+
+Public Function Dot(v1 As Float[], v2 As Float[]) As Float
+
+    Return v1[0] * v2[0] + v1[1] * v2[1]
+
+End

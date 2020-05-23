@@ -1,0 +1,27 @@
+' Gambas class file
+
+' Element maintained by Tincho
+
+
+Create Static
+Inherits ToolsBase
+
+'Public cAlias As New Collection
+'Private cax As New String[]
+
+Public Function Start(Optional Mode_ As Integer = 0) As Boolean
+
+
+    Dim ly As FLayers
+
+    ly = New FLayers
+    ly.Text = ("Layers")
+    ly.Run()
+
+    ' Comprobando que cambian lso valores
+    'For Each cmd In cAlias
+    '    Print cAlias.key & ": " & cmd
+    'Next
+    'Me.Finish
+
+End

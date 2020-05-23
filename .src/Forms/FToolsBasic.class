@@ -1,0 +1,15 @@
+' Gambas class file
+
+Public Sub toolbasic_Click()
+    
+   appmain.hFCAD.PanFloating.Visible = False
+    
+End
+
+Public Sub mnuQuit_Click()
+    
+    Me.Close
+    
+End
+
+

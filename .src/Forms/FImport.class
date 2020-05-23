@@ -1,0 +1,151 @@
+' Gambas class file
+
+'
+' RADG
+' Rapid Application Development for Gambas
+'
+' Copyright (C) Martín Belmonte
+'
+' This program is free software; you can redistribute it and/or modify
+' it under the terms of the GNU General Public License as published by
+' the Free Software Foundation; either version 2 of the License, or
+' (at your option) any later version.
+'
+' This program is distributed in the hope that it will be useful,
+' but WITHOUT ANY WARRANTY; without even the implied warranty of
+' MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+' GNU General Public License for more details.
+'
+' You should have received a copy of the GNU General Public License
+' along with this program; if not, write to the Free Software
+' Foundation, Inc., 51 Franklin St, Fifth Floor,
+' Boston, MA  02110-1301  USA
+'
+
+Export
+
+Public Observer As Observer        ''Observador usaod para avisar si hay cambios sin aplicar
+'------------------------------------------------------------------------------
+' Variables que se pasaron desde el módulo de inicio
+Private apc As String               '' Archivo de configuracion del programa
+Private lgg As Logger               '' Registro de eventos de la aplicación.
+'------------------------------------------------------------------------------
+Private ctn As New Collection       '' Colección de variables del programa que reflejan los cambios de configuración.
+Private cfg As New Collection       '' Coleccion de propiedades del proyecto
+Private CurrFile As String          '' Current selected file
+'Private cModel As New Collection        '' CAD model obtained from the current file file
+Private cImport As New Collection        '' CAD model obtained from the current file file
+
+Public Sub _new(cin As Collection)
+
+    Run(cin)
+
+End
+
+Public Sub Run(cin As Collection) As Boolean
+    '------------------------------------------------------------------------------
+
+    Dim obj As Object
+    Dim ictn As New Collection
+    Dim iSet As String
+
+    apc = cin["AppCfg"]           ' Archivo de configuracion del programa
+    lgg = cin["AppLog"]           ' Registro de eventos de la aplicación.
+
+    iSet = xmg.GetVar("Theme.Icons", apc)
+    ictn = dsk.GNumix(iSet & "/")
+
+    For Each obj In Me.Controls
+        Select Object.Type(obj)
+            Case "ToolButton", "ButtonBox", "Dirbox"
+                If obj.Picture Then
+
+                    If ictn.Exist(obj.Tag) Then
+                        If Exist(ictn[obj.Tag]) Then
+                            If Stat(ictn[obj.Tag]).Type = gb.File Or Stat(ictn[obj.Tag]).Type = gb.Link Then
+                                obj.Picture = Image.Load(ictn[obj.Tag]).Stretch(20, 20).Picture
+                                Print "> Control con icono: " & obj.Tag
+                            Endif
+                        Endif
+                    Endif
+
+                Endif
+        End Select
+    Next
+    '------------------------------------------------------------------------------
+    Observer = New Observer(Me) As "Observer"
+    HSplit1.Layout = [1, 2]
+    VSplit1.Layout = [2, 1]
+    FileChooser1.Filter = ["*.dxf;*.dwg;*.svg", "Drawing files"]
+
+    Me.Menus.Hide
+    Me.Show()
+
+End
+
+Public Sub Observer_Close() '' Utilización de un observador para guardar los cambios antesde cerar el formulario si es que los hay.
+
+    Me.Close
+
+End
+
+Public Sub btnOK_Click()
+
+    Dim xForm As FCAD
+    Dim cTmp As Collection
+
+    cModel.Clear
+    Dim wspce As Workspace
+
+    cModel = GetModel(CurrFile)
+
+    If cModel.Count > 0 Then
+        wspce = APPMain["Workspace1"]
+
+        If wspce.ActiveWindow.Tag = APPMain.CurrentFile Then
+            xForm = wspce.ActiveWindow
+            xForm.cModel.Clear
+            xForm.cModel = cModel
+            xForm.LoadDrawingMap()
+        Endif
+
+    Else
+        Message.Info(("No information was extracted from the file"))
+    Endif
+
+    Me.Close(True)
+
+End
+
+Public Sub btnCancel_Click()
+
+    Me.Close
+
+End
+
+Public Sub FileChooser1_Change()
+
+    CurrFile = FileChooser1.SelectedPath
+
+End
+
+Public Function GetModel(FilePath As String) As Collection
+
+    Dim Filethumb As String
+    Dim FileExt As String
+    Dim mdl As New Collection
+
+    Filethumb = "/tmp/thumb.bmp"
+    FileExt = File.Ext(FilePath)
+
+    Select String.LCase(FileExt)
+
+        Case "dwg"
+
+            mdl = cad.Import(FilePath)
+
+    End Select
+
+    Return mdl
+
+End

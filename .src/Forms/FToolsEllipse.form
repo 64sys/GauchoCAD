@@ -1,0 +1,35 @@
+# Gambas Form File 3.0
+
+{ Form Form
+  MoveScaled(0,0,57,6)
+  Arrangement = Arrange.Horizontal
+  AutoResize = True
+  { tgbCircle44 ToggleButton toolbasic
+    Name = "tgbCircle44"
+    MoveScaled(0,0,6,6)
+    ToolTip = ("Circle")
+    Picture = Picture["png/32x32/ellipse4points.png"]
+    Radio = True
+  }
+  { tgbLine ToggleButton toolbasic
+    Name = "tgbLine"
+    MoveScaled(6,0,6,6)
+    ToolTip = ("Line")
+    Picture = Picture["png/32x32/ellipsecenter3points.png"]
+    Radio = True
+  }
+  { tgbPLine ToggleButton toolbasic
+    Name = "tgbPLine"
+    MoveScaled(12,0,6,6)
+    ToolTip = ("pLine")
+    Picture = Picture["png/32x32/ellipsefocipoint.png"]
+    Radio = True
+  }
+  { tgbPLine2 ToggleButton toolbasic
+    Name = "tgbPLine2"
+    MoveScaled(18,0,6,6)
+    ToolTip = ("pLine")
+    Picture = Picture["png/32x32/ellipseinscribed.png"]
+    Radio = True
+  }
+}

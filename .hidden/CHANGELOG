@@ -1,0 +1,53 @@
+GambasCAD
+---------
+A very simple CAD 
+
+Authors: Terco, Tincho, Postpase, Vuott
+
+VER       DATE      CHANGES
+--------------------------------------------------------------------------------------------------------------------
+0.0.42	22/05/20	Improved bloque construction perfomance. Dimension repaired. Multidocument!!!
+
+0.0.38  21/05/20	We have vector fonts! Big thank for the work of LibreCAD guys. Arc repaired. Ellipse repaired.
+
+0.0.34	16/05/20	Tincho made a WorkSpace so we're moving to multidocument. And to GL. And code broke again.
+
+0.0.32	14/05/20	After consulting with the Mailing List, moved to Qt5 in wich Paint is faster than Cairo. So yet againg
+									we're going in that direction. For now.
+
+0.0.30  13/05/20  Now using Cairo transformation to Zoom/Pan to save time. DXF read almost ready.
+
+0.0.28  12/05/20  Ellipse repired. Has POI now. Fontsize corrected. 
+
+0.0.26  11/05/20  Separated Load/Save/SaveAs to ease the use. POI optimized for speed and limited to 24.000 due to
+                  perfomance limitations. Tool ZoomExtents. Tool ZoomWindow. 
+
+0.0.24  06/05/20  Added arrays, MText (too slow on rendering)
+                  Moved from Paint to Cairo class
+
+0.0.22  05/05/20  Added Blocks, Ellipse, Text, hanged all tools to ToolsBase parent
+                  Completed the originals for basic entities. Selecting with colors.
+                  
+
+0.0.20  01/05/20  Flipped the Y axis to match all CADs out there, now its vertical
+                  Cleaned all GUI. 
+                  Created dedicated files modCAD and FCAD.
+                  
+0.0.10  27/04/20  Changed Px[], Pz[] to P[] pairs to provide more compatibility with external libs
+                  Improved Load/Save to V5 to catch up with new element vars can constants
+                  Fix IsInside, Orientation, Added BoundingPoligon debugging with F6
+
+0.0.8   26/04/20  Added vars to entities: a bounding poligon to catch points easily
+                                        a helper list to show waiting user input
+                                        a traducible Gender name to call the class from command line
+                  Tools and entities now are divided in families, to group them in a button that shows more buttons
+                  clsJobPadre and clsJovPrevious blend into clsJobPrevious, so either we into something or selecting
+                
+
+0.0.2   25/04/20  Changed to dynamic arrays in the elements
+                  Allows to create elements with unknown total points
+                  Removed Gender and PointDone from elements class
+                  Load/Save works
+                  Added text input
+                
+0.0.1   25/04/20  First GambasCAD version forked from PlantDesigner

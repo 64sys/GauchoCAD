@@ -1,0 +1,518 @@
+' Gambas class file
+
+' Tool maintained by Terco
+' PlantDesigner
+' Software para diseño de plantas tipo de hormigon
+'
+' Copyright (C) Ing Martin P Cristia
+'
+' This program is free software; you can redistribute it and/or modify
+' it under the terms of the GNU General Public License as published by
+' the Free Software Foundation; either version 2 of the License, or
+' (at your option) any later version.
+'
+' This program is distributed in the hope that it will be useful,
+' but WITHOUT ANY WARRANTY; without even the implied warranty of
+' MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+' GNU General Public License for more details.
+'
+' You should have received a copy of the GNU General Public License
+' along with this program; if not, write to the Free Software
+' Foundation, Inc., 51 Franklin St, Fifth Floor,
+' Boston, MA  02110-1301  USA
+' Gambas class file
+
+' Credits
+' --------
+' Icon design por Trinh Ho ,Good Ware, freepik get them at https://www.flaticon.es
+' Scheme inspired on example called MuchosCirculos by JGuardon y Shell
+' XML Load/Save by Tincho
+' GUI by Postpase/Tincho
+
+Public tmr33Hz As Integer                   '  +1  every 33Hz so it goes from 0 to 1E32
+
+Public KeysAccumulator As String
+
+Public DrawingReady As Boolean = False
+Public DrawNeedsUpdate As Boolean                   ' true on mouse, key or tool events
+Public TimerTic As Integer = 0                      ' this reaches 1024 and then zeroes, at 33Hz
+Public nDraws As Integer
+Public nDrawsRequired As Integer
+Public idDrawing As Integer
+
+' Variables que se pasaron desde el módulo de inicio ----------------------------------------
+Private cex As New Collection       '' Variables básicas para pasar a los demas formularios
+Private con As New Connection       '' Conexión a la base de datos
+Private adi As String               '' Directorio del programa
+'Private dbc As String               '' Archivo de configuracion de la base de datos
+Private apc As String               '' Archivo de configuracion del programa
+Private etx As String               '' Editor de texto plano por ddefecto
+Private lgg As Logger               '' Registro de eventos de la aplicación.
+
+' vars particulares de cada pestaña
+
+Public CursorX As Integer
+Public CursorY As Integer
+Public PanX As Integer = 0              ' trnaslation of th 0,0 from the corner of the drawing area
+Public PanY As Integer = 0              ' in pixels
+Public ScaleZoom As Float = 1
+Public Propiedadtest As String
+'-----------------------------------
+Public cModel As New Collection     '' ALl data from a GauchoCAD xml file is loaded here
+Public cImport As New Collection    '' Impor data from dxf, dwg is loaded here
+
+Public Struct arrBlockSt
+    name As String
+    x As Float
+    y As Float
+    layer As String
+    entities As Object[]
+End Struct
+
+Public arrBlocks As New ArrBlockSt[]
+Public arrEntities As New Object[]             ' were al elements live
+Public arrSelecIndex As New Integer[]          ' indice en el array de entidades
+
+Public Xmenor As Float = 1E100
+Public Xmayor As Float = -1E100
+Public Ymenor As Float = 1E100
+Public Ymayor As Float = -1E100
+
+' point of interests
+Public POI As New Single[]                  ' xy pairs of points
+Public iEntities As New Integer[]           ' related entity
+Public iEntity As New Single[]             ' SELECTED: X,Y, i
+
+' OpenGl stuff
+
+Public GlListAllEntities As Integer
+Public GlListSelectedEntities As Integer
+
+' DEPRECADO
+' Public Function Action_Activate(cAction As String) As Boolean
+'
+'     Dim o As Object
+'
+'     If cAction = "" Then Return
+'
+'     o = Object.New(cAction)
+'     ' si funciono, estamos aqui todavia
+'
+'     If o.usewith = "" Then
+'         modCAD.clsJob = o
+'         modCAD.clsJob.start
+'     Else
+'         APPMain.hFCAD.arrEntities.Add(o)
+'         modCAD.clsJob = Object.New(o.usewith)
+'         modCAD.clsJob.start(o)
+'
+'     End If
+'
+' Catch
+'     Error.Raise("El boton esta mal configurado")
+'
+'     Message.Error(Error.Text & gb.NewLine & Error.Where)
+'
+' End
+
+Public Sub Form_Open()
+
+    ' Dim n As Integer
+    ' Dim b As Integer
+    ' Dim x As Integer
+    '
+    ' 'This code show the form in the bigest screen in system when more than one exist
+    ' For n = 0 To Screens.Count - 1
+    '     If Screens[n].AvailableWidth > b Then
+    '         b = Screens[n].AvailableWidth
+    '         x = n
+    '     Endif
+    ' Next
+    ' Me.x = Screens[x].AvailableX
+    ' Me.y = Screens[x].AvailableY
+    ' Me.Maximized = True
+    ' '-----------------------------------------------------------------
+
+End
+
+Public Sub form_Resize()
+    ' lo unico que cambia es el drawing area
+
+    If Me.h < 700 Then Me.h = 700
+    GLArea1.H = Me.H - 50 '- tobOpen.h
+
+    If Me.w < 1000 Then Me.w = 1000
+    GLArea1.w = Me.w - 20
+
+End
+
+Public Sub form_Arrange()
+
+    appmain.hFcad.glarea1.w = GLArea1.W
+    appmain.hFcad.glarea1.h = GLArea1.H
+    PanX = 0
+    PanY = 0
+    ScaleZoom = puntos.ScreenDensity
+    GLplus.Init(glarea1)
+
+    Regen()                 ' estas dos lineas se agregan porque la ventana carga un archivo en _New pero no lo
+    cadZoomE.Start()        ' puede mostrar hasta tener una GLArea conformada y a la vista
+    DrawingReady = True
+
+End
+
+'     paint.Begin(drwArea.Image)
+'     paint.AntiAlias = True
+'     clsDrawingAids.DibujaHelper
+'     clsDrawingAids.DrawCoordenadas
+'     paint.End
+'
+'     drwArea.Refresh
+'
+'
+' End
+
+'=================================================================================================================
+'   ^^^^^^^^^^^^^^    PARA REFERENCIA, ASI TRABAJABA CON PAINT    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+'=================================================================================================================
+
+Public Sub GLArea1_draw()
+
+    If Not DrawingReady Then Return
+
+    modCAD.drwDrawingClass = modCAD.drwOpenGLClass
+    gl.Clear(gl.DEPTH_BUFFER_BIT Or gl.COLOR_BUFFER_BIT)
+
+    gl.LoadIdentity
+
+    gl.Translatef(PanX, PanY, 0)
+    gl.Scalef(ScaleZoom, ScaleZoom, 1)
+
+    ' el orden del dibujo es importante en paint, porque una cosa tapa a la otra
+
+    ' Primero la grid
+    ' clsDrawingAids.DrawGrid
+
+    modCAD.clsJob.Draw
+    ' If modCAD.DrawBounds Then clsDrawingAids.DrawBoundingPoligons
+    '
+    clsDrawingAids.DrawCoordenadas
+    '
+    clsDrawingAids.DibujaHelper
+    gl.CallList(GlListAllEntities)                      ' si GL no tiene contexto, la lista no se genera. Es necesario que la instancia de FCAD este cargada.
+
+    '
+
+End
+
+' Protocolo del Mouse
+'--------------------
+
+' Rigth Clicks  ---> No son enviados a las clases herramienta/entidad; son procesados por FCAD como accion es que terminan o empiezan algo. Tanto MouseDown/Up
+'   MouseDown ---------> Lo ignoro
+'   MouseUp -----------> A-Trabajo activo? Mando señal de Finalizar/Cancelar ya mismo
+'                        B- Click en objeto: muestro las propiedades frmPropiedades (aun no implementado)
+'                           Click en el aire: Equivale a <enter> que repite el trabajo anterior, si lo hubo.
+
+' Wheel -----------> Es utilizado como zoom. No es enviado a las clases.
+
+' MouseMove--------> 1-Trabajo activo? --> Se envia el evento
+'                    2-Paneando? Se actualizan los valores de PanX/Y y se refresca la pantalla
+
+' Left Clicks
+'   MouseDown------> 1- Trabajo activo? -> Se envia a la clase que trabaja modCAD.clsJobs si hay una activa. Sino se analziza donde fue el click.
+'                    2- no hay trabajos:
+'                           2.a- Click en el aire  --> o Paneo, segun el boton que este presionado.
+'                           2.b- Click en objeto   --> De/selecciono el objeto
+'
+'
+'
+'   MouseUp-------->1-Trabajo activo: ---> envio evento
+'
+'
+
+Public Sub GLArea1_MouseDown()
+
+    If Mouse.Right Then Return  'handled in MouseUp
+
+    modCAD.clsJob.mouseDown() ' dispatch event to the Job
+
+End
+
+Public Sub GLArea1_MouseMove()
+
+    CursorX = mouse.x
+    CursorY = mouse.y
+
+    modCAD.clsJob.MouseMove() ' dispatch event to the Job
+
+    clsEntities.CheckPOI
+
+End
+
+Public Function Xreal(ScreenX As Float) As Float
+
+    Return (screenx - glarea1.w / 2 - PanX) / ScaleZoom
+
+End
+
+Public Function Yreal(ScreenY As Float) As Float
+
+    Return (-ScreenY + glarea1.h / 2 - PanY) / ScaleZoom
+
+End
+
+Public Function Pixels(distancia As Float) As Float  ' converts meters to pixels
+    ' transforma Metros en Pixeles sin tener en cuenta el Pan
+
+    Return distancia * ScaleZoom
+
+End
+
+Public Function Metros(pixeles As Integer) As Float  ' converts pixels to meters
+
+    Return pixeles / ScaleZoom
+
+End
+
+Public Sub GLArea1_MouseWheel()
+    ' ex  Public Sub drwArea_MouseWheel()
+
+    Dim px, py As Float
+    ' chequeamos si vale la pena seguir dibujando la grid, o sea, menos de 3 pixels
+
+    If Pixels(puntos.GridSpacing) < 5 Then puntos.Gridactive = False Else puntos.Gridactive = True
+
+    px = Xreal(GLArea1.w / 2)
+    py = Yreal(GLArea1.h / 2)
+
+    ' TODO: , redondear para que la escala sea 1:100 1:75 1:50 etc
+    ScaleZoom = ScaleZoom * (1 + 0.075 * Mouse.Delta)
+
+    ' pero con ciertos limites
+    ' If ScaleZoom < 0.001 Then ScaleZoom = 0.001
+    ' If ScaleZoom > 50 Then ScaleZoom = 50
+
+    ' reacomodo el panning, pero solo si estoy en los limites del drwarea, sino es solo un zoom
+    ' pero tengo que reajustar la posicion de las cosas , porque tienden a alejarse
+    ' Supongamos que partimos de un Zoom = 1 y una posicion centrada, y hacemos zoom=2
+    ' la posicion de las cosas estara 2x mas alejado; yo quiero que lo que hay en el centro de la pantalla, siga ahi
+    ' entonces Pc = drwarea/2 anes del zoom, debera estar en el mismo lugar
+
+    If Mouse.X < glarea1.w * 0.2 Then
+        PanX -= (mouse.X - glarea1.w / 2) / 10 * Mouse.Delta
+    Else If Mouse.X > glarea1.w * 0.8 Then
+        PanX -= (mouse.X - glarea1.w / 2) / 10 * Mouse.Delta
+    Else
+        ' PanX = glarea1.w / 2 - Pixels(px)
+        PanX = -Pixels(px) ' post Paint
+    Endif
+
+    If Mouse.y < glarea1.h * 0.2 Then
+        PanY += (mouse.y - glarea1.w / 2) / 10 * Mouse.Delta
+    Else If Mouse.y > glarea1.h * 0.8 Then
+        PanY += (mouse.y - glarea1.w / 2) / 10 * Mouse.Delta
+    Else
+        'PanY = (Pixels(py) + glarea1.h / 2)     ' el eje Y trabaja distinto, asi que debemos cambiar esto
+        PanY = -Pixels(py)                      ' cambio post Paint
+    Endif
+
+    redraw
+
+End
+
+Public Sub GLArea1_MouseUp()
+    ' ex Public Sub drwArea_MouseUp()
+
+    ' "Los IF son mas rapidos" - Autor Anonimo
+
+    ' los rigth clicks se manejan en FCAD , ni las herramientas ni las entidades los necesitan
+    If Mouse.Right Then                ' rigth clicks means finish what you're doing rigth now and go back to the previous Job
+        ' the Finish() sub will do this in a good manner
+        modCAD.clsJob.Finish
+
+    Else ' Left Click
+
+        modCAD.clsJob.MouseUp()
+
+    End If
+
+    clsEntities.CheckPOI
+
+    redraw
+
+End
+
+Public Sub form_KeyPress()
+
+    If (Key.Code = Key.Enter) Or (Key.Code = Key.Return) Then
+        Debug KeysAccumulator
+        modCAD.clsJob.KeyText(KeysAccumulator)
+        KeysAccumulator = ""
+        redraw
+        Return
+    Endif
+    If Key.Code = Key.f6 Then
+        modCAD.DrawBounds = Not modCAD.DrawBounds
+        regen
+        Return
+    Endif
+
+    If Key.Code = Key.BackSpace Then
+
+        KeysAccumulator = Left(KeysAccumulator, -1)
+        redraw
+        Return
+    Endif
+
+    If Key.Code = Key.f8 Then
+        modCAD.Ortogonal = Not modCAD.Ortogonal
+        redraw
+    Endif
+    If Key.Code = Key.f7 Then
+
+        puntos.Gridactive = Not puntos.Gridactive
+        redraw
+    Endif
+
+    If Key.Code = Key.Esc Then
+
+        modCAD.clsJob.Finish()  ' Now!
+        ' we cancel everything
+        modCAD.clsJobPrevious = modCAD.clsJob
+        modCAD.clsJob = clsDefaultJob
+
+        redraw
+        Return
+
+    End If
+
+    ' A GOOD KEY
+    KeysAccumulator &= Key.Text
+
+    If Key.Code = Key.Space Then
+        Stop Event
+    Endif
+    'Label1.Text = KeysAccumulator
+    glarea1.Refresh
+
+End
+
+Public Sub tmr500_Timer()
+
+    If clsDrawingAids.PromtSlash = "|" Then clsDrawingAids.PromtSlash = "" Else clsDrawingAids.PromtSlash = "|"
+    redraw
+
+End
+
+Public Sub redraw()
+
+    glarea1.Refresh
+
+End
+
+'' Regenera las listas de OpenGL
+Public Sub Regen()
+
+    clsEntities.GLGenDrawList
+    redraw
+
+End
+
+' =============================================================================================================================
+' =============================================================================================================================
+' =============================================================================================================================
+
+'       Desde aca es para el funcionamiento de la GUI
+
+' =============================================================================================================================
+' =============================================================================================================================
+' =============================================================================================================================
+
+Public Sub _new(cin As Collection)
+
+    Run(cin)
+
+End
+
+Public Sub Run(cMdl As Collection) As Boolean
+
+    'Dim iSet As String
+    'Dim ictn As New Collection
+    'Dim FilePath As String
+
+    '------------------------------------------------------------------------------
+    '' Estableciendo las variables de conexion y otras más
+    'cModel.Add("test", "test")
+    'cModel.Add(arrEntities, "Entities")
+    cModel = cMdl.Copy()
+    'cex = cin
+    'con = cin["Connex"]           ' Conexión a la base de datos
+    'adi = cin["AppDir"]           ' Directorio del programa
+    'apc = cin["AppCfg"]           ' Archivo de configuracion del programa
+    'etx = cin["AppEdi"]           ' Editor de texto plano por defecto
+    'lgg = cin["AppLog"]            ' Registro de eventos de la aplicación.
+    'FilePath = cModel["File"]
+
+    Me.Menus.Hide
+    'Me.Text = File.Name(FilePath)
+    'Me.Caption = FilePath
+
+    Me.Show()
+
+End
+
+Public Sub Form_Activate()
+
+    'cadLoad.Start(FilePath)
+    LoadDrawingMap()
+
+End
+
+Public Sub ToolButton1_Click()
+
+    If cModel.Exist("Layers") Then
+        Print "Layers"
+    Endif
+
+    LoadDrawingMap()
+
+End
+
+Public Sub LoadDrawingMap()
+
+    Dim cLayers As New Collection
+    Dim Layer As Variant
+    Dim app As APPMain
+
+    If cModel.Count > 0 Then
+        TreeView1.Clear
+        TreeView1.Add("drawing", "Drawing")
+
+        'File ----------------------
+        If cModel.Exist("File") Then
+            TreeView1.Add("file", ("File") & ": " & File.Name(cModel["File"]),, "drawing")
+        Endif
+        'Version ----------------------
+        If cModel.Exist("Version") Then
+            TreeView1.Add("version", ("Version") & ": " & cModel["Version"],, "drawing")
+        Endif
+
+        cLayers.Clear
+        'Layers ----------------------
+        If cModel.Exist("Layers") Then
+            cLayers = cModel["Layers"]
+            TreeView1.Add("layers", "Layers",, "drawing")
+            For Each Layer In cLayers
+                TreeView1.Add(Layer["name"], Layer["name"],, "layers")
+            Next
+        Endif
+        'Layers ----------------------
+
+        TreeView1["layers"].Expanded = True
+    Endif
+    'Refresh the comboboxes in APPMain
+    APP = Me.Parent.Parent.Parent.Parent.Parent.Parent
+    APPMain.LoadComboboxes(cModel)
+
+End

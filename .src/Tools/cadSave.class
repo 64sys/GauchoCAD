@@ -1,0 +1,85 @@
+' Gambas class file
+
+Inherits ToolsBase
+Public Const GENDER As String = ("Save")
+
+Public Function Start(Optional ElemToBuild As Variant, Optional _mode As Integer = 0) As Boolean
+
+    SaveToFile(modCAD.FileName)
+    Me.Finish
+
+End
+
+Public Function SaveToFile(nName As String) As Boolean
+
+    Dim obj As Object
+    Dim tm As New Collection
+    Dim ct As New Collection
+    Dim hdr As String
+    Dim p, lev, fPar As String
+    Dim i As Integer       '<-------------Martin
+    'Dim lay As Collection  'Tincho
+    Dim enty As New Collection  'Tincho
+
+    'tm.Clear              ' Tincho
+    'For Each lay In modCAD.cLayers
+    ct.Add(modCAD.cLayers, "layers")
+    ct.Add(modCAD.cColors, "colors")
+    ct.Add(modCAD.cStyles, "styles")
+    ct.Add(modCAD.cWeights, "weights")
+    'Next
+    enty.Clear
+    If nNAme = "" Then nName = modCAD.FileName
+
+    For Each obj In APPMain.hFCAD.arrEntities
+        tm.Clear              ' Tincho
+
+        p = ""                 '<----Martin: Limpieza para reutilizacion
+        lev = ""
+        fPar = ""
+
+        hdr = sog.UUIDHandle(4)
+        tm.Add(Object.Type(obj), "type")
+        tm.Add(hdr, "handle")
+
+        ' Todos los arrays de cada entidad tienen la misma longitud (pero difieren entre si), luego armo las variables a insertar
+
+        For i = 0 To obj.p.max  '
+
+            p &= obj.P[i] & ":"               '<------------------- Unica rutina para todas las entidades, presentes y futuras
+            '                                       |
+        Next
+
+        For i = 0 To obj.level.max  '  fParam puede ser distinto
+            lev &= obj.level[i] & ":"
+        Next                                    '                                       |
+
+        For i = 0 To obj.fParam.max  '  fParam puede ser distinto
+            fPar &= obj.fParam[i] & ":"
+        Next                                    '                                       |
+
+        ' extraigo el ultimo ":"                                                        v
+        p = Left$(p, -1)
+        lev = Left$(lev, -1)
+        fPar = Left$(fpar, -1)
+
+        tm.Add(p, "p")            '       +---------------------+
+        tm.Add(fpar, "fparam")     '  <----+   Estos son arrays  |
+        tm.Add(lev, "level")       '       +---------------------+
+        tm.Add(obj.StringData, "string")                           ' Martin nuevo
+        tm.Add(obj.Layer, "layer")
+        tm.Add(obj.block, "block")
+        tm.Add(obj._color, "color") ' <------------------------ Este parametro esta inventado, ojo. ( ya no )
+        tm.Add(obj.RefPointX, "refx")                    ' nuevos
+        tm.Add(obj.RefPointY, "refy")
+        enty.Add(tm.Copy(), hdr)
+
+    Next
+
+    ct.Add(enty.Copy(), "entities")
+
+    xmg.XmlDwg(nName, ct, Application.Name & "-" & Application.Version)
+
+    Return True                 ' all OK
+
+End

@@ -1,0 +1,152 @@
+' Gambas class file
+
+' Represents a simple acotation
+' Element maintained by Terco
+' V3
+Inherits EntityBase
+Public Const GENDER As String = ("MText")
+Public Const DrawingOrder As Integer = 100 ' 1 a 32.724 esto debe Drawse primero y ser sobreescrito por el resto
+Public Const PointsToDraw As Integer = 1             ' minimal point requered for drawing something usefull
+Public Const HelperTrabajo As String = ("Inserts a multiline text")
+Public Const ParamType As String = "PAFT"
+Public Const ParamHelper As String = ("Start point;Angle;Heigth;")      ' a little text that is shown at the prompt waiting for user input during build
+Public Const ParamDefault As String = (" ; 0 ; 10 ; ")
+
+Public Sub Draw()
+
+  If Not Me.DrawAble Or Not Me.Visible Then Return
+
+     
+    
+    If modCAD.drwDrawingClass = modCAD.drwPaintClass Then
+    
+        
+        
+            Dim angulo As Float, hText As New PaintExtents, lText As String
+        
+            Dim FontScalePrev As Float
+        
+            paint.Save
+        
+            'FontScalePrev = paint.FontScale
+            
+            
+            paint.LineWidth = 1
+            ' La cota puede estar inclinada, entonces debo rotarla
+        
+            If Me.fParam.Count > 0 Then
+        
+                angulo = Me.fParam[0] / 180 * Pi
+        
+            Else
+        
+                angulo = 0
+        
+            End If
+        
+            
+        
+            If Me.StringData = "" Then
+        
+                ltext = "ABCdef123"
+        
+            Else
+        
+                ltext = Me.StringData
+        
+            End If
+        
+            If Me.fParam.Count > 1 Then
+        
+                If Me.fParam[1] <= 0 Then 
+                    paint.Font.Size = 10 
+                Else ' FIXME: hay problemas con el ancho del total del texto que no acompaña el zooming
+                    paint.Font.Size = Me.fParam[1] 
+                End If
+        
+            Else
+                ' cuando ScaleZoom es 0.15 el texto coincide con DXF
+                ' entonces voy a trabajar con esa relacion
+        
+                paint.Font.Size = 10
+        
+            End If
+        
+            htext = paint.TextExtents(ltext)
+        
+            paint.brush = Paint.Color(Me.ColorToPaint)
+        
+            paint.Translate(Me.p[0], Me.p[1])
+            paint.Rotate(-angulo)
+            paint.Scale(1, -1)
+            
+            paint.DrawText(ltext)
+        
+            paint.Stroke
+            
+            paint.Restore
+            
+     End If
+    
+    If modCAD.drwDrawingClass = modCAD.drwOpenGLClass Then
+        
+ 
+        glPlus.DrawMultilineText(Me.StringData, Me.p[0], Me.p[1], Me.fParam[0], Me.fParam[1], Me.ColorToPaint)
+ 
+    
+    End If
+    
+
+End
+
+
+
+Public Sub CreateBoundingPoligon()
+
+    ' checkk Viga / Beam to see how its done
+
+    Me.BoundingPoligon.Clear
+
+    Dim BpX, BpZ, l As Float, Rotated As Float[]
+    l = puntos.distancia(Me.p[0], Me.p[1], Me.p[2], Me.p[3])
+
+    ' From an unrotated point of view, our bouding points look like
+    ' 1
+    BpX = Me.p[0]
+    BpZ = Me.p[1] - Me.fParam[0] / 2  ' thats wall thickness
+
+    ' and, the rotated are
+
+    rotated = puntos.RotateFromPointWithSinCos(Me.p[0], Me.p[1], (Me.p[3] - Me.p[1]) / l, (Me.p[2] - Me.p[0]) / l, BpX, Bpz)
+    Me.BoundingPoligon.Insert(rotated)     ' pair
+
+    ' 2
+    BpX = Me.p[0] + l
+    BpZ = Me.p[1] - Me.fParam[0] / 2
+
+    ' and, the rotated are
+
+    rotated = puntos.RotateFromPointWithSinCos(Me.p[0], Me.p[1], (Me.p[3] - Me.p[1]) / l, (Me.p[2] - Me.p[0]) / l, BpX, Bpz)
+    Me.BoundingPoligon.Insert(rotated)     ' pair
+
+    ' 3
+    BpX = Me.p[0] + l
+    BpZ = Me.p[1] + Me.fParam[0] / 2
+
+    ' and, the rotated are
+
+    rotated = puntos.RotateFromPointWithSinCos(Me.p[0], Me.p[1], (Me.p[3] - Me.p[1]) / l, (Me.p[2] - Me.p[0]) / l, BpX, Bpz)
+    Me.BoundingPoligon.Insert(rotated)     ' pair
+
+    ' 4
+    BpX = Me.p[0]
+    BpZ = Me.p[1] + Me.fParam[0] / 2
+
+    ' and, the rotated are
+
+    rotated = puntos.RotateFromPointWithSinCos(Me.p[0], Me.p[1], (Me.p[3] - Me.p[1]) / l, (Me.p[2] - Me.p[0]) / l, BpX, Bpz)
+    Me.BoundingPoligon.Insert(rotated)     ' pair
+
+End
+
+

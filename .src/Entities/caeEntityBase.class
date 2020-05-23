@@ -1,0 +1,15 @@
+' Gambas class file
+
+' Element maintained by Terco
+
+' V2
+Inherits EntityBase
+
+
+' this class gives more life to entities by adding capabilities to react to each other
+
+' change shape and move across the board at time intervals
+
+' they also will be able to receive and transmit things like electricity, fluid, gas, data, sounds, etc
+
+

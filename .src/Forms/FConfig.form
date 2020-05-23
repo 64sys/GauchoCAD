@@ -1,0 +1,111 @@
+# Gambas Form File 3.0
+
+{ Form Form
+  MoveScaled(0,0,64,64)
+  Icon = Picture["logo.png"]
+  Arrangement = Arrange.Vertical
+  { mnuConfig Menu
+    Text = ("Configuración")
+    { mnuNewconfig Menu config
+      Name = "mnuNewconfig"
+      Text = ("Nueva configuración")
+      Picture = Picture["icon:/32/new"]
+      Tag = "new-configuration"
+    }
+    { mnuApplyconfig Menu config
+      Name = "mnuApplyconfig"
+      Text = ("Aplicar los cambios en la configuración")
+      Picture = Picture["icon:/32/save"]
+      Tag = "apply-configuration"
+    }
+    { mnuRestoreconfig Menu config
+      Name = "mnuRestoreconfig"
+      Text = ("Restaurar configuración")
+      Picture = Picture["icon:/32/open"]
+      Tag = "restore-configuration"
+    }
+    { mnuBackupconfig Menu config
+      Name = "mnuBackupconfig"
+      Text = ("Resguardar configuración")
+      Picture = Picture["icon:/32/archive"]
+      Tag = "backup-configuration"
+    }
+    { mnuOpenLogfile Menu
+      Text = ("Abrir el archivo de registro")
+      Picture = Picture["icon:/22/recent"]
+      Tag = "open-logfile"
+    }
+    { mnuExit Menu config
+      Name = "mnuExit"
+      Text = ("Salir")
+      Picture = Picture["icon:/32/quit"]
+      Tag = "exit"
+    }
+  }
+  { Panel2 Panel
+    MoveScaled(0,0,64,5)
+    Background = Color.TextBackground
+    Arrangement = Arrange.Horizontal
+    { tobNewconfig ToolButton config
+      Name = "tobNewconfig"
+      MoveScaled(0,0,5,5)
+      Tag = "new"
+      ToolTip = ("Nueva configuración")
+      Picture = Picture["icon:/22/new"]
+    }
+    { tobApplyconfig ToolButton config
+      Name = "tobApplyconfig"
+      MoveScaled(7,0,5,5)
+      Tag = "save"
+      ToolTip = ("Aplicar la configuración")
+      Picture = Picture["icon:/22/save"]
+    }
+    { tobRestoreconfig ToolButton config
+      Name = "tobRestoreconfig"
+      MoveScaled(14,0,5,5)
+      Tag = "open"
+      ToolTip = ("Restaurar configuración")
+      Picture = Picture["icon:/22/open"]
+    }
+    { tobBackupconfig ToolButton config
+      Name = "tobBackupconfig"
+      MoveScaled(23,0,5,5)
+      Tag = "archive"
+      ToolTip = ("Archivar configuración")
+      Picture = Picture["icon:/22/archive"]
+    }
+    { tobOpenDir ToolButton config
+      Name = "tobOpenDir"
+      MoveScaled(29,0,5,5)
+      Tag = "directory"
+      ToolTip = ("Abrir el direcotrio de la configuración")
+      Picture = Picture["icon:/22/directory"]
+    }
+    { Panel1 Panel
+      MoveScaled(36,0,2,4)
+      Expand = True
+    }
+    { Panel3 Panel
+      MoveScaled(45,0,2,4)
+      Expand = True
+    }
+    { tobExit ToolButton config
+      Name = "tobExit"
+      MoveScaled(58,0,5,5)
+      Visible = False
+      Tag = "close"
+      ToolTip = ("Salir")
+      Picture = Picture["icon:/22/close"]
+    }
+  }
+  { IconPanel1 IconPanel
+    MoveScaled(2,12,55,41)
+    Background = Color.Transparent
+    Expand = True
+    Arrangement = Arrange.Vertical
+    Margin = True
+    Index = 0
+    Text = ("Directorios")
+    Index = 0
+  }
+}

@@ -1,0 +1,148 @@
+' Gambas class file
+
+' Represents an circle's arc
+' Element maintained by Terco
+' V2
+Inherits EntityBase
+Public Const GENDER As String = ("Arc")
+Public Const PointsToDraw As Integer = 1             ' minimal point requered for drawing something usefull
+Public Const HelperTrabajo As String = ("Draws an arc")
+Public Const ParamType As String = "PLAA"                             ' that is Point, Point, Float; could be Color Text, etc
+Public Const ParamHelper As String = ("Center;Radious;Start;End")      ' a little text that is shown at the prompt waiting for user input during build
+Public Const ParamDefault As String = ("0,0;1;0;90")
+
+' vars creadas en finish
+Public start As Float
+Public recorrido As Float
+
+Public Sub Draw()
+    
+    If Not Me.DrawAble Or Not Me.Visible Then Return
+    Dim difAng As Float
+    Dim major, minor, angle, la As Float
+    
+    
+     If modCAD.drwDrawingClass = modCAD.drwPaintClass Then
+   
+           
+            paint.LineWidth = Me.LineWidth / appmain.hFcad.ScaleZoom / modCAD.ScaleLines 
+            
+            paint.brush = Paint.Color(Me.ColorToPaint)
+         
+            paint.Arc(Me.p[0], Me.p[1], Me.fParam[0], Me.start, Me.recorrido)
+            
+            paint.Stroke
+    End If
+                
+     If modCAD.drwDrawingClass = modCAD.drwOpenGLClass Then
+         
+
+        If Me.StepsDone = 1 Then 
+            
+            Me.fParam[2] = 360
+            
+        Else If Me.StepsDone = 2 Then 
+            
+            If Me.fParam[1] < 0 Then Me.fParam[1] = 360 + Me.fParam[1]
+            difang = (Me.fParam[2] - Me.fParam[1])
+        
+            GLplus.Lines([Me.p[0], Me.p[1], Me.p[0] + Me.fParam[0] * Cos(Me.fParam[1] / 180 * Pi), Me.p[1] + Me.fParam[0] * Sin(Me.fParam[1] / 180 * Pi)], Me.ColorToPaint)
+            clsDrawingAids.Helper.texto = Format$(Me.fParam[1], ("0.0 deg")) 
+                
+        Else If Me.StepsDone = 3 Then 
+                
+               
+               
+                If Me.fParam[1] < 0 Then Me.fParam[1] = 360 + Me.fParam[1]
+                If Me.fParam[2] < 0 Then Me.fParam[2] = 360 + Me.fParam[2]              ' grados
+                Me.start = Me.fParam[1] / 180 * Pi                                      ' rad
+                Me.recorrido = (Me.fParam[2] - Me.fParam[1]) / 180 * Pi                 ' rad
+                If Me.recorrido < 0 Then
+            
+                    Me.recorrido += 2 * Pi
+            
+                Endif
+                
+                gl.PushMatrix
+                gl.Translatef(Me.p[0], Me.p[1], 0)
+                'gl.Rotatef(angle * 180 / Pi, 0, 0, 1)
+                GLplus.arc(Me.fParam[0], Me.start, Me.recorrido, Me.ColorToPaint, Me.LineWidth)
+                gl.PopMatrix
+                clsDrawingAids.Helper.texto = Format$(Me.fParam[1], ("0.0 deg")) & (" to ") & Format$(Me.fParam[2], ("0.0 deg"))
+        Else
+        
+            ' TODO: esto probabemente funcione para arcos en los dos primeros cuadrantes
+            
+            gl.PushMatrix
+            gl.Translatef(Me.p[0], Me.p[1], 0)
+            'gl.Rotatef(angle * 180 / Pi, 0, 0, 1)
+            GLplus.arc(Me.fParam[0], Me.start, Me.recorrido, Me.ColorToPaint, Me.LineWidth)
+            gl.PopMatrix
+        End If
+    Endif
+    
+    
+
+End
+
+
+
+'' Creo los puntos de interes
+'' Build point of interest
+
+Public Function BuildPOI() As Integer
+
+    Me.MyPoi.Clear
+    ' el circulo tiene 5 puntos de interes
+    ' centro
+    Me.MyPoi.Insert([Me.p[0], Me.p[1]])
+
+    ' ' horiz
+    ' Me.MyPoi.Insert([Me.p[0] - Me.fParam[0], Me.p[1]])
+    ' Me.MyPoi.Insert([Me.p[0] + Me.fParam[0], Me.p[1]])
+    ' 
+    ' ' vert
+    ' Me.MyPoi.Insert([Me.p[0], Me.p[1] - Me.fParam[0]])
+    ' Me.MyPoi.Insert([Me.p[0], Me.p[1] + Me.fParam[0]])
+
+    Return Me.MyPoi.Count / 2
+
+End
+
+' This function will return False if the element couldn't be created for some reason: bad or incomple user input
+' True means all is good, False will instruct the clsEntityBuilder to delete it
+Public Sub Finish(ParamsDone As Integer) As Boolean
+
+    ' calculo el recorrido del arco como
+    
+    If Me.fParam[1] < 0 Then Me.fParam[1] = 360 + Me.fParam[1]
+    If Me.fParam[2] < 0 Then Me.fParam[2] = 360 + Me.fParam[2]              ' grados
+    Me.start = Me.fParam[1] / 180 * Pi                                      ' rad
+    Me.recorrido = (Me.fParam[2] - Me.fParam[1]) / 180 * Pi                 ' rad
+    If Me.recorrido < 0 Then
+
+        Me.recorrido += 2 * Pi
+
+    Endif
+
+    
+    
+    'CreateBoundingPoligon
+    
+     ' tareas finales de armado del objeto
+    Me.b.resize(Me.P.count)
+    Me.psel.resize(Me.p.count / 2)
+    Me.ForDeletion = False
+    Me.DrawAble = True
+    Me.Selected = False
+    Me.Finished = True
+
+    If Not True Then
+
+        Me.ForDeletion = True
+        Me.DrawAble = False
+
+    End If
+
+End
+

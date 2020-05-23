@@ -1,0 +1,415 @@
+' Gambas class file
+
+' Variables que se pasaron desde el módulo de inicio
+Public Observer As Observer         ''Observador usaod para avisar si hay cambios sin aplicar
+Private cex As New Collection       '' Variables básicas para pasar a los demas formularios
+Private con As New Connection       '' Conexión a la base de datos
+Private adi As String               '' Directorio del programa
+Private dbc As String               '' Archivo de configuracion de la base de datos
+Private apc As String               '' Archivo de configuracion del programa
+Private etx As String               '' Editor de texto plano por ddefecto
+Private lgg As Logger               '' Registro de eventos de la aplicación.
+'------------------------------------------------------------------------------
+
+'Variables del formulario
+Public hFCAD As FCAD                    '' CAD Editor
+Public CurrentForm As Form
+Public CurrentFile As String
+
+Public cMod As New Collection    '' All drawings common collection
+
+Public Sub Run(cin As Collection)
+
+    Dim obj As Object
+    Dim ictn As New Collection
+    Dim mnu As Menu
+    Dim tob As ToolButton
+    Dim i As Integer
+    Dim iSet As String
+    Dim z As Integer
+    '------------------------------------------------------------------------------
+    '' Estableciendo las variables de conexion y otras más
+    cex = cin
+    con = cin["Connex"]           ' Conexión a la base de datos
+    adi = cin["AppDir"]           ' Directorio del programa
+    apc = cin["AppCfg"]           ' Archivo de configuracion del programa
+    dbc = cin["DbsCfg"]           ' Archivo de configuracion de la base de datos
+    etx = cin["AppEdi"]           ' Editor de texto plano por defecto
+    lgg = cin["AppLog"]           ' Registro de eventos de la aplicación.
+    '------------------------------------------------------------------------------
+    'iSet = xmg.GetVar("Desktop.Icons", apc)
+    iSet = "/usr/share/icons/Numix/64"
+    ictn = dsk.GNumix(iSet & "/")
+    '------------------------------------------------------------------------------
+    For Each mnu In Me.Menus
+        For Each obj In mnu.Children
+            'Agregando item del menu en el menu alternativo
+            If obj.Visible = True Then
+                Select mnu.Name
+                    Case "grpEntities"
+                        tob = New ToolButton(pnlEntities) As "entity"
+                        z = 48
+                    Case "grpTools"
+                        tob = New ToolButton(pnlTools) As "tool"
+                        z = 48
+                    Case Else
+                        tob = New ToolButton(pnlFile) As "menuapp"
+                        z = 32
+                End Select
+
+                With tob
+                    .Name = "tob" & obj.Tag & CStr(i)
+                    .Tag = obj.Tag
+                    .Tooltip = obj.Text
+                    .Enabled = obj.Enabled
+                    .W = z
+                    .H = z
+                    If Exist(ictn[obj.Tag]) Then
+                        If Stat(ictn[obj.Tag]).Type = gb.File Or Stat(ictn[obj.Tag]).Type = gb.Link Then
+                            tob.Picture = Image.Load(ictn[obj.Tag]).Stretch(z - 8, z - 8).Picture
+                        Else
+                            tob.Picture = obj.Picture
+                        Endif
+                    Else
+                        tob.Picture = obj.Picture
+                    Endif
+                End With
+            Endif
+            Inc i
+        Next
+    Next
+
+    Me.Show()
+
+End
+
+Public Sub Form_Open()
+
+    Dim n As Integer
+    Dim b As Integer
+    Dim x As Integer
+
+    For n = 0 To Screens.Count - 1
+        If Screens[n].AvailableWidth > b Then
+            b = Screens[n].AvailableWidth
+            x = n
+        Endif
+    Next
+
+    Me.x = Screens[x].AvailableX
+    Me.y = Screens[x].AvailableY
+
+    Me.Maximized = True
+
+    Task("new")
+
+End
+
+Public Sub entity_Click()
+
+    Dim obj As Object
+
+    obj = Last
+
+    If Workspace1.ActiveWindow Then
+        modCAD.clsJob.KeyText(String.UCaseFirst(obj.Tag))
+    Endif
+
+End
+
+Public Sub tool_Click()
+
+    Dim obj As Object
+
+    obj = Last
+
+    If Workspace1.ActiveWindow Then
+        modCAD.clsJob.KeyText(String.UCaseFirst(obj.Tag))
+    Endif
+
+End
+
+Public Sub menuapp_Click()
+
+    Dim obj As Object
+
+    obj = Last
+
+    Task(obj.Tag)
+
+End
+
+'' This create a collection whith all the drawing information, graphical and no
+'' t graphical. The collections made here will be used in each instance of FCAD
+
+' Public Function FileLoad(sFile As String) As Collection
+'
+'     Dim cMdl As New Collection
+'
+'     cMdl = cad.LoadGaucho(sFile)
+'
+'     Return cMdl
+'
+' End
+
+'' This
+Public Sub FileCreate(sTemplate As String)
+
+End
+
+Public Sub LoadComboboxes(cMdl As Collection)
+
+    Dim Layer As Variant
+    Dim Style As Variant
+    Dim Width As Variant
+    Dim DimSt As Variant
+
+    cMod = cMdl
+
+    cboLayers.Clear
+    cboStyles.Clear
+    cboWidths.Clear
+    cboDimSts.Clear
+
+    If cMdl.Count > 0 Then
+        If cMdl.Exist("Layers") Then
+            For Each Layer In cMdl["Layers"]
+                cboLayers.Add(Layer["name"])
+            Next
+            For Each Layer In cMdl["Layers"]
+                cboLayers.Text = Layer["name"]
+                Break
+            Next
+        Endif
+
+        If cMdl.Exist("Styles") Then
+            For Each Style In cMdl["Styles"]
+                cboStyles.Add(Style["name"])
+            Next
+            For Each Style In cMdl["Styles"]
+                cboStyles.Text = Style["name"]
+                Break
+            Next
+        Endif
+
+        If cMdl.Exist("Widths") Then
+            For Each Width In cMdl["Widths"]
+                cboWidths.Add(Width["value"])
+            Next
+            For Each Width In cMdl["Widths"]
+                cboWidths.Text = Width["value"]
+                Break
+            Next
+        Endif
+
+        If cMdl.Exist("DimSts") Then
+            For Each DimSt In cMdl["DimSts"]
+                cboDimSts.Add(DimSt["name"])
+            Next
+            For Each DimSt In cMdl["DimSts"]
+                cboDimSts.Text = DimSt["name"]
+                Break
+            Next
+        Endif
+
+    Endif
+
+End
+
+Public Sub Task(sTask As String)
+
+    Dim s As String
+    Dim cModel As New Collection
+    Dim ctn As New Collection
+    Dim cfg As New Collection
+
+    Dim hFConfig As FConfig                 '' Edit program configuration
+    Dim hFAbout As FAbout                  '' Formulario que muestra informacin del programa
+    Dim hFImport As FImport                 '' Impor from others formats
+    Dim w As Window
+    Dim wtag As String
+
+    Dim FilePath As String            ''Nombre del archivo que se abrira
+    Dim FileDef As String
+    Dim i As Integer
+    Dim mdl As New Collection
+
+    Select sTask
+
+        Case "import"
+
+            mdl = cad.Import(FilePath)
+
+            wtag = sTask
+            hFImport = New FImport(cex)
+            hFImport.Tag = wtag
+            hFImport.Title = ("Import")
+            hFImport.Show()
+
+        Case "open"
+
+            Dialog.Filter = ["*.xml", "GauchoCAD"]
+            Dialog.OpenFile(False)
+            FilePath = Dialog.Path
+
+            If Exist(FilePath) Then
+                Select String.LCase(File.Ext(FilePath))
+                    Case "xml"
+
+                        'cModel = FileLoad(FilePath)
+                        cModel = cad.LoadGaucho(FilePath)
+                        LoadComboboxes(cModel)
+
+                        wtag = FilePath
+                        If Workspace1.Count = 0 Or ExistWin(wtag, Workspace1) = False Then
+                            hFCAD = New FCAD(cModel.Copy())
+                            hFCAD.Tag = wtag
+                            hFCAD.Title = File.Name(FilePath)
+                            Workspace1.Add(hFCAD)
+                        Else
+                            For Each w In Workspace1.Windows
+                                If w.Tag = wtag Then
+                                    Workspace1.ActiveWindow = w
+                                    Break
+                                Endif
+                            Next
+                        Endif
+                End Select
+            Endif
+        Case "new"
+
+            FileDef = adi &/ "default.xml"
+            If Exist(FileDef) = False Then
+                Copy "./def.xml" To FileDef
+            Endif
+
+            For i = 1 To 99
+                FilePath = User.Home &/ "drawing" & CStr(i) & ".xml"
+                If ExistWin(FilePath, Workspace1) = False Then
+                    Break
+                Endif
+            Next
+
+            FileDef = adi &/ "default.xml"
+            If Exist(FileDef) Then
+                If Exist(FilePath) = False Then
+                    Copy FileDef To FilePath
+                Endif
+            Endif
+
+            'cModel = FileLoad(FilePath)
+            cModel = cad.LoadGaucho(FilePath)
+            LoadComboboxes(cModel.Copy())
+
+            wtag = FilePath
+            If Workspace1.Count = 0 Or ExistWin(wtag, Workspace1) = False Then
+
+                hFCAD = New FCAD(cModel)
+                hFCAD.Tag = wtag
+                hFCAD.Title = File.Name(FilePath)
+                Workspace1.Add(hFCAD)
+            Else
+                For Each w In Workspace1.Windows
+                    If w.Tag = wtag Then
+                        Workspace1.ActiveWindow = w
+                        Break
+                    Endif
+                Next
+            Endif
+
+        Case "info"
+            wtag = sTask
+            If Workspace1.Count = 0 Or ExistWin(wtag, Workspace1) = False Then
+                File.Save("/tmp/apppath.txt", Application.Dir)
+                cfg = sog.ProjInfo(Application.Path & "/.project")
+                hFAbout = New FAbout(cfg)
+                hFAbout.Tag = wtag
+                hFAbout.Title = ("About") & " " & Application.Name
+                Workspace1.Add(hFAbout)
+            Else
+                For Each w In Workspace1.Windows
+                    If w.Tag = wtag Then
+                        Workspace1.ActiveWindow = w
+                        Break
+                    Endif
+                Next
+            Endif
+
+        Case "help"
+            Print "Help"
+
+        Case "options"
+            wtag = sTask
+            If Workspace1.Count = 0 Or ExistWin(wtag, Workspace1) = False Then
+                '---------------------------------------------------
+                s = adi &/ "cfg.xml"
+                If Exist(File.Dir(s)) = False Then
+                    Mkdir File.Dir(s)
+                Endif
+                If Exist(s) = False Then
+                    ctn = xmg.XmlIni()
+                    xmg.XmlConfMaker(s, ctn, Application.Name)
+                Endif
+                hFConfig = New FConfig(cex)
+                hFConfig.Title = ("Configurtion")
+                hFConfig.Tag = wtag
+                Workspace1.Add(hFConfig)
+                '---------------------------------------------------
+            Else
+                For Each w In Workspace1.Windows
+                    If w.Tag = wtag Then
+                        Workspace1.ActiveWindow = w
+                        Break
+                    Endif
+                Next
+            Endif
+
+        Case "quit"
+            Me.Close
+
+    End Select
+
+End
+
+'' This vierify if the drawing is already opened
+
+Public Function ExistWin(wtag As String, ws As Workspace) As Boolean
+
+    Dim wExist As Boolean
+    Dim w As Window
+
+    wExist = False
+
+    For Each w In ws.Windows
+        If w.Tag = wtag Then
+            wExist = True
+            Break
+        Endif
+    Next
+
+    Return wExist
+
+End
+
+Public Sub Workspace1_Activate()
+
+    Dim aWin As Window
+
+    aWin = Workspace1.ActiveWindow
+
+    If aWin.Name = "FCAD" Then
+        Print aWin.Tag
+        CurrentFile = aWin.Tag
+        ' LoadComboboxes(aWin.cModel)
+    Endif
+
+End
+
+Public Sub tobLayers_Click()
+
+    Dim FLay As FLayers
+
+    FLay = New FLayers
+    FLay.Run(cMod)
+
+End

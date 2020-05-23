@@ -1,0 +1,342 @@
+# Gambas Form File 3.0
+
+{ Form Form
+  MoveScaled(0,0,137,93)
+  Background = Color.TextBackground
+  Icon = Picture["logo.svg"]
+  Arrangement = Arrange.Vertical
+  { grpFile Menu
+    Text = ("File")
+    { mnuNew Menu menuapp
+      Name = "mnuNew"
+      Text = ("New")
+      Picture = Picture["icon:/32/new"]
+      Tag = "new"
+    }
+    { mnuOpen Menu menuapp
+      Name = "mnuOpen"
+      Text = ("Open")
+      Picture = Picture["icon:/22/open"]
+      Tag = "open"
+    }
+    { mnuSave Menu menuapp
+      Name = "mnuSave"
+      Text = ("Save")
+      Picture = Picture["icon:/22/save"]
+      Tag = "save"
+    }
+    { mnuSaveAs Menu menuapp
+      Name = "mnuSaveAs"
+      Text = ("Save as")
+      Picture = Picture["icon:/22/save-as"]
+      Tag = "saveas"
+    }
+    { mnuImport Menu menuapp
+      Name = "mnuImport"
+      Text = ("Import")
+      Picture = Picture["icon:/32/download"]
+      Tag = "import"
+    }
+    { mnuExport Menu menuapp
+      Name = "mnuExport"
+      Text = ("Export")
+      Picture = Picture["icon:/32/upload"]
+      Tag = "export"
+    }
+    { mnuPlot Menu menuapp
+      Name = "mnuPlot"
+      Text = ("Plot")
+      Picture = Picture["icon:/32/print"]
+      Tag = "print"
+    }
+    { mnuClose Menu menuapp
+      Name = "mnuClose"
+      Text = ("Close")
+      Picture = Picture["icon:/32/close"]
+      Enabled = False
+      Visible = False
+      Tag = "close"
+    }
+    { mnuExit Menu menuapp
+      Name = "mnuExit"
+      Text = ("Quit")
+      Picture = Picture["icon:/22/quit"]
+      Tag = "exit"
+    }
+  }
+  { grpOptions Menu
+    Text = ("Options")
+    { mnuOptions Menu menuapp
+      Name = "mnuOptions"
+      Text = ("Preferences")
+      Picture = Picture["icon:/32/options"]
+      Tag = "options"
+    }
+  }
+  { grpEntities Menu
+    Text = ("Entities")
+    Tag = "entities"
+    { mnuLine Menu entity
+      Name = "mnuLine"
+      Text = ("Line")
+      Picture = Picture["svg/line.svg"]
+      Tag = "line"
+    }
+    { mnuPolyline Menu entity
+      Name = "mnuPolyline"
+      Text = ("Polyline")
+      Picture = Picture["svg/polyline.svg"]
+      Tag = "pline"
+    }
+    { mnuCircle Menu entity
+      Name = "mnuCircle"
+      Text = ("Circle")
+      Picture = Picture["svg/circle.svg"]
+      Tag = "circle"
+    }
+    { mnuEllipse Menu entity
+      Name = "mnuEllipse"
+      Text = ("Ellipse")
+      Picture = Picture["svg/ellipse.svg"]
+      Tag = "ellipse"
+    }
+    { mnuArc Menu entity
+      Name = "mnuArc"
+      Text = ("Arc")
+      Picture = Picture["svg/arc.svg"]
+      Tag = "arc"
+    }
+    { mnuRectangle Menu entity
+      Name = "mnuRectangle"
+      Text = ("Rectangle")
+      Picture = Picture["svg/rectangle.svg"]
+      Tag = "rectangle"
+    }
+    { mnuText Menu entity
+      Name = "mnuText"
+      Text = ("Text")
+      Picture = Picture["svg/text.svg"]
+      Tag = "text"
+    }
+    { mnuMText Menu entity
+      Name = "mnuMText"
+      Text = ("Multi Text")
+      Enabled = False
+      Tag = "mtext"
+    }
+    { mnuDim Menu entity
+      Name = "mnuDim"
+      Text = ("Dimmension")
+      Tag = "dim"
+    }
+    { mnuBlock Menu entity
+      Name = "mnuBlock"
+      Text = ("Block")
+      Enabled = False
+      Tag = "block"
+    }
+    { mnuHatch Menu entity
+      Name = "mnuHatch"
+      Text = ("Hatch")
+      Picture = Picture["svg/hatch.svg"]
+      Enabled = False
+      Tag = "hatch"
+    }
+    { mnuPoint Menu entity
+      Name = "mnuPoint"
+      Text = ("Point")
+      Tag = "point"
+    }
+  }
+  { grpTools Menu
+    Text = ("Tools")
+    { mnuMove Menu tool
+      Name = "mnuMove"
+      Text = ("Move")
+      Picture = Picture["svg/move.svg"]
+      Tag = "move"
+    }
+    { mnuCopy Menu tool
+      Name = "mnuCopy"
+      Text = ("Copy")
+      Picture = Picture["svg/copy.svg"]
+      Tag = "copy"
+    }
+    { mnuScale Menu tool
+      Name = "mnuScale"
+      Text = ("Scale")
+      Picture = Picture["svg/scale.svg"]
+      Tag = "Scale"
+    }
+    { mnuArray Menu tool
+      Name = "mnuArray"
+      Text = ("Array")
+      Visible = False
+      Tag = "array"
+    }
+    { mnuRotate Menu tool
+      Name = "mnuRotate"
+      Text = ("Rotate")
+      Picture = Picture["svg/rotate.svg"]
+      Tag = "rotate"
+    }
+    { mnuStretch Menu tool
+      Name = "mnuStretch"
+      Text = ("Stretch")
+      Picture = Picture["svg/stretch.svg"]
+      Tag = "stretch"
+    }
+    { mnuOffset Menu tool
+      Name = "mnuOffset"
+      Text = ("Offset")
+      Tag = "offset"
+    }
+    { mnuFillet Menu tool
+      Name = "mnuFillet"
+      Text = ("Fillet")
+      Tag = "fillet"
+    }
+    { mnuDelete Menu tool
+      Name = "mnuDelete"
+      Text = ("Delete")
+      Picture = Picture["svg/layers/draw-eraser.svg"]
+      Tag = "erase"
+    }
+  }
+  { grpView Menu
+    Text = ("View")
+    { mnuZoomw Menu view
+      Name = "mnuZoomw"
+      Text = ("Zoom window")
+      Tag = "zoomw"
+    }
+    { mnuPan Menu view
+      Name = "mnuPan"
+      Text = ("Pan view")
+      Tag = "pan"
+    }
+    { mnuZoome Menu view
+      Name = "mnuZoome"
+      Text = ("Zoom extends")
+      Picture = Picture["svg/layers/zoom-fit-best.svg"]
+      Tag = "zoome"
+    }
+  }
+  { grpHelp Menu
+    Text = ("?")
+    { mnuInfo Menu menuapp
+      Name = "mnuInfo"
+      Text = ("About")
+      Picture = Picture["icon:/32/info"]
+      Tag = "info"
+    }
+    { Menu1 Menu menuapp
+      Name = "Menu1"
+      Text = ("Help")
+      Picture = Picture["icon:/32/help"]
+      Tag = "help"
+    }
+  }
+  { Panel1 Panel
+    MoveScaled(6,9,111,74)
+    Expand = True
+    Arrangement = Arrange.Vertical
+    { Panel2 Panel
+      MoveScaled(1,1,106,5)
+      Arrangement = Arrange.Horizontal
+      { pnlFile Panel
+        MoveScaled(0,0,24,5)
+        Expand = True
+        Arrangement = Arrange.Horizontal
+        Spacing = True
+      }
+      { PanToolsHorizontal Panel
+        MoveScaled(27,0,78,5)
+        Expand = True
+        Arrangement = Arrange.Row
+        Spacing = True
+        Padding = 2
+        { cboLayers ComboBox dprop
+          Name = "cboLayers"
+          MoveScaled(1,0,15,4)
+          Tag = "layer"
+          ToolTip = ("Layers")
+          ReadOnly = True
+        }
+        { tobLayers ToolButton
+          MoveScaled(16,0,4,4)
+          Picture = Picture["svg/layers/layers.svg"]
+          Border = True
+        }
+        { Separator1 Separator
+          MoveScaled(21,0,1,4)
+        }
+        { cboStyles ComboBox dprop
+          Name = "cboStyles"
+          MoveScaled(23,0,15,4)
+          Tag = "style"
+          ToolTip = ("Line styles")
+          ReadOnly = True
+        }
+        { Separator2 Separator
+          MoveScaled(42,0,1,4)
+        }
+        { cboWidths ComboBox dprop
+          Name = "cboWidths"
+          MoveScaled(44,0,11,4)
+          Tag = "weight"
+          ToolTip = ("Line widths")
+          ReadOnly = True
+        }
+        { Separator3 Separator
+          MoveScaled(56,0,1,4)
+        }
+        { cboDimSts ComboBox dprop
+          Name = "cboDimSts"
+          MoveScaled(59,0,14,4)
+          Tag = "style"
+          ToolTip = ("Dimmension styles")
+          ReadOnly = True
+        }
+      }
+    }
+    { PanEdit1 Panel
+      MoveScaled(1,7,106,66)
+      Expand = True
+      Arrangement = Arrange.Horizontal
+      Spacing = True
+      Margin = True
+      { Panel3 SidePanel
+        MoveScaled(2,1,24,62)
+        Arrangement = Arrange.Vertical
+        Orientation = Align.Right
+        { pnlEntities Panel
+          MoveScaled(0,3,22,18)
+          Expand = True
+          Arrangement = Arrange.Row
+          Spacing = True
+        }
+        { pnlTools Panel
+          MoveScaled(0,23,22,18)
+          Expand = True
+          Arrangement = Arrange.Row
+          Spacing = True
+        }
+        { pnlView Panel
+          MoveScaled(0,42,21,17)
+          Expand = True
+          Arrangement = Arrange.Row
+          { Spring1 Spring
+            MoveScaled(1,1,2,2)
+          }
+        }
+      }
+      { Workspace1 Workspace
+        MoveScaled(32,4,71,59)
+        Background = Color.TextBackground
+        Expand = True
+        Border = False
+      }
+    }
+  }
+}

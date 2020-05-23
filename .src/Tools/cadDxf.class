@@ -1,0 +1,644 @@
+' Gambas class file
+
+' Imports DXF 2007 files (limites entities and data)
+' Tool maintained by Terco
+Inherits ToolsBase
+Create Static
+Public Const GENDER As String = ("Dxf")
+
+Public Struct commonSt
+    layer As String         ' 8
+    linetype As String      ' 6
+    bColor As Integer       ' 62
+    linetypescale As Float  ' 42 o 41
+    visible As Integer      ' 60
+End Struct
+
+Public Struct lineSt
+    x1 As Float
+    y1 As Float
+    x2 As Float
+    y2 As Float
+End Struct
+
+Public Struct textSt
+    x As Float              ' 10
+    y As Float              ' 20
+    altura As Float         ' 40
+    texto As String         '  1
+    rotacion As Float       ' 50
+End Struct
+
+Public Struct mtextSt
+    x As Float              ' 10
+    y As Float              ' 20
+    h As Float              ' 10
+    w As Float              ' 20
+    alineacion As Integer
+    
+    altura As Float         ' 40
+    texto As String         '  1
+    rotacion As Float       ' 50
+End Struct
+
+Public Struct dimSt
+    bloque As String        '  2
+    p As Float[]            ' 10,20,11,21,12,22.......
+    tipo As Integer          ' 70 0 = rotado 1 = alineado, 2 = angular
+    alineacion As Integer   ' 71
+    medida As Float         ' 42
+    texto As String         ' 1 text override
+    angulo As Float         ' 50
+End Struct
+
+Public Struct InsertSt
+    block_name As String    '  2
+    x As Float              ' 10
+    y As Float              ' 20
+    z As Float              ' 30
+    escX As Float           ' 41
+    escY As Float           ' 42
+    escZ As Float           ' 43
+    rotacion As Float       ' 50
+End Struct
+
+Public Struct blockSt
+    layer As String         '  8
+    block_name As String    '  2
+    x As Float              ' 10
+    y As Float              ' 20
+    z As Float              ' 30
+End Struct
+
+
+
+Public Struct circleSt
+    x As Float
+    y As Float
+    r As Float
+End Struct
+
+Public Struct arcSt
+    x As Float
+    y As Float
+    r As Float
+    sa As Float
+    ea As Float
+End Struct
+
+Public Struct ellipseSt
+    xc As Float
+    yc As Float
+    xm As Float
+    ym As Float
+    relacion As Float
+    StartAngle As Float
+    EndAngle As Float
+End Struct
+
+
+Public Struct StructpolylineSt
+    vertexcount As Integer
+    poliflag As Integer
+    p As Float[]
+End Struct
+
+Public Struct solidSt
+    p As Float[]
+End Struct
+
+Public Struct StructsplineeSt
+    mFitPointCount As Integer
+    p As Float[]
+End Struct
+
+
+
+
+Public Nx As Integer
+Public Ny As Integer
+Public Dx As Float
+Public Dy As Float
+Public Np As Integer
+Public Dp As Float
+
+
+Public mCommon As New CommonSt
+Public mLine As New LineSt
+Public mCircle As New CircleSt
+Public mEllipse As New EllipseSt
+Public mPolyLine As New StructpolylineSt
+Public mText As New TextSt
+Public mMText As New TextSt
+Public mSpline As New StructsplineeSt
+Public mArc As New ArcSt
+Public mInsert As New InsertSt
+Public mBlock As New BlockSt 
+Public mSolid As New SolidSt 
+Public mDim As New DimSt 
+
+Private mBlockCount As Integer
+Private mInsertCount As Integer
+Private mTextcount As Integer
+Private mMTextcount As Integer
+Private mLineCount As Integer
+Private mPolyLineCount As Integer
+Private mPolyLinePointsCount As Integer
+Private mCircleCount As Integer
+Private mEllipseCount As Integer
+Private mArcCount As Integer
+Private mSplineCount As Integer
+Private mSolidCount As Integer
+Private mDimCount As Integer
+
+Private flgReadingBlock As Boolean
+
+Public t As Float = Timer
+
+Public fp As File
+
+Public lpCode As String
+Public lpValue As String
+
+
+' Add more if needed
+
+
+Public Function Start(Optional ElemToBuild As Variant, Optional _mode As Integer = 0) As Boolean
+    ' Llamada por FCAD al inicio de la aplicacion de esta herramienta
+
+    ' Aprovechamos para establecer los helpers (comentarios de ayuda en pantalla)
+    Me.PointsDone = 0
+    Me.PointsTotal = 2                 ' orto: Punto base + Nx + Dx + Ny + Dy   , polar = Punto base + N + angulo 
+    
+    Me.mode = _mode
+    
+    Dim sDXF As String
+    
+
+    
+    Dialog.Filter = ["*.dxf", "Drawing eXchange Format v2007"]
+    Dialog.OpenFile(False)
+    sDxf = Dialog.Path
+    If Exist(sDxf) Then
+        LoadFile(sDxf)
+    Endif
+    
+
+    clsEntities.ReconstruirBloques
+    modCAD.ApplyLayerProperties
+    clsEntities.GLGenDrawList
+    cadZoomE.Start()
+    
+    Return
+    
+  
+    
+
+End
+
+Private Sub ReadData() 
+    
+    
+        Line Input #fp, lpcode
+        Line Input #fp, lpValue
+        
+        If Right(lpcode, 1) = gb.Cr Then lpcode = Left(lpcode, -1)
+        If Right(lpvalue, 1) = gb.cr Then lpvalue = Left(lpvalue, -1)
+        
+        lpcode = Trim$(lpcode)
+        lpvalue = Trim$(lpvalue)
+    
+End
+
+Private Function GetData(CODE As Integer) As String
+    
+    While (CInt(lpcode) <> CODE) And Not Eof(fp) 
+        Line Input #fp, lpcode
+        Line Input #fp, lpValue
+        
+        If Right(lpcode, 1) = gb.Cr Then lpcode = Left(lpcode, -1)
+        If Right(lpvalue, 1) = gb.cr Then lpvalue = Left(lpvalue, -1)
+        
+        lpcode = Trim$(lpcode)
+        lpvalue = Trim$(lpvalue)
+    Wend
+    Return lpValue
+   
+End
+
+Public Sub FinishDXFRead()
+
+    Print "SPlines", mSplineCount
+    Print "lines", mLineCount
+    Print "Polylines", mPolyLineCount
+    Print "Circles", mCircleCount
+    Print "Arcs", mArcCount
+    Print "Texto", mTextcount
+    Print "MTexto", mMTextcount
+    Print "Inserts", mInsertcount
+    Print "Blocks", mBlockCount
+    Print "Dims", mDimCount
+    
+    Print
+    Print "Total elements", mPolyLinePointsCount + mDimCount + mLineCount + mCircleCount + mMTextcount + mTextcount + mArcCount + mSplineCount + mInsertCount, " processed in ", Str(Timer - t), " Secconds"
+    
+    
+
+  fp.Close
+    
+    
+    
+End
+
+
+
+
+
+Public Procedure LoadFile(stn As String)
+
+
+  
+  Dim i As Integer
+  Dim mLoadStatus As Boolean
+
+    mPolyLine.p = New Float[]
+
+    mSpline.p = New Float[]
+    
+
+  
+  fp = Open stn For Read
+  If Not fp Then Error.Raise("Error !") 
+    
+  
+    While Not Eof(fp)
+        Wait 0.0001
+        
+        
+        'Print lpcode, lpvalue
+        If (lpvalue = "LINE") And Not Eof(fp) Then
+
+            ReadData                                 
+            While (lpcode <> "0") And Not Eof(fp) 
+                If lpcode = "8" Then mCommon.layer = lpvalue                ' Layer
+                If lpcode = "6" Then mCommon.linetype = lpvalue             ' LineType
+                If lpcode = "62" Then mCommon.bColor = CInt(lpvalue)        ' Color code (no es RBG) (256=ByLayer)
+                  
+                If lpcode = "10" Then mLine.x1 = CFloat(lpvalue)
+                If lpcode = "20" Then mLine.y1 = CFloat(lpvalue)
+                If lpcode = "11" Then mLine.x2 = CFloat(lpvalue)
+                If lpcode = "21" Then mLine.y2 = CFloat(lpvalue)
+                ReadData  
+                Inc mLineCount
+                
+            Wend
+
+                
+                ' Print "Line", mLine.layer, mLine.x1, mLine.y1, mLine.x2, mLine.y2
+                ' 
+                modCAD.AddLine([mLine.x1, mLine.y1, mLine.x2, mLine.y2], mCommon.bColor, 1, mCommon.linetype, mCommon.layer, mBlock.block_name)
+
+        '-----------------------------------------------------------
+        ' DIM
+        '-----------------------------------------------------------
+        Else If (lpcode = "0") And (lpvalue = "DIMENSION") Then
+            
+            ReadData
+            mDim.p = New Float[]
+
+            While (lpcode <> "0") And Not Eof(fp) 
+                If lpcode = "8" Then mCommon.layer = lpvalue                ' Layer
+                If lpcode = "6" Then mCommon.linetype = lpvalue             ' LineType
+                If lpcode = "62" Then mCommon.bColor = CInt(lpvalue)        ' Color code (no es RBG) (256=ByLayer)
+
+                If lpcode = "2" Then mDim.bloque = lpvalue
+                If lpcode = "10" Then mDim.p.Add(CFloat(lpvalue))
+                If lpcode = "20" Then mDim.p.Add(CFloat(lpvalue))
+                If lpcode = "11" Then mDim.p.Add(CFloat(lpvalue))
+                If lpcode = "21" Then mDim.p.Add(CFloat(lpvalue))
+                If lpcode = "70" Then mDim.tipo = CInt(lpvalue)
+                If lpcode = "71" Then mDim.alineacion = CInt(lpvalue)
+                If lpcode = "42" Then mDim.medida = CFloat(lpvalue)
+                If lpcode = "42" Then mDim.texto = lpvalue
+                If lpcode = "12" Then mDim.p.Add(CFloat(lpvalue))
+                If lpcode = "13" Then mDim.p.Add(CFloat(lpvalue))
+                If lpcode = "14" Then mDim.p.Add(CFloat(lpvalue))
+                If lpcode = "15" Then mDim.p.Add(CFloat(lpvalue))
+                If lpcode = "16" Then mDim.p.Add(CFloat(lpvalue))
+                If lpcode = "26" Then mDim.p.Add(CFloat(lpvalue))
+                If lpcode = "22" Then mDim.p.Add(CFloat(lpvalue))
+                If lpcode = "23" Then mDim.p.Add(CFloat(lpvalue))
+                If lpcode = "24" Then mDim.p.Add(CFloat(lpvalue))
+                If lpcode = "25" Then mDim.p.Add(CFloat(lpvalue))
+                If lpcode = "50" Then mDim.angulo = CFloat(lpvalue)
+            
+                ReadData
+            Wend
+
+            Inc mDimCount
+            modCAD.AddDim(mDim.p, mDim.bloque, mDim.medida, mDim.texto, mDim.alineacion, mDim.angulo, mDim.tipo, mCommon.bColor, 1, mCommon.linetype, mCommon.layer, mBlock.block_name)
+         
+
+        '-----------------------------------------------------------
+        ' LWPOLYLINE
+        '-----------------------------------------------------------
+
+        '' Lwpolyline command:
+        Else If (lpcode = "0") And (lpvalue = "LWPOLYLINE") Then
+            
+            mPolyLine.p = New Float[]
+          
+            ReadData
+            While (lpcode <> "0") And Not Eof(fp) 
+                If lpcode = "8" Then mCommon.layer = lpvalue                ' Layer
+                If lpcode = "6" Then mCommon.linetype = lpvalue             ' LineType
+                If lpcode = "62" Then mCommon.bColor = CInt(lpvalue)        ' Color code (no es RBG) (256=ByLayer)
+
+                If lpcode = "90" Then mPolyLine.vertexcount = Val(lpValue)
+                If lpcode = "70" Then mPolyLine.poliflag = Val(lpValue)       ' 0 = abierta, 1 = cerrada
+                If lpcode = "10" Then mPolyLine.p.Add(CFloat(lpValue))
+                If lpcode = "20" Then mPolyLine.p.Add(CFloat(lpValue))
+
+                ReadData
+            Wend
+
+            If mPolyLine.poliflag = 1 And mPolyLine.p.Count > 0 Then ' agrego el primer punto de nuevo
+                mPolyLine.p.Add(mPolyLine.p[0])
+                mPolyLine.p.Add(mPolyLine.p[1])
+            End If
+            mPolyLinePointsCount += mPolyLine.p.Count / 2
+            Inc mPolyLineCount
+            modCAD.AddPolyLine(mPolyLine.p, mCommon.bColor, 1, mCommon.linetype, mCommon.layer, mBlock.block_name)
+         
+         
+         '-----------------------------------------------------------
+        ' SOLID
+        '-----------------------------------------------------------
+
+        
+        Else If (lpcode = "0") And (lpvalue = "SOLID") Then
+            
+            mSolid.p = New Float[]
+          
+            ReadData
+            While (lpcode <> "0") And Not Eof(fp) 
+                If lpcode = "8" Then mCommon.layer = lpvalue                ' Layer
+                If lpcode = "6" Then mCommon.linetype = lpvalue             ' LineType
+                If lpcode = "62" Then mCommon.bColor = CInt(lpvalue)        ' Color code (no es RBG) (256=ByLayer)
+
+              If lpcode = "10" Then mSolid.p.Add(CFloat(lpValue))
+              If lpcode = "20" Then mSolid.p.Add(CFloat(lpValue))
+              If lpcode = "11" Then mSolid.p.Add(CFloat(lpValue))
+              If lpcode = "21" Then mSolid.p.Add(CFloat(lpValue))
+              If lpcode = "12" Then mSolid.p.Add(CFloat(lpValue))
+              If lpcode = "22" Then mSolid.p.Add(CFloat(lpValue))
+              If lpcode = "13" Then mSolid.p.Add(CFloat(lpValue))
+              If lpcode = "23" Then mSolid.p.Add(CFloat(lpValue))
+                ReadData
+            Wend
+            Inc mSolidCount
+            modCAD.AddSolid(mSolid.p, mCommon.bColor, 1, mCommon.linetype, mCommon.layer, mBlock.block_name)
+         
+
+        '-----------------------------------------------------------
+        ' CIRCLE
+        '-----------------------------------------------------------
+         '' Circle command:
+        Else If (lpcode = "0") And (lpvalue = "CIRCLE") Then
+            ReadData
+            While (lpcode <> "0") And Not Eof(fp) 
+                If lpcode = "8" Then mCommon.layer = lpvalue                ' Layer
+                If lpcode = "6" Then mCommon.linetype = lpvalue             ' LineType
+                If lpcode = "62" Then mCommon.bColor = CInt(lpvalue)        ' Color code (no es RBG) (256=ByLayer)
+
+              If lpcode = "10" Then mCircle.x = CFloat(lpValue)
+              If lpcode = "20" Then mCircle.y = CFloat(lpValue)
+              If lpcode = "40" Then mCircle.r = CFloat(lpValue)
+                 ReadData
+            Wend
+            Inc mCircleCount
+            ' Print "Circle", mCircle.layer, mCircle.x, mCircle.y, mCircle.r
+             modCAD.AddCircle([mCircle.x, mCircle.y], mCircle.r, mCommon.bColor, 1, mCommon.linetype, mCommon.layer, mBlock.block_name)
+        
+         '-----------------------------------------------------------
+        ' ELLIPSE
+        '-----------------------------------------------------------
+         
+        Else If (lpcode = "0") And (lpvalue = "ELLIPSE") Then
+          
+          
+            ReadData
+              
+            While (lpcode <> "0") And Not Eof(fp) 
+                If lpcode = "8" Then mCommon.layer = lpvalue                ' Layer
+                If lpcode = "6" Then mCommon.linetype = lpvalue             ' LineType
+                If lpcode = "62" Then mCommon.bColor = CInt(lpvalue)        ' Color code (no es RBG) (256=ByLayer)
+
+                If lpcode = "10" Then mEllipse.xc = CFloat(lpValue)     ' centro
+                If lpcode = "20" Then mEllipse.yc = CFloat(lpValue)
+                If lpcode = "11" Then mEllipse.xm = CFloat(lpValue)     ' eje mayor, relativo al centro
+                If lpcode = "21" Then mEllipse.ym = CFloat(lpValue)
+                If lpcode = "40" Then mEllipse.relacion = CFloat(lpValue)
+                If lpcode = "41" Then mEllipse.StartAngle = CFloat(lpValue)
+                If lpcode = "42" Then mEllipse.EndAngle = CFloat(lpValue)
+                ReadData
+            Wend
+              Inc mEllipseCount
+            ' 
+            modCAD.AddEllipse([mEllipse.xc, mEllipse.yc, mEllipse.xm, mEllipse.ym], mEllipse.relacion, mEllipse.StartAngle, mEllipse.EndAngle, mCommon.bColor, 1, mCommon.linetype, mCommon.layer, mBlock.block_name)
+        
+      
+        '-----------------------------------------------------------
+        ' ARC
+        '-----------------------------------------------------------
+        ' Arc command
+        Else If (lpcode = "0") And (lpvalue = "ARC") Then
+            
+            ReadData
+              
+            While (lpcode <> "0") And Not Eof(fp) 
+                If lpcode = "8" Then mCommon.layer = lpvalue                ' Layer
+                If lpcode = "6" Then mCommon.linetype = lpvalue             ' LineType
+                If lpcode = "62" Then mCommon.bColor = CInt(lpvalue)        ' Color code (no es RBG) (256=ByLayer)
+
+              If lpcode = "10" Then mArc.x = CFloat(lpValue)
+              If lpcode = "20" Then mArc.y = CFloat(lpValue)
+              If lpcode = "40" Then mArc.r = CFloat(lpValue)
+              If lpcode = "50" Then mArc.sa = CFloat(lpValue)
+              If lpcode = "51" Then mArc.ea = CFloat(lpValue)
+              ReadData
+            Wend
+            Inc mArcCount
+            ' Print "Arc", mCommon.layer, mArc.x, mArc.y, mArc.r, mArc.sa, mArc.ea
+            modCAD.Addarc([mArc.x, mArc.y], mArc.r, mArc.sa, mArc.ea, mCommon.bColor, 1, mCommon.linetype, mCommon.layer, mBlock.block_name)
+        
+            ' 
+        '-----------------------------------------------------------
+        ' SPLINE
+        '-----------------------------------------------------------
+        Else If (lpcode = "0") And (lpvalue = "SPLINE") Then
+            mSpline.p = New Float[]
+              
+            ReadData
+            While (lpcode <> "0") And Not Eof(fp) 
+                If lpcode = "8" Then mCommon.layer = lpvalue                ' Layer
+                If lpcode = "6" Then mCommon.linetype = lpvalue             ' LineType
+                If lpcode = "62" Then mCommon.bColor = CInt(lpvalue)        ' Color code (no es RBG) (256=ByLayer)
+
+                If lpcode = "73" Then mSpline.mFitPointCount = Val(lpValue)
+                If lpcode = "10" Then mSpline.p.Add(CFloat(lpValue))
+                If lpcode = "20" Then mSpline.p.Add(CFloat(lpValue))
+                ReadData
+            Wend
+            
+            Inc mSplineCount
+            
+            modCAD.AddSPLine(mSpline.p, mCommon.bColor, 1, mCommon.linetype, mCommon.layer, mBlock.block_name)
+            
+
+      '-----------------------------------------------------------
+      ' TEXT
+      '-----------------------------------------------------------
+        ' layer As String         ' 8
+        ' linetype As String      ' 6
+        ' bColor As Integer       ' 62
+        ' linetypescale As Float  ' 42 o 41
+        ' bloque As Integer   
+        ' visible As Integer      ' 60
+        ' 
+        ' x As Float              ' 10
+        ' y As Float              ' 20
+        ' altura As Float         ' 40
+        ' texto As String         '  1
+        ' rotacion As Float       ' 50
+    
+      
+        Else If (lpcode = "0") And (lpvalue = "TEXT") Then
+              
+
+            
+            ReadData
+            While (lpcode <> "0") And Not Eof(fp) 
+                If lpcode = "8" Then mCommon.layer = lpvalue                ' Layer
+                If lpcode = "6" Then mCommon.linetype = lpvalue             ' LineType
+                If lpcode = "62" Then mCommon.bColor = CInt(lpvalue)        ' Color code (no es RBG) (256=ByLayer)
+
+                If lpcode = "10" Then mText.x = CFloat(lpValue)         ' X1
+                If lpcode = "20" Then mText.y = CFloat(lpValue)         ' Y1
+                If lpcode = "40" Then mText.altura = Val(lpValue)         ' Altura
+                If lpcode = "1" Then mText.texto = lpValue                 ' Texto
+                If lpcode = "50" Then mText.rotacion = CFloat(lpValue)      ' rotacion
+                ReadData
+            Wend
+          
+                  
+            Inc mTextCount
+            modCAD.AddText([mText.x, mText.y], mText.rotacion, mText.altura, mText.texto, mCommon.bColor, 1, mCommon.linetype, mCommon.layer, mBlock.block_name)
+          
+            '-----------------------------------------------------------
+            ' MTEXT
+            '-----------------------------------------------------------
+                
+
+        Else If (lpcode = "0") And (lpvalue = "MTEXT") Then
+
+              mMText.texto = ""
+             ReadData
+            
+            While (lpcode <> "0") And Not Eof(fp) 
+                If lpcode = "8" Then mCommon.layer = lpvalue                ' Layer
+                If lpcode = "6" Then mCommon.linetype = lpvalue             ' LineType
+                If lpcode = "62" Then mCommon.bColor = CInt(lpvalue)        ' Color code (no es RBG) (256=ByLayer)
+
+                If lpcode = "10" Then mMText.x = CFloat(lpValue)                ' X1
+                If lpcode = "20" Then mMText.y = CFloat(lpValue)                ' Y1
+                If lpcode = "40" Then mMText.altura = Val(lpValue)              ' Altura
+                If lpcode = "3" Or lpcode = "1" Then mMText.texto &= lpValue    ' Texto
+                If lpcode = "50" Then mMText.rotacion = CFloat(lpValue)      ' rotacion
+                ReadData
+            Wend
+            Inc mMTextCount
+            modCAD.AddMText([mMText.x, mMText.y], mMText.rotacion, mMText.altura, mMText.texto, mCommon.bColor, 1, mCommon.linetype, mCommon.layer, mBlock.block_name)
+          
+      '-----------------------------------------------------------
+      ' INSERT
+      '-----------------------------------------------------------
+    '   
+         Else If (lpcode = "0") And (lpvalue = "INSERT") Then
+            
+            ReadData
+            While (lpcode <> "0") And Not Eof(fp) 
+                If lpcode = "8" Then mCommon.layer = lpvalue                ' Layer
+                If lpcode = "6" Then mCommon.linetype = lpvalue             ' LineType
+                If lpcode = "62" Then mCommon.bColor = CInt(lpvalue)        ' Color code (no es RBG) (256=ByLayer)
+
+                If lpcode = "2" Then mInsert.block_name = lpValue
+                If lpcode = "10" Then mInsert.x = CFloat(lpValue)         ' X
+                If lpcode = "20" Then mInsert.y = CFloat(lpValue)         ' Y
+                If lpcode = "41" Then mInsert.escX = CFloat(lpValue)         ' esc X
+                If lpcode = "42" Then mInsert.escY = CFloat(lpValue)         ' esc Y
+                If lpcode = "50" Then mInsert.rotacion = CFloat(lpValue)      ' rotacion
+                ReadData
+                
+            Wend
+                  
+            Inc mInsertCount
+            modCAD.AddInsert([mInsert.x, mInsert.y], mInsert.escX, mInsert.escY, mInsert.rotacion, mCommon.bColor, mCommon.linetype, mCommon.layer, mInsert.block_name)
+            
+      '-----------------------------------------------------------
+      ' BLOCK
+      '-----------------------------------------------------------
+    '   
+         Else If (lpcode = "0") And (lpvalue = "BLOCK") Then
+            ReadData
+            FlgReadingBlock = True
+            While (lpcode <> "0") And Not Eof(fp) 
+                If lpcode = "8" Then mCommon.layer = lpvalue                ' Layer
+                If lpcode = "6" Then mCommon.linetype = lpvalue             ' LineType
+                If lpcode = "62" Then mCommon.bColor = CInt(lpvalue)        ' Color code (no es RBG) (256=ByLayer)
+
+                If lpcode = "8" Then mBlock.layer = lpvalue                ' Layer
+                If lpcode = "2" Then mBlock.block_name = lpValue
+                If lpcode = "10" Then mBlock.x = CFloat(lpValue)         ' X
+                If lpcode = "20" Then mBlock.y = CFloat(lpValue)         ' Y
+                ReadData
+            
+              Wend
+              
+            modCAD.AddBlock([mBlock.x, mBlock.y], mBlock.layer, mBlock.block_name) 
+                 
+            Inc mBlockCount
+        
+        
+        Else If (lpcode = "0") And (lpvalue = "ENDBLK") Then
+            ReadData
+            flgReadingBlock = False
+            mBlock.block_name = ""
+            
+        Else
+            ReadData
+      
+      Endif
+      
+      
+  
+  
+  
+    Wend
+    
+    
+  FinishDXFRead
+  
+  
+  
+  
+End
+
+Private Sub ExtractCommonData()
+    
+  
+    
+    
+End
+

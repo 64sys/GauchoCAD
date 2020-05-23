@@ -1,0 +1,128 @@
+' Gambas class file
+
+' Tool maintained by Terco
+Inherits ToolsBase
+Create Static
+Public Const GENDER As String = ("Copy")
+' Add more if needed
+
+
+Public Function Start(Optional ElemToBuild As Variant, Optional _Mode As Integer = 0) As Boolean
+    ' Llamada por FCAD al inicio de la aplicacion de esta herramienta
+
+    ' Aprovechamos para establecer los helpers (comentarios de ayuda en pantalla)
+    Me.PointsDone = 0
+    Me.PointsTotal = 2
+
+    clsDrawingAids.HelperTrabajo = ("Copy ")
+
+    ' chequeamos si hubo seleccion previa
+    Me.SelectionCount = clsEntities.GetSelectionCount()
+
+    If Me.SelectionCount = 0 Then                                     ' we have no elements in the selection
+
+        clsDrawingAids.Helper.texto = clsDrawingAids.HelperTrabajo & (": Selecct entities")
+
+        modCAD.clsJobPrevious = Me
+        modCAD.clsJob = clsDefaultJob
+
+    Else                                                                    ' need the first point
+
+        clsEntities.BackUp(True)
+        clsDrawingAids.Helper.texto = clsDrawingAids.HelperTrabajo & (": Base point")
+        clsDrawingAids.HelperTrabajo = clsDrawingAids.HelperTrabajo & Str(Me.SelectionCount) & (" elements")
+
+    Endif
+    
+    Me.Active = True
+    modCAD.ToolActive = True
+    
+
+End
+
+
+Public Function MouseUp() ' called by FCAD-> DrawingArea_MouseUp
+
+    Inc Me.PointsDone
+
+    If Me.PointsDone = 1 Then ' acabo de marcar el punto base
+        modCAD.DrawOriginals = True
+
+        ' ya tengo cosas seleccionadas
+        clsDrawingAids.Helper.texto = ("Final point")
+
+        ' punto real base
+        Me.SelStartXr = puntos.Near(appmain.hFcad.Xreal(mouse.x))
+        Me.SelStartYr = puntos.Near(appmain.hFcad.Yreal(mouse.y))
+
+        ' prevenir acciones tontas como hacer click en otro elemento antes de terminar con el actual
+       appmain.hFCAD.DesHabilitarBotones
+    Else If Me.PointsDone = 2 Then ' acabo de marcar el punto destino
+        ' permitir otros trabajos
+       appmain.hFCAD.HabilitarBotones
+
+        Me.Finish()
+
+    Endif
+
+End
+
+Public Function MouseMove() ' called by FCAD-> DrawingArea_MouseMove
+
+    If Me.PointsDone = 1 Then
+        ' we compare Real values from the starting point to the location
+        ' represente by the mouse now, taking account that the drawing
+        ' could have being moved by the mouse wheel
+
+        ' new Real position is
+        Me.SelEndXr = puntos.Near(appmain.hFcad.Xreal(mouse.x))
+        Me.SelEndyr = puntos.Near(appmain.hFcad.Yreal(mouse.y))
+
+        If modCAD.Ortogonal Then
+
+            If Abs(Me.SelEndXr - Me.SelStartXr) > Abs(Me.SelEndyr - Me.SelStartYr) Then ' X prevails
+
+                Me.SelEndyr = Me.SelStartYr
+
+            Else
+
+                Me.SelEndXr = Me.SelStartXr
+
+            Endif
+
+        End If
+
+        clsEntities.MoveFromBackUp(Me.SelEndXr - Me.SelStartXr, Me.SelEndyr - Me.SelStartYr, True)
+
+    End If
+    appmain.hFCAD.redraw
+
+End
+
+
+Public Sub Finish()
+
+    If Me.PointsDone = Me.PointsTotal Then
+        ' job finished correctly
+
+        clsEntities.Restore(True)
+        ' and now we move
+        clsEntities.Move(Me.SelEndXr - Me.SelStartXr, Me.SelEndyr - Me.SelStartYr, True)
+
+        clsEntities.ClonElements(True) ' let make a copy of them
+
+        clsEntities.Restore(True) ' back the Originals to starting position, the copies are at the new one
+
+        clsEntities.Finish
+
+    End If
+
+    modCAD.clsJobPrevious = Me
+    modCAD.clsJob = clsDefaultJob
+    clsDrawingAids.CleanTexts
+    clsEntities.DeSelection()
+    modCAD.DrawOriginals = False
+   appmain.hFCAD.redraw
+    Me.Active = False
+    modCAD.ToolActive = False
+End

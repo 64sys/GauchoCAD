@@ -1,0 +1,298 @@
+' Gambas class file
+
+Private oldrichtext As String 
+
+Public TextW As Integer
+Public TextH As Integer
+
+
+
+Public Sub _new()
+  
+  Me.tag = New Collection
+ 
+End
+
+Public Sub Form_Open()
+
+  Dim fuente As String
+
+  If Me.Tag["campo"] Then
+      texto.RichText = Me.Tag["campo"].RichText
+      oldrichtext = Me.Tag["campo"].RichText
+  Endif
+  If Me.Tag["sololectura"] = True Then
+      TBar1.Visible = False
+      texto.ReadOnly = True
+  Else
+      For Each fuente In Fonts
+          cbFuentes.add(fuente)
+      Next
+      cbFuentes.Index = cbFuentes.Find(texto.Format.Font.Name) '  .Find(mcomun.preferencias["fuente"])
+      SpinBox1.Value = texto.Format.Font.Size
+        ' If mcomun.preferencias["fuente"] Then
+        '     If Len(texto.Text) < 1 Then
+        '         texto.Font = Font[mcomun.preferencias["fuente"] & "," & mcomun.preferencias["fuente_size"]] 'fuente & "," & fuente_size]
+        '     Endif
+        '     cbFuentes.Index = cbFuentes.Find(mcomun.preferencias["fuente"]) 'fuente)
+        '     SpinBox1.Value = mcomun.preferencias["fuente_size"] ' fuente_size
+        ' Endif
+   Endif 
+ 
+  
+  End
+
+
+Public Sub form_Arrange()
+    
+  
+  texto.top = TBar1.Top + TBar1.Height
+  texto.Left = TBar1.Left
+  texto.h = TextH
+  texto.W = TextW
+  
+    
+    
+End
+
+Public Sub TBar1_Arrange()
+    
+  Me.Width = TBar1.W + 100
+    
+    
+End
+
+
+Public Sub texto_Cursor()
+
+  Object.Lock(btnBold)
+  Object.Lock(btnItalic)
+  Object.Lock(btnUnderline)
+  Object.Lock(btnStrikeOut)
+  Object.Lock(btnAlignLeft)
+  Object.Lock(btnAlignCenter)
+  Object.Lock(btnAlignRight)
+  Object.Lock(btnAlignJustify)
+  Object.Lock(cbFuentes)
+  Object.Lock(SpinBox1)
+  
+  
+  btnBold.Value = texto.Format.Font.Bold
+  btnItalic.Value = texto.Format.Font.Italic
+  btnUnderline.Value = texto.Format.Font.Underline
+  btnStrikeOut.Value = texto.Format.Font.StrikeOut
+  
+  Select Case texto.Format.Alignment
+    Case Align.Left
+      btnAlignLeft.Value = True
+    Case Align.Right
+      btnAlignRight.Value = True
+    Case Align.Center
+      btnAlignCenter.Value = True
+    Case Align.Justify
+      btnAlignJustify.Value = True
+    Case Align.Normal
+      btnAlignLeft.Value = True ' If the displayed langage is left to right written, that's OK. Elsewhere...
+  End Select
+  
+  
+  cbFuentes.Text = texto.Format.Font.Name
+  SpinBox1.Value = texto.Format.Font.Size
+  
+  Object.UnLock(btnBold)
+  Object.UnLock(btnItalic)
+  Object.UnLock(btnUnderline)
+  Object.UnLock(btnStrikeOut)
+  Object.UnLock(btnAlignLeft)
+  Object.UnLock(btnAlignCenter)
+  Object.UnLock(btnAlignRight)
+  Object.UnLock(btnAlignJustify)
+  Object.UnLock(cbFuentes)
+  Object.UnLock(SpinBox1)
+  
+
+End
+
+Public Sub btnBold_Click()
+
+   'texto.Format.Font.Bold = Last.Value
+   
+    texto.Format.Font.Bold = Not texto.Format.Font.Bold 
+
+End
+
+Public Sub btnItalic_Click()
+
+  texto.Format.Font.Italic = Not texto.Format.Font.Italic 'Last.Value
+
+End
+
+Public Sub btnUnderline_Click()
+
+  texto.Format.Font.Underline = Last.Value
+
+End
+
+Public Sub btnStrikeOut_Click()
+
+  texto.Format.Font.StrikeOut = Last.Value
+
+End
+
+Public Sub btnAlignLeft_Click()
+
+  texto.Format.Alignment = Align.Left
+
+End
+
+Public Sub btnAlignCenter_Click()
+
+  texto.Format.Alignment = Align.Center
+
+End
+
+Public Sub btnAlignRight_Click()
+
+  texto.Format.Alignment = Align.Right
+
+End
+
+
+Public Sub SpinBox1_Change()
+
+  texto.Format.Font.Size = Last.Value
+  texto.SetFocus
+
+End
+
+
+Public Sub cbFuentes_Click()
+
+  texto.Format.Font.Name = Last.text
+
+End
+
+Public Sub btnAlignJustify_Click()
+
+  texto.Format.Alignment = Align.Justify
+
+End
+
+
+
+Public Function solotexto(cHtml As String) As String
+  
+  Dim cad As String
+  Dim n, desde, hasta As Integer
+  Dim aUnchar As New String[]
+  Dim asinchar As New String[]
+  aUnchar = ["&quot;", "</p>"]
+  aSinchar = ["\n", "\r"]
+  cad = cHtml
+  For Each cad In aUnchar
+    cad = Replace(cad, cad, "\"")
+  Next
+  For Each cad In asinchar
+    cad = Replace(cad, cad, "")
+  Next
+  While True
+      n = String.InStr(cad, "<")
+      If n > 0 Then
+          desde = n
+          hasta = String.InStr(cad, ">")
+      Else
+          Return cad
+      Endif
+      If desde = 1 Then
+        cad = String.Mid(cad, hasta + 1)
+      Else
+        cad = String.Mid(cad, 1, desde - 1) & String.Mid(cad, hasta + 1)
+      Endif
+  Wend
+End
+
+
+Public Sub texto_KeyPress()
+  
+  If Key.code = Key["-"] And Key.Alt Then
+         Stop Event
+'         Desktop.SendKeys(String.Chr(Int(&2014)))
+         texto.Insert(String.Chr(Int(&2014)))
+  Endif
+  If Key.code = Key["n"] And Key.Alt Then
+         Stop Event
+       btnBold_Click()
+  Endif
+  If Key.code = Key["i"] And Key.Alt Then
+   Stop Event
+       btnItalic_Click()
+  Endif
+ appmain.hFCAD.redraw
+  
+  
+End
+
+Public Sub texto_KeyRelease()
+
+  Dim n As Integer
+
+  If Key.code = Key.Enter Or Key.code = Key.Return Then
+     n = texto.Pos 
+     Texto.RichText = Replace(Texto.RichText, "text-indent:" & SBIndent.Tag & "px", "text-indent:" & SBIndent.Text & "px")
+     SBIndent.Tag = SBIndent.Text
+     texto.pos = n
+  
+  Else If Key.Code = Key.Esc Then
+      
+      Me.Hide
+      
+  Endif
+
+  
+End
+
+Public Sub Form_Show()
+
+ 
+  texto.SetFocus
+End
+
+
+
+
+
+
+
+Public Sub SBIndent_Change()
+    
+     texto.RichText = Replace(Texto.RichText, "text-indent:" & SBIndent.Tag & "px", "text-indent:" & SBIndent.Text & "px")
+     SBIndent.tag = SBIndent.text
+     
+End
+
+
+
+
+Public Sub texto_Change()
+
+    Dim asep As String[]
+    Dim s As String
+    Dim n As Integer
+    
+    asep = ["\"", Chr(10)]
+    s = String.Mid(texto.Text, 1)
+    For n = 0 To asep.Count - 1
+        s = Replace(s, asep[n], " ")
+    Next
+    
+    Try Me.Tag["campo"].RichText = texto.RichText 'por si el campo no se llama texto...
+    
+End
+
+
+Public Sub Button1_Click()
+
+    APPMain.hFCAD.arrEntities.Last.stringdata = texto.RichText
+    Me.Hide
+
+End

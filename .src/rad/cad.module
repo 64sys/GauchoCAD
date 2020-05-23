@@ -1,0 +1,1772 @@
+' Gambas module file
+
+Export
+
+'' This load all the info form a gaucho xml file, then put it in a collection a
+'' nd return it.
+
+Public Function LoadGaucho(sFile As String) As Collection
+
+    Dim c As New Collection
+    Dim cLayers As New Collection
+    Dim cStyles As New Collection
+    Dim cWidths As New Collection
+    Dim cDimSts As New Collection
+    Dim cFonts As New Collection
+    Dim cMdl As New Collection
+    Dim hxml As New XmlDocument
+    Dim ent As XmlElement
+
+    hxml.Open(sFile)
+
+    cMdl.Add(sFile, "File")
+
+    For Each ent In hxml.GetElementsByTagName("header")
+        Select ent.Attributes["type"]
+            Case "version"
+                cMdl.Add(ent.Attributes["name"], "Version")
+
+            Case "layer"
+                c.Clear
+                c["id"] = ent.Attributes["id"]
+                c["type"] = ent.Attributes["type"]
+                c["name"] = ent.Attributes["name"]
+                c["show"] = CBool(ent.Attributes["show"])
+                c["frozen"] = CBool(ent.Attributes["frozen"])
+                c["locked"] = CBool(ent.Attributes["locked"])
+                c["colour"] = CInt(ent.Attributes["colour"])
+                c["style"] = CInt(ent.Attributes["style"])
+                c["width"] = CInt(ent.Attributes["width"])
+                c["print"] = CBool(ent.Attributes["print"])
+                cLayers.Add(c.Copy(), ent.Attributes["id"])
+
+            Case "style"
+                c.Clear
+                c["id"] = ent.Attributes["id"]
+                c["type"] = ent.Attributes["type"]
+                c["name"] = ent.Attributes["name"]
+                cStyles.Add(c.Copy(), ent.Attributes["id"])
+
+            Case "width"
+                c.Clear
+                c["id"] = ent.Attributes["id"]
+                c["type"] = ent.Attributes["type"]
+                c["value"] = ent.Attributes["value"]
+                cWidths.Add(c.Copy(), ent.Attributes["id"])
+
+            Case "dimst"
+                c.Clear
+                c["id"] = ent.Attributes["id"]
+                c["type"] = ent.Attributes["type"]
+                c["name"] = ent.Attributes["name"]
+                cDimSts.Add(c.Copy(), ent.Attributes["id"])
+
+            Case "font"
+                c.Clear
+                c["id"] = ent.Attributes["id"]
+                c["type"] = ent.Attributes["type"]
+                c["name"] = ent.Attributes["name"]
+                cFonts.Add(c.Copy(), ent.Attributes["id"])
+
+        End Select
+    Next
+
+    cMdl.Add(cLayers, "Layers")
+    cMdl.Add(cStyles, "Styles")
+    cMdl.Add(cWidths, "Widths")
+    cMdl.Add(cDimSts, "DimSts")
+    cMdl.Add(cFonts, "Fonts")
+
+    ''TODO: poner las entidade en el cModel
+    ' For Each ent In hxml.GetElementsByTagName("entity")
+    '     c.Clear
+    '
+    '     Select ent.Attributes["type"]
+    '
+    '         Case "line"
+    '
+    '             c["id"] = ent.Attributes["id"]
+    '             c["type"] = ent.Attributes["type"]
+    '             fx = CFloat(ent.Attributes["p1"]
+    '             fy =
+    '             c["p1"] = CFloat(ent.Attributes["label"]
+    '
+    '
+    '         Case "polyline"
+    '
+    '         Case "text"
+    '
+    '         Case "circle"
+    '             c["id"] = ent.Attributes["id"]
+    '             c["type"] = ent.Attributes["type"]
+    '             c["p1"] = ent.Attributes["label"]
+    '
+    '         Case "ellipse"
+    '
+    '         Case "arc"
+    '
+    '     End Select
+    '     If c.Count > 0 Then
+    '         If c.Exist("id") Then
+    '             cEntities.Add(c.Copy(), ent.Attributes["id"])
+    '         Endif
+    '     Endif
+    '
+    ' Next
+    '
+    ' cMdl.Add(cEntities, "Entities")
+
+    Return cMdl
+
+End
+
+Public Function ExportSVG(model As Collection) As String
+
+    Dim ent As Variant
+    Dim xsvg As XmlDocument
+    Dim sFileIn As String
+    Dim sFileSVG As String
+    Dim sFile As String
+    Dim sVersion As String
+
+    sFile = model["File"]
+    sVersion = model["Version"]
+
+    sFileSVG = File.Dir(sFile) &/ File.Name(sFile) & ".svg"
+
+    xsvg.Open(sFileSVG)
+
+    For Each ent In model
+        Select ent["Name"]
+            Case "LINE"
+
+        End Select
+
+    Next
+
+End
+
+Public Function Import(sFile As String) As Collection
+
+    Dim sCont As String
+    Dim cont As Collection
+    Dim enty As Collection
+    Dim comm As Collection
+    Dim spec As Collection
+    Dim FileVersion As String       ''2004, 14, 2007 ...
+    Dim vent As Collection
+    Dim v As Variant
+    Dim ctn As Variant
+    Dim x As Variant
+    Dim Ety As Variant
+    Dim Idx As Variant
+    Dim set As New Collection         ''Combination of the previous two
+    Dim entities As New Collection       ''All the entities
+    Dim model As New Collection       ''Complete model
+    Dim layers As Collection
+    Dim AcHeader As Collection
+
+    layers = GetLayersList(sFile)
+
+    vent = cad.GetEntityList()
+    sCont = dwgread(sFile)
+    If sCont <> "" Then
+        FileVersion = Split(sCont, "\n")[1]
+        FileVersion = Replace(FileVersion, " ", "")
+        FileVersion = Replace(FileVersion, "(", ":")
+        FileVersion = Split(FileVersion, ":")[1]
+
+        cont = Sections(sCont, FileVersion)
+
+        model.Add(sFile, "File")
+        model.Add(FileVersion, "Version")
+        model.Add(layers, "Layers")
+
+        If cont.Exist("Header") Then
+            AcHeader = Header(cont["Header"])
+            If AcHeader.Count > 0 Then
+                model.Add(AcHeader, "Header")
+            Endif
+        Endif
+
+        If cont.Exist("Handles") Then
+
+            enty = Objects(cont["Handles"])
+
+            For Each v In vent
+                If v = True Then ' for debug change to False
+                    If enty.Exist(vent.Key) Then
+                        ctn = enty[vent.Key]
+                        If ctn.Count > 0 Then
+                            For Each x In ctn
+                                comm = DecodeCommon(x)
+                                spec = DecodeEntity(x)
+                                Ety = comm["Name"]
+                                Idx = comm["Id"]
+                                set.Clear
+                                'combinax
+                                If comm["Id"] = spec["Id"] Then
+                                    For Each v In comm
+                                        set.Add(v, comm.Key)
+                                    Next
+                                    For Each v In spec
+                                        If set.Exist(spec.Key) = False Then
+                                            set.Add(v, spec.Key)
+                                        Endif
+                                    Next
+                                Endif
+                                entities.Add(set.Copy(), set["Id"])
+                            Next
+                        Endif
+                    Endif
+                Endif
+            Next
+        Endif
+    Endif
+
+    model.Add(entities, "Entities")
+
+    Return model
+
+End
+
+Public Function GetLayersList(sFile As String) As Collection
+
+    Dim layers As New Collection
+    Dim sOut As String
+    Dim stx As String[]
+    Dim slay As String
+    Dim lay As New Collection
+
+    If Exist(sFile) Then
+        Shell "/usr/local/bin/dwglayers -f '" & sFile & "' 2>&1 " To sOut
+    Endif
+
+    If sOut <> "" Then
+        stx = Split(sOut, "\n")
+        For Each slay In stx
+            If InStr(slay, "\t") > 0 Then
+
+                If String.Mid(slay, 1, 1) = "f" Then
+                    lay.Add(True, "Frozen")
+                Else
+                    lay.Add(False, "Frozen")
+                Endif
+                If String.Mid(slay, 2, 1) = "+" Then
+                    lay.Add(True, "On")
+                Else
+                    lay.Add(False, "On")
+                Endif
+                If String.Mid(slay, 3, 1) = "l" Then
+                    lay.Add(True, "Locked")
+                Else
+                    lay.Add(False, "Locked")
+                Endif
+
+                lay.Add(Split(slay, "\t")[1], "Name")
+
+            Endif
+            layers.Add(lay.Copy(), lay["Name"])
+        Next
+    Endif
+
+    Return layers
+
+End
+
+Public Function GetEntityList() As Collection
+
+    Dim entity As New Collection
+
+    entity.Add(False, "3DFACE")
+    entity.Add(False, "3DSOLID")
+    entity.Add(False, "ACAD_PROXY_ENTITY")
+    entity.Add(True, "ARC") 'ok
+    entity.Add(True, "ATTDEF") 'ok
+    entity.Add(True, "ATTRIB") 'ok
+    entity.Add(False, "BODY")
+    entity.Add(True, "CIRCLE") 'ok
+    entity.Add(False, "DIMENSION")
+    entity.Add(True, "ELLIPSE") 'ok
+    entity.Add(True, "HATCH")
+    entity.Add(False, "HELIX")
+    entity.Add(False, "IMAGE")
+    entity.Add(True, "INSERT") 'ok
+    entity.Add(False, "LEADER")
+    'entity.Add(False, "LIGHT")
+    entity.Add(True, "LINE") 'ok
+    entity.Add(True, "LWPOLYLINE") 'ok
+    'entity.Add(False, "MLINE") 'very complex, to do later
+    'entity.Add(False, "MULTILEADER")
+    'entity.Add(False, "MLEADERSTYLE")
+    entity.Add(True, "MTEXT") 'ok
+    entity.Add(False, "OLEFRAME")
+    entity.Add(False, "OLE2FRAME")
+    entity.Add(True, "POINT") 'ok
+    entity.Add(False, "POLYLINE") 'not yey
+    entity.Add(False, "RAY")
+    entity.Add(False, "REGION")
+    entity.Add(False, "SECTION")
+    entity.Add(False, "SEQEND")
+    entity.Add(False, "SHAPE")
+    entity.Add(False, "SOLID")
+    entity.Add(False, "SPLINE")
+    entity.Add(False, "SUN")
+    entity.Add(False, "SURFACE")
+    entity.Add(False, "TABLE")
+    entity.Add(True, "TEXT") 'ok
+    entity.Add(False, "TOLERANCE")
+    entity.Add(False, "TRACE")
+    entity.Add(False, "UNDERLAY")
+    entity.Add(False, "VERTEX")
+    entity.Add(False, "VIEWPORT")
+    entity.Add(False, "WIPEOUT")
+    entity.Add(False, "XLINE")
+
+    Return entity
+
+End
+
+'dwg2dxf
+'dwg2svg
+'dwgdump
+'dwgfilter
+'dwggrep
+'dwglayers
+'dwgread *
+'dwgwrite
+'dxf2dwg
+'dxfwrite
+
+Public Function dwgread(f As String, Optional fmt As String) As String
+
+    Dim sOut As String
+
+    If Exist(f) Then
+        Select fmt
+            Case ""
+                Shell "/usr/local/bin/dwgread -v4 '" & f & "' 2>&1 " To sOut
+            Case "json"
+                Shell "/usr/local/bin/dwgread -v4 --format JSON '" & f & "' 2>&1 " To sOut
+        End Select
+
+    Endif
+
+    Return sOut
+
+End
+
+Public Function Sections(s As String, vsn As String) As Collection
+
+    Dim sWrd As String
+    Dim cont As New Collection
+    'Dim sVer As String
+    Dim sec As New String[]
+    Dim sn As String
+    Dim sName As String
+    Dim sHead As String
+    Dim contx As String[]
+    Dim tmx As New String[]
+    Dim tm As String
+
+    Select vsn
+
+        Case "AC1015" '"DWG2000"
+            sWrd = "=======> "
+            s = Replace(s, "\t", " ")
+            s = Replace(s, sWrd, "\t")
+            sec = Split(s, "\t")
+
+            tmx = ["AuxHeader", "Thumbnail", "Header Variables", "CLASS", "Handles", "Last Object", "Second Header", "MEASUREMENT"]
+
+            For Each sn In sec
+                If InStr(sn, "\n") > 0 Then
+                    contx = Split(sn, "\n")
+                    sHead = contx[0]
+                    sName = ""
+                    For Each tm In tmx
+                        If InStr(sHead, tm) > 0 Then
+                            sName = tm
+                            Break
+                        Endif
+                    Next
+                    If sName <> "" Then
+                        sName = Replace(sName, "AcDb:", "")
+                        If sName = "Header Variables" Then
+                            sName = "Header"
+                        Endif
+                        cont.Add(sn, sName)
+                    Endif
+                Endif
+            Next
+
+        Case "AC1018", "AC1024", "AC1027" ' "DWG2004", "DWG2010", "DWG2013"
+            sWrd = "Found section_info["
+            s = Replace(s, "\t", " ")
+            s = Replace(s, sWrd, "\t")
+            sec = Split(s, "\t")
+
+            For Each sn In sec
+                If InStr(sn, "\n") > 0 Then
+                    contx = Split(sn, "\n")
+                    sHead = contx[0]
+                    If InStr(sHead, "] AcDb:") > 0 Then
+                        sName = Split(sHead, " ")[1]
+                        sName = Replace(sName, "AcDb:", "")
+                        cont.Add(sWrd & sn, sName)
+                    Endif
+                Endif
+            Next
+
+        Case "AC1021" '"DWG2007"
+
+            s = Replace(s, "\t", " ")
+
+            tmx = ["AppInfoHistory", "AppInfo", "Preview", "SummaryInfo", "RevHistory", "AcDbObjects", "ObjFreeSpace", "Template", "Handles", "Classes", "AuxHeader", "Header"]
+
+            For Each tm In tmx
+                Select tm
+                    Case "AppInfoHistory", "AppInfo", "Preview", "SummaryInfo", "RevHistory", "ObjFreeSpace", "Template"
+                        s = Replace(s, tm & " (", "\t" & tm & " (")
+
+                    Case "AcDbObjects", "Handles", "Classes", "AuxHeader", "Header"
+                        s = Replace(s, tm & "\n-------------------", "\t" & tm & "\n-------------------")
+
+                End Select
+            Next
+
+            sec = Split(s, "\t")
+
+            For Each sn In sec
+                If InStr(sn, "\n") > 0 Then
+                    contx = Split(sn, "\n")
+                    sHead = contx[0]
+                    sName = ""
+                    For Each tm In tmx
+                        If InStr(sHead, tm) > 0 Then
+                            sName = tm
+                            Break
+                        Endif
+                    Next
+                    If sName <> "" Then
+                        cont.Add(sn, "AcDb:" & sName)
+                    Endif
+                Endif
+            Next
+
+    End Select
+
+    Return cont
+
+End
+
+Public Function Objects(s As String) As Collection
+    'list,number
+
+    Dim stx As String[]
+    Dim i As Integer
+    Dim obt As String
+    'Dim sVer As String
+    Dim obx As String[]
+    Dim tmx As New Collection
+    Dim j As Integer
+    Dim hdx As String[]
+    'Dim dtx As String[]
+    Dim k As Integer
+    Dim sTag As String
+    Dim sVal As String
+    Dim st As String
+    Dim out As New Collection
+    Dim p As Integer
+    Dim sType As String
+
+    s = Replace(s, "==========================================\n", "\t")
+    stx = Split(s, "\t")
+
+    If stx.count > 0 Then
+        For i = 1 To stx.Max
+            tmx.Clear
+            obt = stx[i]
+            obx = Split(obt, "\n")
+            hdx = Split(Replace(Replace(obx[0], ", ", "\t"), ": ", ":"), "\t")
+            For k = 0 To hdx.Max
+                sTag = Split(hdx[k], ":")[0]
+                sTag = Replace(sTag, " ", "")
+                sVal = Split(hdx[k], ":")[1]
+                If sTag = "Object number" Then
+                    tmx.Add(CStr(Split(sVal, "/")[0]), "object_int")
+                    tmx.Add(CStr(Split(sVal, "/")[1]), "object_hex")
+                Else
+                    tmx.Add(sVal, sTag)
+                Endif
+            Next
+
+            '"Add object BLOCK_CONTROL [0] Decode object BLOCK_CONTROL"
+            Select String.Mid(obx[1], 1, 4)
+                Case "Warn"
+                    sType = Split(obx[2], " ")[Split(obx[2], " ").Max - 1]
+                    p = 1
+                Case "Add "
+                    sType = Split(obx[1], " ")[Split(obx[1], " ").Max - 1]
+                    p = 0
+                Case Else
+                    sType = "Error"
+            End Select
+
+            If sType <> "Error" Then
+                tmx.Add(sType, "XType")
+                sVal = Split(obx[1 + p], " ")[Split(obx[1 + p], " ").Max]
+                tmx.Add(sVal, "XName")
+            Endif
+
+            For j = (2 + p) To obx.Max - 3
+                If InStr(obx[j], ": ") Then
+                    st = Replace(obx[j], ": ", "\t")
+                    sTag = Split(st, "\t")[0]
+                    sTag = Replace(sTag, " ", "")
+                    sVal = Split(st, "\t")[1]
+                    tmx.Add(sVal, sTag)
+                Endif
+            Next
+
+            If tmx.Exist("XName") Then
+                If out.Exist(tmx["XName"]) Then
+                    out[tmx["XName"]].Add(tmx.Copy())
+                Else
+                    out.Add([tmx.Copy()], tmx["XName"])
+                Endif
+            Else
+                Print "entity error" & tmx["Object_int"]
+            Endif
+        Next
+    Endif
+
+    Return out
+
+End
+
+Public Function Header(s As String) As Collection
+
+    Dim stx As String[]
+    Dim i As Integer
+    Dim obt As String
+    Dim obx As New String[]
+    Dim sTag As String
+    Dim sVal As String
+    Dim out As New Collection
+
+    stx = Split(s, "\n")
+
+    If stx.count > 0 Then
+        For i = 1 To stx.Max
+            obt = stx[i]
+            obx.Clear
+            If InStr(obt, ": ") > 0 Then
+                obt = Replace(obt, ": ", "\t")
+                obt = Replace(obt, " [", "\t")
+                obt = Replace(obt, "]", "")
+                obx = Split(obt, "\t")
+                sTag = obx[0]
+                sVal = obx[1]
+                out.Add(sVal, sTag)
+            Endif
+        Next
+    Endif
+
+    Return out
+
+End
+
+'' Decode the common fields for any entity
+
+Public Function DecodeCommon(c As Collection) As Collection
+
+    Dim v As Variant
+    Dim prp As New Collection
+    Dim sVal As Variant
+    Dim i As Integer
+    'Dim clr As New String[]
+    Dim f As Float
+
+    If c.Exist("XName") Then
+
+        If c.Exist("Objectnumber") Then
+            If InStr(c["Objectnumber"], "/") > 1 Then
+                i = CInt(Split(c["Objectnumber"], "/")[0])
+            Endif
+            prp.Add(i, "Id")
+        Endif
+
+        prp.Add(c["XName"], "Name")
+
+        If c["XName"] = "LWPOLYLINE" Then
+            Print "LWPOLYLINE"
+        Endif
+
+        For Each v In c
+            i = -1
+            f = 0.0
+            Select c.Key
+
+                Case "layer"
+                    sVal = DecodeLayer(CStr(v))
+                    prp.Add(sVal, "Layer")
+
+                Case "ltype_flags"
+                    i = DecodeInteger(CStr(v))
+                    prp.Add(i, "Style")
+
+                Case "linewt"
+                    i = DecodeHex(sVal)
+                    prp.Add(i, "Weight")
+
+                    ' Case "color.raw"
+                    '
+                    '     If c.Exist("color.flag") Then
+                    '         sVal = String.Mid(c["color.flag"], 1, InStr(c["color.flag"], "[") - 1)
+                    '     Else
+                    '         sVal = String.Mid(v, 1, InStr(v, "[") - 1)
+                    '     Endif
+                    '
+                    '     i = DecodeHex(sVal)
+                    '     prp.Add(i, "Colour")
+
+                Case "ltype_scale"
+                    f = DecodeFloat(CStr(v))
+                    prp.Add(f, c.Key)
+
+                Case "plotstyle_flags"
+                    i = DecodeInteger(CStr(v))
+                    prp.Add(i, c.Key)
+
+                Case "invisible"
+                    i = DecodeInteger(CStr(v))
+                    prp.Add(i, c.Key)
+
+            End Select
+
+            ' Colour
+            sVal = ""
+            If c.Exist("color.raw") Then
+                sVal = String.Mid(c["color.raw"], 1, InStr(c["color.raw"], "[") - 1)
+                i = DecodeHex(sVal)
+            Else
+                If c.Exist("color.index") Then
+                    sVal = String.Mid(c["color.index"], 1, InStr(c["color.index"], "[") - 1)
+                    sval = Replace(sval, " ", "")
+                    i = CInt(sval)
+                Endif
+            Endif
+
+            If i >= 0 And i <= 256 Then
+                prp.Add(i, "Colour")
+            Else
+                prp.Add(0, "Colour")
+            Endif
+
+        Next
+    Endif
+
+    Return prp
+
+End
+
+'' Decode the fields for a specific entity
+
+Public Function DecodeEntity(c As Collection) As Collection
+
+    Dim v As Variant
+    Dim prp As New Collection
+    Dim sVal As Variant
+    Dim pt As New Float[]
+    Dim pt1 As New Float[]
+    Dim pt2 As New Float[]
+    Dim i As Integer
+    Dim f As Float
+    ' Dim fp1 As Float
+    ' Dim fp2 As Float
+    ' Dim fp3 As Float
+    Dim p As Integer
+    Dim sDec As String
+    Dim sTag As String
+    Dim sTag1 As String
+    Dim sTag2 As String
+    Dim hx As Integer
+    Dim sTag3 As String
+    Dim n As Integer
+    Dim d As Integer
+    Dim sTag5 As String
+    Dim sTag4 As String
+
+    If c.Exist("XName") Then
+
+        If c.Exist("Objectnumber") Then
+            If InStr(c["Objectnumber"], "/") > 1 Then
+                i = CInt(Split(c["Objectnumber"], "/")[0])
+            Endif
+            prp.Add(i, "Id")
+        Endif
+
+        prp.Add(c["XName"], "Name")
+
+        Select c["XName"]
+
+            Case "TEXT"
+
+                'dataflags: 0 xb5[RC 0]
+                For Each v In c
+                    Select c.Key
+                        Case "insertion_pt"
+                            pt = DecodeCoord(CStr(v))
+                            prp.Add(pt, "P1")
+
+                        Case "alignment_pt"
+                            pt = DecodeCoord(CStr(v))
+                            prp.Add(pt, "P2")
+
+                        Case "rotation"
+                            f = DecodeFloat(CStr(v))
+                            prp.Add(f, "Angle")
+
+                        Case "height"
+                            f = DecodeFloat(CStr(v))
+                            prp.Add(f, "Height")
+
+                        Case "horiz_alignment"
+                            i = DecodeInteger(CStr(v))
+                            prp.Add(i, "Horiz")
+
+                        Case "style"
+                            sVal = DecodeTextStyle(CStr(v))
+                            prp.Add(sVal, "Font")
+
+                        Case "text_value" ' I deide call just "text" to the tag
+                            sVal = DecodeText(CStr(v))
+                            prp.Add(sVal, "Text")
+
+                    End Select
+                Next
+
+            Case "MTEXT"
+
+                For Each v In c
+                    Select c.Key
+                        Case "insertion_pt"
+                            pt = DecodeCoord(CStr(v))
+                            prp.Add(pt, "P1")
+
+                        Case "extrusion"
+                            pt = DecodeCoord(CStr(v))
+                            prp.Add(pt, c.Key)
+
+                        Case "x_axis_dir"
+                            pt = DecodeCoord(CStr(v))
+                            prp.Add(pt, c.Key)
+
+                        Case "rect_width"
+                            f = DecodeFloat(CStr(v))
+                            prp.Add(f, c.Key)
+
+                        Case "text_height"
+                            f = DecodeFloat(CStr(v))
+                            prp.Add(f, "Height")
+
+                        Case "attachment"
+                            i = DecodeInteger(CStr(v))
+                            prp.Add(i, c.Key)
+
+                        Case "drawing_dir"
+                            i = DecodeInteger(CStr(v))
+                            prp.Add(i, c.Key)
+
+                        Case "extents_height"
+                            f = DecodeFloat(CStr(v))
+                            prp.Add(f, c.Key)
+
+                        Case "extents_width"
+                            f = DecodeFloat(CStr(v))
+                            prp.Add(f, c.Key)
+
+                        Case "text"
+                            sVal = DecodeText(CStr(v))
+                            prp.Add(sVal, "Text")
+
+                        Case "linespace_style"
+                            i = DecodeInteger(CStr(v))
+                            prp.Add(i, c.Key)
+
+                        Case "linespace_factor"
+                            f = DecodeFloat(CStr(v))
+                            prp.Add(f, c.Key)
+
+                        Case "unknown_bit"
+                            i = DecodeInteger(CStr(v))
+                            prp.Add(i, c.Key)
+
+                        Case "bg_fill_flag"
+
+                            i = DecodeInteger(CStr(v))
+                            prp.Add(i, c.Key)
+
+                        Case "style"
+                            sVal = DecodeTextStyle(CStr(v))
+                            prp.Add(sVal, "Font")
+
+                    End Select
+                Next
+
+            Case "ATTDEF"
+
+                For Each v In c
+                    Select c.Key
+                        Case "insertion_pt"
+                            pt = DecodeCoord(CStr(v))
+                            prp.Add(pt, "P1")
+
+                        Case "height"
+                            f = DecodeFloat(CStr(v))
+                            prp.Add(f, "Height")
+
+                        Case "default_value"
+                            sVal = DecodeText(CStr(v))
+                            prp.Add(sVal, "Default")
+
+                        Case "tag"
+                            sVal = DecodeText(CStr(v))
+                            prp.Add(sVal, "Tag")
+
+                        Case "field_length"
+                            i = DecodeInteger(CStr(v))
+                            prp.Add(i, "Length")
+
+                            'flags: 0 x0[RC 70]
+
+                        Case "prompt"
+                            sVal = DecodeText(CStr(v))
+                            prp.Add(sVal, "Prompt")
+
+                        Case "style"
+                            sVal = DecodeTextStyle(CStr(v))
+                            prp.Add(sVal, "Font")
+
+                    End Select
+                Next
+
+            Case "ATTRIB"
+
+                For Each v In c
+                    Select c.Key
+                        Case "insertion_pt"
+                            pt = DecodeCoord(CStr(v))
+                            prp.Add(pt, "P1")
+
+                        Case "height"
+                            f = DecodeFloat(CStr(v))
+                            prp.Add(f, "Height")
+
+                        Case "text_value"
+                            sVal = DecodeText(CStr(v))
+                            prp.Add(sVal, "Text")
+
+                        Case "tag"
+                            sVal = DecodeText(CStr(v))
+                            prp.Add(sVal, "Tag")
+
+                        Case "field_length"
+                            i = DecodeInteger(CStr(v))
+                            prp.Add(i, "Length")
+
+                        Case "style"
+                            sVal = DecodeTextStyle(CStr(v))
+                            prp.Add(sVal, "Font")
+
+                    End Select
+                Next
+
+            Case "POINT"
+                prp.Add([0, 0, 0], "P1")
+                For Each v In c
+                    Select c.Key
+                        Case "x"
+                            f = DecodeFloat(CStr(v))
+                            'prp.Add(f, c.Key)
+                            prp["P1"][0] = f
+
+                        Case "y"
+                            f = DecodeFloat(CStr(v))
+                            'prp.Add(f, c.Key)
+                            prp["P1"][1] = f
+
+                        Case "z"
+                            f = DecodeFloat(CStr(v))
+                            'prp.Add(f, c.Key)
+                            prp["P1"][2] = f
+
+                            ' Case "x_ang"
+                            '     f = DecodeFloat(CStr(v))
+                            '     prp.Add(f, "Angle")
+                    End Select
+                Next
+
+                f = DecodeFloat(c["x_ang"])
+                prp.Add(f, "Angle")
+
+            Case "LINE"
+                For Each v In c
+                    Select c.Key
+                        Case "start"
+                            pt = DecodeCoord(CStr(v))
+                            prp.Add(pt, "P1")
+                        Case "end"
+                            pt = DecodeCoord(CStr(v))
+                            prp.Add(pt, "P2")
+                    End Select
+                Next
+
+            Case "INSERT"
+                For Each v In c
+                    Select c.Key
+
+                        Case "ins_pt"
+                            pt = DecodeCoord(CStr(v))
+                            prp.Add(pt, "P1")
+
+                        Case "scale_flag"
+                            i = DecodeInteger(CStr(v))
+                            prp.Add(i, c.Key)
+
+                        Case "scale"
+                            pt = DecodeCoord(CStr(v))
+                            prp.Add(pt, "Scale")
+
+                        Case "rotation"
+                            f = DecodeFloat(CStr(v))
+                            prp.Add(f, "Angle")
+
+                        Case "extrusion"
+                            pt = DecodeCoord(CStr(v))
+                            prp.Add(pt, c.Key)
+
+                        Case "has_attribs"
+                            i = DecodeInteger(CStr(v))
+                            prp.Add(i, c.Key)
+
+                        Case "num_owned"
+                            i = DecodeInteger(CStr(v))
+                            prp.Add(i, c.Key)
+
+                        Case "block_header"
+                            sVal = DecodeBlockHeader(CStr(v))
+                            prp.Add(sVal, c.Key)
+
+                            'Case "attrib_handles[vcount][0]"
+                            ': (3.2.192)abs: 192[H * 0]""
+                            'Case "seqend"
+                            ': (3.2.191)abs: 191[H 0]
+
+                    End Select
+                Next
+
+            Case "CIRCLE"
+                For Each v In c
+                    Select c.Key
+                        Case "center"
+                            pt = DecodeCoord(CStr(v))
+                            prp.Add(pt, "P1")
+
+                        Case "radius"
+                            f = DecodeFloat(CStr(v))
+                            prp.Add(f, "Radius")
+                    End Select
+                Next
+
+            Case "ARC"
+                For Each v In c
+                    Select c.Key
+                        Case "center"
+                            pt = DecodeCoord(CStr(v))
+                            prp.Add(pt, "P1")
+
+                        Case "radius"
+                            f = DecodeFloat(CStr(v))
+                            prp.Add(f, "Radius")
+
+                        Case "start_angle"
+                            f = DecodeFloat(CStr(v))
+                            prp.Add(f, "Angle1")
+
+                        Case "end_angle"
+                            f = DecodeFloat(CStr(v))
+                            prp.Add(f, "Angle2")
+                    End Select
+                Next
+
+            Case "ELLIPSE"
+                For Each v In c
+                    Select c.Key
+                        Case "center"
+                            pt = DecodeCoord(CStr(v))
+                            prp.Add(pt, "P1")
+
+                        Case "sm_axis"
+                            pt = DecodeCoord(CStr(v))
+                            prp.Add(pt, c.Key)
+
+                        Case "extrusion"
+                            pt = DecodeCoord(CStr(v))
+                            prp.Add(pt, c.Key)
+
+                        Case "axis_ratio"
+                            f = DecodeFloat(CStr(v))
+                            prp.Add(f, c.Key)
+
+                        Case "start_angle"
+                            f = DecodeFloat(CStr(v))
+                            prp.Add(f, "Angle1")
+
+                        Case "end_angle"
+                            f = DecodeFloat(CStr(v))
+                            prp.Add(f, "Angle2")
+
+                    End Select
+
+                Next
+
+            Case "LWPOLYLINE"
+                For Each v In c
+                    Select c.Key
+                        Case "num_points"
+                            i = DecodeInteger(CStr(v))
+                            prp.Add(i, "Points")
+                            For p = 0 To i
+                                sDec = "points[" & p & "]"
+                                sTag = "P" & CStr(p)
+                                If c.Exist(sDec) Then
+                                    pt = DecodeCoord(CStr(c[sDec]))
+                                    prp.Add(pt, sTag)
+                                Endif
+                            Next
+                    End Select
+                Next
+
+            Case "HATCH"
+                For Each v In c
+                    Select c.Key
+
+                        Case "is_gradient_fill"
+                            i = DecodeInteger(CStr(v))
+                            prp.Add(i, c.Key)
+
+                        Case "reserved"
+                            i = DecodeInteger(CStr(v))
+                            prp.Add(i, c.Key)
+
+                        Case "gradient_angle"
+                            f = DecodeFloat(CStr(v))
+                            prp.Add(f, c.Key)
+
+                        Case "gradient_shift"
+                            f = DecodeFloat(CStr(v))
+                            prp.Add(f, c.Key)
+
+                        Case "single_color_gradient"
+                            i = DecodeInteger(CStr(v))
+                            prp.Add(i, c.Key)
+
+                        Case "gradient_tint"
+                            f = DecodeFloat(CStr(v))
+                            prp.Add(f, c.Key)
+
+                        Case "num_colors"
+                            i = DecodeInteger(CStr(v))
+                            prp.Add(i, c.Key)
+
+                        Case "gradient_name"
+                            sVal = DecodeText(CStr(v))
+                            prp.Add(sVal, c.Key)
+
+                        Case "elevation"
+                            f = DecodeFloat(CStr(v))
+                            prp.Add(f, c.Key)
+
+                        Case "extrusion"
+                            pt = DecodeCoord(CStr(v))
+                            prp.Add(pt, c.Key)
+
+                        Case "name"
+                            sVal = DecodeText(CStr(v))
+                            prp.Add(sVal, c.Key)
+
+                        Case "solid_fill"
+                            i = DecodeInteger(CStr(v))
+                            prp.Add(i, c.Key)
+
+                        Case "associative"
+                            i = DecodeInteger(CStr(v))
+                            prp.Add(i, c.Key)
+
+                        Case "num_paths"
+                            i = DecodeInteger(CStr(v))
+                            prp.Add(i, c.Key)
+
+                        Case "paths[0].flag"
+                            i = DecodeInteger(CStr(v))
+                            prp.Add(i, c.Key)
+
+                        Case "paths[0].num_segs_or_paths"
+                            i = DecodeInteger(CStr(v))
+                            prp.Add(i, c.Key)
+
+                            For p = 0 To i
+                                sTag = "paths[0].segs[p].type_status"
+                                sTag1 = "paths[0].segs[p].first_endpoint"
+                                sTag2 = "paths[0].segs[p].second_endpoint"
+
+                                If c.Exist(sTag) Then
+                                    hx = DecodeHex(CStr(c[sTag]))
+                                    prp.Add(hx, sTag1)
+                                Endif
+
+                                If c.Exist(sTag1) Then
+                                    pt1 = DecodeCoord(CStr(c[sTag1]))
+                                    prp.Add(pt1, sTag1)
+                                Endif
+
+                                If c.Exist(sTag2) Then
+                                    pt2 = DecodeCoord(CStr(c[sTag2]))
+                                    prp.Add(pt2, sTag2)
+                                Endif
+
+                            Next
+
+                        Case "paths[0].num_boundary_handles"
+                            i = DecodeInteger(CStr(v))
+                            prp.Add(i, c.Key)
+
+                        Case "style"
+                            i = DecodeInteger(CStr(v))
+                            prp.Add(i, c.Key)
+
+                        Case "pattern_type"
+                            i = DecodeInteger(CStr(v))
+                            prp.Add(i, c.Key)
+
+                        Case "angle"
+                            f = DecodeFloat(CStr(v))
+                            prp.Add(f, c.Key)
+
+                        Case "scale_spacing"
+                            f = DecodeFloat(CStr(v))
+                            prp.Add(f, c.Key)
+
+                        Case "double_flag"
+                            i = DecodeInteger(CStr(v))
+                            prp.Add(i, c.Key)
+
+                        Case "num_deflines"
+                            i = DecodeInteger(CStr(v))
+                            prp.Add(i, c.Key)
+
+                            For p = 0 To i
+
+                                sTag1 = "deflines[" & CStr(i) & "].pt0"
+                                pt = DecodeCoord(CStr(c[sTag1]))
+                                prp.Add(pt, sTag1)
+
+                                sTag2 = "deflines[" & CStr(i) & "].offset"
+                                pt = DecodeCoord(CStr(c[sTag2]))
+                                prp.Add(pt, sTag2)
+
+                                sTag3 = "deflines[" & CStr(i) & "].num_dashes"
+                                n = DecodeInteger(CStr(c[sTag3]))
+                                prp.Add(n, sTag3)
+
+                                For d = 0 To n
+                                    sTag4 = "deflines[rcount1].dashes[" & CStr(d) & "]"
+                                    f = DecodeFloat(CStr(c[sTag4]))
+                                    prp.Add(f, sTag4)
+                                Next
+                                sTag5 = "deflines[rcount1].angle"
+                                f = DecodeFloat(CStr(c[sTag5]))
+                                prp.Add(f, sTag5)
+
+                            Next
+
+                        Case "num_seeds"
+                            i = DecodeInteger(CStr(v))
+                            prp.Add(i, c.Key)
+
+                        Case "seeds[vcount]"
+                            pt = DecodeCoord(CStr(v))
+                            prp.Add(pt, c.Key)
+
+                            'Case "boundary_handles[vcount][0]"
+                            ': (4.1.8E)abs: 8E[H * 0] => LWPOLYLINE
+
+                    End Select
+                Next
+        End Select
+    Endif
+
+    Return prp
+
+End
+
+Private Function DecodeCoord(s As String) As Float[]
+
+    Dim pt As New Float[]
+    Dim sVal As String
+
+    sVal = Replace(s, " ", "")
+    sVal = Replace(sVal, ",", ":")
+    sVal = Replace(sVal, "(", "")
+    sVal = Replace(sVal, ")", "")
+    If InStr(sVal, "[") > 0 Then
+        sVal = String.Mid(sVal, 1, InStr(sVal, "[") - 1)
+    Endif
+
+    pt = Split(sVal, ":")
+
+    Return pt
+
+End
+
+Private Function DecodeHex(s As String) As Integer
+
+    Dim out As Integer
+
+    If InStr(s, "0x") > 0 Then
+        out = Val(Replace(s, "0x", "&00"))
+    Else
+        out = 0
+    Endif
+
+    Return out
+
+End
+
+Private Function DecodeFloat(s As String) As Float
+
+    Dim out As Float
+    Dim sVal As String
+
+    sVal = Replace(s, " ", "")
+    If InStr(sVal, "[") > 0 Then
+        out = Split(sVal, "[")[0]
+    Else
+        out = 0.0
+    Endif
+
+    Return out
+
+End
+
+Private Function DecodeInteger(s As String) As Integer
+
+    Dim out As Integer
+    Dim sVal As String
+
+    sVal = Replace(s, " ", "")
+    If InStr(sVal, "[") > 0 Then
+        out = Split(sVal, "[")[0]
+    Else
+        out = 0
+    Endif
+
+    Return out
+
+End
+
+Private Function DecodeLayer(s As String) As String
+
+    Dim out As String
+
+    If InStr(s, " => LAYER ") > 0 Then
+        out = Split(Replace(s, " => LAYER ", "\t"), "\t")[1]
+    Else
+        out = s
+    Endif
+
+    Return out
+
+End
+
+Private Function DecodeBlockHeader(s As String) As String
+
+    Dim out As String
+
+    If InStr(s, " => BLOCK_HEADER ") > 0 Then
+        out = Split(Replace(s, " => BLOCK_HEADER ", "\t"), "\t")[1]
+    Else
+        out = s
+    Endif
+
+    Return out
+
+End
+
+Private Function DecodeTextStyle(s As String) As String
+
+    Dim out As String
+
+    If InStr(s, " => STYLE ") > 0 Then
+        out = Split(Replace(s, " => STYLE ", "\t"), "\t")[1]
+    Else
+        out = s
+    Endif
+
+    Return out
+
+End
+
+Private Function DecodeText(s As String) As String
+
+    Dim out As String
+    'Dim i As Integer
+
+    'Dim k As Integer = 1
+    'Dim q As Integer
+    'Dim r As Integer
+
+    's = vag.ConvertPath(s)
+    s = Conv$(s, "ISO-8859-1", "UTF-8")
+    If InStr(s, "\\U+") > 0 Then
+        s = String2.Flat(s)
+    Endif
+
+    's = Replace(s, "\\U+00B0", "°")
+
+    If InStr(s, " [") > 0 Then
+        out = Split(Replace(s, " [", "\t"), "\t")[0]
+        If String.Left(out) = Chr(34) Then
+            out = String.Mid(out, 2)
+        Endif
+        If String.Right(out) = Chr(34) Then
+            out = String.Mid(out, 1, String.Len(out) - 1)
+
+        Endif
+    Else
+        out = s
+    Endif
+
+    Return out
+
+End
+
+Public Function RGBColors() As String[]
+
+    Dim rgbx As New String[]
+
+    rgbx.Add("0,0,0")
+    rgbx.Add("255,0,0")
+    rgbx.Add("255,255,0")
+    rgbx.Add("0,255,0")
+    rgbx.Add("0,255,255")
+    rgbx.Add("0,0,255")
+    rgbx.Add("255,0,255")
+    rgbx.Add("255,255,255")
+    rgbx.Add("128,128,128")
+    rgbx.Add("192,192,192")
+    rgbx.Add("255,0,0")
+    rgbx.Add("255,127,127")
+    rgbx.Add("165,0,0")
+    rgbx.Add("165,82,82")
+    rgbx.Add("127,0,0")
+    rgbx.Add("127,63,63")
+    rgbx.Add("76,0,0")
+    rgbx.Add("76,38,38")
+    rgbx.Add("38,0,0")
+    rgbx.Add("38,19,19")
+    rgbx.Add("255,63,0")
+    rgbx.Add("255,159,127")
+    rgbx.Add("165,41,0")
+    rgbx.Add("165,103,82")
+    rgbx.Add("127,31,0")
+    rgbx.Add("127,79,63")
+    rgbx.Add("76,19,0")
+    rgbx.Add("76,47,38")
+    rgbx.Add("38,9,0")
+    rgbx.Add("38,23,19")
+    rgbx.Add("255,127,0")
+    rgbx.Add("255,191,127")
+    rgbx.Add("165,82,0")
+    rgbx.Add("165,124,82")
+    rgbx.Add("127,63,0")
+    rgbx.Add("127,95,63")
+    rgbx.Add("76,38,0")
+    rgbx.Add("76,57,38")
+    rgbx.Add("38,19,0")
+    rgbx.Add("38,28,19")
+    rgbx.Add("255,191,0")
+    rgbx.Add("255,223,127")
+    rgbx.Add("165,124,0")
+    rgbx.Add("165,145,82")
+    rgbx.Add("127,95,0")
+    rgbx.Add("127,111,63")
+    rgbx.Add("76,57,0")
+    rgbx.Add("76,66,38")
+    rgbx.Add("38,28,0")
+    rgbx.Add("38,33,19")
+    rgbx.Add("255,255,0")
+    rgbx.Add("255,255,127")
+    rgbx.Add("165,165,0")
+    rgbx.Add("165,165,82")
+    rgbx.Add("127,127,0")
+    rgbx.Add("127,127,63")
+    rgbx.Add("76,76,0")
+    rgbx.Add("76,76,38")
+    rgbx.Add("38,38,0")
+    rgbx.Add("38,38,19")
+    rgbx.Add("191,255,0")
+    rgbx.Add("223,255,127")
+    rgbx.Add("124,165,0")
+    rgbx.Add("145,165,82")
+    rgbx.Add("95,127,0")
+    rgbx.Add("111,127,63")
+    rgbx.Add("57,76,0")
+    rgbx.Add("66,76,38")
+    rgbx.Add("28,38,0")
+    rgbx.Add("33,38,19")
+    rgbx.Add("127,255,0")
+    rgbx.Add("191,255,127")
+    rgbx.Add("82,165,0")
+    rgbx.Add("124,165,82")
+    rgbx.Add("63,127,0")
+    rgbx.Add("95,127,63")
+    rgbx.Add("38,76,0")
+    rgbx.Add("57,76,38")
+    rgbx.Add("19,38,0")
+    rgbx.Add("28,38,19")
+    rgbx.Add("63,255,0")
+    rgbx.Add("159,255,127")
+    rgbx.Add("41,165,0")
+    rgbx.Add("103,165,82")
+    rgbx.Add("31,127,0")
+    rgbx.Add("79,127,63")
+    rgbx.Add("19,76,0")
+    rgbx.Add("47,76,38")
+    rgbx.Add("9,38,0")
+    rgbx.Add("23,38,19")
+    rgbx.Add("0,255,0")
+    rgbx.Add("127,255,127")
+    rgbx.Add("0,165,0")
+    rgbx.Add("82,165,82")
+    rgbx.Add("0,127,0")
+    rgbx.Add("63,127,63")
+    rgbx.Add("0,76,0")
+    rgbx.Add("38,76,38")
+    rgbx.Add("0,38,0")
+    rgbx.Add("19,38,19")
+    rgbx.Add("0,255,63")
+    rgbx.Add("127,255,159")
+    rgbx.Add("0,165,41")
+    rgbx.Add("82,165,103")
+    rgbx.Add("0,127,31")
+    rgbx.Add("63,127,79")
+    rgbx.Add("0,76,19")
+    rgbx.Add("38,76,47")
+    rgbx.Add("0,38,9")
+    rgbx.Add("19,38,23")
+    rgbx.Add("0,255,127")
+    rgbx.Add("127,255,191")
+    rgbx.Add("0,165,82")
+    rgbx.Add("82,165,124")
+    rgbx.Add("0,127,63")
+    rgbx.Add("63,127,95")
+    rgbx.Add("0,76,38")
+    rgbx.Add("38,76,57")
+    rgbx.Add("0,38,19")
+    rgbx.Add("19,38,28")
+    rgbx.Add("0,255,191")
+    rgbx.Add("127,255,223")
+    rgbx.Add("0,165,124")
+    rgbx.Add("82,165,145")
+    rgbx.Add("0,127,95")
+    rgbx.Add("63,127,111")
+    rgbx.Add("0,76,57")
+    rgbx.Add("38,76,66")
+    rgbx.Add("0,38,28")
+    rgbx.Add("19,38,33")
+    rgbx.Add("0,255,255")
+    rgbx.Add("127,255,255")
+    rgbx.Add("0,165,165")
+    rgbx.Add("82,165,165")
+    rgbx.Add("0,127,127")
+    rgbx.Add("63,127,127")
+    rgbx.Add("0,76,76")
+    rgbx.Add("38,76,76")
+    rgbx.Add("0,38,38")
+    rgbx.Add("19,38,38")
+    rgbx.Add("0,191,255")
+    rgbx.Add("127,223,255")
+    rgbx.Add("0,124,165")
+    rgbx.Add("82,145,165")
+    rgbx.Add("0,95,127")
+    rgbx.Add("63,111,127")
+    rgbx.Add("0,57,76")
+    rgbx.Add("38,66,76")
+    rgbx.Add("0,28,38")
+    rgbx.Add("19,33,38")
+    rgbx.Add("0,127,255")
+    rgbx.Add("127,191,255")
+    rgbx.Add("0,82,165")
+    rgbx.Add("82,124,165")
+    rgbx.Add("0,63,127")
+    rgbx.Add("63,95,127")
+    rgbx.Add("0,38,76")
+    rgbx.Add("38,57,76")
+    rgbx.Add("0,19,38")
+    rgbx.Add("19,28,38")
+    rgbx.Add("0,63,255")
+    rgbx.Add("127,159,255")
+    rgbx.Add("0,41,165")
+    rgbx.Add("82,103,165")
+    rgbx.Add("0,31,127")
+    rgbx.Add("63,79,127")
+    rgbx.Add("0,19,76")
+    rgbx.Add("38,47,76")
+    rgbx.Add("0,9,38")
+    rgbx.Add("19,23,38")
+    rgbx.Add("0,0,255")
+    rgbx.Add("127,127,255")
+    rgbx.Add("0,0,165")
+    rgbx.Add("82,82,165")
+    rgbx.Add("0,0,127")
+    rgbx.Add("63,63,127")
+    rgbx.Add("0,0,76")
+    rgbx.Add("38,38,76")
+    rgbx.Add("0,0,38")
+    rgbx.Add("19,19,38")
+    rgbx.Add("63,0,255")
+    rgbx.Add("159,127,255")
+    rgbx.Add("41,0,165")
+    rgbx.Add("103,82,165")
+    rgbx.Add("31,0,127")
+    rgbx.Add("79,63,127")
+    rgbx.Add("19,0,76")
+    rgbx.Add("47,38,76")
+    rgbx.Add("9,0,38")
+    rgbx.Add("23,19,38")
+    rgbx.Add("127,0,255")
+    rgbx.Add("191,127,255")
+    rgbx.Add("82,0,165")
+    rgbx.Add("124,82,165")
+    rgbx.Add("63,0,127")
+    rgbx.Add("95,63,127")
+    rgbx.Add("38,0,76")
+    rgbx.Add("57,38,76")
+    rgbx.Add("19,0,38")
+    rgbx.Add("28,19,38")
+    rgbx.Add("191,0,255")
+    rgbx.Add("223,127,255")
+    rgbx.Add("124,0,165")
+    rgbx.Add("145,82,165")
+    rgbx.Add("95,0,127")
+    rgbx.Add("111,63,127")
+    rgbx.Add("57,0,76")
+    rgbx.Add("66,38,76")
+    rgbx.Add("28,0,38")
+    rgbx.Add("33,19,38")
+    rgbx.Add("255,0,255")
+    rgbx.Add("255,127,255")
+    rgbx.Add("165,0,165")
+    rgbx.Add("165,82,165")
+    rgbx.Add("127,0,127")
+    rgbx.Add("127,63,127")
+    rgbx.Add("76,0,76")
+    rgbx.Add("76,38,76")
+    rgbx.Add("38,0,38")
+    rgbx.Add("38,19,38")
+    rgbx.Add("255,0,191")
+    rgbx.Add("255,127,223")
+    rgbx.Add("165,0,124")
+    rgbx.Add("165,82,145")
+    rgbx.Add("127,0,95")
+    rgbx.Add("127,63,111")
+    rgbx.Add("76,0,57")
+    rgbx.Add("76,38,66")
+    rgbx.Add("38,0,28")
+    rgbx.Add("38,19,33")
+    rgbx.Add("255,0,127")
+    rgbx.Add("255,127,191")
+    rgbx.Add("165,0,82")
+    rgbx.Add("165,82,124")
+    rgbx.Add("127,0,63")
+    rgbx.Add("127,63,95")
+    rgbx.Add("76,0,38")
+    rgbx.Add("76,38,57")
+    rgbx.Add("38,0,19")
+    rgbx.Add("38,19,28")
+    rgbx.Add("255,0,63")
+    rgbx.Add("255,127,159")
+    rgbx.Add("165,0,41")
+    rgbx.Add("165,82,103")
+    rgbx.Add("127,0,31")
+    rgbx.Add("127,63,79")
+    rgbx.Add("76,0,19")
+    rgbx.Add("76,38,47")
+    rgbx.Add("38,0,9")
+    rgbx.Add("38,19,23")
+    rgbx.Add("0,0,0")
+    rgbx.Add("51,51,51")
+    rgbx.Add("102,102,102")
+    rgbx.Add("153,153,153")
+    rgbx.Add("204,204,204")
+    rgbx.Add("255,255,255")
+
+    Return rgbx
+
+End
+
+'' Input a dxf color return a rgb color
+
+Public Function DecodeColor() As Integer[]
+
+    Dim rgb As New Integer[]
+
+    Dim s As String
+    Dim r As String
+    Dim g As String
+    Dim b As String
+    '  Dim hx As String
+    Dim irgb As Integer
+    Dim rgbx As String[]
+
+    rgbx = RGBColors()
+
+    For Each s In rgbx
+        r = Split(s, ",")[0]
+        g = Split(s, ",")[1]
+        b = Split(s, ",")[2]
+        irgb = Color.RGB(CInt(r), CInt(g), CInt(b))
+        rgb.Add(irgb)
+    Next
+
+    Return rgb
+
+End
+
+'' Create a collection whith te program variables needed
+
+Public Function CADConfig() As Collection
+
+    Dim ctnOut As New Collection
+    Dim ctnTmp As New Collection
+    Dim str As String
+    Dim sBase As String
+
+    sBase = User.Home &/ "." & String.LCase(vag.NoSymbols(Application.Name))
+
+    ctnTmp.Clear
+
+    ctnTmp.Add("CAD.Background-Dark", "Name")
+    ctnTmp.Add(("CAD"), "Group")
+    ctnTmp.Add(False, "Value")
+    ctnTmp.Add("Boolean", "Data")
+    ctnTmp.Add("cko", "Ctrl")
+    ctnTmp.Add(("Drawing window bacground color"), "Desc")
+    str = ctnTmp["Name"]
+    ctnOut.Add(ctnTmp.Copy(), str)
+
+    ctnTmp.Add("CAD.DrawOriginals", "Name")
+    ctnTmp.Add(("CAD"), "Group")
+    ctnTmp.Add(False, "Value")
+    ctnTmp.Add("Boolean", "Data")
+    ctnTmp.Add("cko", "Ctrl")
+    ctnTmp.Add(("Draw originals"), "Desc")
+    str = ctnTmp["Name"]
+    ctnOut.Add(ctnTmp.Copy(), str)
+
+    ctnTmp.Add("CAD.DrawMarcados", "Name")
+    ctnTmp.Add(("CAD"), "Group")
+    ctnTmp.Add(True, "Value")
+    ctnTmp.Add("Boolean", "Data")
+    ctnTmp.Add("cko", "Ctrl")
+    ctnTmp.Add(("Draw marked"), "Desc")
+    str = ctnTmp["Name"]
+    ctnOut.Add(ctnTmp.Copy(), str)
+    'DrawMarcados As Boolean = True
+
+    ctnTmp.Add("CAD.DrawSoloColumnas", "Name")
+    ctnTmp.Add(("CAD"), "Group")
+    ctnTmp.Add(False, "Value")
+    ctnTmp.Add("Boolean", "Data")
+    ctnTmp.Add("cko", "Ctrl")
+    ctnTmp.Add(("Draw only columns"), "Desc")
+    str = ctnTmp["Name"]
+    ctnOut.Add(ctnTmp.Copy(), str)
+    'DrawSoloColumnas As Boolean = False
+
+    ctnTmp.Add("CAD.DrawBounds", "Name")
+    ctnTmp.Add(("CAD"), "Group")
+    ctnTmp.Add(False, "Value")
+    ctnTmp.Add("Boolean", "Data")
+    ctnTmp.Add("cko", "Ctrl")
+    ctnTmp.Add(("Draw bounds"), "Desc")
+    str = ctnTmp["Name"]
+    ctnOut.Add(ctnTmp.Copy(), str)
+    'DrawBounds As Boolean = False
+
+    ctnTmp.Add("CAD.FormatoCotas", "Name")
+    ctnTmp.Add(("CAD"), "Group")
+    ctnTmp.Add("0.00", "Value")
+    ctnTmp.Add("String", "Data")
+    ctnTmp.Add("txo", "Ctrl")
+    ctnTmp.Add(("Dimensions format"), "Desc")
+    str = ctnTmp["Name"]
+    ctnOut.Add(ctnTmp.Copy(), str)
+    'FormatoCotas As String = "0.00"
+
+    ctnTmp.Add("CAD.ColorForSelected", "Name")
+    ctnTmp.Add(("CAD"), "Group")
+    ctnTmp.Add(&H70E000, "Value")
+    ctnTmp.Add("String", "Data")
+    ctnTmp.Add("txo", "Ctrl")
+    ctnTmp.Add(("Color sellection"), "Desc")
+    str = ctnTmp["Name"]
+    ctnOut.Add(ctnTmp.Copy(), str)
+    'ColorForSelected As Integer = &H70E000
+
+    ctnTmp.Add("CAD.ToolActive", "Name")
+    ctnTmp.Add(("CAD"), "Group")
+    ctnTmp.Add(True, "Value")
+    ctnTmp.Add("Boolean", "Data")
+    ctnTmp.Add("cko", "Ctrl")
+    ctnTmp.Add(("Tool active"), "Desc")
+    str = ctnTmp["Name"]
+    ctnOut.Add(ctnTmp.Copy(), str)
+    'ToolActive As Boolean
+
+    ctnTmp.Add("CAD.Ortogonal", "Name")
+    ctnTmp.Add(("CAD"), "Group")
+    ctnTmp.Add(False, "Value")
+    ctnTmp.Add("Boolean", "Data")
+    ctnTmp.Add("cko", "Ctrl")
+    ctnTmp.Add(("Ortogonal"), "Desc")
+    str = ctnTmp["Name"]
+    ctnOut.Add(ctnTmp.Copy(), str)
+    'Ortogonal As Boolean = False
+
+    ctnTmp.Add("CAD.OrtogonalForzado", "Name")
+    ctnTmp.Add(("CAD"), "Group")
+    ctnTmp.Add(False, "Value")
+    ctnTmp.Add("Boolean", "Data")
+    ctnTmp.Add("cko", "Ctrl")
+    ctnTmp.Add(("Oorthogonal forced"), "Desc")
+    str = ctnTmp["Name"]
+    ctnOut.Add(ctnTmp.Copy(), str)
+    'OrtogonalForzado As Boolean = False
+
+    ctnTmp.Add("CAD.OrtogonalIgnorado", "Name")
+    ctnTmp.Add(("CAD"), "Group")
+    ctnTmp.Add(False, "Value")
+    ctnTmp.Add("Boolean", "Data")
+    ctnTmp.Add("cko", "Ctrl")
+    ctnTmp.Add(("Oorthogonal ignored"), "Desc")
+    str = ctnTmp["Name"]
+    ctnOut.Add(ctnTmp.Copy(), str)
+    'OrtogonalIgnorado As Boolean = False
+
+    Return ctnOut
+
+End

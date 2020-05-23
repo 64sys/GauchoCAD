@@ -1,0 +1,339 @@
+# Gambas Form File 3.0
+
+{ Form Form
+  MoveScaled(0,0,149,80)
+  Expand = True
+  Icon = Picture["png/bosquejo2.png"]
+  Arrangement = Arrange.Horizontal
+  Spacing = True
+  Padding = 3
+  { grpFile Menu
+    Text = ("File")
+    Visible = False
+    { mnuNew Menu file
+      Name = "mnuNew"
+      Text = ("New")
+      Picture = Picture["icon:/32/new"]
+      Visible = False
+      Tag = "new"
+    }
+    { mnuOpen Menu file
+      Name = "mnuOpen"
+      Text = ("Open")
+      Picture = Picture["icon:/22/open"]
+      Visible = False
+      Tag = "open"
+    }
+    { mnuSave Menu file
+      Name = "mnuSave"
+      Text = ("Save")
+      Picture = Picture["icon:/22/save"]
+      Visible = False
+      Tag = "save"
+    }
+    { mnuSaveAs Menu file
+      Name = "mnuSaveAs"
+      Text = ("Save as")
+      Picture = Picture["icon:/22/save-as"]
+      Visible = False
+      Tag = "saveas"
+    }
+    { mnuImport Menu file
+      Name = "mnuImport"
+      Text = ("Import")
+      Picture = Picture["icon:/32/download"]
+      Visible = False
+      Tag = "import"
+    }
+    { mnuExport Menu file
+      Name = "mnuExport"
+      Text = ("Export")
+      Picture = Picture["icon:/32/upload"]
+      Visible = False
+      Tag = "export"
+    }
+    { mnuPlot Menu file
+      Name = "mnuPlot"
+      Text = ("Plot")
+      Picture = Picture["icon:/32/print"]
+      Visible = False
+      Tag = "print"
+    }
+    { mnuClose Menu file
+      Name = "mnuClose"
+      Text = ("Close")
+      Picture = Picture["icon:/32/close"]
+      Visible = False
+      Tag = "close"
+    }
+    { mnuExit Menu file
+      Name = "mnuExit"
+      Text = ("Quit")
+      Picture = Picture["icon:/22/quit"]
+      Visible = False
+      Tag = "exit"
+    }
+  }
+  { grpOptions Menu
+    Text = ("Options")
+    Visible = False
+    { mnuOptions Menu options
+      Name = "mnuOptions"
+      Text = ("Preferences")
+      Picture = Picture["icon:/32/options"]
+      Visible = False
+      Tag = "options"
+    }
+  }
+  { grpEntities Menu
+    Text = ("Entities")
+    Visible = False
+    Tag = "entities"
+    { mnuLine Menu entity
+      Name = "mnuLine"
+      Text = ("Line")
+      Picture = Picture["svg/line.svg"]
+      Visible = False
+      Tag = "line"
+    }
+    { mnuPolyline Menu entity
+      Name = "mnuPolyline"
+      Text = ("Polyline")
+      Picture = Picture["svg/polyline.svg"]
+      Visible = False
+      Tag = "pline"
+    }
+    { mnuCircle Menu entity
+      Name = "mnuCircle"
+      Text = ("Circle")
+      Picture = Picture["svg/circle.svg"]
+      Visible = False
+      Tag = "circle"
+    }
+    { mnuEllipse Menu entity
+      Name = "mnuEllipse"
+      Text = ("Ellipse")
+      Picture = Picture["svg/ellipse.svg"]
+      Visible = False
+      Tag = "ellipse"
+    }
+    { mnuArc Menu entity
+      Name = "mnuArc"
+      Text = ("Arc")
+      Picture = Picture["svg/arc.svg"]
+      Visible = False
+      Tag = "arc"
+    }
+    { mnuRectangle Menu entity
+      Name = "mnuRectangle"
+      Text = ("Rectangle")
+      Picture = Picture["svg/rectangle.svg"]
+      Visible = False
+      Tag = "rectangle"
+    }
+    { mnuText Menu entity
+      Name = "mnuText"
+      Text = ("Text")
+      Picture = Picture["svg/text.svg"]
+      Visible = False
+      Tag = "text"
+    }
+    { mnuMText Menu entity
+      Name = "mnuMText"
+      Text = ("Multi Text")
+      Enabled = False
+      Visible = False
+      Tag = "mtext"
+    }
+    { mnuDim Menu entity
+      Name = "mnuDim"
+      Text = ("Dimmension")
+      Visible = False
+      Tag = "dim"
+    }
+    { mnuBlock Menu entity
+      Name = "mnuBlock"
+      Text = ("Block")
+      Enabled = False
+      Visible = False
+      Tag = "block"
+    }
+    { mnuHatch Menu entity
+      Name = "mnuHatch"
+      Text = ("Hatch")
+      Picture = Picture["svg/hatch.svg"]
+      Enabled = False
+      Visible = False
+      Tag = "hatch"
+    }
+    { mnuPoint Menu entity
+      Name = "mnuPoint"
+      Text = ("Point")
+      Visible = False
+      Tag = "point"
+    }
+  }
+  { grpTools Menu
+    Text = ("Tools")
+    Visible = False
+    { mnuMove Menu tool
+      Name = "mnuMove"
+      Text = ("Move")
+      Picture = Picture["svg/move.svg"]
+      Visible = False
+      Tag = "move"
+    }
+    { mnuCopy Menu tool
+      Name = "mnuCopy"
+      Text = ("Copy")
+      Picture = Picture["svg/copy.svg"]
+      Visible = False
+      Tag = "copy"
+    }
+    { mnuScale Menu tool
+      Name = "mnuScale"
+      Text = ("Scale")
+      Picture = Picture["svg/scale.svg"]
+      Visible = False
+      Tag = "Scale"
+    }
+    { mnuArray Menu tool
+      Name = "mnuArray"
+      Text = ("Array")
+      Visible = False
+      Tag = "array"
+    }
+    { mnuRotate Menu tool
+      Name = "mnuRotate"
+      Text = ("Rotate")
+      Picture = Picture["svg/rotate.svg"]
+      Visible = False
+      Tag = "rotate"
+    }
+    { mnuStretch Menu tool
+      Name = "mnuStretch"
+      Text = ("Stretch")
+      Picture = Picture["svg/stretch.svg"]
+      Visible = False
+      Tag = "stretch"
+    }
+    { mnuOffset Menu tool
+      Name = "mnuOffset"
+      Text = ("Offset")
+      Visible = False
+      Tag = "offset"
+    }
+    { mnuFillet Menu tool
+      Name = "mnuFillet"
+      Text = ("Fillet")
+      Visible = False
+      Tag = "fillet"
+    }
+    { mnuDelete Menu tool
+      Name = "mnuDelete"
+      Text = ("Delete")
+      Picture = Picture["svg/layers/draw-eraser.svg"]
+      Visible = False
+      Tag = "erase"
+    }
+  }
+  { grpView Menu
+    Text = ("View")
+    Visible = False
+    { mnuZoomw Menu view
+      Name = "mnuZoomw"
+      Text = ("Zoom window")
+      Visible = False
+      Tag = "zoomw"
+    }
+    { mnuPan Menu view
+      Name = "mnuPan"
+      Text = ("Pan view")
+      Visible = False
+      Tag = "pan"
+    }
+    { mnuZoome Menu view
+      Name = "mnuZoome"
+      Text = ("Zoom extends")
+      Picture = Picture["svg/layers/zoom-fit-best.svg"]
+      Visible = False
+      Tag = "zoome"
+    }
+  }
+  { grpHelp Menu
+    Text = ("?")
+    Visible = False
+    { mnuInfo Menu
+      Text = ("About")
+      Picture = Picture["icon:/32/info"]
+      Visible = False
+      Tag = "info"
+    }
+  }
+  { Panel1 Panel
+    MoveScaled(1,1,137,76)
+    Expand = True
+    Arrangement = Arrange.Vertical
+    { PanEdit1 Panel
+      MoveScaled(1,7,106,64)
+      Expand = True
+      Arrangement = Arrange.Horizontal
+      Spacing = True
+      Margin = True
+      { Panel5 Panel
+        MoveScaled(22,1,52,62)
+        Expand = True
+        Arrangement = Arrange.Vertical
+        { pnlDrawing Panel
+          MoveScaled(3,10,48,25)
+          Expand = True
+          Arrangement = Arrange.Horizontal
+          { !GLArea1 GLArea
+            MoveScaled(2,2,42,18)
+            #Public = True
+            Tracking = True
+            Expand = True
+          }
+        }
+        { pnlMessage Panel
+          MoveScaled(3,57,48,4)
+          Arrangement = Arrange.Horizontal
+          { lblInfo Label
+            MoveScaled(4,0,24,4)
+            Expand = True
+            Alignment = Align.Left
+          }
+        }
+      }
+      { SidePanel1 SidePanel
+        MoveScaled(79,2,21,59)
+        Arrangement = Arrange.Vertical
+        Orientation = Align.Right
+        { Panel2 Panel
+          MoveScaled(1,2,18,4)
+          Arrangement = Arrange.Horizontal
+          { ToolButton1 ToolButton
+            MoveScaled(3,0,4,4)
+            Picture = Picture["icon:/32/refresh"]
+          }
+        }
+        { TreeView1 TreeView
+          MoveScaled(2,11,16,39)
+          Expand = True
+          Border = False
+        }
+        { !tmr500 #Timer
+          #MoveScaled(6,53)
+          #Public = True
+          Enabled = True
+          Delay = 300
+        }
+      }
+    }
+    { lblCoord Label
+      MoveScaled(2,72,40,4)
+      AutoResize = True
+      Text = ("Coordenadas")
+    }
+  }
+}

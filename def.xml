@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--GambasCAD-NewPaintVersion-0.0.33-->
+<svg>
+ <metadata id="metadata5">
+  <dc:format>image/svg+xml</dc:format>
+ </metadata>
+<header id="0" type="version" name="alpha" />
+
+<header id="0" type="layer" name="0" show="T" frozen="" locked="" colour="1" style="1" width="1" print="T" />
+<header id="1" type="layer" name="Format" show="T" frozen="" locked="" colour="1" style="1" width="1" print="T" />
+<header id="2" type="layer" name="Text" show="T" frozen="" locked="" colour="1" style="1" width="1" print="T" />
+<header id="3" type="layer" name="Revision" show="T" frozen="" locked="" colour="1" style="1" width="1" print="T" />
+
+<header id="0" type="style" name="Solid" />
+<header id="1" type="style" name="Dashed" />
+<header id="2" type="style" name="Dotted" />
+<header id="3" type="style" name="Dash Dot" />
+<header id="4" type="style" name="Short Dash" />
+<header id="5" type="style" name="Medium Dash" />
+<header id="6" type="style" name="Long Dash" />
+<header id="7" type="style" name="Short Dash x2" />
+<header id="8" type="style" name="Medium Dash x2" />
+<header id="9" type="style" name="Long Dash x2" />
+
+
+<header id="0" type="width" value="0.00" />
+<header id="1" type="width" value="0.05" />
+<header id="2" type="width" value="0.09" />
+<header id="3" type="width" value="0.10" />
+<header id="4" type="width" value="0.13" />
+<header id="5" type="width" value="0.15" />
+<header id="6" type="width" value="0.18" />
+<header id="7" type="width" value="0.20" />
+<header id="8" type="width" value="0.25" />
+<header id="9" type="width" value="0.30" />
+
+<header id="0" type="dimst" name="Standard" />
+<header id="1" type="dimst" name="Thick" />
+<header id="2" type="dimst" name="Arrow" />
+
+<header id="0" type="font" name="Standard" />
+<header id="1" type="font" name="Italic" />
+<header id="2" type="font" name="Bold" />
+
+
+ <entity type="circle" p1="7.64814814814815:4.2337962962963" fparam="6.57067507983777" level="0" layer="0" colour="0" refx="0" refy="0" />
+ <entity type="polyline" p1="-18.2189814814815:2.97731481481481:-21.2782407407407:-5.1625:-11.3083333333333:-6.36435185185185:-14.6134259259259:-10.5981481481481:-7.67546296296296:-8.38564814814815:-7.21111111111111:-11.6087962962963:-1.55694444444444:-5.27175925925926:4.15185185185185:-11.5541666666667:6.80138888888889:-4.20648148148148:18.7106481481481:-11.6634259259259:19.2569444444444:-2.7587962962963:19.9944444444444:5.13518518518519:14.9685185185185:11.5541666666667:15.4055555555556:8.74074074074074" level="0:0:0:0:0:0:0:0:0:0:0:0:0:0" layer="0" colour="0" refx="0" refy="0" />
+ <entity type="line" p="-13.3569444444444:6.06388888888889:-5.24444444444445:-7.62083333333333" level="0:0" layer="0" colour="0" refx="0" refy="0" />
+
+</svg>

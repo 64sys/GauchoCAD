@@ -1,0 +1,18 @@
+' Gambas module file
+
+' Public Sub Main()
+'
+'     modCAD.Main
+'
+'    appmain.hFCAD.Run()
+'     'FCAD.Show
+'
+' End
+
+Public Sub Main()
+
+    modCAD.Main
+
+    Starter.Run()
+
+End

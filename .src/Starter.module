@@ -1,0 +1,113 @@
+' Gambas module file
+
+' Variables a transferir
+Private adi As String               '' Directorio del programa
+Private apc As String               '' Archivo de configuracion del programa
+Private CADConfig As String         '' CAD config file
+Private etx As String               '' Editor de texto plano por defecto
+Private lgf As String               '' Archivo de registro de incidencias
+Private dbn As String               '' Nombre de la base de datos
+Private sql As String               '' Sentencia SQL de creacion de la base de datos varia segun el tipo de base de datos.
+Private lgg As Logger               '' Registro de eventos de la aplicación.
+
+''Vars for environment
+Public WindowMode As Integer
+Public WindowBackColor As Integer           ' ->Tincho
+Public WindowInfoColor As Integer           ' habria que agrupar todas las vars de ambiente, hay dos opciones simples
+Public WindowTextColor As Integer           ' una struct "flags" o ponerles un prefijo flg, ej: flgWindowMode
+Public WindowCursorColor As Integer         ' me gusta mas la segunda opcion porque con un Seach+Replace solucionas todo de un saque
+'----------------------
+
+' Variables de un solo uso
+Private ldd As Boolean              '' Testigo de finalización de carga.
+
+Public Sub Run()
+
+    '    Dim sFile As String
+    Dim cex As New Collection         '' Colección con variables para pasar al siguiente módulo o formulario
+    '    Dim rpl As New Collection         '' Lista de nombres de tablas y campos y sus titulos para reemplazar nombres por titulos en el xml cuando es creado
+    '    Dim thx As New String[]           '' Lista d etemas del editor interno
+    '    Dim i As Integer
+    Dim CADConfigData As New Collection
+
+    '' Verificar que existe el direcotrio del porgrama en Home
+    adi = User.Home &/ "." & String.LCase(vag.NoSymbols(Application.Title))
+    apc = adi &/ "cfg.xml"
+    lgf = adi &/ Format(Now(), "yyyy") & ".log"
+
+    If Exist(adi) = False Then
+        Shell "mkdir -p " & adi Wait
+    Endif
+
+    '' Estableciendo las variables de entorno especiales con un archivo XML
+    CADConfig = adi &/ "cad.xml"
+    If Exist(File.Dir(CADConfig)) = False Then
+        Mkdir File.Dir(CADConfig)
+    Endif
+    If Exist(CADConfig) = False Then
+        CADConfigData = cad.CADConfig()
+        xmg.XmlConfMaker(CADConfig, CADConfigData, Application.Title & " " & Application.Version)
+    Endif
+
+    '' Arrancando el sistema de
+    If Exist(lgf) = False Then
+        Shell "touch " & lgf Wait
+    Endif
+    lgg = New Logger(Logger.Info, Logger.DefaultFormat, lgf)
+    lgg.Begin
+
+    '' Verificación del editor de texto plano por defecto en el sistema
+    If sog.MimeDefaultApp("text/plain").Count > 0 Then
+        etx = sog.MimeDefaultApp("text/plain")[0]
+    Else
+        etx = ""
+    Endif
+
+    '' Bandera de indicacion de formulario cargado
+    ldd = True
+
+    '' Applying the environments vars
+    SetEnvironmentVars()
+
+    '' Abrir el formulario principal del programa
+    cex.Add(adi, "AppDir")
+    cex.Add(apc, "AppCfg")
+    cex.Add(CADConfig, "CADCfg")
+    cex.Add(etx, "AppEdi")
+    cex.Add(lgg, "AppLog")
+
+    APPMain.Run(cex)
+    'FCAD.Run(cex)
+
+End
+
+Private Sub SetEnvironmentVars()
+
+    Dim WindowMode As Integer
+
+    Select CBool(xmg.GetVar("CAD.Background-Dark", CADConfig))
+        Case True
+            WindowBackColor = &1B2224
+            WindowInfoColor = &HA0A000
+            WindowTextColor = &C09209
+            WindowCursorColor = &5F5FBF
+        Case Else
+            WindowBackColor = Color.White
+            WindowInfoColor = &HFFFF00
+            WindowTextColor = Color.Blue
+            WindowCursorColor = Color.Black
+    End Select
+
+    Select xmg.GetVar("CAD.GraphMode", CADConfig)
+        Case "1"
+            WindowMode = 1
+
+        Case "2"
+            WindowMode = 2
+
+        Case Else
+            WindowMode = 1
+
+    End Select
+
+End

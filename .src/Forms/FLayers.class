@@ -1,0 +1,352 @@
+' Gambas class file
+
+'Private lay As Collection
+
+'Public Sub Run(ByRef cnt As Collection)
+Private stx As New String[]
+Private lbx As New String[]
+
+Private xStyles As New String[]
+Private xWeights As New String[]
+Private xColors As New String[]
+
+Private draft As New Collection
+
+Private cLayers As New Collection
+
+Private CurrentKey As String
+Private CurrentRow As Integer
+Private loading As Boolean
+
+Public Sub Run(cMod As Collection)
+
+    Dim col As String
+    Dim i As Integer
+    Dim lbl As String
+
+    If cMod.Exist("Layers") Then
+        cLayers = cMod["Layers"]
+    Endif
+
+    'For i = 0 To modCAD.cStyles.Count - 1
+    '    xStyles.Add(CStr(i))
+    'Next
+
+    'For i = 0 To modCAD.cWeights.Count - 1
+    '    xWeights.Add(CStr(i))
+    'Next
+
+    'For i = 0 To modCAD.cColors.Count - 1
+    '    xColors.Add(CStr(i))
+    'Next
+
+    ' Made a copy for job
+    'draft = modCAD.cLayers.Copy()
+
+    stx = [("id"), ("Name"), ("Show"), ("Frozen"), ("Lock"), ("Color"), ("Style"), ("Width"), ("Print")]
+    lbx = ["id", "name", "show", "frozen", "locked", "colour", "style", "width", "print"]
+
+    TableView1.Columns.Count = stx.Count
+
+    For i = 0 To stx.Max
+        col = stx[i]
+        lbl = lbx[i]
+        If i = 1 Then
+            TableView1.Columns[i].Expand = True
+            TableView1.Columns[i].Alignment = Align.Left
+            TableView1.Columns[i].Title = col
+        Endif
+        Select lbl
+            Case "show", "frozen", "lock", "color", "style", "weight", "print"
+                TableView1.Columns[i].Alignment = Align.Center
+                TableView1.Columns[i].Width = 75
+                TableView1.Columns[i].Title = col
+            Case "id"
+                TableView1.Columns[i].Alignment = Align.Center
+                TableView1.Columns[i].Width = 25
+                TableView1.Columns[i].Title = "i"
+        End Select
+
+        'Inc i
+    Next
+
+    TableView1.Rows.Count = 0
+    'TableView1.Rows.Count = draft.Count 'modCAD.cLayers.Count '+ 1
+    TableView1.Rows.Count = cLayers.Count
+    Me.Title = ("Layers")
+
+    Me.ShowModal()
+
+End
+
+Public Sub TableView1_Data(Row As Integer, Column As Integer)
+
+    Dim v As Variant
+    Dim i As Integer
+    Dim st As Variant
+    Dim pic As Picture
+    Dim tog As ToggleButton
+
+    For Each v In cLayers 'draft 'modCAD.cLayers
+        If i = row Then
+            st = v[lbx[Column]]
+            Select lbx[Column]
+
+                Case "id"
+                    TableView1[row, Column].Text = st
+
+                Case "name"
+                    TableView1[row, Column].Text = st
+
+                Case "show"
+
+                    If st = True Then
+                        pic = Image.Load("./svg/layers/lamp-on.png").Stretch(16, 16).Picture
+                        TableView1[row, Column].Picture = pic
+                        TableView1[row, Column].WordWrap = True
+                    Else
+                        pic = Image.Load("./svg/layers/lamp-off.png").Stretch(16, 16).Picture
+                        TableView1[row, Column].Picture = pic
+                        TableView1[row, Column].WordWrap = False
+                    Endif
+
+                Case "frozen"
+                    If st = True Then
+                        pic = Image.Load("./svg/layers/frozen.png").Stretch(16, 16).Picture
+                        TableView1[row, Column].Picture = pic
+                        TableView1[row, Column].WordWrap = True
+                    Else
+                        pic = Image.Load("./svg/layers/liquid.png").Stretch(16, 16).Picture
+                        TableView1[row, Column].Picture = pic
+                        TableView1[row, Column].WordWrap = False
+                    Endif
+
+                Case "locked"
+                    If st = True Then
+                        pic = Image.Load("./svg/layers/lock-on.png").Stretch(21, 21).Picture
+                        TableView1[row, Column].Picture = pic
+                        TableView1[row, Column].WordWrap = True
+                    Else
+                        pic = Image.Load("./svg/layers/lock-off.png").Stretch(21, 21).Picture
+                        TableView1[row, Column].Picture = pic
+                        TableView1[row, Column].WordWrap = False
+                    Endif
+
+                Case "colour"
+                    TableView1[row, Column].Text = st
+
+                Case "style"
+                    TableView1[row, Column].Text = st
+
+                Case "width"
+                    TableView1[row, Column].Text = st
+
+                Case "print"
+                    If st = True Then
+                        pic = Image.Load("./svg/layers/print-on.png").Stretch(21, 21).Picture
+                        TableView1[row, Column].Picture = pic
+                        TableView1[row, Column].WordWrap = True
+                    Else
+                        pic = Image.Load("./svg/layers/print-off.png").Stretch(21, 21).Picture
+                        TableView1[row, Column].Picture = pic
+                        TableView1[row, Column].WordWrap = False
+                    Endif
+
+                    ' Case Else
+                    '     TableView1[row, Column].Text = st
+
+            End Select
+            'Break
+        Endif
+        Inc i
+    Next
+
+    TableView1.Refresh
+
+    loading = False
+
+End
+
+Public Sub LMenu_Click()
+
+    Dim obj As Object
+    Dim drf As Variant
+    Dim n As Variant
+
+    'If modCAD.FileName <> "" Then
+
+    obj = Last
+
+    Select obj.Tag
+        Case "add"
+            For Each drf In cLayers 'draft
+                If drf["name"] = "0" Then
+                    n = drf.Copy()
+                    Break
+                Endif
+
+            Next
+
+            n["id"] = cLayers.Count
+            n["name"] = "layer-" & Format(cLayers.Count + 1, "00")
+
+            cLayers.Add(n, n["name"])
+            TableView1.Rows.Count = 0
+            TableView1.Rows.Count = cLayers.Count
+
+            'modCAD.cLayers.Add()
+
+        Case "erase"
+            If loading = False Then
+                Select CurrentKey
+                    Case "0", ""
+                        'skip
+
+                    Case Else
+                        'draft.Remove(CurrentKey)
+                        cLayers.Remove(CurrentKey)
+                        loading = True
+                        TableView1.Rows.Count = 0
+                        TableView1.Rows.Count = cLayers.Count
+
+                End Select
+            Endif
+
+        Case "save"
+            'modCAD.cLayers = draft.Copy()
+            Me.Close
+
+        Case "cancel"
+
+            Me.Close
+
+    End Select
+    'Endif
+
+End
+
+Public Sub TableView1_Click()
+
+    Dim pic As Picture
+    Dim pdat As String
+    Dim pkey As String
+    Dim v As Variant
+    Dim pval As Variant
+
+    Select lbx[TableView1.Column]
+
+        Case "show"
+            Select TableView1[TableView1.Row, TableView1.Column].WordWrap
+                Case False
+                    TableView1[TableView1.Row, TableView1.Column].WordWrap = True
+                    pic = Image.Load("./svg/layers/lamp-on.png").Stretch(16, 16).Picture
+                Case True
+                    TableView1[TableView1.Row, TableView1.Column].WordWrap = False
+                    pic = Image.Load("./svg/layers/lamp-off.png").Stretch(16, 16).Picture
+            End Select
+            TableView1[TableView1.Row, TableView1.Column].Picture = pic
+
+        Case "frozen"
+            Select TableView1[TableView1.Row, TableView1.Column].WordWrap
+                Case False
+                    TableView1[TableView1.Row, TableView1.Column].WordWrap = True
+                    pic = Image.Load("./svg/layers/frozen.png").Stretch(16, 16).Picture
+                Case True
+                    TableView1[TableView1.Row, TableView1.Column].WordWrap = False
+                    pic = Image.Load("./svg/layers/liquid.png").Stretch(16, 16).Picture
+            End Select
+            TableView1[TableView1.Row, TableView1.Column].Picture = pic
+
+        Case "locked"
+            Select TableView1[TableView1.Row, TableView1.Column].WordWrap
+                Case False
+                    TableView1[TableView1.Row, TableView1.Column].WordWrap = True
+                    pic = Image.Load("./svg/layers/lock-off.png").Stretch(21, 21).Picture
+                Case True
+                    TableView1[TableView1.Row, TableView1.Column].WordWrap = False
+                    pic = Image.Load("./svg/layers/lock-on.png").Stretch(21, 21).Picture
+            End Select
+            TableView1[TableView1.Row, TableView1.Column].Picture = pic
+
+        Case "print"
+            Select TableView1[TableView1.Row, TableView1.Column].WordWrap
+                Case False
+                    TableView1[TableView1.Row, TableView1.Column].WordWrap = True
+                    pic = Image.Load("./svg/layers/print-on.png").Stretch(21, 21).Picture
+                Case True
+                    TableView1[TableView1.Row, TableView1.Column].WordWrap = False
+                    pic = Image.Load("./svg/layers/print-off.png").Stretch(21, 21).Picture
+            End Select
+            TableView1[TableView1.Row, TableView1.Column].Picture = pic
+
+        Case "name"
+            TableView1.Edit
+
+        Case "colour"
+            TableView1.Edit(xColors, True)
+        Case "style"
+            TableView1.Edit(xStyles, True)
+        Case "width"
+            TableView1.Edit(xWeights, True)
+    End Select
+
+    pdat = lbx[TableView1.Column]
+    pkey = TableView1[TableView1.Row, 0].Text
+
+    '    Print pdat & ":" & pkey
+
+    For Each v In draft
+        If draft.Key = pkey Then
+            Select pdat
+                Case "show", "frozen", "locked", "print"
+                    pval = TableView1[TableView1.Row, TableView1.Column].WordWrap
+                    v[pdat] = pval
+                Case "colour", "style", "width"
+                    pval = Val(TableView1[TableView1.Row, TableView1.Column].Text)
+                    'Case "label"
+                    '    pval = TableView1[TableView1.Row, TableView1.Column].Text
+                    v[pdat] = pval
+            End Select
+
+        Endif
+    Next
+
+End
+
+Public Sub TableView1_Save(Row As Integer, Column As Integer, Value As String)
+
+    Dim pdat As String
+    Dim pkey As String
+    Dim v As Variant
+
+    pdat = lbx[TableView1.Column]
+    pkey = TableView1[Row, 0].Text
+
+    TableView1[Row, Column].Text = Value
+
+    Select pdat
+        Case "name"
+            For Each v In draft
+                If v["id"] = CInt(pkey) Then
+                    v[pdat] = Value
+                Endif
+            Next
+        Case "colour", "width", "style"
+            For Each v In draft
+                If v["id"] = CInt(pkey) Then
+                    v[pdat] = Value
+                Endif
+            Next
+    End Select
+
+End
+
+Public Sub TableView1_Select()
+
+    If loading = False Then
+        CurrentRow = TableView1.Row
+        CurrentKey = TableView1[CurrentRow, 0].Text
+        Print CurrentRow
+    Endif
+
+End

@@ -1,0 +1,156 @@
+' Gambas class file
+
+' Scale from a certain point
+' Tool maintained by Terco
+Inherits ToolsBase
+Create Static
+Public Const GENDER As String = ("Scale")
+
+
+Public Function Start(Optional ElemToBuild As Variant, Optional _Mode As Integer = 0) As Boolean
+    ' Llamada por FCAD al inicio de la aplicacion de esta herramienta
+
+    ' Aprovechamos para establecer los helpers (comentarios de ayuda en pantalla)
+    Me.PointsDone = 0
+    Me.PointsTotal = 2
+
+    clsDrawingAids.HelperTrabajo = ("Scale ")
+
+    ' chequeamos si hubo seleccion previa
+    Me.SelectionCount = clsEntities.GetSelectionCount()
+
+    If Me.SelectionCount = 0 Then                                     ' we have no elements in the selection
+
+        clsDrawingAids.Helper.texto = clsDrawingAids.HelperTrabajo & (": Selecct entities")
+
+        modCAD.clsJobPrevious = Me
+        modCAD.clsJob = clsDefaultJob
+
+    Else                                                                    ' need the first point
+
+        clsEntities.BackUp(True)
+        clsDrawingAids.Helper.texto = clsDrawingAids.HelperTrabajo & (": Base point")
+        clsDrawingAids.HelperTrabajo = clsDrawingAids.HelperTrabajo & Str(Me.SelectionCount) & (" elements")
+
+    Endif
+    Me.Active = True
+    modCAD.ToolActive = True
+
+End
+
+
+Public Function MouseUp() ' called by FCAD-> DrawingArea_MouseUp
+
+    Inc Me.PointsDone
+
+    If Me.PointsDone = 1 Then ' acabo de marcar el punto base
+
+        ' ya tengo cosas seleccionadas
+        clsDrawingAids.Helper.texto = ("Final point")
+
+        ' punto real base
+        Me.SelStartXr = puntos.Near(appmain.hFcad.Xreal(mouse.x))
+        Me.SelStartYr = puntos.Near(appmain.hFcad.Yreal(mouse.y))
+
+        ' and we save the mouse click
+        Me.SelStartX = mouse.x
+        Me.SelStartY = mouse.y
+
+        ' prevenir acciones tontas como hacer click en otro elemento antes de terminar con el actual
+       appmain.hFCAD.DesHabilitarBotones
+    Else If Me.PointsDone = 2 Then ' acabo de marcar el punto destino
+        ' permitir otros trabajos
+       appmain.hFCAD.HabilitarBotones
+
+        ' we have the point set from MouseMove
+
+        Me.Finish()
+
+    Endif
+    appmain.hFCAD.redraw
+
+End
+
+Public Function MouseMove() ' called by FCAD-> DrawingArea_MouseMove
+
+    If Me.PointsDone = 1 Then
+        ' we compare Real values from the starting point to the location
+        ' represente by the mouse now, taking account that the drawing
+        ' could have being moved by the mouse wheel
+
+        ' new Real position is
+        Me.SelEndXr = puntos.Near(appmain.hFcad.Xreal(mouse.x))
+        Me.SelEndyr = puntos.Near(appmain.hFcad.Yreal(mouse.y))
+
+        '  we need To determine scale factor
+        '
+        ' lets say is the distance from first click to the current position / 10
+        '
+
+        ScaleFromOrigin((puntos.distancia(mouse.x, mouse.y, Me.SelStartX, Me.SelStartY) - 50) / 50)
+
+    End If
+
+End
+
+
+Public Sub Finish()
+
+    If Me.PointsDone = Me.PointsTotal Then
+
+        ' job finished correctly
+        ' we restore the point first
+        clsEntities.Restore(True)
+        ' and now we move
+
+        ScaleFromOrigin((puntos.distancia(mouse.x, mouse.y, Me.SelStartX, Me.SelStartY) - 50) / 50)
+
+        ' and bak them up
+        clsEntities.BackUp(True)
+        clsEntities.Finish
+
+    Else
+
+        ' user cancelled the operation
+        clsEntities.Restore(True)
+
+    Endif
+
+    modCAD.clsJobPrevious = Me
+    modCAD.clsJob = clsDefaultJob
+    clsDrawingAids.CleanTexts
+    clsEntities.DeSelection()
+    modCAD.DrawOriginals = False
+   appmain.hFCAD.redraw
+    Me.Active = False
+    modCAD.ToolActive = False
+
+End
+
+' in this case well do all stuff here, not using the Class Puntos
+
+Public Sub ScaleFromOrigin(ScaleFactor As Float)
+
+    ' crea un backup de todos los puntos
+    Dim e As Object, i As Integer
+
+    ' X axis: Me.SelStartXrr           Now              Scale = 3             Final
+    '              ^
+    ' 0------------|-----------------X,Z --------------------------------Xscaled
+
+    ' Xscaled = (X - Me.SelStartX) * Scale + SelStarXr
+
+    For Each e In APPMain.hFCAD.arrEntities
+        If e.selected Then
+            For i = 0 To e.p.max Step 2
+
+                e.P[i] = e.B[i] + (e.B[i] - Me.SelStartXr) * ScaleFactor
+
+                e.P[i + 1] = e.B[i + 1] + (e.B[i + 1] - Me.SelStartYr) * ScaleFactor
+
+            Next
+        Endif
+
+    Next
+
+End
