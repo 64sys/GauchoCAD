@@ -94,18 +94,18 @@ Public Sub btnOK_Click()
     Dim xForm As FCAD
     Dim cTmp As Collection
 
-    cModel.Clear
+    cImport.Clear
     Dim wspce As Workspace
 
-    cModel = GetModel(CurrFile)
+    cImport = GetModel(CurrFile)
 
-    If cModel.Count > 0 Then
+    If cImport.Count > 0 Then
         wspce = APPMain["Workspace1"]
 
         If wspce.ActiveWindow.Tag = APPMain.CurrentFile Then
             xForm = wspce.ActiveWindow
-            xForm.cModel.Clear
-            xForm.cModel = cModel
+            xForm.cImport.Clear
+            xForm.cImport = cImport
             xForm.LoadDrawingMap()
         Endif
 
