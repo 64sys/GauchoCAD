@@ -140,9 +140,11 @@ Public GLDrwList As New Integer[]                       ' all entities, each one
 Public GLDrwListEditing As New Integer[]                        ' all entities on edit by some tool, including new ones
 
 
-
-' font stuff
-Public imgFontAtlas As Image
+Public Sub Resize()
+    
+    
+    
+End
 
 
 
@@ -185,8 +187,7 @@ shaFragmentShaderSource = "#version 330 core" & gb.cr &
     Gl.Enable(Gl.NORMALIZE) 
     
     hText = Gl.GenTextures(1)
-    imgFontAtlas = New Image(drwContext.w, drwContext.h, 0)
-   
+  
     
     
       
@@ -621,127 +622,8 @@ Public Sub Vertex3D(p As Punto3d, Optional _Color4F As GLColorSt)
 ' ' 
 End
 
-Public Sub txtRendering2D(texto As String, x As Float, y As Float, Optional rectW As Float = 0, rectH As Float = 0, Altura As Single = 12, _color As Long = Color.Blue, _BackColor As Long = -1, centradoH As Integer = 0, centradoV As Integer = 0)
 
-    ' this works in a Orthogonal projection
-    ' si no se pasa el tamaño del rectangulo, no hay centrado, el texto se escribe desde el punto inicial 
-    ' y ocupa todo el tamaño de la imagen generada
 
-
-
-    Dim rectangulo As PaintExtents
-
-    Dim p As New Punto3d
-
-
-    If _backcolor >= 0 Then
-
-        imgFontAtlas.Fill(_BackColor)
-
-    Else
-
-        ' until I know how to make it transparente, it goes like this
-
-        'imagen.Fill(Color.White)
-
-
-
-    End If
-
-    EscalaGL = 1
-
-    Paint.Begin(imgFontAtlas)
-
-        Paint.Font.Size = Altura
-
-        Paint.Brush = Paint.Color(_color)
-        
-        rectangulo = Paint.TextExtents(texto)
-
-        Paint.DrawText(texto, 0, 0) 'locate the text at the bottom + 15% so it's vertically centered in the box
-
-        Paint.Fill
-
-    Paint.End
-
-    
-
-
-    ' allignment to the 3D point p
-
-    If centradoH = 1 Then x -= rectangulo.Width * EscalaGL
-
-    If centradoH = 2 Then x -= rectangulo.Width / 2 * EscalaGL
-
-
-
-    If centradoV = 1 Then y -= rectangulo.Height * EscalaGL
-
-    If centradoV = 2 Then y -= rectangulo.Height / 2 * EscalaGL
-
-
-
-    Gl.TexImage2D(imgFontAtlas)
-
-
-    Gl.TexParameteri(Gl.TEXTURE_2D, Gl.TEXTURE_MIN_FILTER, Gl.NEAREST)
-
-    Gl.TexParameteri(Gl.TEXTURE_2D, Gl.TEXTURE_MAG_FILTER, Gl.NEAREST)
-
-
-    gl.BindTexture(gl.TEXTURE_2D, hText[0])
-
-
-    Gl.Begin(Gl.QUADS)
-
-        'gl.color3f(1, 1, 1)
-
-
-
-        Gl.TexCoordf(0.0, 1.0) ' Bottom Left OF The Texture AND Quad
-
-        Gl.Vertex2f(x, y)
-
-
-
-        Gl.TexCoordf(1.0, 1.0) ' Bottom Right OF The Texture AND Quad
-
-        Gl.Vertex2f(x + rectangulo.Width, y)
-
-
-
-        Gl.TexCoordf(1.0, 0.0) ' Top Right OF The Texture AND Quad
-
-        Gl.Vertex2f(x + rectangulo.Width, y + rectangulo.Height)
-
-
-
-        Gl.TexCoordf(0.0, 0.0) ' Top Left OF The Texture AND Quad
-
-        Gl.Vertex2f(x, y + rectangulo.Height)
-
-
-
-    Gl.End()
-
-    ' gl.PopMatrix
-    ' gl.MatrixMode(gl.PROJECTION)
-    ' gl.PopMatrix
-
-End
-
-
-Public Sub txtRendering3D(texto As String, pr As Punto3d, Optional Altura As Single = 12, Optional _color As Long = Color.Blue, Optional _BackColor As Long = -1, Optional centradoH As Integer = 0, Optional centradoV As Integer = 0)
-
-    Dim x As Float, y As Float, z As Float
-
-
-    Get2DpointFrom3Dworld(pr, ByRef x, ByRef y, ByRef z)
-
-    If z <= 1 Then txtRendering2D(texto, x, y, altura, _color, _backcolor, centradoH, centradoV)
-
-
-End
 
 Public Sub Get2DpointFrom3Dworld(p1 As Punto3d, ByRef x2 As Float, ByRef y2 As Float, Optional ByRef z2 As Float)
 

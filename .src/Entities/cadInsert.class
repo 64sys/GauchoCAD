@@ -23,7 +23,7 @@ Public Sub Draw()
         paint.Scale(Me.fParam[0], Me.fParam[1])
         paint.Rotate(Me.fParam[2])
         modCAD.ScaleLines = (Abs(Me.fParam[0]) + Abs(Me.fParam[1])) / 2
-        For Each ET In clsEntities.arrBlocks[i].entities
+        For Each ET In appmain.hFCAD.arrBlocks[i].entities
             et.Draw
         Next
         modCAD.ScaleLines = 1
@@ -39,7 +39,7 @@ Public Sub Draw()
         gl.Scalef(Me.fParam[0], Me.fParam[1], 1)
         
         ' modCAD.ScaleLines = (Abs(Me.fParam[0]) + Abs(Me.fParam[1])) / 2   ' ??????????????????
-        For Each ET In clsEntities.arrBlocks[i].entities
+        For Each ET In appmain.hFCAD.arrBlocks[i].entities
             et.Draw
         Next
         'modCAD.ScaleLines = 1

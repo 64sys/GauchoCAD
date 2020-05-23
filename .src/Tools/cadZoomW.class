@@ -61,11 +61,11 @@ Public Function MouseUp() ' esta rutina es llamada por FCAD en el evento Drawing
     Else
         ' engañamos a estas vars
         
-        clsEntities.Xmayor = Me.SelEndXr
-        clsEntities.Xmenor = Me.SelStartXr
+        appmain.hFCAD.Xmayor = Me.SelEndXr
+        appmain.hFCAD.Xmenor = Me.SelStartXr
         
-        clsEntities.Ymayor = Me.SelEndYr
-        clsEntities.Ymenor = Me.SelStartYr
+        appmain.hFCAD.Ymayor = Me.SelEndYr
+        appmain.hFCAD.Ymenor = Me.SelStartYr
         
         cadZoomE.Start(, 1)
         Me.Finish
@@ -95,9 +95,7 @@ Public Sub Draw() ' esta rutina es llamada por FCAD en el evento DrawingArea_Dra
     ' por ultimo, y para que se vea arriba, la seleccion
 
     If Not Me.Active Then Return
-    ' gl.PushMatrix
-    ' gl.LoadIdentity
-
+ 
     Dim xyStart, xyEnd As Float[]
     
     GLplus.Rectangle2D(Me.SelStartXr, Me.SelStartYr, Me.SelEndXr - Me.SelStartXr, Me.SelEndYr - Me.SelStartYr,,,,, Color.DarkBlue, 1, 2)

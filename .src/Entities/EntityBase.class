@@ -12,7 +12,7 @@ Public Const ParamDefault As String = (" ")
 
 ' SAVE from this vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 ' IMPORTANT: ALL CHANGES HERE MUST BE TRANSLATED TO cadLoad/Save and clsEntities.CopyElementData()                                                                                    |
-Public P As New Float[]                     ' X,Y pairs
+Public P As New Float[]                     ' X,Y pairs                        
 Public Level As New Float[]                 ' the future Z or elevation
 Public StringData As String                 ' split with "|" separator if neccesary, that's is Entity specific.
 Public StringData2 As String                 ' split with "|" separator if neccesary, that's is Entity specific.
@@ -23,15 +23,16 @@ Public Block As String                     ' Para tener la posibilidade de junta
 Public _Color As Integer                   ' 0=by layer, 1=by block, 10+=16 bit color code  ;  ths is not the color to be draw, ColorToPaint is, set in Finish()
 Public LineType As Integer                  ' 0=continuous, 1=dashed from flxDash
 Public LineWidth As Integer = 1             ' this is it
-Public RefPointX As Float                   ' new
+Public RefPointX As Float                   ' new 
 Public RefPointY As Float
 ' SAVE to here  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 
 ' NOT SAVED
 ' construction and usage vars
 Public BlockNumber As Integer
 Public ColorToPaint As Integer            ' this is the color to be painted, gets ready in Finish from the _color param
-Public Selected As Boolean
+Public Selected As Boolean                
 Public ForDeletion As Boolean = True      ' this must be falsed in Finish
 Public DrawAble As Boolean = False        ' True si durante la construccion ya tiene suficientes elementos para poder hacer una representacion digna
 Public Visible As Boolean = True          ' si esta entidad puede ser mostrada independientmente
@@ -44,9 +45,11 @@ Public Psel As New Boolean[]              ' selected points
 Public BoundingPoligon As New Float[]     ' this is a poligon built at element's contruction that defines a poligon used for detecting points inside me
 Public MyPoi As New Single[]                 ' point of interest
 
+
 Public Sub _new()
 
 End
+
 
 Public Function _compare(cosas As Object) As Integer
 
@@ -62,13 +65,17 @@ Public Sub Draw()
 
     If Not Me.DrawAble Or Not Me.Visible Then Return
 
+
     ' AQUI VAN LAS RUTINAS DE DIBUJO
 
 End
 
+
+
 '' Determines if the entity was selected by a rectanle surrounding al points
 '' by default, if ALL points are selected, it can.
 Public Function SelFull() As Boolean
+    
 
     Dim i As Integer, puedo As Boolean
 
@@ -135,8 +142,8 @@ Public Sub Finish(ParamsDone As Integer) As Boolean
 
     'Print "Finish en EntityBase"
     CreateBoundingPoligon
-
-    ' tareas finales de armado del objeto
+    
+     ' tareas finales de armado del objeto
     Me.b.resize(Me.P.count)
     Me.psel.resize(Me.p.count / 2)
     Me.ForDeletion = False

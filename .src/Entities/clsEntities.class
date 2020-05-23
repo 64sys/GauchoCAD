@@ -548,7 +548,7 @@ Public Function BackUp(Optional OnlySelected As Boolean = False, OnlyPointSelect
 
     Dim e As Object, c, i As Integer
 
-    For Each e In clsEntities.APPMain.hFCAD.arrEntities
+    For Each e In APPMain.hFCAD.arrEntities
         If (e.selected And OnlySelected) Or Not OnlySelected Then
             BackUpPosition(e)
         Endif
@@ -563,7 +563,7 @@ Public Function Restore(Optional OnlySelected As Boolean = False, OnlyPointSelec
     ' restores to the position backups
     Dim e As Object, c, i As Integer
 
-    For Each e In clsEntities.APPMain.hFCAD.arrEntities
+    For Each e In APPMain.hFCAD.arrEntities
         If (e.selected And OnlySelected) Or Not OnlySelected Then
             RestorePosition(e)
         Endif
@@ -578,7 +578,7 @@ Public Sub Move(dX As Float, dZ As Float, Optional OnlySelected As Boolean = Fal
     ' crea un backup de todos los puntos
     Dim e As Object, i As Integer
 
-    For Each e In clsEntities.APPMain.hFCAD.arrEntities
+    For Each e In APPMain.hFCAD.arrEntities
         If (e.selected And OnlySelected) Or Not OnlySelected Then
             For i = 0 To e.p.max Step 2
 
@@ -663,8 +663,9 @@ Public Sub CalcularLimites()
     Dim e As Object, i As Integer
 
     For Each e In APPMain.hFCAD.arrEntities
-        If e.block = "" Then
+        If e.block = "" And e.visible Then
             For i = 0 To e.p.max Step 2
+                'If e.p[i] > 0 Then Debug e.gender
     
                 If e.p[i] < APPMain.hFCAD.Xmenor Then APPMain.hFCAD.Xmenor = e.p[i]
     

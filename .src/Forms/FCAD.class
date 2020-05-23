@@ -32,7 +32,7 @@
 Public tmr33Hz As Integer                   '  +1  every 33Hz so it goes from 0 to 1E32
 
 Public KeysAccumulator As String
-
+Public FirstTime As Boolean = True
 Public DrawingReady As Boolean = False
 Public DrawNeedsUpdate As Boolean                   ' true on mouse, key or tool events
 Public TimerTic As Integer = 0                      ' this reaches 1024 and then zeroes, at 33Hz
@@ -88,93 +88,40 @@ Public iEntity As New Single[]             ' SELECTED: X,Y, i
 Public GlListAllEntities As Integer
 Public GlListSelectedEntities As Integer
 
-' DEPRECADO
-' Public Function Action_Activate(cAction As String) As Boolean
-'
-'     Dim o As Object
-'
-'     If cAction = "" Then Return
-'
-'     o = Object.New(cAction)
-'     ' si funciono, estamos aqui todavia
-'
-'     If o.usewith = "" Then
-'         modCAD.clsJob = o
-'         modCAD.clsJob.start
-'     Else
-'         APPMain.hFCAD.arrEntities.Add(o)
-'         modCAD.clsJob = Object.New(o.usewith)
-'         modCAD.clsJob.start(o)
-'
-'     End If
-'
-' Catch
-'     Error.Raise("El boton esta mal configurado")
-'
-'     Message.Error(Error.Text & gb.NewLine & Error.Where)
-'
-' End
 
 Public Sub Form_Open()
 
-    ' Dim n As Integer
-    ' Dim b As Integer
-    ' Dim x As Integer
-    '
-    ' 'This code show the form in the bigest screen in system when more than one exist
-    ' For n = 0 To Screens.Count - 1
-    '     If Screens[n].AvailableWidth > b Then
-    '         b = Screens[n].AvailableWidth
-    '         x = n
-    '     Endif
-    ' Next
-    ' Me.x = Screens[x].AvailableX
-    ' Me.y = Screens[x].AvailableY
-    ' Me.Maximized = True
-    ' '-----------------------------------------------------------------
+Debug "open " & Me.Title
 
 End
 
 Public Sub form_Resize()
-    ' lo unico que cambia es el drawing area
-
-    If Me.h < 700 Then Me.h = 700
-    GLArea1.H = Me.H - 50 '- tobOpen.h
-
-    If Me.w < 1000 Then Me.w = 1000
-    GLArea1.w = Me.w - 20
-
+    Debug "resize " & Me.Title
+    GLplus.Init(glarea1)
 End
 
 Public Sub form_Arrange()
 
-    appmain.hFcad.glarea1.w = GLArea1.W
-    appmain.hFcad.glarea1.h = GLArea1.H
-    PanX = 0
-    PanY = 0
-    ScaleZoom = puntos.ScreenDensity
-    GLplus.Init(glarea1)
+    Debug "arrange " & Me.Title
+ 
+    
+    
 
-    Regen()                 ' estas dos lineas se agregan porque la ventana carga un archivo en _New pero no lo
-    cadZoomE.Start()        ' puede mostrar hasta tener una GLArea conformada y a la vista
-    DrawingReady = True
+    
 
 End
+Public Sub form_Activate()
 
-'     paint.Begin(drwArea.Image)
-'     paint.AntiAlias = True
-'     clsDrawingAids.DibujaHelper
-'     clsDrawingAids.DrawCoordenadas
-'     paint.End
-'
-'     drwArea.Refresh
-'
-'
-' End
+    Debug "activate " & Me.Title
+    If FirstTime Then           ' esto ocurre cuando me llega un archivo cargado que tengo que mostrar por primera vez
+        Debug "FirstTIme " & Me.Title
+        Regen()                 ' estas dos lineas se agregan porque la ventana carga un archivo en _New pero no lo
+        cadZoomE.Start()        ' puede mostrar hasta tener una GLArea conformada y a la vista
+        FirstTime = False
+        DrawingReady = True
+    Endif
 
-'=================================================================================================================
-'   ^^^^^^^^^^^^^^    PARA REFERENCIA, ASI TRABAJABA CON PAINT    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-'=================================================================================================================
+End
 
 Public Sub GLArea1_draw()
 
@@ -401,6 +348,7 @@ End
 Public Sub tmr500_Timer()
 
     If clsDrawingAids.PromtSlash = "|" Then clsDrawingAids.PromtSlash = "" Else clsDrawingAids.PromtSlash = "|"
+    Inc clsDrawingAids.ErrorTimer
     redraw
 
 End
@@ -446,6 +394,7 @@ Public Sub Run(cMdl As Collection) As Boolean
     'cModel.Add("test", "test")
     'cModel.Add(arrEntities, "Entities")
     cModel = cMdl.Copy()
+    cModel.Add(arrEntities, "Entities")
     'cex = cin
     'con = cin["Connex"]           ' Conexión a la base de datos
     'adi = cin["AppDir"]           ' Directorio del programa
@@ -462,12 +411,7 @@ Public Sub Run(cMdl As Collection) As Boolean
 
 End
 
-Public Sub Form_Activate()
 
-    'cadLoad.Start(FilePath)
-    LoadDrawingMap()
-
-End
 
 Public Sub ToolButton1_Click()
 

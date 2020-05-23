@@ -33,6 +33,7 @@ Public HelperTrabajo2 As String     '   sin usar
 Public HelperTrabajo3 As String     '   sin usar
 Public HelperTrabajo4 As String     '   sin usar
 Public ErrorMessage As String
+Public ErrorTimer As Integer = 0
 Public HelperDibujo As String       ' Se escribe abajo "Grid  Ortho" , etc
 
 Public PromtSlash As String = "|"
@@ -79,8 +80,16 @@ End
 Public Sub DibujaHelper()
 
     Dim hExt As PaintExtents, trabajoYteclado As String, sNext As String
+    
+    If ErrorMessage <> "" Then
 
-    texting(ErrorMessage, 10 - appmain.hFcad.glarea1.w / 2, 30 - appmain.hFcad.glarea1.h / 2, Color.Red)
+        texting(ErrorMessage, 10 - appmain.hFcad.glarea1.w / 2, 30 - appmain.hFcad.glarea1.h / 2, Color.Red)
+        
+        If ErrorTimer = 15 Then ErrorMessage = ""
+    Else
+        ErrorTimer = 0
+        
+    End If
 
     If HelperTrabajoNext <> "" Then snext = HelperTrabajoNext & " : "
 

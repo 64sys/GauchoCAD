@@ -52,7 +52,7 @@ End
 
 
 
-Public Sub Draw()               ' called byappmain.hFCAD.drwArea_Draw
+Public Sub Draw()               ' called by appmain.hFCAD.drwArea_Draw
 
 
     Dim iii As Integer
@@ -76,7 +76,7 @@ Public Sub Finish()
     modCAD.clsJobPrevious = Me
     modCAD.clsJob = clsDefaultJob
     clsDrawingAids.CleanTexts
-    appmain.hFCAD.redraw
+    appmain.hFCAD.Regen
 
 End
 

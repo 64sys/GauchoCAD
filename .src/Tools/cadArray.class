@@ -226,7 +226,7 @@ Public Sub Finish()
     clsDrawingAids.CleanTexts
     clsEntities.DeSelection()
     modCAD.DrawOriginals = False
-   appmain.hFCAD.redraw
+   appmain.hFCAD.Regen
     Me.Active = False
     modCAD.ToolActive = False
 End

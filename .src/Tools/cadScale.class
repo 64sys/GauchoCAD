@@ -57,10 +57,10 @@ Public Function MouseUp() ' called by FCAD-> DrawingArea_MouseUp
         Me.SelStartY = mouse.y
 
         ' prevenir acciones tontas como hacer click en otro elemento antes de terminar con el actual
-       appmain.hFCAD.DesHabilitarBotones
+       ' TODO: reparar -> appmain.hFCAD.DesHabilitarBotones
     Else If Me.PointsDone = 2 Then ' acabo de marcar el punto destino
         ' permitir otros trabajos
-       appmain.hFCAD.HabilitarBotones
+       ' TODO: reparar -> appmain.hFCAD.HabilitarBotones
 
         ' we have the point set from MouseMove
 
@@ -121,7 +121,7 @@ Public Sub Finish()
     clsDrawingAids.CleanTexts
     clsEntities.DeSelection()
     modCAD.DrawOriginals = False
-   appmain.hFCAD.redraw
+   appmain.hFCAD.Regen
     Me.Active = False
     modCAD.ToolActive = False
 
