@@ -116,7 +116,7 @@ Public Function KeyText(EnteredText As String)
     End If
 
     ' TODO: dejar comentado mientras hagamos debug
-Catch
+'Catch
 
     clsDrawingAids.ErrorMessage = "Command not recognized"
     '

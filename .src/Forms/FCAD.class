@@ -448,7 +448,7 @@ Public Sub LoadDrawingMap()
             cLayers = cModel["Layers"]
             TreeView1.Add("layers", "Layers",, "drawing")
             For Each Layer In cLayers
-                TreeView1.Add(Layer["name"], Layer["name"],, "layers")
+                TreeView1.Add(Layer.key, Layer.Key,, "layers")
             Next
         Endif
         'Layers ----------------------

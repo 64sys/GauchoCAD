@@ -410,6 +410,7 @@ Public Sub tobLayers_Click()
     Dim FLay As FLayers
 
     FLay = New FLayers
-    FLay.Run(cMod)
+    'FLay.Run(cMod)                             ' si le cargo la copia no se guardan los cambios, 
+    FLay.Run(hFCAD.cModel)
 
 End

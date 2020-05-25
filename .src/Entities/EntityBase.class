@@ -15,12 +15,12 @@ Public Const ParamDefault As String = (" ")
 Public P As New Float[]                     ' X,Y pairs                        
 Public Level As New Float[]                 ' the future Z or elevation
 Public StringData As String                 ' split with "|" separator if neccesary, that's is Entity specific.
-Public StringData2 As String                 ' split with "|" separator if neccesary, that's is Entity specific.
-Public StringData3 As String                 ' split with "|" separator if neccesary, that's is Entity specific.
+Public StringData2 As String                ' split with "|" separator if neccesary, that's is Entity specific.
+Public StringData3 As String                ' split with "|" separator if neccesary, that's is Entity specific.
 Public fParam As New Float[]                ' array of floats
-Public Layer As String = "0"                    ' Capa o Layer
-Public Block As String                     ' Para tener la posibilidade de juntar cosas en un block
-Public _Color As Integer                   ' 0=by layer, 1=by block, 10+=16 bit color code  ;  ths is not the color to be draw, ColorToPaint is, set in Finish()
+Public Layer As String = "0"                ' Capa o Layer que se guarda en el archivo
+Public Block As String                      ' Para tener la posibilidade de juntar cosas en un block
+Public _Color As Integer                    ' 0=by layer, 1=by block, 10+=16 bit color code  ;  ths is not the color to be draw, ColorToPaint is, set in Finish()
 Public LineType As Integer                  ' 0=continuous, 1=dashed from flxDash
 Public LineWidth As Integer = 1             ' this is it
 Public RefPointX As Float                   ' new 
@@ -30,20 +30,21 @@ Public RefPointY As Float
 
 ' NOT SAVED
 ' construction and usage vars
+Public LayerId As String                    ' esta variable es la Key en la coleccion de layers
 Public BlockNumber As Integer
-Public ColorToPaint As Integer            ' this is the color to be painted, gets ready in Finish from the _color param
+Public ColorToPaint As Integer              ' this is the color to be painted, gets ready in Finish from the _color param
 Public Selected As Boolean                
-Public ForDeletion As Boolean = True      ' this must be falsed in Finish
-Public DrawAble As Boolean = False        ' True si durante la construccion ya tiene suficientes elementos para poder hacer una representacion digna
-Public Visible As Boolean = True          ' si esta entidad puede ser mostrada independientmente
-Public Finished As Boolean = False        ' colocar en true cuando se llegue a completar
-Public StepsDone As Integer                ' esto lo cambia cls ElementBuilder durante la construccion
-Public Group As Integer = 0               ' Pertenecemos a un grupo?
-Public flxDash As New Integer[]           ' tipo de linea, continua, puntos, etc
-Public B As New Float[]                   ' Backup point
-Public Psel As New Boolean[]              ' selected points
-Public BoundingPoligon As New Float[]     ' this is a poligon built at element's contruction that defines a poligon used for detecting points inside me
-Public MyPoi As New Single[]                 ' point of interest
+Public ForDeletion As Boolean = True        ' this must be falsed in Finish
+Public DrawAble As Boolean = False          ' True si durante la construccion ya tiene suficientes elementos para poder hacer una representacion digna
+Public Visible As Boolean = True            ' si esta entidad puede ser mostrada independientmente
+Public Finished As Boolean = False          ' colocar en true cuando se llegue a completar
+Public StepsDone As Integer                 ' esto lo cambia cls ElementBuilder durante la construccion
+Public Group As Integer = 0                 ' Pertenecemos a un grupo?
+Public flxDash As New Integer[]             ' tipo de linea, continua, puntos, etc
+Public B As New Float[]                     ' Backup point
+Public Psel As New Boolean[]                ' selected points
+Public BoundingPoligon As New Float[]       ' this is a poligon built at element's contruction that defines a poligon used for detecting points inside me
+Public MyPoi As New Single[]                ' point of interest
 
 
 Public Sub _new()

@@ -31,7 +31,7 @@ Public Sub Draw()
         
             If Me.fParam.Count > 0 Then
         
-                angulo = Me.fParam[0] / 180 * Pi
+                angulo = Me.fParam[0] / 180 * Pi    ' ojo OPENGL--> GRADOS, GAMBAS-->RADIANESDXF
         
             Else
         

@@ -150,6 +150,7 @@ Private mArcCount As Integer
 Private mSplineCount As Integer
 Private mSolidCount As Integer
 Private mDimCount As Integer
+Private mLayerCount As Integer
 
 Private flgReadingBlock As Boolean
 
@@ -186,7 +187,7 @@ Public Function Start(Optional ElemToBuild As Variant, Optional _mode As Integer
     
 
     clsEntities.ReconstruirBloques
-    modCAD.ApplyLayerProperties
+    modCAD.ApplyLayerProperties(1)
     clsEntities.GLGenDrawList
     cadZoomE.Start()
     
@@ -369,11 +370,61 @@ Public Procedure LoadFile(stn As String)
             modCAD.AddPolyLine(mPolyLine.p, mCommon.bColor, 1, mCommon.linetype, mCommon.layer, mBlock.block_name)
          
          
+        '-----------------------------------------------------------
+        ' LAYER
+        '-----------------------------------------------------------
+        Else If (lpcode = "0") And (lpvalue = "LAYER") Then
+            Dim newLayer As New Collection
+            Inc mLayerCount
+            APPMain.hFCAD.cModel["Layers"].Add(newlayer, Format(mLayerCount, "00"))
+            newlayer.Add(Format(mLayerCount, "00"), "id")
+            ReadData
+            While (lpcode <> "0") And Not Eof(fp) 
+                If lpcode = "2" Then newlayer.Add(lpvalue, "name")
+                
+               
+                If lpcode = "6" Then newLayer.Add(lpvalue, "style")
+                If lpcode = "62" Then 
+                        newLayer.Add(Abs(CInt(lpvalue)), "colour")
+                        If CInt(lpvalue) > 0 Then newLayer.Add(True, "show") Else newLayer.Add(False, "show") 
+                End If
+                If lpcode = "70" Then
+                    If ((CInt(lpvalue) And 2) = 2 Or (CInt(lpvalue) And 1) = 1) Then newLayer.Add(True, "locked") Else newLayer.Add(False, "locked")
+                End If
+                If lpcode = "20" Then   
+                    If ((CInt(lpvalue) And 4) = 4) Then newLayer.Add(True, "frozen") Else newLayer.Add(False, "frozen")
+                End If
+
+                If lpcode = "290" Then newLayer.Add(lpvalue, "print")
+                If lpcode = "370" Then newLayer.Add(lpvalue, "width")
+                ReadData
+            Wend
+            
+         '-----------------------------------------------------------
+        ' DIMSTYLE
+        '-----------------------------------------------------------
+        
+        Else If (lpcode = "0") And (lpvalue = "DIMSTYLE") Then
+            Dim newCol As New Collection
+            
+            ReadData
+            While (lpcode <> "0") And Not Eof(fp) 
+                If lpcode = "2" Then APPMain.hFCAD.cModel["DimSts"].Add(newCol, lpvalue)
+                
+                If lpcode = "40" Then newCol.Add(CFloat(lpvalue), "DIMSCALE")
+                'If lpcode = "3" Then newCol.Add(CFloat(lpvalue), "DIMPOST")
+                'If lpcode = "4" Then newCol.Add(CFloat(lpvalue), "DIMAPOST")
+                
+                
+                ReadData
+            Wend
+            
+        
+        
+        
          '-----------------------------------------------------------
         ' SOLID
         '-----------------------------------------------------------
-
-        
         Else If (lpcode = "0") And (lpvalue = "SOLID") Then
             
             mSolid.p = New Float[]

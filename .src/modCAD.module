@@ -249,7 +249,7 @@ Public Function AddEllipse(Points As Float[], r As Float, angle1 As Float, angle
     oEntity = Object.New("cadEllipse")           ' create the new entity of proper class
     oEntity.P.insert(points)                    ' centro x1,y1
     oEntity.fParam.Add(r)                      ' radio
-    oEntity.fParam.Add(angle1)                      ' radio
+    oEntity.fParam.Add(angle1)                 ' radio
     oEntity.fParam.Add(angle2)                   ' angulo
     oEntity.layer = Layer
     oEntity._color = _color
@@ -268,7 +268,7 @@ Public Function AddText(Points As Float[], angle As Float, height As Float, _Tex
 
     oEntity = Object.New("cadText")             ' create the new entity of proper class
     oEntity.P.insert(points)                    ' recibimos position x1,y1
-    oEntity.fParam.Add(angle * 180 / Pi)        '-----> angulo: DXF lo envia en RADIANES, nosotro usamos GRADOS, la conversion es aca mismo
+    oEntity.fParam.Add(angle)                   ' grados
     oEntity.fParam.Add(height)                  ' alto letras
     oEntity.stringdata = _text                  ' el texto
     oEntity.layer = Layer
@@ -288,7 +288,7 @@ Public Function AddMText(Points As Float[], angle As Float, height As Float, _Te
 
     oEntity = Object.New("cadMText")             ' create the new entity of proper class
     oEntity.P.insert(points)                    ' recibimos position x1,y1
-    oEntity.fParam.Add(angle * 180 / Pi)        '-----> angulo: DXF lo envia en RADIANES, nosotro usamos GRADOS, la conversion es aca mismo
+    oEntity.fParam.Add(angle)                  ' GRADOS
     oEntity.fParam.Add(height)                  ' alto letras
     oEntity.stringdata = _text                  ' el texto
     oEntity.layer = Layer
@@ -317,7 +317,7 @@ Public Function AddInsert(Points As Float[], scaleX As Float, scaleY As Float, a
     oEntity.P.insert(points)                    ' recibimos position x1,y1
     oEntity.fParam.Add(scaleX)
     oEntity.fParam.Add(scaleY)
-    oEntity.fParam.Add(angulo)
+    oEntity.fParam.Add(angulo)                  ' GRADOS
     oEntity.layer = Layer
     oEntity._color = _color
     oEntity.Block = Block
@@ -342,28 +342,52 @@ Public Function AddBlock(Points As Float[], Optional Layer As String, Optional B
 
 End
 
-Public Function ApplyLayerProperties()
 
-    Dim e As Object
+'' Aplica los cambios en los Layers a las entidades
+'' Si mode = 1, primero recontruye el layerID (para ser usado luego de abrir un archivo)
+Public Function ApplyLayerProperties(Optional mode As Integer = 0)
 
+    Dim e As Object, cLayer As Collection
+    Dim LayerName As String
+    
     Print "Aplicando propiedades del Layers"
-
-    For Each e In APPMain.hFCAD.arrEntities
-
-        If e._color = 256 Then          ' buscar color del layer
-
-        Else If e._color = 257 Then     ' buscar color del objeto
-
-        Else If e._color = 0 Then       ' buscar color del bloque
-
-        Else
-
-            e.ColorToPaint = gColor[e._color]
-
-        Endif
-
-    Next
-
+   
+        For Each e In APPMain.hFCAD.arrEntities
+            
+            If mode = 1 Then
+                ' reconstruyo el ID del layer en la entidad, para ello busco en la lista cual coincide con su nombre
+                For Each cLayer In APPMain.hFCAD.cModel["Layers"]
+                    If e.layer = cLayer["name"] Then
+                        e.layerID = cLayer["id"]
+                        Break
+                    Endif
+                Next
+                
+            Endif
+            
+            
+            ' nombre, el que pudo haber cambiado (exepto el "0")
+            e.layer = APPMain.hFCAD.cModel["Layers"][e.layerID]["name"]
+              
+            ' visibiliad
+            If APPMain.hFCAD.cModel["Layers"][e.layerID]["show"] Then e.visible = True Else e.visible = False
+            
+            
+            ' color
+            If e._color = 256 Then          ' buscar color del layer
+                e.ColorToPaint = gColor[APPMain.hFCAD.cModel["Layers"][e.layerID]["colour"]]
+            Else If e._color = 257 Then     ' buscar color del objeto
+    
+            Else If e._color = 0 Then       ' buscar color del bloque
+    
+            Else
+    
+                e.ColorToPaint = gColor[e._color]
+    
+            Endif
+    
+        Next
+   
 End
 
 '' Input a dxf color return a rgb color
