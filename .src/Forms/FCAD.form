@@ -292,6 +292,7 @@
             MoveScaled(2,2,42,18)
             #Public = True
             Tracking = True
+            Mouse = Mouse.Cross
             Expand = True
           }
         }

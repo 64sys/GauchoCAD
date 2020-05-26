@@ -70,6 +70,7 @@ Public FileName As String                           ' current work filename
 Public WindowBackColor As Integer   '' Window backgrount color
 Public WindowTextColor As Integer   '' Window helper text color
 Public WindowCursorColor As Integer '' Window cursor color
+Public WhiteAndBlack As Integer     '' El color blanco/negro siempre sera distinto al fondo
 '---------------------------------------------------------------
 
 Public Sub Main()
@@ -77,7 +78,7 @@ Public Sub Main()
 
     Dim lay As New Collection       '' Layer properties
 
- 
+    If WindowBackColor < CInt(Val("&H808080")) Then WhiteAndBlack = Color.White Else WhiteAndBlack = Color.Black
     ' armo el array de colores
     gcolor = DecodeColor()
  
@@ -90,6 +91,9 @@ Public Sub Main()
 
     FontList = glPlus.LoadFonts(Application.Path &/ "Fonts/LFF")
     glPlus.SelectFont("romanc")
+    
+    
+    
     
     
 End
@@ -375,14 +379,15 @@ Public Function ApplyLayerProperties(Optional mode As Integer = 0)
             
             ' color
             If e._color = 256 Then          ' buscar color del layer
-                e.ColorToPaint = gColor[APPMain.hFCAD.cModel["Layers"][e.layerID]["colour"]]
+              
+                e.gbColor = gColor[APPMain.hFCAD.cModel["Layers"][e.layerID]["colour"]]
             Else If e._color = 257 Then     ' buscar color del objeto
-    
+                e.gbColor = gColor[APPMain.hFCAD.cModel["Layers"][e.layerID]["colour"]]     ' FIXME: cambiar esto 
             Else If e._color = 0 Then       ' buscar color del bloque
-    
+                e.gbColor = gColor[APPMain.hFCAD.cModel["Layers"][e.layerID]["colour"]]     ' FIXME: cambiar esto
             Else
     
-                e.ColorToPaint = gColor[e._color]
+                e.gbColor = gColor[e._color]
     
             Endif
     
@@ -659,13 +664,18 @@ Public Function DecodeColor() As Integer[]
     rgbx.Add("204:204:204")
     rgbx.Add("255:255:255")
 
-    For Each s In rgbx
-        r = Split(s, ":")[0]
-        g = Split(s, ":")[1]
-        b = Split(s, ":")[2]
+    Dim i As Integer
+    For i = 0 To rgbx.Max
+        s = rgbx[i]
+        If i = 0 Or i = 8 Or i = rgbx.Max Then
+            rgb.Add(WhiteAndBlack)
+        Else
+            r = Split(s, ":")[0]
+            g = Split(s, ":")[1]
+            b = Split(s, ":")[2]
 
         rgb.Add(Color.RGB(CInt(r), CInt(g), CInt(b)))
-
+        Endif
     Next
 
     Return rgb

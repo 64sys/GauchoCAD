@@ -140,14 +140,16 @@ Public Sub GLArea1_draw()
     ' Primero la grid
     ' clsDrawingAids.DrawGrid
 
-    modCAD.clsJob.Draw
+   
     ' If modCAD.DrawBounds Then clsDrawingAids.DrawBoundingPoligons
     '
     clsDrawingAids.DrawCoordenadas
     '
     clsDrawingAids.DibujaHelper
+    
     gl.CallList(GlListAllEntities)                      ' si GL no tiene contexto, la lista no se genera. Es necesario que la instancia de FCAD este cargada.
-
+    
+    modCAD.clsJob.Draw
     '
 
 End
@@ -301,6 +303,14 @@ Public Sub form_KeyPress()
     Endif
     If Key.Code = Key.f6 Then
         modCAD.DrawBounds = Not modCAD.DrawBounds
+        Dim i As Integer
+    
+        For i = 0 To 200000
+
+            modCAD.AddLine([Rnd(-20, 20), Rnd(-20, 20), Rnd(-20, 20), Rnd(-20, 20)], 0, 1, 0, "0")
+            arrEntities.Last.gbcolor = Color.RGB(Rnd(0, 255), Rnd(0, 255), Rnd(0, 255))
+        Next
+        
         regen
         Return
     Endif

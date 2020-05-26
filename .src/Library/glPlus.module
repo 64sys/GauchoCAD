@@ -180,6 +180,8 @@ shaFragmentShaderSource = "#version 330 core" & gb.cr &
     
     ' no tengo idea, debe ser algo de AntiAlias
     gl.Enable(gl.SMOOTH)
+    gl.Enable(gl.BLEND)
+    gl.BlendFunc(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA)
     ' usaremos luces
     ' Gl.Enable(Gl.LIGHTING)
     ' Gl.Enable(Gl.LIGHT0)
@@ -285,13 +287,13 @@ Public Sub Rectangle2D(x1 As Float, y1 As Float, w As Float, h As Float, Optiona
     If mode >= 1 Then                                      ' solo recuadro
         
         gl.LineWidth(BoundingWidth)
-        gl.Begin(gl.LINE_STRIP)
+        gl.Begin(gl.LINE_LOOP)
         
             Vertex2D(x1, y1, BoundingColor)
             Vertex2D(x1 + w, y1, BoundingColor)
             Vertex2D(x1 + w, y1 + h, BoundingColor)
             Vertex2D(x1, y1 + h, BoundingColor)
-            Vertex2D(x1, y1, BoundingColor)
+            
         gl.End
         
         
@@ -410,13 +412,13 @@ Public Sub glColorRGB(gbColor As Integer)
 
     Dim r, g, b, a As Float
 
-    ' FIXME: alpha no se extrae correctamente
-    a = (Shr(gbColor, 24) And 255) / 255
+    
+    a = 1 - Color.GetAlpha(gbColor) / 255
     r = (Shr(gbColor, 16) And 255) / 255
     g = (Shr(gbColor, 8) And 255) / 255
     b = (gbColor And 255) / 255
-    glColor4f(r, g, b, 1)
-    
+    glColor4f(r, g, b, a)
+    'Debug r, g, b, a
 
 
 End

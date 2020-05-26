@@ -9,7 +9,7 @@ Public Const PointsToDraw As Integer = 0             ' minimal point requered fo
 Public Const HelperTrabajo As String = ("SPLine")
 Public Const ParamType As String = "PPPP"                             ' that is Point, Point, Float; could be Color Text, etc
 Public Const ParamHelper As String = ("First Point;Next Point;Next Point;Last Point")      ' a little text that is shown at the prompt waiting for user input during build
-Public Const ParamDefault As String = ("")
+Public Const ParamDefault As String = ""
 
 
 
@@ -20,6 +20,7 @@ Public Const ParamDefault As String = ("")
     Return
     
     If Not Me.DrawAble Or Not Me.Visible Then Return
+    If Me.Selected And Not modCAD.ToolActive Then Me.ColorToPaint = modCAD.ColorForSelected Else Me.ColorToPaint = Me.gbColor
 
     
     Dim i As Integer

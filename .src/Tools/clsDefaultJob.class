@@ -8,6 +8,7 @@ Create Static
 Public Const GENDER As String = ("Default")
 
 
+
 Public Function Start(Optional ElemToBuild As Variant, Optional _Mode As Integer = 0) As Boolean
     ' Modes:
     '       0 = Move, all points in the element must be selected, or click on it.
@@ -39,9 +40,14 @@ Public Function MouseUp() ' esta rutina es llamada por FCAD en el evento Drawing
     Me.SelEndX = mouse.x
     Me.SelEndy = mouse.y
     Me.Active = False
-
+    Dim Crossing As Boolean = False
     ' corrijo para start<end
-    If Me.SelStartX > Me.SelEndX Then Swap Me.SelStartX, Me.SelEndX
+    If Me.SelStartX > Me.SelEndX Then 
+        crossing = True
+        Swap Me.SelStartX, Me.SelEndX
+    Else
+        crossing = False
+    End If
     If Me.SelStartY < Me.SelEndy Then Swap Me.SelStartY, Me.SelEndy                     ' this is FLIPPED
 
     Dim tipo As String
@@ -62,8 +68,10 @@ Public Function MouseUp() ' esta rutina es llamada por FCAD en el evento Drawing
 
     Else
         ' busco elementos seleccionados
-        clsEntities.SelectionSquare(Me.SelStartXr, Me.SelStartYr, Me.SelEndXr, Me.SelEndyr, tipo)
-
+        Me.selectionCount = clsEntities.SelectionSquare(Me.SelStartXr, Me.SelStartYr, Me.SelEndXr, Me.SelEndyr, tipo, crossing) 
+        Appmain.hFCAD.regen
+        
+        
     End If
 
     '     'aprovecho para ver si hay algo util en la seleccion
@@ -141,24 +149,26 @@ Public Sub Draw() ' esta rutina es llamada por FCAD en el evento DrawingArea_Dra
     'paint.LineWidth = 1.0 / appmain.hFcad.ScaleZoom / 2
     'gl.LineWidth = 1.0 
     
-    ' If Me.SelStartX > Me.SelEndX Then                               ' Seleccion crossing, o sea que si cualquier arista del rectangulo cruza el bounding poligon, queda seleccionado
+     If Me.SelStartX > Me.SelEndX Then                               ' Seleccion crossing, o sea que si cualquier arista del rectangulo cruza el bounding poligon, queda seleccionado
     '     paint.brush = Paint.Color(Color.RGB(224, 220, 207, 175))
     '     paint.Rectangle(Me.SelStartX, Me.SelStartY, Me.SelEndX - Me.SelStartX, Me.SelEndy - Me.SelStartY)
     '     paint.Fill(True)
     '     paint.Dash = clsDrawingAids.Dashes
     '     paint.brush = Paint.Color(Color.RGB(255, 0, 0, 0))
     '     paint.Stroke
+        GLplus.Rectangle2D(Me.SelStartXr, Me.SelStartYr, Me.SelEndXr - Me.SelStartXr, Me.SelEndyr - Me.SelStartYr, Color.RGB(224, 220, 207, 215),,,, Color.red, 1, 2)
     '     
-    ' Else                                                            ' seleccion full, todos los puntos deben estar adentro
+     Else                                                            ' seleccion full, todos los puntos deben estar adentro
         ' paint.Dash = Null
         ' paint.brush = Paint.Color(Color.RGB(224, 220, 207, 175))
         ' paint.Rectangle(Me.SelStartX, Me.SelStartY, Me.SelEndX - Me.SelStartX, Me.SelEndy - Me.SelStartY)
         ' paint.Fill(True)
         ' paint.brush = Paint.Color(Color.RGB(0, 255, 255, 0))
         ' paint.Stroke
-        GLplus.Rectangle2D(Me.SelStartXr, Me.SelStartYr, Me.SelEndXr - Me.SelStartXr, Me.SelEndyr - Me.SelStartYr, Color.RGB(224, 220, 207, 215))
+        GLplus.Rectangle2D(Me.SelStartXr, Me.SelStartYr, Me.SelEndXr - Me.SelStartXr, Me.SelEndyr - Me.SelStartYr, Color.RGB(224, 220, 207, 215),,,, Color.Green, 1, 2)
+        
 
-    'End If
+    End If
     
     'gl.PopMatrix
 

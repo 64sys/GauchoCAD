@@ -6,6 +6,8 @@ Authors: Terco, Tincho, Postpase, Vuott
 
 VER       DATE      CHANGES
 --------------------------------------------------------------------------------------------------------------------
+0.0.50	25/05/20	Fix selecting window. Blending works bad.
+
 0.0.44	23/05/20	Blended with Tincho's and up to GitHub again. Tools repaired.
 
 0.0.42	22/05/20	Improved bloque construction perfomance. Dimension repaired. Multidocument!!!

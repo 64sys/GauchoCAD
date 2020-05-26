@@ -617,7 +617,7 @@ Public Sub MoveFromBackUp(dX As Float, dZ As Float, Optional OnlySelected As Boo
 
 End
 
-Public Function SelectionSquare(X1real As Float, Z1real As Float, X2real As Float, Z2real As Float, Optional NuevaSumaResta As String = "nueva") As Integer
+Public Function SelectionSquare(X1real As Float, Z1real As Float, X2real As Float, Z2real As Float, Optional NuevaSumaResta As String = "nueva", crossing As Boolean) As Integer
 
     ' Veo que accion estoy tomando
     Dim e As Object, i, TotalSeleccionados As Integer
@@ -639,12 +639,14 @@ Public Function SelectionSquare(X1real As Float, Z1real As Float, X2real As Floa
                     If Not e.Psel[i / 2] Then
                         Inc TotalSeleccionados
                         e.Psel[i / 2] = True
+                        If crossing Then Me.SelectElem(e, False)
                     End If
                 Else If NuevaSumaResta = "resta" Then
 
                     If e.Psel[i / 2] Then
                         e.Psel[i / 2] = False
-                        Inc TotalSeleccionados
+                        Dec TotalSeleccionados
+                        If crossing Then Me.DeSelectElem(e, False)
                     End If
                 End If
 

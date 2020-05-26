@@ -7,21 +7,19 @@ Public Const GENDER As String = ("Line")
 Public Const DrawingOrder As Integer = 1        ' 1 = draws first
 Public Const HelperTrabajo As String = ("a line")
 Public Const ParamType As String = "PP"                             ' that is Point, Point; could be Color Text, etc
-Public Const ParamHelper As String = ("Start point;End point")      ' a little text that is shown at the prompt waiting for user input during build
+Public Const ParamHelper As String = "Start point;End point"
 
 Public Sub Draw()
 
     If Not Me.DrawAble Or Not Me.Visible Then Return
     
+    If Me.Selected And Not modCAD.ToolActive Then Me.ColorToPaint = modCAD.ColorForSelected Else Me.ColorToPaint = Me.gbColor
+    
     If modCAD.drwDrawingClass = modCAD.drwPaintClass Then
         
             paint.LineWidth = Me.LineWidth / appmain.hFcad.ScaleZoom / modCAD.ScaleLines 
             If Me.flxDash Then paint.Dash = Me.flxDash
-            If Me.Selected And Not modCAD.ToolActive Then
-                paint.brush = Paint.Color(modCAD.ColorForSelected)
-            Else
-                paint.brush = Paint.Color(Me.ColorToPaint)
-            Endif
+            paint.brush = Paint.Color(Me.gbColor)
             paint.MoveTo(Me.p[0], Me.p[1])
             paint.LineTo(Me.p[2], Me.p[3])
             paint.Stroke

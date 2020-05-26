@@ -8,7 +8,7 @@ Public Const DrawingOrder As Integer = 0        ' 1 = draws first
 Public Const PointsToDraw As Integer = 1             ' minimal point requered for drawing something usefull
 Public Const OrtogonalIgnorado As Boolean = False
 Public Const OrtogonalForzado As Boolean = False
-Public Const ParamDefault As String = (" ")
+Public Const ParamDefault As String = " "
 
 ' SAVE from this vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 ' IMPORTANT: ALL CHANGES HERE MUST BE TRANSLATED TO cadLoad/Save and clsEntities.CopyElementData()                                                                                    |
@@ -32,7 +32,8 @@ Public RefPointY As Float
 ' construction and usage vars
 Public LayerId As String                    ' esta variable es la Key en la coleccion de layers
 Public BlockNumber As Integer
-Public ColorToPaint As Integer              ' this is the color to be painted, gets ready in Finish from the _color param
+Public ColorToPaint As Integer              ' este es el color que realmente se va a dibujar
+Public gbColor As Integer                   ' este es el color que se obtiene de modCAD.gColor(CADcolor)
 Public Selected As Boolean                
 Public ForDeletion As Boolean = True        ' this must be falsed in Finish
 Public DrawAble As Boolean = False          ' True si durante la construccion ya tiene suficientes elementos para poder hacer una representacion digna

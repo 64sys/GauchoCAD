@@ -9,7 +9,7 @@ Public Const DrawingOrder As Integer = 100 ' 1 a 32.724 esto debe Drawse primero
 Public Const PointsToDraw As Integer = 1             ' minimal point requered for drawing something usefull
 Public Const HelperTrabajo As String = ("Insert an acotation")
 Public Const ParamType As String = "PP"                             ' that is Point, Point, Float; could be Color Text, etc
-Public Const ParamHelper As String = ("Start point;End point")      ' a little text that is shown at the prompt waiting for user input during build
+Public Const ParamHelper As String = "Start point;End point"
 
 Public Sub Draw()
  
@@ -20,7 +20,7 @@ Public Sub Draw()
     
 
     If Not Me.DrawAble Or Not Me.Visible Then Return
-
+    If Me.Selected And Not modCAD.ToolActive Then Me.ColorToPaint = modCAD.ColorForSelected Else Me.ColorToPaint = Me.gbColor
     Dim ET As Object, i As Integer
     i = clsEntities.FIndBlockID(Me.StringData2)
     If i < 0 Then Return

@@ -7,7 +7,7 @@ Public Const GENDER As String = ("Insert")
 Public Const HelperTrabajo As String = ("Inserts a block")
 Public Const ParamType As String = "TPFFF"
 Public Const ParamHelper As String = ("BlockName; Position ; X scale ; Y scale ; Rotation")
-Public Const ParamDefault As String = ("<no name>; 0,0 ; 1 ;1 ; 0")
+Public Const ParamDefault As String = "<no name>; 0,0 ; 1 ;1 ; 0"
 
 
 
