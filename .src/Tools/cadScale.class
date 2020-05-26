@@ -4,7 +4,7 @@
 ' Tool maintained by Terco
 Inherits ToolsBase
 Create Static
-Public Const GENDER As String = ("Scale")
+Public Const GENDER As String = "Scale"
 
 
 Public Function Start(Optional ElemToBuild As Variant, Optional _Mode As Integer = 0) As Boolean

@@ -4,7 +4,7 @@
 ' Tool maintained by Terco
 Inherits ToolsBase
 Create Static
-Public Const GENDER As String = ("Dxf")
+Public Const GENDER As String = "Dxf"
 
 Public Struct commonSt
     layer As String         ' 8

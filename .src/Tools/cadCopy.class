@@ -3,7 +3,7 @@
 ' Tool maintained by Terco
 Inherits ToolsBase
 Create Static
-Public Const GENDER As String = ("Copy")
+Public Const GENDER As String = "Copy"
 ' Add more if needed
 
 

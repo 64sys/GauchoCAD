@@ -4,7 +4,7 @@
 ' Element maintained by Terco
 ' V2
 Inherits EntityBase
-Public Const GENDER As String = ("PLine")          
+Public Const GENDER As String = "PLine"          
 Public Const PointsToDraw As Integer = 0             ' minimal point requered for drawing something usefull
 Public Const HelperTrabajo As String = ("Poliline")
 Public Const ParamType As String = "P+"                             ' that is Point, Point, Float; could be Color Text, etc

@@ -5,7 +5,7 @@
 ' this is the Main Job, either we are doing this or other job
 Inherits ToolsBase
 Create Static
-Public Const GENDER As String = ("Default")
+Public Const GENDER As String = "Default"
 
 
 

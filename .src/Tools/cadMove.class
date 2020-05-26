@@ -3,7 +3,7 @@
 ' Tool maintained by Terco
 Create Static
 Inherits ToolsBase
-Public Const GENDER As String = ("Move")
+Public Const GENDER As String = "Move"
 
 
 Public Function Start(Optional ElemToBuild As Variant, Optional _Mode As Integer = 0) As Boolean

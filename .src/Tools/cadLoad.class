@@ -1,7 +1,7 @@
 ' Gambas class file
 
 Inherits ToolsBase
-Public Const GENDER As String = ("Load")
+Public Const GENDER As String = "Load"
 
 Public Function Start(Optional filename As Variant, Optional _mode As Integer = 0) As Boolean
 

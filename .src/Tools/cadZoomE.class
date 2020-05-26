@@ -3,7 +3,7 @@
 ' Tool maintained by Terco
 Inherits ToolsBase
 Create Static
-Public Const GENDER As String = ("ZoomE")
+Public Const GENDER As String = "ZoomE"
 
 
 '  PanX y PanY estanen coordenadas de pantalla, o sea pixeles

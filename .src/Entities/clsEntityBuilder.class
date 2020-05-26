@@ -4,7 +4,7 @@
 Create Static
 
 ' Pixeles
-Public Const GENDER As String = ("Builder")
+Public Const GENDER As String = "Builder"
 Public LastMouseDownX As Integer    ' change in MouseDown
 Public LastMouseDownY As Integer
 Public SelStartX As Integer         ' change in MouseDown

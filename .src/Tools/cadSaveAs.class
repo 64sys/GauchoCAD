@@ -1,7 +1,7 @@
 ' Gambas class file
 
 Inherits ToolsBase
-Public Const GENDER As String = ("SaveAs")
+Public Const GENDER As String = "SaveAs"
 
 Public Function Start(Optional ElemToBuild As Variant, Optional _mode As Integer = 0) As Boolean
  

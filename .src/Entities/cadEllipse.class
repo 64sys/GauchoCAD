@@ -4,7 +4,7 @@
 ' Element maintained by Terco
 ' V2
 Inherits EntityBase
-Public Const GENDER As String = ("Ellipse")          
+Public Const GENDER As String = "Ellipse"          
 Public Const PointsToDraw As Integer = 1             ' minimal point requered for drawing something usefull
 Public Const HelperTrabajo As String = ("Draw an ellipse")
 Public Const ParamType As String = "PPFAA"
