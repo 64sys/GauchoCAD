@@ -1,0 +1,1009 @@
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: GauchoCAD 3.14.3\n"
+"POT-Creation-Date: 2020-05-27 02:08 UTC\n"
+"PO-Revision-Date: 2020-05-25 12:52 UTC\n"
+"Last-Translator: belmotek <info@belmotek.net>\n"
+"Language: es_AR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: .project:1
+msgid "GauchoCAD"
+msgstr ""
+
+#: .project:2
+msgid "A little CAD made in Gambas"
+msgstr ""
+
+#: APPMain.class:354
+#, fuzzy
+msgid "Configurtion"
+msgstr "Configuración"
+
+#: APPMain.form:73 FCAD.form:68
+msgid "File"
+msgstr "Archivo"
+
+#: APPMain.form:77 FCAD.form:73
+msgid "New"
+msgstr "Nuevo"
+
+#: APPMain.form:84 FCAD.form:81
+msgid "Open"
+msgstr "Abrir"
+
+#: APPMain.form:91 FAlias.form:62 FCAD.form:89 FLayers.form:60
+msgid "Save"
+msgstr "Guardar"
+
+#: APPMain.form:98 FCAD.form:97
+msgid "Save as"
+msgstr "Guardar como"
+
+#: APPMain.form:105 FCAD.form:105
+msgid "Import"
+msgstr "Importar"
+
+#: APPMain.form:112 FCAD.form:113
+msgid "Export"
+msgstr "Exportar"
+
+#: APPMain.form:119 FCAD.form:121
+msgid "Plot"
+msgstr "Trazar"
+
+#: APPMain.form:126 FCAD.form:129
+msgid "Close"
+msgstr "Cerrar"
+
+#: APPMain.form:135 FCAD.form:137
+msgid "Quit"
+msgstr "Salir"
+
+#: APPMain.form:142 FCAD.form:145
+msgid "Options"
+msgstr "Opciones"
+
+#: APPMain.form:146 FCAD.form:150
+msgid "Preferences"
+msgstr "Preferencias"
+
+#: APPMain.form:153 FCAD.form:158
+msgid "Entities"
+msgstr "Entidades"
+
+#: APPMain.form:158 FCAD.form:164 FToolsBasic.form:33 FToolsCircle.form:17
+#: FToolsEllipse.form:25
+msgid "Line"
+msgstr "Línea"
+
+#: APPMain.form:165 FCAD.form:172
+msgid "Polyline"
+msgstr "Polilínea"
+
+#: APPMain.form:172 FCAD.form:180 FToolsBasic.form:24 FToolsCircle.form:41
+#: FToolsEllipse.form:17
+msgid "Circle"
+msgstr "Circulo"
+
+#: APPMain.form:179 FCAD.form:188 FToolsBasic.form:61
+msgid "Ellipse"
+msgstr "Elipses"
+
+#: APPMain.form:186 FCAD.form:196
+msgid "Arc"
+msgstr "Arco"
+
+#: APPMain.form:193 FCAD.form:204 FToolsBasic.form:51
+msgid "Rectangle"
+msgstr "Rectángulo"
+
+#: APPMain.form:200 FCAD.form:212 FToolsBasic.form:120
+msgid "Text"
+msgstr "Texto"
+
+#: APPMain.form:207 FCAD.form:220
+msgid "Multi Text"
+msgstr "Texto múltiple"
+
+#: APPMain.form:214 FCAD.form:228
+msgid "Dimmension"
+msgstr "Cotas"
+
+#: APPMain.form:220 FCAD.form:235 cadBlock.class:7
+msgid "Block"
+msgstr "Bloque"
+
+#: APPMain.form:227 FCAD.form:243
+msgid "Hatch"
+msgstr "Rayado"
+
+#: APPMain.form:235 FCAD.form:252
+msgid "Point"
+msgstr "Punto"
+
+#: APPMain.form:241 FCAD.form:259
+msgid "Tools"
+msgstr "Herramientas"
+
+#: APPMain.form:245 FCAD.form:264
+msgid "Move"
+msgstr "Mover"
+
+#: APPMain.form:252 FCAD.form:272
+msgid "Copy"
+msgstr "Copiar"
+
+#: APPMain.form:259 FCAD.form:280
+msgid "Scale"
+msgstr "Escalar"
+
+#: APPMain.form:266 FCAD.form:288
+msgid "Array"
+msgstr "Matriz"
+
+#: APPMain.form:273 FCAD.form:295
+msgid "Rotate"
+msgstr "Girar"
+
+#: APPMain.form:280 FCAD.form:303
+msgid "Stretch"
+msgstr "Estirar"
+
+#: APPMain.form:287 FCAD.form:311
+msgid "Offset"
+msgstr "offset"
+
+#: APPMain.form:293 FCAD.form:318
+msgid "Fillet"
+msgstr "Chanfle"
+
+#: APPMain.form:299 FCAD.form:325
+msgid "Delete"
+msgstr "Borrar"
+
+#: APPMain.form:306 FCAD.form:333
+msgid "View"
+msgstr "Vista"
+
+#: APPMain.form:310 FCAD.form:338
+msgid "Zoom window"
+msgstr "Zoom window"
+
+#: APPMain.form:316 FCAD.form:345
+msgid "Pan view"
+msgstr "Desplazar la vista"
+
+#: APPMain.form:322 FCAD.form:352
+msgid "Zoom extends"
+msgstr "Zoom extends"
+
+#: APPMain.form:329 FCAD.form:360
+msgid "?"
+msgstr "?"
+
+#: APPMain.form:333 FCAD.form:364
+msgid "About"
+msgstr "Acerca de"
+
+#: APPMain.form:340
+msgid "Help"
+msgstr "Ayuda"
+
+#: APPMain.form:373 FLayers.class:76 cadLayers.class:18
+msgid "Layers"
+msgstr "Capas"
+
+#: APPMain.form:391
+msgid "Line styles"
+msgstr "Estilos de linea"
+
+#: APPMain.form:403
+msgid "Line widths"
+msgstr "Espesores de linea"
+
+#: APPMain.form:415
+msgid "Dimmension styles"
+msgstr "Estilos de cotas"
+
+#: EntityBase.class:5
+msgid "EntityBase"
+msgstr ""
+
+#: FAbout.class:136
+msgid "Código fuente"
+msgstr ""
+
+#: FAbout.class:145
+msgid "Contacto"
+msgstr ""
+
+#: FAbout.class:163
+msgid "Licencia del programa"
+msgstr ""
+
+#: FAbout.class:173
+msgid "El icono no existe"
+msgstr ""
+
+#: FAbout.class:195
+msgid "Acerca de"
+msgstr ""
+
+#: FAbout.class:215
+msgid "Hola desarrolladores de"
+msgstr ""
+
+#: FAlias.class:21 cadAlias.class:42
+msgid "Alias"
+msgstr ""
+
+#: FAlias.class:21
+msgid "Command"
+msgstr ""
+
+#: FAlias.form:69 FImport.form:66 FLayers.form:68
+msgid "Cancel"
+msgstr "Cancelar"
+
+#: FCAD.class:452
+msgid "Version"
+msgstr "Versión"
+
+#: FCAD.form:444
+msgid "Coordenadas"
+msgstr ""
+
+#: FConfig.class:93
+msgid "No existe el archivo de configuración"
+msgstr ""
+
+#: FConfig.class:477
+msgid "Configuración del programa"
+msgstr ""
+
+#: FConfig.class:478
+msgid "Los cambios fueron guardados"
+msgstr ""
+
+#: FConfig.class:498
+msgid "Nueva copia creada"
+msgstr ""
+
+#: FConfig.class:511
+msgid "Copia archivada exitosamente"
+msgstr ""
+
+#: FConfig.class:520
+msgid "Configuración restaurada"
+msgstr ""
+
+#: FConfig.form:28
+msgid "Configuración"
+msgstr ""
+
+#: FConfig.form:32
+msgid "Nueva configuración"
+msgstr ""
+
+#: FConfig.form:39
+msgid "Aplicar los cambios en la configuración"
+msgstr ""
+
+#: FConfig.form:46
+msgid "Restaurar configuración"
+msgstr ""
+
+#: FConfig.form:53
+msgid "Resguardar configuración"
+msgstr ""
+
+#: FConfig.form:59
+msgid "Abrir el archivo de registro"
+msgstr ""
+
+#: FConfig.form:66
+msgid "Salir"
+msgstr ""
+
+#: FConfig.form:89
+msgid "Aplicar la configuración"
+msgstr ""
+
+#: FConfig.form:105
+msgid "Archivar configuración"
+msgstr ""
+
+#: FConfig.form:113
+msgid "Abrir el direcotrio de la configuración"
+msgstr ""
+
+#: FConfig.form:144
+msgid "Directorios"
+msgstr ""
+
+#: FEditor.form:37
+msgid "ToolBar1"
+msgstr ""
+
+#: FEditor.form:45
+msgid "Bold.- Ctrl+N"
+msgstr ""
+
+#: FEditor.form:52
+msgid "Italic.- Ctrl+I"
+msgstr ""
+
+#: FEditor.form:59
+msgid "Underline"
+msgstr ""
+
+#: FEditor.form:66
+msgid "StrikeOut"
+msgstr ""
+
+#: FEditor.form:81
+msgid "Align Left"
+msgstr ""
+
+#: FEditor.form:89
+msgid "Align Center"
+msgstr ""
+
+#: FEditor.form:97
+msgid "Align Right"
+msgstr ""
+
+#: FEditor.form:115
+msgid "Tamaño de Indentado"
+msgstr ""
+
+#: FEditor.form:126
+msgid "Fuentes disponibles"
+msgstr ""
+
+#: FEditor.form:128
+msgid "Fuentes"
+msgstr ""
+
+#: FEditor.form:137
+msgid "Tamaño de la letra"
+msgstr ""
+
+#: FEditor.form:146 FImport.form:60
+msgid "OK"
+msgstr ""
+
+#: FImport.class:113
+msgid "No information was extracted from the file"
+msgstr ""
+
+#: FLayers.class:46 dbs.module:1763
+msgid "Color"
+msgstr ""
+
+#: FLayers.class:46
+msgid "Frozen"
+msgstr ""
+
+#: FLayers.class:46
+msgid "Lock"
+msgstr ""
+
+#: FLayers.class:46 dbs.module:1744
+msgid "Name"
+msgstr ""
+
+#: FLayers.class:46
+msgid "Print"
+msgstr ""
+
+#: FLayers.class:46
+msgid "Show"
+msgstr ""
+
+#: FLayers.class:46
+msgid "Style"
+msgstr ""
+
+#: FLayers.class:46
+msgid "Width"
+msgstr "Ancho"
+
+#: FLayers.class:46
+msgid "id"
+msgstr ""
+
+#: FToolsBasic.form:42 FToolsCircle.form:25 FToolsEllipse.form:33
+msgid "pLine"
+msgstr ""
+
+#: FToolsBasic.form:70
+msgid "Beam"
+msgstr ""
+
+#: FToolsBasic.form:78
+msgid "Column"
+msgstr ""
+
+#: FToolsBasic.form:86
+msgid "CWall"
+msgstr ""
+
+#: FToolsBasic.form:94
+msgid "Dim"
+msgstr ""
+
+#: FToolsBasic.form:103
+msgid "Lantern"
+msgstr ""
+
+#: FToolsBasic.form:111
+msgid "Shellball"
+msgstr ""
+
+#: _cadImage.class:8
+msgid "Inserts an image"
+msgstr ""
+
+#: _cadImage.class:10
+msgid "Position;Rotation; Scale"
+msgstr ""
+
+#: cad.module:1715
+msgid "CAD"
+msgstr "CAD"
+
+#: cad.module:1719
+msgid "Drawing window bacground color"
+msgstr ""
+
+#: cad.module:1728
+msgid "Draw originals"
+msgstr ""
+
+#: cad.module:1737
+msgid "Draw marked"
+msgstr ""
+
+#: cad.module:1747
+msgid "Draw only columns"
+msgstr ""
+
+#: cad.module:1757
+msgid "Draw bounds"
+msgstr ""
+
+#: cad.module:1767
+msgid "Dimensions format"
+msgstr ""
+
+#: cad.module:1777
+msgid "Color sellection"
+msgstr ""
+
+#: cad.module:1787
+msgid "Tool active"
+msgstr ""
+
+#: cad.module:1797
+msgid "Ortogonal"
+msgstr ""
+
+#: cad.module:1807
+msgid "Oorthogonal forced"
+msgstr ""
+
+#: cad.module:1817
+msgid "Oorthogonal ignored"
+msgstr ""
+
+#: cadArc.class:9
+msgid "Draws an arc"
+msgstr ""
+
+#: cadArc.class:11
+msgid "Center;Radious;Start;End"
+msgstr ""
+
+#: cadArc.class:50
+msgid "0.0 deg"
+msgstr ""
+
+#: cadArc.class:71
+msgid " to "
+msgstr ""
+
+#: cadArray.class:29
+msgid "Array "
+msgstr ""
+
+#: cadArray.class:36 cadCopy.class:24 cadMove.class:23 cadScale.class:24
+#: cadStretch.class:23
+msgid ": Selecct entities"
+msgstr ""
+
+#: cadArray.class:44 cadCopy.class:32 cadMove.class:31 cadScale.class:32
+#: cadStretch.class:32
+msgid ": Base point"
+msgstr ""
+
+#: cadArray.class:45 cadCopy.class:33 cadMove.class:32 cadScale.class:33
+#: cadStretch.class:33 clsDefaultJob.class:83
+msgid " elements"
+msgstr ""
+
+#: cadArray.class:68
+msgid ": Ortog or Polar [O]?"
+msgstr ""
+
+#: cadArray.class:85
+msgid ": Columns [1]?"
+msgstr ""
+
+#: cadArray.class:89
+msgid ": Repetitions [1]?"
+msgstr ""
+
+#: cadArray.class:92
+msgid "Bad input"
+msgstr ""
+
+#: cadArray.class:100
+msgid ": X distance [0]?"
+msgstr ""
+
+#: cadArray.class:104
+msgid ": Angle  [45]?"
+msgstr ""
+
+#: cadArray.class:112
+msgid ": Rows [1]?"
+msgstr ""
+
+#: cadArray.class:124
+msgid ": Y distance [0]?"
+msgstr ""
+
+#: cadBlock.class:9
+msgid "Name; Origin"
+msgstr ""
+
+#: cadBlock.class:24
+msgid "Select two or mores entities first"
+msgstr ""
+
+#: cadCircle.class:9
+msgid "Draw a circle"
+msgstr ""
+
+#: cadCircle.class:11
+msgid "Start point;Radious"
+msgstr ""
+
+#: cadCopy.class:17
+msgid "Copy "
+msgstr ""
+
+#: cadCopy.class:52 cadMove.class:48 cadScale.class:49 cadStretch.class:48
+msgid "Final point"
+msgstr ""
+
+#: cadDim.class:10
+msgid "Insert an acotation"
+msgstr ""
+
+#: cadEllipse.class:9
+msgid "Draw an ellipse"
+msgstr ""
+
+#: cadEllipse.class:11
+msgid "Start point;Major Radious;Minor/Major;Start;End"
+msgstr ""
+
+#: cadErase.class:15
+msgid "Delete "
+msgstr ""
+
+#: cadErase.class:23
+msgid ": Select entities"
+msgstr ""
+
+#: cadInsert.class:7
+msgid "Inserts a block"
+msgstr ""
+
+#: cadInsert.class:9
+msgid "BlockName; Position ; X scale ; Y scale ; Rotation"
+msgstr ""
+
+#: cadLine.class:8
+msgid "a line"
+msgstr ""
+
+#: cadLoad.class:13
+msgid "Archivos de GambasCAD"
+msgstr ""
+
+#: cadMText.class:10
+msgid "Inserts a multiline text"
+msgstr ""
+
+#: cadMText.class:12 cadText.class:12
+msgid "Start point;Angle;Heigth;"
+msgstr ""
+
+#: cadMove.class:16
+msgid "Move "
+msgstr ""
+
+#: cadPLine.class:9
+msgid "Poliline"
+msgstr ""
+
+#: cadPLine.class:11
+msgid "Next Point"
+msgstr ""
+
+#: cadPan.class:11
+msgid "Panning"
+msgstr ""
+
+#: cadSPLine.class:9
+#, fuzzy
+msgid "SPLine"
+msgstr "Línea"
+
+#: cadSPLine.class:11 cadSolid.class:11
+msgid "First Point;Next Point;Next Point;Last Point"
+msgstr ""
+
+#: cadScale.class:17
+msgid "Scale "
+msgstr ""
+
+#: cadSolid.class:9
+msgid "Solid"
+msgstr ""
+
+#: cadStretch.class:16
+msgid "Stretch "
+msgstr ""
+
+#: cadText.class:10
+msgid "Inserts a text"
+msgstr ""
+
+#: cadZoomW.class:58
+msgid "Window is too small"
+msgstr "La ventana es muy pequeña"
+
+#: clsDefaultJob.class:83
+msgid "Selected "
+msgstr ""
+
+#: clsEntities.class:36
+msgid "Loading blocks "
+msgstr ""
+
+#: clsEntityBuilder.class:72
+msgid "Can create entity"
+msgstr ""
+
+#: dbs.module:1406
+msgid "Extrayendo datos de"
+msgstr ""
+
+#: dbs.module:1406
+msgid "Sistema"
+msgstr ""
+
+#: dbs.module:1413
+msgid "Formateando datos de"
+msgstr ""
+
+#: dbs.module:1421
+msgid "Base de datos completada"
+msgstr ""
+
+#: dbs.module:1500
+msgid "Títulos de los campos de tablas y vistas"
+msgstr ""
+
+#: dbs.module:1502
+msgid "Títulos de las vistas"
+msgstr ""
+
+#: dbs.module:1582
+msgid "Títulos de los campos de las vistas"
+msgstr ""
+
+#: dbs.module:1742
+msgid "Date"
+msgstr ""
+
+#: dbs.module:1745
+msgid "Email"
+msgstr ""
+
+#: dbs.module:1746
+msgid "Mobile"
+msgstr ""
+
+#: dbs.module:1747
+msgid "Phone"
+msgstr ""
+
+#: dbs.module:1750
+msgid "Quantity"
+msgstr ""
+
+#: dbs.module:1751
+msgid "Price"
+msgstr ""
+
+#: dbs.module:1752
+msgid "Trademark"
+msgstr ""
+
+#: dbs.module:1753
+msgid "Description"
+msgstr ""
+
+#: dbs.module:1754
+msgid "Address"
+msgstr ""
+
+#: dbs.module:1755
+msgid "Vendor"
+msgstr ""
+
+#: dbs.module:1756
+msgid "Class"
+msgstr ""
+
+#: dbs.module:1757
+msgid "Code"
+msgstr ""
+
+#: dbs.module:1758
+msgid "City"
+msgstr ""
+
+#: dbs.module:1759
+msgid "Simbol"
+msgstr ""
+
+#: dbs.module:1760
+msgid "Job"
+msgstr ""
+
+#: dbs.module:1761
+msgid "Client"
+msgstr ""
+
+#: dbs.module:1762
+msgid "Tipy"
+msgstr ""
+
+#: dsk.module:82
+msgid "Seleccionar archivo"
+msgstr ""
+
+#: dsk.module:91
+msgid "Filtro"
+msgstr ""
+
+#: dsk.module:113
+msgid "Seleccionar directorio"
+msgstr ""
+
+#: dsk.module:168
+msgid "Hola"
+msgstr ""
+
+#: sog.module:577
+msgid "Desconocido"
+msgstr ""
+
+#: uty.module:576
+msgid "Autor"
+msgstr ""
+
+#: uty.module:577
+msgid "Proveedor"
+msgstr ""
+
+#: uty.module:578
+msgid "Versión"
+msgstr ""
+
+#: uty.module:579
+msgid "Fecha de este documento"
+msgstr ""
+
+#: uty.module:580
+msgid "Componentes"
+msgstr ""
+
+#: uty.module:582
+msgid "esta formado por"
+msgstr ""
+
+#: uty.module:582
+msgid "métodos"
+msgstr ""
+
+#: uty.module:582
+msgid "módulos"
+msgstr ""
+
+#: vag.module:455
+msgid "Espacios al inicio y al final"
+msgstr ""
+
+#: vag.module:457
+msgid "Espacio al inicio"
+msgstr ""
+
+#: vag.module:461
+msgid "Espacio al final"
+msgstr ""
+
+#: vag.module:466
+msgid "Repetidos"
+msgstr ""
+
+#: vag.module:493
+msgid "Excluidos"
+msgstr ""
+
+#: vag.module:497
+msgid "Mas de una letra mayúscula"
+msgstr ""
+
+#: xmg.module:673
+msgid "Programa"
+msgstr ""
+
+#: xmg.module:677
+msgid "Directorio de la aplicación"
+msgstr ""
+
+#: xmg.module:687
+msgid "Escritorio"
+msgstr ""
+
+#: xmg.module:691
+msgid "Editor de texto simple por defecto"
+msgstr ""
+
+#: xmg.module:701
+msgid "Tema del editor interno"
+msgstr ""
+
+#: xmg.module:711
+msgid "Íconos del programa"
+msgstr ""
+
+#: xmg.module:718
+msgid "Escanear"
+msgstr ""
+
+#: xmg.module:722
+msgid "Directorio para escanear uno"
+msgstr ""
+
+#: xmg.module:732
+msgid "Directorio para escanear dos"
+msgstr ""
+
+#: xmg.module:742
+msgid "Directorio para escanear tres"
+msgstr ""
+
+#: xmg.module:752
+msgid "Directorio para escanear cuatro"
+msgstr ""
+
+#: xmg.module:762
+msgid "Directorio para escanear cinco"
+msgstr ""
+
+#: xmg.module:769
+msgid "Salida"
+msgstr ""
+
+#: xmg.module:773
+msgid "Sobreescribir archivos de salida"
+msgstr ""
+
+#: xmg.module:783
+msgid "Directorio de salida uno"
+msgstr ""
+
+#: xmg.module:793
+msgid "Directorio de salida dos"
+msgstr ""
+
+#: xmg.module:803
+msgid "Directorio de salida tres"
+msgstr ""
+
+#: xmg.module:813
+msgid "Directorio de salida cuatro"
+msgstr ""
+
+#: xmg.module:823
+msgid "Directorio de salida cinco"
+msgstr ""
+
+#: xmg.module:830
+msgid "Base de datos"
+msgstr ""
+
+#: xmg.module:834
+msgid "Motor de base de datos"
+msgstr ""
+
+#: xmg.module:844
+msgid "Consulta"
+msgstr ""
+
+#: xmg.module:854
+msgid "Directorio que contiene el archivo"
+msgstr ""
+
+#: xmg.module:864
+msgid "Archivo de la base de datos"
+msgstr ""
+
+#: xmg.module:874
+msgid "Servidor"
+msgstr ""
+
+#: xmg.module:894
+msgid "Puerto"
+msgstr ""
+
+#: xmg.module:904
+msgid "Usuario"
+msgstr ""
+
+#: xmg.module:914
+msgid "Contraseña"
+msgstr ""
+
+#: xmg.module:920
+msgid "Base de dotos"
+msgstr ""
+
+#: xmg.module:974
+msgid "Tabla actual"
+msgstr ""
+
+#: xmg.module:980
+msgid "Personalización"
+msgstr ""
+
+#: xmg.module:984
+msgid "Variable"
+msgstr ""
+
+#: xmg.module:1080
+msgid "Impotación"
+msgstr ""
+
+#: xmg.module:1084
+msgid "Separador de columnas"
+msgstr ""
+
+#: xmg.module:1094
+msgid "Extensión"
+msgstr ""
+
+#~ msgid "ZoomW"
+#~ msgstr "Zoom window"

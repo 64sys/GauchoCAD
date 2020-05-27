@@ -63,6 +63,7 @@ Public Function MouseUp() ' esta rutina es llamada por FCAD en el evento Drawing
 
     ' veo si el rectangulo es suficientemente grande como para representar una seleccion por rectangulo
     If (Me.SelEndX - Me.SelStartX + (-Me.SelEndy + Me.SelStartY)) < 10 Then ' es un rectangulo minusculo
+        
         ' lo tomo como un click en un punto, le pregunto al iterador de plantas tipo si hay algo en ese lugar
         clsEntities.SelectFromPoint(Me.SelEndXr, Me.SelEndyr, True) ' en coordenedas reales en metros
 
@@ -117,7 +118,7 @@ Public Function KeyText(EnteredText As String)
 
     Else                                                    ' its propably an eentity
 
-        APPMain.hFCAD.arrEntities.Add(o)
+       
         modCAD.clsJob = Object.New(o.usewith)
         modCAD.clsJob.start(o)
 

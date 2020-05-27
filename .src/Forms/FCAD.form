@@ -289,10 +289,9 @@
           Expand = True
           Arrangement = Arrange.Horizontal
           { !GLArea1 GLArea
-            MoveScaled(2,2,42,18)
+            MoveScaled(2,3,42,18)
             #Public = True
             Tracking = True
-            Mouse = Mouse.Cross
             Expand = True
           }
         }

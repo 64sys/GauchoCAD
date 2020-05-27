@@ -170,8 +170,14 @@ shaFragmentShaderSource = "#version 330 core" & gb.cr &
     gl.Enable(gl.TEXTURE_2D)
 
     ' con este color limpiamos la pantalla
-    gl.ClearColor(1, 1, 1, 1)
-    'gl.ClearColor(0, 0, 0, 1)
+    If modCAD.WindowBackColor = 0 Then 
+        gl.ClearColor(0, 0, 0, 1)
+    Else
+        gl.ClearColor(1, 1, 1, 1)
+            
+    Endif
+    
+    
     ' borramos lo que haya dibujado
     gl.Clear(gl.DEPTH_BUFFER_BIT Or gl.COLOR_BUFFER_BIT)
 

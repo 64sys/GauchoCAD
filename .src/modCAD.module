@@ -67,7 +67,7 @@ Public FileName As String                           ' current work filename
 '---------------------------------------------------------------
 'Tincho
 'Vars direct or derivated from config xml
-Public WindowBackColor As Integer   '' Window backgrount color
+Public WindowBackColor As Integer = Color.White  '' Window backgrount color
 Public WindowTextColor As Integer   '' Window helper text color
 Public WindowCursorColor As Integer '' Window cursor color
 Public WhiteAndBlack As Integer     '' El color blanco/negro siempre sera distinto al fondo
@@ -78,7 +78,7 @@ Public Sub Main()
 
     Dim lay As New Collection       '' Layer properties
 
-    If WindowBackColor < CInt(Val("&H808080")) Then WhiteAndBlack = Color.White Else WhiteAndBlack = Color.Black
+    If WindowBackColor = 0 Then WhiteAndBlack = Color.White Else WhiteAndBlack = Color.Black
     ' armo el array de colores
     gcolor = DecodeColor()
  
@@ -93,6 +93,10 @@ Public Sub Main()
     glPlus.SelectFont("romanc")
     
     
+    Dim r As New Float[]
+    
+    r = puntos.lineLineIntersection([0, 0], [1, 1], [0, 1], [-1, 2])
+    Debug r[0], r[1]
     
     
     

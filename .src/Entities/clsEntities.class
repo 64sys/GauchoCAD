@@ -146,12 +146,27 @@ End
 
 '' This is called by MouseMove events, so make sure its fast
 '' and its called form there
-Public Sub CheckPOI()
+Public Sub CheckPOI(xr As Float, Yr As Float)
 
-    ' x,y, indice de la entidad que marco esos POI
+    ' ' x,y, indice de la entidad que marco esos POI
     APPMain.hFCAD.iEntity.Clear
-    APPMain.hFCAD.iEntity.Insert(puntos.FindPOI(mouse.x, mouse.y, APPMain.hFCAD.poi, 16))
+    ' APPMain.hFCAD.iEntity.Insert(puntos.FindPOI(mouse.x, mouse.y, APPMain.hFCAD.poi, 16))
+    Dim rData As New Float[]
     
+    Dim e As Object, t As Float = Timer
+    For Each e In APPMain.hFCAD.arrEntities
+        
+        If e.AboveMe(xr, yr, APPMain.hFCAD.Metros(10), 0, rDAta) Then  
+                Debug "Nearest found at ", rData[0], rData[1]
+                APPMain.hFCAD.iEntity.Insert(rData)
+                APPMain.hFCAD.iEntity.Add(-1)
+                Return
+        Endif
+        
+        
+    Next
+    
+    APPMain.hFCAD.iEntity.Insert([0, 0, -1])
 
 End
 
@@ -455,7 +470,8 @@ Public Sub SelectAllElemFromBlock(iBlock As String, Optional AndItsPoints As Boo
             SelectElem(e)
             If e.gender = "Block" Then
                 
-                SelectAllElemFromBlock(e.fParam[0]) ' recursively call up
+                ' FIXME: esto no funciona
+                'SelectAllElemFromBlock(e.fParam[0]) ' recursively call up
                 
             Endif
     
@@ -479,7 +495,8 @@ Public Sub DeSelectAllElemFromBlock(iBlock As String, Optional AndItsPoints As B
             DeSelectElem(e)
             If e.gender = "Block" Then
                 
-                DeSelectAllElemFromBlock(e.fParam[0]) ' recursively call up
+                ' FIXME: esto no funciona
+                'DeSelectAllElemFromBlock(e.fParam[0]) ' recursively call up
                 
             Endif
     

@@ -328,23 +328,7 @@ Public Function RotateFromPointWithSinCos(CenterX As Float, CenterZ As Float, S 
 
 End
 
-' / / C + + Implementation.To find the point Of
-' / / intersection Of two lines
-' #include < bits / stdc + + .h >
-' using namespace std;
-'
-' / / This pair Is Used To store the X And Y
-' / / coordinates Of a point respectively
-' #define pdd pair < double, double >
-'
-' / / Function used To display X And Y coordinates
-' / / Of a point
-' void displayPoint(pdd P)
-' {
-'     cout < < "(" < < P.first < < ", " < < P.second
-'          < < ")" < < endl;
-' }
-'
+
 Public Function lineLineIntersection(A As Float[], B As Float[], C As Float[], D As Float[]) As Float[]
 
     '     / / Line AB represented As A1x + b1y = c1
@@ -374,34 +358,7 @@ Public Function lineLineIntersection(A As Float[], B As Float[], C As Float[], D
 
 End
 
-Public Function lineLineIntersection2(A As Float[], B As Float[], C As Float[], D As Float[]) As Float[]
 
-    '     / / Line AB represented As A1x + b1y = c1
-    Dim a1 As Float = B[1] - A[1]
-    Dim b1 As Float = A[0] - B[0]
-    Dim c1 As Float = a1 * (A[0]) + b1 * (A[1])
-    '
-    '     / / Line CD represented As A2x + b2y = c2
-    Dim a2 As Float = D[1] - C[1]
-    Dim b2 As Float = C[0] - D[0]
-    Dim c2 As Float = a2 * (C[0]) + b2 * (C[1])
-    '
-    Dim determinant As Float = a1 * b2 - a2 * b1
-    '
-    If (determinant = 0) Then
-        '
-        '         / / The lines are parallel.This Is Simplified
-        '         / / by returning a pair Of FLT_MAX
-        Return A
-        '
-    Else
-        '
-        Dim x As Float = (b2 * c1 - b1 * c2) / determinant
-        Dim y As Float = (a1 * c2 - a2 * c1) / determinant
-        Return [x, y]
-    End If
-
-End
 
 Public Function ReboundVector(vector As Float[], wall As Float[]) As Float[]
 

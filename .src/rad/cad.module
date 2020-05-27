@@ -13,9 +13,25 @@ Public Function LoadGaucho(sFile As String) As Collection
     Dim cWidths As New Collection
     Dim cDimSts As New Collection
     Dim cFonts As New Collection
+    Dim cEntities As New Collection
     Dim cMdl As New Collection
     Dim hxml As New XmlDocument
     Dim ent As XmlElement
+    Dim i As Integer
+    Dim sKey As String
+
+    ' Dim p1 As String
+    ' Dim fx1 As Float
+    ' Dim fy1 As Float
+    ' Dim fz1 As Float
+    ' Dim p2 As String
+    ' Dim fx2 As Float
+    ' Dim fy2 As Float
+    ' Dim fz2 As Float
+    ' Dim sLayer As String
+    ' Dim sStyle As String
+    ' Dim sWidth As String
+    ' Dim sColour As String
 
     hxml.Open(sFile)
 
@@ -78,45 +94,103 @@ Public Function LoadGaucho(sFile As String) As Collection
     cMdl.Add(cFonts, "Fonts")
 
     ''TODO: poner las entidade en el cModel
-    ' For Each ent In hxml.GetElementsByTagName("entity")
-    '     c.Clear
-    '
-    '     Select ent.Attributes["type"]
-    '
-    '         Case "line"
-    '
-    '             c["id"] = ent.Attributes["id"]
-    '             c["type"] = ent.Attributes["type"]
-    '             fx = CFloat(ent.Attributes["p1"]
-    '             fy =
-    '             c["p1"] = CFloat(ent.Attributes["label"]
-    '
-    '
-    '         Case "polyline"
-    '
-    '         Case "text"
-    '
-    '         Case "circle"
-    '             c["id"] = ent.Attributes["id"]
-    '             c["type"] = ent.Attributes["type"]
-    '             c["p1"] = ent.Attributes["label"]
-    '
-    '         Case "ellipse"
-    '
-    '         Case "arc"
-    '
-    '     End Select
-    '     If c.Count > 0 Then
-    '         If c.Exist("id") Then
-    '             cEntities.Add(c.Copy(), ent.Attributes["id"])
-    '         Endif
-    '     Endif
-    '
-    ' Next
-    '
-    ' cMdl.Add(cEntities, "Entities")
+    For Each ent In hxml.GetElementsByTagName("entity")
+        c.Clear
+        'Commons fields
+
+        'c["id"] = ent.Attributes["id"]
+        sKey = CStr(i) 'sog.UUIDHandle(6)
+        c["id"] = sKey
+        c["type"] = ent.Attributes["type"]
+        '-----
+        c["layer"] = ent.Attributes["layer"]
+        c["style"] = ent.Attributes["style"]
+        c["width"] = ent.Attributes["width"]
+        c["colour"] = ent.Attributes["colour"]
+        '-----
+
+        Select ent.Attributes["type"]
+
+            Case "line", "polyline"
+                c["p"] = EncodePoint(ent.Attributes["p"], "p")
+
+            Case "circle"
+                c["p"] = EncodePoint(ent.Attributes["p"], "p")
+                c["r"] = EncodePoint(ent.Attributes["r"], "r")
+
+            Case "ellipse"
+                c["p"] = EncodePoint(ent.Attributes["p"], "p")
+                c["r"] = EncodePoint(ent.Attributes["r"], "r")
+                c["a"] = EncodePoint(ent.Attributes["a"], "a")
+                Print "x"
+
+            Case "arc"
+                c["p"] = EncodePoint(ent.Attributes["p"], "p")
+                c["r"] = EncodePoint(ent.Attributes["r"], "r")
+                c["a"] = EncodePoint(ent.Attributes["a"], "a")
+                Print c["a"]
+
+            Case "text"
+                c["p"] = EncodePoint(ent.Attributes["p"], "p")
+                c["a"] = EncodePoint(ent.Attributes["a"], "a")
+                c["text"] = ent.Attributes["t"]
+                c["h"] = ent.Attributes["h"]
+                c["f"] = ent.Attributes["f"]
+
+            Case "insert"
+                c["p"] = EncodePoint(ent.Attributes["p"], "p")
+                c["a"] = EncodePoint(ent.Attributes["a"], "a")
+                c["s"] = CFloat(ent.Attributes["s"])
+                c["b"] = ent.Attributes["b"]
+
+                Print c["a"]
+
+        End Select
+        If c.Count > 0 Then
+            'If c.Exist("id") Then
+            cEntities.Add(c.Copy(), sKey)
+            'Endif
+        Endif
+        Inc i
+    Next
+
+    cMdl.Add(cEntities, "Entities")
 
     Return cMdl
+
+End
+
+'' This function encode a float list like a point angles etc. from a string in
+'' delimiter char for dimansions is : the for delimitatiosn of groups we use ;
+
+Private Function EncodePoint(sPoint As String, sTag As String) As Collection
+
+    Dim cp As New Collection
+    Dim fp As New Float[]
+    Dim stx As New String[]
+    Dim sp As String
+    Dim i As Integer
+
+    If InStr(sPoint, ";") > 0 Then
+        ' Single point ie.lines
+        stx = Split(sPoint, ";")
+    Else
+        'Multipoint, ie.Polylines
+        stx.Add(sPoint)
+    Endif
+
+    For Each sp In stx
+        If InStr(sPoint, ":") > 0 Then
+            fp = Split(sp, ":")
+        Else
+            fp.Add(sp)
+        Endif
+        cp.Add(fp.Copy(), sTag & CStr(i))
+        fp.Clear
+        Inc i
+    Next
+
+    Return cp
 
 End
 
@@ -146,7 +220,22 @@ Public Function ExportSVG(model As Collection) As String
 
 End
 
-Public Function Import(sFile As String) As Collection
+Public Function ImportDxf(sFile As String) As Collection
+
+    Dim model As New Collection       ''Complete model
+    Dim sections As New Collection 'String[]
+
+    sections = GetDXFSections(sFile)
+
+    If sections.Count > 0 Then
+        Print sections.Count
+    Endif
+
+    Return model
+
+End
+
+Public Function ImportDwg(sFile As String) As Collection
 
     Dim sCont As String
     Dim cont As Collection
@@ -169,7 +258,9 @@ Public Function Import(sFile As String) As Collection
     layers = GetLayersList(sFile)
 
     vent = cad.GetEntityList()
+
     sCont = dwgread(sFile)
+
     If sCont <> "" Then
         FileVersion = Split(sCont, "\n")[1]
         FileVersion = Replace(FileVersion, " ", "")
@@ -337,7 +428,6 @@ End
 'dwgwrite
 'dxf2dwg
 'dxfwrite
-
 Public Function dwgread(f As String, Optional fmt As String) As String
 
     Dim sOut As String
@@ -360,7 +450,6 @@ Public Function Sections(s As String, vsn As String) As Collection
 
     Dim sWrd As String
     Dim cont As New Collection
-    'Dim sVer As String
     Dim sec As New String[]
     Dim sn As String
     Dim sName As String
@@ -400,7 +489,7 @@ Public Function Sections(s As String, vsn As String) As Collection
                 Endif
             Next
 
-        Case "AC1018", "AC1024", "AC1027" ' "DWG2004", "DWG2010", "DWG2013"
+        Case "AC1018", "AC1024", "AC1027"
             sWrd = "Found section_info["
             s = Replace(s, "\t", " ")
             s = Replace(s, sWrd, "\t")
@@ -418,7 +507,7 @@ Public Function Sections(s As String, vsn As String) As Collection
                 Endif
             Next
 
-        Case "AC1021" '"DWG2007"
+        Case "AC1021"
 
             s = Replace(s, "\t", " ")
 
@@ -620,17 +709,6 @@ Public Function DecodeCommon(c As Collection) As Collection
                     i = DecodeHex(sVal)
                     prp.Add(i, "Weight")
 
-                    ' Case "color.raw"
-                    '
-                    '     If c.Exist("color.flag") Then
-                    '         sVal = String.Mid(c["color.flag"], 1, InStr(c["color.flag"], "[") - 1)
-                    '     Else
-                    '         sVal = String.Mid(v, 1, InStr(v, "[") - 1)
-                    '     Endif
-                    '
-                    '     i = DecodeHex(sVal)
-                    '     prp.Add(i, "Colour")
-
                 Case "ltype_scale"
                     f = DecodeFloat(CStr(v))
                     prp.Add(f, c.Key)
@@ -713,7 +791,6 @@ Public Function DecodeEntity(c As Collection) As Collection
 
             Case "TEXT"
 
-                'dataflags: 0 xb5[RC 0]
                 For Each v In c
                     Select c.Key
                         Case "insertion_pt"
@@ -839,8 +916,6 @@ Public Function DecodeEntity(c As Collection) As Collection
                             i = DecodeInteger(CStr(v))
                             prp.Add(i, "Length")
 
-                            'flags: 0 x0[RC 70]
-
                         Case "prompt"
                             sVal = DecodeText(CStr(v))
                             prp.Add(sVal, "Prompt")
@@ -889,22 +964,16 @@ Public Function DecodeEntity(c As Collection) As Collection
                     Select c.Key
                         Case "x"
                             f = DecodeFloat(CStr(v))
-                            'prp.Add(f, c.Key)
                             prp["P1"][0] = f
 
                         Case "y"
                             f = DecodeFloat(CStr(v))
-                            'prp.Add(f, c.Key)
                             prp["P1"][1] = f
 
                         Case "z"
                             f = DecodeFloat(CStr(v))
-                            'prp.Add(f, c.Key)
                             prp["P1"][2] = f
 
-                            ' Case "x_ang"
-                            '     f = DecodeFloat(CStr(v))
-                            '     prp.Add(f, "Angle")
                     End Select
                 Next
 
@@ -958,11 +1027,6 @@ Public Function DecodeEntity(c As Collection) As Collection
                         Case "block_header"
                             sVal = DecodeBlockHeader(CStr(v))
                             prp.Add(sVal, c.Key)
-
-                            'Case "attrib_handles[vcount][0]"
-                            ': (3.2.192)abs: 192[H * 0]""
-                            'Case "seqend"
-                            ': (3.2.191)abs: 191[H 0]
 
                     End Select
                 Next
@@ -1200,9 +1264,6 @@ Public Function DecodeEntity(c As Collection) As Collection
                             pt = DecodeCoord(CStr(v))
                             prp.Add(pt, c.Key)
 
-                            'Case "boundary_handles[vcount][0]"
-                            ': (4.1.8E)abs: 8E[H * 0] => LWPOLYLINE
-
                     End Select
                 Next
         End Select
@@ -1322,19 +1383,11 @@ End
 Private Function DecodeText(s As String) As String
 
     Dim out As String
-    'Dim i As Integer
 
-    'Dim k As Integer = 1
-    'Dim q As Integer
-    'Dim r As Integer
-
-    's = vag.ConvertPath(s)
     s = Conv$(s, "ISO-8859-1", "UTF-8")
     If InStr(s, "\\U+") > 0 Then
         s = String2.Flat(s)
     Endif
-
-    's = Replace(s, "\\U+00B0", "°")
 
     If InStr(s, " [") > 0 Then
         out = Split(Replace(s, " [", "\t"), "\t")[0]
@@ -1628,7 +1681,6 @@ Public Function DecodeColor() As Integer[]
     Dim r As String
     Dim g As String
     Dim b As String
-    '  Dim hx As String
     Dim irgb As Integer
     Dim rgbx As String[]
 
@@ -1768,5 +1820,361 @@ Public Function CADConfig() As Collection
     'OrtogonalIgnorado As Boolean = False
 
     Return ctnOut
+
+End
+
+'DXF ========================================================================
+
+Public Function GetDXFSections(sFile As String) As Collection
+
+    Dim sContent As String
+    Dim tmx As New String[]
+    Dim stx As New String[]
+    Dim sec As String
+    Dim sSub As String
+    Dim i As Integer
+    Dim out As New Collection
+    Dim sName As String
+    Dim sCont As String
+    Dim cCont As New Collection
+
+    If Exist(sFile) Then
+        If Stat(sFile).Type = gb.File Then
+            sContent = File.Load(sFile)
+            sSub = String.Mid(sContent, 1, 25)
+
+            For i = 1 To String.Len(sSub)
+                Print Asc(String.Mid(sSub, i, 1)) & " " & String.Mid(sSub, i, 1)
+            Next
+
+            sContent = Replace(sContent, "\r\n", "\n")
+            sContent = Replace(sContent, "\t", " ")
+            sContent = Replace(sContent, "  0\nSECTION\n  2\n", "\t")
+            sContent = Replace(sContent, "  0\nENDSEC\n", "\t")
+            tmx = Split(sContent, "\t")
+
+            If tmx.count > 0 Then
+                For Each sec In tmx
+                    If sec <> "" Then
+                        sName = Split(sec, "\n")[0]
+                        sCont = String.Mid(sec, String.Len(sName & "\n") + 1)
+
+                        Select sName
+                            Case "HEADER"
+                                cCont = GetDXFHeader(sCont)
+                                out.Add(cCont, sName)
+                            Case "TABLES"
+                                cCont = GetDXFTables(sCont)
+                                out.Add(cCont, sName)
+                            Case "CLASSES", "BLOCKS", "ENTITIES", "OBJECTS"
+                                out.Add(sCont, sName)
+                        End Select
+
+                    Endif
+                Next
+            Endif
+        Endif
+    Endif
+
+    Return out
+
+End
+
+Public Function GetDXFHeader(sCont As String) As Collection
+
+    Dim tmx As New String[]
+    Dim stx As New String[]
+    Dim cTmp As New Collection
+    Dim out As New Collection
+    Dim i As Integer
+    Dim item As String
+    Dim vrt As Variant
+    Dim v As Variant
+    Dim f As Variant
+    Dim s As String
+    Dim d As String
+
+    sCont = Replace(sCont, "  9\n$", "\t")
+
+    stx = Split(sCont, "\t")
+
+    For Each item In stx
+        If item <> "" Then
+            cTmp = DecodeDXFItem(item)
+            Select cTmp.Count
+                Case 0
+                    'skip
+                Case 1
+                    For Each vrt In cTmp
+                        out.Add(vrt, cTmp.Key)
+                    Next
+                Case Else
+                    Print "overload"
+            End Select
+        Endif
+        Inc i
+        'Endif
+    Next
+    ' For Each v In out
+    '     Select TypeOf(v)
+    '         Case gb.Object
+    '             i = 0
+    '             For Each f In v
+    '                 If i = 0 Then
+    '                     d = CStr(f)
+    '                 Else
+    '                     d &= ":" & CStr(f)
+    '                 Endif
+    '
+    '                 Inc i
+    '             Next
+    '         Case Else
+    '             d = CStr(v)
+    '             If InStr(d, " ") Then
+    '                 Print out.Key & "\t" & d '& "\n"
+    '             Endif
+    '     End Select
+    '     s &= out.Key & "\t" & d & "\n"
+    ' Next
+    '
+    ' File.Save(User.Home &/ "dxf-header-secion.txt", s)
+    Return out
+
+End
+
+Public Function GetDXFTables(sCont As String) As Collection
+
+    Dim tmx As New String[]
+    Dim stx As New String[]
+    Dim cTmp As New Collection
+    Dim cDecoded As New Collection
+    Dim out As New Collection
+    Dim i As Integer
+    Dim item As String
+    Dim vrt As Variant
+    Dim v As Variant
+    Dim f As Variant
+    Dim s As String
+    Dim d As String
+
+    sCont = Replace(sCont, "\t", " ")
+    sCont = Replace(sCont, "  0\nTABLE\n  2\n", "\t")
+    sCont = Replace(sCont, "  0\nENDTAB\n", "\t")
+
+    stx = Split(sCont, "\t")
+
+    For Each item In stx
+        If item <> "" Then
+            If InStr(item, "LAYER\n  5\n") > 0 Then
+                cDecoded = GetDXFLayerList(item)
+                out.Add(cDecoded.Copy(), "Layers")
+            Endif
+            ' If InStr(item, "VPORT\n  5\n") > 0 Then
+            '     GetDXFVportList(item)
+            ' Endif
+            ' cTmp = DecodeDXFItem(item)
+            ' Select cTmp.Count
+            '     Case 0
+            '         'skip
+            '     Case 1
+            '         For Each vrt In cTmp
+            '             out.Add(vrt, cTmp.Key)
+            '         Next
+            '     Case Else
+            '         Print "overload"
+            ' End Select
+        Endif
+        ' Inc i
+        'Endif
+    Next
+    ' For Each v In out
+    '     Select TypeOf(v)
+    '         Case gb.Object
+    '             i = 0
+    '             For Each f In v
+    '                 If i = 0 Then
+    '                     d = CStr(f)
+    '                 Else
+    '                     d &= ":" & CStr(f)
+    '                 Endif
+    '
+    '                 Inc i
+    '             Next
+    '         Case Else
+    '             d = CStr(v)
+    '             If InStr(d, " ") Then
+    '                 Print out.Key & "\t" & d '& "\n"
+    '             Endif
+    '     End Select
+    '     s &= out.Key & "\t" & d & "\n"
+    ' Next
+    '
+    ' File.Save(User.Home &/ "dxf-header-secion.txt", s)
+    Return out
+
+End
+
+Private Function GetDXFLayerList(sItem As String) As Collection
+
+    Dim stx As String[]
+    Dim i As Integer
+    Dim sCont As String
+    Dim cTmp As New Collection
+    Dim cDeco As New Collection
+    Dim sLay As String
+    Dim slx As String[]
+    Dim s As String
+    Dim lName As String
+    Dim sTag As String
+    Dim sVal As String
+    Dim j As Integer
+
+    sCont = Replace(sItem, "\t", " ")
+    sCont = Replace(sCont, "LAYER\n  5\n", "\t")
+    'sCont = Replace(sCont, "100\nAcDbLayerTableRecord\n    2\n", "\t")
+    sCont = Replace(sCont, "100\nAcDbSymbolTableRecord\n100\n", "\t")
+    '
+
+    '100\nAcDbLayerTableRecord\n    2\n
+
+    stx = Split(sCont, "\t")
+
+    ' stx = Split(sItem, "\n")
+    For i = 0 To stx.Max
+        If InStr(stx[i], "AcDbLayerTableRecord\n  2\n") > 0 Then
+            sLay = Replace(stx[i], "AcDbLayerTableRecord\n  2\n", "")
+            slx = Split(slay, "\n")
+
+            cTmp.Add(slx[0], "Layer")
+
+            For j = 1 To slx.Max - 2 Step 2
+                sTag = Replace(slx[j], " ", "")
+                sVal = Replace(slx[j + 1], " ", "")
+                Select sTag
+                    Case "70"
+                        Select sVal
+                            Case "1"
+                                cTmp.Add(True, "Frozen")
+                                cTmp.Add(False, "Locked")
+                            Case "4"
+                                cTmp.Add(False, "Frozen")
+                                cTmp.Add(True, "Locked")
+                            Case Else
+                                cTmp.Add(False, "Locked")
+                                cTmp.Add(False, "Frozen")
+                        End Select
+                    Case "62"
+                        If InStr(sVal, "-") = 0 Then
+                            cTmp.Add(True, "On")
+                            cTmp.Add(CInt(sVal), "Colour")
+                        Else
+                            cTmp.Add(False, "On")
+                            cTmp.Add(CInt(Replace(sVal, "-", "")), "Colour")
+                        Endif
+
+                    Case "6"
+                        cTmp.Add(sVal, "Style")
+
+                    Case "290"
+                        If sVal = 0 Then
+                            cTmp.Add(False, "Plot")
+                        Else
+                            cTmp.Add(True, "Plot")
+                        Endif
+
+                    Case "370"
+                        cTmp.Add(CInt(sVal), "Width")
+
+                End Select
+                If cTmp.Exist("Plot") = False Then
+                    cTmp.Add(True, "Plot")
+                Endif
+
+            Next
+
+            cDeco.Add(cTmp.Copy(), slx[0])
+            cTmp.Clear
+
+        Endif
+
+    Next
+
+    Return cDeco
+
+End
+
+Private Function DecodeDXFItem(sItem As String) As Collection
+
+    Dim stx As String[]
+    Dim cTmp As New Collection
+    Dim i As Integer
+    Dim vrt As Variant
+    Dim sTag As String
+    Dim x As Float
+    Dim y As Float
+    Dim z As Float
+
+    stx = Split(sItem, "\n")
+
+    For i = 0 To stx.Max
+        If i = 0 Then
+            Select Replace(stx[i + 1], " ", "")
+                Case "1", "3"
+                    sTag = stx[i]
+                    vrt = stx[i + 2]
+                    cTmp.Add(vrt, sTag)
+                Case "70", "62", "370", "280", "290", "380"
+                    sTag = stx[i]
+                    vrt = CInt(Replace(stx[i + 2], " ", ""))
+                    cTmp.Add(vrt, sTag)
+                Case "40", "50"
+                    sTag = stx[i]
+                    vrt = CFloat(Replace(stx[i + 2], " ", ""))
+                    cTmp.Add(vrt, sTag)
+                Case "10"
+                    sTag = stx[i]
+                    x = CFloat(Replace(stx[i + 2], " ", ""))
+                    If Replace(stx[i + 3], " ", "") = "20" Then
+                        y = CFloat(Replace(stx[i + 4], " ", ""))
+                    Endif
+                    If Replace(stx[i + 5], " ", "") = "30" Then
+                        z = CFloat(Replace(stx[i + 6], " ", ""))
+                    Endif
+                    cTmp.Add([x, y, z], sTag)
+                Case "20", "30"
+                    'skip
+
+                Case Else
+                    sTag = stx[i]
+                    vrt = stx[i + 2]
+                    cTmp.Add(vrt, sTag)
+
+                    Select sTag
+                        Case "OLESTARTUP"
+                            Print sTag & ": " & vrt
+                    End Select
+
+            End Select
+
+            '     If stx[i + 3] = "" Then
+            '         Break
+            '     Else
+            '
+            '         Select Replace(stx[i], " ", "")
+            '             Case "10"
+            '                 cTmp.Add(CFloat(stx[i + 1]), "x")
+            '             Case "20"
+            '                 cTmp.Add(CFloat(stx[i + 1]), "y")
+            '             Case "30"
+            '                 cTmp.Add(CFloat(stx[i + 1]), "z")
+            '         End Select
+            '     Endif
+            ' Else
+
+        Endif
+
+    Next
+
+    Return cTmp
 
 End

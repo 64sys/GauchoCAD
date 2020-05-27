@@ -215,17 +215,17 @@ Public Sub LMenu_Click()
         Case "save"
             ' aplicamos los cambios de la tabla copiada a la tabla real del dibujo
             APPMain.hFCAD.cModel["Layers"] = cLayers.Copy()
-            
+
             Dim t As Float = Timer                              ' IGNORAR: estos Timers y Debug son para monitorear el tiempo de actualizacion
-            
-             ' aplicamos los parametros de los layers a las entidades
+
+            ' aplicamos los parametros de los layers a las entidades
             modCAD.ApplyLayerProperties
             Debug "apply properties time ", Timer - t           ' IGNORAR: estos Timers y Debug son para monitorear el tiempo de actualizacion
             t = Timer                                           ' IGNORAR: estos Timers y Debug son para monitorear el tiempo de actualizacion
-            
+
             ' regeneramos el grafico
             clsEntities.GLGenDrawList
-            
+
             Debug "Regen time ", Timer - t                      ' IGNORAR: estos Timers y Debug son para monitorear el tiempo de actualizacion
             Me.Close
 
@@ -258,7 +258,7 @@ Public Sub TableView1_Click()
                     pic = Image.Load("./svg/layers/lamp-off.png").Stretch(16, 16).Picture
             End Select
             TableView1[TableView1.Row, TableView1.Column].Picture = pic
-            
+
             ' aplico los cambios al layer correspondiente
             ' TODO: propagar al resto
             cLayers[TableView1[TableView1.Row, 0].Text]["show"] = TableView1[TableView1.Row, TableView1.Column].WordWrap

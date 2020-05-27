@@ -229,6 +229,7 @@ Public Sub Task(sTask As String)
     Dim w As Window
     Dim wtag As String
 
+    Dim stx As New String[]
     Dim FilePath As String            ''Nombre del archivo que se abrira
     Dim FileDef As String
     Dim i As Integer
@@ -237,14 +238,27 @@ Public Sub Task(sTask As String)
     Select sTask
 
         Case "import"
+            stx = dsk.FileChooser(User.Home, ["dxf", "dwg"])
+            If stx.count > 0 Then
+                FilePath = stx[0]
 
-            mdl = cad.Import(FilePath)
+                Select String.LCase(File.Ext(FilePath))
+                    Case "dxf"
+                        mdl = cad.ImportDxf(FilePath)
 
-            wtag = sTask
-            hFImport = New FImport(cex)
-            hFImport.Tag = wtag
-            hFImport.Title = ("Import")
-            hFImport.Show()
+                    Case "dwg"
+                        mdl = cad.ImportDwg(FilePath)
+                End Select
+
+            Endif
+
+            'mdl = cad.Import(FilePath)
+
+            'wtag = sTask
+            'hFImport = New FImport(cex)
+            'hFImport.Tag = wtag
+            'hFImport.Title = ("Import")
+            'hFImport.Show()
 
         Case "open"
 
@@ -351,7 +365,7 @@ Public Sub Task(sTask As String)
                     xmg.XmlConfMaker(s, ctn, Application.Name)
                 Endif
                 hFConfig = New FConfig(cex)
-                hFConfig.Title = ("Configurtion")
+                hFConfig.Title = ("Configuration")
                 hFConfig.Tag = wtag
                 Workspace1.Add(hFConfig)
                 '---------------------------------------------------
@@ -410,7 +424,7 @@ Public Sub tobLayers_Click()
     Dim FLay As FLayers
 
     FLay = New FLayers
-    'FLay.Run(cMod)                             ' si le cargo la copia no se guardan los cambios, 
+    'FLay.Run(cMod)                             ' si le cargo la copia no se guardan los cambios,
     FLay.Run(hFCAD.cModel)
 
 End

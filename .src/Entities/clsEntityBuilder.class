@@ -65,7 +65,7 @@ Public Function Start(ElemToBuild As Variant, Optional Mode As Integer = 0)
 
         If LastEntity Then                                            ' we know the last element, try to create a new one
             elem = Object.New(Object.Class(LastEntity).Name)           ' create the New Class
-            APPMain.hFCAD.arrEntities.Add(elem)                                    ' make sure we add it to the list
+                                             
 
         Else                                                                            ' the is no way to know what element was done last
 
@@ -368,6 +368,7 @@ Public Function MouseDown() ' esta rutina es llamada por FCAD en el evento Drawi
 
     ' y si tengo enganche?
 
+    appmain.hFcad.iEntity[2] = -1
     If (appmain.hFcad.iEntity[2] >= 0) And (modCAD.OrtogonalForzado = False) Then
 
         ' esto re enganchado
@@ -418,6 +419,7 @@ Public Sub Finish()
     elem.Finish(elem.StepsDone)
     elem.buildPOI
     clsEntities.BackUpPosition(elem)
+    APPMain.hFCAD.arrEntities.Add(elem)   
    
     LastEntity = elem                                       ' save it to repeat on rigth click
 

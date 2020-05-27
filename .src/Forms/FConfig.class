@@ -90,7 +90,7 @@ Public Sub Run(cin As Collection) As Boolean
         Me.Show()
 
     Else
-        Message.Error(("No existe el archivo de configuración"))
+        Message.Error(("Configuration file does not exist"))
     Endif
 
 End
@@ -474,8 +474,8 @@ Public Sub config_Click()
                     xmg.XmlConfSave(apc, ctn)
 
                     ctw.Clear
-                    ctw.Add(("Configuración del programa"), "Title")
-                    ctw.Add(("Los cambios fueron guardados"), "Body")
+                    ctw.Add(("Program configuration"), "Title")
+                    ctw.Add(("The changes was saved"), "Body")
                     ctw.Add(LogLevel.Info, "Level")
                     Tweet(ctw)
 
@@ -494,8 +494,8 @@ Public Sub config_Click()
                         Me.Close
                     Endif
                     ctw.Clear
-                    ctw.Add(("Configuración del programa"), "Title")
-                    ctw.Add(("Nueva copia creada"), "Body")
+                    ctw.Add(("Program configuration"), "Title")
+                    ctw.Add(("A new copy was created"), "Body")
                     ctw.Add(LogLevel.Info, "Level")
                     Tweet(ctw)
 
@@ -507,8 +507,8 @@ Public Sub config_Click()
                     Shell "mv " & gz & " " & rgz Wait
                     If Exist(rgz) Then
                         ctw.Clear
-                        ctw.Add(("Configuración del programa"), "Title")
-                        ctw.Add(("Copia archivada exitosamente"), "Body")
+                        ctw.Add(("Program configuration"), "Title")
+                        ctw.Add(("A copy was successfully archived"), "Body")
                         ctw.Add(LogLevel.Info, "Level")
                         Tweet(ctw)
 
@@ -517,7 +517,7 @@ Public Sub config_Click()
                     gz = apc & ".gz"
                     rgz = File.Dir(apc) &/ sTime & File.BaseName(apc) & ".gz"
                     If Exist(rgz) Then
-                        Message.Info(("Configuración restaurada"))
+                        Message.Info(("Restored configuration"))
                     Endif
 
                 Case "directory"
