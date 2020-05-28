@@ -76,20 +76,29 @@ End
 
 '' Determines if the entity was selected by a rectanle surrounding al points
 '' by default, if ALL points are selected, it can.
-Public Function SelFull() As Boolean
+Public Function SelFull(X1real As Float, Z1real As Float, X2real As Float, Z2real As Float) As Boolean
     
 
     Dim i As Integer, puedo As Boolean
 
     puedo = True                     ' supongamos que puedo, por ahora
-    For i = 0 To Me.PSel.Max
-        If Not Me.PSel[i] Then puedo = False
+    For i = 0 To Me.p.max Step 2
+        If Not (Me.p[i] >= X1real And Me.p[i] <= X2real) And (Me.p[i + 1] >= Z1real And Me.p[i + 1] <= Z2real) Then
+            puedo = False
+        End If
     Next
 
     If puedo Then
+        For i = 0 To Me.PSel.Max
+            Me.PSel[i] = True
+        Next
 
         Return True
     Else
+        For i = 0 To Me.PSel.Max
+            Me.PSel[i] = False
+        Next
+
         Return False
     End If
 
@@ -97,13 +106,16 @@ End
 
 '' Determines if the entity can be stretched
 '' by default, if ANY point is selected, it can.
-Public Function SelPartial() As Boolean
+Public Function SelPartial(X1real As Float, Z1real As Float, X2real As Float, Z2real As Float) As Boolean
 
     Dim i As Integer, puedo As Boolean
 
     puedo = False
-    For i = 0 To Me.PSel.Max
-        If Me.PSel[i] Then puedo = True
+    For i = 0 To Me.p.max Step 2
+        If (Me.p[i] >= X1real And Me.p[i] <= X2real) And (Me.p[i + 1] >= Z1real And Me.p[i + 1] <= Z2real) Then
+            Me.PSel[i] = True
+            puedo = True
+        End If
     Next
 
     If puedo Then
@@ -115,14 +127,27 @@ Public Function SelPartial() As Boolean
 
 End
 
+''      0 No busca nada en particular = Nearest
+''      1       Endpoint
+''      2       Midpoint
+''      4       Perpendicular
+''      8       Center
+''      16      Quadrant
+''      32      Perpendicular
+''      64      Perpendicular
+''      128     Perpendicular
+''      256     Perpendicular
 Public Function AboveMe(Xreal As Float, Yreal As Float, tolerance As Float, mode As Integer, returnData As Float[]) As Boolean
 
     ' this could be overriden in the child
-
+    
+    returnData.Insert([0, 0, -1])               ' minimal response
     If Me.P.Count = 0 Then Return
 
     If puntos.Around(Xreal, yreal, Me.P[0], Me.P[1], APPMain.hFCAD.Metros(10)) Then
-
+        returnData[0] = Me.P[0]
+        returnData[1] = Me.P[1]
+        returnData[2] = 0
         Return True
     Else
 

@@ -40,9 +40,12 @@ Public FormatoCotas As String = "0.00"
 Public ColorForSelected As Integer = &H70E000
 Public ToolActive As Boolean
 
+Public HookSize As Integer = 16                       ' for use with poi
 Public Ortogonal As Boolean = False              ' idem Ortho F8 del CAD
 Public OrtogonalForzado As Boolean = False
 Public OrtogonalIgnorado As Boolean = False
+Public SnapMode As Integer                      ' Bitwise: -1 Off ; 0 = Nearest; 1 = Endpoint; 2 = midpoint 
+
 
 Public clsJob As Object                             ' what I am doing now, thats either selecting or something else
 Public clsJobPrevious As Object                     ' what was doing before

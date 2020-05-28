@@ -51,32 +51,50 @@ Fast Public Sub Draw()
  
 End
 
-'' Creo los puntos de interes
-'' Build point of interest
-
-Public Function BuildPOI() As Integer
+'' Devuelve [x,y] punto de interes
+Public Function AboveMe(Xreal As Float, Yreal As Float, tolerance As Float, mode As Integer, fData As Float[]) As Boolean
+    ' si una de las dos lineas de una cruz con centro en X,Y y largo Tolerance cruza la linea, estamos arriba
+    Dim i As Integer
+    Dim fDist1, fDist2, fDist3, fDist4 As Float
+    'TODO: para debug, agrego esto
+    mode = 1 + 2 ' endpoint+midpoint
     
-    
-    Dim I, poiCount As Integer
-    
-    Me.MyPoi.Clear
-    ' P0
-    Me.MyPoi.Insert([Me.p[0], Me.p[1]])
-    
-    For i = 0 To Me.P.Max - 2 Step 2
-    
-        ' MID
-        Me.MyPoi.Insert([(Me.p[i + 2] + Me.p[i]) / 2, (Me.p[i + 3] + Me.p[i + 1]) / 2])
-        
-        ' Pi+1
-        Me.MyPoi.Insert([Me.p[i + 2], Me.p[i + 3]])
-        
-        ' FIXME: this limit is for idiot plines
-        If i >= 100 Then Break
-        
+    fData.Clear
+    For i = 0 To Me.P.count - 4 Step 2
+        If puntos.doIntersect(xreal - tolerance / 2, Yreal, Xreal + tolerance / 2, Yreal, Me.P[i + 0], Me.P[i + 1], Me.P[i + 2], Me.P[i + 3]) Or puntos.doIntersect(xreal, Yreal - tolerance / 2, Xreal, Yreal + tolerance / 2, Me.P[i + 0], Me.P[i + 1], Me.P[i + 2], Me.P[i + 3]) Then ' its above me
+            
+            ' busco el punto exacto en la linea donde se produce la interseccion
+            fData.Insert(puntos.lineLineIntersection([xreal - tolerance / 2, Yreal], [Xreal + tolerance / 2, Yreal], [Me.P[i + 0], Me.P[i + 1]], [Me.P[i + 2], Me.P[i + 3]]))
+            ' veo que punto esta mas cerca
+            fDist1 = puntos.distancia(Me.P[i + 0], Me.P[i + 1], fData[0], fData[1])   ' end 1
+            fDist2 = puntos.distancia((Me.P[i + 0] + Me.P[i + 2]) / 2, (Me.P[i + 1] + Me.P[i + 3]) / 2, fData[0], fData[1])   ' mid
+            fDist3 = puntos.distancia(Me.P[i + 2], Me.P[i + 3], fData[0], fData[1])   ' end 2
+            If fdist1 > fdist2 Then
+                If fDist2 > fDist3 Then         ' End 2
+                    fData[0] = Me.P[i + 2]
+                    fData[1] = Me.P[i + 3]
+                    fData.Add(1)                 ' 1 = EndPoint
+                    Return True
+                Else
+                    fData[0] = (Me.P[i + 0] + Me.P[i + 2]) / 2
+                    fData[1] = (Me.P[i + 1] + Me.P[i + 3]) / 2
+                    fData.Add(2)                 ' 2 = MidPoint
+                    Return True
+                Endif
+            Else
+                fData[0] = Me.P[i + 0]
+                fData[1] = Me.P[i + 1]
+                fData.Add(1)                     ' 1 = EndPoint
+                Return True
+                
+            Endif
+            
+            
+            
+        Endif
     Next
     
-    Return Me.MyPoi.Count / 2
+    Return False
     
 End
 

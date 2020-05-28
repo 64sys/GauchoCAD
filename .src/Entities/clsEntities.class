@@ -157,15 +157,22 @@ Public Sub CheckPOI(xr As Float, Yr As Float)
     For Each e In APPMain.hFCAD.arrEntities
         
         If e.AboveMe(xr, yr, APPMain.hFCAD.Metros(10), 0, rDAta) Then  
-                Debug "Nearest found at ", rData[0], rData[1]
+                'Debug "Nearest found at ", rData[0], rData[1]
                 APPMain.hFCAD.iEntity.Insert(rData)
-                APPMain.hFCAD.iEntity.Add(-1)
+                APPMain.hFCAD.oEntity = e
+                If rData[2] = 16 Then clsDrawingAids.Helper.texto = ("Quadrant")
+                If rData[2] = 8 Then clsDrawingAids.Helper.texto = ("Center")
+                If rData[2] = 2 Then clsDrawingAids.Helper.texto = ("MidPoint")
+                If rData[2] = 1 Then clsDrawingAids.Helper.texto = ("EndPoint")
+                clsDrawingAids.Helper.dX = 15
+                clsDrawingAids.Helper.dY = 15
+                clsDrawingAids.Helper.fColor = Color.DarkBlue
                 Return
         Endif
         
         
     Next
-    
+    clsDrawingAids.Helper.texto = ""
     APPMain.hFCAD.iEntity.Insert([0, 0, -1])
 
 End
@@ -647,29 +654,37 @@ Public Function SelectionSquare(X1real As Float, Z1real As Float, X2real As Floa
     End If
 
     For Each e In APPMain.hFCAD.arrEntities
-        For i = 0 To e.p.max Step 2
-            If (e.p[i] >= X1real And e.p[i] <= X2real) And (e.p[i + 1] >= Z1real And e.p[i + 1] <= Z2real) Then
-
+        ' cada entidad debe decidir si esta seleccionada o no
+        If crossing Then
+            If e.SelPartial(X1real, Z1real, X2real, Z2real) Then
                 ' el punto esta en el recuadro
                 If NuevaSumaResta <> "resta" Then
+                    Inc TotalSeleccionados
+                    Me.SelectElem(e, False)
 
-                    If Not e.Psel[i / 2] Then
-                        Inc TotalSeleccionados
-                        e.Psel[i / 2] = True
-                        If crossing Then Me.SelectElem(e, False)
-                    End If
                 Else If NuevaSumaResta = "resta" Then
-
-                    If e.Psel[i / 2] Then
-                        e.Psel[i / 2] = False
-                        Dec TotalSeleccionados
-                        If crossing Then Me.DeSelectElem(e, False)
-                    End If
+                    Dec TotalSeleccionados
+                    Me.DeSelectElem(e, False)
+                    
                 End If
 
             Endif
-        Next
+        Else
+            If e.SelFull(X1real, Z1real, X2real, Z2real) Then
+                ' el punto esta en el recuadro
+                If NuevaSumaResta <> "resta" Then
+                    Inc TotalSeleccionados
+                    Me.SelectElem(e, False)
 
+                Else If NuevaSumaResta = "resta" Then
+                    Dec TotalSeleccionados
+                    Me.DeSelectElem(e, False)
+                    
+                End If
+
+            Endif
+        
+        End If
     Next
 
     Return TotalSeleccionados

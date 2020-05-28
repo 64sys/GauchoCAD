@@ -358,7 +358,7 @@ End
 Public Function Arc(Optional radio As Float, start_angle As Float, length As Float, _color As Integer = 0, LineWidth As Float = 1, dashes As Float[])
 
     GL.Begin(gl.LINE_STRIP)
-    Dim x, y, theta, angle_increment As Float
+    Dim theta, angle_increment As Float
     
     'double max_angle = 2 * Math.PI
     'double angle_increment = Math.PI / 1000
@@ -366,9 +366,6 @@ Public Function Arc(Optional radio As Float, start_angle As Float, length As Flo
     
     For theta = 0 To length Step angle_increment
 
-        '// x = r * Math.Cos(theta)
-        '// y = r * Math.Sin(theta)
-        'GL.Vertex2(x + radio * Cos(theta), y + radio * Sin(theta))
         GLplus.Vertex2D(radio * Cos(start_angle + theta), radio * Sin(start_angle + theta), _color)
     Next
     

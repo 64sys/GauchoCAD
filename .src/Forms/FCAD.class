@@ -78,10 +78,13 @@ Public Xmayor As Float = -1E100
 Public Ymenor As Float = 1E100
 Public Ymayor As Float = -1E100
 
-' point of interests
+' point of interests and entities
 Public POI As New Single[]                  ' xy pairs of points
 Public iEntities As New Integer[]           ' related entity
-Public iEntity As New Single[]             ' SELECTED: X,Y, i
+
+' interaccion del mouse en pantalla
+Public iEntity As New Single[]             ' las coordenadas del punto encontrado y el tipo de punto
+Public oEntity As Object                   ' la entidad
 
 ' OpenGl stuff
 
@@ -133,6 +136,7 @@ Public Sub GLArea1_draw()
     gl.LoadIdentity
 
     gl.Translatef(PanX, PanY, 0)
+    
     gl.Scalef(ScaleZoom, ScaleZoom, 1)
 
     ' el orden del dibujo es importante en paint, porque una cosa tapa a la otra
@@ -140,17 +144,17 @@ Public Sub GLArea1_draw()
     ' Primero la grid
     ' clsDrawingAids.DrawGrid
 
-   
     ' If modCAD.DrawBounds Then clsDrawingAids.DrawBoundingPoligons
-    '
+    
     clsDrawingAids.DrawCoordenadas
-    '
+    
     clsDrawingAids.DibujaHelper
     
     gl.CallList(GlListAllEntities)                      ' si GL no tiene contexto, la lista no se genera. Es necesario que la instancia de FCAD este cargada.
     
     modCAD.clsJob.Draw
-    '
+    
+    If iEntity[2] > 0 Then glPlus.Rectangle2D(iEntity[0] - Metros(4), iEntity[1] - Metros(4), Metros(8), Metros(8),,,,, Color.Green, 1, 2)
 
 End
 
@@ -183,8 +187,31 @@ End
 Public Sub GLArea1_MouseDown()
 
     If Mouse.Right Then Return  'handled in MouseUp
+    
+    Select Case modCAD.clsJob.gender
+        
+        Case "Default"                                                  ' 1. Seleccionando
+            
+            modCAD.clsJob.mouseDown()                               '    -> envio el evento a la clase default
+            
+        Case "Builder"                                                  ' 2.Construyendo una entidad
+            
+            clsEntities.CheckPOI(Xreal(Mouse.x), Yreal(Mouse.y))        '   -> busco punto donde pueda engancharse la entidad nueva
+            modCAD.clsJob.mouseDown()                                   '      y envio el evento a la clase
+            
+            
+        Case Else
+            
+            
+            modCAD.clsJob.mouseDown() ' dispatch event to the Job
+        
+        
 
-    modCAD.clsJob.mouseDown() ' dispatch event to the Job
+    End Select
+    
+    redraw
+
+    
 
 End
 
@@ -193,9 +220,61 @@ Public Sub GLArea1_MouseMove()
     CursorX = mouse.x
     CursorY = mouse.y
 
-    modCAD.clsJob.MouseMove() ' dispatch event to the Job
+    Select Case modCAD.clsJob.gender
+        
+        Case "Default"                                                  ' 1. Seleccionando
+  
+            modCAD.clsJob.MouseMove() ' dispatch event to the Job
 
-    clsEntities.CheckPOI(Xreal(Mouse.x), Yreal(Mouse.y))
+            clsEntities.CheckPOI(Xreal(Mouse.x), Yreal(Mouse.y))
+            
+            If iEntity[2] >= 0 Then
+                ' FInspector.lblEntity.Text = oEntity.gender
+                ' ' FInspector.lblColor.Background = oEntity.gbcolor
+                ' ' FInspector.lblColorName.TExt = oEntity._color
+                ' FInspector.lblLayer.TExt = oEntity.layer
+                ' FInspector.Top = Mouse.Screeny - FInspector.h - 20
+                ' FInspector.Left = Mouse.ScreenX + 20
+                ' FInspector.Show
+                FInspector.Run(oEntity)
+            Else
+                FInspector.Close
+                
+            Endif
+        
+        Case Else
+            
+            
+            modCAD.clsJob.MouseMove() ' dispatch event to the Job
+        
+        
+
+    End Select
+End
+
+
+
+Public Sub GLArea1_MouseUp()
+    ' ex Public Sub drwArea_MouseUp()
+
+    ' "Los IF son mas rapidos" - Autor Anonimo
+
+    ' los rigth clicks se manejan en FCAD , ni las herramientas ni las entidades los necesitan
+    If Mouse.Right Then                ' rigth clicks means finish what you're doing rigth now and go back to the previous Job
+        ' the Finish() sub will do this in a good manner
+        modCAD.clsJob.Finish
+
+    Else ' Left Click
+        
+        
+        
+        modCAD.clsJob.MouseUp()
+
+    End If
+
+    
+
+    redraw
 
 End
 
@@ -265,28 +344,6 @@ Public Sub GLArea1_MouseWheel()
         'PanY = (Pixels(py) + glarea1.h / 2)     ' el eje Y trabaja distinto, asi que debemos cambiar esto
         PanY = -Pixels(py)                      ' cambio post Paint
     Endif
-
-    redraw
-
-End
-
-Public Sub GLArea1_MouseUp()
-    ' ex Public Sub drwArea_MouseUp()
-
-    ' "Los IF son mas rapidos" - Autor Anonimo
-
-    ' los rigth clicks se manejan en FCAD , ni las herramientas ni las entidades los necesitan
-    If Mouse.Right Then                ' rigth clicks means finish what you're doing rigth now and go back to the previous Job
-        ' the Finish() sub will do this in a good manner
-        modCAD.clsJob.Finish
-
-    Else ' Left Click
-
-        modCAD.clsJob.MouseUp()
-
-    End If
-
-    clsEntities.CheckPOI(Xreal(Mouse.x), Yreal(Mouse.y))
 
     redraw
 

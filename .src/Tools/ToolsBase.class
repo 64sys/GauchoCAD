@@ -76,7 +76,7 @@ Public Sub Finish()
     modCAD.clsJobPrevious = Me
     modCAD.clsJob = clsDefaultJob
     clsDrawingAids.CleanTexts
-    appmain.hFCAD.Regen
+    
 
 End
 

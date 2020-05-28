@@ -37,65 +37,49 @@ End
 '' Se fija si la posicion indicada esta aproximadamente sobre la entidad, de acuerdo a la tolerancia
 '' mode es para establecer si se busca especificamente algun punto y devolver su posicion y tipo.
 '' Mode: 
-''      0 No busca nada en particular = Nearest
-''      1       Endpoint
-''      2       Midpoint
-''      4       Perpendicular
-''      8       Perpendicular
-''      16      Perpendicular
-''      32      Perpendicular
-''      64      Perpendicular
-''      128     Perpendicular
-''      256     Perpendicular
+
 '' Devuelve [x,y] punto de interes
-Public Function AboveMe(Xreal As Float, Yreal As Float, tolerance As Float, mode As Integer, returnData As Float[]) As Boolean
+Public Function AboveMe(Xreal As Float, Yreal As Float, tolerance As Float, mode As Integer, fData As Float[]) As Boolean
     ' si una de las dos lineas de una cruz con centro en X,Y y largo Tolerance cruza la linea, estamos arriba
-    Dim fInt As New Float[]
+    'Dim fData As New Float[]
+    Dim fDist1, fDist2, fDist3, fDist4 As Float
+    'TODO: para debug, agrego esto
+    mode = 1 + 2 ' endpoint+midpoint
     
-    If puntos.doIntersect(xreal - tolerance / 2, Yreal, Xreal + tolerance / 2, Yreal, Me.P[0], Me.P[1], Me.P[2], Me.P[3]) Then
-        returnData.Clear
+    fData.Clear
+    If puntos.doIntersect(xreal - tolerance / 2, Yreal, Xreal + tolerance / 2, Yreal, Me.P[0], Me.P[1], Me.P[2], Me.P[3]) Or puntos.doIntersect(xreal, Yreal - tolerance / 2, Xreal, Yreal + tolerance / 2, Me.P[0], Me.P[1], Me.P[2], Me.P[3]) Then ' its above me
+        
         ' busco el punto exacto en la linea donde se produce la interseccion
-        fInt.Insert(puntos.lineLineIntersection([xreal - tolerance / 2, Yreal], [Xreal + tolerance / 2, Yreal], [Me.P[0], Me.P[1]], [Me.P[2], Me.P[3]]))
-        returnData.Insert(fInt)
+        fData.Insert(puntos.lineLineIntersection([xreal - tolerance / 2, Yreal], [Xreal + tolerance / 2, Yreal], [Me.P[0], Me.P[1]], [Me.P[2], Me.P[3]]))
+        ' veo que punto esta mas cerca
+        fDist1 = puntos.distancia(Me.P[0], Me.P[1], fData[0], fData[1])   ' end 1
+        fDist2 = puntos.distancia((Me.P[0] + Me.P[2]) / 2, (Me.P[1] + Me.P[3]) / 2, fData[0], fData[1])   ' mid
+        fDist3 = puntos.distancia(Me.P[2], Me.P[3], fData[0], fData[1])   ' end 2
+        If fdist1 > fdist2 Then
+            If fDist2 > fDist3 Then         ' End 2
+                fData[0] = Me.P[2]
+                fData[1] = Me.P[3]
+                fData.Add(1)                 ' 1 = EndPoint
+            Else
+                fData[0] = (Me.P[0] + Me.P[2]) / 2
+                fData[1] = (Me.P[1] + Me.P[3]) / 2
+                fData.Add(2)                 ' 2 = MidPoint
+            Endif
+        Else
+            fData[0] = Me.P[0]
+            fData[1] = Me.P[1]
+            fData.Add(1)                     ' 1 = EndPoint
+        
+            
+        Endif
+        
         Return True
         
     Endif
     
-    
-    If puntos.doIntersect(xreal, Yreal - tolerance / 2, Xreal, Yreal + tolerance / 2, Me.P[0], Me.P[1], Me.P[2], Me.P[3]) Then
-        returnData.Clear
-        ' busco el punto exacto en la linea donde se produce la interseccion
-        fInt.Insert(puntos.lineLineIntersection([xreal, Yreal - tolerance / 2], [Xreal, Yreal + tolerance / 2], [Me.P[0], Me.P[1]], [Me.P[2], Me.P[3]]))
-        returnData.Insert(fInt)
-        Return True
-        
-        
-        
-    Endif
     
     Return False
     
 End
 
 
-
-
-'' Creo los puntos de interes
-'' Build point of interest
-
-Public Function BuildPOI() As Integer
-
-    Me.MyPoi.Clear
-    ' P1
-    Me.MyPoi.Insert([Me.p[0], Me.p[1]])
-
-    ' P2
-    Me.MyPoi.Insert([Me.p[2], Me.p[3]])
-    
-    ' MID
-    Me.MyPoi.Insert([(Me.p[2] + Me.p[0]) / 2, (Me.p[3] + Me.p[1]) / 2])
-    
-    Return Me.MyPoi.Count / 2            ' marcamos 3 puntos para esta entidad
-    
-    
-End
