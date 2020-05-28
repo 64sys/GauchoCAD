@@ -11,87 +11,82 @@ Public Const HelperTrabajo As String = ("Inserts a text")
 Public Const ParamType As String = "PAFT"
 Public Const ParamHelper As String = ("Start point;Angle;Heigth;")      ' a little text that is shown at the prompt waiting for user input during build
 Public Const ParamDefault As String = " ; 0 ; 10 ; "
+Public Const StretchAble As Boolean = False
 
 Public Sub Draw()
 
     If Not Me.DrawAble Or Not Me.Visible Then Return
     If Me.Selected And Not modCAD.ToolActive Then Me.ColorToPaint = modCAD.ColorForSelected Else Me.ColorToPaint = Me.gbColor
-    
-    
+
     If modCAD.drwDrawingClass = modCAD.drwPaintClass Then
-    
 
-            Dim angulo As Float, hText As New PaintExtents, lText As String
-            Dim FontScalePrev As Float
-        
-            paint.Save
-        
-            'FontScalePrev = paint.FontScale
-            paint.LineWidth = 1
-            ' La cota puede estar inclinada, entonces debo rotarla
-        
-            If Me.fParam.Count > 0 Then
-        
-                angulo = Me.fParam[0] / 180 * Pi    ' ojo OPENGL--> GRADOS, GAMBAS-->RADIANESDXF
-        
-            Else
-        
-                angulo = 0
-        
-            End If
-        
-            
-        
-            If Me.StringData = "" Then
-        
-                ltext = "ABCdef123"
-        
-            Else
-        
-                ltext = Me.StringData
-        
-            End If
-        
-            If Me.fParam.Count > 1 Then
-        
-                If Me.fParam[1] <= 0 Then 
-                    paint.Font.Size = 10 
-                Else ' FIXME: hay problemas con el ancho del total del texto que no acompaña el zooming
-                    paint.Font.Size = Me.fParam[1] 
-                End If
-        
-            Else
-                ' cuando ScaleZoom es 0.15 el texto coincide con DXF
-                ' entonces voy a trabajar con esa relacion
-        
+        Dim angulo As Float, hText As New PaintExtents, lText As String
+        Dim FontScalePrev As Float
+
+        paint.Save
+
+        'FontScalePrev = paint.FontScale
+        paint.LineWidth = 1
+        ' La cota puede estar inclinada, entonces debo rotarla
+
+        If Me.fParam.Count > 0 Then
+
+            angulo = Me.fParam[0] / 180 * Pi    ' ojo OPENGL--> GRADOS, GAMBAS-->RADIANESDXF
+
+        Else
+
+            angulo = 0
+
+        End If
+
+        If Me.StringData = "" Then
+
+            ltext = "ABCdef123"
+
+        Else
+
+            ltext = Me.StringData
+
+        End If
+
+        If Me.fParam.Count > 1 Then
+
+            If Me.fParam[1] <= 0 Then
                 paint.Font.Size = 10
-        
+            Else ' FIXME: hay problemas con el ancho del total del texto que no acompaña el zooming
+                paint.Font.Size = Me.fParam[1]
             End If
-        
-            htext = paint.TextExtents(ltext)
-        
-            paint.brush = Paint.Color(Me.ColorToPaint)
-        
-            paint.Translate(Me.p[0], Me.p[1])
-            paint.Rotate(-angulo)
-            paint.Scale(1, -1)
-            
-            paint.DrawText(ltext)
-        
-            paint.Stroke
-            
-            paint.Restore
+
+        Else
+            ' cuando ScaleZoom es 0.15 el texto coincide con DXF
+            ' entonces voy a trabajar con esa relacion
+
+            paint.Font.Size = 10
+
+        End If
+
+        htext = paint.TextExtents(ltext)
+
+        paint.brush = Paint.Color(Me.ColorToPaint)
+
+        paint.Translate(Me.p[0], Me.p[1])
+        paint.Rotate(-angulo)
+        paint.Scale(1, -1)
+
+        paint.DrawText(ltext)
+
+        paint.Stroke
+
+        paint.Restore
     End If
-    
+
     If modCAD.drwDrawingClass = modCAD.drwOpenGLClass Then
-    
+
         glPlus.DrawText(Me.StringData, Me.p[0], Me.p[1], Me.fParam[0], Me.fParam[1], Me.ColorToPaint)
-        
+
     End If
-    
+
 End
-
-
 
 Public Sub CreateBoundingPoligon()
 
@@ -147,5 +142,3 @@ End
 Public Function BuildPOI() As Integer
 
 End
-
-

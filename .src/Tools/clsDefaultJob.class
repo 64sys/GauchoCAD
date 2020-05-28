@@ -7,8 +7,6 @@ Inherits ToolsBase
 Create Static
 Public Const GENDER As String = "Default"
 
-
-
 Public Function Start(Optional ElemToBuild As Variant, Optional _Mode As Integer = 0) As Boolean
     ' Modes:
     '       0 = Move, all points in the element must be selected, or click on it.
@@ -21,9 +19,9 @@ End
 Public Function MouseDown() ' esta rutina es llamada por FCAD en el evento DrawingArea_MouseDown
 
     If Mouse.Left Then
-        
+
         If appmain.hFcad.iEntity[2] >= 0 Then                         ' 1.1.2 el mouse no esta enganchado, pero esta arriba de una entidad
-                    
+
             If appmain.hFcad.oEntity.selected Then
                 clsEntities.deSelectElem(appmain.hFcad.oEntity)               '   -> la deselecciono
             Else
@@ -31,18 +29,17 @@ Public Function MouseDown() ' esta rutina es llamada por FCAD en el evento Drawi
             Endif
             Me.Active = False
             appmain.hFcad.regen
-                    
-        Else        
-    
+
+        Else
+
             Me.SelStartX = mouse.x
             Me.SelStartY = mouse.y
             Me.SelStartXr = appmain.hFcad.Xreal(Me.SelStartX)
             Me.SelStartYr = appmain.hFcad.Yreal(Me.SelStartY)
-      
+
             Me.SelEndX = Me.SelStartX
             Me.SelEndy = Me.SelStartY
-          
-            
+
             Me.Active = True
         End If
     End If
@@ -53,57 +50,55 @@ Public Function MouseUp() ' esta rutina es llamada por FCAD en el evento Drawing
 
     Me.SelEndX = mouse.x
     Me.SelEndy = mouse.y
-    
+
     If Me.Active Then
         Dim Crossing As Boolean = False
         ' corrijo para start<end
         Me.Active = False
-        If Me.SelStartX > Me.SelEndX Then 
+        If Me.SelStartX > Me.SelEndX Then
             crossing = True
             Swap Me.SelStartX, Me.SelEndX
         Else
             crossing = False
         End If
         If Me.SelStartY < Me.SelEndy Then Swap Me.SelStartY, Me.SelEndy                     ' this is FLIPPED
-    
+
         Dim tipo As String
         tipo = "nueva"
         If Mouse.Shift Then tipo = "resta" ' estos elementos de la seleccion anterior
         If Mouse.Control Then tipo = "suma" ' elementos a la seleccion anterior
-    
+
         ' Paso a coordenadas reales
         Me.SelStartXr = appmain.hFcad.Xreal(Me.SelStartX)
         Me.SelStartYr = appmain.hFcad.Yreal(Me.SelStartY)
         Me.SelEndXr = appmain.hFcad.Xreal(Me.SelEndX)
         Me.SelEndyr = appmain.hFcad.Yreal(Me.SelEndy)
-    
+
         ' veo si el rectangulo es suficientemente grande como para representar una seleccion por rectangulo
-        If (Me.SelEndX - Me.SelStartX + (-Me.SelEndy + Me.SelStartY)) > 10 Then 
-          
-            
-            Me.selectionCount = clsEntities.SelectionSquare(Me.SelStartXr, Me.SelStartYr, Me.SelEndXr, Me.SelEndyr, tipo, crossing) 
+        If (Me.SelEndX - Me.SelStartX + (-Me.SelEndy + Me.SelStartY)) > 10 Then
+
+            Me.selectionCount = clsEntities.SelectionSquare(Me.SelStartXr, Me.SelStartYr, Me.SelEndXr, Me.SelEndyr, tipo, crossing)
             Appmain.hFCAD.regen
-            
-            
+
         End If
-    
+
+        clsDrawingAids.HelperTrabajo = ("Selected ") & Str$(Me.selectionCount) & (" elements")
+
         '     'aprovecho para ver si hay algo util en la seleccion
-    
-        Select Case Me.Mode
-    
-            Case 0 ' Move, all vertices must be selected
-                clsDrawingAids.HelperTrabajo = ("Selected ") & Str$(clsEntities.DeSelection("todo", "mover")) & (" elements")
-    
-            Case 1 ' Stretch
-                clsDrawingAids.HelperTrabajo = ("Selected ") & Str$(clsEntities.DeSelection("todo", "estirar")) & (" elements")
-    
-        End Select
+        '
+        ' Select Case Me.Mode
+        '
+        '     Case 0 ' Move, all vertices must be selected
+        '        clsDrawingAids.HelperTrabajo = ("Selected ") & Str$(clsEntities.DeSelection("todo", "mover")) & (" elements")
+        '
+        '     Case 1 ' Stretch
+        '         clsDrawingAids.HelperTrabajo = ("Selected ") & Str$(clsEntities.DeSelection("todo", "estirar")) & (" elements")
+        '
+        ' End Select
     Else
-        
-        
-        
-        
+
     End If
+
 End
 
 Public Function MouseMove() ' esta rutina es llamada por FCAD en el evento DrawingArea_MouseMove
@@ -113,9 +108,10 @@ Public Function MouseMove() ' esta rutina es llamada por FCAD en el evento Drawi
         Me.SelEndy = mouse.y
         Me.SelEndXr = appmain.hFcad.Xreal(Me.SelEndX)
         Me.SelEndyr = appmain.hFcad.Yreal(Me.SelEndy)
-    
+
         appmain.hFCAD.redraw
     End If
+
 End
 
 Public Function KeyText(EnteredText As String)
@@ -136,14 +132,13 @@ Public Function KeyText(EnteredText As String)
 
     Else                                                    ' its propably an eentity
 
-       
         modCAD.clsJob = Object.New(o.usewith)
         modCAD.clsJob.start(o)
 
     End If
 
     ' TODO: dejar comentado mientras hagamos debug
-'Catch
+    'Catch
 
     clsDrawingAids.ErrorMessage = "Command not recognized"
     '
@@ -155,19 +150,16 @@ Public Sub Draw() ' esta rutina es llamada por FCAD en el evento DrawingArea_Dra
     ' por ultimo, y para que se vea arriba, la seleccion
 
     If Not Me.Active Then Return
-  
-     If Me.SelStartX > Me.SelEndX Then                               ' Seleccion crossing, o sea que si cualquier arista del rectangulo cruza el bounding poligon, queda seleccionado
-  
+
+    If Me.SelStartX > Me.SelEndX Then                               ' Seleccion crossing, o sea que si cualquier arista del rectangulo cruza el bounding poligon, queda seleccionado
+
         GLplus.Rectangle2D(Me.SelStartXr, Me.SelStartYr, Me.SelEndXr - Me.SelStartXr, Me.SelEndyr - Me.SelStartYr, Color.RGB(224, 220, 207, 215),,,, Color.red, 1, 2)
-    '     
-     Else                                                            ' seleccion full, todos los puntos deben estar adentro
-   
+        '
+    Else                                                            ' seleccion full, todos los puntos deben estar adentro
+
         GLplus.Rectangle2D(Me.SelStartXr, Me.SelStartYr, Me.SelEndXr - Me.SelStartXr, Me.SelEndyr - Me.SelStartYr, Color.RGB(224, 220, 207, 215),,,, Color.Green, 1, 2)
-        
 
     End If
-    
-  
 
 End
 
@@ -180,6 +172,5 @@ Public Sub Finish()
     clsDrawingAids.CleanTexts
     appmain.hFCAD.redraw
     modCAD.clsJob.Start(modCAD.clsJobPreviousParam)
-
 
 End

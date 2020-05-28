@@ -13,41 +13,35 @@ Create Static
 Create Private
 'Fast
 
-
 Public ScreenDensity As Float = 1080 / 29.5  ' pixele by cm wich gives a 1:100 scale in my monitor
 
 Public HookSize As Integer = 16                       ' for use with poi
 
-
 Public GridSpacing As Float = 0.5
 Public GridActive As Boolean           ' use with F7: 0 = no grid, 1 = dots, 2 = lines
-
-
 
 '' Returns the index in the array of pairs that is near the given point using HookSize parameter
 Public Function FindPOI(xr As Float, yr As Float, arr As Single[], hook As Single) As Single[]
 
     Dim i As Integer
-    
+
     ' Xr = Xreal(x)
     ' Yr = Yreal(y)
     ' hook = Metros(HookSize)
-   
-    
+
     For i = 0 To arr.Max Step 2
-        
-        If ((arr[i] - hook) < Xr And (arr[i] + hook) > Xr) Or ((arr[i] - hook) > Xr And (arr[i] + hook < Xr)) Then 
-            
-            If ((arr[i + 1] - hook) < yr And (arr[i + 1] + hook) > yr) Or ((arr[i + 1] - hook) > yr And (arr[i + 1] + hook) < yr) Then 
-                
+
+        If ((arr[i] - hook) < Xr And (arr[i] + hook) > Xr) Or ((arr[i] - hook) > Xr And (arr[i] + hook < Xr)) Then
+
+            If ((arr[i + 1] - hook) < yr And (arr[i + 1] + hook) > yr) Or ((arr[i + 1] - hook) > yr And (arr[i + 1] + hook) < yr) Then
+
                 Return [arr[i], arr[i + 1], i]
-            
+
             End If
 
         Endif
 
     Next
-   
 
     Return [0, 0, -1]           ' no points near
 
@@ -77,30 +71,29 @@ Public Function Near(xyzReal As Float) As Float
 End
 
 ' Public Function Xpix(Xr As Float) As Integer ' Return the screen X axis position from a point in the world
-' 
+'
 '     Return Pixels(Xr) + PanX
-' 
+'
 ' End
-' 
+'
 ' Public Function Ypix(Yr As Float) As Integer ' same for Y
 '     ' ubica en el grafico una posicion en el mundo real
-' 
+'
 '     Return ViewportHeight - Pixels(Yr) - PanY
-' 
+'
 ' End
-
 
 ' Public Function Xreal(ScreenX As Integer) As Float  ' converts a point in the screen to the point in the world
-' 
-'     
+'
+'
 '     Return Metros(ScreenX - PanX)
-' 
-' 
+'
+'
 ' End
-' 
+'
 ' Public Function Yreal(ScreenY As Integer) As Float ' same for Z
-' 
-'     Return Metros(-ScreenY - pany) 
+'
+'     Return Metros(-ScreenY - pany)
 ' End
 
 Public Function distancia(x1 As Float, y1 As Float, x2 As Float, y2 As Float) As Float
@@ -328,7 +321,6 @@ Public Function RotateFromPointWithSinCos(CenterX As Float, CenterZ As Float, S 
 
 End
 
-
 Public Function lineLineIntersection(A As Float[], B As Float[], C As Float[], D As Float[]) As Float[]
 
     '     / / Line AB represented As A1x + b1y = c1
@@ -358,8 +350,6 @@ Public Function lineLineIntersection(A As Float[], B As Float[], C As Float[], D
 
 End
 
-
-
 Public Function ReboundVector(vector As Float[], wall As Float[]) As Float[]
 
     Dim alfa, beta, gamma, l As Float
@@ -378,16 +368,14 @@ Public Sub Normalize(v As Float[])
     Dim l As Float, i As Integer
 
     For i = 0 To v.Max
-        l += v[i] * v[i] 
+        l += v[i] * v[i]
     Next
     l = Sqr(l)
     For i = 0 To v.Max
         v[i] /= l
     Next
-    
 
 End
-
 
 Public Function Dot(v1 As Float[], v2 As Float[]) As Float
 
@@ -396,20 +384,22 @@ Public Function Dot(v1 As Float[], v2 As Float[]) As Float
 End
 
 Public Function Translate(points As Float[], dx As Float, dy As Float) As Boolean
-    
+
     Dim i As Integer
+
     For i = 0 To points.max Step 2
         points[i] += dx
         points[i + 1] += dy
     Next
+
 End
 
-
 '' Angle must be in Radians
-Public Function Rotate(points As Float[], Radians As Float) 
+Public Function Rotate(points As Float[], Radians As Float)
 
     Dim i As Integer
     Dim s, c, xnew, ynew As Float
+
     s = Sin(Radians)
     c = Cos(Radians)
 
@@ -418,19 +408,63 @@ Public Function Rotate(points As Float[], Radians As Float)
         ' rotate point
         xnew = points[i] * c - points[i + 1] * s
         ynew = points[i] * s + points[i + 1] * c
-    
-        points[i] = xnew 
-        points[i + 1] = ynew 
+
+        points[i] = xnew
+        points[i + 1] = ynew
     Next
 
 End
 
 Public Function Scale(points As Float[], Sx As Float, Sy As Float) As Boolean
-    
+
     Dim i As Integer
+
     For i = 0 To points.max Step 2
         points[i] *= Sx
         points[i + 1] *= Sy
     Next
+
 End
 
+'' Devuelve True si el poligono esta dentro del rectangulo
+Public Function IsPoligonInsideRect(poligon As Float[], x0 As Float, y0 As Float, x1 As Float, y1 As Float) As Boolean
+
+    Dim i As Integer
+
+    For i = 0 To poligon.max Step 2
+        If poligon[i] < x0 Then Return False
+        If poligon[i] > x1 Then Return False
+        If poligon[i + 1] < y0 Then Return False
+        If poligon[i + 1] > y1 Then Return False
+    Next
+    Return True
+
+End
+
+'' Devuelve True si el poligono cruza la linea x0,y0 - x1,y1
+Public Function IsPoligonCrossingLine(poligon As Float[], x0 As Float, y0 As Float, x1 As Float, y1 As Float) As Boolean
+
+    Dim i As Integer
+
+    For i = 0 To poligon.count - 4 Step 2
+        If doIntersect(poligon[i], poligon[i + 1], poligon[i + 2], poligon[i + 3], x0, y0, x1, y1) Then Return True
+    Next
+    ' cierre del poligono, puntos inicial y final
+    If doIntersect(poligon[0], poligon[1], poligon[poligon.max - 1], poligon[poligon.max], x0, y0, x1, y1) Then Return True
+
+    Return False
+
+End
+
+'' Devuelve True si el poligono cruza la linea x0,y0 - x1,y1
+Public Function IsPoligonCrossingRect(poligon As Float[], x0 As Float, y0 As Float, x1 As Float, y1 As Float) As Boolean
+
+    Dim i As Integer
+
+    If IsPoligonCrossingLine(poligon, x0, y0, x1, y0) Then Return True
+    If IsPoligonCrossingLine(poligon, x0, y1, x1, y1) Then Return True
+    If IsPoligonCrossingLine(poligon, x0, y0, x0, y1) Then Return True
+    If IsPoligonCrossingLine(poligon, x1, y0, x1, y1) Then Return True
+    Return False
+
+End

@@ -9,10 +9,11 @@ Public Const PointsToDraw As Integer = 1             ' minimal point requered fo
 Public Const OrtogonalIgnorado As Boolean = False
 Public Const OrtogonalForzado As Boolean = False
 Public Const ParamDefault As String = " "
+Public Const StretchAble As Boolean = True           ' Si lo puedo deformar
 
 ' SAVE from this vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 ' IMPORTANT: ALL CHANGES HERE MUST BE TRANSLATED TO cadLoad/Save and clsEntities.CopyElementData()                                                                                    |
-Public P As New Float[]                     ' X,Y pairs                        
+Public P As New Float[]                     ' X,Y pairs
 Public Level As New Float[]                 ' the future Z or elevation
 Public StringData As String                 ' split with "|" separator if neccesary, that's is Entity specific.
 Public StringData2 As String                ' split with "|" separator if neccesary, that's is Entity specific.
@@ -23,10 +24,9 @@ Public Block As String                      ' Para tener la posibilidade de junt
 Public _Color As Integer                    ' 0=by layer, 1=by block, 10+=16 bit color code  ;  ths is not the color to be draw, ColorToPaint is, set in Finish()
 Public LineType As Integer                  ' 0=continuous, 1=dashed from flxDash
 Public LineWidth As Integer = 1             ' this is it
-Public RefPointX As Float                   ' new 
+Public RefPointX As Float                   ' new
 Public RefPointY As Float
 ' SAVE to here  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
 
 ' NOT SAVED
 ' construction and usage vars
@@ -34,24 +34,22 @@ Public LayerId As String                    ' esta variable es la Key en la cole
 Public BlockNumber As Integer
 Public ColorToPaint As Integer              ' este es el color que realmente se va a dibujar
 Public gbColor As Integer                   ' este es el color que se obtiene de modCAD.gColor(CADcolor)
-Public Selected As Boolean                
+Public Selected As Boolean
 Public ForDeletion As Boolean = True        ' this must be falsed in Finish
 Public DrawAble As Boolean = False          ' True si durante la construccion ya tiene suficientes elementos para poder hacer una representacion digna
 Public Visible As Boolean = True            ' si esta entidad puede ser mostrada independientmente
 Public Finished As Boolean = False          ' colocar en true cuando se llegue a completar
 Public StepsDone As Integer                 ' esto lo cambia cls ElementBuilder durante la construccion
 Public Group As Integer = 0                 ' Pertenecemos a un grupo?
-Public flxDash As New Integer[]             ' tipo de linea, continua, puntos, etc
+Public flxDash As New Integer[]             ' DEPRECADO
 Public B As New Float[]                     ' Backup point
 Public Psel As New Boolean[]                ' selected points
 Public BoundingPoligon As New Float[]       ' this is a poligon built at element's contruction that defines a poligon used for detecting points inside me
 Public MyPoi As New Single[]                ' point of interest
 
-
 Public Sub _new()
 
 End
-
 
 Public Function _compare(cosas As Object) As Integer
 
@@ -59,6 +57,8 @@ Public Function _compare(cosas As Object) As Integer
 
 End
 
+'' Las entidades pueden proveer un poligono que las envuelva
+'' el mismo su usara para seleccionarlas.
 Public Sub CreateBoundingPoligon()
 
 End
@@ -67,62 +67,74 @@ Public Sub Draw()
 
     If Not Me.DrawAble Or Not Me.Visible Then Return
 
-
     ' AQUI VAN LAS RUTINAS DE DIBUJO
 
 End
 
-
-
 '' Determines if the entity was selected by a rectanle surrounding al points
 '' by default, if ALL points are selected, it can.
-Public Function SelFull(X1real As Float, Z1real As Float, X2real As Float, Z2real As Float) As Boolean
-    
+Public Function SelFull(X1real As Float, Y1real As Float, X2real As Float, Y2real As Float) As Boolean
 
     Dim i As Integer, puedo As Boolean
 
-    puedo = True                     ' supongamos que puedo, por ahora
-    For i = 0 To Me.p.max Step 2
-        If Not (Me.p[i] >= X1real And Me.p[i] <= X2real) And (Me.p[i + 1] >= Z1real And Me.p[i + 1] <= Z2real) Then
-            puedo = False
+    ' Si tengo un bounding poligon, entonces verifico que todos los puntos esten dentro
+    If Me.BoundingPoligon.Count > 0 Then
+
+        Return puntos.IsPoligonInsideRect(BoundingPoligon, X1real, Y1real, X2real, Y2real)
+
+    Else    ' no tengo un poligono, entonces verifico que todos los puntos definitorios de al entidad esten dentro
+
+        puedo = True                     ' supongamos que puedo, por ahora
+        For i = 0 To Me.p.max Step 2
+            If Not (Me.p[i] >= X1real And Me.p[i] <= X2real) And (Me.p[i + 1] >= Y1real And Me.p[i + 1] <= Y2real) Then
+                puedo = False
+            End If
+        Next
+
+        If puedo Then
+            For i = 0 To Me.PSel.Max
+                Me.PSel[i] = True
+            Next
+
+            Return True
+        Else
+            For i = 0 To Me.PSel.Max
+                Me.PSel[i] = False
+            Next
+
+            Return False
         End If
-    Next
-
-    If puedo Then
-        For i = 0 To Me.PSel.Max
-            Me.PSel[i] = True
-        Next
-
-        Return True
-    Else
-        For i = 0 To Me.PSel.Max
-            Me.PSel[i] = False
-        Next
-
-        Return False
-    End If
+    Endif
 
 End
 
 '' Determines if the entity can be stretched
 '' by default, if ANY point is selected, it can.
-Public Function SelPartial(X1real As Float, Z1real As Float, X2real As Float, Z2real As Float) As Boolean
+Public Function SelPartial(X1real As Float, Y1real As Float, X2real As Float, Y2real As Float) As Boolean
 
     Dim i As Integer, puedo As Boolean
 
-    puedo = False
-    For i = 0 To Me.p.max Step 2
-        If (Me.p[i] >= X1real And Me.p[i] <= X2real) And (Me.p[i + 1] >= Z1real And Me.p[i + 1] <= Z2real) Then
-            Me.PSel[i] = True
-            puedo = True
+    ' Si tengo un bounding poligon, entonces verifico que alguna linea lo cruce
+    If Me.BoundingPoligon.Count > 0 Then
+
+        Return puntos.IsPoligonCrossingRect(BoundingPoligon, X1real, Y1real, X2real, Y2real)
+
+    Else    ' no tengo un poligono, entonces verifico que todos los puntos definitorios de al entidad esten dentro
+
+        puedo = False
+        For i = 0 To Me.p.max Step 2
+            If (Me.p[i] >= X1real And Me.p[i] <= X2real) And (Me.p[i + 1] >= Y1real And Me.p[i + 1] <= Y2real) Then
+                Me.PSel[i] = True
+                puedo = True
+            End If
+        Next
+
+        If puedo Then
+
+            Return True
+        Else
+            Return False
         End If
-    Next
-
-    If puedo Then
-
-        Return True
-    Else
-        Return False
     End If
 
 End
@@ -140,7 +152,7 @@ End
 Public Function AboveMe(Xreal As Float, Yreal As Float, tolerance As Float, mode As Integer, returnData As Float[]) As Boolean
 
     ' this could be overriden in the child
-    
+
     returnData.Insert([0, 0, -1])               ' minimal response
     If Me.P.Count = 0 Then Return
 
@@ -185,8 +197,8 @@ Public Sub Finish(ParamsDone As Integer) As Boolean
 
     'Print "Finish en EntityBase"
     CreateBoundingPoligon
-    
-     ' tareas finales de armado del objeto
+
+    ' tareas finales de armado del objeto
     Me.b.resize(Me.P.count)
     Me.psel.resize(Me.p.count / 2)
     Me.ForDeletion = False

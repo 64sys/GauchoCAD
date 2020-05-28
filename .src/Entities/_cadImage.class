@@ -11,41 +11,37 @@ Public Const ParamHelper As String = ("Position;Rotation; Scale")      ' a littl
 Public Const ParamDefault As String = " ; 0 ; 1"
 Public imagen As New Image
 Public HBRUSH As PaintBrush
-Public Loaded As Boolean    
+Public Loaded As Boolean
 
 Public Sub Draw()
 
     If Me.StepsDone = 0 And Not Loaded Then            ' need the filename first
-            
-            Dim f As String
-            Dialog.OpenFile(False)
-            Dialog.Filter = ["*.*"]
-            f = Dialog.Path
-            If Exist(f) Then
-                Me.StringData = f
-                imagen = Image.Load(f)
-                hBrush = paint.Image(Imagen)
-                
-                ' hBrush.Scale(W / hImage.W, H / hImage.H)
-                ' paint.brush = hBrush
-                ' paint.Rectangle(X, Y, W, H)
-                ' paint.Fill
-            Endif
-                Loaded = True
-            ' Catch
-                
-                'SVGLoaded = False
-                
-                    
+
+        Dim f As String
+        Dialog.OpenFile(False)
+        Dialog.Filter = ["*.*"]
+        f = Dialog.Path
+        If Exist(f) Then
+            Me.StringData = f
+            imagen = Image.Load(f)
+            hBrush = paint.Image(Imagen)
+
+            ' hBrush.Scale(W / hImage.W, H / hImage.H)
+            ' paint.brush = hBrush
+            ' paint.Rectangle(X, Y, W, H)
+            ' paint.Fill
+        Endif
+        Loaded = True
+        ' Catch
+
+        'SVGLoaded = False
+
     Else If Me.StepsDone = 1 Then                   ' we have the position
 
         hBrush.Translate(Me.p[0], Me.p[1])
         paint.brush = hBrush
         paint.Fill
-    
-    End If
-    
-    
-    
-End
 
+    End If
+
+End

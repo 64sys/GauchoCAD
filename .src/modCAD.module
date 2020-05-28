@@ -44,8 +44,7 @@ Public HookSize As Integer = 16                       ' for use with poi
 Public Ortogonal As Boolean = False              ' idem Ortho F8 del CAD
 Public OrtogonalForzado As Boolean = False
 Public OrtogonalIgnorado As Boolean = False
-Public SnapMode As Integer                      ' Bitwise: -1 Off ; 0 = Nearest; 1 = Endpoint; 2 = midpoint 
-
+Public SnapMode As Integer                      ' Bitwise: -1 Off ; 0 = Nearest; 1 = Endpoint; 2 = midpoint
 
 Public clsJob As Object                             ' what I am doing now, thats either selecting or something else
 Public clsJobPrevious As Object                     ' what was doing before
@@ -84,7 +83,7 @@ Public Sub Main()
     If WindowBackColor = 0 Then WhiteAndBlack = Color.White Else WhiteAndBlack = Color.Black
     ' armo el array de colores
     gcolor = DecodeColor()
- 
+
     ' this is what we are doing now
     clsJob = clsDefaultJob
     clsJobPrevious = clsDefaultJob
@@ -94,15 +93,12 @@ Public Sub Main()
 
     FontList = glPlus.LoadFonts(Application.Path &/ "Fonts/LFF")
     glPlus.SelectFont("romanc")
-    
-    
+
     Dim r As New Float[]
-    
-    r = puntos.lineLineIntersection([0, 0], [1, 1], [0, 1], [-1, 2])
+    r = [0, 1, 1, 2]
+    puntos.Rotate(r, Pi / 4)
     Debug r[0], r[1]
-    
-    
-    
+
 End
 
 ' importing
@@ -145,11 +141,13 @@ Public Function AddPolyLine(Points As Float[], Optional _color As Integer = 0, O
     oEntity = Null                  ' free object
 
 End
+
 Public Function AddDim(Points As Float[], bloque As String, medida As Float, texto As String, alineacion As Integer, angulo As Float, tipo As Integer, _Color As Integer, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
-    
+
     Dim oEntity As Object                       ' creamos la entidad de la clase apropiada
+
     oEntity = Object.New("cadDim")              ' create the new entity of proper class
-    
+
     oEntity.P.insert(points)                    ' recibimos los dos vertices de la linea x1,y1,x2,y2
     oEntity.fParam.Add(tipo)
     oEntity.fParam.Add(MEDIDA)
@@ -165,11 +163,8 @@ Public Function AddDim(Points As Float[], bloque As String, medida As Float, tex
     APPMain.hFCAD.arrEntities.Add(oEntity)
     oEntity.finish(-1)
     oEntity = Null                  ' free object
-    
-    
-  
-  
-End  
+
+End
 
 Public Function AddSolid(Points As Float[], Optional _color As Integer = 0, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
 
@@ -353,53 +348,50 @@ Public Function AddBlock(Points As Float[], Optional Layer As String, Optional B
 
 End
 
-
 '' Aplica los cambios en los Layers a las entidades
 '' Si mode = 1, primero recontruye el layerID (para ser usado luego de abrir un archivo)
 Public Function ApplyLayerProperties(Optional mode As Integer = 0)
 
     Dim e As Object, cLayer As Collection
     Dim LayerName As String
-    
+
     Print "Aplicando propiedades del Layers"
-   
-        For Each e In APPMain.hFCAD.arrEntities
-            
-            If mode = 1 Then
-                ' reconstruyo el ID del layer en la entidad, para ello busco en la lista cual coincide con su nombre
-                For Each cLayer In APPMain.hFCAD.cModel["Layers"]
-                    If e.layer = cLayer["name"] Then
-                        e.layerID = cLayer["id"]
-                        Break
-                    Endif
-                Next
-                
-            Endif
-            
-            
-            ' nombre, el que pudo haber cambiado (exepto el "0")
-            e.layer = APPMain.hFCAD.cModel["Layers"][e.layerID]["name"]
-              
-            ' visibiliad
-            If APPMain.hFCAD.cModel["Layers"][e.layerID]["show"] Then e.visible = True Else e.visible = False
-            
-            
-            ' color
-            If e._color = 256 Then          ' buscar color del layer
-              
-                e.gbColor = gColor[APPMain.hFCAD.cModel["Layers"][e.layerID]["colour"]]
-            Else If e._color = 257 Then     ' buscar color del objeto
-                e.gbColor = gColor[APPMain.hFCAD.cModel["Layers"][e.layerID]["colour"]]     ' FIXME: cambiar esto 
-            Else If e._color = 0 Then       ' buscar color del bloque
-                e.gbColor = gColor[APPMain.hFCAD.cModel["Layers"][e.layerID]["colour"]]     ' FIXME: cambiar esto
-            Else
-    
-                e.gbColor = gColor[e._color]
-    
-            Endif
-    
-        Next
-   
+
+    For Each e In APPMain.hFCAD.arrEntities
+
+        If mode = 1 Then
+            ' reconstruyo el ID del layer en la entidad, para ello busco en la lista cual coincide con su nombre
+            For Each cLayer In APPMain.hFCAD.cModel["Layers"]
+                If e.layer = cLayer["name"] Then
+                    e.layerID = cLayer["id"]
+                    Break
+                Endif
+            Next
+
+        Endif
+
+        ' nombre, el que pudo haber cambiado (exepto el "0")
+        e.layer = APPMain.hFCAD.cModel["Layers"][e.layerID]["name"]
+
+        ' visibiliad
+        If APPMain.hFCAD.cModel["Layers"][e.layerID]["show"] Then e.visible = True Else e.visible = False
+
+        ' color
+        If e._color = 256 Then          ' buscar color del layer
+
+            e.gbColor = gColor[APPMain.hFCAD.cModel["Layers"][e.layerID]["colour"]]
+        Else If e._color = 257 Then     ' buscar color del objeto
+            e.gbColor = gColor[APPMain.hFCAD.cModel["Layers"][e.layerID]["colour"]]     ' FIXME: cambiar esto
+        Else If e._color = 0 Then       ' buscar color del bloque
+            e.gbColor = gColor[APPMain.hFCAD.cModel["Layers"][e.layerID]["colour"]]     ' FIXME: cambiar esto
+        Else
+
+            e.gbColor = gColor[e._color]
+
+        Endif
+
+    Next
+
 End
 
 '' Input a dxf color return a rgb color
@@ -681,7 +673,7 @@ Public Function DecodeColor() As Integer[]
             g = Split(s, ":")[1]
             b = Split(s, ":")[2]
 
-        rgb.Add(Color.RGB(CInt(r), CInt(g), CInt(b)))
+            rgb.Add(Color.RGB(CInt(r), CInt(g), CInt(b)))
         Endif
     Next
 

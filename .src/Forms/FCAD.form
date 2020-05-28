@@ -291,6 +291,7 @@
           { !GLArea1 GLArea
             MoveScaled(2,3,42,18)
             #Public = True
+            Background = Color.Black
             Tracking = True
             Expand = True
           }

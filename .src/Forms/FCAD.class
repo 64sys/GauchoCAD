@@ -91,28 +91,25 @@ Public oEntity As Object                   ' la entidad
 Public GlListAllEntities As Integer
 Public GlListSelectedEntities As Integer
 
-
 Public Sub Form_Open()
 
-Debug "open " & Me.Title
+    Debug "open " & Me.Title
 
 End
 
 Public Sub form_Resize()
+
     Debug "resize " & Me.Title
     GLplus.Init(glarea1)
+
 End
 
 Public Sub form_Arrange()
 
     Debug "arrange " & Me.Title
- 
-    
-    
-
-    
 
 End
+
 Public Sub form_Activate()
 
     Debug "activate " & Me.Title
@@ -136,7 +133,7 @@ Public Sub GLArea1_draw()
     gl.LoadIdentity
 
     gl.Translatef(PanX, PanY, 0)
-    
+
     gl.Scalef(ScaleZoom, ScaleZoom, 1)
 
     ' el orden del dibujo es importante en paint, porque una cosa tapa a la otra
@@ -145,15 +142,15 @@ Public Sub GLArea1_draw()
     ' clsDrawingAids.DrawGrid
 
     ' If modCAD.DrawBounds Then clsDrawingAids.DrawBoundingPoligons
-    
+
     clsDrawingAids.DrawCoordenadas
-    
+
     clsDrawingAids.DibujaHelper
-    
+
     gl.CallList(GlListAllEntities)                      ' si GL no tiene contexto, la lista no se genera. Es necesario que la instancia de FCAD este cargada.
-    
+
     modCAD.clsJob.Draw
-    
+
     If iEntity[2] > 0 Then glPlus.Rectangle2D(iEntity[0] - Metros(4), iEntity[1] - Metros(4), Metros(8), Metros(8),,,,, Color.Green, 1, 2)
 
 End
@@ -187,31 +184,25 @@ End
 Public Sub GLArea1_MouseDown()
 
     If Mouse.Right Then Return  'handled in MouseUp
-    
+
     Select Case modCAD.clsJob.gender
-        
+
         Case "Default"                                                  ' 1. Seleccionando
-            
+
             modCAD.clsJob.mouseDown()                               '    -> envio el evento a la clase default
-            
+
         Case "Builder"                                                  ' 2.Construyendo una entidad
-            
+
             clsEntities.CheckPOI(Xreal(Mouse.x), Yreal(Mouse.y))        '   -> busco punto donde pueda engancharse la entidad nueva
             modCAD.clsJob.mouseDown()                                   '      y envio el evento a la clase
-            
-            
+
         Case Else
-            
-            
+
             modCAD.clsJob.mouseDown() ' dispatch event to the Job
-        
-        
 
     End Select
-    
-    redraw
 
-    
+    redraw
 
 End
 
@@ -221,13 +212,13 @@ Public Sub GLArea1_MouseMove()
     CursorY = mouse.y
 
     Select Case modCAD.clsJob.gender
-        
+
         Case "Default"                                                  ' 1. Seleccionando
-  
+
             modCAD.clsJob.MouseMove() ' dispatch event to the Job
 
             clsEntities.CheckPOI(Xreal(Mouse.x), Yreal(Mouse.y))
-            
+
             If iEntity[2] >= 0 Then
                 ' FInspector.lblEntity.Text = oEntity.gender
                 ' ' FInspector.lblColor.Background = oEntity.gbcolor
@@ -239,20 +230,16 @@ Public Sub GLArea1_MouseMove()
                 FInspector.Run(oEntity)
             Else
                 FInspector.Close
-                
+
             Endif
-        
+
         Case Else
-            
-            
+
             modCAD.clsJob.MouseMove() ' dispatch event to the Job
-        
-        
 
     End Select
+
 End
-
-
 
 Public Sub GLArea1_MouseUp()
     ' ex Public Sub drwArea_MouseUp()
@@ -265,14 +252,10 @@ Public Sub GLArea1_MouseUp()
         modCAD.clsJob.Finish
 
     Else ' Left Click
-        
-        
-        
+
         modCAD.clsJob.MouseUp()
 
     End If
-
-    
 
     redraw
 
@@ -360,14 +343,14 @@ Public Sub form_KeyPress()
     Endif
     If Key.Code = Key.f6 Then
         modCAD.DrawBounds = Not modCAD.DrawBounds
-        Dim i As Integer
-    
-        For i = 0 To 50000
+        ' Dim i As Integer
+        '
+        ' For i = 0 To 50000
+        '
+        '     modCAD.AddLine([Rnd(-20, 20), Rnd(-20, 20), Rnd(-20, 20), Rnd(-20, 20)], 0, 1, 0, "0")
+        '     arrEntities.Last.gbcolor = Color.RGB(Rnd(0, 255), Rnd(0, 255), Rnd(0, 255))
+        ' Next
 
-            modCAD.AddLine([Rnd(-20, 20), Rnd(-20, 20), Rnd(-20, 20), Rnd(-20, 20)], 0, 1, 0, "0")
-            arrEntities.Last.gbcolor = Color.RGB(Rnd(0, 255), Rnd(0, 255), Rnd(0, 255))
-        Next
-        
         regen
         Return
     Endif
@@ -452,33 +435,14 @@ End
 
 Public Sub Run(cMdl As Collection) As Boolean
 
-    'Dim iSet As String
-    'Dim ictn As New Collection
-    'Dim FilePath As String
-
-    '------------------------------------------------------------------------------
-    '' Estableciendo las variables de conexion y otras más
-    'cModel.Add("test", "test")
-    'cModel.Add(arrEntities, "Entities")
     cModel = cMdl.Copy()
     cModel.Add(arrEntities, "Entities")
-    'cex = cin
-    'con = cin["Connex"]           ' Conexión a la base de datos
-    'adi = cin["AppDir"]           ' Directorio del programa
-    'apc = cin["AppCfg"]           ' Archivo de configuracion del programa
-    'etx = cin["AppEdi"]           ' Editor de texto plano por defecto
-    'lgg = cin["AppLog"]            ' Registro de eventos de la aplicación.
-    'FilePath = cModel["File"]
 
     Me.Menus.Hide
-    'Me.Text = File.Name(FilePath)
-    'Me.Caption = FilePath
 
     Me.Show()
 
 End
-
-
 
 Public Sub ToolButton1_Click()
 
@@ -493,8 +457,14 @@ End
 Public Sub LoadDrawingMap()
 
     Dim cLayers As New Collection
+    Dim iLayers As New Collection
     Dim Layer As Variant
     Dim app As APPMain
+    Dim ito As Variant
+    Dim it As Variant
+    Dim sKey As String
+    Dim sVal As String
+    Dim sName As String
 
     If cModel.Count > 0 Then
         TreeView1.Clear
@@ -519,10 +489,37 @@ Public Sub LoadDrawingMap()
             Next
         Endif
         'Layers ----------------------
-
         TreeView1["layers"].Expanded = True
     Endif
-    'Refresh the comboboxes in APPMain
+    If cImport.Count > 0 Then
+        TreeView1.Add("import", "Import")
+        For Each ito In cImport
+            sKey = cImport.Key
+            Select TypeOf(ito)
+                Case gb.Object
+                    TreeView1.Add("i" & sKey, sKey,, "import")
+                    For Each it In ito
+                        Select sKey
+                            Case "Entities"
+                                sName = String.LCase(ito[ito.Key]["entity"])
+                                If TreeView1.Exist("i" & sName) = False Then
+                                    TreeView1.Add("i" & sName, sName,, "i" & sKey)
+                                Endif
+                            Case "Block"
+                                sName = ito[ito.Key]["block"]
+                                If TreeView1.Exist("i" & sName) = False Then
+                                    TreeView1.Add("i" & sName, sName,, "i" & sKey)
+                                Endif
+                            Case Else
+                                TreeView1.Add("i" & ito.Key, sName,, "i" & sKey)
+                        End Select
+
+                    Next
+                Case gb.String
+                    TreeView1.Add("i" & sKey, sKey,, "import")
+            End Select
+        Next
+    Endif
     APP = Me.Parent.Parent.Parent.Parent.Parent.Parent
     APPMain.LoadComboboxes(cModel)
 

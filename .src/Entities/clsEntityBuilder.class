@@ -39,9 +39,7 @@ Public elem As Object
 
 Public LastEntity As Object
 
-
 Public XYreal As Float[]
-
 
 Public Function Start(ElemToBuild As Variant, Optional Mode As Integer = 0)
 
@@ -65,7 +63,6 @@ Public Function Start(ElemToBuild As Variant, Optional Mode As Integer = 0)
 
         If LastEntity Then                                            ' we know the last element, try to create a new one
             elem = Object.New(Object.Class(LastEntity).Name)           ' create the New Class
-                                             
 
         Else                                                                            ' the is no way to know what element was done last
 
@@ -82,16 +79,14 @@ Public Function Start(ElemToBuild As Variant, Optional Mode As Integer = 0)
 
     End If
 
-    
     clsEntities.FillEntity(elem)
     ' reset from previous element
     elem.StepsDone = 0
-   
+
     iPoints = 0
     iFloat = 0
     iString = 0
 
-    
     Pointstotal = elem.p.count / 2                                          ' at this point P is either set or 0 if non determined
     StepsTotal = Len(elem.ParamType)
 
@@ -144,13 +139,13 @@ Public Function KeyText(EnteredText As String) ' esta rutina es llamada por FCAD
                 ' got othe first point and exit
                 elem.P[iPoints * 2] = elem.P[0]
                 elem.P[iPoints * 2 + 1] = elem.P[1]
-                 Me.Finish
-                 
+                Me.Finish
+
             Else If Left(EnteredText, 1) = "U" Then     ' undo last command and go
 
                 elem.P.remove(elem.P.max)
                 elem.P.remove(elem.P.max)
-                 Me.Finish
+                Me.Finish
             Else                                        ' an X,Y or @X,Y
 
                 If InStr(EnteredText, "@") > 0 Then    ' may be a point
@@ -176,20 +171,19 @@ Public Function KeyText(EnteredText As String) ' esta rutina es llamada por FCAD
 
         Case "T"
             errtxt = ", expected text, not a point"
-            ' its a valid input? 
+            ' its a valid input?
             If EnteredText = "" Then
-            
-                'elem.stringdata = EnteredText 
-                 elem.stringdata &= ParamDefault[elem.StepsDone]
+
+                'elem.stringdata = EnteredText
+                elem.stringdata &= ParamDefault[elem.StepsDone]
             Else If elem.stringdata <> "" Then                      ' we have a previous entry
-            
-            
+
                 elem.stringdata &= "|" & EnteredText  ' split if necessary
-                
+
             Else
-                
+
                 elem.stringdata &= EnteredText                      ' first entry
-                
+
             End If
 
             AdvanceStep
@@ -209,13 +203,13 @@ Public Function KeyText(EnteredText As String) ' esta rutina es llamada por FCAD
 
             Inc iFloat
             AdvanceStep
-            
+
         Case "C"                                ' color
             If Dialog.SelectColor() Then
                 elem.fParam[iFloat] = CFloat(Dialog.Color)
                 Inc iFloat
                 AdvanceStep
-                        
+
             Endif
             Key.Cod
 
@@ -225,7 +219,7 @@ Finally
 
     Return
 
-    Catch
+Catch
 
     ' unexpected input
     clsDrawingAids.ErrorMessage = ("Bad input" & ErrTxt)
@@ -274,11 +268,9 @@ Public Sub AdvanceStep()
 End
 
 Public Function MouseMove() ' esta rutina es llamada por FCAD en el evento DrawingArea_MouseMove
-    
-    
+
     If (Me.iPoints > elem.P.Count / 2) And InStr("LAP", NextParamType) = 0 Then Return ' we are expecting a parameter
-    
-    
+
     ' if we expect a parameter, it will be passed
     If NextParamType = "A" Then
 
@@ -293,7 +285,7 @@ Public Function MouseMove() ' esta rutina es llamada por FCAD en el evento Drawi
 
         ' return the angle from horizontal to us
         elem.fParam[iFloat] = puntos.distancia(puntos.Near(appmain.hFcad.Xreal(mouse.x)), puntos.Near(appmain.hFcad.Yreal(mouse.y)), elem.p[elem.p.max - 1], elem.p[elem.p.max])
-        
+
         appmain.hFCAD.redraw
         Return              ' nothing more to do here
     End If
@@ -326,18 +318,16 @@ Public Function MouseMove() ' esta rutina es llamada por FCAD en el evento Drawi
         End If
 
     End If
-    
-     appmain.hFCAD.redraw
+
+    appmain.hFCAD.redraw
+
 End
 
 Public Function MouseDown() ' esta rutina es llamada por FCAD en el evento DrawingArea_MouseDown
 
-  
-
     clsDrawingAids.ErrorMessage = ""
     If (Me.iPoints > elem.P.Count / 2) And InStr("LAP", NextParamType) = 0 Then Return ' we are expecting a parameter
-    
-    
+
     ' if we expect a parameter, it will be passed
     If NextParamType = "A" Then
 
@@ -407,9 +397,7 @@ End
 
 Public Sub Draw()               ' called byappmain.hFCAD.drwArea_Draw
 
-    
     elem.draw
-    
 
 End
 
@@ -418,11 +406,10 @@ Public Sub Finish()
     elem.Finish(elem.StepsDone)
     elem.buildPOI
     clsEntities.BackUpPosition(elem)
-    APPMain.hFCAD.arrEntities.Add(elem)   
-   
+    APPMain.hFCAD.arrEntities.Add(elem)
+
     LastEntity = elem                                       ' save it to repeat on rigth click
 
- 
     modCAD.clsJobPrevious = Me
     modCAD.clsJob = clsDefaultJob
     clsDrawingAids.CleanTexts
@@ -430,9 +417,7 @@ Public Sub Finish()
     ' sort them
     APPMain.hFCAD.arrEntities.Sort()
     clsEntities.GLGenDrawList
-   
-    appmain.hFCAD.redraw
-    
 
+    appmain.hFCAD.redraw
 
 End

@@ -4,7 +4,7 @@
 ' Element maintained by Terco
 ' V2
 Inherits EntityBase
-Public Const GENDER As String = "Ellipse"          
+Public Const GENDER As String = "Ellipse"
 Public Const PointsToDraw As Integer = 1             ' minimal point requered for drawing something usefull
 Public Const HelperTrabajo As String = ("Draw an ellipse")
 Public Const ParamType As String = "PPFAA"
@@ -16,34 +16,33 @@ Public start As Float
 Public recorrido As Float
 
 Public Sub Draw()
-     If Not Me.DrawAble Or Not Me.Visible Then Return
+
+    If Not Me.DrawAble Or Not Me.Visible Then Return
     If Me.Selected And Not modCAD.ToolActive Then Me.ColorToPaint = modCAD.ColorForSelected Else Me.ColorToPaint = Me.gbColor
-      
-    
+
     Dim major, minor, angle, la As Float
-    
+
     major = Sqr(Me.p[2] * Me.p[2] + Me.p[3] * Me.p[3])
     Minor = major * Me.fParam[0]
     angle = -Ang(Me.p[2], Me.p[3])          ' TODO: check  this -
     If major = 0 Then major = 1
-    
+
     If modCAD.drwDrawingClass = modCAD.drwPaintClass Then
-        
-    
-            paint.Save
-            If Me.flxDash Then paint.Dash = Me.flxDash
-     
-            paint.brush = Paint.Color(Me.ColorToPaint)
-   
-            paint.Translate(Me.p[0], Me.p[1])
-            paint.Rotate(-angle)
-            Paint.Scale(1, Minor / major)
-            paint.LineWidth = Me.LineWidth / appmain.hFcad.ScaleZoom / modCAD.ScaleLines
-            paint.arc(0, 0, major, Me.start, Me.recorrido)
-            paint.Stroke
-            paint.Restore
-    End If            
-    
+
+        paint.Save
+        If Me.flxDash Then paint.Dash = Me.flxDash
+
+        paint.brush = Paint.Color(Me.ColorToPaint)
+
+        paint.Translate(Me.p[0], Me.p[1])
+        paint.Rotate(-angle)
+        Paint.Scale(1, Minor / major)
+        paint.LineWidth = Me.LineWidth / appmain.hFcad.ScaleZoom / modCAD.ScaleLines
+        paint.arc(0, 0, major, Me.start, Me.recorrido)
+        paint.Stroke
+        paint.Restore
+    End If
+
     If modCAD.drwDrawingClass = modCAD.drwOpenGLClass Then
         Dim x, y, theta, angle_increment As Float
         Dim i As Integer
@@ -51,55 +50,53 @@ Public Sub Draw()
         ' gl.Translatef(Me.p[0], Me.p[1], 0)
         ' gl.Rotatef(angle * 180 / Pi, 0, 0, 1)
         ' gl.Scalef(1, Minor / major, 1)
-          Me.BoundingPoligon.Clear
-          GL.Begin(gl.LINE_STRIP)
-           Me.start = Me.fParam[1] * Pi / 180
-           Me.recorrido = Me.fParam[2] * Pi / 180 - Me.fParam[1]
-           If Me.recorrido < 0 Then Me.recorrido = 2 * Pi + Me.recorrido
-          
-            
-            angle_increment = Pi * 2 / 360
-            For theta = 0 To Me.recorrido Step angle_increment
-                ' el punto considerando 0,0 al centro
-                x = major * Cos(Me.start + theta)
-                y = major * Sin(Me.start + theta)
-                Me.BoundingPoligon.Add(x)
-                Me.BoundingPoligon.Add(y)
-                
-                'GLplus.Vertex2D(radio * Cos(start_angle + theta), radio * Sin(start_angle + theta), _color)
-            Next
-            
-            ' aplico las trnasformaciones
-            puntos.Scale(Me.BoundingPoligon, 1, minor / major)
-            puntos.Rotate(Me.BoundingPoligon, angle)
-            puntos.Translate(Me.BoundingPoligon, Me.p[0], Me.p[1])
-            For i = 0 To Me.BoundingPoligon.max Step 2
-                GLplus.Vertex2D(Me.BoundingPoligon[i], Me.BoundingPoligon[i + 1], Me.ColorToPaint)
-            Next
+        Me.BoundingPoligon.Clear
+        GL.Begin(gl.LINE_STRIP)
+        Me.start = Me.fParam[1] * Pi / 180
+        Me.recorrido = Me.fParam[2] * Pi / 180 - Me.fParam[1]
+        If Me.recorrido < 0 Then Me.recorrido = 2 * Pi + Me.recorrido
 
-            GL.End
+        angle_increment = Pi * 2 / 360
+        For theta = 0 To Me.recorrido Step angle_increment
+            ' el punto considerando 0,0 al centro
+            x = major * Cos(Me.start + theta)
+            y = major * Sin(Me.start + theta)
+            Me.BoundingPoligon.Add(x)
+            Me.BoundingPoligon.Add(y)
+
+            'GLplus.Vertex2D(radio * Cos(start_angle + theta), radio * Sin(start_angle + theta), _color)
+        Next
+
+        ' aplico las trnasformaciones
+        puntos.Scale(Me.BoundingPoligon, 1, minor / major)
+        puntos.Rotate(Me.BoundingPoligon, angle)
+        puntos.Translate(Me.BoundingPoligon, Me.p[0], Me.p[1])
+        For i = 0 To Me.BoundingPoligon.max Step 2
+            GLplus.Vertex2D(Me.BoundingPoligon[i], Me.BoundingPoligon[i + 1], Me.ColorToPaint)
+        Next
+
+        GL.End
 
         'GLplus.arc(major, Me.start, Me.recorrido, Me.ColorToPaint, Me.LineWidth)
         'gl.PopMatrix
 
     Endif
-    
-    
- 
+
 End
 
 '' Devuelve [x,y] punto de interes
 Public Function AboveMe(Xreal As Float, Yreal As Float, tolerance As Float, mode As Integer, fData As Float[]) As Boolean
     ' si una de las dos lineas de una cruz con centro en X,Y y largo Tolerance cruza la linea, estamos arriba
+
     Dim i As Integer
     Dim fDist1, fDist2, fDist3, fDist4 As Float
     'TODO: para debug, agrego esto
     mode = 1 + 2 ' endpoint+midpoint
-    
+
     fData.Clear
     For i = 0 To Me.P.count - 4 Step 2
         If puntos.doIntersect(xreal - tolerance / 2, Yreal, Xreal + tolerance / 2, Yreal, Me.BoundingPoligon[i + 0], Me.BoundingPoligon[i + 1], Me.BoundingPoligon[i + 2], Me.BoundingPoligon[i + 3]) Or puntos.doIntersect(xreal, Yreal - tolerance / 2, Xreal, Yreal + tolerance / 2, Me.BoundingPoligon[i + 0], Me.BoundingPoligon[i + 1], Me.BoundingPoligon[i + 2], Me.BoundingPoligon[i + 3]) Then ' its above me
-            
+
             ' busco el punto exacto en la linea donde se produce la interseccion
             fData.Insert(puntos.lineLineIntersection([xreal - tolerance / 2, Yreal], [Xreal + tolerance / 2, Yreal], [Me.BoundingPoligon[i + 0], Me.BoundingPoligon[i + 1]], [Me.BoundingPoligon[i + 2], Me.BoundingPoligon[i + 3]]))
             ' veo que punto esta mas cerca
@@ -123,21 +120,15 @@ Public Function AboveMe(Xreal As Float, Yreal As Float, tolerance As Float, mode
                 fData[1] = Me.BoundingPoligon[i + 1]
                 fData.Add(1)                     ' 1 = EndPoint
                 Return True
-                
+
             Endif
-            
-            
-            
+
         Endif
     Next
-    
+
     Return False
-    
+
 End
-
-
-
-
 
 ' This function will return False if the element couldn't be created for some reason: bad or incomple user input
 ' True means all is good, False will instruct the clsEntityBuilder to delete it
@@ -145,16 +136,14 @@ Public Sub Finish(ParamsDone As Integer) As Boolean
 
     ' calculo el recorrido del arco como
     ' OJO en la ELLIPSE vienen en radianes, y en ARC en grados
-    Me.start = Me.fParam[1] 
+    Me.start = Me.fParam[1]
     Me.recorrido = Me.fParam[2] - Me.fParam[1]
     If Me.recorrido < 0 Then Me.recorrido = 2 * Pi + Me.recorrido
-    Me.recorrido = Me.recorrido 
-    
-    
-    
+    Me.recorrido = Me.recorrido
+
     'CreateBoundingPoligon
-    
-     ' tareas finales de armado del objeto
+
+    ' tareas finales de armado del objeto
     Me.b.resize(Me.P.count)
     Me.psel.resize(Me.p.count / 2)
     Me.ForDeletion = False

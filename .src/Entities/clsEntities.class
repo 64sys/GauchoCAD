@@ -11,31 +11,30 @@ Public Struct arrBlockSt
 End Struct
 
 Public Function FIndBlockID(BlockName As String) As Integer
-    
-  Dim i As Integer
-  For i = 0 To APPMain.hFCAD.arrBlocks.Max
-      If APPMain.hFCAD.arrBlocks[i].name = BlockName Then Return i
-  Next
-  Return -1
-    
+
+    Dim i As Integer
+
+    For i = 0 To APPMain.hFCAD.arrBlocks.Max
+        If APPMain.hFCAD.arrBlocks[i].name = BlockName Then Return i
+    Next
+    Return -1
+
 End
 
-
-
 Public Function ReconstruirBloques() As Boolean
-    
+
     ' busco bloques y coloco puntos de referencias
-    
-    
+
     ' Armamos los bolques, que extraemos de las entidades
     Dim i, i2 As Integer, PartesEncontradas As Boolean, iStart As Integer
     Dim t As Float = Timer
+
     Print "Recostruyendo bloques"
-    
+
     For i = 0 To APPMain.hFCAD.arrEntities.Max
         clsDrawingAids.HelperTrabajo = ("Loading blocks ") & Format$(i / APPMain.hFCAD.arrEntities.Max, "0.00%")
         Wait 0.0001
-        If APPMain.hFCAD.arrEntities[i].gender = "Block" Then 
+        If APPMain.hFCAD.arrEntities[i].gender = "Block" Then
             Dim newBlock As New ArrBlockst
             newBlock.name = APPMain.hFCAD.arrEntities[i].block
             newBlock.x = APPMain.hFCAD.arrEntities[i].p[0]
@@ -47,7 +46,7 @@ Public Function ReconstruirBloques() As Boolean
                     If APPMain.hFCAD.arrEntities[i2].block = newBlock.name And APPMain.hFCAD.arrEntities[i2].gender <> "Insert" Then 'no quiero insertarme a mi mismo
                         PartesEncontradas = True
                         Dim o2 As Object
-                        o2 = ClonEntity(APPMain.hFCAD.arrEntities[i2]) 
+                        o2 = ClonEntity(APPMain.hFCAD.arrEntities[i2])
                         CopyElemData(APPMain.hFCAD.arrEntities[i2], o2)
                         o2.finish(-1)
                         newBlock.entities.Add(o2)
@@ -58,22 +57,21 @@ Public Function ReconstruirBloques() As Boolean
                         iStart = i2
                         Break
                     End If
-                
-                
+
                 Endif
             Next
             APPMain.hFCAD.arrBlocks.Add(newBlock)
         End If
     Next
-   
+
     Wait 0.001
     Debug "Reconstruccion finalizada en ", Str$(Timer - t)
-    
+
 End
 
 Public Sub _new()
 
-   APPMain.hFCAD.iEntity.Insert([0, 0, 0])
+    APPMain.hFCAD.iEntity.Insert([0, 0, 0])
 
 End
 
@@ -84,15 +82,13 @@ Public Sub GetFreeBlockNumber() As Integer
     Dim i, n As Integer = 1
 
     For i = 0 To APPMain.hFCAD.arrEntities.Max
-        
+
         If APPMain.hFCAD.arrEntities[i].BlockNumber > n Then n = APPMain.hFCAD.arrEntities[i].BlockNumber + 1
-        
+
     Next
     Return n
 
 End
-
-
 
 Public Sub FillEntity(o As Object)
 
@@ -128,19 +124,16 @@ End
 Fast Public Sub ReBuildPOI()
 
     Dim i, ii, n As Integer, EPoi As New Integer[], nPois As Integer
-    
+
     APPMain.hFCAD.poi.Clear
-    
+
     For i = 0 To APPMain.hFCAD.arrEntities.Max
 
         APPMain.hFCAD.arrEntities[i].buildpoi()               ' ask them to rebuild thir POI
 
         APPMain.hFCAD.poi.Insert(APPMain.hFCAD.arrEntities[i].MyPOI)           ' and insert it
-        
+
     Next
-    
-    
-   
 
 End
 
@@ -152,25 +145,24 @@ Public Sub CheckPOI(xr As Float, Yr As Float)
     APPMain.hFCAD.iEntity.Clear
     ' APPMain.hFCAD.iEntity.Insert(puntos.FindPOI(mouse.x, mouse.y, APPMain.hFCAD.poi, 16))
     Dim rData As New Float[]
-    
+
     Dim e As Object, t As Float = Timer
     For Each e In APPMain.hFCAD.arrEntities
-        
-        If e.AboveMe(xr, yr, APPMain.hFCAD.Metros(10), 0, rDAta) Then  
-                'Debug "Nearest found at ", rData[0], rData[1]
-                APPMain.hFCAD.iEntity.Insert(rData)
-                APPMain.hFCAD.oEntity = e
-                If rData[2] = 16 Then clsDrawingAids.Helper.texto = ("Quadrant")
-                If rData[2] = 8 Then clsDrawingAids.Helper.texto = ("Center")
-                If rData[2] = 2 Then clsDrawingAids.Helper.texto = ("MidPoint")
-                If rData[2] = 1 Then clsDrawingAids.Helper.texto = ("EndPoint")
-                clsDrawingAids.Helper.dX = 15
-                clsDrawingAids.Helper.dY = 15
-                clsDrawingAids.Helper.fColor = Color.DarkBlue
-                Return
+
+        If e.AboveMe(xr, yr, APPMain.hFCAD.Metros(10), 0, rDAta) Then
+            'Debug "Nearest found at ", rData[0], rData[1]
+            APPMain.hFCAD.iEntity.Insert(rData)
+            APPMain.hFCAD.oEntity = e
+            If rData[2] = 16 Then clsDrawingAids.Helper.texto = ("Quadrant")
+            If rData[2] = 8 Then clsDrawingAids.Helper.texto = ("Center")
+            If rData[2] = 2 Then clsDrawingAids.Helper.texto = ("MidPoint")
+            If rData[2] = 1 Then clsDrawingAids.Helper.texto = ("EndPoint")
+            clsDrawingAids.Helper.dX = 15
+            clsDrawingAids.Helper.dY = 15
+            clsDrawingAids.Helper.fColor = Color.DarkBlue
+            Return
         Endif
-        
-        
+
     Next
     clsDrawingAids.Helper.texto = ""
     APPMain.hFCAD.iEntity.Insert([0, 0, -1])
@@ -183,20 +175,18 @@ Public Sub GLGenDrawList()
 
     Dim cosa As Object, idDrawing As Integer ' la instancia de dibujo en la que estamos
     Dim i As Integer
-   
-    
+
     ' si esxite esta lista, la borro
     If Not gl.islist(APPMain.hFCAD.GlListAllEntities) Then APPMain.hFCAD.GlListAllEntities = gl.GenLists(1)
-     modCAD.drwDrawingClass = modCAD.drwOpenGLClass 
-     gl.NewList(APPMain.hFCAD.GlListAllEntities, gl.COMPILE)
-     
-        For Each cosa In APPMain.hFCAD.arrEntities
-            
-            
-            cosa.Draw()
+    modCAD.drwDrawingClass = modCAD.drwOpenGLClass
+    gl.NewList(APPMain.hFCAD.GlListAllEntities, gl.COMPILE)
 
-        Next
-  
+    For Each cosa In APPMain.hFCAD.arrEntities
+
+        cosa.Draw()
+
+    Next
+
     gl.EndList
 
 End
@@ -205,22 +195,16 @@ Public Sub DrawObjetos()
 
     Dim cosa As Object, idDrawing As Integer ' la instancia de dibujo en la que estamos
     Dim i As Integer
-   
-    
+
     If modCAD.drwDrawingClass = modCAD.drwPaintClass Then
-        
-    
+
         For Each cosa In APPMain.hFCAD.arrEntities
-            
-            
+
             cosa.Draw()
 
         Next
-  
 
     End If
-    
-    
 
 End
 
@@ -250,7 +234,7 @@ Public Sub ClonElements(Optional selected As Boolean = True)
     For i = 0 To m
         If APPMain.hFCAD.arrEntities[i].Selected Then
             APPMain.hFCAD.arrEntities.Add(ClonEntity(APPMain.hFCAD.arrEntities[i]))                        ' return an empty element of the same Class
-    
+
         End If
     Next
 
@@ -262,6 +246,7 @@ Public Sub ClonEntity(e As Object) As Object
     ' llama a las rutinas de reconstruccion del contorno y de los POI
 
     Dim o As Object
+
     o = Object.New(Object.Class(e).Name)            ' create the New Class
     CopyElemData(e, o)                              ' copy important values
     o.Finish(-1)                                    ' do all good stuff, -1 means self check
@@ -271,16 +256,10 @@ Public Sub ClonEntity(e As Object) As Object
 
 End
 
-
 '' Busca elementos seleccionados y arma un array nuevo con ellos, eliminandolos del anterior
 Public Function SelectArrayMake() As Integer
 
-    
-    
-    
 End
-
-
 
 Public Function DeSelection(Optional elementos As String = "todo", Accion As String = "deseleccionar") As Integer
     ' Esta rutina analiza si los elemento seleccionados para alguna accion pueden realizarla, caso contrario los deselecciona
@@ -297,9 +276,9 @@ Public Function DeSelection(Optional elementos As String = "todo", Accion As Str
 
     '   primero vacio la seleccion anterior
     APPMain.hFCAD.arrSelecIndex.Clear
-    
+
     For iii = 0 To APPMain.hFCAD.arrEntities.Max
-        
+
         cosa = APPMain.hFCAD.arrEntities[iii]
 
         clase = Object.Type(cosa)
@@ -309,7 +288,7 @@ Public Function DeSelection(Optional elementos As String = "todo", Accion As Str
             Case "mover", "copiar", "borrar", "escalar" ' necesito que todos los puntos esten seleccionados
 
                 If cosa.SelFull() And (elementos = "todo" Or elementos = clase) Then
-                    
+
                     APPMain.hFCAD.arrSelecIndex.Add(iii)
                     SelectElem(cosa)
                     Inc i
@@ -450,43 +429,39 @@ Public Sub SelectElem(elem As Object, Optional AndItsPoints As Boolean = True)
     Next
 
     elem.selected = True
-    
-    
+
     ' but, its part of a block?
-    
+
     If elem.Block <> "" Then
-        
+
         SelectAllElemFromBlock(elem.Block)
-        
+
     Endif
-    
 
 End
-
 
 Public Sub SelectAllElemFromBlock(iBlock As String, Optional AndItsPoints As Boolean = True)
 
     ' select all elements from a block
 
     Dim e As Object
-    
+
     For Each e In APPMain.hFCAD.arrEntities
         If e.Selected Then Continue
-    
-        If e.Block = iBlock Then 
+
+        If e.Block = iBlock Then
             SelectElem(e)
             If e.gender = "Block" Then
-                
+
                 ' FIXME: esto no funciona
                 'SelectAllElemFromBlock(e.fParam[0]) ' recursively call up
-                
+
             Endif
-    
+
         End If
-    
+
     Next
 
-    
 End
 
 Public Sub DeSelectAllElemFromBlock(iBlock As String, Optional AndItsPoints As Boolean = True)
@@ -494,27 +469,24 @@ Public Sub DeSelectAllElemFromBlock(iBlock As String, Optional AndItsPoints As B
     ' select all elements from a block
 
     Dim e As Object
-    
+
     For Each e In APPMain.hFCAD.arrEntities
         If Not e.Selected Then Continue
-    
-        If e.Block = iBlock Then 
+
+        If e.Block = iBlock Then
             DeSelectElem(e)
             If e.gender = "Block" Then
-                
+
                 ' FIXME: esto no funciona
                 'DeSelectAllElemFromBlock(e.fParam[0]) ' recursively call up
-                
+
             Endif
-    
+
         End If
-    
+
     Next
 
-    
 End
-
-
 
 Public Sub DeSelectElem(elem As Object, Optional AndItsPoints As Boolean = True)
 
@@ -525,13 +497,13 @@ Public Sub DeSelectElem(elem As Object, Optional AndItsPoints As Boolean = True)
     Next
 
     elem.selected = False
-    
+
     ' but, its part of a block?
-    
+
     If elem.Block <> "" Then
-        
+
         DeSelectAllElemFromBlock(elem.Block)
-        
+
     Endif
 
 End
@@ -629,19 +601,19 @@ Public Sub MoveFromBackUp(dX As Float, dZ As Float, Optional OnlySelected As Boo
             If (e.selected And OnlySelected) Or Not OnlySelected Then
                 For i = 0 To e.p.max Step 2
                     If (e.Psel[i / 2] And OnlyPointSelected) Or Not OnlyPointSelected Then
-    
+
                         e.P[i] = e.B[i] + dX
                         e.P[i + 1] = e.B[i + 1] + dZ
-    
+
                     End If
                 Next
             Endif
-        End If    
+        End If
     Next
 
 End
 
-Public Function SelectionSquare(X1real As Float, Z1real As Float, X2real As Float, Z2real As Float, Optional NuevaSumaResta As String = "nueva", crossing As Boolean) As Integer
+Public Function SelectionSquare(X1real As Float, Y1real As Float, X2real As Float, Y2real As Float, Optional NuevaSumaResta As String = "nueva", crossing As Boolean) As Integer
 
     ' Veo que accion estoy tomando
     Dim e As Object, i, TotalSeleccionados As Integer
@@ -656,7 +628,7 @@ Public Function SelectionSquare(X1real As Float, Z1real As Float, X2real As Floa
     For Each e In APPMain.hFCAD.arrEntities
         ' cada entidad debe decidir si esta seleccionada o no
         If crossing Then
-            If e.SelPartial(X1real, Z1real, X2real, Z2real) Then
+            If e.SelPartial(X1real, Y1real, X2real, Y2real) Then
                 ' el punto esta en el recuadro
                 If NuevaSumaResta <> "resta" Then
                     Inc TotalSeleccionados
@@ -665,12 +637,12 @@ Public Function SelectionSquare(X1real As Float, Z1real As Float, X2real As Floa
                 Else If NuevaSumaResta = "resta" Then
                     Dec TotalSeleccionados
                     Me.DeSelectElem(e, False)
-                    
+
                 End If
 
             Endif
         Else
-            If e.SelFull(X1real, Z1real, X2real, Z2real) Then
+            If e.SelFull(X1real, Y1real, X2real, Y2real) Then
                 ' el punto esta en el recuadro
                 If NuevaSumaResta <> "resta" Then
                     Inc TotalSeleccionados
@@ -679,11 +651,11 @@ Public Function SelectionSquare(X1real As Float, Z1real As Float, X2real As Floa
                 Else If NuevaSumaResta = "resta" Then
                     Dec TotalSeleccionados
                     Me.DeSelectElem(e, False)
-                    
+
                 End If
 
             Endif
-        
+
         End If
     Next
 
@@ -700,19 +672,17 @@ Public Sub CalcularLimites()
         If e.block = "" And e.visible Then
             For i = 0 To e.p.max Step 2
                 'If e.p[i] > 0 Then Debug e.gender
-    
+
                 If e.p[i] < APPMain.hFCAD.Xmenor Then APPMain.hFCAD.Xmenor = e.p[i]
-    
+
                 If e.p[i + 1] < APPMain.hFCAD.Ymenor Then APPMain.hFCAD.Ymenor = e.p[i + 1]
-    
+
                 If e.p[i] > APPMain.hFCAD.Xmayor Then APPMain.hFCAD.Xmayor = e.p[i]
-    
+
                 If e.p[i + 1] > APPMain.hFCAD.Ymayor Then APPMain.hFCAD.Ymayor = e.p[i + 1]
-    
+
             Next
         End If
     Next
 
 End
-
-

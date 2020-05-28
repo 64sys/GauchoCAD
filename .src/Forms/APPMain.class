@@ -245,6 +245,9 @@ Public Sub Task(sTask As String)
                 Select String.LCase(File.Ext(FilePath))
                     Case "dxf"
                         mdl = cad.ImportDxf(FilePath)
+                        If mdl.Count > 0 Then
+                            hFCAD.cImport = mdl
+                        Endif
 
                     Case "dwg"
                         mdl = cad.ImportDwg(FilePath)
