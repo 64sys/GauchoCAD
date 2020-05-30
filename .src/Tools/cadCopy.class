@@ -6,7 +6,6 @@ Create Static
 Public Const GENDER As String = "Copy"
 ' Add more if needed
 
-
 Public Function Start(Optional ElemToBuild As Variant, Optional _Mode As Integer = 0) As Boolean
     ' Llamada por FCAD al inicio de la aplicacion de esta herramienta
 
@@ -33,13 +32,11 @@ Public Function Start(Optional ElemToBuild As Variant, Optional _Mode As Integer
         clsDrawingAids.HelperTrabajo = clsDrawingAids.HelperTrabajo & Str(Me.SelectionCount) & (" elements")
 
     Endif
-    
+
     Me.Active = True
     modCAD.ToolActive = True
-    
 
 End
-
 
 Public Function MouseUp() ' called by FCAD-> DrawingArea_MouseUp
 
@@ -56,10 +53,10 @@ Public Function MouseUp() ' called by FCAD-> DrawingArea_MouseUp
         Me.SelStartYr = puntos.Near(appmain.hFcad.Yreal(mouse.y))
 
         ' prevenir acciones tontas como hacer click en otro elemento antes de terminar con el actual
-       ' TODO: reparar -> appmain.hFCAD.DesHabilitarBotones
+        ' TODO: reparar -> appmain.hFCAD.DesHabilitarBotones
     Else If Me.PointsDone = 2 Then ' acabo de marcar el punto destino
         ' permitir otros trabajos
-       ' TODO: reparar -> appmain.hFCAD.HabilitarBotones
+        ' TODO: reparar -> appmain.hFCAD.HabilitarBotones
 
         Me.Finish()
 
@@ -95,10 +92,9 @@ Public Function MouseMove() ' called by FCAD-> DrawingArea_MouseMove
         clsEntities.MoveFromBackUp(Me.SelEndXr - Me.SelStartXr, Me.SelEndyr - Me.SelStartYr, True)
 
     End If
-    appmain.hFCAD.redraw
+    appmain.hFCAD.Regen
 
 End
-
 
 Public Sub Finish()
 
@@ -122,7 +118,8 @@ Public Sub Finish()
     clsDrawingAids.CleanTexts
     clsEntities.DeSelection()
     modCAD.DrawOriginals = False
-   appmain.hFCAD.Regen
+    appmain.hFCAD.Regen
     Me.Active = False
     modCAD.ToolActive = False
+
 End

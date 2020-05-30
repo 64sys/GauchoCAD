@@ -9,12 +9,11 @@ Public Const ParamType As String = "TPFFF"
 Public Const ParamHelper As String = ("BlockName; Position ; X scale ; Y scale ; Rotation")
 Public Const ParamDefault As String = "<no name>; 0,0 ; 1 ;1 ; 0"
 
-
-
 Public Sub Draw()
 
-    ' 
+    '
     Dim ET As Object, i As Integer
+
     i = clsEntities.FIndBlockID(Me.Block)
     If i < 0 Then Return
     If modCAD.drwDrawingClass = modCAD.drwPaintClass Then
@@ -28,37 +27,34 @@ Public Sub Draw()
         Next
         modCAD.ScaleLines = 1
         paint.Restore
-        
+
     End If
-    
-     If modCAD.drwDrawingClass = modCAD.drwOpenGLClass Then
-         
+
+    If modCAD.drwDrawingClass = modCAD.drwOpenGLClass Then
+
         gl.PushMatrix
         gl.Translatef(appmain.hFcad.pixels(Me.p[0]) / appmain.hFcad.ScaleZoom, appmain.hFcad.pixels(Me.p[1]) / appmain.hFcad.ScaleZoom, 0)
         gl.Rotatef(Me.fParam[2], 0, 0, 1)
         gl.Scalef(Me.fParam[0], Me.fParam[1], 1)
-        
+
         ' modCAD.ScaleLines = (Abs(Me.fParam[0]) + Abs(Me.fParam[1])) / 2   ' ??????????????????
         For Each ET In appmain.hFCAD.arrBlocks[i].entities
             et.Draw
         Next
         'modCAD.ScaleLines = 1
         gl.PopMatrix
-        
-         
-         
-     Endif
-    
-    
+
+    Endif
+
 End
 
 Public Sub Finish(ParamsDone As Integer) As Boolean
-    
+
     ' ' we set the block property of all entities selected
-    ' 
+    '
     ' ' if an entitty is part of other block, we look for that block
     ' Dim e As Object, iBlock As Integer
-    ' 
+    '
     ' iBlock = clsEntities.GetFreeBlockNumber()
     ' Me.fParam.add(iBlock)
     Me.Finished = True
@@ -67,15 +63,15 @@ Public Sub Finish(ParamsDone As Integer) As Boolean
     ' For Each e In APPMain.hFCAD.arrEntities
     '     If e.Selected Then                      ' parto of this
     '         If e.Block > 0 Then                   ' entity is part of a block
-    '         
+    '
     '             ' nothing to do, as we will find the block and make it part of this one
-    '         
+    '
     '         Else
     '             e.Block = iBlock
     '         End If
-    '         
+    '
     '     Endif
-    '     
+    '
     ' Next
-    
+
 End

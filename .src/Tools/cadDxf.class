@@ -35,7 +35,7 @@ Public Struct mtextSt
     h As Float              ' 10
     w As Float              ' 20
     alineacion As Integer
-    
+
     altura As Float         ' 40
     texto As String         '  1
     rotacion As Float       ' 50
@@ -70,8 +70,6 @@ Public Struct blockSt
     z As Float              ' 30
 End Struct
 
-
-
 Public Struct circleSt
     x As Float
     y As Float
@@ -96,7 +94,6 @@ Public Struct ellipseSt
     EndAngle As Float
 End Struct
 
-
 Public Struct StructpolylineSt
     vertexcount As Integer
     poliflag As Integer
@@ -112,16 +109,12 @@ Public Struct StructsplineeSt
     p As Float[]
 End Struct
 
-
-
-
 Public Nx As Integer
 Public Ny As Integer
 Public Dx As Float
 Public Dy As Float
 Public Np As Integer
 Public Dp As Float
-
 
 Public mCommon As New CommonSt
 Public mLine As New LineSt
@@ -133,9 +126,9 @@ Public mMText As New TextSt
 Public mSpline As New StructsplineeSt
 Public mArc As New ArcSt
 Public mInsert As New InsertSt
-Public mBlock As New BlockSt 
-Public mSolid As New SolidSt 
-Public mDim As New DimSt 
+Public mBlock As New BlockSt
+Public mSolid As New SolidSt
+Public mDim As New DimSt
 
 Private mBlockCount As Integer
 Private mInsertCount As Integer
@@ -161,71 +154,62 @@ Public fp As File
 Public lpCode As String
 Public lpValue As String
 
-
 ' Add more if needed
-
 
 Public Function Start(Optional ElemToBuild As Variant, Optional _mode As Integer = 0) As Boolean
     ' Llamada por FCAD al inicio de la aplicacion de esta herramienta
 
     ' Aprovechamos para establecer los helpers (comentarios de ayuda en pantalla)
     Me.PointsDone = 0
-    Me.PointsTotal = 2                 ' orto: Punto base + Nx + Dx + Ny + Dy   , polar = Punto base + N + angulo 
-    
-    Me.mode = _mode
-    
-    Dim sDXF As String
-    
+    Me.PointsTotal = 2                 ' orto: Punto base + Nx + Dx + Ny + Dy   , polar = Punto base + N + angulo
 
-    
+    Me.mode = _mode
+
+    Dim sDXF As String
+
     Dialog.Filter = ["*.dxf", "Drawing eXchange Format v2007"]
     Dialog.OpenFile(False)
     sDxf = Dialog.Path
     If Exist(sDxf) Then
         LoadFile(sDxf)
     Endif
-    
 
     clsEntities.ReconstruirBloques
     modCAD.ApplyLayerProperties(1)
     clsEntities.GLGenDrawList
     cadZoomE.Start()
-    
+
     Return
-    
-  
-    
 
 End
 
-Private Sub ReadData() 
-    
-    
-        Line Input #fp, lpcode
-        Line Input #fp, lpValue
-        
-        If Right(lpcode, 1) = gb.Cr Then lpcode = Left(lpcode, -1)
-        If Right(lpvalue, 1) = gb.cr Then lpvalue = Left(lpvalue, -1)
-        
-        lpcode = Trim$(lpcode)
-        lpvalue = Trim$(lpvalue)
-    
+Private Sub ReadData()
+
+    Line Input #fp, lpcode
+    Line Input #fp, lpValue
+
+    If Right(lpcode, 1) = gb.Cr Then lpcode = Left(lpcode, -1)
+    If Right(lpvalue, 1) = gb.cr Then lpvalue = Left(lpvalue, -1)
+
+    lpcode = Trim$(lpcode)
+    lpvalue = Trim$(lpvalue)
+
 End
 
 Private Function GetData(CODE As Integer) As String
-    
-    While (CInt(lpcode) <> CODE) And Not Eof(fp) 
+
+    While (CInt(lpcode) <> CODE) And Not Eof(fp)
         Line Input #fp, lpcode
         Line Input #fp, lpValue
-        
+
         If Right(lpcode, 1) = gb.Cr Then lpcode = Left(lpcode, -1)
         If Right(lpvalue, 1) = gb.cr Then lpvalue = Left(lpvalue, -1)
-        
+
         lpcode = Trim$(lpcode)
         lpvalue = Trim$(lpvalue)
     Wend
     Return lpValue
-   
+
 End
 
 Public Sub FinishDXFRead()
@@ -240,48 +224,34 @@ Public Sub FinishDXFRead()
     Print "Inserts", mInsertcount
     Print "Blocks", mBlockCount
     Print "Dims", mDimCount
-    
+
     Print
     Print "Total elements", mPolyLinePointsCount + mDimCount + mLineCount + mCircleCount + mMTextcount + mTextcount + mArcCount + mSplineCount + mInsertCount, " processed in ", Str(Timer - t), " Secconds"
-    
-    
 
-  fp.Close
-    
-    
-    
+    fp.Close
+
 End
-
-
-
-
 
 Public Procedure LoadFile(stn As String)
 
-
-  
-  Dim i As Integer
-  Dim mLoadStatus As Boolean
+    Dim i As Integer
+    Dim mLoadStatus As Boolean
 
     mPolyLine.p = New Float[]
 
     mSpline.p = New Float[]
-    
 
-  
-  fp = Open stn For Read
-  If Not fp Then Error.Raise("Error !") 
-    
-  
+    fp = Open stn For Read
+    If Not fp Then Error.Raise("Error !")
+
     While Not Eof(fp)
         Wait 0.0001
-        
-        
+
         'Print lpcode, lpvalue
         If (lpvalue = "LINE") And Not Eof(fp) Then
 
-            ReadData                                 
-            While (lpcode <> "0") And Not Eof(fp) 
+            ReadData
+            While (lpcode <> "0") And Not Eof(fp)
                 If lpcode = "8" Then mCommon.layer = lpvalue                ' Layer
                 If lpcode = "6" Then mCommon.linetype = lpvalue             ' LineType
                 If lpcode = "62" Then mCommon.bColor = CInt(lpvalue)        ' Color code (no es RBG) (256=ByLayer)
@@ -289,25 +259,24 @@ Public Procedure LoadFile(stn As String)
                 If lpcode = "20" Then mLine.y1 = CFloat(lpvalue)
                 If lpcode = "11" Then mLine.x2 = CFloat(lpvalue)
                 If lpcode = "21" Then mLine.y2 = CFloat(lpvalue)
-                ReadData  
+                ReadData
                 Inc mLineCount
-                
+
             Wend
 
-                
-                ' Print "Line", mLine.layer, mLine.x1, mLine.y1, mLine.x2, mLine.y2
-                ' 
-                modCAD.AddLine([mLine.x1, mLine.y1, mLine.x2, mLine.y2], mCommon.bColor, 1, mCommon.linetype, mCommon.layer, mBlock.block_name)
+            ' Print "Line", mLine.layer, mLine.x1, mLine.y1, mLine.x2, mLine.y2
+            '
+            modCAD.AddLine([mLine.x1, mLine.y1, mLine.x2, mLine.y2], mCommon.bColor, 1, mCommon.linetype, mCommon.layer, mBlock.block_name)
 
-        '-----------------------------------------------------------
-        ' DIM
-        '-----------------------------------------------------------
+            '-----------------------------------------------------------
+            ' DIM
+            '-----------------------------------------------------------
         Else If (lpcode = "0") And (lpvalue = "DIMENSION") Then
-            
+
             ReadData
             mDim.p = New Float[]
 
-            While (lpcode <> "0") And Not Eof(fp) 
+            While (lpcode <> "0") And Not Eof(fp)
                 If lpcode = "8" Then mCommon.layer = lpvalue                ' Layer
                 If lpcode = "6" Then mCommon.linetype = lpvalue             ' LineType
                 If lpcode = "62" Then mCommon.bColor = CInt(lpvalue)        ' Color code (no es RBG) (256=ByLayer)
@@ -331,25 +300,24 @@ Public Procedure LoadFile(stn As String)
                 If lpcode = "24" Then mDim.p.Add(CFloat(lpvalue))
                 If lpcode = "25" Then mDim.p.Add(CFloat(lpvalue))
                 If lpcode = "50" Then mDim.angulo = CFloat(lpvalue)
-            
+
                 ReadData
             Wend
 
             Inc mDimCount
             modCAD.AddDim(mDim.p, mDim.bloque, mDim.medida, mDim.texto, mDim.alineacion, mDim.angulo, mDim.tipo, mCommon.bColor, 1, mCommon.linetype, mCommon.layer, mBlock.block_name)
-         
 
-        '-----------------------------------------------------------
-        ' LWPOLYLINE
-        '-----------------------------------------------------------
+            '-----------------------------------------------------------
+            ' LWPOLYLINE
+            '-----------------------------------------------------------
 
-        '' Lwpolyline command:
+            '' Lwpolyline command:
         Else If (lpcode = "0") And (lpvalue = "LWPOLYLINE") Then
-            
+
             mPolyLine.p = New Float[]
-          
+
             ReadData
-            While (lpcode <> "0") And Not Eof(fp) 
+            While (lpcode <> "0") And Not Eof(fp)
                 If lpcode = "8" Then mCommon.layer = lpvalue                ' Layer
                 If lpcode = "6" Then mCommon.linetype = lpvalue             ' LineType
                 If lpcode = "62" Then mCommon.bColor = CInt(lpvalue)        ' Color code (no es RBG) (256=ByLayer)
@@ -368,30 +336,28 @@ Public Procedure LoadFile(stn As String)
             mPolyLinePointsCount += mPolyLine.p.Count / 2
             Inc mPolyLineCount
             modCAD.AddPolyLine(mPolyLine.p, mCommon.bColor, 1, mCommon.linetype, mCommon.layer, mBlock.block_name)
-         
-         
-        '-----------------------------------------------------------
-        ' LAYER
-        '-----------------------------------------------------------
+
+            '-----------------------------------------------------------
+            ' LAYER
+            '-----------------------------------------------------------
         Else If (lpcode = "0") And (lpvalue = "LAYER") Then
             Dim newLayer As New Collection
             Inc mLayerCount
             APPMain.hFCAD.cModel["Layers"].Add(newlayer, Format(mLayerCount, "00"))
             newlayer.Add(Format(mLayerCount, "00"), "id")
             ReadData
-            While (lpcode <> "0") And Not Eof(fp) 
+            While (lpcode <> "0") And Not Eof(fp)
                 If lpcode = "2" Then newlayer.Add(lpvalue, "name")
-                
-               
+
                 If lpcode = "6" Then newLayer.Add(lpvalue, "style")
-                If lpcode = "62" Then 
-                        newLayer.Add(Abs(CInt(lpvalue)), "colour")
-                        If CInt(lpvalue) > 0 Then newLayer.Add(True, "show") Else newLayer.Add(False, "show") 
+                If lpcode = "62" Then
+                    newLayer.Add(Abs(CInt(lpvalue)), "colour")
+                    If CInt(lpvalue) > 0 Then newLayer.Add(True, "show") Else newLayer.Add(False, "show")
                 End If
                 If lpcode = "70" Then
                     If ((CInt(lpvalue) And 2) = 2 Or (CInt(lpvalue) And 1) = 1) Then newLayer.Add(True, "locked") Else newLayer.Add(False, "locked")
                 End If
-                If lpcode = "20" Then   
+                If lpcode = "20" Then
                     If ((CInt(lpvalue) And 4) = 4) Then newLayer.Add(True, "frozen") Else newLayer.Add(False, "frozen")
                 End If
 
@@ -399,38 +365,34 @@ Public Procedure LoadFile(stn As String)
                 If lpcode = "370" Then newLayer.Add(lpvalue, "width")
                 ReadData
             Wend
-            
-         '-----------------------------------------------------------
-        ' DIMSTYLE
-        '-----------------------------------------------------------
-        
+
+            '-----------------------------------------------------------
+            ' DIMSTYLE
+            '-----------------------------------------------------------
+
         Else If (lpcode = "0") And (lpvalue = "DIMSTYLE") Then
             Dim newCol As New Collection
-            
+
             ReadData
-            While (lpcode <> "0") And Not Eof(fp) 
+            While (lpcode <> "0") And Not Eof(fp)
                 If lpcode = "2" Then APPMain.hFCAD.cModel["DimSts"].Add(newCol, lpvalue)
-                
+
                 If lpcode = "40" Then newCol.Add(CFloat(lpvalue), "DIMSCALE")
                 'If lpcode = "3" Then newCol.Add(CFloat(lpvalue), "DIMPOST")
                 'If lpcode = "4" Then newCol.Add(CFloat(lpvalue), "DIMAPOST")
-                
-                
+
                 ReadData
             Wend
-            
-        
-        
-        
-         '-----------------------------------------------------------
-        ' SOLID
-        '-----------------------------------------------------------
+
+            '-----------------------------------------------------------
+            ' SOLID
+            '-----------------------------------------------------------
         Else If (lpcode = "0") And (lpvalue = "SOLID") Then
-            
+
             mSolid.p = New Float[]
-          
+
             ReadData
-            While (lpcode <> "0") And Not Eof(fp) 
+            While (lpcode <> "0") And Not Eof(fp)
                 If lpcode = "8" Then mCommon.layer = lpvalue                ' Layer
                 If lpcode = "6" Then mCommon.linetype = lpvalue             ' LineType
                 If lpcode = "62" Then mCommon.bColor = CInt(lpvalue)        ' Color code (no es RBG) (256=ByLayer)
@@ -442,41 +404,39 @@ Public Procedure LoadFile(stn As String)
                 If lpcode = "22" Then mSolid.p.Add(CFloat(lpValue))
                 If lpcode = "13" Then mSolid.p.Add(CFloat(lpValue))
                 If lpcode = "23" Then mSolid.p.Add(CFloat(lpValue))
-                  ReadData
+                ReadData
             Wend
             Inc mSolidCount
             modCAD.AddSolid(mSolid.p, mCommon.bColor, 1, mCommon.linetype, mCommon.layer, mBlock.block_name)
-         
 
-        '-----------------------------------------------------------
-        ' CIRCLE
-        '-----------------------------------------------------------
-         '' Circle command:
+            '-----------------------------------------------------------
+            ' CIRCLE
+            '-----------------------------------------------------------
+            '' Circle command:
         Else If (lpcode = "0") And (lpvalue = "CIRCLE") Then
             ReadData
-            While (lpcode <> "0") And Not Eof(fp) 
+            While (lpcode <> "0") And Not Eof(fp)
                 If lpcode = "8" Then mCommon.layer = lpvalue                ' Layer
                 If lpcode = "6" Then mCommon.linetype = lpvalue             ' LineType
                 If lpcode = "62" Then mCommon.bColor = CInt(lpvalue)        ' Color code (no es RBG) (256=ByLayer)
                 If lpcode = "10" Then mCircle.x = CFloat(lpValue)
                 If lpcode = "20" Then mCircle.y = CFloat(lpValue)
                 If lpcode = "40" Then mCircle.r = CFloat(lpValue)
-                   ReadData
+                ReadData
             Wend
             Inc mCircleCount
             ' Print "Circle", mCircle.layer, mCircle.x, mCircle.y, mCircle.r
-             modCAD.AddCircle([mCircle.x, mCircle.y], mCircle.r, mCommon.bColor, 1, mCommon.linetype, mCommon.layer, mBlock.block_name)
-        
-         '-----------------------------------------------------------
-        ' ELLIPSE
-        '-----------------------------------------------------------
-         
+            modCAD.AddCircle([mCircle.x, mCircle.y], mCircle.r, mCommon.bColor, 1, mCommon.linetype, mCommon.layer, mBlock.block_name)
+
+            '-----------------------------------------------------------
+            ' ELLIPSE
+            '-----------------------------------------------------------
+
         Else If (lpcode = "0") And (lpvalue = "ELLIPSE") Then
-          
-          
+
             ReadData
-              
-            While (lpcode <> "0") And Not Eof(fp) 
+
+            While (lpcode <> "0") And Not Eof(fp)
                 If lpcode = "8" Then mCommon.layer = lpvalue                ' Layer
                 If lpcode = "6" Then mCommon.linetype = lpvalue             ' LineType
                 If lpcode = "62" Then mCommon.bColor = CInt(lpvalue)        ' Color code (no es RBG) (256=ByLayer)
@@ -489,20 +449,19 @@ Public Procedure LoadFile(stn As String)
                 If lpcode = "42" Then mEllipse.EndAngle = CFloat(lpValue)
                 ReadData
             Wend
-              Inc mEllipseCount
-            ' 
+            Inc mEllipseCount
+            '
             modCAD.AddEllipse([mEllipse.xc, mEllipse.yc, mEllipse.xm, mEllipse.ym], mEllipse.relacion, mEllipse.StartAngle, mEllipse.EndAngle, mCommon.bColor, 1, mCommon.linetype, mCommon.layer, mBlock.block_name)
-        
-      
-        '-----------------------------------------------------------
-        ' ARC
-        '-----------------------------------------------------------
-        ' Arc command
+
+            '-----------------------------------------------------------
+            ' ARC
+            '-----------------------------------------------------------
+            ' Arc command
         Else If (lpcode = "0") And (lpvalue = "ARC") Then
-            
+
             ReadData
-              
-            While (lpcode <> "0") And Not Eof(fp) 
+
+            While (lpcode <> "0") And Not Eof(fp)
                 If lpcode = "8" Then mCommon.layer = lpvalue                ' Layer
                 If lpcode = "6" Then mCommon.linetype = lpvalue             ' LineType
                 If lpcode = "62" Then mCommon.bColor = CInt(lpvalue)        ' Color code (no es RBG) (256=ByLayer)
@@ -516,16 +475,16 @@ Public Procedure LoadFile(stn As String)
             Inc mArcCount
             ' Print "Arc", mCommon.layer, mArc.x, mArc.y, mArc.r, mArc.sa, mArc.ea
             modCAD.Addarc([mArc.x, mArc.y], mArc.r, mArc.sa, mArc.ea, mCommon.bColor, 1, mCommon.linetype, mCommon.layer, mBlock.block_name)
-        
-            ' 
-        '-----------------------------------------------------------
-        ' SPLINE
-        '-----------------------------------------------------------
+
+            '
+            '-----------------------------------------------------------
+            ' SPLINE
+            '-----------------------------------------------------------
         Else If (lpcode = "0") And (lpvalue = "SPLINE") Then
             mSpline.p = New Float[]
-              
+
             ReadData
-            While (lpcode <> "0") And Not Eof(fp) 
+            While (lpcode <> "0") And Not Eof(fp)
                 If lpcode = "8" Then mCommon.layer = lpvalue                ' Layer
                 If lpcode = "6" Then mCommon.linetype = lpvalue             ' LineType
                 If lpcode = "62" Then mCommon.bColor = CInt(lpvalue)        ' Color code (no es RBG) (256=ByLayer)
@@ -534,35 +493,31 @@ Public Procedure LoadFile(stn As String)
                 If lpcode = "20" Then mSpline.p.Add(CFloat(lpValue))
                 ReadData
             Wend
-            
+
             Inc mSplineCount
-            
+
             modCAD.AddSPLine(mSpline.p, mCommon.bColor, 1, mCommon.linetype, mCommon.layer, mBlock.block_name)
-            
 
-      '-----------------------------------------------------------
-      ' TEXT
-      '-----------------------------------------------------------
-        ' layer As String         ' 8
-        ' linetype As String      ' 6
-        ' bColor As Integer       ' 62
-        ' linetypescale As Float  ' 42 o 41
-        ' bloque As Integer   
-        ' visible As Integer      ' 60
-        ' 
-        ' x As Float              ' 10
-        ' y As Float              ' 20
-        ' altura As Float         ' 40
-        ' texto As String         '  1
-        ' rotacion As Float       ' 50
-    
-      
+            '-----------------------------------------------------------
+            ' TEXT
+            '-----------------------------------------------------------
+            ' layer As String         ' 8
+            ' linetype As String      ' 6
+            ' bColor As Integer       ' 62
+            ' linetypescale As Float  ' 42 o 41
+            ' bloque As Integer
+            ' visible As Integer      ' 60
+            '
+            ' x As Float              ' 10
+            ' y As Float              ' 20
+            ' altura As Float         ' 40
+            ' texto As String         '  1
+            ' rotacion As Float       ' 50
+
         Else If (lpcode = "0") And (lpvalue = "TEXT") Then
-              
 
-            
             ReadData
-            While (lpcode <> "0") And Not Eof(fp) 
+            While (lpcode <> "0") And Not Eof(fp)
                 If lpcode = "8" Then mCommon.layer = lpvalue                ' Layer
                 If lpcode = "6" Then mCommon.linetype = lpvalue             ' LineType
                 If lpcode = "62" Then mCommon.bColor = CInt(lpvalue)        ' Color code (no es RBG) (256=ByLayer)
@@ -573,22 +528,20 @@ Public Procedure LoadFile(stn As String)
                 If lpcode = "50" Then mText.rotacion = CFloat(lpValue)      ' rotacion
                 ReadData
             Wend
-          
-                  
+
             Inc mTextCount
             modCAD.AddText([mText.x, mText.y], mText.rotacion, mText.altura, mText.texto, mCommon.bColor, 1, mCommon.linetype, mCommon.layer, mBlock.block_name)
-          
+
             '-----------------------------------------------------------
             ' MTEXT
             '-----------------------------------------------------------
-                
 
         Else If (lpcode = "0") And (lpvalue = "MTEXT") Then
 
-              mMText.texto = ""
-             ReadData
-            
-            While (lpcode <> "0") And Not Eof(fp) 
+            mMText.texto = ""
+            ReadData
+
+            While (lpcode <> "0") And Not Eof(fp)
                 If lpcode = "8" Then mCommon.layer = lpvalue                ' Layer
                 If lpcode = "6" Then mCommon.linetype = lpvalue             ' LineType
                 If lpcode = "62" Then mCommon.bColor = CInt(lpvalue)        ' Color code (no es RBG) (256=ByLayer)
@@ -601,15 +554,15 @@ Public Procedure LoadFile(stn As String)
             Wend
             Inc mMTextCount
             modCAD.AddMText([mMText.x, mMText.y], mMText.rotacion, mMText.altura, mMText.texto, mCommon.bColor, 1, mCommon.linetype, mCommon.layer, mBlock.block_name)
-          
-      '-----------------------------------------------------------
-      ' INSERT
-      '-----------------------------------------------------------
-    '   
-         Else If (lpcode = "0") And (lpvalue = "INSERT") Then
-            
+
+            '-----------------------------------------------------------
+            ' INSERT
+            '-----------------------------------------------------------
+            '
+        Else If (lpcode = "0") And (lpvalue = "INSERT") Then
+
             ReadData
-            While (lpcode <> "0") And Not Eof(fp) 
+            While (lpcode <> "0") And Not Eof(fp)
                 If lpcode = "8" Then mCommon.layer = lpvalue                ' Layer
                 If lpcode = "6" Then mCommon.linetype = lpvalue             ' LineType
                 If lpcode = "62" Then mCommon.bColor = CInt(lpvalue)        ' Color code (no es RBG) (256=ByLayer)
@@ -620,20 +573,20 @@ Public Procedure LoadFile(stn As String)
                 If lpcode = "42" Then mInsert.escY = CFloat(lpValue)         ' esc Y
                 If lpcode = "50" Then mInsert.rotacion = CFloat(lpValue)      ' rotacion
                 ReadData
-                
+
             Wend
-                  
+
             Inc mInsertCount
             modCAD.AddInsert([mInsert.x, mInsert.y], mInsert.escX, mInsert.escY, mInsert.rotacion, mCommon.bColor, mCommon.linetype, mCommon.layer, mInsert.block_name)
-            
-      '-----------------------------------------------------------
-      ' BLOCK
-      '-----------------------------------------------------------
-    '   
-         Else If (lpcode = "0") And (lpvalue = "BLOCK") Then
+
+            '-----------------------------------------------------------
+            ' BLOCK
+            '-----------------------------------------------------------
+            '
+        Else If (lpcode = "0") And (lpvalue = "BLOCK") Then
             ReadData
             FlgReadingBlock = True
-            While (lpcode <> "0") And Not Eof(fp) 
+            While (lpcode <> "0") And Not Eof(fp)
                 If lpcode = "8" Then mCommon.layer = lpvalue                ' Layer
                 If lpcode = "6" Then mCommon.linetype = lpvalue             ' LineType
                 If lpcode = "62" Then mCommon.bColor = CInt(lpvalue)        ' Color code (no es RBG) (256=ByLayer)
@@ -642,42 +595,29 @@ Public Procedure LoadFile(stn As String)
                 If lpcode = "10" Then mBlock.x = CFloat(lpValue)         ' X
                 If lpcode = "20" Then mBlock.y = CFloat(lpValue)         ' Y
                 ReadData
-            
-              Wend
-              
-            modCAD.AddBlock([mBlock.x, mBlock.y], mBlock.layer, mBlock.block_name) 
-                 
+
+            Wend
+
+            modCAD.AddBlock([mBlock.x, mBlock.y], mBlock.layer, mBlock.block_name)
+
             Inc mBlockCount
-        
-        
+
         Else If (lpcode = "0") And (lpvalue = "ENDBLK") Then
             ReadData
             flgReadingBlock = False
             mBlock.block_name = ""
-            
+
         Else
             ReadData
-      
-      Endif
-      
-      
-  
-  
-  
+
+        Endif
+
     Wend
-    
-    
-  FinishDXFRead
-  
-  
-  
-  
+
+    FinishDXFRead
+
 End
 
 Private Sub ExtractCommonData()
-    
-  
-    
-    
-End
 
+End

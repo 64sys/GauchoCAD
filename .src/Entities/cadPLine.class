@@ -4,24 +4,22 @@
 ' Element maintained by Terco
 ' V2
 Inherits EntityBase
-Public Const GENDER As String = "PLine"          
+Public Const GENDER As String = "PLine"
 Public Const PointsToDraw As Integer = 0             ' minimal point requered for drawing something usefull
-Public Const HelperTrabajo As String = ("Poliline")
+Public Const HelperTrabajo As String = ("Polyline")
 Public Const ParamType As String = "P+"                             ' that is Point, Point, Float; could be Color Text, etc
 Public Const ParamHelper As String = ("Next Point")      ' a little text that is shown at the prompt waiting for user input during build
 Public Const ParamDefault As String = "Close/Undo"
 
-
-
 Fast Public Sub Draw()
+
     If Not Me.DrawAble Or Not Me.Visible Then Return
     If Me.Selected And Not modCAD.ToolActive Then Me.ColorToPaint = modCAD.ColorForSelected Else Me.ColorToPaint = Me.gbColor
 
-    
     Dim i As Integer
-    
+
     If modCAD.drwDrawingClass = modCAD.drwPaintClass Then
-    
+
         paint.LineWidth = Me.LineWidth / appmain.hFcad.ScaleZoom / modCAD.ScaleLines
         If Me.flxDash Then paint.Dash = Me.flxDash
         If Me.Selected And Not modCAD.ToolActive Then
@@ -29,40 +27,37 @@ Fast Public Sub Draw()
         Else
             paint.brush = Paint.Color(Me.ColorToPaint)
         Endif
-        
+
         paint.moveto(Me.p[0], Me.p[1])
         For i = 2 To Me.P.Max Step 2
             paint.lineto(Me.p[i], Me.p[i + 1])
-            
+
         Next
-       
+
         paint.Stroke
     End If
-    
-    
+
     If modCAD.drwDrawingClass = modCAD.drwOpenGLClass Then
-            
-            GLplus.PolyLines(Me.p, Me.ColorToPaint, Me.LineWidth)
-            
+
+        GLplus.PolyLines(Me.p, Me.ColorToPaint, Me.LineWidth)
 
     Endif
 
-    
- 
 End
 
 '' Devuelve [x,y] punto de interes
 Public Function AboveMe(Xreal As Float, Yreal As Float, tolerance As Float, mode As Integer, fData As Float[]) As Boolean
     ' si una de las dos lineas de una cruz con centro en X,Y y largo Tolerance cruza la linea, estamos arriba
+
     Dim i As Integer
     Dim fDist1, fDist2, fDist3, fDist4 As Float
     'TODO: para debug, agrego esto
     mode = 1 + 2 ' endpoint+midpoint
-    
+
     fData.Clear
     For i = 0 To Me.P.count - 4 Step 2
         If puntos.doIntersect(xreal - tolerance / 2, Yreal, Xreal + tolerance / 2, Yreal, Me.P[i + 0], Me.P[i + 1], Me.P[i + 2], Me.P[i + 3]) Or puntos.doIntersect(xreal, Yreal - tolerance / 2, Xreal, Yreal + tolerance / 2, Me.P[i + 0], Me.P[i + 1], Me.P[i + 2], Me.P[i + 3]) Then ' its above me
-            
+
             ' busco el punto exacto en la linea donde se produce la interseccion
             fData.Insert(puntos.lineLineIntersection([xreal - tolerance / 2, Yreal], [Xreal + tolerance / 2, Yreal], [Me.P[i + 0], Me.P[i + 1]], [Me.P[i + 2], Me.P[i + 3]]))
             ' veo que punto esta mas cerca
@@ -86,16 +81,12 @@ Public Function AboveMe(Xreal As Float, Yreal As Float, tolerance As Float, mode
                 fData[1] = Me.P[i + 1]
                 fData.Add(1)                     ' 1 = EndPoint
                 Return True
-                
+
             Endif
-            
-            
-            
+
         Endif
     Next
-    
+
     Return False
-    
+
 End
-
-

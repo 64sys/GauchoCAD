@@ -12,83 +12,81 @@ Public Const ParamHelper As String = ("Start point;Radious")      ' a little tex
 Public Const ParamDefault As String = " ; 1 "
 
 Public Sub Draw()
-    
+
     If Not Me.DrawAble Or Not Me.Visible Then Return
-    
+
     If Me.Selected And Not modCAD.ToolActive Then Me.ColorToPaint = modCAD.ColorForSelected Else Me.ColorToPaint = Me.gbColor
-    
+
     If modCAD.drwDrawingClass = modCAD.drwPaintClass Then
 
-        paint.LineWidth = Me.LineWidth / appmain.hFcad.ScaleZoom / modCAD.ScaleLines 
-        
+        paint.LineWidth = Me.LineWidth / appmain.hFcad.ScaleZoom / modCAD.ScaleLines
+
         paint.brush = Paint.Color(Me.ColorToPaint)
-     
+
         paint.Arc(Me.p[0], Me.p[1], Me.fParam[0])
-        
+
         paint.Stroke
     End If
-    
+
     If modCAD.drwDrawingClass = modCAD.drwOpenGLClass Then
-            
+
         'GLplus.Circle(Me.p, Me.fParam[0], Color.Pink, Me.LineWidth)
         gl.PushMatrix
         gl.Translatef(Me.P[0], Me.P[1], 0)
-        GLplus.Arc(Me.fParam[0], 0, 360, Me.ColorToPaint)   
+        GLplus.Arc(Me.fParam[0], 0, 360, Me.ColorToPaint)
         gl.PopMatrix
     Endif
 
 End
 
-
 Public Function AboveMe(Xreal As Float, Yreal As Float, tolerance As Float, mode As Integer, fData As Float[]) As Boolean
     ' si una de las dos lineas de una cruz con centro en X,Y y largo Tolerance cruza la linea, estamos arriba
     'Dim fData As New Float[]
+
     Dim fDist1, fDist2, fDist3, fDist4 As Float
     'TODO: para debug, agrego esto
     mode = 1 + 2 ' endpoint+midpoint
-    
+
     fData.Clear
-    
-    
+
     ' reviso el circulo
-    fDist1 = puntos.distancia(xreal, Yreal, Me.P[0], Me.P[1]) 
+    fDist1 = puntos.distancia(xreal, Yreal, Me.P[0], Me.P[1])
     If (fdist1 <= Me.fParam[0] + tolerance) And (fdist1 >= Me.fParam[0] - tolerance) Then   ' estoy arriba
         fData.Insert([xreal, yreal, 0])
         ' puedo entregar un cuadrante como POI
-        If puntos.Around(xreal, Yreal, Me.P[0] + Me.fParam[0], Me.P[1], tolerance) Then 
+        If puntos.Around(xreal, Yreal, Me.P[0] + Me.fParam[0], Me.P[1], tolerance) Then
             fData[0] = Me.P[0] + Me.fParam[0]
             fData[1] = Me.P[1]
             fData.Add(16)                 ' 16      Quadrant
         Endif
 
-        If puntos.Around(xreal, Yreal, Me.P[0] - Me.fParam[0], Me.P[1], tolerance) Then 
+        If puntos.Around(xreal, Yreal, Me.P[0] - Me.fParam[0], Me.P[1], tolerance) Then
             fData[0] = Me.P[0] - Me.fParam[0]
             fData[1] = Me.P[1]
             fData.Add(16)                 ' 16      Quadrant
         Endif
-        If puntos.Around(xreal, Yreal, Me.P[0], Me.P[1] + Me.fParam[0], tolerance) Then 
+        If puntos.Around(xreal, Yreal, Me.P[0], Me.P[1] + Me.fParam[0], tolerance) Then
             fData[0] = Me.P[0]
             fData[1] = Me.P[1] + Me.fParam[0]
             fData.Add(16)                 ' 16      Quadrant
         Endif
 
-        If puntos.Around(xreal, Yreal, Me.P[0], Me.P[1] - Me.fParam[0], tolerance) Then 
+        If puntos.Around(xreal, Yreal, Me.P[0], Me.P[1] - Me.fParam[0], tolerance) Then
             fData[0] = Me.P[0]
             fData[1] = Me.P[1] - Me.fParam[0]
             fData.Add(16)                 ' 16      Quadrant
         Endif
         Return True
     End If
-    
-    If puntos.Around(xreal, Yreal, Me.P[0], Me.P[1], tolerance) Then 
+
+    If puntos.Around(xreal, Yreal, Me.P[0], Me.P[1], tolerance) Then
         fData.Insert([xreal, yreal, 0])
         fData[0] = Me.P[0]
         fData[1] = Me.P[1] - Me.fParam[0]
         fData.Add(8)                    ' 8      Center
         Return True
     Endif
-        
+
     Return False
 
-    
 End

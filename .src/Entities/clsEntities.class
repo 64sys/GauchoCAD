@@ -71,8 +71,6 @@ End
 
 Public Sub _new()
 
-    APPMain.hFCAD.iEntity.Insert([0, 0, 0])
-
 End
 
 '' Busca un numero de bloque que no haya sido usado

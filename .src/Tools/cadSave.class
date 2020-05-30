@@ -23,10 +23,10 @@ Public Function SaveToFile(nName As String) As Boolean
 
     'tm.Clear              ' Tincho
     'For Each lay In modCAD.cLayers
-    ct.Add(modCAD.cLayers, "layers")
-    ct.Add(modCAD.cColors, "colors")
-    ct.Add(modCAD.cStyles, "styles")
-    ct.Add(modCAD.cWeights, "weights")
+    ct.Add(APPMain.hFCAD.cModel, "layers")
+    ct.Add(APPMain.hFCAD.cModel, "colors")
+    ct.Add(APPMain.hFCAD.cModel, "styles")
+    ct.Add(APPMain.hFCAD.cModel, "weights")
     'Next
     enty.Clear
     If nNAme = "" Then nName = modCAD.FileName

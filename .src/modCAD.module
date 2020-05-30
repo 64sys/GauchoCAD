@@ -101,6 +101,43 @@ Public Sub Main()
 
 End
 
+'' Importa la clave entidades de la coleccion y las coloca en el array de objetos
+
+Public Function ImportEntities(colData As Collection, obxEntities As Object[]) As Integer
+
+    Dim iTotalEntities As Integer, colEnt As Collection, flxPoints As New Float[], P As Float[]
+
+    For Each colEnt In colData["Entities"]
+
+        Select Case colEnt["entity"]
+            Case "LINE"
+                GoSub GetPoints
+                AddLine(flxPoints, colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], colEnt["block"])
+                Inc iTotalEntities
+            Case "LWPOLYLINE"
+
+            Case "ELLIPSE"
+
+            Case "CIRCLE"
+
+            Case "ARC"
+
+        End Select
+
+    Next
+
+    Return iTotalEntities
+
+GetPoints:              ' Leo los puntos que estan separados y los meto en un unico array de Float[]
+    flxPoints.Clear
+    For Each p In colEnt["p"]
+        flxPoints.Insert(p)
+    Next
+
+    Return
+
+End
+
 ' importing
 
 Public Function AddLine(Points As Float[], Optional _color As Integer = 0, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
@@ -124,7 +161,7 @@ End
 Public Function AddPolyLine(Points As Float[], Optional _color As Integer = 0, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
 
     ' points are in x,y,x,y,x,y....
-    ' points are in x,y,x,y,x,y....
+
     Dim oEntity As Object                       ' creamos la entidad de la clase apropiada
 
     oEntity = Object.New("cadPLine")             ' create the new entity of proper class

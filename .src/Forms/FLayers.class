@@ -57,7 +57,7 @@ Public Sub Run(cMod As Collection)
             TableView1.Columns[i].Title = col
         Endif
         Select lbl
-            Case "show", "frozen", "lock", "color", "style", "weight", "print"
+            Case "show", "frozen", "locked", "colour", "style", "width", "print"
                 TableView1.Columns[i].Alignment = Align.Center
                 TableView1.Columns[i].Width = 75
                 TableView1.Columns[i].Title = col
@@ -85,7 +85,7 @@ Public Sub TableView1_Data(Row As Integer, Column As Integer)
     Dim i As Integer
     Dim st As Variant
     Dim pic As Picture
-    Dim tog As ToggleButton
+    '    Dim tog As ToggleButton
 
     For Each v In cLayers 'draft 'modCAD.cLayers
         If i = row Then

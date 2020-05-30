@@ -814,3 +814,9 @@ Public Function DrawMultilineText(UTFMultiString As String, posX As Float, posY 
     gl.PopMatrix
 
 End
+
+'' devuelve un rectangulo que contiene al texto
+'' [x,y,ancho,alto]
+Public Function TextExtends(UTFstring As String, textH As Float) As Float[]
+
+End

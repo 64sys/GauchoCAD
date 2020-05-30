@@ -1,0 +1,209 @@
+' Gambas class file
+
+Inherits ToolsBase
+Create Static
+Public Const GENDER As String = "Trim"
+
+Public arrTijeras As New Integer[]
+
+Public Function Start(Optional ElemToBuild As Variant, Optional _Mode As Integer = 0) As Boolean
+    ' Llamada por FCAD al inicio de la aplicacion de esta herramienta
+
+    Dim i As Integer
+    ' Aprovechamos para establecer los helpers (comentarios de ayuda en pantalla)
+    Me.PointsDone = 0
+    Me.PointsTotal = 2
+
+    clsDrawingAids.HelperTrabajo = ("Trim ")
+
+    ' chequeamos si hubo seleccion previa
+    Me.SelectionCount = clsEntities.GetSelectionCount()
+
+    If Me.SelectionCount = 0 Then                                     ' we have no elements in the selection
+        arrTijeras.Clear
+        clsDrawingAids.Helper.texto = clsDrawingAids.HelperTrabajo & (": Selecct cutting edges")
+
+        modCAD.clsJobPrevious = Me
+        modCAD.clsJob = clsDefaultJob
+
+    Else                                                               ' TENEMOS QUE PEDIR MAS ENTIDADES PARA CORTAR
+
+        ' recolecto las tijeras
+        For i = 0 To appmain.hFCAD.arrEntities.Max
+            If appmain.hFCAD.arrEntities[i].selected Then arrTijeras.Add(i)
+        Next
+
+        'clsEntities.BackUp(True)
+        clsDrawingAids.Helper.texto = clsDrawingAids.HelperTrabajo & (": entities to cut")
+        'clsDrawingAids.HelperTrabajo = clsDrawingAids.HelperTrabajo & Str(Me.SelectionCount) & (" elements")
+
+    Endif
+
+    modCAD.ToolActive = True
+
+End
+
+Public Function MouseDown()
+
+    Dim i As Integer, oTijera As Object, v1, v2, flxIntersec As New Float[]
+
+    If Mouse.Left Then
+
+        If appmain.hFcad.iEntity[2] >= 0 Then                         ' hay una entidad para recortar
+            Select Case appmain.hFcad.oEntity.GENDER                  ' tengo que ver cada caso particular
+                Case "Line"
+                    ' busco las tijeras
+                    For i = 0 To arrTijeras.Max
+                        oTijera = appmain.hFCAD.arrEntities[arrTijeras[i]]
+                        Select Case oTijera.GENDER
+                            Case "Line"             ' recorto linea con linea
+                                If puntos.doIntersect(appmain.hFcad.oEntity.p[0], appmain.hFcad.oEntity.p[1], appmain.hFcad.oEntity.p[2], appmain.hFcad.oEntity.p[3], oTijera.p[0], oTijera.p[1], oTijera.p[2], oTijera.p[3]) Then
+
+                                    ' recorto la linea con otra linea
+                                    ' obtengo el punto de interseccion
+                                    flxIntersec = puntos.lineLineIntersection([appmain.hFcad.oEntity.p[0], appmain.hFcad.oEntity.p[1]], [appmain.hFcad.oEntity.p[2], appmain.hFcad.oEntity.p[3]], [oTijera.p[0], oTijera.p[1]], [oTijera.p[2], oTijera.p[3]])
+
+                                    ' ahora veo cual es el lado a recortar
+                                    ' necesito encontrar los vectores, si van en direccion contraria, es el punto a recortar
+                                    '       P1------X--------------|----------------P2
+                                    '            click           tijera
+
+                                    v1.Add(appmain.hFcad.oEntity.p[0] - appmain.hFcad.iEntity[0])
+                                    v1.Add(appmain.hFcad.oEntity.p[1] - appmain.hFcad.iEntity[1])       ' click - P1
+
+                                    v2.Add(flxIntersec[0] - appmain.hFcad.iEntity[0])       ' cick - Tijera
+                                    v2.Add(flxIntersec[1] - appmain.hFcad.iEntity[1])
+
+                                    If Sgn(v1[0]) <> Sgn(v2[0]) Or Sgn(v1[1]) <> Sgn(v2[1]) Then ' van en sentido contrario
+
+                                        ' intercambio P1 con Tijera
+                                        appmain.hFcad.oEntity.p[0] = flxIntersec[0]
+                                        appmain.hFcad.oEntity.p[1] = flxIntersec[1]
+
+                                    Else
+                                        ' intercambio P2 con Tijera
+                                        appmain.hFcad.oEntity.p[2] = flxIntersec[0]
+                                        appmain.hFcad.oEntity.p[3] = flxIntersec[1]
+
+                                    End If
+
+                                Endif
+                            Case "PLine"
+
+                        End Select
+
+                    Next
+
+            End Select
+            If appmain.hFcad.oEntity.selected Then
+                clsEntities.deSelectElem(appmain.hFcad.oEntity)               '   -> la deselecciono
+            Else
+                clsEntities.SelectElem(appmain.hFcad.oEntity)                 '   -> la selecciono
+            Endif
+            Me.Active = False
+            appmain.hFcad.regen
+
+        Else
+
+            Me.SelStartX = mouse.x
+            Me.SelStartY = mouse.y
+            Me.SelStartXr = appmain.hFcad.Xreal(Me.SelStartX)
+            Me.SelStartYr = appmain.hFcad.Yreal(Me.SelStartY)
+
+            Me.SelEndX = Me.SelStartX
+            Me.SelEndy = Me.SelStartY
+
+            Me.Active = True
+        End If
+
+    End If
+
+End
+
+Public Function MouseMove() ' esta rutina es llamada por FCAD en el evento DrawingArea_MouseMove
+
+    If Me.Active Then
+        Me.SelEndX = mouse.x
+        Me.SelEndy = mouse.y
+        Me.SelEndXr = appmain.hFcad.Xreal(Me.SelEndX)
+        Me.SelEndyr = appmain.hFcad.Yreal(Me.SelEndy)
+
+        appmain.hFCAD.redraw
+    End If
+
+End
+
+Public Function MouseUp() ' called by FCAD-> DrawingArea_MouseUp
+
+    If Mouse.Left Then
+
+        Me.SelEndX = mouse.x
+        Me.SelEndy = mouse.y
+
+        If Me.Active Then
+            Dim Crossing As Boolean = False
+            ' corrijo para start<end
+            Me.Active = False
+            If Me.SelStartX > Me.SelEndX Then
+                crossing = True
+                Swap Me.SelStartX, Me.SelEndX
+            Else
+                crossing = False
+            End If
+            If Me.SelStartY < Me.SelEndy Then Swap Me.SelStartY, Me.SelEndy                     ' this is FLIPPED
+
+            Dim tipo As String
+            tipo = "nueva"
+            If Mouse.Shift Then tipo = "resta" ' estos elementos de la seleccion anterior
+            If Mouse.Control Then tipo = "suma" ' elementos a la seleccion anterior
+
+            ' Paso a coordenadas reales
+            Me.SelStartXr = appmain.hFcad.Xreal(Me.SelStartX)
+            Me.SelStartYr = appmain.hFcad.Yreal(Me.SelStartY)
+            Me.SelEndXr = appmain.hFcad.Xreal(Me.SelEndX)
+            Me.SelEndyr = appmain.hFcad.Yreal(Me.SelEndy)
+
+            ' veo si el rectangulo es suficientemente grande como para representar una seleccion por rectangulo
+            If (Me.SelEndX - Me.SelStartX + (-Me.SelEndy + Me.SelStartY)) > 10 Then
+
+                Me.selectionCount = clsEntities.SelectionSquare(Me.SelStartXr, Me.SelStartYr, Me.SelEndXr, Me.SelEndyr, tipo, crossing)
+                Appmain.hFCAD.regen
+
+            End If
+
+            clsDrawingAids.HelperTrabajo = ("Selected ") & Str$(Me.selectionCount) & (" elements")
+
+            '     'aprovecho para ver si hay algo util en la seleccion
+            '
+            ' Select Case Me.Mode
+            '
+            '     Case 0 ' Move, all vertices must be selected
+            '        clsDrawingAids.HelperTrabajo = ("Selected ") & Str$(clsEntities.DeSelection("todo", "mover")) & (" elements")
+            '
+            '     Case 1 ' Stretch
+            '         clsDrawingAids.HelperTrabajo = ("Selected ") & Str$(clsEntities.DeSelection("todo", "estirar")) & (" elements")
+            '
+            ' End Select
+        Else
+
+        End If
+
+    Else
+
+        Me.Finish
+
+    Endif
+
+End
+
+Public Sub Finish()
+
+    modCAD.clsJobPrevious = Me
+    modCAD.clsJob = clsDefaultJob
+    clsDrawingAids.CleanTexts
+    clsEntities.DeSelection()
+    appmain.hFCAD.Regen
+    Me.Active = False
+    modCAD.ToolActive = False
+
+End

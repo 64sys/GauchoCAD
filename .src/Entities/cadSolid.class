@@ -4,43 +4,61 @@
 ' Element maintained by Terco
 ' V2
 Inherits EntityBase
-Public Const GENDER As String = "Solid"          
+Public Const GENDER As String = "Solid"
 Public Const PointsToDraw As Integer = 0             ' minimal point requered for drawing something usefull
 Public Const HelperTrabajo As String = ("Solid")
 Public Const ParamType As String = "PPPP"                             ' that is Point, Point, Float; could be Color Text, etc
 Public Const ParamHelper As String = ("First Point;Next Point;Next Point;Last Point")      ' a little text that is shown at the prompt waiting for user input during build
 Public Const ParamDefault As String = ""
 
+Public Sub Draw()
 
-
- Public Sub Draw()
     If Not Me.DrawAble Or Not Me.Visible Then Return
     If Me.Selected And Not modCAD.ToolActive Then Me.ColorToPaint = modCAD.ColorForSelected Else Me.ColorToPaint = Me.gbColor
 
-    
     Dim i As Integer
- If modCAD.drwDrawingClass = modCAD.drwPaintClass Then
-   
-    
-    If Me.Selected And Not modCAD.ToolActive Then
-        paint.brush = Paint.Color(modCAD.ColorForSelected)
-    Else
-        paint.brush = Paint.Color(Me.ColorToPaint)
-    Endif
-    
-    
-    Paint.Polygon(Me.p)
-   
-    paint.Fill
-End If
+    If modCAD.drwDrawingClass = modCAD.drwPaintClass Then
+
+        If Me.Selected And Not modCAD.ToolActive Then
+            paint.brush = Paint.Color(modCAD.ColorForSelected)
+        Else
+            paint.brush = Paint.Color(Me.ColorToPaint)
+        Endif
+
+        Paint.Polygon(Me.p)
+
+        paint.Fill
+    End If
 
     If modCAD.drwDrawingClass = modCAD.drwOpenGLClass Then
-            
-    GLplus.Polygon(Me.p, Me.ColorToPaint, Me.ColorToPaint, Me.LineWidth)
-            
 
-    Endif 
- 
+        If Me.StepsDone < 1 Then
+
+            Me.P[2] = Me.P[0]
+            Me.P[3] = Me.P[1]
+
+            glPlus.Lines(Me.p, Me.ColorToPaint, Me.LineWidth)
+
+        End If
+
+        If Me.StepsDone < 2 Then
+
+            Me.P[4] = Me.P[2]
+            Me.P[5] = Me.P[3]
+
+        End If
+
+        If Me.StepsDone < 3 Then
+
+            Me.P[6] = Me.P[4]
+            Me.P[7] = Me.P[5]
+
+        Endif
+
+        Me.BoundingPoligon = Me.P
+
+        GLplus.Polygon(Me.p, Me.ColorToPaint, Me.ColorToPaint, Me.LineWidth)
+
+    Endif
+
 End
-
-

@@ -6,7 +6,6 @@ Inherits ToolsBase
 Create Static
 Public Const GENDER As String = "Array"
 
-
 Public Nx As Integer
 Public Ny As Integer
 Public Dx As Float
@@ -17,14 +16,13 @@ Public Dp As Float
 
 ' Add more if needed
 
-
 Public Function Start(Optional ElemToBuild As Variant, Optional _mode As Integer = 0) As Boolean
     ' Llamada por FCAD al inicio de la aplicacion de esta herramienta
 
     ' Aprovechamos para establecer los helpers (comentarios de ayuda en pantalla)
     Me.PointsDone = 0
-    Me.PointsTotal = 2                 ' orto: Punto base + Nx + Dx + Ny + Dy   , polar = Punto base + N + angulo 
-    
+    Me.PointsTotal = 2                 ' orto: Punto base + Nx + Dx + Ny + Dy   , polar = Punto base + N + angulo
+
     Me.mode = _mode
     clsDrawingAids.HelperTrabajo = ("Array ")
 
@@ -45,55 +43,48 @@ Public Function Start(Optional ElemToBuild As Variant, Optional _mode As Integer
         clsDrawingAids.HelperTrabajo = clsDrawingAids.HelperTrabajo & Str(Me.SelectionCount) & (" elements")
 
     Endif
-    
+
     Me.Active = True
     modCAD.ToolActive = True
-    
 
 End
 
-
 Public Function MouseUp() ' called by FCAD-> DrawingArea_MouseUp
 
-    
     ' solo nos interesa el punto base, luego los clicks no importan
-    
-    
+
     If Me.PointsDone = 0 Then
         ' punto real base
         Me.SelStartXr = puntos.Near(appmain.hFcad.Xreal(mouse.x))
         Me.SelStartYr = puntos.Near(appmain.hFcad.Yreal(mouse.y))
         Inc Me.PointsDone
-        
+
         clsDrawingAids.Helper.texto = clsDrawingAids.HelperTrabajo & (": Ortog or Polar [O]?")
-        
+
     End If
-    
-    
-     
 
 End
 
 Public Function KeyText(EnteredText As String) ' esta rutina es llamada por FCAD en el evento FCAD_KeyPress cuando recibe una texto + <Enter>
 
-      If Me.PointsDone = 1 Then                     ' estamos esperando que nos responda si quere Ortogonal o Polar
-      
+    If Me.PointsDone = 1 Then                     ' estamos esperando que nos responda si quere Ortogonal o Polar
+
         If EnteredText = "" Then                        ' enter es Ortogonal
-        
+
             Me.mode = 1
             Inc Me.PointsDone
             clsDrawingAids.Helper.texto = clsDrawingAids.HelperTrabajo & (": Columns [1]?")
-        Else If Left$(UCase$(EnteredText), 1) = "P" Then 
+        Else If Left$(UCase$(EnteredText), 1) = "P" Then
             Me.mode = 2
             Inc Me.PointsDone
             clsDrawingAids.Helper.texto = clsDrawingAids.HelperTrabajo & (": Repetitions [1]?")
         Else
-            
+
             clsDrawingAids.ErrorMessage = ("Bad input")
         End If
-    
+
     Else If Me.PointsDone = 2 Then
-        
+
         If Me.mode = 1 Then                             ' ortog->Nx
             Nx = CInt(EnteredText)
             Inc Me.PointsDone
@@ -103,9 +94,9 @@ Public Function KeyText(EnteredText As String) ' esta rutina es llamada por FCAD
             Inc Me.PointsDone
             clsDrawingAids.Helper.texto = clsDrawingAids.HelperTrabajo & (": Angle  [45]?")
         End If
-            
+
     Else If Me.PointsDone = 3 Then
-        
+
         If Me.mode = 1 Then                             ' ortog->Dx
             Dx = CFloat(EnteredText)
             Inc Me.PointsDone
@@ -113,120 +104,100 @@ Public Function KeyText(EnteredText As String) ' esta rutina es llamada por FCAD
         Else                                         ' polar -> N
             Dp = CFloat(EnteredText) * Pi / 180
             Me.Finish
-            
-            
+
         End If
     Else If Me.PointsDone = 4 Then
-        
-            ' ortog->Ny
-            Ny = CInt(EnteredText)
-            Inc Me.PointsDone
-            clsDrawingAids.Helper.texto = clsDrawingAids.HelperTrabajo & (": Y distance [0]?")
-        
+
+        ' ortog->Ny
+        Ny = CInt(EnteredText)
+        Inc Me.PointsDone
+        clsDrawingAids.Helper.texto = clsDrawingAids.HelperTrabajo & (": Y distance [0]?")
+
     Else If Me.PointsDone = 5 Then
-        
-            ' ortog->Dy
-            Dy = CFloat(EnteredText)
-            Inc Me.PointsDone
-            Me.Finish
-    
-    End If 
-            
-        
-        
-    Catch
-        
-        clsDrawingAids.ErrorMessage = ("Bad input")
-    
+
+        ' ortog->Dy
+        Dy = CFloat(EnteredText)
+        Inc Me.PointsDone
+        Me.Finish
+
+    End If
+
+Catch
+
+    clsDrawingAids.ErrorMessage = ("Bad input")
+
 End
 
-
-
 Public Sub Finish()
+
     Dim Rx, Ry, i As Integer, o As Object, newO As Object
+
     If Me.mode = 1 And Me.PointsDone = 6 Then               ' me.mode orto finished correctly
-        
-        
-        
+
         For Rx = 1 To Nx
-            
+
             For rY = 1 To Ny
-    
+
                 If rx = 1 And ry = 1 Then Continue
-                    
-                    For Each o In APPMain.hFCAD.arrEntities
-                        If o.selected Then
-                            newO = clsEntities.ClonEntity(o)               ' devuelve una entidad en exactamente la misma posicion
-                            APPMain.hFCAD.arrEntities.Add(newO)
-                            For i = 0 To newO.p.max Step 2
-                                newO.p[i] += dx * (rx - 1)
-                            Next
-                            For i = 1 To newO.p.max Step 2
-                                newO.p[i] += dy * (ry - 1)
-                            Next
-                                   
-                            newO = Null
-                        Endif
-                        
-                    Next
+
+                For Each o In APPMain.hFCAD.arrEntities
+                    If o.selected Then
+                        newO = clsEntities.ClonEntity(o)               ' devuelve una entidad en exactamente la misma posicion
+                        APPMain.hFCAD.arrEntities.Add(newO)
+                        For i = 0 To newO.p.max Step 2
+                            newO.p[i] += dx * (rx - 1)
+                        Next
+                        For i = 1 To newO.p.max Step 2
+                            newO.p[i] += dy * (ry - 1)
+                        Next
+
+                        newO = Null
+                    Endif
+
+                Next
             Next
-            
+
         Next
-        
+
         clsEntities.Finish
 
     End If
-
 
     If Me.mode = 2 And Me.PointsDone = 3 Then               ' me.mode polar finished correctly
-       
-            Dim Nuevos As Float[]
-            For rY = 2 To Np
-    
-                
-                    
-                    For Each o In APPMain.hFCAD.arrEntities
-                        If o.selected Then
-                            newO = clsEntities.ClonEntity(o)               ' devuelve una entidad en exactamente la misma posicion
-                            APPMain.hFCAD.arrEntities.Add(newO)
-                
-                            For i = 0 To newO.p.max Step 2
-                                
-                                nuevos = puntos.RotateFromPointWithAngle(Me.SelStartXr, Me.SelStartYr, dp * (ry - 1), newO.p[i], newO.p[i + 1])
-                                newO.P[i] = nuevos[0]
-                                newO.P[i + 1] = nuevos[1]
-                                nuevos.Clear
-                            Next
-                
-                
-                                   
-                            newO = Null
-                        Endif
+
+        Dim Nuevos As Float[]
+        For rY = 2 To Np
+
+            For Each o In APPMain.hFCAD.arrEntities
+                If o.selected Then
+                    newO = clsEntities.ClonEntity(o)               ' devuelve una entidad en exactamente la misma posicion
+                    APPMain.hFCAD.arrEntities.Add(newO)
+
+                    For i = 0 To newO.p.max Step 2
+
+                        nuevos = puntos.RotateFromPointWithAngle(Me.SelStartXr, Me.SelStartYr, dp * (ry - 1), newO.p[i], newO.p[i + 1])
+                        newO.P[i] = nuevos[0]
+                        newO.P[i + 1] = nuevos[1]
+                        nuevos.Clear
                     Next
-                
+
+                    newO = Null
+                Endif
             Next
-            
-      
-        
+
+        Next
+
         clsEntities.Finish
-       
 
     End If
-
-
-
-
-
-
-
-
 
     modCAD.clsJobPrevious = Me
     modCAD.clsJob = clsDefaultJob
     clsDrawingAids.CleanTexts
     clsEntities.DeSelection()
     modCAD.DrawOriginals = False
-   appmain.hFCAD.Regen
+    appmain.hFCAD.Regen
     Me.Active = False
     modCAD.ToolActive = False
+
 End

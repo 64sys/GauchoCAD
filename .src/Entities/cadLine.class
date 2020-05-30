@@ -12,23 +12,22 @@ Public Const ParamHelper As String = "Start point;End point"
 Public Sub Draw()
 
     If Not Me.DrawAble Or Not Me.Visible Then Return
-    
+
     If Me.Selected And Not modCAD.ToolActive Then Me.ColorToPaint = modCAD.ColorForSelected Else Me.ColorToPaint = Me.gbColor
-    
+
     If modCAD.drwDrawingClass = modCAD.drwPaintClass Then
-        
-            paint.LineWidth = Me.LineWidth / appmain.hFcad.ScaleZoom / modCAD.ScaleLines 
-            If Me.flxDash Then paint.Dash = Me.flxDash
-            paint.brush = Paint.Color(Me.gbColor)
-            paint.MoveTo(Me.p[0], Me.p[1])
-            paint.LineTo(Me.p[2], Me.p[3])
-            paint.Stroke
-    End If        
-    
+
+        paint.LineWidth = Me.LineWidth / appmain.hFcad.ScaleZoom / modCAD.ScaleLines
+        If Me.flxDash Then paint.Dash = Me.flxDash
+        paint.brush = Paint.Color(Me.gbColor)
+        paint.MoveTo(Me.p[0], Me.p[1])
+        paint.LineTo(Me.p[2], Me.p[3])
+        paint.Stroke
+    End If
+
     If modCAD.drwDrawingClass = modCAD.drwOpenGLClass Then
-            
-            GLplus.Lines(Me.p, Me.ColorToPaint, Me.LineWidth)
-            
+
+        GLplus.Lines(Me.p, Me.ColorToPaint, Me.LineWidth)
 
     Endif
 
@@ -36,19 +35,20 @@ End
 
 '' Se fija si la posicion indicada esta aproximadamente sobre la entidad, de acuerdo a la tolerancia
 '' mode es para establecer si se busca especificamente algun punto y devolver su posicion y tipo.
-'' Mode: 
+'' Mode:
 
 '' Devuelve [x,y] punto de interes
 Public Function AboveMe(Xreal As Float, Yreal As Float, tolerance As Float, mode As Integer, fData As Float[]) As Boolean
     ' si una de las dos lineas de una cruz con centro en X,Y y largo Tolerance cruza la linea, estamos arriba
     'Dim fData As New Float[]
+
     Dim fDist1, fDist2, fDist3, fDist4 As Float
     'TODO: para debug, agrego esto
     mode = 1 + 2 ' endpoint+midpoint
-    
+
     fData.Clear
     If puntos.doIntersect(xreal - tolerance / 2, Yreal, Xreal + tolerance / 2, Yreal, Me.P[0], Me.P[1], Me.P[2], Me.P[3]) Or puntos.doIntersect(xreal, Yreal - tolerance / 2, Xreal, Yreal + tolerance / 2, Me.P[0], Me.P[1], Me.P[2], Me.P[3]) Then ' its above me
-        
+
         ' busco el punto exacto en la linea donde se produce la interseccion
         fData.Insert(puntos.lineLineIntersection([xreal - tolerance / 2, Yreal], [Xreal + tolerance / 2, Yreal], [Me.P[0], Me.P[1]], [Me.P[2], Me.P[3]]))
         ' veo que punto esta mas cerca
@@ -69,17 +69,13 @@ Public Function AboveMe(Xreal As Float, Yreal As Float, tolerance As Float, mode
             fData[0] = Me.P[0]
             fData[1] = Me.P[1]
             fData.Add(1)                     ' 1 = EndPoint
-        
-            
+
         Endif
-        
+
         Return True
-        
+
     Endif
-    
-    
+
     Return False
-    
+
 End
-
-

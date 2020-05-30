@@ -384,12 +384,12 @@ Public Function GetEntityList() As Collection
     entity.Add(False, "IMAGE")
     entity.Add(True, "INSERT") 'ok
     entity.Add(False, "LEADER")
-    'entity.Add(False, "LIGHT")
+    entity.Add(False, "LIGHT")
     entity.Add(True, "LINE") 'ok
     entity.Add(True, "LWPOLYLINE") 'ok
-    'entity.Add(False, "MLINE") 'very complex, to do later
-    'entity.Add(False, "MULTILEADER")
-    'entity.Add(False, "MLEADERSTYLE")
+    entity.Add(False, "MLINE") 'very complex, to do later
+    entity.Add(False, "MULTILEADER")
+    entity.Add(False, "MLEADERSTYLE")
     entity.Add(True, "MTEXT") 'ok
     entity.Add(False, "OLEFRAME")
     entity.Add(False, "OLE2FRAME")
@@ -1490,15 +1490,16 @@ Public Function EntityCodes(Optional ent As String) As Collection
 
     Dim cod As New Collection
 
-    cod.Add("entity", "0")
-    cod.Add("handle", "5")
-    cod.Add("linetype", "6")
-    cod.Add("layer", "8")
-    cod.Add("colour", "62")
-    cod.Add("width", "370")
-    cod.Add("visible", "60")
-    cod.Add("paper", "67")
-    cod.Add("thickness", "39")
+    cod.Add("entity", "0") '*
+    cod.Add("handle", "5") '*
+    cod.Add("style", "6") '*
+    cod.Add("layer", "8") '*
+    cod.Add("colour", "62") '*
+    cod.Add("width", "370") '*
+    cod.Add("visible", "60") '*
+    cod.Add("paper", "67") '*
+    cod.Add("elev", "38")
+    cod.Add("thick", "39")
     cod.Add("x0", "10")
     cod.Add("y0", "20")
     cod.Add("z0", "30")
@@ -1508,8 +1509,14 @@ Public Function EntityCodes(Optional ent As String) As Collection
     cod.Add("extrx", "210")
     cod.Add("extry", "220")
     cod.Add("extrz", "230")
+    cod.Add("blkid", "330")
 
     Select String.LCase(ent)
+
+        Case "lwpolyline"
+            cod.Add("points", "90")
+            cod.Add("closed", "70")
+            cod.Add("constant", "43")
 
         Case "arc"
             cod.Add("radius", "40")
@@ -2090,17 +2097,30 @@ Public Function GetDXFEntities(sCont As String) As Collection
     'Dim blx As New String[]
     'Dim k As Integer
     Dim cItem As New Collection
-    Dim e As Variant
+    'Dim e As Variant
     Dim sKey As String
+    Dim cEnty As Collection
+    Dim eN As Variant
+
+    cEnty = GetEntityList()
 
     sCont = Replace(sCont, "\t", " ")
-    sCont = Replace(sCont, "  0\n", "\t  0\n")
+
+    For Each eN In cEnty
+        sCont = Replace(sCont, "  0\n" & cEnty.Key & "\n  5\n", "\t  0\n" & cEnty.Key & "\n  5\n")
+    Next
+    'sCont = Replace(sCont, "  0\n", "\t  0\n")
+
+    '  0\nLWPOLYLINE\n  5\n
 
     stx = Split(sCont, "\t")
 
     For i = 0 To stx.Max
         If InStr(stx[i], "\n100\nAcDbEntity\n") > 0 Then
             'If String2.Count(stx[i], "\n  0\n") > 1 And InStr(stx[i], "  0\nVIEWPORT") = 0 Then
+            If InStr(stx[i], "  0\nLWPOLYLINE") > 0 Then
+                Print "x"
+            Endif
             cItem = DecodeDXFEntity(stx[i])
             If cItem.Count > 1 Then
                 sKey = ""
@@ -2253,10 +2273,10 @@ Private Function GetDXFLayerList(sItem As String) As Collection
                         End Select
                     Case "62"
                         If InStr(sVal, "-") = 0 Then
-                            cTmp.Add(True, "On")
+                            cTmp.Add(True, "show")
                             cTmp.Add(CInt(sVal), "colour")
                         Else
-                            cTmp.Add(False, "On")
+                            cTmp.Add(False, "show")
                             cTmp.Add(CInt(Replace(sVal, "-", "")), "colour")
                         Endif
 
@@ -2541,51 +2561,127 @@ End
 Private Function DecodeDXFEntity(sItem As String) As Collection
 
     Dim stx As String[]
-    'Dim out As New Collection
     Dim cTmp As New Collection
+    Dim cTmp2 As New Collection
     Dim i As Integer
-    Dim vrt As Variant
     Dim sTag As String
-    Dim x As Float
-    Dim y As Float
-    Dim z As Float
     Dim Entity As String
     Dim sVal As String
     Dim codes As New Collection
+    Dim rep As New Collection
+    Dim e As Variant
+    Dim p As New Float[]
+    Dim x As Float
+    Dim y As Float
+    Dim z As Float
+    Dim xTag As String
+    Dim xOrd As String
+    Dim pt As String
+    Dim pt2 As String
+    Dim spt As New String[]
+    Dim cp As New Collection
 
     stx = Split(sItem, "\n")
 
+    If stx[0] = "  0" Then
+        sTag = "entity"
+        sVal = stx[1]
+        cTmp.Add(sVal, sTag)
+        codes = EntityCodes(sVal)
+    Endif
+
+    For i = 0 To stx.Max Step 2
+        If stx[i] <> "" Then
+            sTag = Replace(stx[i], " ", "")
+            If codes.Exist(sTag) Then
+                sTag = codes[sTag]
+            Endif
+            If rep.Exist(sTag) = False Then
+                rep.Add([1, 0], sTag)
+            Else
+                rep[sTag][0] = rep[sTag][0] + 1
+            Endif
+        Endif
+    Next
+
     For i = 0 To stx.Max Step 2
         If stx[i] = "  0" Then
-            ' If cTmp.Count > 0 Then
-            '     If cTmp.Exist("Handle") Then
-            '         out.Add(cTmp.Copy(), cTmp["Handle"])
-            '     Endif
-            ' Endif
             Entity = ""
-            codes.Clear
             cTmp.Clear
             sVal = stx[i + 1]
             cTmp.Add(sVal, "entity")
-            codes = EntityCodes(sVal)
         Else
             If stx[i] <> "" Then
+                If codes.Count = 0 Then
+                    Print "Error codes"
+                Endif
                 sTag = Replace(stx[i], " ", "")
                 If codes.Exist(sTag) Then
                     sTag = codes[sTag]
                 Endif
-
-                If cTmp.Exist(sTag) = False Then
-                    sVal = stx[i + 1]
-                    cTmp.Add(sVal, sTag)
+                sVal = stx[i + 1]
+                If rep.Exist(sTag) And rep[sTag][0] > 1 Then
+                    rep[sTag][1] = rep[sTag][1] + 1
+                    cTmp.Add(sVal, sTag & "." & CStr(rep[sTag][1]))
                 Else
-                    Print sTag & ": The key already exist"
+                    cTmp.Add(sVal, sTag)
                 Endif
 
             Endif
         Endif
     Next
-    Return cTmp
+
+    If cTmp.Exist("x0") Or cTmp.Exist("x0.1") Then
+        'Select cTmp["entity"]
+        '    Case "LWPOLYLINE", "LINE", "XLINE", "POLYLINE", "SPLINE", "ARC", "CIRCLE", "ELLIPSE", "VERTEX", "INSERT", "POINT", "ATTRIB", "ATTDEF"
+        spt.Clear
+        For Each e In cTmp
+            If InStr(cTmp.Key, "x0") > 0 Or InStr(cTmp.Key, "x1") > 0 Then
+
+                If InStr(cTmp.Key, ".") > 0 Then
+                    xTag = Split(cTmp.Key, ".")[0]
+                    xOrd = "." & Split(cTmp.Key, ".")[1]
+                Else
+                    xTag = cTmp.Key
+                    xOrd = ""
+                Endif
+
+                Select xTag
+                    Case "x0"
+                        pt = cTmp[cTmp.Key]
+                        If cTmp.Exist("y0" & xOrd) Then
+                            pt &= ":" & cTmp["y0" & xOrd]
+                        Endif
+                        If cTmp.Exist("z0" & xOrd) Then
+                            pt &= ":" & cTmp["z0" & xOrd]
+                        Endif
+                        spt.Add(pt)
+                    Case "x1"
+                        pt = cTmp[cTmp.Key]
+                        If cTmp.Exist("y1" & xOrd) Then
+                            pt &= ":" & cTmp["y1" & xOrd]
+                        Endif
+                        If cTmp.Exist("z1" & xOrd) Then
+                            pt &= ":" & cTmp["z1" & xOrd]
+                        Endif
+                        spt.Add(pt)
+                End Select
+            Endif
+
+            If InStr(cTmp.Key, "x0") = 0 And InStr(cTmp.Key, "y0") = 0 And InStr(cTmp.Key, "z0") = 0 Then
+                If InStr(cTmp.Key, "x1") = 0 And InStr(cTmp.Key, "y1") = 0 And InStr(cTmp.Key, "z1") = 0 Then
+                    cTmp2.Add(cTmp[cTmp.Key], cTmp.Key)
+                Endif
+            Endif
+        Next
+        cp = EncodePoint(spt.Join(";"), "p")
+        cTmp2.Add(cp.Copy(), "p")
+        cp.Clear
+        Return cTmp2
+    Else
+        Return cTmp
+    Endif
+    'End Select
 
 End
 
@@ -2597,8 +2693,18 @@ Private Function DecodeDXFBlock(sItem As String) As Collection
     Dim out As New Collection
     Dim i As Integer
     Dim cTmp As Collection
+    Dim cEnty As Collection
+    Dim eN As Variant
 
-    sCont = Replace(sItem, "  0\n", "\t  0\n")
+    cEnty = GetEntityList()
+
+    sCont = Replace(sItem, "\t", " ")
+
+    For Each eN In cEnty
+        sCont = Replace(sCont, "  0\n" & cEnty.Key & "\n  5\n", "\t  0\n" & cEnty.Key & "\n  5\n")
+    Next
+
+    'sCont = Replace(sItem, "  0\n", "\t  0\n")
 
     btx = Split(sCont, "\t")
 

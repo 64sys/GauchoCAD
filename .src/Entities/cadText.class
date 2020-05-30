@@ -135,10 +135,3 @@ Public Sub CreateBoundingPoligon()
     Me.BoundingPoligon.Insert(rotated)     ' pair
 
 End
-
-'' Creo los puntos de interes
-'' Build point of interest
-
-Public Function BuildPOI() As Integer
-
-End

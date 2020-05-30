@@ -24,7 +24,7 @@ Public Sub Draw()
 
     major = Sqr(Me.p[2] * Me.p[2] + Me.p[3] * Me.p[3])
     Minor = major * Me.fParam[0]
-    angle = -Ang(Me.p[2], Me.p[3])          ' TODO: check  this -
+    angle = Ang(Me.p[2], Me.p[3])          ' Los coordenadas del eje mayor son relativas al centro
     If major = 0 Then major = 1
 
     If modCAD.drwDrawingClass = modCAD.drwPaintClass Then
@@ -46,15 +46,8 @@ Public Sub Draw()
     If modCAD.drwDrawingClass = modCAD.drwOpenGLClass Then
         Dim x, y, theta, angle_increment As Float
         Dim i As Integer
-        ' gl.PushMatrix
-        ' gl.Translatef(Me.p[0], Me.p[1], 0)
-        ' gl.Rotatef(angle * 180 / Pi, 0, 0, 1)
-        ' gl.Scalef(1, Minor / major, 1)
         Me.BoundingPoligon.Clear
         GL.Begin(gl.LINE_STRIP)
-        Me.start = Me.fParam[1] * Pi / 180
-        Me.recorrido = Me.fParam[2] * Pi / 180 - Me.fParam[1]
-        If Me.recorrido < 0 Then Me.recorrido = 2 * Pi + Me.recorrido
 
         angle_increment = Pi * 2 / 360
         For theta = 0 To Me.recorrido Step angle_increment
@@ -77,9 +70,6 @@ Public Sub Draw()
 
         GL.End
 
-        'GLplus.arc(major, Me.start, Me.recorrido, Me.ColorToPaint, Me.LineWidth)
-        'gl.PopMatrix
-
     Endif
 
 End
@@ -94,7 +84,7 @@ Public Function AboveMe(Xreal As Float, Yreal As Float, tolerance As Float, mode
     mode = 1 + 2 ' endpoint+midpoint
 
     fData.Clear
-    For i = 0 To Me.P.count - 4 Step 2
+    For i = 0 To Me.BoundingPoligon.count - 4 Step 2
         If puntos.doIntersect(xreal - tolerance / 2, Yreal, Xreal + tolerance / 2, Yreal, Me.BoundingPoligon[i + 0], Me.BoundingPoligon[i + 1], Me.BoundingPoligon[i + 2], Me.BoundingPoligon[i + 3]) Or puntos.doIntersect(xreal, Yreal - tolerance / 2, Xreal, Yreal + tolerance / 2, Me.BoundingPoligon[i + 0], Me.BoundingPoligon[i + 1], Me.BoundingPoligon[i + 2], Me.BoundingPoligon[i + 3]) Then ' its above me
 
             ' busco el punto exacto en la linea donde se produce la interseccion

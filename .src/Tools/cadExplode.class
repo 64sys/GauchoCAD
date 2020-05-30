@@ -1,0 +1,29 @@
+' Gambas class file
+
+Inherits ToolsBase
+Create Static
+Public Const GENDER As String = "Explode"
+
+Public Function Start(Optional ElemToBuild As Variant, Optional _Mode As Integer = 0) As Boolean
+
+    ' Aprovechamos para establecer los helpers (comentarios de ayuda en pantalla)
+
+    clsDrawingAids.HelperTrabajo = ("Explode ")
+
+    ' chequeamos si hubo seleccion previa
+    Me.SelectionCount = clsEntities.GetSelectionCount()
+
+    If Me.SelectionCount = 0 Then                                     ' we have no elements in the selection
+
+        clsDrawingAids.Helper.texto = clsDrawingAids.HelperTrabajo & (": Selecct blocks")
+
+        modCAD.clsJobPrevious = Me
+        modCAD.clsJob = clsDefaultJob
+
+    Else                                                                    ' EXPLOTA !!!
+
+    Endif
+
+    modCAD.ToolActive = True
+
+End

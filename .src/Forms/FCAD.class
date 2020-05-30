@@ -41,13 +41,13 @@ Public nDrawsRequired As Integer
 Public idDrawing As Integer
 
 ' Variables que se pasaron desde el módulo de inicio ----------------------------------------
-Private cex As New Collection       '' Variables básicas para pasar a los demas formularios
-Private con As New Connection       '' Conexión a la base de datos
-Private adi As String               '' Directorio del programa
+'Private cex As New Collection       '' Variables básicas para pasar a los demas formularios
+'Private con As New Connection       '' Conexión a la base de datos
+'Private adi As String               '' Directorio del programa
 'Private dbc As String               '' Archivo de configuracion de la base de datos
-Private apc As String               '' Archivo de configuracion del programa
-Private etx As String               '' Editor de texto plano por ddefecto
-Private lgg As Logger               '' Registro de eventos de la aplicación.
+'Private apc As String               '' Archivo de configuracion del programa
+'Private etx As String               '' Editor de texto plano por ddefecto
+'Private lgg As Logger               '' Registro de eventos de la aplicación.
 
 ' vars particulares de cada pestaña
 
@@ -101,6 +101,7 @@ Public Sub form_Resize()
 
     Debug "resize " & Me.Title
     GLplus.Init(glarea1)
+    iEntity.Insert([0, 0, 0])
 
 End
 
@@ -128,6 +129,7 @@ Public Sub GLArea1_draw()
     If Not DrawingReady Then Return
 
     modCAD.drwDrawingClass = modCAD.drwOpenGLClass
+
     gl.Clear(gl.DEPTH_BUFFER_BIT Or gl.COLOR_BUFFER_BIT)
 
     gl.LoadIdentity
@@ -141,7 +143,7 @@ Public Sub GLArea1_draw()
     ' Primero la grid
     ' clsDrawingAids.DrawGrid
 
-    ' If modCAD.DrawBounds Then clsDrawingAids.DrawBoundingPoligons
+    If modCAD.DrawBounds Then clsDrawingAids.DrawBoundingPoligons
 
     clsDrawingAids.DrawCoordenadas
 
@@ -198,6 +200,7 @@ Public Sub GLArea1_MouseDown()
 
         Case Else
 
+            clsEntities.CheckPOI(Xreal(Mouse.x), Yreal(Mouse.y))        '   -> busco punto donde pueda engancharse la entidad nueva
             modCAD.clsJob.mouseDown() ' dispatch event to the Job
 
     End Select
@@ -350,6 +353,7 @@ Public Sub form_KeyPress()
         '     modCAD.AddLine([Rnd(-20, 20), Rnd(-20, 20), Rnd(-20, 20), Rnd(-20, 20)], 0, 1, 0, "0")
         '     arrEntities.Last.gbcolor = Color.RGB(Rnd(0, 255), Rnd(0, 255), Rnd(0, 255))
         ' Next
+        modCAD.AddEllipse([10, 10, 150, 150], 0.5, 0, Pi)
 
         regen
         Return
@@ -436,7 +440,8 @@ End
 Public Sub Run(cMdl As Collection) As Boolean
 
     cModel = cMdl.Copy()
-    cModel.Add(arrEntities, "Entities")
+
+    'cModel.Add(arrEntities, "Entities") ' Esto lo comento porque si no pisa el Entities collection
 
     Me.Menus.Hide
 
@@ -450,20 +455,122 @@ Public Sub ToolButton1_Click()
         Print "Layers"
     Endif
 
+    LayersTransfer()
+    EntitiesTransfer()
+
+    modCAD.ImportEntities(cModel, arrEntities)
+    'modCAD.ApplyLayerProperties
+    regen
+
     LoadDrawingMap()
+
+End
+
+'' This transfer layers from imported file, one collection actually, to the model collection
+
+Public Sub EntitiesTransfer()
+
+    Dim tEnt As New Collection
+    '    Dim i As Integer
+    Dim iEt As Variant
+    '   Dim mEt As Variant
+    Dim prop As String
+    Dim iEnt As Collection
+    Dim mEnt As Collection
+    '  Dim r As Integer
+
+    If cImport.Count > 0 Then
+        If cImport.Exist("Entities") Then
+            iEnt = cImport["Entities"]
+            If cModel.Exist("Entities") Then
+                mEnt = cModel["Entities"]
+                For Each iEt In iEnt
+                    Select iEt["entity"]
+                        Case "LINE"
+                            'tEnt.Add(iEt["handle"], "handle")
+                            For Each prop In ["entity", "handle", "blkid", "layer", "style", "width", "colour", "visible", "paper", "elev", "thick", "p"]
+                                tEnt.Add(iEt[prop], prop)
+                            Next
+                            mEnt.Add(tEnt.copy(), iEt["handle"])
+                            tEnt.Clear
+                    End Select
+                Next
+            Endif
+        Endif
+    Endif
+
+End
+
+'' This transfer layers from imported file, one collection actually, to the model collection
+
+Public Sub LayersTransfer()
+
+    Dim tLay As New Collection
+    Dim i As Integer
+    Dim il As Variant
+    Dim ml As Variant
+    Dim prop As String
+    Dim iLay As Collection
+    Dim mLay As Collection
+    Dim r As Integer
+
+    If cImport.Count > 0 Then
+        If cImport.Exist("Layers") Then
+            iLay = cImport["Layers"]
+            If cModel.Exist("Layers") Then
+                mLay = cModel["Layers"]
+
+                For Each il In iLay
+                    r = 0
+                    For Each ml In mLay
+                        If ml["name"] = il["name"] Then
+                            r = -1
+                            Break
+                        Else
+                            Inc r
+                        Endif
+                    Next
+
+                    If r > -1 Then
+                        tLay.Add(CStr(r), "id")
+                        tLay.Add("layer", "type")
+                        For Each prop In ["name", "show", "frozen", "locked", "colour", "style", "width", "print"]
+                            tLay.Add(il[prop], prop)
+                        Next
+                        mLay.Add(tLay.copy(), CStr(r))
+                        tLay.Clear
+                    Endif
+
+                Next
+            Else
+                For Each il In iLay
+                    tLay.Add(CStr(i), "id")
+                    tLay.Add("layer", "type")
+
+                    For Each prop In ["name", "show", "frozen", "locked", "colour", "style", "width", "print"]
+                        tLay.Add(iLay[prop], prop)
+                    Next
+
+                    mLay.Add(tLay.copy(), CStr(i))
+                    tLay.Clear
+                    Inc i
+                Next
+            Endif
+        Endif
+    Endif
 
 End
 
 Public Sub LoadDrawingMap()
 
     Dim cLayers As New Collection
-    Dim iLayers As New Collection
+    ' Dim iLayers As New Collection
     Dim Layer As Variant
     Dim app As APPMain
     Dim ito As Variant
     Dim it As Variant
     Dim sKey As String
-    Dim sVal As String
+    'Dim sVal As String
     Dim sName As String
 
     If cModel.Count > 0 Then
@@ -491,35 +598,36 @@ Public Sub LoadDrawingMap()
         'Layers ----------------------
         TreeView1["layers"].Expanded = True
     Endif
-    If cImport.Count > 0 Then
-        TreeView1.Add("import", "Import")
-        For Each ito In cImport
-            sKey = cImport.Key
-            Select TypeOf(ito)
-                Case gb.Object
-                    TreeView1.Add("i" & sKey, sKey,, "import")
-                    For Each it In ito
-                        Select sKey
-                            Case "Entities"
-                                sName = String.LCase(ito[ito.Key]["entity"])
-                                If TreeView1.Exist("i" & sName) = False Then
-                                    TreeView1.Add("i" & sName, sName,, "i" & sKey)
-                                Endif
-                            Case "Block"
-                                sName = ito[ito.Key]["block"]
-                                If TreeView1.Exist("i" & sName) = False Then
-                                    TreeView1.Add("i" & sName, sName,, "i" & sKey)
-                                Endif
-                            Case Else
-                                TreeView1.Add("i" & ito.Key, sName,, "i" & sKey)
-                        End Select
 
-                    Next
-                Case gb.String
-                    TreeView1.Add("i" & sKey, sKey,, "import")
-            End Select
-        Next
-    Endif
+    ' If cImport.Count > 0 Then
+    '     TreeView1.Add("import", "Import")
+    '     For Each ito In cImport
+    '         sKey = cImport.Key
+    '         Select TypeOf(ito)
+    '             Case gb.Object
+    '                 TreeView1.Add("i" & sKey, sKey,, "import")
+    '                 For Each it In ito
+    '                     Select sKey
+    '                         Case "Entities"
+    '                             sName = String.LCase(ito[ito.Key]["entity"])
+    '                             If TreeView1.Exist("i" & sName) = False Then
+    '                                 TreeView1.Add("i" & sName, sName,, "i" & sKey)
+    '                             Endif
+    '                         Case "Block"
+    '                             sName = ito[ito.Key]["block"]
+    '                             If TreeView1.Exist("i" & sName) = False Then
+    '                                 TreeView1.Add("i" & sName, sName,, "i" & sKey)
+    '                             Endif
+    '                         Case Else
+    '                             TreeView1.Add("i" & ito.Key, sName,, "i" & sKey)
+    '                     End Select
+    '
+    '                 Next
+    '             Case gb.String
+    '                 TreeView1.Add("i" & sKey, sKey,, "import")
+    '         End Select
+    '     Next
+    ' Endif
     APP = Me.Parent.Parent.Parent.Parent.Parent.Parent
     APPMain.LoadComboboxes(cModel)
 

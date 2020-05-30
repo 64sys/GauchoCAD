@@ -272,7 +272,6 @@ Public Sub Task(sTask As String)
             If Exist(FilePath) Then
                 Select String.LCase(File.Ext(FilePath))
                     Case "xml"
-
                         'cModel = FileLoad(FilePath)
                         cModel = cad.LoadGaucho(FilePath)
                         LoadComboboxes(cModel)

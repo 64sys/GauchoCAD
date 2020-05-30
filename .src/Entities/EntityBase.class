@@ -124,7 +124,7 @@ Public Function SelPartial(X1real As Float, Y1real As Float, X2real As Float, Y2
         puedo = False
         For i = 0 To Me.p.max Step 2
             If (Me.p[i] >= X1real And Me.p[i] <= X2real) And (Me.p[i + 1] >= Y1real And Me.p[i + 1] <= Y2real) Then
-                Me.PSel[i] = True
+                Me.PSel[i / 2] = True
                 puedo = True
             End If
         Next
@@ -157,10 +157,23 @@ Public Function AboveMe(Xreal As Float, Yreal As Float, tolerance As Float, mode
     If Me.P.Count = 0 Then Return
 
     If puntos.Around(Xreal, yreal, Me.P[0], Me.P[1], APPMain.hFCAD.Metros(10)) Then
+
         returnData[0] = Me.P[0]
         returnData[1] = Me.P[1]
         returnData[2] = 0
         Return True
+
+    Else If Me.BoundingPoligon.Count > 0 Then
+
+        If puntos.isInside(Me.BoundingPoligon, Me.BoundingPoligon.Count / 2, Xreal, yreal) Then
+            returnData[0] = Xreal
+            returnData[1] = yreal
+            returnData[2] = 0
+
+            Return True
+
+        End If
+
     Else
 
         Return False
@@ -168,13 +181,13 @@ Public Function AboveMe(Xreal As Float, Yreal As Float, tolerance As Float, mode
 
 End
 
-Public Sub PointClick(Xr As Float, Zr As Float) As Boolean
+Public Sub PointClick(Xr As Float, Yr As Float) As Boolean
 
     ' this could be overriden in the child
 
     If Me.BoundingPoligon.Count = 0 Then Return False
 
-    If puntos.isInside(Me.BoundingPoligon, Me.BoundingPoligon.Count / 2, xr, zr) Then
+    If puntos.isInside(Me.BoundingPoligon, Me.BoundingPoligon.Count / 2, xr, Yr) Then
 
         Return True
     Else

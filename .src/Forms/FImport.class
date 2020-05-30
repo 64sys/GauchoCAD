@@ -30,8 +30,8 @@ Public Observer As Observer        ''Observador usaod para avisar si hay cambios
 Private apc As String               '' Archivo de configuracion del programa
 Private lgg As Logger               '' Registro de eventos de la aplicación.
 '------------------------------------------------------------------------------
-Private ctn As New Collection       '' Colección de variables del programa que reflejan los cambios de configuración.
-Private cfg As New Collection       '' Coleccion de propiedades del proyecto
+'Private ctn As New Collection       '' Colección de variables del programa que reflejan los cambios de configuración.
+'Private cfg As New Collection       '' Coleccion de propiedades del proyecto
 Private CurrFile As String          '' Current selected file
 'Private cModel As New Collection        '' CAD model obtained from the current file file
 Private cImport As New Collection        '' CAD model obtained from the current file file
@@ -92,7 +92,7 @@ End
 Public Sub btnOK_Click()
 
     Dim xForm As FCAD
-    Dim cTmp As Collection
+    '    Dim cTmp As Collection
 
     cImport.Clear
     Dim wspce As Workspace
