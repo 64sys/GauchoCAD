@@ -225,7 +225,7 @@ Public Sub Task(sTask As String)
 
     Dim hFConfig As FConfig                 '' Edit program configuration
     Dim hFAbout As FAbout                  '' Formulario que muestra informacin del programa
-    Dim hFImport As FImport                 '' Impor from others formats
+    'Dim hFImport As FImport                 '' Impor from others formats
     Dim w As Window
     Dim wtag As String
 

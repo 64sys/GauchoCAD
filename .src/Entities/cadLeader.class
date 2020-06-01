@@ -20,20 +20,4 @@
 ' Foundation, Inc., 51 Franklin St, Fifth Floor,
 ' Boston, MA  02110-1301  USA
 
-Inherits ToolsBase
-Public Const GENDER As String = "SaveAs"
-
-Public Function Start(Optional ElemToBuild As Variant, Optional _mode As Integer = 0) As Boolean
-
-    Dim xf As String[]
-    Dim f As String
-
-    Dialog.SaveFile()
-    f = Dialog.Path
-    If File.Ext(f) <> "xml" Then
-        f = f & ".xml"
-    Endif
-    cadSave.SaveToFile(f) ' <--- Tincho
-    Me.Finish
-
-End
+Inherits EntityBase

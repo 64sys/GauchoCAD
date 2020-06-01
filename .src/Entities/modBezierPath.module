@@ -1,351 +1,347 @@
 ' Gambas module file
 
-    ' 
-    ' This class demonstrates the code discussed In these two articles:
-    ' 
-    ' http: / / devmag.org.za / 2011 / 04 / 05 / bzier - curves - a - tutorial /
-    ' http: / / devmag.org.za / 2011 / 06 / 23 / bzier - path - algorithms /
-    ' 
-    ' Use this code As You wish, at your own risk.If it blows up
-    ' your computer, makes a plane crash, Or otherwise cause damage,
-    ' injury, Or death, it Is Not my fault.
-    ' 
-    ' @author Herman Tulleken, dev.mag.org.za
-    ' 
+'
+' This class demonstrates the code discussed In these two articles:
+'
+' http: / / devmag.org.za / 2011 / 04 / 05 / bzier - curves - a - tutorial /
+' http: / / devmag.org.za / 2011 / 06 / 23 / bzier - path - algorithms /
+'
+' Use this code As You wish, at your own risk.If it blows up
+' your computer, makes a plane crash, Or otherwise cause damage,
+' injury, Or death, it Is Not my fault.
+'
+' @author Herman Tulleken, dev.mag.org.za
+' Translation from C++ to Gambas, Martin P Cristia
 
+' Class for representing a Bezier path, And methods For getting suitable points To
+' draw the curve With Line segments.
 
+Private Const nDim As Integer = 2           ' 1 = planar, 2 = space
+Private Const SEGMENTS_PER_CURVE As Integer = 10
+Private Const MINIMUM_SQR_DISTANCE As Float = 0.01
 
-    ' Class for representing a Bezier path, And methods For getting suitable points To
-    ' draw the curve With Line segments.
+' This corresponds To about 172 degrees, 8 degrees From a traight Line
+Private Const DIVISION_THRESHOLD As Float = -0.99
 
-    Private Const nDim As Integer = 2           ' 1 = planar, 2 = space
-    Private Const SEGMENTS_PER_CURVE As Integer = 10
-    Private Const MINIMUM_SQR_DISTANCE As Float = 0.01 
+Private controlPoints As Float[]
 
-                                                                ' This corresponds To about 172 degrees, 8 degrees From a traight Line
-    Private Const DIVISION_THRESHOLD As Float = -0.99 
+Private curveCount As Integer                               ' how many bezier curves In this path?
 
-    Private controlPoints As Float[]
+' Constructs a New Empty Bezier curve.Use one Of these methods
+' To add points: SetControlPoints, Interpolate, SamplePoints.
+'
+Public Sub BezierPath()
 
-    Private curveCount As Integer                               ' how many bezier curves In this path?
+    controlPoints = New Float[]
 
-    
-        ' Constructs a New Empty Bezier curve.Use one Of these methods
-        ' To add points: SetControlPoints, Interpolate, SamplePoints.
-        ' 
-    Public Sub BezierPath()
-    
-        controlPoints = New Float[]
-    End
+End
 
-    
-        ' Sets the control points Of this Bezier path.
-        ' Points 0 - 3 forms the first Bezier curve, points
-        ' 3 - 6 forms the second curve, etc.
-   
-    Public Sub SetControlPoints(newControlPoints As Float[])
-    
-        controlPoints.Clear()
-        controlPoints.Add(newControlPoints)
-        curveCount = (controlPoints.Count - 1) / 3
-    End
+' Sets the control points Of this Bezier path.
+' Points 0 - 3 forms the first Bezier curve, points
+' 3 - 6 forms the second curve, etc.
 
-    
-        ' Returns the control points For this Bezier curve.
-   
-    Public Function GetControlPoints() As Float[]
-    
-        Return controlPoints
-        
-    End
+Public Sub SetControlPoints(newControlPoints As Float[])
 
-    
-        ' Calculates a Bezier interpolated path For the given points.
-   
-    Public Sub Interpolate(segmentPoints As Float[], scale As Float)
-    
-        controlPoints.Clear
-        
+    controlPoints.Clear()
+    controlPoints.Add(newControlPoints)
+    curveCount = (controlPoints.Count - 1) / 3
 
-        If (segmentPoints.Count < 2) Then
-        
-            Return 
+End
+
+' Returns the control points For this Bezier curve.
+
+Public Function GetControlPoints() As Float[]
+
+    Return controlPoints
+
+End
+
+' Calculates a Bezier interpolated path For the given points.
+
+Public Sub Interpolate(segmentPoints As Float[], scale As Float)
+
+    controlPoints.Clear
+
+    If (segmentPoints.Count < 2) Then
+
+        Return
+    End If
+    Dim i As Integer
+    Dim p0, p1, p2, q0, q1, tangent As New Float[]
+
+    For i = 0 To segmentPoints.Max
+
+        If (i = 0) Then                                    ' Is First
+
+            p1 = segmentPoints[i]
+            p2 = segmentPoints[i + 1]
+
+            tangent = (p2 - p1)
+            q1 = p1 + scale * tangent
+
+            controlPoints.Add(p1)
+            controlPoints.Add(q1)
+
+        Else If (i = segmentPoints.max) Then ' Last
+
+            p0 = segmentPoints[i - 1]
+            p1 = segmentPoints[i]
+            tangent = (p1 - p0)
+            q0 = p1 - scale * tangent
+
+            controlPoints.Add(q0)
+            controlPoints.Add(p1)
+
+        Else
+
+            p0 = segmentPoints[i - 1]
+            p1 = segmentPoints[i]
+            p2 = segmentPoints[i + 1]
+            tangent = (p2 - p0).normalized
+            q0 = p1 - scale * tangent * (p1 - p0).magnitude
+            q1 = p1 + scale * tangent * (p2 - p1).magnitude
+
+            controlPoints.Add(q0)
+            controlPoints.Add(p1)
+            controlPoints.Add(q1)
         End If
-       Dim i As Integer
-        Dim p0, p1, p2, q0, q1, tangent As New Float[]
-        
-        For i = 0 To segmentPoints.Max
-        
-            If (i = 0) Then                                    ' Is First
-            
-                p1 = segmentPoints[i]
-                p2 = segmentPoints[i + 1]
+    Next
 
-                tangent = (p2 - p1)
-                q1 = p1 + scale * tangent
+    curveCount = (controlPoints.Count - 1) / 3
 
-                controlPoints.Add(p1)
-                controlPoints.Add(q1)
-            
-            Else If (i = segmentPoints.max) Then ' Last
-            
-                p0 = segmentPoints[i - 1]
-                p1 = segmentPoints[i]
-                tangent = (p1 - p0)
-                q0 = p1 - scale * tangent
+End
 
-                controlPoints.Add(q0)
-                controlPoints.Add(p1)
-            
-            Else
-            
-                p0 = segmentPoints[i - 1]
-                p1 = segmentPoints[i]
-                p2 = segmentPoints[i + 1]
-                tangent = (p2 - p0).normalized
-                q0 = p1 - scale * tangent * (p1 - p0).magnitude
-                q1 = p1 + scale * tangent * (p2 - p1).magnitude
+' Sample the given points As A Bezier path.
 
-                controlPoints.Add(q0)
-                controlPoints.Add(p1)
-                controlPoints.Add(q1)
-            End If
-        Next
+Public Sub SamplePoints(sourcePoints As Float[], minSqrDistance As Float, maxSqrDistance As Float, scale As Float)
 
-        curveCount = (controlPoints.Count - 1) / 3
-    End
+    If (sourcePoints.Count < 2) Then
 
-    
-        ' Sample the given points As A Bezier path.
-   
-    Public Sub SamplePoints(sourcePoints As Float[], minSqrDistance As Float, maxSqrDistance As Float, scale As Float)
-    
-        If (sourcePoints.Count < 2) Then
-        
-            Return 
-        End If
+        Return
+    End If
 
-        Dim p1, p0, tangent, samplePoints, potentialSamplePoint As New Float[], i As Integer
-       Dim d1, d2 As Float
-        samplePoints.Push(sourcePoints[0])
+    Dim p1, p0, tangent, samplePoints, potentialSamplePoint As New Float[], i As Integer
+    Dim d1, d2 As Float
+    samplePoints.Push(sourcePoints[0])
 
-        potentialSamplePoint = sourcePoints[1]
+    potentialSamplePoint = sourcePoints[1]
 
-        i = 2
+    i = 2
 
-        For i = 2 To sourcePoints.Count
-        
-            If (((potentialSamplePoint - sourcePoints[i]).sqrMagnitude > minSqrDistance) And ((samplePoints.Peek() - sourcePoints[i]).sqrMagnitude > maxSqrDistance)) Then
-            
-                samplePoints.Push(potentialSamplePoint)
-            End If
+    For i = 2 To sourcePoints.Count
 
-            potentialSamplePoint = sourcePoints[i]
-        Next
+        If (((potentialSamplePoint - sourcePoints[i]).sqrMagnitude > minSqrDistance) And ((samplePoints.Peek() - sourcePoints[i]).sqrMagnitude > maxSqrDistance)) Then
 
-        ' Now handle Last bit Of curve
-        p1 = samplePoints.Pop()                                 ' Last sample point
-        p0 = samplePoints.Peek()                                ' second Last sample point
-        tangent = (p0 - potentialSamplePoint).normalized
-        d2 = (potentialSamplePoint - p1).magnitude
-        d1 = (p1 - p0).magnitude
-        p1 = p1 + tangent * ((d1 - d2) / 2)
-
-        samplePoints.Push(p1)
-        samplePoints.Push(potentialSamplePoint)
-
-
-        Interpolate(samplePoints, scale)
-    End
-
-
-        ' Caluclates a point On the path.
-        ' 
-        ' @param curveIndex The index Of the curve that the point Is On.For example,
-        ' the second curve(index 1) Is The curve With controlpoints 3, 4, 5, And 6.
-        ' 
-        ' @param t The paramater indicating where On the curve the point is.0 corresponds
-        ' To the "left" point, 1 corresponds To the "right" End point.
-
-    Public Function CalculateBezierPoint(curveIndex As Integer, t As Float) As Float[]
-    
-        Dim nodeIndex As Integer = curveIndex * 3
-        Dim p0, p1, p2, p3 As New Float[]
-        Dim i As Integer
-        For i = 0 To 2
-            p0 = controlPoints[nodeIndex]
-            p1 = controlPoints[nodeIndex + 1]
-            p2 = controlPoints[nodeIndex + 2]
-            p3 = controlPoints[nodeIndex + 3]
-        Next
-        Return CalculateBezierPoint(t, p0, p1, p2, p3)
-    End
-
-
-        ' Gets the drawing points.This implementation simply calculates a certain number
-        ' Of points per curve.
-
-    Public Function GetDrawingPoints0() As Float[]
-    
-        Dim drawingPoints As New Float[]
-       Dim curveIndex, j As Integer
-        Dim t As Float
-        For curveIndex = 0 To curveCount - 1
-        
-            If (curveIndex = 0) Then '  Only Do this For the first End point.
-             ' When i! = 0, this coincides With the
-             ' End point Of the previous segment,
-            
-                drawingPoints.Add(CalculateBezierPoint(curveIndex, 0))
-            End If
-
-            For j = 1 To SEGMENTS_PER_CURVE 
-            
-                t = j / SEGMENTS_PER_CURVE
-                drawingPoints.Add(CalculateBezierPoint(curveIndex, t))
-            Next
-        Next
-
-        Return drawingPoints
-    End
-
-
-        ' Gets the drawing points.This implementation simply calculates a certain number
-        ' Of points per curve.
-        ' 
-        ' This Is A lsightly different inplementation From the one above.
-
-    Public Function GetDrawingPoints1() As Float[]
-       Dim t As Float, i, j As Integer
-        Dim drawingPoints As New Float[]
-        Dim p0, p1, p2, p3 As New Float[]
-        For i = 0 To controlPoints.max - 3 Step 3
-        
-            p0 = controlPoints[i]
-            p1 = controlPoints[i + 1]
-            p2 = controlPoints[i + 2]
-            p3 = controlPoints[i + 3]
-
-            If i = 0 Then                 ' only Do this For the first End point.When i! = 0, this coincides With the End point Of the previous segment,
-            
-                drawingPoints.Add(CalculateBezierPoint(0, p0, p1, p2, p3))
-            End If
-
-            For j = 1 To SEGMENTS_PER_CURVE 
-  
-                t = j / SEGMENTS_PER_CURVE
-                drawingPoints.Add(CalculateBezierPoint(t, p0, p1, p2, p3))
-            Next
-        Next
-
-        Return drawingPoints
-    End
-
-
-        ' This gets the drawing points Of a bezier curve, using recursive division,
-        ' which results In less points For the same accuracy As The above implementation.
-        ' 
-    Public Function GetDrawingPoints2() As Float[]
-    
-        Dim bezierCurveDrawingPoints, drawingPoints As New Float[]
-       Dim curveIndex As Integer
-        For curveIndex = 0 To curveCount
-        
-            bezierCurveDrawingPoints = FindDrawingPoints(curveIndex)
-
-            If (curveIndex <> 0) Then
-            
-                ' remove the fist point, As It coincides With the Last point Of the previous Bezier curve.
-                bezierCurveDrawingPoints.Remove(0)
-            End If
-
-            drawingPoints.Add(bezierCurveDrawingPoints)
-        Next
-
-        Return drawingPoints
-    End
-    
-    
-
-    Public Function FindDrawingPoints2(curveIndex As Integer) As Float[]
-    
-        Dim pointList, left, right As New Float[]
-
-        left = CalculateBezierPoint(curveIndex, 0)
-        right = CalculateBezierPoint(curveIndex, 1)
-
-        pointList.Add(left)
-        pointList.Add(right)
-
-        FindDrawingPoints(curveIndex, 0, 1, pointList, 1)
-
-        Return pointList
-    End
-
-
-
-        ' @returns the number Of points added.
-
-    Public Function FindDrawingPoints(curveIndex As Integer, t0 As Float, t1 As Float, pointList As Float[], insertionIndex As Float) As Integer
-        Dim left, right, mid, leftDirection, rightDirection As New Float[]
-        Dim tmid As Float, i As Integer
-        Dim pointsAddedCount As Integer = 0
-        
-        left = CalculateBezierPoint(curveIndex, t0)
-        
-        right = CalculateBezierPoint(curveIndex, t1)
-
-        If ((left - right).sqrMagnitude < MINIMUM_SQR_DISTANCE) Then
-        
-            Return 0
+            samplePoints.Push(potentialSamplePoint)
         End If
 
-        tMid = (t0 + t1) / 2
-        mid = CalculateBezierPoint(curveIndex, tMid)
-        For i = 0 To nDim
-            leftDirection[i] = left[i] - mid[i]
-            rightDirection[i] = right[i] - mid[i]
-       Next
-        puntos.Normalize(leftDirection)
-        puntos.Normalize(rightDirection)
+        potentialSamplePoint = sourcePoints[i]
+    Next
 
-        If (puntos.Dot(leftDirection, rightDirection) > DIVISION_THRESHOLD) Or (Abs(tMid - 0.5) < 0.0001) Then 
-            
+    ' Now handle Last bit Of curve
+    p1 = samplePoints.Pop()                                 ' Last sample point
+    p0 = samplePoints.Peek()                                ' second Last sample point
+    tangent = (p0 - potentialSamplePoint).normalized
+    d2 = (potentialSamplePoint - p1).magnitude
+    d1 = (p1 - p0).magnitude
+    p1 = p1 + tangent * ((d1 - d2) / 2)
 
-            pointsAddedCount += FindDrawingPoints(curveIndex, t0, tMid, pointList, insertionIndex)
-            pointList.Insert(insertionIndex + pointsAddedCount, mid)
-            Inc pointsAddedCount 
-            pointsAddedCount += FindDrawingPoints(curveIndex, tMid, t1, pointList, insertionIndex + pointsAddedCount)
+    samplePoints.Push(p1)
+    samplePoints.Push(potentialSamplePoint)
 
-            Return pointsAddedCount
+    Interpolate(samplePoints, scale)
+
+End
+
+' Caluclates a point On the path.
+'
+' @param curveIndex The index Of the curve that the point Is On.For example,
+' the second curve(index 1) Is The curve With controlpoints 3, 4, 5, And 6.
+'
+' @param t The paramater indicating where On the curve the point is.0 corresponds
+' To the "left" point, 1 corresponds To the "right" End point.
+
+Public Function CalculateBezierPoint(curveIndex As Integer, t As Float) As Float[]
+
+    Dim nodeIndex As Integer = curveIndex * 3
+    Dim p0, p1, p2, p3 As New Float[]
+    Dim i As Integer
+
+    For i = 0 To 2
+        p0 = controlPoints[nodeIndex]
+        p1 = controlPoints[nodeIndex + 1]
+        p2 = controlPoints[nodeIndex + 2]
+        p3 = controlPoints[nodeIndex + 3]
+    Next
+    Return CalculateBezierPoint(t, p0, p1, p2, p3)
+
+End
+
+' Gets the drawing points.This implementation simply calculates a certain number
+' Of points per curve.
+
+Public Function GetDrawingPoints0() As Float[]
+
+    Dim drawingPoints As New Float[]
+    Dim curveIndex, j As Integer
+    Dim t As Float
+
+    For curveIndex = 0 To curveCount - 1
+
+        If (curveIndex = 0) Then '  Only Do this For the first End point.
+            ' When i! = 0, this coincides With the
+            ' End point Of the previous segment,
+
+            drawingPoints.Add(CalculateBezierPoint(curveIndex, 0))
         End If
+
+        For j = 1 To SEGMENTS_PER_CURVE
+
+            t = j / SEGMENTS_PER_CURVE
+            drawingPoints.Add(CalculateBezierPoint(curveIndex, t))
+        Next
+    Next
+
+    Return drawingPoints
+
+End
+
+' Gets the drawing points.This implementation simply calculates a certain number
+' Of points per curve.
+'
+' This Is A lsightly different inplementation From the one above.
+
+Public Function GetDrawingPoints1() As Float[]
+
+    Dim t As Float, i, j As Integer
+    Dim drawingPoints As New Float[]
+    Dim p0, p1, p2, p3 As New Float[]
+
+    For i = 0 To controlPoints.max - 3 Step 3
+
+        p0 = controlPoints[i]
+        p1 = controlPoints[i + 1]
+        p2 = controlPoints[i + 2]
+        p3 = controlPoints[i + 3]
+
+        If i = 0 Then                 ' only Do this For the first End point.When i! = 0, this coincides With the End point Of the previous segment,
+
+            drawingPoints.Add(CalculateBezierPoint(0, p0, p1, p2, p3))
+        End If
+
+        For j = 1 To SEGMENTS_PER_CURVE
+
+            t = j / SEGMENTS_PER_CURVE
+            drawingPoints.Add(CalculateBezierPoint(t, p0, p1, p2, p3))
+        Next
+    Next
+
+    Return drawingPoints
+
+End
+
+' This gets the drawing points Of a bezier curve, using recursive division,
+' which results In less points For the same accuracy As The above implementation.
+'
+Public Function GetDrawingPoints2() As Float[]
+
+    Dim bezierCurveDrawingPoints, drawingPoints As New Float[]
+    Dim curveIndex As Integer
+
+    For curveIndex = 0 To curveCount
+
+        bezierCurveDrawingPoints = FindDrawingPoints(curveIndex)
+
+        If (curveIndex <> 0) Then
+
+            ' remove the fist point, As It coincides With the Last point Of the previous Bezier curve.
+            bezierCurveDrawingPoints.Remove(0)
+        End If
+
+        drawingPoints.Add(bezierCurveDrawingPoints)
+    Next
+
+    Return drawingPoints
+
+End
+
+Public Function FindDrawingPoints2(curveIndex As Integer) As Float[]
+
+    Dim pointList, left, right As New Float[]
+
+    left = CalculateBezierPoint(curveIndex, 0)
+    right = CalculateBezierPoint(curveIndex, 1)
+
+    pointList.Add(left)
+    pointList.Add(right)
+
+    FindDrawingPoints(curveIndex, 0, 1, pointList, 1)
+
+    Return pointList
+
+End
+
+' @returns the number Of points added.
+
+Public Function FindDrawingPoints(curveIndex As Integer, t0 As Float, t1 As Float, pointList As Float[], insertionIndex As Float) As Integer
+
+    Dim left, right, mid, leftDirection, rightDirection As New Float[]
+    Dim tmid As Float, i As Integer
+    Dim pointsAddedCount As Integer = 0
+
+    left = CalculateBezierPoint(curveIndex, t0)
+
+    right = CalculateBezierPoint(curveIndex, t1)
+
+    If ((left - right).sqrMagnitude < MINIMUM_SQR_DISTANCE) Then
 
         Return 0
-    End
+    End If
 
+    tMid = (t0 + t1) / 2
+    mid = CalculateBezierPoint(curveIndex, tMid)
+    For i = 0 To nDim
+        leftDirection[i] = left[i] - mid[i]
+        rightDirection[i] = right[i] - mid[i]
+    Next
+    puntos.Normalize(leftDirection)
+    puntos.Normalize(rightDirection)
 
+    If (puntos.Dot(leftDirection, rightDirection) > DIVISION_THRESHOLD) Or (Abs(tMid - 0.5) < 0.0001) Then
 
-    ' Caluclates a point On the Bezier curve represented With the four controlpoints given.
+        pointsAddedCount += FindDrawingPoints(curveIndex, t0, tMid, pointList, insertionIndex)
+        pointList.Insert(insertionIndex + pointsAddedCount, mid)
+        Inc pointsAddedCount
+        pointsAddedCount += FindDrawingPoints(curveIndex, tMid, t1, pointList, insertionIndex + pointsAddedCount)
 
-    Private Function CalculateBezierPoint22(t As Float, p0 As Float[], p1 As Float[], p2 As Float[], p3 As Float[]) As Float[]
-    
-        Dim i As Integer 
-        Dim u, tt, uu, uuu, ttt As Float
-        Dim p As New Float[]
-        u = 1 - t
-        tt = t * t
-        uu = u * u
-        uuu = uu * u
-        ttt = tt * t
+        Return pointsAddedCount
+    End If
 
-        For i = 0 To p0.max
-            p[i] = uuu * p0[i]              ' first term
-           p[i] += 3 * uu * t * p1[i]    ' second term
-            p[i] += 3 * u * tt * p2[i]    ' third term
-            p[i] += ttt * p3[i]           ' fourth term
-        Next
-        
-        Return p
+    Return 0
 
-    End
+End
 
+' Caluclates a point On the Bezier curve represented With the four controlpoints given.
+
+Private Function CalculateBezierPoint22(t As Float, p0 As Float[], p1 As Float[], p2 As Float[], p3 As Float[]) As Float[]
+
+    Dim i As Integer
+    Dim u, tt, uu, uuu, ttt As Float
+    Dim p As New Float[]
+
+    u = 1 - t
+    tt = t * t
+    uu = u * u
+    uuu = uu * u
+    ttt = tt * t
+
+    For i = 0 To p0.max
+        p[i] = uuu * p0[i]              ' first term
+        p[i] += 3 * uu * t * p1[i]    ' second term
+        p[i] += 3 * u * tt * p2[i]    ' third term
+        p[i] += ttt * p3[i]           ' fourth term
+    Next
+
+    Return p
+
+End

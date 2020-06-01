@@ -1,51 +1,62 @@
 ' Gambas class file
 
+' GauchoCAD
+' A simple CAD made in Gambas
+'
+' Copyright (C) Ing Martin P Cristia
+'
+' This program is free software; you can redistribute it and/or modify
+' it under the terms of the GNU General Public License as published by
+' the Free Software Foundation; either version 3 of the License, or
+' (at your option) any later version.
+'
+' This program is distributed in the hope that it will be useful,
+' but WITHOUT ANY WARRANTY; without even the implied warranty of
+' MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+' GNU General Public License for more details.
+'
+' You should have received a copy of the GNU General Public License
+' along with this program; if not, write to the Free Software
+' Foundation, Inc., 51 Franklin St, Fifth Floor,
+' Boston, MA  02110-1301  USA
 
 Public Sub Form_Open()
-
-    
 
 End
 
 Public Sub Run(o As Object)
-    
+
     lblEntity.Text = o.gender
     ' FInspector.lblColor.Background = oEntity.gbcolor
     ' FInspector.lblColorName.TExt = oEntity._color
     lblLayer.TExt = o.layer
     Select Case o.gender
         Case "Line"
-            
+
             Me.lblPropName1.Text = ("Length")
             Me.lblProp1.Text = Left$(Str$(puntos.distancia(o.p[0], o.p[1], o.p[2], o.p[3])), 9)
-            
+
             Me.lblPropName2.Text = "LineWidth"
             Me.lblProp2.Text = Str$(o.linewidth)
-            
+
             Me.lblPropName3.Text = "LineType"
             Me.lblProp3.Text = Str$(o.LineType)
-        
+
         Case "Circle"
-            
+
             Me.lblPropName1.Text = ("Radious")
             Me.lblProp1.Text = Left$(Str$(o.fparam[0]), 9)
-            
+
             Me.lblPropName2.Text = "LineWidth"
             Me.lblProp2.Text = Str$(o.LineWidth)
-            
+
             Me.lblPropName3.Text = "LineType"
             Me.lblProp3.Text = Str$(o.LineType)
-            
-        
-        
+
     End Select
-    
-    
-    
+
     Me.Top = Mouse.Screeny - FInspector.h - 20
     Me.Left = Mouse.ScreenX + 20
     Me.Show
-    
-    
-End
 
+End

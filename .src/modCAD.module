@@ -1,14 +1,14 @@
 ' Gambas module file
 
-' Tool maintained by Terco
-' PlantDesigner
-' Software para diseño de plantas tipo de hormigon
+' GauchoCAD
+' A simple CAD made in Gambas
 '
 ' Copyright (C) Ing Martin P Cristia
+' Copyright (C) Martin Belmonte
 '
 ' This program is free software; you can redistribute it and/or modify
 ' it under the terms of the GNU General Public License as published by
-' the Free Software Foundation; either version 2 of the License, or
+' the Free Software Foundation; either version 3 of the License, or
 ' (at your option) any later version.
 '
 ' This program is distributed in the hope that it will be useful,
@@ -20,13 +20,6 @@
 ' along with this program; if not, write to the Free Software
 ' Foundation, Inc., 51 Franklin St, Fifth Floor,
 ' Boston, MA  02110-1301  USA
-' Gambas class file
-
-' Credits
-' --------
-' Icon design por Trinh Ho ,Good Ware, freepik get them at https://www.flaticon.es
-' Based on an example called MuchosCirculos by JGuardon y MrShell
-' XML Load/Save by Tincho
 
 ' Filtros del dibujo
 Public DrawOriginals As Boolean = False
@@ -131,7 +124,8 @@ Public Function ImportEntities(colData As Collection, obxEntities As Object[]) A
 GetPoints:              ' Leo los puntos que estan separados y los meto en un unico array de Float[]
     flxPoints.Clear
     For Each p In colEnt["p"]
-        flxPoints.Insert(p)
+        flxPoints.Add(p[0])
+        flxPoints.Add(p[1])     ' P[2] es Z y lo ingnoro
     Next
 
     Return

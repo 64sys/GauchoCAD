@@ -1,5 +1,25 @@
 ' Gambas class file
 
+' GauchoCAD
+' A simple CAD made in Gambas
+'
+' Copyright (C) Ing Martin P Cristia
+'
+' This program is free software; you can redistribute it and/or modify
+' it under the terms of the GNU General Public License as published by
+' the Free Software Foundation; either version 3 of the License, or
+' (at your option) any later version.
+'
+' This program is distributed in the hope that it will be useful,
+' but WITHOUT ANY WARRANTY; without even the implied warranty of
+' MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+' GNU General Public License for more details.
+'
+' You should have received a copy of the GNU General Public License
+' along with this program; if not, write to the Free Software
+' Foundation, Inc., 51 Franklin St, Fifth Floor,
+' Boston, MA  02110-1301  USA
+
 Inherits ToolsBase
 Public Const GENDER As String = "Load"
 
@@ -7,29 +27,28 @@ Public Function Start(Optional filename As Variant, Optional _mode As Integer = 
 
     Dim xf As String[]
     Dim f As String
-    
-    
+
     If filename = "" Then
         Dialog.Filter = ["*.xml", ("Archivos de GambasCAD")]
         Dialog.OpenFile(False)
-    
+
         f = Dialog.Path
         If Exist(f) Then
             LoadFromFile(f)
         Endif
     Else
-            LoadFromFile(filename)
-        
-    End If
-   clsEntities.ReconstruirBloques
-    Me.Finish
-   ' appmain.hFCAD.LoadLayers()
-   ' appmain.hFCAD.LoadWeights()    ' esto no funciona porque la ventana no esta añadida al workspace
-   ' appmain.hFCAD.LoadStyles()
-   
-   clsEntities.GLGenDrawList
+        LoadFromFile(filename)
 
-   cadZoomE.Start()                ' esto no funciona porque la ventana no esta añadida al workspace
+    End If
+    clsEntities.ReconstruirBloques
+    Me.Finish
+    ' appmain.hFCAD.LoadLayers()
+    ' appmain.hFCAD.LoadWeights()    ' esto no funciona porque la ventana no esta añadida al workspace
+    ' appmain.hFCAD.LoadStyles()
+
+    clsEntities.GLGenDrawList
+
+    cadZoomE.Start()                ' esto no funciona porque la ventana no esta añadida al workspace
 
 End
 
@@ -166,14 +185,10 @@ Public Sub LoadFromFile(Optional FilePath As String)
 
 End
 
-
-
 Public Sub Finish()     ' en este caso no podemos usar la rutina de la clase padre
 
     modCAD.clsJobPrevious = Me
     modCAD.clsJob = clsDefaultJob
     clsDrawingAids.CleanTexts
-   
 
 End
-
