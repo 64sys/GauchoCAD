@@ -1,7 +1,7 @@
 # Gambas Form File 3.0
 
 { Form Form
-  MoveScaled(0,0,137,93)
+  MoveScaled(0,0,137,85)
   Background = Color.TextBackground
   Icon = Picture["logo.svg"]
   Arrangement = Arrange.Vertical
@@ -245,11 +245,11 @@
     }
   }
   { Panel1 Panel
-    MoveScaled(6,9,111,74)
+    MoveScaled(2,2,134,78)
     Expand = True
     Arrangement = Arrange.Vertical
     { Panel2 Panel
-      MoveScaled(1,1,106,5)
+      MoveScaled(1,1,132,5)
       Arrangement = Arrange.Horizontal
       { pnlFile Panel
         MoveScaled(0,0,24,5)
@@ -260,27 +260,31 @@
       { PanToolsHorizontal Panel
         MoveScaled(27,0,78,5)
         Expand = True
-        Arrangement = Arrange.Row
+        Arrangement = Arrange.Horizontal
         Spacing = True
         Padding = 2
+        { ColorPalette1 ColorPalette
+          MoveScaled(1,0,25,5)
+          Border = False
+        }
         { cboLayers ComboBox dprop
           Name = "cboLayers"
-          MoveScaled(1,0,15,5)
+          MoveScaled(9,0,15,5)
           Tag = "layer"
           ToolTip = ("Layers")
           ReadOnly = True
         }
-        { tobLayers ToolButton
-          MoveScaled(16,0,4,4)
-          Picture = Picture["svg/layers/layers.svg"]
-          Border = True
-        }
         { Separator1 Separator
           MoveScaled(21,0,1,4)
         }
+        { tobLayers ToolButton
+          MoveScaled(26,0,5,5)
+          Picture = Picture["svg/layers/layers.svg"]
+          Border = True
+        }
         { cboStyles ComboBox dprop
           Name = "cboStyles"
-          MoveScaled(23,0,15,5)
+          MoveScaled(33,0,15,5)
           Tag = "style"
           ToolTip = ("Line styles")
           ReadOnly = True
@@ -290,7 +294,7 @@
         }
         { cboWidths ComboBox dprop
           Name = "cboWidths"
-          MoveScaled(44,0,11,5)
+          MoveScaled(49,0,11,5)
           Tag = "weight"
           ToolTip = ("Line widths")
           ReadOnly = True
@@ -300,15 +304,21 @@
         }
         { cboDimSts ComboBox dprop
           Name = "cboDimSts"
-          MoveScaled(59,0,14,5)
+          MoveScaled(62,0,14,5)
           Tag = "style"
           ToolTip = ("Dimmension styles")
           ReadOnly = True
         }
       }
+      { pnlHelp Panel
+        MoveScaled(114,0,17,5)
+        Expand = True
+        Arrangement = Arrange.Horizontal
+        Spacing = True
+      }
     }
     { PanEdit1 Panel
-      MoveScaled(1,7,106,66)
+      MoveScaled(1,11,106,66)
       Expand = True
       Arrangement = Arrange.Horizontal
       Spacing = True
