@@ -2899,7 +2899,7 @@ Private Function DecodeDXFBlock(sItem As String) As Collection
     Next
 
     If parts.Count > 0 Then
-        out.Add(parts.Copy(), "parts")
+        out.Add(parts.Copy(), "Entities")
     Endif
 
     Return out
