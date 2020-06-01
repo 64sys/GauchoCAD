@@ -88,7 +88,7 @@ Public Sub Run(cin As Collection)
                         z = 32
 
                     Case "grpView"
-                        tob = New ToolButton(pnlFile) As "tool"
+                        tob = New ToolButton(pnlToolsH) As "tool"
                         z = 32
 
                     Case Else
@@ -221,10 +221,10 @@ End
 
 Public Sub LoadComboboxes(cMdl As Collection)
 
-    Dim Layer As Variant
-    Dim Style As Variant
-    Dim Width As Variant
-    Dim DimSt As Variant
+    Dim aLayer As Variant
+    Dim aStyle As Variant
+    Dim aWidth As Variant
+    Dim aDimSt As Variant
 
     cMod = cMdl
 
@@ -235,41 +235,41 @@ Public Sub LoadComboboxes(cMdl As Collection)
 
     If cMdl.Count > 0 Then
         If cMdl.Exist("Layers") Then
-            For Each Layer In cMdl["Layers"]
-                cboLayers.Add(Layer["name"])
+            For Each aLayer In cMdl["Layers"]
+                cboLayers.Add(aLayer["name"])
             Next
-            For Each Layer In cMdl["Layers"]
-                cboLayers.Text = Layer["name"]
+            For Each aLayer In cMdl["Layers"]
+                cboLayers.Text = aLayer["name"]
                 Break
             Next
         Endif
 
         If cMdl.Exist("Styles") Then
-            For Each Style In cMdl["Styles"]
-                cboStyles.Add(Style["name"])
+            For Each aStyle In cMdl["Styles"]
+                cboStyles.Add(aStyle["name"])
             Next
-            For Each Style In cMdl["Styles"]
-                cboStyles.Text = Style["name"]
+            For Each aStyle In cMdl["Styles"]
+                cboStyles.Text = aStyle["name"]
                 Break
             Next
         Endif
 
         If cMdl.Exist("Widths") Then
-            For Each Width In cMdl["Widths"]
-                cboWidths.Add(Width["value"])
+            For Each aWidth In cMdl["Widths"]
+                cboWidths.Add(aWidth["value"])
             Next
-            For Each Width In cMdl["Widths"]
-                cboWidths.Text = Width["value"]
+            For Each aWidth In cMdl["Widths"]
+                cboWidths.Text = aWidth["value"]
                 Break
             Next
         Endif
 
         If cMdl.Exist("DimSts") Then
-            For Each DimSt In cMdl["DimSts"]
-                cboDimSts.Add(DimSt["name"])
+            For Each aDimSt In cMdl["DimSts"]
+                cboDimSts.Add(aDimSt["name"])
             Next
-            For Each DimSt In cMdl["DimSts"]
-                cboDimSts.Text = DimSt["name"]
+            For Each aDimSt In cMdl["DimSts"]
+                cboDimSts.Text = aDimSt["name"]
                 Break
             Next
         Endif
@@ -312,7 +312,11 @@ Public Sub Task(sTask As String)
                         Endif
 
                     Case "dwg"
-                        mdl = cad.ImportDwg(FilePath)
+                        Message.Info(("Not implemented yet"))
+                        ' mdl = cad.ImportDwg(FilePath)
+                        ' If mdl.Count > 0 Then
+                        '     hFCAD.cImport = mdl
+                        ' Endif
                 End Select
 
             Endif
@@ -469,6 +473,8 @@ Public Function ExistWin(wtag As String, ws As Workspace) As Boolean
 
 End
 
+'' This is very important because switch the cModel collection between drawings
+
 Public Sub Workspace1_Activate()
 
     Dim aWin As Window
@@ -476,9 +482,10 @@ Public Sub Workspace1_Activate()
     aWin = Workspace1.ActiveWindow
 
     If aWin.Name = "FCAD" Then
+        hFCAD = aWin
+        LoadComboboxes(hFCAD.cModel)
         Print aWin.Tag
         CurrentFile = aWin.Tag
-        ' LoadComboboxes(aWin.cModel)
     Endif
 
 End

@@ -483,6 +483,9 @@ Public Sub EntitiesTransfer()
     Dim prop As String
     Dim iEnt As Collection
     Dim mEnt As Collection
+    Dim iBk As Collection
+    Dim iB As Variant
+
     '  Dim r As Integer
 
     If cImport.Count > 0 Then
@@ -513,6 +516,18 @@ Public Sub EntitiesTransfer()
                             tEnt.Add(iEt["a"], "a")
 
                         Case "INSERT"
+
+                            ' If cImport.Exist("Blocks") Then
+                            '     iBk = cImport["Blocks"]
+                            '     For Each iB In iBk
+                            '         If iB["entity"] = "BLOCK" Then
+                            '             If iB["block"] = iEt["b"] Then
+                            '                 Print iB["block"]
+                            '             Endif
+                            '         Endif
+                            '     Next
+                            ' Endif
+
                             tEnt.Add(iEt["b"], "ba")
                             tEnt.Add(iEt["p"], "p")
                             tEnt.Add(iEt["s"], "s")

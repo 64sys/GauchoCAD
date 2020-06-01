@@ -2080,8 +2080,8 @@ Public Function GetDXFBlocks(sCont As String) As Collection
     Dim out As New Collection
     Dim i As Integer
     Dim cItem As New Collection
-    Dim e As Variant
-    Dim sKey As String
+    'Dim e As Variant
+    'Dim sKey As String
 
     sCont = Replace(sCont, "\t", " ")
     sCont = Replace(sCont, "  0\nBLOCK\n", "\t  0\nBLOCK\n")
@@ -2094,17 +2094,18 @@ Public Function GetDXFBlocks(sCont As String) As Collection
                 'cItem = DecodeDXFEntity(stx[i])
                 cItem = DecodeDXFBlock(stx[i])
                 If cItem.Count > 1 Then
-                    sKey = ""
-                    For Each e In cItem
-                        If e["entity"] = "BLOCK" Then
-                            sKey = cItem.Key
-                            Break
-                        Endif
-                    Next
-                    If sKey <> "" Then
-                        out.Add(cItem.Copy(), sKey)
-                    Endif
-
+                    '     sKey = ""
+                    '     For Each e In cItem
+                    '         If e["entity"] = "BLOCK" Then
+                    '             sKey = cItem.Key
+                    '             Break
+                    '         Endif
+                    '     Next
+                    '     If sKey <> "" Then
+                    out.Add(cItem.Copy(), cItem["block"])
+                    cItem.Clear
+                    '     Endif
+                    '
                 Endif
             Endif
         Endif
@@ -2737,6 +2738,19 @@ Private Function DecodeDXFEntity(sItem As String) As Collection
         cp.Clear
 
         Select cTmp["entity"]
+
+            Case "BLOCK"
+                If cTmp.Exist("block") Then
+                    cTmp2.Add(cTmp["block"], "block")
+                Else
+                    cTmp2.Add("", "block")
+                Endif
+                If cTmp.Exist("bdesc") Then
+                    cTmp2.Add(cTmp["bdesc"], "bdesc")
+                Else
+                    cTmp2.Add("", "bdesc")
+                Endif
+
             Case "ELLIPSE", "CIRCLE", "ARC"
                 If cTmp.Exist("ratio") Then ' For ellipse
                     r = CFloat(cTmp["ratio"])
@@ -2820,16 +2834,27 @@ Private Function DecodeDXFEntity(sItem As String) As Collection
 
 End
 
+'' In takes all the raw data in a block item from blocks section, listing each
+'' entity inside the block but also the block inset
+'' This function lists the content of a block, that is, all the entities that
+'' compose it including block itself and endblock. Then it creates a collection
+'' with all the entities that are not a block or endblock and puts it as one
+'' more property of the collection returned by this function that represents th
+'' e block.
+
 Private Function DecodeDXFBlock(sItem As String) As Collection
 
     Dim sCont As String
     Dim btx As String[]
-    'Dim stx As String[]
-    Dim out As New Collection
+    Dim raw As New Collection       '' List all the entities including the block and endblk at the same level
+    Dim out As New Collection       '' List returned by the function that represent the block and its contents
+    Dim parts As New Collection     '' List of all entities in the block
     Dim i As Integer
     Dim cTmp As Collection
     Dim cEnty As Collection
     Dim eN As Variant
+    Dim rw As Variant
+    Dim bl As Variant
 
     cEnty = GetEntityList()
 
@@ -2839,22 +2864,44 @@ Private Function DecodeDXFBlock(sItem As String) As Collection
         sCont = Replace(sCont, "  0\n" & cEnty.Key & "\n  5\n", "\t  0\n" & cEnty.Key & "\n  5\n")
     Next
 
-    'sCont = Replace(sItem, "  0\n", "\t  0\n")
-
     btx = Split(sCont, "\t")
 
     For i = 0 To btx.Max
         If InStr(btx[i], "100\nAcDbEntity") > 0 Then
             cTmp = DecodeDXFEntity(btx[i])
+
             If cTmp.Count > 0 Then
                 If cTmp.Exist("handle") Then
-                    out.Add(cTmp.Copy(), cTmp["handle"])
+                    raw.Add(cTmp.Copy(), cTmp["handle"])
                     cTmp.Clear
                 Endif
-
             Endif
         Endif
     Next
+    ' ok now
+    cTmp.Clear
+    For Each rw In raw
+        Select rw["entity"]
+            Case "BLOCK"
+                For Each bl In rw
+                    out.Add(bl, rw.Key)
+                Next
+
+            Case Else
+
+                For Each bl In rw
+                    cTmp.Add(bl, rw.Key)
+                Next
+                parts.Add(cTmp.Copy(), rw["handle"])
+                cTmp.Clear
+
+        End Select
+    Next
+
+    If parts.Count > 0 Then
+        out.Add(parts.Copy(), "parts")
+    Endif
+
     Return out
 
 End
