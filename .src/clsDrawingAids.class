@@ -1,25 +1,5 @@
 ' Gambas class file
 
-' GauchoCAD
-' A simple CAD made in Gambas
-'
-' Copyright (C) Ing Martin P Cristia
-'
-' This program is free software; you can redistribute it and/or modify
-' it under the terms of the GNU General Public License as published by
-' the Free Software Foundation; either version 3 of the License, or
-' (at your option) any later version.
-'
-' This program is distributed in the hope that it will be useful,
-' but WITHOUT ANY WARRANTY; without even the implied warranty of
-' MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-' GNU General Public License for more details.
-'
-' You should have received a copy of the GNU General Public License
-' along with this program; if not, write to the Free Software
-' Foundation, Inc., 51 Franklin St, Fifth Floor,
-' Boston, MA  02110-1301  USA
-
 ' Tool maintained by Terco
 Create Static
 
@@ -115,14 +95,16 @@ Public Sub DibujaHelper()
 
     trabajoYteclado = HelperTrabajo & " > " & sNext & appmain.hFCAD.KeysAccumulator & PromtSlash
 
-    Texting(trabajoYteclado, 10 - appmain.hFcad.glarea1.w / 2, 10 - appmain.hFcad.glarea1.h / 2, color.blue)
+    'Texting(trabajoYteclado, 10 - appmain.hFcad.glarea1.w / 2, 10 - appmain.hFcad.glarea1.h / 2, color.blue)
+    Texting(trabajoYteclado, 10 - appmain.hFcad.glarea1.w / 2, 10 - appmain.hFcad.glarea1.h / 2, Starter.WindowInfoColor) ' Tincho - toma color de la configuración
 
     HelperDibujo = ""
     If modCAD.Ortogonal Then HelperDibujo = "F8-Ortho"
     If puntos.Gridactive Then HelperDibujo = HelperDibujo & "  F7-Grid = " & Format$(puntos.GridSpacing, "0.00 m")
     ' and so on...
 
-    texting(HelperDibujo, 40, 10 - appmain.hFcad.glarea1.h / 2, color.blue)
+    'texting(HelperDibujo, 40, 10 - appmain.hFcad.glarea1.h / 2, color.blue)
+    texting(HelperDibujo, 40, 10 - appmain.hFcad.glarea1.h / 2, Starter.WindowInfoColor) ' Tincho - toma color de la configuración
 
     ' helper del mouse
     If Len(Helper.Texto) = 0 Then Return
@@ -156,9 +138,13 @@ Public Sub DrawCoordenadas()
     z = appmain.hFcad.Metros(1) ' metros por pixel segun la ampliacion del usuario (rueda del mouse)
     lEsc = "Esc 1:" & Format$(1 / appmain.hFcad.ScaleZoom * 100 * puntos.ScreenDensity, "0")
 
-    Texting(l, 10 - appmain.hFcad.glarea1.w / 2, appmain.hFcad.glarea1.h / 2 - 15, color.blue)
-    Texting(l2, 10 - appmain.hFcad.glarea1.w / 2, appmain.hFcad.glarea1.h / 2 - 35, color.blue)
-    Texting(lEsc, appmain.hFcad.glarea1.w / 2 - 100, 10 - appmain.hFcad.glarea1.h / 2, color.blue)
+    ' Texting(l, 10 - appmain.hFcad.glarea1.w / 2, appmain.hFcad.glarea1.h / 2 - 15, color.blue)
+    ' Texting(l2, 10 - appmain.hFcad.glarea1.w / 2, appmain.hFcad.glarea1.h / 2 - 35, color.blue)
+    ' Texting(lEsc, appmain.hFcad.glarea1.w / 2 - 100, 10 - appmain.hFcad.glarea1.h / 2, color.blue)
+
+    Texting(l, 10 - appmain.hFcad.glarea1.w / 2, appmain.hFcad.glarea1.h / 2 - 15, Starter.WindowInfoColor)
+    Texting(l2, 10 - appmain.hFcad.glarea1.w / 2, appmain.hFcad.glarea1.h / 2 - 35, Starter.WindowInfoColor)
+    Texting(lEsc, appmain.hFcad.glarea1.w / 2 - 100, 10 - appmain.hFcad.glarea1.h / 2, Starter.WindowInfoColor)
 
 End
 

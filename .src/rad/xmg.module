@@ -668,23 +668,36 @@ Public Function XmlIni() As Collection ''Crea una coleccion con las variables y 
 
     sBase = User.Home &/ "." & String.LCase(vag.NoSymbols(Application.Name))
 
+    'Program
     ctnTmp.Clear
     ctnTmp.Add("Application.Directory", "Name")
-    ctnTmp.Add(("Programa"), "Group")
+    ctnTmp.Add(("Program"), "Group")
     ctnTmp.Add(sBase, "Value")
     ctnTmp.Add("String", "Data")
     ctnTmp.Add("dio", "Ctrl")
-    ctnTmp.Add(("Directorio de la aplicación"), "Desc")
+    ctnTmp.Add(("Application directory"), "Desc")
     str = ctnTmp["Name"]
     ctnOut.Add(ctnTmp.Copy(), str)
 
+    ctnTmp.Clear
+    ctnTmp.Add("Application.window-background-color", "Name")
+    ctnTmp.Add(("Program"), "Group")
+    ctnTmp.Add("Dark", "Value")
+    ctnTmp.Add("String", "Data")
+    ctnTmp.Add("cmo~Dark:Light", "Ctrl")
+    ctnTmp.Add(("Window background color"), "Desc")
+    str = ctnTmp["Name"]
+    ctnOut.Add(ctnTmp.Copy(), str)
+
+    'Desktop
+    ctnTmp.Clear
     ctnTmp.Add("Desktop.Text-Editor", "Name")
     If sog.MimeDefaultApp("text/plain").Count > 0 Then
         str = sog.MimeDefaultApp("text/plain")[0]
     Else
         str = ""
     Endif
-    ctnTmp.Add(("Escritorio"), "Group")
+    ctnTmp.Add(("Desktop"), "Group")
     ctnTmp.Add(str, "Value")
     ctnTmp.Add("String", "Data")
     ctnTmp.Add("txo", "Ctrl")
@@ -693,405 +706,12 @@ Public Function XmlIni() As Collection ''Crea una coleccion con las variables y 
     ctnOut.Add(ctnTmp.Copy(), str)
 
     ctnTmp.Clear
-    ctnTmp.Add("Desktop.Text-Editor-Theme", "Name")
-    ctnTmp.Add(("Escritorio"), "Group")
-    ctnTmp.Add(sBase & "/editor/dark.theme", "Value")
-    ctnTmp.Add("String", "Data")
-    ctnTmp.Add("fio", "Ctrl")
-    ctnTmp.Add(("Tema del editor interno"), "Desc")
-    str = ctnTmp["Name"]
-    ctnOut.Add(ctnTmp.Copy(), str)
-
-    ctnTmp.Clear
     ctnTmp.Add("Desktop.Icons", "Name")
-    ctnTmp.Add(("Escritorio"), "Group")
+    ctnTmp.Add(("Desktop"), "Group")
     ctnTmp.Add("/usr/share/icons/Numix/32", "Value")
     ctnTmp.Add("String", "Data")
     ctnTmp.Add("dio", "Ctrl")
     ctnTmp.Add(("Íconos del programa"), "Desc")
-    str = ctnTmp["Name"]
-    ctnOut.Add(ctnTmp.Copy(), str)
-
-    '----- Scan Dirs ------------------------------------------------------------
-    ctnTmp.Clear
-    ctnTmp.Add("Scan.Directory-1", "Name")
-    ctnTmp.Add(("Escanear"), "Group")
-    ctnTmp.Add(" ", "Value")
-    ctnTmp.Add("String", "Data")
-    ctnTmp.Add("dio", "Ctrl")
-    ctnTmp.Add(("Directorio para escanear uno"), "Desc")
-    str = ctnTmp["Name"]
-    ctnOut.Add(ctnTmp.Copy(), str)
-
-    ctnTmp.Clear
-    ctnTmp.Add("Scan.Directory-2", "Name")
-    ctnTmp.Add(("Escanear"), "Group")
-    ctnTmp.Add(" ", "Value")
-    ctnTmp.Add("String", "Data")
-    ctnTmp.Add("dio", "Ctrl")
-    ctnTmp.Add(("Directorio para escanear dos"), "Desc")
-    str = ctnTmp["Name"]
-    ctnOut.Add(ctnTmp.Copy(), str)
-
-    ctnTmp.Clear
-    ctnTmp.Add("Scan.Directory-3", "Name")
-    ctnTmp.Add(("Escanear"), "Group")
-    ctnTmp.Add(" ", "Value")
-    ctnTmp.Add("String", "Data")
-    ctnTmp.Add("dio", "Ctrl")
-    ctnTmp.Add(("Directorio para escanear tres"), "Desc")
-    str = ctnTmp["Name"]
-    ctnOut.Add(ctnTmp.Copy(), str)
-
-    ctnTmp.Clear
-    ctnTmp.Add("Scan.Directory-4", "Name")
-    ctnTmp.Add(("Escanear"), "Group")
-    ctnTmp.Add(" ", "Value")
-    ctnTmp.Add("String", "Data")
-    ctnTmp.Add("dio", "Ctrl")
-    ctnTmp.Add(("Directorio para escanear cuatro"), "Desc")
-    str = ctnTmp["Name"]
-    ctnOut.Add(ctnTmp.Copy(), str)
-
-    ctnTmp.Clear
-    ctnTmp.Add("Scan.Directory-5", "Name")
-    ctnTmp.Add(("Escanear"), "Group")
-    ctnTmp.Add(" ", "Value")
-    ctnTmp.Add("String", "Data")
-    ctnTmp.Add("dio", "Ctrl")
-    ctnTmp.Add(("Directorio para escanear cinco"), "Desc")
-    str = ctnTmp["Name"]
-    ctnOut.Add(ctnTmp.Copy(), str)
-
-    '------ Output files, dirs & Actions ----------------------------------------
-    ctnTmp.Clear
-    ctnTmp.Add("Output.Override-Files", "Name")
-    ctnTmp.Add(("Salida"), "Group")
-    ctnTmp.Add("False", "Value")
-    ctnTmp.Add("Boolean", "Data")
-    ctnTmp.Add("cko", "Ctrl")
-    ctnTmp.Add(("Sobreescribir archivos de salida"), "Desc")
-    str = ctnTmp["Name"]
-    ctnOut.Add(ctnTmp.Copy(), str)
-
-    ctnTmp.Clear
-    ctnTmp.Add("Output.Directory-1", "Name")
-    ctnTmp.Add(("Salida"), "Group")
-    ctnTmp.Add(" ", "Value")
-    ctnTmp.Add("String", "Data")
-    ctnTmp.Add("dio", "Ctrl")
-    ctnTmp.Add(("Directorio de salida uno"), "Desc")
-    str = ctnTmp["Name"]
-    ctnOut.Add(ctnTmp.Copy(), str)
-
-    ctnTmp.Clear
-    ctnTmp.Add("Output.Directory-2", "Name")
-    ctnTmp.Add(("Salida"), "Group")
-    ctnTmp.Add(" ", "Value")
-    ctnTmp.Add("String", "Data")
-    ctnTmp.Add("dio", "Ctrl")
-    ctnTmp.Add(("Directorio de salida dos"), "Desc")
-    str = ctnTmp["Name"]
-    ctnOut.Add(ctnTmp.Copy(), str)
-
-    ctnTmp.Clear
-    ctnTmp.Add("Output.Directory-3", "Name")
-    ctnTmp.Add(("Salida"), "Group")
-    ctnTmp.Add(" ", "Value")
-    ctnTmp.Add("String", "Data")
-    ctnTmp.Add("dio", "Ctrl")
-    ctnTmp.Add(("Directorio de salida tres"), "Desc")
-    str = ctnTmp["Name"]
-    ctnOut.Add(ctnTmp.Copy(), str)
-
-    ctnTmp.Clear
-    ctnTmp.Add("Output.Directory-4", "Name")
-    ctnTmp.Add(("Salida"), "Group")
-    ctnTmp.Add(" ", "Value")
-    ctnTmp.Add("String", "Data")
-    ctnTmp.Add("dio", "Ctrl")
-    ctnTmp.Add(("Directorio de salida cuatro"), "Desc")
-    str = ctnTmp["Name"]
-    ctnOut.Add(ctnTmp.Copy(), str)
-
-    ctnTmp.Clear
-    ctnTmp.Add("Output.Directory-5", "Name")
-    ctnTmp.Add(("Salida"), "Group")
-    ctnTmp.Add(" ", "Value")
-    ctnTmp.Add("String", "Data")
-    ctnTmp.Add("dio", "Ctrl")
-    ctnTmp.Add(("Directorio de salida cinco"), "Desc")
-    str = ctnTmp["Name"]
-    ctnOut.Add(ctnTmp.Copy(), str)
-    '----------------------------------------------------------------------------
-
-    ctnTmp.Clear
-    ctnTmp.Add("Database.Engine", "Name")
-    ctnTmp.Add(("Base de datos"), "Group")
-    ctnTmp.Add("sqlite3", "Value")
-    ctnTmp.Add("String", "Data")
-    ctnTmp.Add("cmo~sqlite3:postgresql:mysql", "Ctrl")
-    ctnTmp.Add(("Motor de base de datos"), "Desc")
-    str = ctnTmp["Name"]
-    ctnOut.Add(ctnTmp.Copy(), str)
-
-    ctnTmp.Clear
-    ctnTmp.Add("Database.Query", "Name")
-    ctnTmp.Add(("Base de datos"), "Group")
-    ctnTmp.Add(" ", "Value")
-    ctnTmp.Add("String", "Data")
-    ctnTmp.Add("txo", "Ctrl")
-    ctnTmp.Add(("Consulta"), "Desc")
-    str = ctnTmp["Name"]
-    ctnOut.Add(ctnTmp.Copy(), str)
-
-    ctnTmp.Clear
-    ctnTmp.Add("Database.Sqlite3-Host", "Name")
-    ctnTmp.Add(("Base de datos"), "Group")
-    ctnTmp.Add(sBase, "Value")
-    ctnTmp.Add("String", "Data")
-    ctnTmp.Add("dio", "Ctrl")
-    ctnTmp.Add(("Directorio que contiene el archivo"), "Desc")
-    str = ctnTmp["Name"]
-    ctnOut.Add(ctnTmp.Copy(), str)
-
-    ctnTmp.Clear
-    ctnTmp.Add("Database.Sqlite3-Name", "Name")
-    ctnTmp.Add(("Base de datos"), "Group")
-    ctnTmp.Add("app.sqlite", "Value")
-    ctnTmp.Add("String", "Data")
-    ctnTmp.Add("txo", "Ctrl")
-    ctnTmp.Add(("Archivo de la base de datos"), "Desc")
-    str = ctnTmp["Name"]
-    ctnOut.Add(ctnTmp.Copy(), str)
-
-    ctnTmp.Clear
-    ctnTmp.Add("Database.Postgresql-Host", "Name")
-    ctnTmp.Add(("Base de datos"), "Group")
-    ctnTmp.Add(" ", "Value")
-    ctnTmp.Add("String", "Data")
-    ctnTmp.Add("vao~IPAddress", "Ctrl")
-    ctnTmp.Add(("Servidor") & " PostgreSQL", "Desc")
-    str = ctnTmp["Name"]
-    ctnOut.Add(ctnTmp.Copy(), str)
-
-    ctnTmp.Clear
-    ctnTmp.Add("Database.Postgresql-Name", "Name")
-    ctnTmp.Add(("Base de datos"), "Group")
-    ctnTmp.Add(" ", "Value")
-    ctnTmp.Add("String", "Data")
-    ctnTmp.Add("txo", "Ctrl")
-    ctnTmp.Add(("Base de datos") & " PostgreSQL", "Desc")
-    str = ctnTmp["Name"]
-    ctnOut.Add(ctnTmp.Copy(), str)
-
-    ctnTmp.Clear
-    ctnTmp.Add("Database.Postgresql-Port", "Name")
-    ctnTmp.Add(("Base de datos"), "Group")
-    ctnTmp.Add(0, "Value")
-    ctnTmp.Add("Integer", "Data")
-    ctnTmp.Add("vao~Number", "Ctrl")
-    ctnTmp.Add(("Puerto") & " PostgreSQL", "Desc")
-    str = ctnTmp["Name"]
-    ctnOut.Add(ctnTmp.Copy(), str)
-
-    ctnTmp.Clear
-    ctnTmp.Add("Database.Postgresql-User", "Name")
-    ctnTmp.Add(("Base de datos"), "Group")
-    ctnTmp.Add(User.name, "Value")
-    ctnTmp.Add("String", "Data")
-    ctnTmp.Add("txo", "Ctrl")
-    ctnTmp.Add(("Usuario") & " PostgreSQL", "Desc")
-    str = ctnTmp["Name"]
-    ctnOut.Add(ctnTmp.Copy(), str)
-
-    ctnTmp.Clear
-    ctnTmp.Add("Database.Postgresql-Passwd", "Name")
-    ctnTmp.Add(("Base de datos"), "Group")
-    ctnTmp.Add(" ", "Value")
-    ctnTmp.Add("String", "Data")
-    ctnTmp.Add("txs" & "", "Ctrl")
-    ctnTmp.Add(("Contraseña") & " PostgreSQL", "Desc")
-    str = ctnTmp["Name"]
-    ctnOut.Add(ctnTmp.Copy(), str)
-
-    ctnTmp.Clear
-    ctnTmp.Add("Database.Mysql-Host", "Name")
-    ctnTmp.Add(("Base de dotos"), "Group")
-    ctnTmp.Add(" ", "Value")
-    ctnTmp.Add("String", "Data")
-    ctnTmp.Add("vao~IPAddress", "Ctrl")
-    ctnTmp.Add(("Servidor") & " MySQL", "Desc")
-    str = ctnTmp["Name"]
-    ctnOut.Add(ctnTmp.Copy(), str)
-
-    ctnTmp.Clear
-    ctnTmp.Add("Database.Mysql-Name", "Name")
-    ctnTmp.Add(("Base de dotos"), "Group")
-    ctnTmp.Add(" ", "Value")
-    ctnTmp.Add("String", "Data")
-    ctnTmp.Add("txo", "Ctrl")
-    ctnTmp.Add(("Base de datos") & " MySQL", "Desc")
-    str = ctnTmp["Name"]
-    ctnOut.Add(ctnTmp.Copy(), str)
-
-    ctnTmp.Clear
-    ctnTmp.Add("Database.Mysql-Port", "Name")
-    ctnTmp.Add(("Base de datos"), "Group")
-    ctnTmp.Add(0, "Value")
-    ctnTmp.Add("Integer", "Data")
-    ctnTmp.Add("vao~Number", "Ctrl")
-    ctnTmp.Add(("Puerto") & " MySQL", "Desc")
-    str = ctnTmp["Name"]
-    ctnOut.Add(ctnTmp.Copy(), str)
-
-    ctnTmp.Clear
-    ctnTmp.Add("Database.Mysql-User", "Name")
-    ctnTmp.Add(("Base de datos"), "Group")
-    ctnTmp.Add(User.name, "Value")
-    ctnTmp.Add("String", "Data")
-    ctnTmp.Add("txo", "Ctrl")
-    ctnTmp.Add(("Usuario") & " MySQL", "Desc")
-    str = ctnTmp["Name"]
-    ctnOut.Add(ctnTmp.Copy(), str)
-
-    ctnTmp.Clear
-    ctnTmp.Add("Database.Mysql-Passwd", "Name")
-    ctnTmp.Add(("Base de datos"), "Group")
-    ctnTmp.Add(" ", "Value")
-    ctnTmp.Add("String", "Data")
-    ctnTmp.Add("txs", "Ctrl")
-    ctnTmp.Add(("Contraseña") & " MySQL", "Desc")
-    str = ctnTmp["Name"]
-    ctnOut.Add(ctnTmp.Copy(), str)
-
-    ctnTmp.Clear
-    ctnTmp.Add("Database.Table-Current", "Name")
-    ctnTmp.Add(("Base de datos"), "Group")
-    ctnTmp.Add(" ", "Value")
-    ctnTmp.Add("String", "Data")
-    ctnTmp.Add("txr", "Ctrl")
-    ctnTmp.Add(("Tabla actual"), "Desc")
-    str = ctnTmp["Name"]
-    ctnOut.Add(ctnTmp.Copy(), str)
-
-    ctnTmp.Clear
-    ctnTmp.Add("Custom.Var-0", "Name")
-    ctnTmp.Add(("Personalización"), "Group")
-    ctnTmp.Add(" ", "Value")
-    ctnTmp.Add("String", "Data")
-    ctnTmp.Add("txo", "Ctrl")
-    ctnTmp.Add(("Variable") & " 0", "Desc") 'Filtrado por extensiones de archivo.
-    str = ctnTmp["Name"]
-    ctnOut.Add(ctnTmp.Copy(), str)
-
-    ctnTmp.Clear
-    ctnTmp.Add("Custom.Var-1", "Name")
-    ctnTmp.Add(("Personalización"), "Group")
-    ctnTmp.Add("2", "Value")
-    ctnTmp.Add("Integer", "Data")
-    ctnTmp.Add("vao", "Ctrl")
-    ctnTmp.Add(("Variable") & " 1", "Desc") 'Hsplit lado treeview
-    str = ctnTmp["Name"]
-    ctnOut.Add(ctnTmp.Copy(), str)
-
-    ctnTmp.Clear
-    ctnTmp.Add("Custom.Var-2", "Name")
-    ctnTmp.Add(("Personalización"), "Group")
-    ctnTmp.Add("4", "Value")
-    ctnTmp.Add("Integer", "Data")
-    ctnTmp.Add("vao", "Ctrl")
-    ctnTmp.Add(("Variable") & " 2", "Desc") 'Hsplit lado gridview
-    str = ctnTmp["Name"]
-    ctnOut.Add(ctnTmp.Copy(), str)
-
-    ctnTmp.Clear
-    ctnTmp.Add("Custom.Var-3", "Name")
-    ctnTmp.Add(("Personalización"), "Group")
-    ctnTmp.Add("False", "Value")
-    ctnTmp.Add("Boolean", "Data")
-    ctnTmp.Add("cko", "Ctrl")
-    ctnTmp.Add(("Variable") & " 3", "Desc")  'Visualización de los filtros en la tabla
-    str = ctnTmp["Name"]
-    ctnOut.Add(ctnTmp.Copy(), str)
-
-    ctnTmp.Clear
-    ctnTmp.Add("Custom.Var-4", "Name")
-    ctnTmp.Add(("Personalización"), "Group")
-    ctnTmp.Add("False", "Value")
-    ctnTmp.Add("Boolean", "Data")
-    ctnTmp.Add("cko", "Ctrl")
-    ctnTmp.Add(("Variable") & " 4", "Desc") 'Visualización de la ordenacion de datos
-    str = ctnTmp["Name"]
-    ctnOut.Add(ctnTmp.Copy(), str)
-
-    ctnTmp.Clear
-    ctnTmp.Add("Custom.Var-5", "Name")
-    ctnTmp.Add(("Personalización"), "Group")
-    ctnTmp.Add(" ", "Value")
-    ctnTmp.Add("Float", "Data")
-    ctnTmp.Add("vao", "Ctrl")
-    ctnTmp.Add(("Variable") & " 5", "Desc")
-    str = ctnTmp["Name"]
-    ctnOut.Add(ctnTmp.Copy(), str)
-
-    ctnTmp.Clear
-    ctnTmp.Add("Custom.Var-6", "Name")
-    ctnTmp.Add(("Personalización"), "Group")
-    ctnTmp.Add(" ", "Value")
-    ctnTmp.Add("Float", "Data")
-    ctnTmp.Add("vao", "Ctrl")
-    ctnTmp.Add(("Variable") & " 6", "Desc")
-    str = ctnTmp["Name"]
-    ctnOut.Add(ctnTmp.Copy(), str)
-
-    ctnTmp.Clear
-    ctnTmp.Add("Custom.Var-7", "Name")
-    ctnTmp.Add(("Personalización"), "Group")
-    ctnTmp.Add(" ", "Value")
-    ctnTmp.Add("String", "Data")
-    ctnTmp.Add("txo", "Ctrl")
-    ctnTmp.Add(("Variable") & " 7", "Desc")
-    str = ctnTmp["Name"]
-    ctnOut.Add(ctnTmp.Copy(), str)
-
-    ctnTmp.Clear
-    ctnTmp.Add("Custom.Var-8", "Name")
-    ctnTmp.Add(("Personalización"), "Group")
-    ctnTmp.Add(" ", "Value")
-    ctnTmp.Add("String", "Data")
-    ctnTmp.Add("txo", "Ctrl")
-    ctnTmp.Add(("Variable") & " 8", "Desc")
-    str = ctnTmp["Name"]
-    ctnOut.Add(ctnTmp.Copy(), str)
-
-    ctnTmp.Clear
-    ctnTmp.Add("Custom.Var-9", "Name")
-    ctnTmp.Add(("Personalización"), "Group")
-    ctnTmp.Add(" ", "Value")
-    ctnTmp.Add("String", "Data")
-    ctnTmp.Add("txo", "Ctrl")
-    ctnTmp.Add(("Variable") & " 9", "Desc")
-    str = ctnTmp["Name"]
-    ctnOut.Add(ctnTmp.Copy(), str)
-
-    ctnTmp.Clear
-    ctnTmp.Add("Import.Separator", "Name")
-    ctnTmp.Add(("Impotación"), "Group")
-    ctnTmp.Add("\t", "Value")
-    ctnTmp.Add("String", "Data")
-    ctnTmp.Add("cmo~Tab:Comma:Colon:Semicolon", "Ctrl")
-    ctnTmp.Add(("Separador de columnas"), "Desc")
-    str = ctnTmp["Name"]
-    ctnOut.Add(ctnTmp.Copy(), str)
-
-    ctnTmp.Clear
-    ctnTmp.Add("Import.Ext", "Name")
-    ctnTmp.Add(("Impotación"), "Group")
-    ctnTmp.Add("csv", "Value")
-    ctnTmp.Add("String", "Data")
-    ctnTmp.Add("cmo~txt:csv:tsv", "Ctrl")
-    ctnTmp.Add(("Extensión"), "Desc")
     str = ctnTmp["Name"]
     ctnOut.Add(ctnTmp.Copy(), str)
 

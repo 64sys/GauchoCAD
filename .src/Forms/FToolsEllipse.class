@@ -1,9 +1,0 @@
-' Gambas class file
-
-
-
-Public Sub toolbasic_Click()
-
-   appmain.hFCAD.PanFloating.Visible = False
-
-End

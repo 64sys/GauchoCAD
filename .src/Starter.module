@@ -40,14 +40,14 @@ Public Sub Run()
     Endif
 
     '' Estableciendo las variables de entorno especiales con un archivo XML
-    CADConfig = adi &/ "cad.xml"
-    If Exist(File.Dir(CADConfig)) = False Then
-        Mkdir File.Dir(CADConfig)
-    Endif
-    If Exist(CADConfig) = False Then
-        CADConfigData = cad.CADConfig()
-        xmg.XmlConfMaker(CADConfig, CADConfigData, Application.Title & " " & Application.Version)
-    Endif
+    ' CADConfig = adi &/ "cad.xml"
+    ' If Exist(File.Dir(CADConfig)) = False Then
+    '     Mkdir File.Dir(CADConfig)
+    ' Endif
+    ' If Exist(CADConfig) = False Then
+    '     CADConfigData = cad.CADConfig()
+    '     xmg.XmlConfMaker(CADConfig, CADConfigData, Application.Title & " " & Application.Version)
+    ' Endif
 
     '' Arrancando el sistema de
     If Exist(lgf) = False Then
@@ -83,31 +83,35 @@ End
 
 Private Sub SetEnvironmentVars()
 
-    Dim WindowMode As Integer
+    'Dim WindowMode As Integer
 
-    Select CBool(xmg.GetVar("CAD.Background-Dark", CADConfig))
-        Case True
-            WindowBackColor = &1B2224
-            WindowInfoColor = &HA0A000
-            WindowTextColor = &C09209
-            WindowCursorColor = &5F5FBF
-        Case Else
+    Select xmg.GetVar("Application.window-background", apc)
+        Case "Light"
             WindowBackColor = Color.White
             WindowInfoColor = &HFFFF00
             WindowTextColor = Color.Blue
             WindowCursorColor = Color.Black
-    End Select
-
-    Select xmg.GetVar("CAD.GraphMode", CADConfig)
-        Case "1"
-            WindowMode = 1
-
-        Case "2"
-            WindowMode = 2
-
         Case Else
-            WindowMode = 1
+            'WindowBackColor = &1B2224
+            WindowBackColor = Color.Black
+            WindowInfoColor = &HA0A000
+            'WindowTextColor = &C09209
+            'WindowCursorColor = &5F5FBF
+            WindowTextColor = Color.Yellow
+            WindowCursorColor = Color.White
 
     End Select
+
+    ' Select xmg.GetVar("CAD.GraphMode", CADConfig)
+    '     Case "1"
+    '         WindowMode = 1
+    '
+    '     Case "2"
+    '         WindowMode = 2
+    '
+    '     Case Else
+    '         WindowMode = 1
+    '
+    ' End Select
 
 End
