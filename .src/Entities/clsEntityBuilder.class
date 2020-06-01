@@ -121,6 +121,7 @@ Public Function Start(ElemToBuild As Variant, Optional Mode As Integer = 0)
     ' instructions to FCAD
     modCAD.OrtogonalIgnorado = elem.OrtogonalIgnorado
     modCAD.OrtogonalForzado = elem.OrtogonalForzado
+    elem.gbcolor = appmain.CurrentColor
     clsDrawingAids.HelperTrabajo = elem.HelperTrabajo
 
 End

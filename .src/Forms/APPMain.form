@@ -257,64 +257,59 @@
         Arrangement = Arrange.Horizontal
         Spacing = True
       }
-      { PanToolsHorizontal Panel
-        MoveScaled(27,0,78,5)
+      { ColorPalette1 ColorPalette
+        MoveScaled(26,0,20,5)
+        Expand = True
+        Border = False
+      }
+      { cboLayers ComboBox dprop
+        Name = "cboLayers"
+        MoveScaled(47,0,15,5)
+        Tag = "layer"
+        ToolTip = ("Layers")
+        ReadOnly = True
+      }
+      { tobLayers ToolButton
+        MoveScaled(64,0,5,5)
+        Picture = Picture["svg/layers/layers.svg"]
+        Border = True
+      }
+      { cboStyles ComboBox dprop
+        Name = "cboStyles"
+        MoveScaled(71,0,15,5)
+        Tag = "style"
+        ToolTip = ("Line styles")
+        ReadOnly = True
+      }
+      { cboWidths ComboBox dprop
+        Name = "cboWidths"
+        MoveScaled(87,0,11,5)
+        Tag = "weight"
+        ToolTip = ("Line widths")
+        ReadOnly = True
+      }
+      { cboDimSts ComboBox dprop
+        Name = "cboDimSts"
+        MoveScaled(100,0,14,5)
+        Tag = "style"
+        ToolTip = ("Dimmension styles")
+        ReadOnly = True
+      }
+      { pnlToolsH Panel
+        MoveScaled(115,0,15,5)
         Expand = True
         Arrangement = Arrange.Horizontal
         Spacing = True
         Padding = 2
-        { ColorPalette1 ColorPalette
-          MoveScaled(1,0,25,5)
-          Border = False
-        }
-        { cboLayers ComboBox dprop
-          Name = "cboLayers"
-          MoveScaled(9,0,15,5)
-          Tag = "layer"
-          ToolTip = ("Layers")
-          ReadOnly = True
-        }
         { Separator1 Separator
           MoveScaled(21,0,1,4)
-        }
-        { tobLayers ToolButton
-          MoveScaled(26,0,5,5)
-          Picture = Picture["svg/layers/layers.svg"]
-          Border = True
-        }
-        { cboStyles ComboBox dprop
-          Name = "cboStyles"
-          MoveScaled(33,0,15,5)
-          Tag = "style"
-          ToolTip = ("Line styles")
-          ReadOnly = True
         }
         { Separator2 Separator
           MoveScaled(42,0,1,4)
         }
-        { cboWidths ComboBox dprop
-          Name = "cboWidths"
-          MoveScaled(49,0,11,5)
-          Tag = "weight"
-          ToolTip = ("Line widths")
-          ReadOnly = True
-        }
         { Separator3 Separator
           MoveScaled(56,0,1,4)
         }
-        { cboDimSts ComboBox dprop
-          Name = "cboDimSts"
-          MoveScaled(62,0,14,5)
-          Tag = "style"
-          ToolTip = ("Dimmension styles")
-          ReadOnly = True
-        }
-      }
-      { pnlHelp Panel
-        MoveScaled(114,0,17,5)
-        Expand = True
-        Arrangement = Arrange.Horizontal
-        Spacing = True
       }
     }
     { PanEdit1 Panel
