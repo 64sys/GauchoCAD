@@ -1,5 +1,27 @@
 ' Gambas class file
 
+' Gambas module file
+
+' RADG
+' Rapid Application Development for Gambas
+'
+' Copyright (C) Martín Belmonte
+'
+' This program is free software; you can redistribute it and/or modify
+' it under the terms of the GNU General Public License as published by
+' the Free Software Foundation; either version 2 of the License, or
+' (at your option) any later version.
+'
+' This program is distributed in the hope that it will be useful,
+' but WITHOUT ANY WARRANTY; without even the implied warranty of
+' MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+' GNU General Public License for more details.
+'
+' You should have received a copy of the GNU General Public License
+' along with this program; if not, write to the Free Software
+' Foundation, Inc., 51 Franklin St, Fifth Floor,
+' Boston, MA  02110-1301  USA
+'
 ' Variables que se pasaron desde el módulo de inicio
 Public Observer As Observer         ''Observador usaod para avisar si hay cambios sin aplicar
 Private cex As New Collection       '' Variables básicas para pasar a los demas formularios
@@ -15,6 +37,7 @@ Private lgg As Logger               '' Registro de eventos de la aplicación.
 Public hFCAD As FCAD                    '' CAD Editor
 Public CurrentForm As Form
 Public CurrentFile As String
+Public CurrentColor As Integer
 
 Public cMod As New Collection    '' All drawings common collection
 
@@ -27,6 +50,9 @@ Public Sub Run(cin As Collection)
     Dim i As Integer
     Dim iSet As String
     Dim z As Integer
+
+    CurrentColor = Color.Green
+
     '------------------------------------------------------------------------------
     '' Estableciendo las variables de conexion y otras más
     cex = cin
@@ -261,7 +287,7 @@ Public Sub Task(sTask As String)
 
     Dim hFConfig As FConfig                 '' Edit program configuration
     Dim hFAbout As FAbout                  '' Formulario que muestra informacin del programa
-    Dim hFImport As FImport                 '' Impor from others formats
+    'Dim hFImport As FImport                 '' Impor from others formats
     Dim w As Window
     Dim wtag As String
 
@@ -464,5 +490,12 @@ Public Sub tobLayers_Click()
     FLay = New FLayers
     'FLay.Run(cMod)                             ' si le cargo la copia no se guardan los cambios,
     FLay.Run(hFCAD.cModel)
+
+End
+
+Public Sub ColorPalette1_Click()
+
+    CurrentColor = ColorPalette1.Current
+    Print CurrentColor
 
 End
