@@ -253,20 +253,20 @@ End
 '' Dibuja un rectangulo, relleno o vacio.
 '' Puede dibujar un contorno del mismo de otro color->Bounding
 '' Mode: 0=relleno, 1=relleno y recuadro, 2=solo recuadro
-Public Sub Rectangle2D(x1 As Float, y1 As Float, w As Float, h As Float, Optional _color1 As Integer = Color.Blue, _color2 As Integer = -14, _color3 As Integer = -14, _color4 As Integer = -14, BoundingColor As Integer, BoundingWidth As Integer = 1, mode As Integer = 0)
+Public Sub Rectangle2D(x1 As Float, y1 As Float, w As Float, h As Float, Optional colour1 As Integer = Color.Blue, colour2 As Integer = -14, colour3 As Integer = -14, colour4 As Integer = -14, BoundingColor As Integer, BoundingWidth As Integer = 1, mode As Integer = 0)
 
     Dim c2, c3, c4 As Integer
 
     ' Quad esta obsoleto , reemplazo por dos triangulos
     If mode = 0 Or mode = 1 Then
 
-        If _color2 = -14 Then c2 = _color1 Else c2 = _color2
-        If _color3 = -14 Then c3 = _color1 Else c3 = _color3
-        If _color4 = -14 Then c4 = _color1 Else c4 = _color4
+        If colour2 = -14 Then c2 = colour1 Else c2 = colour2
+        If colour3 = -14 Then c3 = colour1 Else c3 = colour3
+        If colour4 = -14 Then c4 = colour1 Else c4 = colour4
 
         gl.begin(gl.TRIANGLES)
 
-        Vertex2D(x1, y1, _color1)
+        Vertex2D(x1, y1, colour1)
         Vertex2D(x1 + w, y1, c2)
         Vertex2D(x1 + w, y1 + h, c3)
 
@@ -274,7 +274,7 @@ Public Sub Rectangle2D(x1 As Float, y1 As Float, w As Float, h As Float, Optiona
 
         gl.begin(gl.TRIANGLEs)
 
-        Vertex2D(x1, y1, _color1)
+        Vertex2D(x1, y1, colour1)
         Vertex2D(x1 + w, y1 + h, c4)
         Vertex2D(x1, y1 + h, c3)
 
@@ -299,18 +299,18 @@ Public Sub Rectangle2D(x1 As Float, y1 As Float, w As Float, h As Float, Optiona
 End
 
 '' Dibuja un serie de lineas
-Public Function Lines(vertices As Float[], Optional _color As Integer = 0, LineWidth As Float = 1, dashes As Float[])
+Public Function Lines(vertices As Float[], Optional colour As Integer = 0, LineWidth As Float = 1, dashes As Float[])
 
     ' TODO: dashes is for later use
 
     Dim i As Integer
 
-    'glColorRGB(_color)
+    'glColorRGB(colour)
     gl.LineWidth(LineWidth) ' obsoleto en WebGL
     gl.Begin(gl.Lines)
 
     For i = 0 To vertices.Max Step 2
-        glColorRGB(_color)
+        glColorRGB(colour)
         gl.Vertex2f(vertices[i], vertices[i + 1])
 
     Next
@@ -319,18 +319,18 @@ Public Function Lines(vertices As Float[], Optional _color As Integer = 0, LineW
 End
 
 '' Dibuja un seria de polilinea
-Public Function Polygon(vertices As Float[], Optional _color As Integer = 0, FillColor As Integer = 0, LineWidth As Float = 1, dashes As Float[])
+Public Function Polygon(vertices As Float[], Optional colour As Integer = 0, FillColor As Integer = 0, LineWidth As Float = 1, dashes As Float[])
 
     ' TODO: dashes is for later use
 
     Dim i As Integer
 
-    'glColorRGB(_color)
+    'glColorRGB(colour)
     gl.LineWidth(LineWidth) ' obsoleto en WebGL
     gl.Begin(gl.POLYGON)
 
     For i = 0 To vertices.Max Step 2
-        glColorRGB(_color)
+        glColorRGB(colour)
         gl.Vertex2f(vertices[i], vertices[i + 1])
 
     Next
@@ -341,7 +341,7 @@ End
 '' Siempre gira en sentido anti-horario
 '' Las medidas de los angulo inicial y recorrido estan en RADIANES
 
-Public Function Arc(Optional radio As Float, start_angle As Float, length As Float, _color As Integer = 0, LineWidth As Float = 1, dashes As Float[])
+Public Function Arc(Optional radio As Float, start_angle As Float, length As Float, colour As Integer = 0, LineWidth As Float = 1, dashes As Float[])
 
     GL.Begin(gl.LINE_STRIP)
     Dim theta, angle_increment As Float
@@ -352,7 +352,7 @@ Public Function Arc(Optional radio As Float, start_angle As Float, length As Flo
 
     For theta = 0 To length Step angle_increment
 
-        GLplus.Vertex2D(radio * Cos(start_angle + theta), radio * Sin(start_angle + theta), _color)
+        GLplus.Vertex2D(radio * Cos(start_angle + theta), radio * Sin(start_angle + theta), colour)
     Next
 
     GL.End
@@ -360,18 +360,18 @@ Public Function Arc(Optional radio As Float, start_angle As Float, length As Flo
 End
 '' Dibuja un seria de polilinea
 
-Public Function PolyLines(vertices As Float[], Optional _color As Integer = 0, LineWidth As Float = 1, dashes As Float[])
+Public Function PolyLines(vertices As Float[], Optional colour As Integer = 0, LineWidth As Float = 1, dashes As Float[])
 
     ' TODO: dashes is for later use
 
     Dim i As Integer
 
-    'glColorRGB(_color)
+    'glColorRGB(colour)
     gl.LineWidth(LineWidth) ' obsoleto en WebGL
     gl.Begin(gl.LINE_STRIP)
 
     For i = 0 To vertices.Max Step 2
-        glColorRGB(_color)
+        glColorRGB(colour)
         gl.Vertex2f(vertices[i], vertices[i + 1])
 
     Next
@@ -380,7 +380,7 @@ Public Function PolyLines(vertices As Float[], Optional _color As Integer = 0, L
 End
 
 '' Dibuja un circulo
-Public Function Circle(center As Float[], radious As Float, Optional _color As Integer = 0, LineWidth As Float = 1, dashes As Float[])
+Public Function Circle(center As Float[], radious As Float, Optional colour As Integer = 0, LineWidth As Float = 1, dashes As Float[])
 
     ' TODO: dashes is for later use
 
@@ -554,14 +554,14 @@ Public Sub DibujarCargaPuntual3(punta As Punto3d, cola As Punto3d, colorflecha A
 
 End Sub
 
-Public Sub Vertex2D(x2d As Float, y2d As Float, Optional _Color As Integer = Color.Red)
+Public Sub Vertex2D(x2d As Float, y2d As Float, Optional colour As Integer = Color.Red)
     '
     '
     '     '2020 el color va primero
     ' '
 
-    If _Color Then
-        Me.glColorRGB(_Color)
+    If colour Then
+        Me.glColorRGB(colour)
 
     Endif
 
@@ -570,13 +570,13 @@ Public Sub Vertex2D(x2d As Float, y2d As Float, Optional _Color As Integer = Col
 
 End
 
-Public Sub Vertex3D(p As Punto3d, Optional _Color4F As GLColorSt)
+Public Sub Vertex3D(p As Punto3d, Optional colour4F As GLColorSt)
     '
     '
     '     '2020 el color va primero
     '
-    '     If _Color4F Then
-    '         gl.Color4f(_Color4F.r, _Color4F.g, _Color4F.b, _Color4F.Alpha)
+    '     If colour4F Then
+    '         gl.Color4f(colour4F.r, colour4F.g, colour4F.b, colour4F.Alpha)
     '
     '     Endif
     '     gl.Vertex3f(p.x, p.y, p.z)
@@ -767,22 +767,22 @@ End
 '' Grafica un texto en el contexto actual de acuerdo a los parametros pasados
 '' Debe estar definida la Font con nombre y altura
 ''
-Public Function DrawText(UTFstring As String, posX As Float, posY As Float, Optional angle As Float = 0, textH As Float = 1, _color As Integer = -14, linewidth As Float = 1, rectW As Float = 0, rectH As Float = 0, alignHoriz As Integer = 0, alignVert As Integer = 0) As Boolean
+Public Function DrawText(UTFstring As String, posX As Float, posY As Float, Optional angle As Float = 0, textH As Float = 1, colour As Integer = -14, linewidth As Float = 1, rectW As Float = 0, rectH As Float = 0, alignHoriz As Integer = 0, alignVert As Integer = 0) As Boolean
 
     Dim i, iii, UTFcode, LetterIndex As Integer, Xadvance As Float
 
     gl.PushMatrix                                                               ' para evitar peleas, guardo la matriz de trnasformacion
     gl.Translatef(posX, posY, 0)
-    gl.Rotatef(angle, 0, 0, 1)
+    gl.Rotatef(angle, 0, 0, 1)                                                  ' en grados
     gl.Scalef(textH * FontScale, textH * FontScale, 1)
-    If _color <> -14 Then Me.glColorRGB(_color)
+    If colour <> -14 Then Me.glColorRGB(colour)
     For i = 1 To Len(UTFstring)                                                 ' para cada letra
         UTFcode = String.Code(UTFstring, i)                                     ' obtengo el UTF code
         If UTFcode = 32 Then                                                    ' es un espacio
             gl.Translatef(ActualFont.LetterSpacing, 0, 0)                       ' muevo el puntero a la siguiente posicion
         Else
             LetterIndex = GetCodeIndex(ActualFont, UTFcode)                     ' obtengo el indice de la letra
-            Lines(ActualFont.Letter[LetterIndex].FontGlyps, _color)                     ' la dibujo
+            Lines(ActualFont.Letter[LetterIndex].FontGlyps, colour)                     ' la dibujo
             For iii = 0 To ActualFont.Letter[LetterIndex].FontGlyps.Max Step 2  ' calculo cuanto tiene que avanzar el puntero
                 If ActualFont.Letter[LetterIndex].FontGlyps[iii] > Xadvance Then Xadvance = ActualFont.Letter[LetterIndex].FontGlyps[iii]
             Next
@@ -798,7 +798,7 @@ End
 '' Grafica un texto de varias lineas en el contexto actual de acuerdo a los parametros pasados
 '' Debe estar definida la Font con nombre y altura
 ''
-Public Function DrawMultilineText(UTFMultiString As String, posX As Float, posY As Float, Optional angle As Float = 0, textH As Float = 1, _color As Integer = -14, linewidth As Float = 1, rectW As Float = 0, rectH As Float = 0, alignHoriz As Integer = 0, alignVert As Integer = 0) As Boolean
+Public Function DrawMultilineText(UTFMultiString As String, posX As Float, posY As Float, Optional angle As Float = 0, textH As Float = 1, colour As Integer = -14, linewidth As Float = 1, rectW As Float = 0, rectH As Float = 0, alignHoriz As Integer = 0, alignVert As Integer = 0) As Boolean
 
     Dim i, iii, UTFcode, LetterIndex As Integer, Xadvance As Float
     Dim mLines As String[], dH As Float, tLine As String
@@ -809,7 +809,7 @@ Public Function DrawMultilineText(UTFMultiString As String, posX As Float, posY 
     gl.Translatef(posX, posY, 0)
     gl.Rotatef(angle, 0, 0, 1)
     gl.Scalef(textH * FontScale, textH * FontScale, 1)
-    If _color <> -14 Then Me.glColorRGB(_color)
+    If colour <> -14 Then Me.glColorRGB(colour)
     For Each tLine In mLines
 
         For i = 1 To Len(tLine)                                                 ' para cada letra
@@ -818,7 +818,7 @@ Public Function DrawMultilineText(UTFMultiString As String, posX As Float, posY 
                 gl.Translatef(ActualFont.LetterSpacing, 0, 0)                       ' muevo el puntero a la siguiente posicion
             Else
                 LetterIndex = GetCodeIndex(ActualFont, UTFcode)                     ' obtengo el indice de la letra
-                Lines(ActualFont.Letter[LetterIndex].FontGlyps, _color)                     ' la dibujo
+                Lines(ActualFont.Letter[LetterIndex].FontGlyps, colour)                     ' la dibujo
                 For iii = 0 To ActualFont.Letter[LetterIndex].FontGlyps.Max Step 2  ' calculo cuanto tiene que avanzar el puntero
                     If ActualFont.Letter[LetterIndex].FontGlyps[iii] > Xadvance Then Xadvance = ActualFont.Letter[LetterIndex].FontGlyps[iii]
                 Next

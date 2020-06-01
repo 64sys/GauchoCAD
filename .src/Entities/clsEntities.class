@@ -397,10 +397,10 @@ Public Function SelectFromPoint(Xr As Float, Zr As Float, Optional Autoselect As
 
 End
 
-Public Sub DrawPoint(x As Float, y As Float, Optional _color As Integer = -1, Optional LargoReal As Float = 0.4)
+Public Sub DrawPoint(x As Float, y As Float, Optional colour As Integer = -1, Optional LargoReal As Float = 0.4)
 
-    If _color <> -1 Then
-        paint.brush = Paint.Color(_color)
+    If colour <> -1 Then
+        paint.brush = Paint.Color(colour)
     Else
         paint.brush = Paint.Color(Color.Blue)
     End If
@@ -552,7 +552,7 @@ Public Sub CopyElemData(origen As Object, destino As Object)
     destino.stringdata = origen.Stringdata
     destino.Layer = origen.Layer
     destino.Group = origen.Group
-    destino._Color = origen._color
+    destino.colour = origen.colour
     destino.LineType = origen.LineType
     destino.LineWidth = origen.LineWidth
 

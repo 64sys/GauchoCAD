@@ -39,7 +39,7 @@ Public StringData3 As String                ' split with "|" separator if necces
 Public fParam As New Float[]                ' array of floats
 Public Layer As String = "0"                ' Capa o Layer que se guarda en el archivo
 Public Block As String                      ' Para tener la posibilidade de juntar cosas en un block
-Public _Color As Integer                    ' 0=by layer, 1=by block, 10+=16 bit color code  ;  ths is not the color to be draw, ColorToPaint is, set in Finish()
+Public colour As Integer                    ' 0=by layer, 1=by block, 10+=16 bit color code  ;  ths is not the color to be draw, ColorToPaint is, set in Finish()
 Public LineType As Integer                  ' 0=continuous, 1=dashed from flxDash
 Public LineWidth As Integer = 1             ' this is it
 Public RefPointX As Float                   ' new

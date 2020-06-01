@@ -102,6 +102,8 @@ Public Function Start(ElemToBuild As Variant, Optional Mode As Integer = 0)
     ' reset from previous element
     elem.StepsDone = 0
 
+    elem.gbcolor = appmain.CurrentColor
+
     iPoints = 0
     iFloat = 0
     iString = 0

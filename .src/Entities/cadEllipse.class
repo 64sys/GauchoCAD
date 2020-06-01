@@ -74,7 +74,7 @@ Public Sub Draw()
             Me.BoundingPoligon.Add(x)
             Me.BoundingPoligon.Add(y)
 
-            'GLplus.Vertex2D(radio * Cos(start_angle + theta), radio * Sin(start_angle + theta), _color)
+            'GLplus.Vertex2D(radio * Cos(start_angle + theta), radio * Sin(start_angle + theta), colour)
         Next
 
         ' aplico las trnasformaciones

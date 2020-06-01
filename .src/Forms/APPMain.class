@@ -476,6 +476,7 @@ Public Sub Workspace1_Activate()
     aWin = Workspace1.ActiveWindow
 
     If aWin.Name = "FCAD" Then
+        hFcad = aWin
         Print aWin.Tag
         CurrentFile = aWin.Tag
         ' LoadComboboxes(aWin.cModel)
