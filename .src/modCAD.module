@@ -1,14 +1,14 @@
 ' Gambas module file
 
-' GauchoCAD
-' A simple CAD made in Gambas
+' Tool maintained by Terco
+' PlantDesigner
+' Software para diseño de plantas tipo de hormigon
 '
 ' Copyright (C) Ing Martin P Cristia
-' Copyright (C) Martin Belmonte
 '
 ' This program is free software; you can redistribute it and/or modify
 ' it under the terms of the GNU General Public License as published by
-' the Free Software Foundation; either version 3 of the License, or
+' the Free Software Foundation; either version 2 of the License, or
 ' (at your option) any later version.
 '
 ' This program is distributed in the hope that it will be useful,
@@ -20,6 +20,13 @@
 ' along with this program; if not, write to the Free Software
 ' Foundation, Inc., 51 Franklin St, Fifth Floor,
 ' Boston, MA  02110-1301  USA
+' Gambas class file
+
+' Credits
+' --------
+' Icon design por Trinh Ho ,Good Ware, freepik get them at https://www.flaticon.es
+' Based on an example called MuchosCirculos by JGuardon y MrShell
+' XML Load/Save by Tincho
 
 ' Filtros del dibujo
 Public DrawOriginals As Boolean = False
@@ -62,7 +69,7 @@ Public FileName As String                           ' current work filename
 '---------------------------------------------------------------
 'Tincho
 'Vars direct or derivated from config xml
-Public WindowBackColor As Integer = Color.White  '' Window backgrount color
+Public WindowBackColor As Integer '= Color.Blac  '' Window backgrount color
 Public WindowTextColor As Integer   '' Window helper text color
 Public WindowCursorColor As Integer '' Window cursor color
 Public WhiteAndBlack As Integer     '' El color blanco/negro siempre sera distinto al fondo
@@ -73,7 +80,24 @@ Public Sub Main()
 
     Dim lay As New Collection       '' Layer properties
 
-    If WindowBackColor = 0 Then WhiteAndBlack = Color.White Else WhiteAndBlack = Color.Black
+    WindowBackColor = Starter.WindowBackColor
+    WindowTextColor = Starter.WindowTextColor
+    WindowCursorColor = Starter.WindowCursorColor
+
+    'WindowBackColor = Color.Black
+    'WindowBackColor = &1B2224
+
+    Select WindowBackColor
+        Case Color.Black
+            'Case &1B2224
+            WhiteAndBlack = Color.White
+
+        Case Else
+            WhiteAndBlack = Color.Black
+
+    End Select
+
+    'If WindowBackColor = 0 Then WhiteAndBlack = Color.White Else WhiteAndBlack = Color.Black
     ' armo el array de colores
     gcolor = DecodeColor()
 
@@ -82,7 +106,7 @@ Public Sub Main()
     clsJobPrevious = clsDefaultJob
     clsJobPreviousParam = 0
 
-    FileName = User.Home &/ "autosaveV5.xml"
+    'FileName = User.Home &/ "autosaveV5.xml"
 
     FontList = glPlus.LoadFonts(Application.Path &/ "Fonts/LFF")
     glPlus.SelectFont("romanc")
@@ -105,15 +129,33 @@ Public Function ImportEntities(colData As Collection, obxEntities As Object[]) A
         Select Case colEnt["entity"]
             Case "LINE"
                 GoSub GetPoints
-                AddLine(flxPoints, colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], colEnt["block"])
+                AddLine(flxPoints, colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], "")
                 Inc iTotalEntities
+
             Case "LWPOLYLINE"
+                GoSub GetPoints
+                AddPolyLine(flxPoints, colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], "")
+                Inc iTotalEntities
 
             Case "ELLIPSE"
+                GoSub GetPoints
+                AddEllipse(flxPoints, colEnt["r"], colEnt["a"][0], colEnt["a"][1], colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], "")
+                Inc iTotalEntities
 
             Case "CIRCLE"
+                GoSub GetPoints
+                AddCircle(flxPoints, colEnt["r"], colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], "")
+                Inc iTotalEntities
 
             Case "ARC"
+                GoSub GetPoints
+                AddArc(flxPoints, colEnt["r"], colEnt["a"][0], colEnt["a"][1], colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], "")
+                Inc iTotalEntities
+
+            Case "INSERT"
+                GoSub GetPoints
+                AddInsert(flxPoints, colEnt["s"][0], colEnt["s"][1], colEnt["a"], colEnt["colour"], colEnt["style"], colEnt["layer"], colEnt["b"])
+                Inc iTotalEntities
 
         End Select
 
@@ -124,6 +166,7 @@ Public Function ImportEntities(colData As Collection, obxEntities As Object[]) A
 GetPoints:              ' Leo los puntos que estan separados y los meto en un unico array de Float[]
     flxPoints.Clear
     For Each p In colEnt["p"]
+        'flxPoints.Insert(p)
         flxPoints.Add(p[0])
         flxPoints.Add(p[1])     ' P[2] es Z y lo ingnoro
     Next
@@ -436,6 +479,7 @@ Public Function DecodeColor() As Integer[]
     Dim g As String
     Dim b As String
     Dim s As String
+    Dim i As Integer
 
     rgbx.Add("0:0:0")
     rgbx.Add("255:0:0")
@@ -694,7 +738,6 @@ Public Function DecodeColor() As Integer[]
     rgbx.Add("204:204:204")
     rgbx.Add("255:255:255")
 
-    Dim i As Integer
     For i = 0 To rgbx.Max
         s = rgbx[i]
         If i = 0 Or i = 8 Or i = rgbx.Max Then

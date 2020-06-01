@@ -52,6 +52,19 @@ Public Sub Run(cin As Collection)
                     Case "grpTools"
                         tob = New ToolButton(pnlTools) As "tool"
                         z = 48
+
+                    Case "grpFile"
+                        tob = New ToolButton(pnlFile) As "menuapp"
+                        z = 32
+
+                    Case "grpOptions"
+                        tob = New ToolButton(pnlFile) As "menuapp"
+                        z = 32
+
+                    Case "grpView"
+                        tob = New ToolButton(pnlFile) As "tool"
+                        z = 32
+
                     Case Else
                         tob = New ToolButton(pnlFile) As "menuapp"
                         z = 32
@@ -62,16 +75,27 @@ Public Sub Run(cin As Collection)
                     .Tag = obj.Tag
                     .Tooltip = obj.Text
                     .Enabled = obj.Enabled
+
                     .W = z
                     .H = z
+
                     If Exist(ictn[obj.Tag]) Then
                         If Stat(ictn[obj.Tag]).Type = gb.File Or Stat(ictn[obj.Tag]).Type = gb.Link Then
-                            tob.Picture = Image.Load(ictn[obj.Tag]).Stretch(z - 8, z - 8).Picture
+                            Select mnu.Name
+                                Case "grpFile", "grpOptions", "grpHelp", "grpView"
+                                    tob.Picture = Image.Load(ictn[obj.Tag]).Stretch(z - 8, z - 8).Picture
+
+                                Case Else
+                                    tob.Picture = obj.Picture
+                                    .Border = True
+                            End Select
                         Else
                             tob.Picture = obj.Picture
+                            .Border = True
                         Endif
                     Else
                         tob.Picture = obj.Picture
+                        .Border = True
                     Endif
                 End With
             Endif
@@ -136,6 +160,18 @@ Public Sub menuapp_Click()
     obj = Last
 
     Task(obj.Tag)
+
+End
+
+Public Sub view_Click()
+
+    Dim obj As Object
+
+    obj = Last
+
+    If Workspace1.ActiveWindow Then
+        modCAD.clsJob.KeyText(String.UCaseFirst(obj.Tag))
+    Endif
 
 End
 
@@ -225,7 +261,7 @@ Public Sub Task(sTask As String)
 
     Dim hFConfig As FConfig                 '' Edit program configuration
     Dim hFAbout As FAbout                  '' Formulario que muestra informacin del programa
-    'Dim hFImport As FImport                 '' Impor from others formats
+    Dim hFImport As FImport                 '' Impor from others formats
     Dim w As Window
     Dim wtag As String
 

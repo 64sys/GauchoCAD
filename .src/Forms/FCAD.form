@@ -5,7 +5,6 @@
   Expand = True
   Icon = Picture["png/bosquejo2.png"]
   Arrangement = Arrange.Horizontal
-  Spacing = True
   Padding = 3
   { grpFile Menu
     Text = ("File")
@@ -275,11 +274,9 @@
     Expand = True
     Arrangement = Arrange.Vertical
     { PanEdit1 Panel
-      MoveScaled(1,7,106,64)
+      MoveScaled(-3,0,106,64)
       Expand = True
       Arrangement = Arrange.Horizontal
-      Spacing = True
-      Margin = True
       { Panel5 Panel
         MoveScaled(22,1,52,62)
         Expand = True
@@ -298,6 +295,7 @@
         }
         { pnlMessage Panel
           MoveScaled(3,57,48,4)
+          Visible = False
           Arrangement = Arrange.Horizontal
           { lblInfo Label
             MoveScaled(4,0,24,4)
@@ -320,6 +318,7 @@
         }
         { TreeView1 TreeView
           MoveScaled(2,11,16,39)
+          Background = Color.TextBackground
           Expand = True
           Border = False
         }
@@ -333,6 +332,7 @@
     }
     { lblCoord Label
       MoveScaled(2,72,40,4)
+      Visible = False
       AutoResize = True
       Text = ("Coordenadas")
     }
