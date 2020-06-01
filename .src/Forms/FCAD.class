@@ -124,6 +124,17 @@ Public Sub form_Activate()
         FirstTime = False
         DrawingReady = True
     Endif
+    If cImport.Count > 0 Then
+        LayersTransfer()
+        EntitiesTransfer()
+        LoadDrawingMap()
+        modCAD.ImportBlocks(cImport)
+        modCAD.ImportEntities(cImport, arrEntities)
+        cImport.Clear
+        modCAD.ApplyLayerProperties(1)
+        regen
+        cadZoomE.Start()
+    Endif
 
 End
 
@@ -459,16 +470,6 @@ Public Sub ToolButton1_Click()
     If cModel.Exist("Layers") Then
         Print "Layers"
     Endif
-
-    LayersTransfer()
-    EntitiesTransfer()
-
-    modCAD.ImportEntities(cModel, arrEntities)
-    modCAD.ApplyLayerProperties(1)
-    regen
-    cadZoomE.Start()
-
-    LoadDrawingMap()
 
 End
 

@@ -49,12 +49,14 @@ Public SnapMode As Integer                      ' Bitwise: -1 Off ; 0 = Nearest;
 Public clsJob As Object                             ' what I am doing now, thats either selecting or something else
 Public clsJobPrevious As Object                     ' what was doing before
 Public clsJobPreviousParam As Integer               ' a param to pass to clsJob.Start( param )
-'------vars for layers, lines, colors etc.
-' This collections will be loaded when the file if loaded
-' Public cLayers As New Collection   '' Lyayers list
-' Public cColors As New Collection   '' Colors list
-' Public cStyles As New Collection   '' Line types list
-' Public cWeights As New Collection  '' Line weights list
+
+Public Struct arrBlockSt
+    name As String
+    x As Float
+    y As Float
+    layer As String
+    entities As Object[]
+End Struct
 
 Public gColor As New Integer[]
 
@@ -118,43 +120,59 @@ Public Sub Main()
 
 End
 
+Public Function ImportBlocks(colData As Collection) ', obxEntities As Object[]) As Integer
+
+    Dim iTotalEntities As Integer, colent, colBlk As Collection, flxPoints As New Float[], P As Float[]
+
+    For Each colBlk In colData["Blocks"]
+        Dim newBlock As New ArrBlockSt
+        newBlock.name = colBlk["block"]
+        APPMain.hFCAD.arrBlocks.Add(newBlock)
+        ImportEntities(colBlk, newBlock.entities, newBlock.name)
+
+    Next
+
+End
+
 '' Importa la clave entidades de la coleccion y las coloca en el array de objetos
 
-Public Function ImportEntities(colData As Collection, obxEntities As Object[]) As Integer
+Public Function ImportEntities(colData As Collection, obxEntities As Object[], Optional BlockName As String = "") As Integer
 
     Dim iTotalEntities As Integer, colEnt As Collection, flxPoints As New Float[], P As Float[]
+
+    If Not colData.Exist("Entities") Then Return
 
     For Each colEnt In colData["Entities"]
 
         Select Case colEnt["entity"]
             Case "LINE"
                 GoSub GetPoints
-                AddLine(flxPoints, colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], "")
+                AddLine(flxPoints, colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], BlockName)
                 Inc iTotalEntities
 
             Case "LWPOLYLINE"
                 GoSub GetPoints
-                AddPolyLine(flxPoints, colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], "")
+                AddPolyLine(flxPoints, colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], BlockName)
                 Inc iTotalEntities
 
             Case "ELLIPSE"
                 GoSub GetPoints
-                AddEllipse(flxPoints, colEnt["r"], colEnt["a"][0], colEnt["a"][1], colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], "")
+                AddEllipse(flxPoints, colEnt["r"], colEnt["a"][0], colEnt["a"][1], colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], BlockName)
                 Inc iTotalEntities
 
             Case "CIRCLE"
                 GoSub GetPoints
-                AddCircle(flxPoints, colEnt["r"], colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], "")
+                AddCircle(flxPoints, colEnt["r"], colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], BlockName)
                 Inc iTotalEntities
 
             Case "ARC"
                 GoSub GetPoints
-                AddArc(flxPoints, colEnt["r"], colEnt["a"][0], colEnt["a"][1], colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], "")
+                AddArc(flxPoints, colEnt["r"], colEnt["a"][0], colEnt["a"][1], colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], BlockName)
                 Inc iTotalEntities
 
             Case "INSERT"
                 GoSub GetPoints
-                AddInsert(flxPoints, colEnt["s"][0], colEnt["s"][1], colEnt["a"], colEnt["colour"], colEnt["style"], colEnt["layer"], colEnt["b"])
+                AddInsert(flxPoints, colEnt["s"][0], colEnt["s"][1], colEnt["a"], colEnt["colour"], colEnt["style"], colEnt["layer"], BlockName)
                 Inc iTotalEntities
 
         End Select
