@@ -1,7 +1,25 @@
 ' Gambas class file
 
-' Element maintained by Terco
-' V2
+' GauchoCAD
+' A simple CAD made in Gambas
+'
+' Copyright (C) Ing Martin P Cristia
+'
+' This program is free software; you can redistribute it and/or modify
+' it under the terms of the GNU General Public License as published by
+' the Free Software Foundation; either version 3 of the License, or
+' (at your option) any later version.
+'
+' This program is distributed in the hope that it will be useful,
+' but WITHOUT ANY WARRANTY; without even the implied warranty of
+' MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+' GNU General Public License for more details.
+'
+' You should have received a copy of the GNU General Public License
+' along with this program; if not, write to the Free Software
+' Foundation, Inc., 51 Franklin St, Fifth Floor,
+' Boston, MA  02110-1301  USA
+
 Public Const GAMBASCADENTITY As String = ("EntityBase")
 Public Const USEWITH As String = "clsEntityBuilder"
 Public Const DrawingOrder As Integer = 0        ' 1 = draws first
@@ -21,7 +39,7 @@ Public StringData3 As String                ' split with "|" separator if necces
 Public fParam As New Float[]                ' array of floats
 Public Layer As String = "0"                ' Capa o Layer que se guarda en el archivo
 Public Block As String                      ' Para tener la posibilidade de juntar cosas en un block
-Public _Color As Integer                    ' 0=by layer, 1=by block, 10+=16 bit color code  ;  ths is not the color to be draw, ColorToPaint is, set in Finish()
+Public colour As Integer                    ' 0=by layer, 1=by block, 10+=16 bit color code  ;  ths is not the color to be draw, ColorToPaint is, set in Finish()
 Public LineType As Integer                  ' 0=continuous, 1=dashed from flxDash
 Public LineWidth As Integer = 1             ' this is it
 Public RefPointX As Float                   ' new

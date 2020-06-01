@@ -228,7 +228,7 @@ Public Sub GLArea1_MouseMove()
             If iEntity[2] >= 0 Then
                 ' FInspector.lblEntity.Text = oEntity.gender
                 ' ' FInspector.lblColor.Background = oEntity.gbcolor
-                ' ' FInspector.lblColorName.TExt = oEntity._color
+                ' ' FInspector.lblColorName.TExt = oEntity.colour
                 ' FInspector.lblLayer.TExt = oEntity.layer
                 ' FInspector.Top = Mouse.Screeny - FInspector.h - 20
                 ' FInspector.Left = Mouse.ScreenX + 20

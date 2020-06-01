@@ -177,7 +177,7 @@ End
 
 ' importing
 
-Public Function AddLine(Points As Float[], Optional _color As Integer = 0, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
+Public Function AddLine(Points As Float[], Optional colour As Integer = 0, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
 
     ' points are in x,y,x,y,x,y....
     Dim oEntity As Object                       ' creamos la entidad de la clase apropiada
@@ -185,7 +185,7 @@ Public Function AddLine(Points As Float[], Optional _color As Integer = 0, Optio
     oEntity = Object.New("cadline")             ' create the new entity of proper class
     oEntity.P.insert(points)                    ' recibimos los dos vertices de la linea x1,y1,x2,y2
     oEntity.layer = Layer
-    oEntity._color = _color
+    oEntity.colour = colour
     oEntity.LineWidth = LineWidth               ' datos CAD
     oEntity.Block = Block
     If oEntity.Block <> "" Then oEntity.visible = False
@@ -195,7 +195,7 @@ Public Function AddLine(Points As Float[], Optional _color As Integer = 0, Optio
 
 End
 
-Public Function AddPolyLine(Points As Float[], Optional _color As Integer = 0, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
+Public Function AddPolyLine(Points As Float[], Optional colour As Integer = 0, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
 
     ' points are in x,y,x,y,x,y....
 
@@ -206,7 +206,7 @@ Public Function AddPolyLine(Points As Float[], Optional _color As Integer = 0, O
     oEntity.P.insert(points)                    ' recibimos los dos vertices de la linea x1,y1,x2,y2
 
     oEntity.layer = Layer
-    oEntity._color = _color
+    oEntity.colour = colour
     oEntity.LineWidth = LineWidth               ' datos CAD
     oEntity.Block = Block
     If oEntity.Block <> "" Then oEntity.visible = False
@@ -216,7 +216,7 @@ Public Function AddPolyLine(Points As Float[], Optional _color As Integer = 0, O
 
 End
 
-Public Function AddDim(Points As Float[], bloque As String, medida As Float, texto As String, alineacion As Integer, angulo As Float, tipo As Integer, _Color As Integer, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
+Public Function AddDim(Points As Float[], bloque As String, medida As Float, texto As String, alineacion As Integer, angulo As Float, tipo As Integer, colour As Integer, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
 
     Dim oEntity As Object                       ' creamos la entidad de la clase apropiada
 
@@ -230,7 +230,7 @@ Public Function AddDim(Points As Float[], bloque As String, medida As Float, tex
     oEntity.stringdata = texto
     oEntity.stringdata2 = bloque
     oEntity.layer = Layer
-    oEntity._color = _color
+    oEntity.colour = colour
     oEntity.LineWidth = LineWidth               ' datos CAD
     oEntity.Block = Block
     If oEntity.Block <> "" Then oEntity.visible = False
@@ -240,7 +240,7 @@ Public Function AddDim(Points As Float[], bloque As String, medida As Float, tex
 
 End
 
-Public Function AddSolid(Points As Float[], Optional _color As Integer = 0, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
+Public Function AddSolid(Points As Float[], Optional colour As Integer = 0, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
 
     ' points are in x,y,x,y,x,y....
     ' points are in x,y,x,y,x,y....
@@ -251,7 +251,7 @@ Public Function AddSolid(Points As Float[], Optional _color As Integer = 0, Opti
     oEntity.P.insert(points)                    ' recibimos los dos vertices de la linea x1,y1,x2,y2
 
     oEntity.layer = Layer
-    oEntity._color = _color
+    oEntity.colour = colour
     oEntity.LineWidth = LineWidth               ' datos CAD
     oEntity.Block = Block
     If oEntity.Block <> "" Then oEntity.visible = False
@@ -261,7 +261,7 @@ Public Function AddSolid(Points As Float[], Optional _color As Integer = 0, Opti
 
 End
 
-Public Function AddSPLine(Points As Float[], Optional _color As Integer = 0, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
+Public Function AddSPLine(Points As Float[], Optional colour As Integer = 0, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
 
     ' points are in x,y,x,y,x,y....
     Dim oEntity As Object                       ' creamos la entidad de la clase apropiada
@@ -271,7 +271,7 @@ Public Function AddSPLine(Points As Float[], Optional _color As Integer = 0, Opt
     oEntity.P.insert(points)                    ' recibimos los dos vertices de la linea x1,y1,x2,y2
 
     oEntity.layer = Layer
-    oEntity._color = _color
+    oEntity.colour = colour
     oEntity.LineWidth = LineWidth               ' datos CAD
     oEntity.Block = Block
     If oEntity.Block <> "" Then oEntity.visible = False
@@ -281,7 +281,7 @@ Public Function AddSPLine(Points As Float[], Optional _color As Integer = 0, Opt
 
 End
 
-Public Function AddCircle(Points As Float[], radious As Float, Optional _color As Integer = 0, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
+Public Function AddCircle(Points As Float[], radious As Float, Optional colour As Integer = 0, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
 
     ' points are in x,y,x,y,x,y....
     Dim oEntity As Object                       ' creamos la entidad de la clase apropiada
@@ -290,7 +290,7 @@ Public Function AddCircle(Points As Float[], radious As Float, Optional _color A
     oEntity.P.insert(points)                    ' centro x1,y1
     oEntity.fParam.Add(radious)                 ' radio
     oEntity.layer = Layer
-    oEntity._color = _color
+    oEntity.colour = colour
     oEntity.LineWidth = LineWidth               ' datos CAD
     oEntity.Block = Block
     If oEntity.Block <> "" Then oEntity.visible = False
@@ -300,7 +300,7 @@ Public Function AddCircle(Points As Float[], radious As Float, Optional _color A
 
 End
 
-Public Function AddArc(Points As Float[], r As Float, angle1 As Float, angle2 As Float, Optional _color As Integer = 0, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
+Public Function AddArc(Points As Float[], r As Float, angle1 As Float, angle2 As Float, Optional colour As Integer = 0, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
 
     ' points are in x,y,x,y,x,y....
     Dim oEntity As Object                      ' creamos la entidad de la clase apropiada
@@ -311,7 +311,7 @@ Public Function AddArc(Points As Float[], r As Float, angle1 As Float, angle2 As
     oEntity.fParam.Add(angle1)                   ' angulo
     oEntity.fParam.Add(angle2)                   ' angulo
     oEntity.layer = Layer
-    oEntity._color = _color
+    oEntity.colour = colour
     oEntity.LineWidth = LineWidth               ' datos CAD
     oEntity.Block = Block
     If oEntity.Block <> "" Then oEntity.visible = False
@@ -321,7 +321,7 @@ Public Function AddArc(Points As Float[], r As Float, angle1 As Float, angle2 As
 
 End
 
-Public Function AddEllipse(Points As Float[], r As Float, angle1 As Float, angle2 As Float, Optional _color As Integer = 0, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
+Public Function AddEllipse(Points As Float[], r As Float, angle1 As Float, angle2 As Float, Optional colour As Integer = 0, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
 
     ' points are in x,y,x,y,x,y....
     Dim oEntity As Object                      ' creamos la entidad de la clase apropiada
@@ -332,7 +332,7 @@ Public Function AddEllipse(Points As Float[], r As Float, angle1 As Float, angle
     oEntity.fParam.Add(angle1)                 ' radio
     oEntity.fParam.Add(angle2)                   ' angulo
     oEntity.layer = Layer
-    oEntity._color = _color
+    oEntity.colour = colour
     oEntity.LineWidth = LineWidth               ' datos CAD
     oEntity.Block = Block
     If oEntity.Block <> "" Then oEntity.visible = False
@@ -342,7 +342,7 @@ Public Function AddEllipse(Points As Float[], r As Float, angle1 As Float, angle
 
 End
 
-Public Function AddText(Points As Float[], angle As Float, height As Float, _Text As String, Optional _color As Integer = Color.Blue, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
+Public Function AddText(Points As Float[], angle As Float, height As Float, _Text As String, Optional colour As Integer = Color.Blue, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
 
     Dim oEntity As Object                       ' creamos la entidad de la clase apropiada
 
@@ -352,7 +352,7 @@ Public Function AddText(Points As Float[], angle As Float, height As Float, _Tex
     oEntity.fParam.Add(height)                  ' alto letras
     oEntity.stringdata = _text                  ' el texto
     oEntity.layer = Layer
-    oEntity._color = _color
+    oEntity.colour = colour
     oEntity.LineWidth = LineWidth               ' datos CAD
     oEntity.Block = Block
     If oEntity.Block <> "" Then oEntity.visible = False
@@ -362,7 +362,7 @@ Public Function AddText(Points As Float[], angle As Float, height As Float, _Tex
 
 End
 
-Public Function AddMText(Points As Float[], angle As Float, height As Float, _Text As String, Optional _color As Integer = Color.Blue, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
+Public Function AddMText(Points As Float[], angle As Float, height As Float, _Text As String, Optional colour As Integer = Color.Blue, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
 
     Dim oEntity As Object                       ' creamos la entidad de la clase apropiada
 
@@ -372,7 +372,7 @@ Public Function AddMText(Points As Float[], angle As Float, height As Float, _Te
     oEntity.fParam.Add(height)                  ' alto letras
     oEntity.stringdata = _text                  ' el texto
     oEntity.layer = Layer
-    oEntity._color = _color
+    oEntity.colour = colour
     oEntity.LineWidth = LineWidth               ' datos CAD
     oEntity.Block = Block
     If oEntity.Block <> "" Then oEntity.visible = False
@@ -382,14 +382,14 @@ Public Function AddMText(Points As Float[], angle As Float, height As Float, _Te
 
 End
 
-Public Function AddCurve(Points As Float[], Optional _color As Integer = 0, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
+Public Function AddCurve(Points As Float[], Optional colour As Integer = 0, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
 
     ' points are in x,y,x,y,x,y....
     Dim o As Object
 
 End
 
-Public Function AddInsert(Points As Float[], scaleX As Float, scaleY As Float, angulo As Float, Optional _color As Integer = Color.Blue, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
+Public Function AddInsert(Points As Float[], scaleX As Float, scaleY As Float, angulo As Float, Optional colour As Integer = Color.Blue, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
 
     Dim oEntity As Object                       ' creamos la entidad de la clase apropiada
 
@@ -399,7 +399,7 @@ Public Function AddInsert(Points As Float[], scaleX As Float, scaleY As Float, a
     oEntity.fParam.Add(scaleY)
     oEntity.fParam.Add(angulo)                  ' GRADOS
     oEntity.layer = Layer
-    oEntity._color = _color
+    oEntity.colour = colour
     oEntity.Block = Block
     APPMain.hFCAD.arrEntities.Add(oEntity)
     oEntity.finish(-1)
@@ -451,16 +451,16 @@ Public Function ApplyLayerProperties(Optional mode As Integer = 0)
         If APPMain.hFCAD.cModel["Layers"][e.layerID]["show"] Then e.visible = True Else e.visible = False
 
         ' color
-        If e._color = 256 Then          ' buscar color del layer
+        If e.colour = 256 Then          ' buscar color del layer
 
             e.gbColor = gColor[APPMain.hFCAD.cModel["Layers"][e.layerID]["colour"]]
-        Else If e._color = 257 Then     ' buscar color del objeto
+        Else If e.colour = 257 Then     ' buscar color del objeto
             e.gbColor = gColor[APPMain.hFCAD.cModel["Layers"][e.layerID]["colour"]]     ' FIXME: cambiar esto
-        Else If e._color = 0 Then       ' buscar color del bloque
+        Else If e.colour = 0 Then       ' buscar color del bloque
             e.gbColor = gColor[APPMain.hFCAD.cModel["Layers"][e.layerID]["colour"]]     ' FIXME: cambiar esto
         Else
 
-            e.gbColor = gColor[e._color]
+            e.gbColor = gColor[e.colour]
 
         Endif
 

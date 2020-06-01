@@ -172,7 +172,7 @@ Public Sub LoadFromFile(Optional FilePath As String)
         ' vars CAD de futura implementacion
         ' TODO: implementar para el resto
         newObj.StringData = ent.Attributes["string"]
-        newObj._color = CInt(ent.Attributes["color"])
+        newObj.colour = CInt(ent.Attributes["color"])
         newObj.Block = ent.Attributes["block"]
         newObj.layer = ent.Attributes["layer"]   ' <------------- tincho uso layer en vez de nivel
         newObj.RefPointX = CFloat(ent.Attributes["refx"])   ' nuevos

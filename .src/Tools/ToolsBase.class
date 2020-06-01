@@ -43,6 +43,8 @@ Public PointsTotal As Integer
 Public Active As Boolean = False
 Public Mode As Integer
 
+Public inxSelected As New Integer[]
+
 Public Function MouseDown() ' called by FCAD-> DrawingArea_MouseDown
 
     ' This too does nothing here, but you can use it

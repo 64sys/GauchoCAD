@@ -6,9 +6,11 @@ End
 
 Public Sub Run(o As Object)
 
+    If Not o Then Return
+
     lblEntity.Text = o.gender
     ' FInspector.lblColor.Background = oEntity.gbcolor
-    ' FInspector.lblColorName.TExt = oEntity._color
+    ' FInspector.lblColorName.TExt = oEntity.colour
     lblLayer.TExt = o.layer
     Select Case o.gender
         Case "Line"

@@ -482,8 +482,10 @@ Public Sub Workspace1_Activate()
     aWin = Workspace1.ActiveWindow
 
     If aWin.Name = "FCAD" Then
+
         hFCAD = aWin
         LoadComboboxes(hFCAD.cModel)
+
         Print aWin.Tag
         CurrentFile = aWin.Tag
     Endif

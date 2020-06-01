@@ -89,7 +89,7 @@ Public Function SaveToFile(nName As String) As Boolean
         tm.Add(obj.StringData, "string")                           ' Martin nuevo
         tm.Add(obj.Layer, "layer")
         tm.Add(obj.block, "block")
-        tm.Add(obj._color, "color") ' <------------------------ Este parametro esta inventado, ojo. ( ya no )
+        tm.Add(obj.colour, "color") ' <------------------------ Este parametro esta inventado, ojo. ( ya no )
         tm.Add(obj.RefPointX, "refx")                    ' nuevos
         tm.Add(obj.RefPointY, "refy")
         enty.Add(tm.Copy(), hdr)
