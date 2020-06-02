@@ -175,6 +175,21 @@ Public Function ImportEntities(colData As Collection, obxEntities As Object[], O
                 AddInsert(flxPoints, colEnt["s"][0], colEnt["s"][1], colEnt["a"], colEnt["colour"], colEnt["style"], colEnt["layer"], BlockName)
                 Inc iTotalEntities
 
+            Case "TEXT"
+                GoSub GetPoints
+                AddText(flxPoints, colEnt["a"], colEnt["h"], colEnt["text"], colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], "")
+                Inc iTotalEntities
+
+            Case "MTEXT"
+                GoSub GetPoints
+                AddMText(flxPoints, colEnt["a"], colEnt["h"], colEnt["text"], colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], "")
+                Inc iTotalEntities
+
+            Case "DIMMENSION"
+                GoSub GetPoints
+                AddDim(flxPoints, colEnt["a"], colEnt["h"], colEnt["text"], colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], "")
+                Inc iTotalEntities
+
         End Select
 
     Next

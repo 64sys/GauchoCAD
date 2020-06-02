@@ -537,6 +537,12 @@ Public Sub EntitiesTransfer()
                             tEnt.Add(iEt["ro"], "ro")
                             tEnt.Add(iEt["cs"], "cs")
                             tEnt.Add(iEt["rs"], "rs")
+                        Case "TEXT"
+                            tEnt.Add(iEt["p"], "p")
+                            tEnt.Add(iEt["a"], "a")
+                            tEnt.Add(iEt["h"], "h")
+                            tEnt.Add(iEt["f"], "f")
+                            tEnt.Add(iEt["text"], "text")
 
                     End Select
                     mEnt.Add(tEnt.copy(), iEt["handle"])
