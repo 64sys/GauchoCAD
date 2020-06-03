@@ -33,10 +33,8 @@ Create Static
 Create Private
 'Fast
 
-Public ScreenDensity As Float = 1080 / 29.5  ' pixele by cm wich gives a 1:100 scale in my monitor
-
 Public HookSize As Integer = 16                       ' for use with poi
-
+Public NumericTolerance As Float = 1e-7
 Public GridSpacing As Float = 0.5
 Public GridActive As Boolean           ' use with F7: 0 = no grid, 1 = dots, 2 = lines
 
@@ -90,32 +88,6 @@ Public Function Near(xyzReal As Float) As Float
 
 End
 
-' Public Function Xpix(Xr As Float) As Integer ' Return the screen X axis position from a point in the world
-'
-'     Return Pixels(Xr) + PanX
-'
-' End
-'
-' Public Function Ypix(Yr As Float) As Integer ' same for Y
-'     ' ubica en el grafico una posicion en el mundo real
-'
-'     Return ViewportHeight - Pixels(Yr) - PanY
-'
-' End
-
-' Public Function Xreal(ScreenX As Integer) As Float  ' converts a point in the screen to the point in the world
-'
-'
-'     Return Metros(ScreenX - PanX)
-'
-'
-' End
-'
-' Public Function Yreal(ScreenY As Integer) As Float ' same for Z
-'
-'     Return Metros(-ScreenY - pany)
-' End
-
 Public Function distancia(x1 As Float, y1 As Float, x2 As Float, y2 As Float) As Float
     ' returns distance between points
 
@@ -131,12 +103,27 @@ Public Function InBetween(x As Float, x1 As Float, x2 As Float) As Boolean
 
 End
 
-'' determines if a XZ point is in the area of other by proximity parameter
-'' this is valid for negative values
-'' Integer version
-Public Function iAround(p1x As Integer, p1z As Integer, p2x As Integer, p2z As Integer, prox As Integer) As Boolean
+'' Devuelve el segmento en el que esta el punto, considerando la tolerancia numerica
 
-    If InBetween(p1x, p2x - prox, p2x + prox) And InBetween(p1z, p2z - prox, p2z + prox) Then Return True Else Return False
+Public Function inPolySegment(poligon As Float[], px As Float, py As Float) As Integer
+
+    Dim i As Integer
+
+    For i = 0 To poligon.Count - 4 Step 2
+
+        If ((poligon[i + 2] - poligon[i]) <> 0) And ((px - poligon[i]) <> 0) Then
+
+            If Abs(poligon[i + 3] - poligon[i + 1]) / (poligon[i + 2] - poligon[i]) - Abs(py - poligon[i + 1]) / (px - poligon[i]) < NumericTolerance Then Return (i + 2) / 2
+
+        Else If ((poligon[i + 2] - poligon[i]) = 0) And ((px - poligon[i]) = 0) Then
+
+            If InBetween(py, poligon[i + 1], poligon[i + 3]) Then Return (i + 2) / 2
+
+        Endif
+
+    Next
+
+    Return -1
 
 End
 
@@ -486,5 +473,34 @@ Public Function IsPoligonCrossingRect(poligon As Float[], x0 As Float, y0 As Flo
     If IsPoligonCrossingLine(poligon, x0, y0, x0, y1) Then Return True
     If IsPoligonCrossingLine(poligon, x1, y0, x1, y1) Then Return True
     Return False
+
+End
+
+'' Largo del poligono, o sea la suma del largo de cada tramo y, si
+'' es cerrado, tambien suma del P0 al Pn
+Public Function PoligonLength(points As Float[], IsClosed As Boolean) As Float
+
+    Dim i As Integer, l As Float
+
+    For i = 0 To points.Count - 4 Step 2
+        l += puntos.distancia(points[i], points[i + 1], points[i + 2], points[i + 3])
+    Next
+    If IsClosed Then l += puntos.distancia(points[0], points[1], points[points.max - 1], points[points.max])
+
+    Return l
+
+End
+
+'' Area del poligono, OJO: si el poligono se cruza, esta funcion dara un resultado erroneo
+Public Function PoligonArea(points As Float[]) As Float
+
+    Dim i As Integer, area As Float
+
+    For i = 0 To points.Count - 4 Step 2
+        area += points[i] * points[i + 3] - points[i + 1] * points[i + 2]
+    Next
+    area += points[points.Max - 1] * points[1] - points[points.max] * points[0]
+
+    Return Abs(area) / 2
 
 End

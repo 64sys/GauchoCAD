@@ -90,7 +90,6 @@ Public Sub Draw()
             clsDrawingAids.Helper.texto = Format$(Me.fParam[1], ("0.0 deg")) & (" to ") & Format$(Me.fParam[2], ("0.0 deg"))
         Else
 
-            ' TODO: esto probabemente funcione para arcos en los dos primeros cuadrantes
 
             Me.BoundingPoligon.Clear
             GL.Begin(gl.LINE_STRIP)

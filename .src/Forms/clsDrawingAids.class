@@ -26,6 +26,8 @@ Public Struct HelperSt
     fHeight As Integer '= 20
 End Struct
 
+Public ScreenDensity As Float = 1080 / 29.5  ' pixele by cm wich gives a 1:100 scale in my monitor
+
 Public Helper As New HelperSt       ' Esto se escribe al lado del mouse
 Public HelperTrabajo As String      '   parte inferior izquierda
 Public HelperTrabajoNext As String      '   parte inferior izquierda
@@ -134,7 +136,7 @@ Public Sub DrawCoordenadas()
     Dim e As Float, z As Float
     e = 1080 / 0.29 ' pixeles por metro segun el tamaño real de la pantalla
     z = appmain.hFcad.Metros(1) ' metros por pixel segun la ampliacion del usuario (rueda del mouse)
-    lEsc = "Esc 1:" & Format$(1 / appmain.hFcad.ScaleZoom * 100 * puntos.ScreenDensity, "0")
+    lEsc = "Esc 1:" & Format$(1 / appmain.hFcad.ScaleZoom * 100 * ScreenDensity, "0")
 
     Texting(l, 10 - appmain.hFcad.glarea1.w / 2, appmain.hFcad.glarea1.h / 2 - 15, color.blue)
     Texting(l2, 10 - appmain.hFcad.glarea1.w / 2, appmain.hFcad.glarea1.h / 2 - 35, color.blue)

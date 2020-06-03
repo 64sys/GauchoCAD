@@ -69,56 +69,22 @@ Public Function MouseDown()
 
     If Mouse.Left Then
 
-        If appmain.hFcad.iEntity[2] >= 0 Then                         ' hay una entidad para recortar
+        If appmain.hFcad.iEntity[2] >= 0 Then                               ' hay una entidad para recortar
+
             Select Case appmain.hFcad.oEntity.GENDER                  ' tengo que ver cada caso particular
                 Case "Line"
                     ' busco las tijeras
                     For i = 0 To arrTijeras.Max
-                        oTijera = appmain.hFCAD.arrEntities[arrTijeras[i]]
-                        Select Case oTijera.GENDER
-                            Case "Line"             ' recorto linea con linea
-                                If puntos.doIntersect(appmain.hFcad.oEntity.p[0], appmain.hFcad.oEntity.p[1], appmain.hFcad.oEntity.p[2], appmain.hFcad.oEntity.p[3], oTijera.p[0], oTijera.p[1], oTijera.p[2], oTijera.p[3]) Then
-
-                                    ' recorto la linea con otra linea
-                                    ' obtengo el punto de interseccion
-                                    flxIntersec = puntos.lineLineIntersection([appmain.hFcad.oEntity.p[0], appmain.hFcad.oEntity.p[1]], [appmain.hFcad.oEntity.p[2], appmain.hFcad.oEntity.p[3]], [oTijera.p[0], oTijera.p[1]], [oTijera.p[2], oTijera.p[3]])
-
-                                    ' ahora veo cual es el lado a recortar
-                                    ' necesito encontrar los vectores, si van en direccion contraria, es el punto a recortar
-                                    '       P1------X--------------|----------------P2
-                                    '            click           tijera
-
-                                    v1.Add(appmain.hFcad.oEntity.p[0] - appmain.hFcad.iEntity[0])
-                                    v1.Add(appmain.hFcad.oEntity.p[1] - appmain.hFcad.iEntity[1])       ' click - P1
-
-                                    v2.Add(flxIntersec[0] - appmain.hFcad.iEntity[0])       ' cick - Tijera
-                                    v2.Add(flxIntersec[1] - appmain.hFcad.iEntity[1])
-
-                                    If Sgn(v1[0]) <> Sgn(v2[0]) Or Sgn(v1[1]) <> Sgn(v2[1]) Then ' van en sentido contrario
-
-                                        ' intercambio P1 con Tijera
-                                        appmain.hFcad.oEntity.p[0] = flxIntersec[0]
-                                        appmain.hFcad.oEntity.p[1] = flxIntersec[1]
-
-                                    Else
-                                        ' intercambio P2 con Tijera
-                                        appmain.hFcad.oEntity.p[2] = flxIntersec[0]
-                                        appmain.hFcad.oEntity.p[3] = flxIntersec[1]
-
-                                    End If
-
-                                Endif
-                            Case "PLine"
-
-                        End Select
+                        'oTijera = appmain.hFCAD.arrEntities[arrTijeras[i]]
+                        recortar(appmain.hFCAD.oEntity, appmain.hFcad.iEntity[0], appmain.hFcad.iEntity[1], appmain.hFCAD.arrEntities[arrTijeras[i]])
 
                     Next
-
             End Select
+
             If appmain.hFcad.oEntity.selected Then
-                clsEntities.deSelectElem(appmain.hFcad.oEntity)               '   -> la deselecciono
+                clsEntities.deSelectElem(appmain.hFcad.oEntity)             '   -> la deselecciono
             Else
-                clsEntities.SelectElem(appmain.hFcad.oEntity)                 '   -> la selecciono
+                clsEntities.SelectElem(appmain.hFcad.oEntity)               '   -> la selecciono
             Endif
             Me.Active = False
             appmain.hFcad.regen
@@ -213,6 +179,149 @@ Public Function MouseUp() ' called by FCAD-> DrawingArea_MouseUp
         Me.Finish
 
     Endif
+
+End
+
+'' Esta sub recorta una cosa con otra cosa
+Public Sub Recortar(oRecortar As Object, Xcorte As Float, Ycorte As Float, oTijera As Object)
+
+    Dim i, iii As Integer, v1, v2, flxIntersecMin, flxIntersec As New Float[], dIntersect, dIntersectMin As Float = 1e20
+    Dim flxObjeto, flxTijera As Float[]
+    Dim s1 As Integer
+
+    Select Case oTijera.GENDER
+        Case "Line"             ' recorto linea con linea
+            If puntos.doIntersect(oRecortar.p[0], oRecortar.p[1], oRecortar.p[2], oRecortar.p[3], oTijera.p[0], oTijera.p[1], oTijera.p[2], oTijera.p[3]) Then
+
+                ' obtengo el punto de interseccion
+                flxIntersec = puntos.lineLineIntersection([oRecortar.p[0], oRecortar.p[1]], [oRecortar.p[2], oRecortar.p[3]], [oTijera.p[0], oTijera.p[1]], [oTijera.p[2], oTijera.p[3]])
+
+                ' ahora veo cual es el lado a recortar
+                ' necesito encontrar los vectores, si van en direccion contraria, es el punto a recortar
+                '       P1------X--------------|----------------P2
+                '            click           tijera
+
+                v1.Add(oRecortar.p[0] - Xcorte)
+                v1.Add(oRecortar.p[1] - Ycorte)       ' click - P1
+
+                v2.Add(flxIntersec[0] - Xcorte)       ' cick - Tijera
+                v2.Add(flxIntersec[1] - Ycorte)
+
+                If Sgn(v1[0]) <> Sgn(v2[0]) Or Sgn(v1[1]) <> Sgn(v2[1]) Then ' van en sentido contrario
+
+                    ' intercambio P1 con Tijera
+                    oRecortar.p[0] = flxIntersec[0]
+                    oRecortar.p[1] = flxIntersec[1]
+
+                Else
+                    ' intercambio P2 con Tijera
+                    oRecortar.p[2] = flxIntersec[0]
+                    oRecortar.p[3] = flxIntersec[1]
+
+                End If
+
+            Endif
+        Case "PLine"
+            ' verifico cual punto de interseccion es el mas cercano
+            For i = 0 To oTijera.p.count - 4 Step 2         ' para todos los puntos de la polilinea
+                If puntos.doIntersect(oRecortar.p[0], oRecortar.p[1], oRecortar.p[2], oRecortar.p[3], oTijera.p[i + 0], oTijera.p[i + 1], oTijera.p[i + 2], oTijera.p[i + 3]) Then
+
+                    ' obtengo el punto de interseccion
+                    flxIntersec = puntos.lineLineIntersection([oRecortar.p[0], oRecortar.p[1]], [oRecortar.p[2], oRecortar.p[3]], [oTijera.p[i + 0], oTijera.p[i + 1]], [oTijera.p[i + 2], oTijera.p[i + 3]])
+
+                    ' mido la distancia
+
+                    dIntersect = puntos.distancia(Xcorte, Ycorte, flxIntersec[0], flxIntersec[1])
+                    If dIntersect < dIntersectMin Then
+                        dIntersectMin = dIntersect
+                        flxIntersecMin.Clear
+                        flxIntersecMin.Insert(flxIntersec)
+
+                    Endif
+                End If
+            Next
+
+            If dIntersectMin < 1e19 Then ' enconte un punto y es el mas cercano al click
+
+                ' ahora veo cual es el lado a recortar
+                ' necesito encontrar los vectores, si van en direccion contraria, es el punto a recortar
+                '       P1------X--------------|----------------P2
+                '            click           tijera
+
+                v1.Add(oRecortar.p[0] - Xcorte)
+                v1.Add(oRecortar.p[1] - Ycorte)       ' click - P1
+
+                v2.Add(flxIntersecMin[0] - Xcorte)       ' cick - Tijera
+                v2.Add(flxIntersecMin[1] - Ycorte)
+
+                If Sgn(v1[0]) <> Sgn(v2[0]) Or Sgn(v1[1]) <> Sgn(v2[1]) Then ' van en sentido contrario
+
+                    ' intercambio P1 con Tijera
+                    oRecortar.p[0] = flxIntersecMin[0]
+                    oRecortar.p[1] = flxIntersecMin[1]
+
+                Else
+                    ' intercambio P2 con Tijera
+                    oRecortar.p[2] = flxIntersecMin[0]
+                    oRecortar.p[3] = flxIntersecMin[1]
+
+                End If
+            End If
+
+        Case "Arc", "Ellipse", "Text", "MText", "Circle"
+
+            ' en el caso general, la tijera es un poligono y la entidad a recortar, otro
+            ' yo tengo que encontrar , para cada cruce de la tijera y la entidad , la distancia (o mejor dicho recorrido)
+            ' entre el cruce y el click del usuario porque eso determina la parte a recortar
+
+            flxTijera = oTijera.BoundingPoligon
+            flxObjeto = oRecortar.BoundingPoligon
+
+            ' Paso 1: encontrar el cruce que esta mas cerca del click del user sobre la entidad a recortar
+            Do
+                ' arranco del segmento donde hice el click, el que busco de nuevo
+
+                s1 = puntos.inPolySegment(flxObjeto, Xcorte, Ycorte)
+
+                For i = 0 To flxObjeto.max Step 2
+                    If puntos.IsPoligonCrossingLine.doIntersect(flxObjeto[i], flxObjeto[i])
+
+                        ' For i = 0 To flxTijera.count - 4 Step 2
+                        '     If puntos.doIntersect(oRecortar.p[0], oRecortar.p[1], oRecortar.p[2], oRecortar.p[3], flxTijera[i + 0], flxTijera[i + 1], flxTijera[i + 2], flxTijera[i + 3]) Then
+                        '
+                        '         ' recorto la linea con otra linea
+                        '         ' obtengo el punto de interseccion
+                        '         flxIntersec = puntos.lineLineIntersection([oRecortar.p[0], oRecortar.p[1]], [oRecortar.p[2], oRecortar.p[3]], [flxTijera[i + 0], flxTijera[i + 1]], [flxTijera[i + 2], flxTijera[i + 3]])
+                        '
+                        '         ' ahora veo cual es el lado a recortar
+                        '         ' necesito encontrar los vectores, si van en direccion contraria, es el punto a recortar
+                        '         '       P1------X--------------|----------------P2
+                        '         '            click           tijera
+                        '
+                        '         v1.Add(oRecortar.p[0] - Xcorte)
+                        '         v1.Add(oRecortar.p[1] - Ycorte)       ' click - P1
+                        '
+                        '         v2.Add(flxIntersec[0] - Xcorte)       ' cick - Tijera
+                        '         v2.Add(flxIntersec[1] - Ycorte)
+                        '
+                        '         If Sgn(v1[0]) <> Sgn(v2[0]) Or Sgn(v1[1]) <> Sgn(v2[1]) Then ' van en sentido contrario
+                        '
+                        '             ' intercambio P1 con Tijera
+                        '             oRecortar.p[0] = flxIntersec[0]
+                        '             oRecortar.p[1] = flxIntersec[1]
+                        '
+                        '         Else
+                        '             ' intercambio P2 con Tijera
+                        '             oRecortar.p[2] = flxIntersec[0]
+                        '             oRecortar.p[3] = flxIntersec[1]
+                        '
+                        '         End If
+
+                    Endif
+                Next
+
+            Loop
+    End Select
 
 End
 

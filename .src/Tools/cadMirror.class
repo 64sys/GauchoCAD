@@ -26,7 +26,7 @@ Create Static
 Public Const GENDER As String = "Mirror"
 
 Private Radianes As Float
-
+Private KeepOriginal As Boolean
 Private glSelectedList As Integer
 
 Public Function Start(Optional ElemToBuild As Variant, Optional _Mode As Integer = 0) As Boolean
@@ -35,7 +35,7 @@ Public Function Start(Optional ElemToBuild As Variant, Optional _Mode As Integer
     Dim i As Integer
     ' Aprovechamos para establecer los helpers (comentarios de ayuda en pantalla)
     Me.PointsDone = 0
-    Me.PointsTotal = 2
+    Me.PointsTotal = 3
 
     clsDrawingAids.HelperTrabajo = ("Mirror ")
 
@@ -96,10 +96,10 @@ Public Function MouseUp()
         '     ' TODO: reparar -> appmain.hFCAD.HabilitarBotones
         'Me.SelEndXr = puntos.Near(appmain.hFcad.Xreal(mouse.x))
         'Me.SelEndyr = puntos.Near(appmain.hFcad.Yreal(mouse.y))
-
+        clsDrawingAids.Helper.texto = clsDrawingAids.HelperTrabajo & (": Keep originals (Y/N)? [Y]")
         'Radianes = Ang(Me.SelEndXr - Me.SelStartXr, Me.SelEndYr - Me.SelStartYr)
         '
-        Me.Finish()
+        'Me.Finish()
 
     Endif
 
@@ -116,7 +116,7 @@ Public Function MouseMove() ' called by FCAD-> DrawingArea_MouseMove
         Me.SelEndXr = puntos.Near(appmain.hFcad.Xreal(mouse.x))
         Me.SelEndyr = puntos.Near(appmain.hFcad.Yreal(mouse.y))
 
-        Radianes = Ang(Me.SelEndXr - Me.SelStartXr, Me.SelEndYr - Me.SelStartYr)
+        Radianes = 2 * Ang(Me.SelEndXr - Me.SelStartXr, Me.SelEndYr - Me.SelStartYr)
         '
         '     If modCAD.Ortogonal Then
         '
@@ -144,7 +144,8 @@ Public Sub Draw()               ' called by appmain.hFCAD.drwArea_Draw
 
     gl.PushMatrix
     gl.Translatef(Me.SelStartXr, Me.SelStartYr, 0)
-    gl.Rotatef(Radianes * 180 / Pi, 0, 0, 1)
+    gl.scalef(1, -1, 1)
+    gl.Rotatef(-Radianes * 180 / Pi, 0, 0, 1)
     gl.CallList(glSelectedList)
     gl.PopMatrix
 
@@ -152,18 +153,30 @@ End
 
 Public Function KeyText(EnteredText As String) ' esta rutina es llamada por FCAD en el evento FCAD_KeyPress cuando recibe una texto + <Enter>
 
-    If Me.PointsDone = 1 Then                     ' estamos esperando que nos responda si quere Ortogonal o Polar
+    If Me.PointsDone = 1 Then
 
-        If EnteredText = "" Then                        ' enter es Ortogonal
+        If EnteredText = "" Then
             Radianes = 90 / 180 * Pi
             Inc Me.PointsDone
-            Me.Finish
+
+            clsDrawingAids.Helper.texto = clsDrawingAids.HelperTrabajo & (": Keep originals (Y/N)? [Y]")
 
         Else
             Radianes = CFloat(EnteredText) / 180 * Pi
             Inc Me.PointsDone
-            Me.Finish
+            clsDrawingAids.Helper.texto = clsDrawingAids.HelperTrabajo & (": Keep originals (Y/N)? [Y]")
         End If
+
+    Else If Me.PointsDone = 2 Then
+        If LCase$(Left$(EnteredText, 1)) = "y" Then
+            KeepOriginal = True
+            Inc Me.PointsDone
+            Me.Finish
+        Else If LCase$(Left$(EnteredText, 1)) = "n" Then
+            KeepOriginal = False
+            Inc Me.PointsDone
+            Me.Finish
+        Endif
 
     End If
 
@@ -179,10 +192,13 @@ Public Sub Finish()
 
     If Me.PointsDone = Me.PointsTotal Then
 
+        If KeepOriginal Then clsEntities.ClonElements()
+
         For i = 0 To Me.inxSelected.max
 
             ' en todos los casos, roto los puntos
             puntos.Translate(appmain.hFCAD.arrEntities[Me.inxSelected[i]].p, -Me.SelStartXr, -Me.SelStartYr)  ' pero primero translado
+            puntos.Scale(appmain.hFCAD.arrEntities[Me.inxSelected[i]].p, 1, -1)
             puntos.Rotate(appmain.hFCAD.arrEntities[Me.inxSelected[i]].p, Radianes)
             puntos.Translate(appmain.hFCAD.arrEntities[Me.inxSelected[i]].p, Me.SelStartXr, Me.SelStartYr)    ' y regreso
 
