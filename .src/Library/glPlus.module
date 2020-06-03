@@ -839,4 +839,29 @@ End
 '' [x,y,ancho,alto]
 Public Function TextExtends(UTFstring As String, textH As Float) As Float[]
 
+    Dim i, iii, UTFcode, LetterIndex As Integer, Xadvance As Float
+    Dim tRect As New Float[]
+
+    tRect.Insert([0, 0])
+
+    For i = 1 To Len(UTFstring)                                                 ' para cada letra
+        UTFcode = String.Code(UTFstring, i)                                     ' obtengo el UTF code
+        If UTFcode = 32 Then                                                    ' es un espacio
+            tRect[0] += ActualFont.LetterSpacing * textH * FontScale
+        Else
+            LetterIndex = GetCodeIndex(ActualFont, UTFcode)                     ' obtengo el indice de la letra
+            For iii = 0 To ActualFont.Letter[LetterIndex].FontGlyps.Max Step 2  ' calculo cuanto tiene que avanzar el puntero
+                If ActualFont.Letter[LetterIndex].FontGlyps[iii] > Xadvance Then Xadvance = ActualFont.Letter[LetterIndex].FontGlyps[iii]
+                If ActualFont.Letter[LetterIndex].FontGlyps[iii + 1] > tRect[1] Then tRect[1] = ActualFont.Letter[LetterIndex].FontGlyps[iii + 1]
+            Next
+            tRect[0] += (Xadvance + ActualFont.LetterSpacing) * textH * FontScale
+
+            Xadvance = 0
+        End If
+    Next
+
+    tRect[1] *= textH * FontScale
+
+    Return tRect
+
 End
