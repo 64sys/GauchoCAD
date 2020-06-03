@@ -772,9 +772,6 @@ Public Function DecodeEntity(c As Collection) As Collection
     Dim pt2 As New Float[]
     Dim i As Integer
     Dim f As Float
-    ' Dim fp1 As Float
-    ' Dim fp2 As Float
-    ' Dim fp3 As Float
     Dim p As Integer
     Dim sDec As String
     Dim sTag As String
@@ -1524,11 +1521,6 @@ Public Function EntityCodes(Optional ent As String) As Collection
 
     Select String.LCase(ent)
 
-        Case "lwpolyline"
-            cod.Add("points", "90")
-            cod.Add("closed", "70")
-            cod.Add("constant", "43")
-
         Case "arc"
             cod.Add("radius", "40")
             cod.Add("angle0", "50")
@@ -1541,6 +1533,22 @@ Public Function EntityCodes(Optional ent As String) As Collection
             cod.Add("ratio", "40")
             cod.Add("angle0", "41")
             cod.Add("angle1", "42")
+
+        Case "lwpolyline"
+            cod.Add("points", "90")
+            cod.Add("closed", "70")
+            cod.Add("constant", "43")
+
+        Case "insert"
+            cod.Add("block", "2")
+            cod.Add("scalex", "41")
+            cod.Add("scaley", "42")
+            cod.Add("scalex", "43")
+            cod.Add("angle", "50")
+            cod.Add("columns", "70")
+            cod.Add("rows", "71")
+            cod.Add("cspa", "44")
+            cod.Add("rspa", "44")
 
         Case "attdef"
             cod.Add("texth", "40")
@@ -1560,16 +1568,29 @@ Public Function EntityCodes(Optional ent As String) As Collection
             cod.Add("block", "2")
             cod.Add("bdesc", "4")
 
-        Case "insert"
-            cod.Add("block", "2")
-            cod.Add("scalex", "41")
-            cod.Add("scaley", "42")
-            cod.Add("scalex", "43")
+        Case "text"
+            cod.Add("texth", "40")
+            cod.Add("text", "1")
+            cod.Add("hjust", "72")
+            cod.Add("vjust", "73")
             cod.Add("angle", "50")
-            cod.Add("columns", "70")
-            cod.Add("rows", "71")
-            cod.Add("cspa", "44")
-            cod.Add("rspa", "44")
+            cod.Add("wfactor", "41")
+            cod.Add("tstyle", "7")
+            cod.Add("oblique", "51")
+
+        Case "mtext"
+            cod.Add("texth", "40")
+            cod.Add("textv", "43")
+            cod.Add("text", "1")
+            cod.Add("text2", "1")
+            cod.Add("hjust", "72")
+            cod.Add("vjust", "73")
+            cod.Add("angle", "50")
+            cod.Add("rfactor", "41")
+            cod.Add("hfactor", "42")
+            cod.Add("lfactor", "44")
+            cod.Add("tstyle", "7")
+            cod.Add("oblique", "51")
 
     End Select
 
@@ -2619,6 +2640,7 @@ Private Function DecodeDXFEntity(sItem As String) As Collection
     Dim c As Integer
     Dim sy As Float
     Dim sz As Float
+    Dim tg As Variant
 
     stx = Split(sItem, "\n")
 
@@ -2818,6 +2840,64 @@ Private Function DecodeDXFEntity(sItem As String) As Collection
                     cTmp2.Add(CFloat(cTmp["cspace"]), "cs")
                 Else
                     cTmp2.Add(0, "cs")
+                Endif
+
+            Case "TEXT"
+                For Each tg In cTmp
+
+                    Select cTmp.Key
+
+                        Case "texth"
+                            cTmp2.Add(CFloat(tg), "h")
+                        Case "text"
+                            cTmp2.Add(CStr(tg), "text")
+                        Case "hjust"
+                            cTmp2.Add(CInt(tg), "jh")
+
+                        Case "vjust"
+                            cTmp2.Add(CInt(tg), "jv")
+
+                        Case "angle"
+                            cTmp2.Add(CFloat(tg), "a")
+
+                        Case "wfactor"
+                            cTmp2.Add(CFloat(tg), "w")
+
+                        Case "tstyle"
+                            cTmp2.Add(CStr(tg), "f")
+
+                        Case "oblique"
+                            cTmp2.Add(CFloat(tg), "o")
+
+                    End Select
+                Next
+
+                If cTmp2.Exist("a") = False Then
+                    cTmp2.Add(0, "a")
+                Endif
+
+            Case "MTEXT"
+                For Each tg In cTmp
+
+                    Select cTmp.Key
+
+                        Case "texth"
+                            cTmp2.Add(CFloat(tg), "h")
+                        Case "text"
+                            If cTmp.Exist("text2") Then
+                                cTmp2.Add(CStr(tg) & cTmp["text2"], "text")
+                            Else
+                                cTmp2.Add(CStr(tg), "text")
+                            Endif
+
+                        Case "angle"
+                            cTmp2.Add(CFloat(tg), "a")
+
+                    End Select
+                Next
+
+                If cTmp2.Exist("a") = False Then
+                    cTmp2.Add(0, "a")
                 Endif
 
         End Select
