@@ -45,17 +45,17 @@ Public Mode As Integer
 
 Public inxSelected As New Integer[]
 
-Public Function MouseDown() ' called by FCAD-> DrawingArea_MouseDown
+Public Function MouseDown(mouseX As Integer, mouseY As Integer) ' called by FCAD-> DrawingArea_MouseDown
 
     ' This too does nothing here, but you can use it
 
 End
 
-Public Function MouseUp() ' called by FCAD-> DrawingArea_MouseUp
+Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' called by FCAD-> DrawingArea_MouseUp
 
 End
 
-Public Function MouseMove() ' called by FCAD-> DrawingArea_MouseMove
+Public Function MouseMove(mouseX As Integer, mouseY As Integer) ' called by FCAD-> DrawingArea_MouseMove
 
 End
 

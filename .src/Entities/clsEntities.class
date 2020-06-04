@@ -161,7 +161,7 @@ Public Sub CheckPOI(xr As Float, Yr As Float)
 
     ' ' x,y, indice de la entidad que marco esos POI
     APPMain.hFCAD.iEntity.Clear
-    ' APPMain.hFCAD.iEntity.Insert(puntos.FindPOI(mouse.x, mouse.y, APPMain.hFCAD.poi, 16))
+    ' APPMain.hFCAD.iEntity.Insert(puntos.FindPOI(mouseX, mouseY, APPMain.hFCAD.poi, 16))
     Dim rData As New Float[]
 
     Dim e As Object, t As Float = Timer
@@ -171,13 +171,7 @@ Public Sub CheckPOI(xr As Float, Yr As Float)
             'Debug "Nearest found at ", rData[0], rData[1]
             APPMain.hFCAD.iEntity.Insert(rData)
             APPMain.hFCAD.oEntity = e
-            If rData[2] = 16 Then clsDrawingAids.Helper.texto = ("Quadrant")
-            If rData[2] = 8 Then clsDrawingAids.Helper.texto = ("Center")
-            If rData[2] = 2 Then clsDrawingAids.Helper.texto = ("MidPoint")
-            If rData[2] = 1 Then clsDrawingAids.Helper.texto = ("EndPoint")
-            clsDrawingAids.Helper.dX = 15
-            clsDrawingAids.Helper.dY = 15
-            clsDrawingAids.Helper.fColor = Color.DarkBlue
+
             Return
         Endif
 

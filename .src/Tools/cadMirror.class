@@ -66,7 +66,7 @@ Public Function Start(Optional ElemToBuild As Variant, Optional _Mode As Integer
 
 End
 
-Public Function MouseUp()
+Public Function MouseUp(mouseX As Integer, mouseY As Integer)
 
     Dim i As Integer
 
@@ -78,8 +78,8 @@ Public Function MouseUp()
         clsDrawingAids.Helper.texto = clsDrawingAids.HelperTrabajo & (": Angle [90]?")
 
         ' punto real base
-        Me.SelStartXr = puntos.Near(appmain.hFcad.Xreal(mouse.x))
-        Me.SelStartYr = puntos.Near(appmain.hFcad.Yreal(mouse.y))
+        Me.SelStartXr = puntos.Near(appmain.hFcad.Xreal(mousex))
+        Me.SelStartYr = puntos.Near(appmain.hFcad.Yreal(mouseY))
 
         glSelectedList = gl.GenLists(1)                             ' genero una lista de openGL
         gl.NewList(glSelectedList, gl.COMPILE)                      ' genero los graficos dentro de la lista
@@ -94,8 +94,8 @@ Public Function MouseUp()
     Else If Me.PointsDone = 2 Then ' acabo de marcar el punto destino
         '     ' permitir otros trabajos
         '     ' TODO: reparar -> appmain.hFCAD.HabilitarBotones
-        'Me.SelEndXr = puntos.Near(appmain.hFcad.Xreal(mouse.x))
-        'Me.SelEndyr = puntos.Near(appmain.hFcad.Yreal(mouse.y))
+        'Me.SelEndXr = puntos.Near(appmain.hFcad.Xreal(mousex)
+        'Me.SelEndyr = puntos.Near(appmain.hFcad.Yreal(mouseY))
         clsDrawingAids.Helper.texto = clsDrawingAids.HelperTrabajo & (": Keep originals (Y/N)? [Y]")
         'Radianes = Ang(Me.SelEndXr - Me.SelStartXr, Me.SelEndYr - Me.SelStartYr)
         '
@@ -105,7 +105,7 @@ Public Function MouseUp()
 
 End
 
-Public Function MouseMove() ' called by FCAD-> DrawingArea_MouseMove
+Public Function MouseMove(mouseX As Integer, mouseY As Integer) ' called by FCAD-> DrawingArea_MouseMove
 
     If Me.PointsDone = 1 Then
         '     ' we compare Real values from the starting point to the location
@@ -113,8 +113,8 @@ Public Function MouseMove() ' called by FCAD-> DrawingArea_MouseMove
         '     ' could have being moved by the mouse wheel
         '
         '     ' new Real position is
-        Me.SelEndXr = puntos.Near(appmain.hFcad.Xreal(mouse.x))
-        Me.SelEndyr = puntos.Near(appmain.hFcad.Yreal(mouse.y))
+        Me.SelEndXr = puntos.Near(appmain.hFcad.Xreal(mouseX))
+        Me.SelEndyr = puntos.Near(appmain.hFcad.Yreal(mouseY))
 
         Radianes = 2 * Ang(Me.SelEndXr - Me.SelStartXr, Me.SelEndYr - Me.SelStartYr)
         '

@@ -292,7 +292,7 @@ Public Sub AdvanceStep()
 
 End
 
-Public Function MouseMove() ' esta rutina es llamada por FCAD en el evento DrawingArea_MouseMove
+Public Function MouseMove(mouseX As Integer, mouseY As Integer) ' esta rutina es llamada por FCAD en el evento DrawingArea_MouseMove
 
     If (Me.iPoints > elem.P.Count / 2) And InStr("LAP", NextParamType) = 0 Then Return ' we are expecting a parameter
 
@@ -300,7 +300,7 @@ Public Function MouseMove() ' esta rutina es llamada por FCAD en el evento Drawi
     If NextParamType = "A" Then
 
         ' return the angle from horizontal to us
-        elem.fParam[iFloat] = Ang(appmain.hFcad.Xreal(mouse.x) - elem.p[elem.p.max - 1], appmain.hFcad.Yreal(mouse.y) - elem.p[elem.p.max])
+        elem.fParam[iFloat] = Ang(appmain.hFcad.Xreal(mouseX) - elem.p[elem.p.max - 1], appmain.hFcad.Yreal(mouseY) - elem.p[elem.p.max])
         elem.fParam[iFloat] *= 180 / Pi
         appmain.hFCAD.redraw
         Return              ' nothing more to do here
@@ -309,7 +309,7 @@ Public Function MouseMove() ' esta rutina es llamada por FCAD en el evento Drawi
     If NextParamType = "L" Then
 
         ' return the angle from horizontal to us
-        elem.fParam[iFloat] = puntos.distancia(puntos.Near(appmain.hFcad.Xreal(mouse.x)), puntos.Near(appmain.hFcad.Yreal(mouse.y)), elem.p[elem.p.max - 1], elem.p[elem.p.max])
+        elem.fParam[iFloat] = puntos.distancia(puntos.Near(appmain.hFcad.Xreal(mouseX)), puntos.Near(appmain.hFcad.Yreal(mouseY)), elem.p[elem.p.max - 1], elem.p[elem.p.max])
 
         appmain.hFCAD.redraw
         Return              ' nothing more to do here
@@ -317,8 +317,8 @@ Public Function MouseMove() ' esta rutina es llamada por FCAD en el evento Drawi
 
     If Me.iPoints >= elem.P.Count / 2 Then Return
 
-    elem.P[iPoints * 2] = puntos.Near(appmain.hFcad.Xreal(mouse.x))
-    elem.P[iPoints * 2 + 1] = puntos.Near(appmain.hFcad.Yreal(mouse.y))
+    elem.P[iPoints * 2] = puntos.Near(appmain.hFcad.Xreal(mouseX))
+    elem.P[iPoints * 2 + 1] = puntos.Near(appmain.hFcad.Yreal(mouseY))
 
     ' y si tengo enganche?
 
@@ -348,7 +348,7 @@ Public Function MouseMove() ' esta rutina es llamada por FCAD en el evento Drawi
 
 End
 
-Public Function MouseDown() ' esta rutina es llamada por FCAD en el evento DrawingArea_MouseDown
+Public Function MouseDown(mouseX As Integer, mouseY As Integer) ' esta rutina es llamada por FCAD en el evento DrawingArea_MouseDown
 
     clsDrawingAids.ErrorMessage = ""
     If (Me.iPoints > elem.P.Count / 2) And InStr("LAP", NextParamType) = 0 Then Return ' we are expecting a parameter
@@ -357,7 +357,7 @@ Public Function MouseDown() ' esta rutina es llamada por FCAD en el evento Drawi
     If NextParamType = "A" Then
 
         ' return the angle from horizontal to us
-        elem.fParam[iFloat] = Ang(appmain.hFcad.Xreal(mouse.x) - elem.p[elem.p.max - 1], appmain.hFcad.Yreal(mouse.y) - elem.p[elem.p.max])
+        elem.fParam[iFloat] = Ang(appmain.hFcad.Xreal(mouseX) - elem.p[elem.p.max - 1], appmain.hFcad.Yreal(mouseY) - elem.p[elem.p.max])
         elem.fParam[iFloat] *= 180 / Pi
 
         Inc iFloat
@@ -368,7 +368,7 @@ Public Function MouseDown() ' esta rutina es llamada por FCAD en el evento Drawi
     If NextParamType = "L" Then
 
         ' return the angle from horizontal to us
-        elem.fParam[iFloat] = puntos.distancia(puntos.Near(appmain.hFcad.Xreal(mouse.x)), puntos.Near(appmain.hFcad.Yreal(mouse.y)), elem.p[elem.p.max - 1], elem.p[elem.p.max])
+        elem.fParam[iFloat] = puntos.distancia(puntos.Near(appmain.hFcad.Xreal(mouseX)), puntos.Near(appmain.hFcad.Yreal(mouseY)), elem.p[elem.p.max - 1], elem.p[elem.p.max])
         Inc iFloat
         AdvanceStep
         Return              ' nothing more to do here
@@ -378,8 +378,8 @@ Public Function MouseDown() ' esta rutina es llamada por FCAD en el evento Drawi
 
     ' we are waiting for a point
 
-    elem.P[iPoints * 2] = puntos.Near(appmain.hFcad.Xreal(mouse.x))
-    elem.P[iPoints * 2 + 1] = puntos.Near(appmain.hFcad.Yreal(mouse.y))
+    elem.P[iPoints * 2] = puntos.Near(appmain.hFcad.Xreal(mouseX))
+    elem.P[iPoints * 2 + 1] = puntos.Near(appmain.hFcad.Yreal(mouseY))
 
     ' y si tengo enganche?
 
@@ -409,7 +409,7 @@ Public Function MouseDown() ' esta rutina es llamada por FCAD en el evento Drawi
 
 End
 
-Public Function MouseUp() ' esta rutina es llamada por FCAD en el evento DrawingArea_MouseUp
+Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' esta rutina es llamada por FCAD en el evento DrawingArea_MouseUp
 
 End
 

@@ -40,6 +40,9 @@ Public CurrentFile As String
 Public CurrentColor As Integer
 Public CurrentLayer As String
 
+'variables de ambiente
+Public flgShowInspector As Boolean = True
+
 Public cMod As New Collection    '' All drawings common collection
 
 Public Sub Run(cin As Collection)

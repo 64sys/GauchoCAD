@@ -187,7 +187,7 @@ End
 ' To find orientation Of ordered triplet(p, q, r).
 ' The function returns following values
 ' 0 - - > p, q And r are colinear
-' 2 - - > Clockwise                     WHAT OUT: WE ARE USING AND INVERTED Y AXIS, SO THIS WILL RETURN 2 to clockwise
+' 2 - - > Clockwise                     WATCH OUT: WE ARE USING AND INVERTED Y AXIS, SO THIS WILL RETURN 2 to clockwise
 ' 1 - - > Counterclockwise              functions on the internet are the other way
 Public Function orientation(px As Float, py As Float, qx As Float, qy As Float, rx As Float, ry As Float) As Integer
 

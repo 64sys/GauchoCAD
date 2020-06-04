@@ -31,30 +31,30 @@ Public Function Start(Optional ElemToBuild As Variant, Optional _Mode As Integer
 
 End
 
-Public Function MouseDown() ' called by FCAD-> DrawingArea_MouseDown
+Public Function MouseDown(mouseX As Integer, mouseY As Integer) ' called by FCAD-> DrawingArea_MouseDown
 
-    Me.SelStartX = Mouse.X
-    Me.SelStartY = Mouse.y
+    Me.SelStartX = mouseX
+    Me.SelStartY = mouseY
     appmain.hFCAD.glarea1.Mouse = Mouse.SizeAll
     Me.active = True
 
 End
 
-Public Function MouseUp() ' called by FCAD-> DrawingArea_MouseUp
+Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' called by FCAD-> DrawingArea_MouseUp
 
     appmain.hFCAD.glarea1.Mouse = Mouse.Cross
     Me.active = False
 
 End
 
-Public Function MouseMove() ' called by FCAD-> DrawingArea_MouseMove
+Public Function MouseMove(mouseX As Integer, mouseY As Integer) ' called by FCAD-> DrawingArea_MouseMove
 
     If Not Me.active Then Return
-    appmain.hFCAD.PanX += (mouse.X - Me.SelStartX)
-    appmain.hFCAD.PanY -= (mouse.y - Me.SelStartY)
+    appmain.hFCAD.PanX += (mousex - Me.SelStartX)
+    appmain.hFCAD.PanY -= (mouseY - Me.SelStartY)
 
-    Me.SelStartX = Mouse.X
-    Me.SelStartY = Mouse.y
+    Me.SelStartX = mouseX
+    Me.SelStartY = mouseY
     appmain.hFCAD.redraw
 
 End

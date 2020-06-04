@@ -57,7 +57,7 @@ Public Function Start(Optional ElemToBuild As Variant, Optional _Mode As Integer
 
 End
 
-Public Function MouseUp() ' called by FCAD-> DrawingArea_MouseUp
+Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' called by FCAD-> DrawingArea_MouseUp
 
     Inc Me.PointsDone
 
@@ -67,12 +67,12 @@ Public Function MouseUp() ' called by FCAD-> DrawingArea_MouseUp
         clsDrawingAids.Helper.texto = ("Final point")
 
         ' punto real base
-        Me.SelStartXr = puntos.Near(appmain.hFcad.Xreal(mouse.x))
-        Me.SelStartYr = puntos.Near(appmain.hFcad.Yreal(mouse.y))
+        Me.SelStartXr = puntos.Near(appmain.hFcad.Xreal(mousex))
+        Me.SelStartYr = puntos.Near(appmain.hFcad.Yreal(mouseY))
 
         ' and we save the mouse click
-        Me.SelStartX = mouse.x
-        Me.SelStartY = mouse.y
+        Me.SelStartX = mousex
+        Me.SelStartY = mouseY
 
         ' prevenir acciones tontas como hacer click en otro elemento antes de terminar con el actual
         ' TODO: reparar -> appmain.hFCAD.DesHabilitarBotones
@@ -81,6 +81,8 @@ Public Function MouseUp() ' called by FCAD-> DrawingArea_MouseUp
         ' TODO: reparar -> appmain.hFCAD.HabilitarBotones
 
         ' we have the point set from MouseMove
+        Me.SelEndX = mousex
+        Me.SelEndY = mouseY
 
         Me.Finish()
 
@@ -89,7 +91,7 @@ Public Function MouseUp() ' called by FCAD-> DrawingArea_MouseUp
 
 End
 
-Public Function MouseMove() ' called by FCAD-> DrawingArea_MouseMove
+Public Function MouseMove(mouseX As Integer, mouseY As Integer) ' called by FCAD-> DrawingArea_MouseMove
 
     If Me.PointsDone = 1 Then
         ' we compare Real values from the starting point to the location
@@ -97,15 +99,15 @@ Public Function MouseMove() ' called by FCAD-> DrawingArea_MouseMove
         ' could have being moved by the mouse wheel
 
         ' new Real position is
-        Me.SelEndXr = puntos.Near(appmain.hFcad.Xreal(mouse.x))
-        Me.SelEndyr = puntos.Near(appmain.hFcad.Yreal(mouse.y))
+        Me.SelEndXr = puntos.Near(appmain.hFcad.Xreal(mousex))
+        Me.SelEndyr = puntos.Near(appmain.hFcad.Yreal(mouseY))
 
         '  we need To determine scale factor
         '
         ' lets say is the distance from first click to the current position / 10
         '
 
-        ScaleFromOrigin((puntos.distancia(mouse.x, mouse.y, Me.SelStartX, Me.SelStartY) - 50) / 50)
+        ScaleFromOrigin((puntos.distancia(mousex, mouseY, Me.SelStartX, Me.SelStartY) - 50) / 50)
 
     End If
 
@@ -120,7 +122,7 @@ Public Sub Finish()
         clsEntities.Restore(True)
         ' and now we move
 
-        ScaleFromOrigin((puntos.distancia(mouse.x, mouse.y, Me.SelStartX, Me.SelStartY) - 50) / 50)
+        ScaleFromOrigin((puntos.distancia(Me.SelEndX, Me.SelEndY, Me.SelStartX, Me.SelStartY) - 50) / 50)
 
         ' and bak them up
         clsEntities.BackUp(True)

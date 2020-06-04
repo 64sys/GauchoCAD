@@ -36,7 +36,7 @@ Public Function Start(Optional ElemToBuild As Variant, Optional _Mode As Integer
 
 End
 
-Public Function MouseDown() ' esta rutina es llamada por FCAD en el evento DrawingArea_MouseDown
+Public Function MouseDown(mouseX As Integer, mouseY As Integer) ' esta rutina es llamada por FCAD en el evento DrawingArea_MouseDown
 
     If Mouse.Left Then
 
@@ -52,8 +52,8 @@ Public Function MouseDown() ' esta rutina es llamada por FCAD en el evento Drawi
 
         Else
 
-            Me.SelStartX = mouse.x
-            Me.SelStartY = mouse.y
+            Me.SelStartX = mouseX
+            Me.SelStartY = mouseY
             Me.SelStartXr = appmain.hFcad.Xreal(Me.SelStartX)
             Me.SelStartYr = appmain.hFcad.Yreal(Me.SelStartY)
 
@@ -66,10 +66,10 @@ Public Function MouseDown() ' esta rutina es llamada por FCAD en el evento Drawi
 
 End
 
-Public Function MouseUp() ' esta rutina es llamada por FCAD en el evento DrawingArea_MouseUp
+Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' esta rutina es llamada por FCAD en el evento DrawingArea_MouseUp
 
-    Me.SelEndX = mouse.x
-    Me.SelEndy = mouse.y
+    Me.SelEndX = mousex
+    Me.SelEndy = mouseY
 
     If Me.Active Then
         Dim Crossing As Boolean = False
@@ -121,11 +121,11 @@ Public Function MouseUp() ' esta rutina es llamada por FCAD en el evento Drawing
 
 End
 
-Public Function MouseMove() ' esta rutina es llamada por FCAD en el evento DrawingArea_MouseMove
+Public Function MouseMove(mouseX As Integer, mouseY As Integer) ' esta rutina es llamada por FCAD en el evento DrawingArea_MouseMove
 
     If Me.Active Then
-        Me.SelEndX = mouse.x
-        Me.SelEndy = mouse.y
+        Me.SelEndX = mouseX
+        Me.SelEndy = mouseY
         Me.SelEndXr = appmain.hFcad.Xreal(Me.SelEndX)
         Me.SelEndyr = appmain.hFcad.Yreal(Me.SelEndy)
 
