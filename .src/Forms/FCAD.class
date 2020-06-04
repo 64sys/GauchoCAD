@@ -132,11 +132,16 @@ Public Sub form_Activate()
         DrawingReady = True
     Endif
     If cImport.Count > 0 Then
+        'LoadDrawingMap()
+        EntitiesTransfer2()
         LayersTransfer()
-        EntitiesTransfer()
-        LoadDrawingMap()
+        'EntitiesTransfer()
+        LoadDrawingMap2()
+        APPMain.LoadComboboxes(cModel)
+
         modCAD.ImportBlocks(cImport)
-        modCAD.ImportEntities(cImport, arrEntities)
+        'modCAD.ImportEntities(cImport, arrEntities)
+        modCAD.ImportEntities2(cModel["Entities"], arrEntities)
         cImport.Clear
         modCAD.ApplyLayerProperties(1)
         regen
@@ -499,81 +504,107 @@ Public Sub ToolButton1_Click()
 
 End
 
-'' This transfer layers from imported file, one collection actually, to the model collection
+Public Sub EntitiesTransfer2()
 
-Public Sub EntitiesTransfer()
-
-    Dim tEnt As New Collection
-    '    Dim i As Integer
-    Dim iEt As Variant
-    '   Dim mEt As Variant
-    Dim prop As String
     Dim iEnt As Collection
     Dim mEnt As Collection
-    Dim iBk As Collection
-    Dim iB As Variant
-
-    '  Dim r As Integer
+    Dim grp As Collection
+    Dim e As Variant
+    Dim mGrp As Collection
 
     If cImport.Count > 0 Then
         If cImport.Exist("Entities") Then
             iEnt = cImport["Entities"]
             If cModel.Exist("Entities") Then
                 mEnt = cModel["Entities"]
-                For Each iEt In iEnt
-                    For Each prop In ["entity", "handle", "layer", "style", "width", "colour", "blkid", "visible", "paper", "elev", "thick", "p"]
-                        tEnt.Add(iEt[prop], prop)
+
+                For Each grp In iEnt
+                    If mEnt.Exist(iEnt.Key) = False Then
+                        mEnt.Add(grp.Copy(), iEnt.Key)
+                    Else
+                        mGrp = mEnt[iEnt.Key]
+                        For Each e In grp
+                            mGrp.Add(e, grp.Key)
+                        Next
+
+                    Endif
+
+                Next
+
+            Endif
+        Endif
+    Endif
+
+End
+
+'' This transfer layers from imported file, one collection actually, to the model collection
+
+Public Sub EntitiesTransfer()
+
+    Dim tEnt As New Collection
+    Dim iEt As Variant
+    Dim prop As String
+    Dim iEnt As Collection
+    Dim mEnt As Collection
+    Dim iBk As Collection
+    Dim iB As Variant
+    Dim iGt As Variant
+
+    If cImport.Count > 0 Then
+        If cImport.Exist("Entities") Then
+            iEnt = cImport["Entities"]
+            If cModel.Exist("Entities") Then
+                mEnt = cModel["Entities"]
+
+                For Each iGt In iEnt
+
+                    For Each iEt In iGt
+                        For Each prop In ["entity", "handle", "layer", "style", "width", "colour", "blkid", "visible", "paper", "elev", "thick", "p"]
+                            tEnt.Add(iEt[prop], prop)
+                        Next
+                        Select iEt["entity"]
+                            Case "LINE", "LWPOLYLINE"
+                                tEnt.Add(iEt["p"], "p")
+
+                            Case "CIRCLE"
+                                tEnt.Add(iEt["p"], "p")
+                                tEnt.Add(iEt["r"], "r")
+
+                            Case "ARC"
+                                tEnt.Add(iEt["p"], "p")
+                                tEnt.Add(iEt["r"], "r")
+                                tEnt.Add(iEt["a"], "a")
+
+                            Case "ELLIPSE"
+                                tEnt.Add(iEt["p"], "p")
+                                tEnt.Add(iEt["r"], "r")
+                                tEnt.Add(iEt["a"], "a")
+
+                            Case "INSERT"
+                                tEnt.Add(iEt["b"], "ba")
+                                tEnt.Add(iEt["p"], "p")
+                                tEnt.Add(iEt["s"], "s")
+                                tEnt.Add(iEt["a"], "a")
+                                tEnt.Add(iEt["co"], "co")
+                                tEnt.Add(iEt["ro"], "ro")
+                                tEnt.Add(iEt["cs"], "cs")
+                                tEnt.Add(iEt["rs"], "rs")
+
+                            Case "TEXT"
+                                tEnt.Add(iEt["p"], "p")
+                                tEnt.Add(iEt["a"], "a")
+                                tEnt.Add(iEt["h"], "h")
+                                tEnt.Add(iEt["f"], "f")
+                                tEnt.Add(iEt["text"], "text")
+
+                            Case "DIMMENSION"
+                                tEnt.Add(iEt["p"], "p")
+
+                        End Select
+                        mEnt.Add(tEnt.copy(), iEt["handle"])
+                        tEnt.Clear
+
                     Next
-                    Select iEt["entity"]
-                        Case "LINE", "LWPOLYLINE"
-                            tEnt.Add(iEt["p"], "p")
-
-                        Case "CIRCLE"
-                            tEnt.Add(iEt["p"], "p")
-                            tEnt.Add(iEt["r"], "r")
-
-                        Case "ARC"
-                            tEnt.Add(iEt["p"], "p")
-                            tEnt.Add(iEt["r"], "r")
-                            tEnt.Add(iEt["a"], "a")
-
-                        Case "ELLIPSE"
-                            tEnt.Add(iEt["p"], "p")
-                            tEnt.Add(iEt["r"], "r")
-                            tEnt.Add(iEt["a"], "a")
-
-                        Case "INSERT"
-
-                            ' If cImport.Exist("Blocks") Then
-                            '     iBk = cImport["Blocks"]
-                            '     For Each iB In iBk
-                            '         If iB["entity"] = "BLOCK" Then
-                            '             If iB["block"] = iEt["b"] Then
-                            '                 Print iB["block"]
-                            '             Endif
-                            '         Endif
-                            '     Next
-                            ' Endif
-
-                            tEnt.Add(iEt["b"], "ba")
-                            tEnt.Add(iEt["p"], "p")
-                            tEnt.Add(iEt["s"], "s")
-                            tEnt.Add(iEt["a"], "a")
-                            tEnt.Add(iEt["co"], "co")
-                            tEnt.Add(iEt["ro"], "ro")
-                            tEnt.Add(iEt["cs"], "cs")
-                            tEnt.Add(iEt["rs"], "rs")
-                        Case "TEXT"
-                            tEnt.Add(iEt["p"], "p")
-                            tEnt.Add(iEt["a"], "a")
-                            tEnt.Add(iEt["h"], "h")
-                            tEnt.Add(iEt["f"], "f")
-                            tEnt.Add(iEt["text"], "text")
-
-                    End Select
-                    mEnt.Add(tEnt.copy(), iEt["handle"])
-                    tEnt.Clear
-
                 Next
             Endif
         Endif
@@ -641,16 +672,92 @@ Public Sub LayersTransfer()
 
 End
 
+Public Sub LoadDrawingMap2()
+
+    Dim ctn As New Collection
+    Dim dra As Variant
+    Dim sKey As String
+    Dim sTag As String
+    Dim sQty As String
+    Dim sEle As String
+    Dim sEty As String
+
+    Dim it As Variant
+    Dim gru As Variant
+    Dim ety As Variant
+
+    TreeView1.Clear
+    TreeView1.Add("model", "Model")
+    TreeView1.Add("import", "Import")
+
+    ctn.Add(cModel, "model")
+    ctn.Add(cImport, "import")
+
+    For Each dra In ctn
+
+        For Each it In dra
+
+            sKey = ctn.Key & ":" & dra.Key
+
+            If TreeView1.Exist(sKey) = False Then
+
+                Select dra.Key
+
+                    Case "File", "Version"
+                        sTag = dra.Key & ": " & it
+                        TreeView1.Add(sKey, sTag,, ctn.Key)
+
+                    Case "Layers"
+                        sTag = ctn.Key & ":" & dra.Key
+                        sQty = "[" & CStr(it.Count) & "]"
+                        TreeView1.Add(sTag, dra.Key & sQty,, ctn.Key)
+                        For Each gru In it
+                            sKey = dra.Key & ":" & gru["name"]
+                            If TreeView1.Exist(sKey) = False Then
+                                TreeView1.Add(sKey, gru["name"],, sTag)
+                            Endif
+                        Next
+
+                    Case "Entities"
+                        sTag = ctn.Key & ":" & dra.Key
+                        TreeView1.Add(sTag, dra.Key,, ctn.Key)
+                        For Each gru In it
+                            sKey = ctn.Key & ":" & it.Key
+                            sQty = "[" & CStr(gru.Count) & "]"
+                            If TreeView1.Exist(sKey) = False Then
+                                TreeView1.Add(sKey, it.Key & sQty,, sTag)
+                            Endif
+                            For Each ety In gru
+                                If ety["handle"] <> "" Then
+                                    sEty = ctn.Key & ":" & ety["handle"]
+                                    Select it.Key
+                                        Case "text"
+                                            sEle = ety["text"]
+                                        Case Else
+                                            sEle = ety["handle"]
+                                    End Select
+                                    If TreeView1.Exist(sEty) = False Then
+                                        TreeView1.Add(sEty, sEle,, sKey)
+                                    Endif
+                                Endif
+                            Next
+                        Next
+
+                End Select
+            Endif
+        Next
+    Next
+
+End
+
 Public Sub LoadDrawingMap()
 
     Dim cLayers As New Collection
-    ' Dim iLayers As New Collection
     Dim Layer As Variant
     Dim app As APPMain
     Dim ito As Variant
     Dim it As Variant
     Dim sKey As String
-    'Dim sVal As String
     Dim sName As String
     Dim mt As Variant
     Dim mEt As Variant
@@ -677,8 +784,14 @@ Public Sub LoadDrawingMap()
                 TreeView1.Add(Layer["name"], Layer["name"],, "layers")
             Next
         Endif
+        'Styles ------------------------
+        'Widths ------------------------
+        'Dims --------------------------
+        'Fonts -------------------------
 
+        'Entities ----------------------
         For Each mt In cModel
+
             If TreeView1.Exist(cModel.Key) = False Then
                 TreeView1.Add(cModel.Key, cModel.Key,, "drawing")
             Endif

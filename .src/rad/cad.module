@@ -43,6 +43,7 @@ Public Function LoadGaucho(sFile As String) As Collection
     Dim ent As XmlElement
     Dim i As Integer
     Dim sKey As String
+    Dim cSout As New Collection
 
     hxml.Open(sFile)
 
@@ -112,7 +113,14 @@ Public Function LoadGaucho(sFile As String) As Collection
         'c["id"] = ent.Attributes["id"]
         sKey = CStr(i) 'sog.UUIDHandle(6)
         c["id"] = sKey
-        c["type"] = ent.Attributes["type"]
+        '-----
+        If ent.Attributes["handle"] Then
+            c["handle"] = ent.Attributes["handle"]
+        Else
+            c["handle"] = sog.UUIDHandle(6)
+        Endif
+        '-----
+        c["entity"] = ent.Attributes["type"]
         '-----
         c["layer"] = ent.Attributes["layer"]
         c["style"] = ent.Attributes["style"]
@@ -127,31 +135,31 @@ Public Function LoadGaucho(sFile As String) As Collection
 
             Case "circle"
                 c["p"] = EncodePoint(ent.Attributes["p"], "p")
-                c["r"] = EncodePoint(ent.Attributes["r"], "r")
+                c["r"] = CFloat(ent.Attributes["r"]) 'EncodePoint(ent.Attributes["r"], "r")
 
             Case "ellipse"
                 c["p"] = EncodePoint(ent.Attributes["p"], "p")
-                c["r"] = EncodePoint(ent.Attributes["r"], "r")
-                c["a"] = EncodePoint(ent.Attributes["a"], "a")
+                c["r"] = CFloat(ent.Attributes["r"]) 'EncodePoint(ent.Attributes["r"], "r")
+                c["a"] = FloatList(ent.Attributes["a"]) 'EncodePoint(ent.Attributes["a"], "a")
                 Print "x"
 
             Case "arc"
                 c["p"] = EncodePoint(ent.Attributes["p"], "p")
-                c["r"] = EncodePoint(ent.Attributes["r"], "r")
-                c["a"] = EncodePoint(ent.Attributes["a"], "a")
+                c["r"] = CFloat(ent.Attributes["r"]) 'EncodePoint(ent.Attributes["r"], "r")
+                c["a"] = FloatList(ent.Attributes["a"])
                 Print c["a"]
 
             Case "text"
                 c["p"] = EncodePoint(ent.Attributes["p"], "p")
-                c["a"] = EncodePoint(ent.Attributes["a"], "a")
+                c["a"] = CFloat(ent.Attributes["a"])
                 c["text"] = ent.Attributes["t"]
                 c["h"] = ent.Attributes["h"]
                 c["f"] = ent.Attributes["f"]
 
             Case "insert"
                 c["p"] = EncodePoint(ent.Attributes["p"], "p")
-                c["a"] = EncodePoint(ent.Attributes["a"], "a")
-                c["s"] = CFloat(ent.Attributes["s"])
+                c["a"] = CFloat(ent.Attributes["a"])
+                c["s"] = FloatList(ent.Attributes["s"])
                 c["b"] = ent.Attributes["b"]
 
                 Print c["a"]
@@ -160,14 +168,35 @@ Public Function LoadGaucho(sFile As String) As Collection
         If c.Count > 0 Then
             'If c.Exist("id") Then
             cEntities.Add(c.Copy(), sKey)
+            cSout = EntitiesSort(cEntities)
             'Endif
         Endif
         Inc i
     Next
 
-    cMdl.Add(cEntities, "Entities")
+    'cMdl.Add(cEntities, "Entities")
+    cMdl.Add(cSout, "Entities")
 
     Return cMdl
+
+End
+
+Private Function FloatList(sList As String) As Float[]
+
+    Dim stx As New String[]
+    Dim flx As New Float[]
+    Dim n As String
+
+    If InStr(sList, ":") > 0 Then
+        stx = Split(sList, ":")
+        If stx.Count > 0 Then
+            For Each n In stx
+                flx.Add(CFloat(n))
+            Next
+        Endif
+    Endif
+
+    Return flx
 
 End
 
@@ -1905,12 +1934,60 @@ Public Function CADConfig() As Collection
 
     ctnTmp.Clear
 
+    'Program
+    ctnTmp.Clear
+    ctnTmp.Add("Application.Directory", "Name")
+    ctnTmp.Add(("Program"), "Group")
+    ctnTmp.Add(sBase, "Value")
+    ctnTmp.Add("String", "Data")
+    ctnTmp.Add("dio", "Ctrl")
+    ctnTmp.Add(("Application directory"), "Desc")
+    str = ctnTmp["Name"]
+    ctnOut.Add(ctnTmp.Copy(), str)
+
+    ctnTmp.Clear
+    ctnTmp.Add("Application.window-background-color", "Name")
+    ctnTmp.Add(("Program"), "Group")
+    ctnTmp.Add("Dark", "Value")
+    ctnTmp.Add("String", "Data")
+    ctnTmp.Add("cmo~Dark:Light", "Ctrl")
+    ctnTmp.Add(("Window background color"), "Desc")
+    str = ctnTmp["Name"]
+    ctnOut.Add(ctnTmp.Copy(), str)
+
+    'Desktop
+    ctnTmp.Clear
+    ctnTmp.Add("Desktop.Text-Editor", "Name")
+    If sog.MimeDefaultApp("text/plain").Count > 0 Then
+        str = sog.MimeDefaultApp("text/plain")[0]
+    Else
+        str = ""
+    Endif
+    ctnTmp.Add(("Desktop"), "Group")
+    ctnTmp.Add(str, "Value")
+    ctnTmp.Add("String", "Data")
+    ctnTmp.Add("txo", "Ctrl")
+    ctnTmp.Add(("Editor de texto simple por defecto"), "Desc")
+    str = ctnTmp["Name"]
+    ctnOut.Add(ctnTmp.Copy(), str)
+
+    ctnTmp.Clear
+    ctnTmp.Add("Desktop.Icons", "Name")
+    ctnTmp.Add(("Desktop"), "Group")
+    ctnTmp.Add("/usr/share/icons/Numix/32", "Value")
+    ctnTmp.Add("String", "Data")
+    ctnTmp.Add("dio", "Ctrl")
+    ctnTmp.Add(("Íconos del programa"), "Desc")
+    str = ctnTmp["Name"]
+    ctnOut.Add(ctnTmp.Copy(), str)
+
+    ' CAD
     ctnTmp.Add("CAD.Background-Dark", "Name")
     ctnTmp.Add(("CAD"), "Group")
     ctnTmp.Add(False, "Value")
     ctnTmp.Add("Boolean", "Data")
     ctnTmp.Add("cko", "Ctrl")
-    ctnTmp.Add(("Drawing window bacground color"), "Desc")
+    ctnTmp.Add(("Drawing window dark mode"), "Desc")
     str = ctnTmp["Name"]
     ctnOut.Add(ctnTmp.Copy(), str)
 
@@ -1931,7 +2008,6 @@ Public Function CADConfig() As Collection
     ctnTmp.Add(("Draw marked"), "Desc")
     str = ctnTmp["Name"]
     ctnOut.Add(ctnTmp.Copy(), str)
-    'DrawMarcados As Boolean = True
 
     ctnTmp.Add("CAD.DrawSoloColumnas", "Name")
     ctnTmp.Add(("CAD"), "Group")
@@ -1941,7 +2017,6 @@ Public Function CADConfig() As Collection
     ctnTmp.Add(("Draw only columns"), "Desc")
     str = ctnTmp["Name"]
     ctnOut.Add(ctnTmp.Copy(), str)
-    'DrawSoloColumnas As Boolean = False
 
     ctnTmp.Add("CAD.DrawBounds", "Name")
     ctnTmp.Add(("CAD"), "Group")
@@ -1951,7 +2026,6 @@ Public Function CADConfig() As Collection
     ctnTmp.Add(("Draw bounds"), "Desc")
     str = ctnTmp["Name"]
     ctnOut.Add(ctnTmp.Copy(), str)
-    'DrawBounds As Boolean = False
 
     ctnTmp.Add("CAD.FormatoCotas", "Name")
     ctnTmp.Add(("CAD"), "Group")
@@ -1961,7 +2035,6 @@ Public Function CADConfig() As Collection
     ctnTmp.Add(("Dimensions format"), "Desc")
     str = ctnTmp["Name"]
     ctnOut.Add(ctnTmp.Copy(), str)
-    'FormatoCotas As String = "0.00"
 
     ctnTmp.Add("CAD.ColorForSelected", "Name")
     ctnTmp.Add(("CAD"), "Group")
@@ -1971,7 +2044,6 @@ Public Function CADConfig() As Collection
     ctnTmp.Add(("Color sellection"), "Desc")
     str = ctnTmp["Name"]
     ctnOut.Add(ctnTmp.Copy(), str)
-    'ColorForSelected As Integer = &H70E000
 
     ctnTmp.Add("CAD.ToolActive", "Name")
     ctnTmp.Add(("CAD"), "Group")
@@ -1981,7 +2053,6 @@ Public Function CADConfig() As Collection
     ctnTmp.Add(("Tool active"), "Desc")
     str = ctnTmp["Name"]
     ctnOut.Add(ctnTmp.Copy(), str)
-    'ToolActive As Boolean
 
     ctnTmp.Add("CAD.Ortogonal", "Name")
     ctnTmp.Add(("CAD"), "Group")
@@ -1991,7 +2062,6 @@ Public Function CADConfig() As Collection
     ctnTmp.Add(("Ortogonal"), "Desc")
     str = ctnTmp["Name"]
     ctnOut.Add(ctnTmp.Copy(), str)
-    'Ortogonal As Boolean = False
 
     ctnTmp.Add("CAD.OrtogonalForzado", "Name")
     ctnTmp.Add(("CAD"), "Group")
@@ -2001,7 +2071,6 @@ Public Function CADConfig() As Collection
     ctnTmp.Add(("Oorthogonal forced"), "Desc")
     str = ctnTmp["Name"]
     ctnOut.Add(ctnTmp.Copy(), str)
-    'OrtogonalForzado As Boolean = False
 
     ctnTmp.Add("CAD.OrtogonalIgnorado", "Name")
     ctnTmp.Add(("CAD"), "Group")
@@ -2011,7 +2080,15 @@ Public Function CADConfig() As Collection
     ctnTmp.Add(("Oorthogonal ignored"), "Desc")
     str = ctnTmp["Name"]
     ctnOut.Add(ctnTmp.Copy(), str)
-    'OrtogonalIgnorado As Boolean = False
+
+    ctnTmp.Add("CAD.flgShowInspector", "Name")
+    ctnTmp.Add(("CAD"), "Group")
+    ctnTmp.Add(False, "Value")
+    ctnTmp.Add("Boolean", "Data")
+    ctnTmp.Add("cko", "Ctrl")
+    ctnTmp.Add(("Show inspector"), "Desc")
+    str = ctnTmp["Name"]
+    ctnOut.Add(ctnTmp.Copy(), str)
 
     Return ctnOut
 
@@ -2140,6 +2217,7 @@ Public Function GetDXFEntities(sCont As String) As Collection
     Dim stx As New String[]
     'Dim cTmp As New Collection
     Dim out As New Collection
+    Dim sout As New Collection
     'Dim item As String
     'Dim sRec As String
     Dim i As Integer
@@ -2178,12 +2256,49 @@ Public Function GetDXFEntities(sCont As String) As Collection
             If cItem.Count > 1 Then
                 sKey = ""
                 If cItem.Exist("handle") Then
-                    sKey = cItem["handle"]
+                    'sKey = cItem["handle"]
+                    sKey = cItem["entity"] & ":" & cItem["handle"]
                     out.Add(cItem.Copy(), sKey)
                 Endif
             Endif
         Endif
     Next
+
+    sout = EntitiesSort(out)
+
+    Return sout
+
+    'Return out
+
+End
+
+Private Function EntitiesSort(c As Collection) As Collection
+
+    Dim stx As New String[]
+    Dim eName As String
+    Dim tmp As New Collection
+    Dim out As New Collection
+    Dim ety As Variant
+
+    For Each ety In c
+        eName = String.LCase(ety["entity"])
+        If stx.Exist(eName) = False Then
+            stx.Add(eName)
+        Endif
+    Next
+
+    stx.Sort
+
+    For Each eName In stx
+        For Each ety In c
+            If eName = String.LCase(ety["entity"]) Then
+                tmp.Add(ety, ety["handle"])
+            Endif
+        Next
+        out.Add(tmp.Copy(), eName)
+        tmp.Clear
+    Next
+
     Return out
 
 End
@@ -2268,10 +2383,10 @@ Public Function GetDXFTables(sCont As String) As Collection
                         cDecoded = GetDXFDimStyleList(item)
                         out.Add(cDecoded.Copy(), "DimStyles")
                         cDecoded.Clear
-                    Case "BLOCK_RECORD"
-                        cDecoded = GetDXFBLockList(item)
-                        out.Add(cDecoded.Copy(), "BLockRecord")
-                        cDecoded.Clear
+                        ' Case "BLOCK_RECORD"
+                        '     cDecoded = GetDXFBLockList(item)
+                        '     out.Add(cDecoded.Copy(), "BLockRecord")
+                        '     cDecoded.Clear
                 End Select
             Endif
         Endif

@@ -433,7 +433,8 @@ Public Sub Task(sTask As String)
                     Mkdir File.Dir(s)
                 Endif
                 If Exist(s) = False Then
-                    ctn = xmg.XmlIni()
+                    'ctn = xmg.XmlIni()
+                    ctn = cad.CADConfig()
                     xmg.XmlConfMaker(s, ctn, Application.Name)
                 Endif
                 hFConfig = New FConfig(cex)
