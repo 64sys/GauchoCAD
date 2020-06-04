@@ -1,10 +1,25 @@
 # GauchoCAD
-A little cad program written in Gambas
+GauchoCAD is a free CAD program written in the Gambas language.
 
-Welcome
+![Screenshoot](./screen.png)
 
-This program was created in a Classes and Objects practice. It is used to draw planes with simple elements such as lines or more complex ones like a slab and uses the Paint class. On the farm there is such a demonstration. As programmers that we are, it also helps us learn by creating new routines that represent elements of the drawing and are easily added without touching the main code. You can also create tools that modify the elements. Suppose we want to add an element that draws a ring:
+# Road map
+The graphics are supported by the opengl library.
 
-Icons
+# History
+At the beginning this program was created as a practice in the use of classes and over time it was mutating, increasing the number of graphic tools, improving the interface etc.
+CAD programs belong to the group of large and complex programs since for this to work it must handle various things from geometric calculations and graphical representation to configurations, user profiles, interpreter of orders, scripting printing, export and import of files, etc.
+GauchoCAD is currently under development and the status is as follows:
+
+![Status](./status.png)
+
+## Links
+# Gambas project
+Gambas is a free development environment and a full powerful development platform based on a Basic interpreter with object extensions.
+http://gambas.sourceforge.net/en/main.html
+
+# Icons
+LibreCAD
+
 eraser
 https://www.flaticon.com/packs/graphic-design-tools-6

@@ -327,12 +327,22 @@
           Expand = True
           Arrangement = Arrange.Row
           Spacing = True
+          { lblEntities Label
+            MoveScaled(1,0,20,3)
+            Text = ("Entities")
+            Alignment = Align.Center
+          }
         }
         { pnlTools Panel
           MoveScaled(0,23,22,18)
           Expand = True
           Arrangement = Arrange.Row
           Spacing = True
+          { lblTools Label
+            MoveScaled(0,0,20,3)
+            Text = ("Tools")
+            Alignment = Align.Center
+          }
         }
         { pnlView Panel
           MoveScaled(0,42,21,17)

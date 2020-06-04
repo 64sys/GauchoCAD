@@ -134,6 +134,85 @@ Public Function ImportBlocks(colData As Collection) ', obxEntities As Object[]) 
 
 End
 
+Public Function ImportEntities2(colData As Collection, obxEntities As Object[], Optional BlockName As String) As Integer
+
+    Dim iTotalEntities As Integer
+    Dim colGrp As Collection
+    Dim colEnt As Collection
+    Dim flxPoints As New Float[]
+    Dim P As Float[]
+    Dim ratio As Float
+
+    For Each colGrp In colData
+        For Each colEnt In colGrp
+
+            Select colData.Key
+
+                Case "line"
+                    GoSub GetPoints
+                    AddLine(flxPoints, colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], BlockName)
+                    Inc iTotalEntities
+
+                Case "lwpollyline"
+                    GoSub GetPoints
+                    AddPolyLine(flxPoints, colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], BlockName)
+                    Inc iTotalEntities
+
+                    ' Case "ellipse"
+                    '     GoSub GetPoints
+                    '
+                    '     AddEllipse(flxPoints, colEnt["r"], colEnt["a"][0], colEnt["a"][1], colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], BlockName)
+                    '     Inc iTotalEntities
+
+                Case "circle"
+                    GoSub GetPoints
+                    AddCircle(flxPoints, colEnt["r"], colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], BlockName)
+                    Inc iTotalEntities
+
+                Case "arc"
+                    GoSub GetPoints
+                    AddArc(flxPoints, colEnt["r"], colEnt["a"][0], colEnt["a"][1], colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], BlockName)
+                    Inc iTotalEntities
+
+                Case "insert"
+                    GoSub GetPoints
+                    AddInsert(flxPoints, colEnt["s"][0], colEnt["s"][1], colEnt["a"], colEnt["colour"], colEnt["style"], colEnt["layer"], BlockName)
+                    Inc iTotalEntities
+
+                Case "text"
+                    GoSub GetPoints
+                    AddText(flxPoints, colEnt["a"], colEnt["h"], colEnt["text"], colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], BlockName)
+                    Inc iTotalEntities
+
+                Case "mtext"
+                    GoSub GetPoints
+                    AddMText(flxPoints, colEnt["a"], colEnt["h"], colEnt["text"], colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], BlockName)
+                    Inc iTotalEntities
+
+                Case "dimmension"
+                    GoSub GetPoints
+                    AddDim(flxPoints, colEnt["a"], colEnt["h"], colEnt["text"], colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], BlockName)
+                    Inc iTotalEntities
+
+            End Select
+
+        Next
+    Next
+
+    Return iTotalEntities
+
+GetPoints:              ' Leo los puntos que estan separados y los meto en un unico array de Float[]
+    flxPoints.Clear
+    For Each p In colEnt["p"]
+        'flxPoints.Insert(p)
+        flxPoints.Add(p[0])
+        flxPoints.Add(p[1])     ' P[2] es Z y lo ingnoro
+    Next
+
+    Return
+
+End
+
 '' Importa la clave entidades de la coleccion y las coloca en el array de objetos
 
 Public Function ImportEntities(colData As Collection, obxEntities As Object[], Optional BlockName As String = "") As Integer

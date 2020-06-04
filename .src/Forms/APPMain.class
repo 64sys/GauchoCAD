@@ -38,6 +38,7 @@ Public hFCAD As FCAD                    '' CAD Editor
 Public CurrentForm As Form
 Public CurrentFile As String
 Public CurrentColor As Integer
+Public CurrentLayer As String
 
 Public cMod As New Collection    '' All drawings common collection
 
@@ -429,7 +430,8 @@ Public Sub Task(sTask As String)
                     Mkdir File.Dir(s)
                 Endif
                 If Exist(s) = False Then
-                    ctn = xmg.XmlIni()
+                    'ctn = xmg.XmlIni()
+                    ctn = cad.CADConfig()
                     xmg.XmlConfMaker(s, ctn, Application.Name)
                 Endif
                 hFConfig = New FConfig(cex)
@@ -506,5 +508,19 @@ Public Sub ColorPalette1_Click()
 
     CurrentColor = ColorPalette1.Current
     Print CurrentColor
+
+End
+
+Public Sub dprop_Click()
+
+    Dim obj As Object
+
+    obj = Last
+
+    Select obj.Tag
+        Case "layer"
+            CurrentLayer = obj.Text
+            Print CurrentLayer
+    End Select
 
 End
