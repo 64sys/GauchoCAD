@@ -1,12 +1,14 @@
 GambasCAD
 ---------
-A very simple CAD 
+A very simple CAD
 
 Authors: Terco, Tincho, Postpase, Vuott
 
 VER       DATE      CHANGES
 --------------------------------------------------------------------------------------------------------------------
-0.0.52	27/05/20	Fixed ZoomW 
+0.0.54	03/06/20	Fix MText. Tools Trim. Added funtions to Puntos
+
+0.0.52	27/05/20	Fixed ZoomW
 
 0.0.50	25/05/20	Fixed selecting window. Blending works bad.
 
@@ -23,22 +25,21 @@ VER       DATE      CHANGES
 
 0.0.30  13/05/20  Now using Cairo transformation to Zoom/Pan to save time. DXF read almost ready.
 
-0.0.28  12/05/20  Ellipse repired. Has POI now. Fontsize corrected. 
+0.0.28  12/05/20  Ellipse repired. Has POI now. Fontsize corrected.
 
 0.0.26  11/05/20  Separated Load/Save/SaveAs to ease the use. POI optimized for speed and limited to 24.000 due to
-                  perfomance limitations. Tool ZoomExtents. Tool ZoomWindow. 
+                  perfomance limitations. Tool ZoomExtents. Tool ZoomWindow.
 
 0.0.24  06/05/20  Added arrays, MText (too slow on rendering)
                   Moved from Paint to Cairo class
 
 0.0.22  05/05/20  Added Blocks, Ellipse, Text, hanged all tools to ToolsBase parent
                   Completed the originals for basic entities. Selecting with colors.
-                  
 
 0.0.20  01/05/20  Flipped the Y axis to match all CADs out there, now its vertical
-                  Cleaned all GUI. 
+                  Cleaned all GUI.
                   Created dedicated files modCAD and FCAD.
-                  
+
 0.0.10  27/04/20  Changed Px[], Pz[] to P[] pairs to provide more compatibility with external libs
                   Improved Load/Save to V5 to catch up with new element vars can constants
                   Fix IsInside, Orientation, Added BoundingPoligon debugging with F6
@@ -48,12 +49,11 @@ VER       DATE      CHANGES
                                         a traducible Gender name to call the class from command line
                   Tools and entities now are divided in families, to group them in a button that shows more buttons
                   clsJobPadre and clsJovPrevious blend into clsJobPrevious, so either we into something or selecting
-                
 
 0.0.2   25/04/20  Changed to dynamic arrays in the elements
                   Allows to create elements with unknown total points
                   Removed Gender and PointDone from elements class
                   Load/Save works
                   Added text input
-                
+
 0.0.1   25/04/20  First GambasCAD version forked from PlantDesigner

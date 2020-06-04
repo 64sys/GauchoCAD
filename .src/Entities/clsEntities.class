@@ -547,6 +547,7 @@ Public Sub CopyElemData(origen As Object, destino As Object)
         destino.fparam[i] = origen.fparam[i]
     Next
 
+    destino.layerID = origen.LayerID
     destino.RefPointX = origen.refpointX
     destino.RefPointY = origen.refpointY
     destino.stringdata = origen.Stringdata

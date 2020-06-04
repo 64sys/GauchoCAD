@@ -31,13 +31,13 @@ Public Sub Draw()
 
     If Not Me.DrawAble Or Not Me.Visible Then Return
 
-    If Me.Selected And Not modCAD.ToolActive Then Me.ColorToPaint = modCAD.ColorForSelected Else Me.ColorToPaint = Me.gbColor
+    If Me.Selected And Not modCAD.ToolActive Then Me.ColorToPaint = modCAD.ColorForSelected Else Me.ColorToPaint = modCAD.GetGBColor(Me.colour, Me.Layerid)
 
     If modCAD.drwDrawingClass = modCAD.drwPaintClass Then
 
         paint.LineWidth = Me.LineWidth / appmain.hFcad.ScaleZoom / modCAD.ScaleLines
         If Me.flxDash Then paint.Dash = Me.flxDash
-        paint.brush = Paint.Color(Me.gbColor)
+        paint.brush = Paint.Color(Me.ColorToPaint)
         paint.MoveTo(Me.p[0], Me.p[1])
         paint.LineTo(Me.p[2], Me.p[3])
         paint.Stroke

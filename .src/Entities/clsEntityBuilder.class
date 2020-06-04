@@ -102,7 +102,7 @@ Public Function Start(ElemToBuild As Variant, Optional Mode As Integer = 0)
     ' reset from previous element
     elem.StepsDone = 0
 
-    elem.gbcolor = appmain.CurrentColor
+    'elem.gbcolor = appmain.CurrentColor
 
     iPoints = 0
     iFloat = 0
@@ -121,7 +121,10 @@ Public Function Start(ElemToBuild As Variant, Optional Mode As Integer = 0)
     ' instructions to FCAD
     modCAD.OrtogonalIgnorado = elem.OrtogonalIgnorado
     modCAD.OrtogonalForzado = elem.OrtogonalForzado
-    elem.gbcolor = appmain.CurrentColor
+
+    elem.layer = appmain.CurrentLayer
+    elem.layerid = modCAD.GetLayerID(appmain.CurrentLayer)
+
     clsDrawingAids.HelperTrabajo = elem.HelperTrabajo
 
 End

@@ -38,6 +38,7 @@ Public hFCAD As FCAD                    '' CAD Editor
 Public CurrentForm As Form
 Public CurrentFile As String
 Public CurrentColor As Integer
+Public CurrentLayer As String
 
 Public cMod As New Collection    '' All drawings common collection
 
@@ -506,5 +507,19 @@ Public Sub ColorPalette1_Click()
 
     CurrentColor = ColorPalette1.Current
     Print CurrentColor
+
+End
+
+Public Sub dprop_Click()
+
+    Dim obj As Object
+
+    obj = Last
+
+    Select obj.Tag
+        Case "layer"
+            CurrentLayer = obj.Text
+            Print CurrentLayer
+    End Select
 
 End

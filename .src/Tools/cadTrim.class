@@ -29,6 +29,12 @@ Public arrTijeras As New Integer[]
 Public Function Start(Optional ElemToBuild As Variant, Optional _Mode As Integer = 0) As Boolean
     ' Llamada por FCAD al inicio de la aplicacion de esta herramienta
 
+    ' TODO: remover al seguir con esta herramienta
+
+    Me.Finish
+
+    Return
+
     Dim i As Integer
     ' Aprovechamos para establecer los helpers (comentarios de ayuda en pantalla)
     Me.PointsDone = 0

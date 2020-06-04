@@ -28,6 +28,8 @@
 ' Based on an example called MuchosCirculos by JGuardon y MrShell
 ' XML Load/Save by Tincho
 
+Public ScreenDensity As Float = 1080 / 29.5  ' pixele by cm wich gives a 1:100 scale in my monitor
+
 ' Filtros del dibujo
 Public DrawOriginals As Boolean = False
 Public DrawMarcados As Boolean = True
@@ -103,6 +105,11 @@ Public Sub Main()
     ' armo el array de colores
     gcolor = DecodeColor()
 
+    ' corrijo los colores que no se ven contra el fondo
+    gcolor[0] = WhiteAndBlack
+    gcolor[7] = WhiteAndBlack
+    gcolor[255] = WhiteAndBlack
+
     ' this is what we are doing now
     clsJob = clsDefaultJob
     clsJobPrevious = clsDefaultJob
@@ -117,6 +124,18 @@ Public Sub Main()
     r = [0, 1, 1, 2]
     puntos.Rotate(r, Pi / 4)
     Debug r[0], r[1]
+
+    Debug "No poli", puntos.inPolySegment([0, 0, 1, 0, 1, 1, 0, 1], 0.5, 0.5)
+
+    Debug "In poli", puntos.inPolySegment([0, 0, 1, 0, 1, 1, 0, 1], 0.5, 0)
+
+    Debug "In poli", puntos.inPolySegment([0, 0, 1, 0, 1, 1, 0, 1], 1, 0.5)
+
+    Debug "In poli", puntos.inPolySegment([0, 0, 1, 0, 1, 1, 0, 1], 1, 1)
+
+    Debug "In poli", puntos.inPolySegment([0, 0, 1, 0, 1, 1, 0, 1], 0.5, 1)
+
+    Debug "In poli", puntos.inPolySegment([0, 0, 1, 1], 0.5, 0.50000001)
 
 End
 
@@ -483,21 +502,40 @@ Public Function ApplyLayerProperties(Optional mode As Integer = 0)
         ' visibiliad
         If APPMain.hFCAD.cModel["Layers"][e.layerID]["show"] Then e.visible = True Else e.visible = False
 
-        ' color
-        If e.colour = 256 Then          ' buscar color del layer
-
-            e.gbColor = gColor[APPMain.hFCAD.cModel["Layers"][e.layerID]["colour"]]
-        Else If e.colour = 257 Then     ' buscar color del objeto
-            e.gbColor = gColor[APPMain.hFCAD.cModel["Layers"][e.layerID]["colour"]]     ' FIXME: cambiar esto
-        Else If e.colour = 0 Then       ' buscar color del bloque
-            e.gbColor = gColor[APPMain.hFCAD.cModel["Layers"][e.layerID]["colour"]]     ' FIXME: cambiar esto
-        Else
-
-            e.gbColor = gColor[e.colour]
-
-        Endif
-
     Next
+
+End
+
+Public Function GetLayerID(LayerName As String) As String
+
+    Dim cLayer As Collection
+
+    For Each cLayer In APPMain.hFCAD.cModel["Layers"]
+        If cLayer["name"] = LayerName Then Return cLayer["id"]
+    Next
+
+End
+
+Public Function GetGBColor(CADcolor As Integer, layerID As String) As Integer
+
+    ' color
+    If CADcolor = 256 Then          ' buscar color del layer
+
+        Return gColor[APPMain.hFCAD.cModel["Layers"][layerID]["colour"]]
+
+    Else If CADcolor = 257 Then     ' buscar color del objeto
+
+        Return gColor[APPMain.hFCAD.cModel["Layers"][layerID]["colour"]]     ' FIXME: cambiar esto
+
+    Else If CADcolor = 0 Then       ' buscar color del bloque
+
+        Return gColor[APPMain.hFCAD.cModel["Layers"][layerID]["colour"]]     ' FIXME: cambiar esto
+
+    Else
+
+        Return gColor[CADcolor]
+
+    Endif
 
 End
 

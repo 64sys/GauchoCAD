@@ -33,7 +33,7 @@ Public Const StretchAble As Boolean = False
 Public Sub Draw()
 
     If Not Me.DrawAble Or Not Me.Visible Then Return
-    If Me.Selected And Not modCAD.ToolActive Then Me.ColorToPaint = modCAD.ColorForSelected Else Me.ColorToPaint = Me.gbColor
+    If Me.Selected And Not modCAD.ToolActive Then Me.ColorToPaint = modCAD.ColorForSelected Else Me.ColorToPaint = modCAD.GetGBColor(Me.colour, Me.Layerid)
 
     If modCAD.drwDrawingClass = modCAD.drwPaintClass Then
 
@@ -109,7 +109,6 @@ End
 
 Public Sub CreateBoundingPoligon()
 
-    ' checkk Viga / Beam to see how its done
     Dim tRect As New Float[]
 
     Me.BoundingPoligon.Clear

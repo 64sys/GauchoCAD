@@ -367,7 +367,12 @@ Public Sub form_KeyPress()
         '     modCAD.AddLine([Rnd(-20, 20), Rnd(-20, 20), Rnd(-20, 20), Rnd(-20, 20)], 0, 1, 0, "0")
         '     arrEntities.Last.gbcolor = Color.RGB(Rnd(0, 255), Rnd(0, 255), Rnd(0, 255))
         ' Next
-        modCAD.AddEllipse([10, 10, 150, 150], 0.5, 0, Pi)
+        '        modCAD.AddEllipse([10, 10, 150, 150], 0.5, 0, Pi)
+
+        'modCAD.AddMText([0, 0], 20, 30, "Primera linea" & gb.Cr & "Segunda linea", 3, 1, 1, "0", "")
+
+        'modCAD.AddText([0, -400], 20, 30, "Unica linea", 3, 1, 1, "0", "")
+        'modCAD.ApplyLayerProperties
 
         regen
         Return

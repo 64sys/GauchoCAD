@@ -34,7 +34,7 @@ Public Sub Draw()
     Dim e As Float
 
     If Not Me.DrawAble Or Not Me.Visible Then Return
-    If Me.Selected And Not modCAD.ToolActive Then Me.ColorToPaint = modCAD.ColorForSelected Else Me.ColorToPaint = Me.gbColor
+    If Me.Selected And Not modCAD.ToolActive Then Me.ColorToPaint = modCAD.ColorForSelected Else Me.ColorToPaint = modCAD.GetGBColor(Me.colour, Me.Layerid)
     Dim ET As Object, i As Integer
     i = clsEntities.FIndBlockID(Me.StringData2)
     If i < 0 Then Return

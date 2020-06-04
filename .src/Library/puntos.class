@@ -99,12 +99,12 @@ Public Function InBetween(x As Float, x1 As Float, x2 As Float) As Boolean
     ' determine if a number is between the other two
     ' this is valid for negative values
 
-    If (x1 < X And x2 > X) Or (x1 > X And x2 < X) Then Return True Else Return False
+    If (x1 <= X And x2 >= X) Or (x1 >= X And x2 <= X) Then Return True Else Return False
 
 End
 
 '' Devuelve el segmento en el que esta el punto, considerando la tolerancia numerica
-
+'' o -1 si no estan en ningun segmento. Si el punto esta en un vertice, devuelve el primer segmento.
 Public Function inPolySegment(poligon As Float[], px As Float, py As Float) As Integer
 
     Dim i As Integer
@@ -113,7 +113,7 @@ Public Function inPolySegment(poligon As Float[], px As Float, py As Float) As I
 
         If ((poligon[i + 2] - poligon[i]) <> 0) And ((px - poligon[i]) <> 0) Then
 
-            If Abs(poligon[i + 3] - poligon[i + 1]) / (poligon[i + 2] - poligon[i]) - Abs(py - poligon[i + 1]) / (px - poligon[i]) < NumericTolerance Then Return (i + 2) / 2
+            If Abs(Abs((poligon[i + 3] - poligon[i + 1]) / (poligon[i + 2] - poligon[i])) - Abs((py - poligon[i + 1]) / (px - poligon[i]))) < NumericTolerance Then Return (i + 2) / 2
 
         Else If ((poligon[i + 2] - poligon[i]) = 0) And ((px - poligon[i]) = 0) Then
 
