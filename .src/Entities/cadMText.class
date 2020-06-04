@@ -32,7 +32,7 @@ Public Const ParamDefault As String = " ; 0 ; 10 ; "
 Public Sub Draw()
 
     If Not Me.DrawAble Or Not Me.Visible Then Return
-    If Me.Selected And Not modCAD.ToolActive Then Me.ColorToPaint = modCAD.ColorForSelected Else Me.ColorToPaint = Me.gbColor
+    If Me.Selected And Not modCAD.ToolActive Then Me.ColorToPaint = modCAD.ColorForSelected Else Me.ColorToPaint = modCAD.GetGBColor(Me.colour, Me.Layerid)
 
     If modCAD.drwDrawingClass = modCAD.drwPaintClass Then
 
@@ -103,54 +103,26 @@ Public Sub Draw()
 
         glPlus.DrawMultilineText(Me.StringData, Me.p[0], Me.p[1], Me.fParam[0], Me.fParam[1], Me.ColorToPaint)
 
+        If Me.StringData <> "" Then CreateBoundingPoligon
+
     End If
 
 End
 
 Public Sub CreateBoundingPoligon()
 
-    ' checkk Viga / Beam to see how its done
+    Dim tRect As New Float[]
 
     Me.BoundingPoligon.Clear
 
-    Dim BpX, BpZ, l As Float, Rotated As Float[]
-    l = puntos.distancia(Me.p[0], Me.p[1], Me.p[2], Me.p[3])
+    tRect = glPlus.MTextExtends(Me.StringData, Me.p[0], Me.p[1], Me.fParam[1])
 
-    ' From an unrotated point of view, our bouding points look like
-    ' 1
-    BpX = Me.p[0]
-    BpZ = Me.p[1] - Me.fParam[0] / 2  ' thats wall thickness
+    ' armo el poligono , que ya tiene la escala
 
-    ' and, the rotated are
+    Me.BoundingPoligon.Insert([tRect[0], tRect[1], tRect[0] + tRect[2], tRect[1], tRect[0] + tRect[2], tRect[1] + tRect[3], tRect[0], tRect[1] + tRect[3]])
 
-    rotated = puntos.RotateFromPointWithSinCos(Me.p[0], Me.p[1], (Me.p[3] - Me.p[1]) / l, (Me.p[2] - Me.p[0]) / l, BpX, Bpz)
-    Me.BoundingPoligon.Insert(rotated)     ' pair
-
-    ' 2
-    BpX = Me.p[0] + l
-    BpZ = Me.p[1] - Me.fParam[0] / 2
-
-    ' and, the rotated are
-
-    rotated = puntos.RotateFromPointWithSinCos(Me.p[0], Me.p[1], (Me.p[3] - Me.p[1]) / l, (Me.p[2] - Me.p[0]) / l, BpX, Bpz)
-    Me.BoundingPoligon.Insert(rotated)     ' pair
-
-    ' 3
-    BpX = Me.p[0] + l
-    BpZ = Me.p[1] + Me.fParam[0] / 2
-
-    ' and, the rotated are
-
-    rotated = puntos.RotateFromPointWithSinCos(Me.p[0], Me.p[1], (Me.p[3] - Me.p[1]) / l, (Me.p[2] - Me.p[0]) / l, BpX, Bpz)
-    Me.BoundingPoligon.Insert(rotated)     ' pair
-
-    ' 4
-    BpX = Me.p[0]
-    BpZ = Me.p[1] + Me.fParam[0] / 2
-
-    ' and, the rotated are
-
-    rotated = puntos.RotateFromPointWithSinCos(Me.p[0], Me.p[1], (Me.p[3] - Me.p[1]) / l, (Me.p[2] - Me.p[0]) / l, BpX, Bpz)
-    Me.BoundingPoligon.Insert(rotated)     ' pair
+    puntos.Translate(Me.BoundingPoligon, -Me.P[0], -Me.P[1])
+    puntos.Rotate(Me.BoundingPoligon, Me.fParam[0] * Pi / 180)
+    puntos.Translate(Me.BoundingPoligon, Me.P[0], Me.P[1])
 
 End

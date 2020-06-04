@@ -30,9 +30,11 @@ Public Const ParamDefault As String = " ; 1 "
 
 Public Sub Draw()
 
+    Dim x, y, theta, angle_increment As Float
+
     If Not Me.DrawAble Or Not Me.Visible Then Return
 
-    If Me.Selected And Not modCAD.ToolActive Then Me.ColorToPaint = modCAD.ColorForSelected Else Me.ColorToPaint = Me.gbColor
+    If Me.Selected And Not modCAD.ToolActive Then Me.ColorToPaint = modCAD.ColorForSelected Else Me.ColorToPaint = modCAD.GetGBColor(Me.colour, Me.Layerid)
 
     If modCAD.drwDrawingClass = modCAD.drwPaintClass Then
 
@@ -47,12 +49,19 @@ Public Sub Draw()
 
     If modCAD.drwDrawingClass = modCAD.drwOpenGLClass Then
 
-        'GLplus.Circle(Me.p, Me.fParam[0], Color.Pink, Me.LineWidth)
-        gl.PushMatrix
-        gl.Translatef(Me.P[0], Me.P[1], 0)
-        GLplus.Arc(Me.fParam[0], 0, 360, Me.ColorToPaint)
-        gl.PopMatrix
-    Endif
+        Me.BoundingPoligon.Clear
+        GL.Begin(gl.LINE_STRIP)
+        angle_increment = Pi * 2 / 360
+        For theta = 0 To 2 * Pi Step angle_increment
+            ' el punto considerando 0,0 al centro
+            x = Me.p[0] + Me.fParam[0] * Cos(theta)
+            y = Me.p[1] + Me.fParam[0] * Sin(theta)
+            Me.BoundingPoligon.Add(x)
+            Me.BoundingPoligon.Add(y)
+            GLplus.Vertex2D(x, y, Me.ColorToPaint)
+        Next
+        gl.End
+    End If
 
 End
 

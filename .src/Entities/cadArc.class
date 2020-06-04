@@ -41,7 +41,7 @@ Public Sub Draw()
 
     If Not Me.DrawAble Or Not Me.Visible Then Return
 
-    If Me.Selected And Not modCAD.ToolActive Then Me.ColorToPaint = modCAD.ColorForSelected Else Me.ColorToPaint = Me.gbColor
+    If Me.Selected And Not modCAD.ToolActive Then Me.ColorToPaint = modCAD.ColorForSelected Else Me.ColorToPaint = modCAD.GetGBColor(Me.colour, Me.Layerid)
 
     If modCAD.drwDrawingClass = modCAD.drwPaintClass Then
 
@@ -89,8 +89,6 @@ Public Sub Draw()
 
             clsDrawingAids.Helper.texto = Format$(Me.fParam[1], ("0.0 deg")) & (" to ") & Format$(Me.fParam[2], ("0.0 deg"))
         Else
-
-            ' TODO: esto probabemente funcione para arcos en los dos primeros cuadrantes
 
             Me.BoundingPoligon.Clear
             GL.Begin(gl.LINE_STRIP)

@@ -319,7 +319,7 @@ Public Function Lines(vertices As Float[], Optional colour As Integer = 0, LineW
 End
 
 '' Dibuja un seria de polilinea
-Public Function Polygon(vertices As Float[], Optional colour As Integer = 0, FillColor As Integer = 0, LineWidth As Float = 1, dashes As Float[])
+Public Function PolygonFilled(vertices As Float[], Optional colour As Integer = 0, FillColor As Integer = 0, LineWidth As Float = 1, dashes As Float[])
 
     ' TODO: dashes is for later use
 
@@ -328,6 +328,26 @@ Public Function Polygon(vertices As Float[], Optional colour As Integer = 0, Fil
     'glColorRGB(colour)
     gl.LineWidth(LineWidth) ' obsoleto en WebGL
     gl.Begin(gl.POLYGON)
+
+    For i = 0 To vertices.Max Step 2
+        glColorRGB(colour)
+        gl.Vertex2f(vertices[i], vertices[i + 1])
+
+    Next
+    gl.end
+
+End
+
+'' Dibuja un seria de polilinea
+Public Function Polygon(vertices As Float[], Optional colour As Integer = 0, FillColor As Integer = 0, LineWidth As Float = 1, dashes As Float[])
+
+    ' TODO: dashes is for later use
+
+    Dim i As Integer
+
+    'glColorRGB(colour)
+    gl.LineWidth(LineWidth) ' obsoleto en WebGL
+    gl.Begin(gl.LINE_LOOP)
 
     For i = 0 To vertices.Max Step 2
         glColorRGB(colour)
@@ -800,9 +820,11 @@ End
 ''
 Public Function DrawMultilineText(UTFMultiString As String, posX As Float, posY As Float, Optional angle As Float = 0, textH As Float = 1, colour As Integer = -14, linewidth As Float = 1, rectW As Float = 0, rectH As Float = 0, alignHoriz As Integer = 0, alignVert As Integer = 0) As Boolean
 
-    Dim i, iii, UTFcode, LetterIndex As Integer, Xadvance As Float
+    Dim i, iii, UTFcode, LetterIndex As Integer, Xadvance, xtotaladvance, Yadvance, ytotaladvance As Float
     Dim mLines As String[], dH As Float, tLine As String
+    Dim tRect As New Float[]
 
+    tRect.Insert([0, 0])
     mlines = Split(UTFMultiString, gb.CrLf & gb.Cr & gb.lf)
 
     gl.PushMatrix                                                               ' para evitar peleas, guardo la matriz de trnasformacion
@@ -816,19 +838,25 @@ Public Function DrawMultilineText(UTFMultiString As String, posX As Float, posY 
             UTFcode = String.Code(tLine, i)                                     ' obtengo el UTF code
             If UTFcode = 32 Then                                                    ' es un espacio
                 gl.Translatef(ActualFont.LetterSpacing, 0, 0)                       ' muevo el puntero a la siguiente posicion
+                xtotaladvance += ActualFont.LetterSpacing
             Else
                 LetterIndex = GetCodeIndex(ActualFont, UTFcode)                     ' obtengo el indice de la letra
                 Lines(ActualFont.Letter[LetterIndex].FontGlyps, colour)                     ' la dibujo
                 For iii = 0 To ActualFont.Letter[LetterIndex].FontGlyps.Max Step 2  ' calculo cuanto tiene que avanzar el puntero
                     If ActualFont.Letter[LetterIndex].FontGlyps[iii] > Xadvance Then Xadvance = ActualFont.Letter[LetterIndex].FontGlyps[iii]
+                    If ActualFont.Letter[LetterIndex].FontGlyps[iii + 1] > tRect[1] Then tRect[1] = ActualFont.Letter[LetterIndex].FontGlyps[iii + 1]
                 Next
+                tRect[0] += (Xadvance + ActualFont.LetterSpacing) * textH * FontScale
                 gl.Translatef(Xadvance + ActualFont.LetterSpacing, 0, 0)                                       ' muevo el puntero a la siguiente posicion
+
+                xtotaladvance += Xadvance + ActualFont.LetterSpacing
                 'Debug Xadvance
                 Xadvance = 0
             End If
         Next
-        gl.Translatef(0, ActualFont.LetterSpacing * 2, 0)
 
+        gl.Translatef(-xtotaladvance, -(ActualFont.WordSpacing + tRect[1]), 0)
+        xtotaladvance = 0
     Next
 
     gl.PopMatrix
@@ -838,5 +866,70 @@ End
 '' devuelve un rectangulo que contiene al texto
 '' [x,y,ancho,alto]
 Public Function TextExtends(UTFstring As String, textH As Float) As Float[]
+
+    Dim i, iii, UTFcode, LetterIndex As Integer, Xadvance As Float
+    Dim tRect As New Float[]
+
+    tRect.Insert([0, 0])
+
+    For i = 1 To Len(UTFstring)                                                 ' para cada letra
+        UTFcode = String.Code(UTFstring, i)                                     ' obtengo el UTF code
+        If UTFcode = 32 Then                                                    ' es un espacio
+            tRect[0] += ActualFont.LetterSpacing * textH * FontScale
+        Else
+            LetterIndex = GetCodeIndex(ActualFont, UTFcode)                     ' obtengo el indice de la letra
+            For iii = 0 To ActualFont.Letter[LetterIndex].FontGlyps.Max Step 2  ' calculo cuanto tiene que avanzar el puntero
+                If ActualFont.Letter[LetterIndex].FontGlyps[iii] > Xadvance Then Xadvance = ActualFont.Letter[LetterIndex].FontGlyps[iii]
+                If ActualFont.Letter[LetterIndex].FontGlyps[iii + 1] > tRect[1] Then tRect[1] = ActualFont.Letter[LetterIndex].FontGlyps[iii + 1]
+            Next
+            tRect[0] += (Xadvance + ActualFont.LetterSpacing) * textH * FontScale
+
+            Xadvance = 0
+        End If
+    Next
+
+    tRect[1] *= textH * FontScale * 1.15
+
+    Return tRect
+
+End
+
+'' devuelve un rectangulo que contiene al texto
+'' [x,y,ancho,alto]
+Public Function MTextExtends(UTFMultiString As String, posX As Float, posY As Float, textH As Float) As Float[]
+
+    Dim i, iii, UTFcode, LetterIndex As Integer, Yadvance, Xadvance, xtotaladvance, xmaxadvance As Float
+    Dim mLines As String[], dH As Float, tLine As String, FirstYadvance As Boolean = False
+    Dim tRect As New Float[]
+
+    tRect.Insert([posX, posY, 0, 0])
+    mlines = Split(UTFMultiString, gb.CrLf & gb.Cr & gb.lf)
+
+    For Each tLine In mLines
+        For i = 1 To Len(tLine)                                                 ' para cada letra
+            UTFcode = String.Code(tLine, i)                                         ' obtengo el UTF code
+            If UTFcode = 32 Then                                                    ' es un espacio
+                tRect[2] += ActualFont.LetterSpacing * textH * FontScale
+            Else
+                LetterIndex = GetCodeIndex(ActualFont, UTFcode)                     ' obtengo el indice de la letra
+                For iii = 0 To ActualFont.Letter[LetterIndex].FontGlyps.Max Step 2  ' calculo cuanto tiene que avanzar el puntero
+                    If ActualFont.Letter[LetterIndex].FontGlyps[iii] > Xadvance Then Xadvance = ActualFont.Letter[LetterIndex].FontGlyps[iii]
+                    If ActualFont.Letter[LetterIndex].FontGlyps[iii + 1] > Yadvance Then Yadvance = ActualFont.Letter[LetterIndex].FontGlyps[iii + 1]
+                Next
+                xtotaladvance += (Xadvance + ActualFont.LetterSpacing) * textH * FontScale
+                Xadvance = 0
+            End If
+        Next
+        If Not FirstYadvance Then
+
+            tRect[1] = ((Yadvance) * textH * FontScale)
+            FirstYadvance = True
+        Endif
+        If xtotaladvance > tRect[2] Then tRect[2] = xtotaladvance
+        xtotaladvance = 0
+        tRect[3] -= ((Yadvance + ActualFont.WordSpacing) * textH * FontScale)
+        Yadvance = 0
+    Next
+    Return tRect
 
 End
