@@ -22,7 +22,6 @@
 <header id="8" type="style" name="Medium Dash x2" />
 <header id="9" type="style" name="Long Dash x2" />
 
-
 <header id="0" type="width" value="0.00" />
 <header id="1" type="width" value="0.05" />
 <header id="2" type="width" value="0.09" />
@@ -42,13 +41,12 @@
 <header id="1" type="font" name="Italic" />
 <header id="2" type="font" name="Bold" />
 
-
  <entity type="line" p="-13.35:6.06;-5.25:-7.62" layer="0" style="0" width="0" colour="0" />
  <entity type="polyline" p="-18.21:2.97;-21.27:-5.16;-11.30:-6.36;-14.61:-10.59;-7.67:-8.38;-7.21:-11.60" layer="0" colour="0" />
- <entity type="circle" p="7.64:4.23;" r="6.57" layer="0" style="0" width="0" colour="0" />
- <entity type="arc" p="8.64:6.23;" r="4.57" a="1.25:2.31" layer="0" style="0" width="0" colour="0" />
- <entity type="ellipse" p="8.64:6.23" r="4.57:6.32" a="2.31" layer="0" style="0" width="0" colour="0" />
+ <entity type="circle" p="7.64:4.23" r="6.57" layer="0" style="0" width="0" colour="0" />
+ <entity type="arc" p="8.64:6.23" r="4.57" a="1.25:2.31" layer="0" style="0" width="0" colour="0" />
+ <entity type="ellipse" p="8.64:6.23" r="2" a="0:2.31" layer="0" style="0" width="0" colour="0" />
  <entity type="text" p="7.64:4.23" a="0" h="0" f="0" t="GauchoCAD" layer="0" style="0" width="0" colour="0" />
- <entity type="insert" p="7.64:4.23" a="0" s="1" b="nblock" layer="0" style="0" width="0" colour="0" />
+ <entity type="insert" p="7.64:4.23" a="0" s="1:1" b="nblock" layer="0" style="0" width="0" colour="0" />
 
 </svg>
