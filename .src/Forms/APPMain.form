@@ -79,31 +79,31 @@
     { mnuLine Menu entity
       Name = "mnuLine"
       Text = ("Line")
-      Picture = Picture["svg/line.svg"]
+      Picture = Picture["svg/tools/line.svg"]
       Tag = "line"
     }
     { mnuPolyline Menu entity
       Name = "mnuPolyline"
       Text = ("Polyline")
-      Picture = Picture["svg/polyline.svg"]
+      Picture = Picture["svg/tools/polyline.svg"]
       Tag = "pline"
     }
     { mnuCircle Menu entity
       Name = "mnuCircle"
       Text = ("Circle")
-      Picture = Picture["svg/circle.svg"]
+      Picture = Picture["svg/tools/circle.svg"]
       Tag = "circle"
     }
     { mnuEllipse Menu entity
       Name = "mnuEllipse"
       Text = ("Ellipse")
-      Picture = Picture["svg/ellipse.svg"]
+      Picture = Picture["svg/tools/ellipse.svg"]
       Tag = "ellipse"
     }
     { mnuArc Menu entity
       Name = "mnuArc"
       Text = ("Arc")
-      Picture = Picture["svg/arc.svg"]
+      Picture = Picture["svg/tools/arc.svg"]
       Tag = "arc"
     }
     { mnuRectangle Menu entity
