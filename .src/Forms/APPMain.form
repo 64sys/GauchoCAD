@@ -79,51 +79,31 @@
     { mnuLine Menu entity
       Name = "mnuLine"
       Text = ("Line")
-<<<<<<< HEAD
-      Picture = Picture["svg/entities/line.svg"]
-=======
       Picture = Picture["svg/tools/line.svg"]
->>>>>>> a3922d8d8b3211ea2814bfff7d811042a80025d1
       Tag = "line"
     }
     { mnuPolyline Menu entity
       Name = "mnuPolyline"
       Text = ("Polyline")
-<<<<<<< HEAD
-      Picture = Picture["svg/entities/polyline.svg"]
-=======
       Picture = Picture["svg/tools/polyline.svg"]
->>>>>>> a3922d8d8b3211ea2814bfff7d811042a80025d1
       Tag = "pline"
     }
     { mnuCircle Menu entity
       Name = "mnuCircle"
       Text = ("Circle")
-<<<<<<< HEAD
-      Picture = Picture["svg/entities/circle.svg"]
-=======
       Picture = Picture["svg/tools/circle.svg"]
->>>>>>> a3922d8d8b3211ea2814bfff7d811042a80025d1
       Tag = "circle"
     }
     { mnuEllipse Menu entity
       Name = "mnuEllipse"
       Text = ("Ellipse")
-<<<<<<< HEAD
-      Picture = Picture["svg/entities/ellipse.svg"]
-=======
       Picture = Picture["svg/tools/ellipse.svg"]
->>>>>>> a3922d8d8b3211ea2814bfff7d811042a80025d1
       Tag = "ellipse"
     }
     { mnuArc Menu entity
       Name = "mnuArc"
       Text = ("Arc")
-<<<<<<< HEAD
-      Picture = Picture["svg/entities/arc.svg"]
-=======
       Picture = Picture["svg/tools/arc.svg"]
->>>>>>> a3922d8d8b3211ea2814bfff7d811042a80025d1
       Tag = "arc"
     }
     { mnuRectangle Menu entity
