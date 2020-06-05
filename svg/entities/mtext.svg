@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   version="1.2"
+   width="112.89mm"
+   height="112.89mm"
+   viewBox="0 0 11289 11289"
+   preserveAspectRatio="xMidYMid"
+   fill-rule="evenodd"
+   stroke-width="28.222"
+   stroke-linejoin="round"
+   xml:space="preserve"
+   id="svg116"
+   sodipodi:docname="mtext.svg"
+   inkscape:version="0.92.5 (2060ec1f9f, 2020-04-08)"><metadata
+   id="metadata120"><rdf:RDF><cc:Work
+       rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
+         rdf:resource="http://purl.org/dc/dcmitype/StillImage" /></cc:Work></rdf:RDF></metadata><sodipodi:namedview
+   pagecolor="#ffffff"
+   bordercolor="#666666"
+   borderopacity="1"
+   objecttolerance="10"
+   gridtolerance="10"
+   guidetolerance="10"
+   inkscape:pageopacity="0"
+   inkscape:pageshadow="2"
+   inkscape:window-width="1920"
+   inkscape:window-height="1029"
+   id="namedview118"
+   showgrid="false"
+   inkscape:zoom="1.1062391"
+   inkscape:cx="353.93858"
+   inkscape:cy="154.31727"
+   inkscape:window-x="1366"
+   inkscape:window-y="25"
+   inkscape:window-maximized="1"
+   inkscape:current-layer="g68"
+   inkscape:snap-text-baseline="true" />
+ <defs
+   class="ClipPathGroup"
+   id="defs8"><marker
+   inkscape:stockid="Arrow1Lend"
+   orient="auto"
+   refY="0.0"
+   refX="0.0"
+   id="Arrow1Lend"
+   style="overflow:visible;"
+   inkscape:isstock="true"><path
+     id="path842"
+     d="M 0.0,0.0 L 5.0,-5.0 L -12.5,0.0 L 5.0,5.0 L 0.0,0.0 z "
+     style="fill-rule:evenodd;stroke:#0066b3;stroke-width:1pt;stroke-opacity:1;fill:#0066b3;fill-opacity:1"
+     transform="scale(0.8) rotate(180) translate(12.5,0)" /></marker><marker
+   inkscape:stockid="Arrow1Lstart"
+   orient="auto"
+   refY="0.0"
+   refX="0.0"
+   id="Arrow1Lstart"
+   style="overflow:visible"
+   inkscape:isstock="true"><path
+     id="path839"
+     d="M 0.0,0.0 L 5.0,-5.0 L -12.5,0.0 L 5.0,5.0 L 0.0,0.0 z "
+     style="fill-rule:evenodd;stroke:#000000;stroke-width:1.0pt"
+     transform="scale(0.8) translate(12.5,0)" /></marker>
+        
+        
+       </defs>
+ <defs
+   class="TextShapeIndex"
+   id="defs12" />
+ <defs
+   class="EmbeddedBulletChars"
+   id="defs44" />
+ <defs
+   class="TextEmbeddedBitmaps"
+   id="defs46" />
+ <g
+   id="g51">
+  <g
+   id="id2"
+   class="Master_Slide">
+   <g
+   id="bg-id2"
+   class="Background" />
+   <g
+   id="bo-id2"
+   class="BackgroundObjects" />
+  </g>
+ </g>
+ <g
+   class="SlideGroup"
+   id="g114">
+  <g
+   id="container-id1">
+    <g
+   class="Page"
+   id="g108">
+      <g
+   class="com.sun.star.drawing.PolyPolygonShape"
+   id="g56">
+       <g
+   id="id3">
+        <rect
+   class="BoundingBox"
+   x="720"
+   y="816"
+   width="9799"
+   height="9801"
+   id="rect53"
+   style="fill:none;stroke:none" />
+       </g>
+      </g>
+      <g
+   class="com.sun.star.drawing.PolyPolygonShape"
+   id="g61"
+   transform="translate(-524.27622,-372.06699)">
+       <g
+   id="id4">
+        <rect
+   class="BoundingBox"
+   x="2698"
+   y="2698"
+   width="5899"
+   height="5899"
+   id="rect58"
+   style="fill:none;stroke:none" />
+       </g>
+      </g>
+      
+      <g
+   class="com.sun.star.drawing.PolyPolygonShape"
+   id="g73">
+       <g
+   id="id6">
+        <rect
+   class="BoundingBox"
+   x="7937"
+   y="1235"
+   width="2121"
+   height="2121"
+   id="rect70"
+   style="fill:none;stroke:none" />
+       </g>
+      </g>
+      
+      
+      <g
+   class="com.sun.star.drawing.PolyPolygonShape"
+   id="g92">
+       <g
+   id="id9">
+        <rect
+   class="BoundingBox"
+   x="1235"
+   y="7937"
+   width="2121"
+   height="2121"
+   id="rect89"
+   style="fill:none;stroke:none" />
+       </g>
+      </g>
+      
+      
+     <g
+   class="com.sun.star.drawing.LineShape"
+   id="g68"
+   transform="translate(-1065.4646,-1285.3223)">
+       <rect
+   style="fill:none;stroke:none"
+   id="rect63"
+   height="5898"
+   width="5898"
+   y="2148.2554"
+   x="2580.1885"
+   class="BoundingBox" />
+      <text
+   xml:space="preserve"
+   style="font-style:normal;font-weight:normal;font-size:2662.24829102px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#0066b3;fill-opacity:1;stroke:#0066b3;stroke-width:0;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+   x="1623.1144"
+   y="4385.2261"
+   id="text3261"
+   transform="scale(1.0221784,0.97830281)"><tspan
+     sodipodi:role="line"
+     id="tspan3259"
+     x="1623.1144"
+     y="4385.2261"
+     style="fill:#0066b3;fill-opacity:1;stroke:#0066b3;stroke-width:0;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1">gaucho</tspan><tspan
+     sodipodi:role="line"
+     x="1623.1144"
+     y="7713.0366"
+     style="fill:#0066b3;fill-opacity:1;stroke:#0066b3;stroke-width:0;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+     id="tspan865">gaucho</tspan><tspan
+     sodipodi:role="line"
+     x="1623.1144"
+     y="11040.847"
+     style="fill:#0066b3;fill-opacity:1;stroke:#0066b3;stroke-width:0;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+     id="tspan867">gaucho</tspan></text>
+
+
+</g></g>
+   </g>
+ </g>
+</svg>

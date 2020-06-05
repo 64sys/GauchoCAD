@@ -312,13 +312,21 @@
           MoveScaled(1,2,18,4)
           Arrangement = Arrange.Horizontal
           { ToolButton1 ToolButton
-            MoveScaled(3,0,4,4)
+            MoveScaled(1,0,4,4)
             Picture = Picture["icon:/32/refresh"]
+          }
+          { SwitchButton1 SwitchButton
+            MoveScaled(10,0,7,4)
           }
         }
         { TreeView1 TreeView
-          MoveScaled(2,11,16,39)
+          MoveScaled(2,11,16,16)
           Background = Color.TextBackground
+          Expand = True
+          Border = False
+        }
+        { ColumnView1 ColumnView
+          MoveScaled(2,30,16,16)
           Expand = True
           Border = False
         }
