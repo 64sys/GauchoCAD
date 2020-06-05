@@ -19,9 +19,7 @@ GauchoCAD is currently under development and the status is as follows:
 Gambas is a free development environment and a full powerful development platform based on a Basic interpreter with object extensions.
 http://gambas.sourceforge.net/en/main.html
 
-# Icons
-LibreCAD
+# Contact
+gauchocad@gmail.com
 
-eraser
-https://www.flaticon.com/packs/graphic-design-tools-6
 
