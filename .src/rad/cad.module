@@ -142,12 +142,12 @@ Public Function LoadGaucho(sFile As String) As Collection
                 c["p"] = EncodePoint(ent.Attributes["p"], "p")
                 c["radius"] = CFloat(ent.Attributes["radius"]) 'EncodePoint(ent.Attributes["r"], "r")
 
-        Case "ellipse"
-            c["p"] = EncodePoint(ent.Attributes["p"], "p")
-            c["ratio"] = CFloat(ent.Attributes["ratio"]) 'EncodePoint(ent.Attributes["r"], "r")
-            ' estos angulos vienen en radianes
-            c["start_angle"] = CFloat(ent.Attributes["start_angle"]) 'FloatList(ent.Attributes["a"]) 'EncodePoint(ent.Attributes["a"], "a")
-            c["end_angle"] = CFloat(ent.Attributes["end_angle"]) 'FloatList(ent.Attributes["a"]) 'EncodePoint(ent.Attributes["a"], "a")
+            Case "ellipse"
+                c["p"] = EncodePoint(ent.Attributes["p"], "p")
+                c["ratio"] = CFloat(ent.Attributes["ratio"]) 'EncodePoint(ent.Attributes["r"], "r")
+                ' estos angulos vienen en radianes
+                c["start_angle"] = CFloat(ent.Attributes["start_angle"]) 'FloatList(ent.Attributes["a"]) 'EncodePoint(ent.Attributes["a"], "a")
+                c["end_angle"] = CFloat(ent.Attributes["end_angle"]) 'FloatList(ent.Attributes["a"]) 'EncodePoint(ent.Attributes["a"], "a")
                 Print "x"
 
             Case "arc"

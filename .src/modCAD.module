@@ -202,17 +202,24 @@ Public Function ImportEntities2(colData As Collection, obxEntities As Object[], 
                     Inc iTotalEntities
 
                 Case "insert"
-                    GoSub GetPoints
+                    'GoSub GetPoints
+                    ' Insert viene con el punto de insercion XYZ, no puedo usar la rutina lectora de puntos
+                    flxPoints.Add(colEnt["p"]["p0"][0])
+                    flxPoints.Add(colEnt["p"]["p0"][1])
                     AddInsert(flxPoints, colEnt["scale"][0], colEnt["scale"][1], colEnt["angle"], colEnt["colour"], colEnt["style"], colEnt["layer"], BlockName)
                     Inc iTotalEntities
 
                 Case "text"
-                    GoSub GetPoints
+                    'GoSub GetPoints
+                    flxPoints.Add(colEnt["p"]["p0"][0])
+                    flxPoints.Add(colEnt["p"]["p0"][1])
                     AddText(flxPoints, colEnt["angle"], colEnt["h"], colEnt["text"], colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], BlockName)
                     Inc iTotalEntities
 
                 Case "mtext"
-                    GoSub GetPoints
+                    'GoSub GetPoints
+                    flxPoints.Add(colEnt["p"]["p0"][0])
+                    flxPoints.Add(colEnt["p"]["p0"][1])
                     AddMText(flxPoints, colEnt["angle"], colEnt["h"], colEnt["text"], colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], BlockName)
                     Inc iTotalEntities
 
@@ -231,10 +238,8 @@ Public Function ImportEntities2(colData As Collection, obxEntities As Object[], 
 GetPoints:              ' Leo los puntos que estan separados y los meto en un unico array de Float[]
     flxPoints.Clear
     For Each p In colEnt["p"]       ' gcad p="xyxyxyxyxyxy"  dxf p0="xy" p1="xy" p2="xy"
-        'flxPoints.Insert(p)        ' esta rutina lee ambos formatos
         For i = 0 To p.Max
-            flxPoints.Add(p[i]) ' con este truco leo los puntos de GCAD y de DXF; pero hay que saber si mandas los Z o solo XY
-            'flxPoints.Add(p[1])     ' P[2] es Z y lo ingnoro
+            flxPoints.Add(p[i])
         Next
     Next
 
