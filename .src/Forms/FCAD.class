@@ -675,6 +675,84 @@ Public Sub LayersTransfer()
 
 End
 
+Public Sub LoadVars()
+
+    Dim ctn As New Collection
+    Dim dra As Variant
+    Dim sKey As String
+    Dim sTag As String
+    Dim sQty As String
+    Dim sEle As String
+    Dim sEty As String
+
+    Dim it As Variant
+    Dim gru As Variant
+    Dim ety As Variant
+
+    TreeView1.Clear
+    TreeView1.Add("model", "Model")
+    TreeView1.Add("import", "Import")
+
+    ctn.Add(cModel, "model")
+    ctn.Add(cImport, "import")
+
+    For Each dra In ctn
+
+        For Each it In dra
+
+            sKey = ctn.Key & ":" & dra.Key
+
+            If TreeView1.Exist(sKey) = False Then
+
+                Select dra.Key
+
+                    Case "File", "Version"
+                        sTag = dra.Key & ": " & it
+                        TreeView1.Add(sKey, sTag,, ctn.Key)
+
+                    Case "Layers"
+                        sTag = ctn.Key & ":" & dra.Key
+                        sQty = "[" & CStr(it.Count) & "]"
+                        TreeView1.Add(sTag, dra.Key & sQty,, ctn.Key)
+                        For Each gru In it
+                            sKey = dra.Key & ":" & gru["name"]
+                            If TreeView1.Exist(sKey) = False Then
+                                TreeView1.Add(sKey, gru["name"],, sTag)
+                            Endif
+                        Next
+
+                    Case "Entities"
+                        sTag = ctn.Key & ":" & dra.Key
+                        TreeView1.Add(sTag, dra.Key,, ctn.Key)
+                        For Each gru In it
+                            sKey = ctn.Key & ":" & it.Key
+                            sQty = "[" & CStr(gru.Count) & "]"
+                            If TreeView1.Exist(sKey) = False Then
+                                TreeView1.Add(sKey, it.Key & sQty,, sTag)
+                            Endif
+                            For Each ety In gru
+                                If ety["handle"] <> "" Then
+                                    sEty = ctn.Key & ":" & ety["handle"]
+                                    Select it.Key
+                                        Case "text"
+                                            sEle = ety["text"]
+                                        Case Else
+                                            sEle = ety["handle"]
+                                    End Select
+                                    If TreeView1.Exist(sEty) = False Then
+                                        TreeView1.Add(sEty, sEle,, sKey)
+                                    Endif
+                                Endif
+                            Next
+                        Next
+
+                End Select
+            Endif
+        Next
+    Next
+
+End
+
 Public Sub LoadDrawingMap2()
 
     Dim ctn As New Collection

@@ -79,48 +79,49 @@
     { mnuLine Menu entity
       Name = "mnuLine"
       Text = ("Line")
-      Picture = Picture["svg/line.svg"]
+      Picture = Picture["svg/tools/line.svg"]
       Tag = "line"
     }
     { mnuPolyline Menu entity
       Name = "mnuPolyline"
       Text = ("Polyline")
-      Picture = Picture["svg/polyline.svg"]
+      Picture = Picture["svg/tools/polyline.svg"]
       Tag = "pline"
     }
     { mnuCircle Menu entity
       Name = "mnuCircle"
       Text = ("Circle")
-      Picture = Picture["svg/circle.svg"]
+      Picture = Picture["svg/tools/circle.svg"]
       Tag = "circle"
     }
     { mnuEllipse Menu entity
       Name = "mnuEllipse"
       Text = ("Ellipse")
-      Picture = Picture["svg/ellipse.svg"]
+      Picture = Picture["svg/tools/ellipse.svg"]
       Tag = "ellipse"
     }
     { mnuArc Menu entity
       Name = "mnuArc"
       Text = ("Arc")
-      Picture = Picture["svg/arc.svg"]
+      Picture = Picture["svg/tools/arc.svg"]
       Tag = "arc"
     }
     { mnuRectangle Menu entity
       Name = "mnuRectangle"
       Text = ("Rectangle")
-      Picture = Picture["svg/rectangle.svg"]
+      Picture = Picture["svg/entities/rectangle.svg"]
       Tag = "rectangle"
     }
     { mnuText Menu entity
       Name = "mnuText"
       Text = ("Text")
-      Picture = Picture["svg/text.svg"]
+      Picture = Picture["svg/entities/text.svg"]
       Tag = "text"
     }
     { mnuMText Menu entity
       Name = "mnuMText"
       Text = ("Multi Text")
+      Picture = Picture["svg/entities/mtext.svg"]
       Enabled = False
       Visible = False
       Tag = "mtext"
@@ -128,6 +129,7 @@
     { mnuDim Menu entity
       Name = "mnuDim"
       Text = ("Dimmension")
+      Picture = Picture["svg/entities/mtext.svg"]
       Enabled = False
       Visible = False
       Tag = "dim"
@@ -142,7 +144,6 @@
     { mnuHatch Menu entity
       Name = "mnuHatch"
       Text = ("Hatch")
-      Picture = Picture["svg/hatch.svg"]
       Enabled = False
       Visible = False
       Tag = "hatch"
@@ -159,19 +160,19 @@
     { mnuMove Menu tool
       Name = "mnuMove"
       Text = ("Move")
-      Picture = Picture["svg/move.svg"]
+      Picture = Picture["svg/tools/move.svg"]
       Tag = "move"
     }
     { mnuCopy Menu tool
       Name = "mnuCopy"
       Text = ("Copy")
-      Picture = Picture["svg/copy.svg"]
+      Picture = Picture["svg/tools/copy.svg"]
       Tag = "copy"
     }
     { mnuScale Menu tool
       Name = "mnuScale"
       Text = ("Scale")
-      Picture = Picture["svg/scale.svg"]
+      Picture = Picture["svg/tools/scale.svg"]
       Tag = "Scale"
     }
     { mnuArray Menu tool
@@ -183,13 +184,13 @@
     { mnuRotate Menu tool
       Name = "mnuRotate"
       Text = ("Rotate")
-      Picture = Picture["svg/rotate.svg"]
+      Picture = Picture["svg/tools/rotate.svg"]
       Tag = "rotate"
     }
     { mnuStretch Menu tool
       Name = "mnuStretch"
       Text = ("Stretch")
-      Picture = Picture["svg/stretch.svg"]
+      Picture = Picture["svg/tools/stretch.svg"]
       Tag = "stretch"
     }
     { mnuOffset Menu tool
@@ -201,12 +202,13 @@
     { mnuFillet Menu tool
       Name = "mnuFillet"
       Text = ("Fillet")
+      Picture = Picture["svg/tools/fillet.svg"]
       Tag = "fillet"
     }
     { mnuDelete Menu tool
       Name = "mnuDelete"
       Text = ("Delete")
-      Picture = Picture["svg/layers/draw-eraser.svg"]
+      Picture = Picture["svg/tools/erase.svg"]
       Tag = "erase"
     }
   }
