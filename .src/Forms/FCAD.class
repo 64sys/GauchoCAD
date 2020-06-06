@@ -126,6 +126,9 @@ Public Sub form_Activate()
     Debug "activate " & Me.Title
     If FirstTime Then           ' esto ocurre cuando me llega un archivo cargado que tengo que mostrar por primera vez
         Debug "FirstTIme " & Me.Title
+        modCAD.ImportBlocks(cModel)
+        modCAD.ImportEntities2(cModel["Entities"], arrEntities)
+        modCAD.ApplyLayerProperties(1)
         Regen()                 ' estas dos lineas se agregan porque la ventana carga un archivo en _New pero no lo
         cadZoomE.Start()        ' puede mostrar hasta tener una GLArea conformada y a la vista
         FirstTime = False
@@ -139,7 +142,7 @@ Public Sub form_Activate()
         LoadDrawingMap2()
         APPMain.LoadComboboxes(cModel)
 
-        modCAD.ImportBlocks(cImport)
+        modCAD.ImportBlocks(cModel)
         'modCAD.ImportEntities(cImport, arrEntities)
         modCAD.ImportEntities2(cModel["Entities"], arrEntities)
         cImport.Clear

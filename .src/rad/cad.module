@@ -128,6 +128,11 @@ Public Function LoadGaucho(sFile As String) As Collection
         c["colour"] = ent.Attributes["colour"]
         '-----
 
+        ' aca hay un problema: si gcad guarda los puntos p0="1:2"  p1="1:1" etc, entoces cModel queda igual que como cuando lees cImport
+        ' pero si los guardas seguido, no podes usar la rutina modCAD.ImportEntities pq vienen distinto
+
+        ' una solucion es cuando importas DXF guardas todos los p seguidos o en gaucho los guardas separados , lo que para polilineas largas no se que comportamiento tendra
+        ' https://stackoverflow.com/questions/56035887/what-is-the-one-line-max-length-limit-in-xml-files
         Select ent.Attributes["type"]
 
             Case "line", "polyline"
@@ -135,31 +140,35 @@ Public Function LoadGaucho(sFile As String) As Collection
 
             Case "circle"
                 c["p"] = EncodePoint(ent.Attributes["p"], "p")
-                c["r"] = CFloat(ent.Attributes["r"]) 'EncodePoint(ent.Attributes["r"], "r")
+                c["radius"] = CFloat(ent.Attributes["radius"]) 'EncodePoint(ent.Attributes["r"], "r")
 
-            Case "ellipse"
-                c["p"] = EncodePoint(ent.Attributes["p"], "p")
-                c["r"] = CFloat(ent.Attributes["r"]) 'EncodePoint(ent.Attributes["r"], "r")
-                c["a"] = FloatList(ent.Attributes["a"]) 'EncodePoint(ent.Attributes["a"], "a")
+        Case "ellipse"
+            c["p"] = EncodePoint(ent.Attributes["p"], "p")
+            c["ratio"] = CFloat(ent.Attributes["ratio"]) 'EncodePoint(ent.Attributes["r"], "r")
+            ' estos angulos vienen en radianes
+            c["start_angle"] = CFloat(ent.Attributes["start_angle"]) 'FloatList(ent.Attributes["a"]) 'EncodePoint(ent.Attributes["a"], "a")
+            c["end_angle"] = CFloat(ent.Attributes["end_angle"]) 'FloatList(ent.Attributes["a"]) 'EncodePoint(ent.Attributes["a"], "a")
                 Print "x"
 
             Case "arc"
                 c["p"] = EncodePoint(ent.Attributes["p"], "p")
-                c["r"] = CFloat(ent.Attributes["r"]) 'EncodePoint(ent.Attributes["r"], "r")
-                c["a"] = FloatList(ent.Attributes["a"])
+                c["radius"] = CFloat(ent.Attributes["radius"]) 'EncodePoint(ent.Attributes["r"], "r")
+                ' estos angulos vienen en GRADOS
+                c["start_angle"] = CFloat(ent.Attributes["start_angle"]) 'FloatList(ent.Attributes["a"]) 'EncodePoint(ent.Attributes["a"], "a")
+                c["end_angle"] = CFloat(ent.Attributes["end_angle"]) 'FloatList(ent.Attributes["a"]) 'EncodePoint(ent.Attributes["a"], "a")
                 Print c["a"]
 
             Case "text"
                 c["p"] = EncodePoint(ent.Attributes["p"], "p")
-                c["a"] = CFloat(ent.Attributes["a"])
+                c["angle"] = CFloat(ent.Attributes["angle"])        ' grados
                 c["text"] = ent.Attributes["t"]
                 c["h"] = ent.Attributes["h"]
                 c["f"] = ent.Attributes["f"]
 
             Case "insert"
                 c["p"] = EncodePoint(ent.Attributes["p"], "p")
-                c["a"] = CFloat(ent.Attributes["a"])
-                c["s"] = FloatList(ent.Attributes["s"])
+                c["angle"] = CFloat(ent.Attributes["angle"])            ' grados
+                c["scale"] = FloatList(ent.Attributes["scale"])
                 c["b"] = ent.Attributes["b"]
 
                 Print c["a"]
@@ -2891,18 +2900,19 @@ Private Function DecodeDXFEntity(sItem As String) As Collection
             Case "ELLIPSE", "CIRCLE", "ARC"
                 If cTmp.Exist("ratio") Then ' For ellipse
                     r = CFloat(cTmp["ratio"])
-                    cTmp2.Add(r, "r")
+                    cTmp2.Add(r, "ratio")
                 Endif
 
                 If cTmp.Exist("radius") Then ' For circle and arc
                     r = CFloat(cTmp["radius"])
-                    cTmp2.Add(r, "r")
+                    cTmp2.Add(r, "radius")
                 Endif
 
                 If cTmp.Exist("angle0") And cTmp.Exist("angle1") Then ' For ellipse and arc
                     a1 = CFloat(cTmp["angle0"])
                     a2 = CFloat(cTmp["angle1"])
-                    cTmp2.Add([a1, a2], "a")
+                    cTmp2.Add(a1, "start_angle")
+                    cTmp2.Add(a1, "end_angle")
                 Endif
 
             Case "INSERT"
@@ -2914,9 +2924,9 @@ Private Function DecodeDXFEntity(sItem As String) As Collection
                 Endif
 
                 If cTmp.Exist("angle") Then
-                    cTmp2.Add(CFloat(cTmp["angle"]), "a")
+                    cTmp2.Add(CFloat(cTmp["angle"]), "angle")
                 Else
-                    cTmp2.Add(0, "a")
+                    cTmp2.Add(0, "angle")
                 Endif
 
                 If cTmp.Exist("scalex") Then
@@ -2937,7 +2947,7 @@ Private Function DecodeDXFEntity(sItem As String) As Collection
                     sz = CFloat(1)
                 Endif
 
-                cTmp2.Add([sx, sy, sz], "s")
+                cTmp2.Add([sx, sy, sz], "scale")
 
                 If cTmp.Exist("columns") Then
                     cTmp2.Add(CInt(cTmp["columns"]), "co")
@@ -2973,7 +2983,7 @@ Private Function DecodeDXFEntity(sItem As String) As Collection
                             cTmp2.Add(CInt(tg), "jv")
 
                         Case "angle"
-                            cTmp2.Add(CFloat(tg), "a")
+                            cTmp2.Add(CFloat(tg), "angle")
 
                         Case "wfactor"
                             cTmp2.Add(CFloat(tg), "w")
@@ -2987,8 +2997,8 @@ Private Function DecodeDXFEntity(sItem As String) As Collection
                     End Select
                 Next
 
-                If cTmp2.Exist("a") = False Then
-                    cTmp2.Add(0, "a")
+                If cTmp2.Exist("angle") = False Then
+                    cTmp2.Add(0, "angle")
                 Endif
 
             Case "MTEXT"
@@ -3006,13 +3016,13 @@ Private Function DecodeDXFEntity(sItem As String) As Collection
                             Endif
 
                         Case "angle"
-                            cTmp2.Add(CFloat(tg), "a")
+                            cTmp2.Add(CFloat(tg), "angle")
 
                     End Select
                 Next
 
-                If cTmp2.Exist("a") = False Then
-                    cTmp2.Add(0, "a")
+                If cTmp2.Exist("angle") = False Then
+                    cTmp2.Add(0, "angle")
                 Endif
 
         End Select

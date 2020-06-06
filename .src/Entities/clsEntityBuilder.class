@@ -184,7 +184,7 @@ Public Function KeyText(EnteredText As String) ' esta rutina es llamada por FCAD
                 elem.P[iPoints * 2] = Xt
                 elem.P[iPoints * 2 + 1] = Zt
 
-                If Relative And elem.StepsDone > 0 Then
+                If Relative And (elem.P.count > 2) Then
                     elem.P[iPoints * 2] += elem.P[(iPoints - 1) * 2]
                     elem.P[iPoints * 2 + 1] += elem.P[(iPoints - 1) * 2 + 1]
 

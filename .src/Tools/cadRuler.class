@@ -23,7 +23,7 @@
 ' Tool maintained by Terco
 Inherits ToolsBase
 Create Static
-Public Const GENDER As String = "Area"
+Public Const GENDER As String = "Ruler"
 
 Private Poli As New Float[]
 
@@ -35,7 +35,7 @@ Public Function Start(Optional ElemToBuild As Variant, Optional _Mode As Integer
     Me.PointsDone = 0
     Me.PointsTotal = 1e10
 
-    clsDrawingAids.HelperTrabajo = ("Area : mark points")
+    clsDrawingAids.HelperTrabajo = ("Ruler : mark points")
     Poli.Add(0)
     Poli.Add(0)
 
@@ -68,6 +68,12 @@ Public Function MouseMove(mouseX As Integer, mouseY As Integer) ' called by FCAD
     Poli[Poli.max - 1] = Me.SelEndXr
     Poli[Poli.max] = Me.SelEndYr
 
+    If Me.PointsDone >= 1 Then
+
+        clsDrawingAids.HelperTrabajo = ("Total length = ") & Str(puntos.PoligonLength(poli, False))
+
+    Endif
+
     appmain.hFCAD.redraw
     ' appmain.hFCAD.Regen
 
@@ -75,7 +81,7 @@ End
 
 Public Sub Draw()               ' called by appmain.hFCAD.drwArea_Draw
 
-    glPlus.PolygonFilled(Poli, Color.DarkBlue, Color.RGB(0, 255, 100, 200))
+    glPlus.PolyLines(Poli, Color.DarkBlue, Color.RGB(0, 255, 100, 200))
 
 End
 
@@ -97,9 +103,9 @@ Public Sub Finish()
 
     Dim i As Integer, ip As Integer, Prot As New Float[]
 
-    If Me.PointsDone > 2 Then
+    If Me.PointsDone >= 2 Then
 
-        clsDrawingAids.HelperTrabajo = ("Area = ") & Str(puntos.PoligonArea(poli)) & (" - Perimeter = ") & Str(puntos.PoligonLength(poli, True))
+        clsDrawingAids.HelperTrabajo = ("Total length = ") & Str(puntos.PoligonLength(poli, False))
 
     Endif
 

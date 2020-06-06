@@ -478,7 +478,7 @@ End
 
 '' Largo del poligono, o sea la suma del largo de cada tramo y, si
 '' es cerrado, tambien suma del P0 al Pn
-Public Function PoligonLength(points As Float[], IsClosed As Boolean) As Float
+Public Function PoligonLength(points As Float[], Optional IsClosed As Boolean = True) As Float
 
     Dim i As Integer, l As Float
 

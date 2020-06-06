@@ -120,6 +120,11 @@ Public Sub Main()
     FontList = glPlus.LoadFonts(Application.Path &/ "Fonts/LFF")
     glPlus.SelectFont("romanc")
 
+    ' ===================================================================================================================
+    '  vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+
+    ' ESTOS SON TESTS , IGNORAR
+
     Dim r As New Float[]
     r = [0, 1, 1, 2]
     puntos.Rotate(r, Pi / 4)
@@ -136,6 +141,8 @@ Public Sub Main()
     Debug "In poli", puntos.inPolySegment([0, 0, 1, 0, 1, 1, 0, 1], 0.5, 1)
 
     Debug "In poli", puntos.inPolySegment([0, 0, 1, 1], 0.5, 0.50000001)
+    '^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    '========================================================================================================================
 
 End
 
@@ -143,11 +150,12 @@ Public Function ImportBlocks(colData As Collection) ', obxEntities As Object[]) 
 
     Dim iTotalEntities As Integer, colent, colBlk As Collection, flxPoints As New Float[], P As Float[]
 
+    If Not colData.Exist("Blocks") Then Return
     For Each colBlk In colData["Blocks"]
         Dim newBlock As New ArrBlockSt
         newBlock.name = colBlk["block"]
         APPMain.hFCAD.arrBlocks.Add(newBlock)
-        ImportEntities(colBlk, newBlock.entities, newBlock.name)
+        ImportEntities2(colBlk["Entities"], newBlock.entities, newBlock.name)
 
     Next
 
@@ -155,7 +163,7 @@ End
 
 Public Function ImportEntities2(colData As Collection, obxEntities As Object[], Optional BlockName As String) As Integer
 
-    Dim iTotalEntities As Integer
+    Dim i, iTotalEntities As Integer
     Dim colGrp As Collection
     Dim colEnt As Collection
     Dim flxPoints As New Float[]
@@ -172,45 +180,45 @@ Public Function ImportEntities2(colData As Collection, obxEntities As Object[], 
                     AddLine(flxPoints, colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], BlockName)
                     Inc iTotalEntities
 
-                Case "lwpollyline"
+                Case "polyline"
                     GoSub GetPoints
                     AddPolyLine(flxPoints, colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], BlockName)
                     Inc iTotalEntities
 
-                    ' Case "ellipse"
-                    '     GoSub GetPoints
-                    '
-                    '     AddEllipse(flxPoints, colEnt["r"], colEnt["a"][0], colEnt["a"][1], colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], BlockName)
-                    '     Inc iTotalEntities
+                Case "ellipse"
+                    GoSub GetPoints
+
+                    AddEllipse(flxPoints, colEnt["ratio"], colEnt["start_angle"], colEnt["end_angle"], colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], BlockName)
+                    Inc iTotalEntities
 
                 Case "circle"
                     GoSub GetPoints
-                    AddCircle(flxPoints, colEnt["r"], colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], BlockName)
+                    AddCircle(flxPoints, colEnt["radius"], colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], BlockName)
                     Inc iTotalEntities
 
                 Case "arc"
                     GoSub GetPoints
-                    AddArc(flxPoints, colEnt["r"], colEnt["a"][0], colEnt["a"][1], colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], BlockName)
+                    AddArc(flxPoints, colEnt["radius"], colEnt["start_angle"], colEnt["end_angle"], colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], BlockName)
                     Inc iTotalEntities
 
                 Case "insert"
                     GoSub GetPoints
-                    AddInsert(flxPoints, colEnt["s"][0], colEnt["s"][1], colEnt["a"], colEnt["colour"], colEnt["style"], colEnt["layer"], BlockName)
+                    AddInsert(flxPoints, colEnt["scale"][0], colEnt["scale"][1], colEnt["angle"], colEnt["colour"], colEnt["style"], colEnt["layer"], BlockName)
                     Inc iTotalEntities
 
                 Case "text"
                     GoSub GetPoints
-                    AddText(flxPoints, colEnt["a"], colEnt["h"], colEnt["text"], colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], BlockName)
+                    AddText(flxPoints, colEnt["angle"], colEnt["h"], colEnt["text"], colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], BlockName)
                     Inc iTotalEntities
 
                 Case "mtext"
                     GoSub GetPoints
-                    AddMText(flxPoints, colEnt["a"], colEnt["h"], colEnt["text"], colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], BlockName)
+                    AddMText(flxPoints, colEnt["angle"], colEnt["h"], colEnt["text"], colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], BlockName)
                     Inc iTotalEntities
 
                 Case "dimmension"
                     GoSub GetPoints
-                    AddDim(flxPoints, colEnt["a"], colEnt["h"], colEnt["text"], colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], BlockName)
+                    AddDim(flxPoints, colEnt["angle"], colEnt["h"], colEnt["text"], colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], BlockName)
                     Inc iTotalEntities
 
             End Select
@@ -222,10 +230,12 @@ Public Function ImportEntities2(colData As Collection, obxEntities As Object[], 
 
 GetPoints:              ' Leo los puntos que estan separados y los meto en un unico array de Float[]
     flxPoints.Clear
-    For Each p In colEnt["p"]
-        'flxPoints.Insert(p)
-        flxPoints.Add(p[0])
-        flxPoints.Add(p[1])     ' P[2] es Z y lo ingnoro
+    For Each p In colEnt["p"]       ' gcad p="xyxyxyxyxyxy"  dxf p0="xy" p1="xy" p2="xy"
+        'flxPoints.Insert(p)        ' esta rutina lee ambos formatos
+        For i = 0 To p.Max
+            flxPoints.Add(p[i]) ' con este truco leo los puntos de GCAD y de DXF; pero hay que saber si mandas los Z o solo XY
+            'flxPoints.Add(p[1])     ' P[2] es Z y lo ingnoro
+        Next
     Next
 
     Return
