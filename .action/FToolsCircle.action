@@ -1,9 +1,0 @@
-# Gambas Action File 3.0
-
-{ Actions
-  { Action cadCircle
-    Text = "Circle"
-    Picture = "png/32x32/menucircle.png"
-  }
-}
-

@@ -141,7 +141,6 @@ Public Sub form_Activate()
         'EntitiesTransfer()
         LoadDrawingMap2()
         APPMain.LoadComboboxes(cModel)
-
         modCAD.ImportBlocks(cModel)
         'modCAD.ImportEntities(cImport, arrEntities)
         modCAD.ImportEntities2(cModel["Entities"], arrEntities)
@@ -402,6 +401,7 @@ Public Sub form_KeyPress()
 
         'modCAD.AddText([0, -400], 20, 30, "Unica linea", 3, 1, 1, "0", "")
         'modCAD.ApplyLayerProperties
+        modCAD.AddLine([0, -200, 400, 0], 2, 1, "Dashed", "0", "")
 
         regen
         Return

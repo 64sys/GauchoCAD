@@ -45,7 +45,7 @@ Public Sub Draw()
 
     If modCAD.drwDrawingClass = modCAD.drwOpenGLClass Then
 
-        GLplus.Lines(Me.p, Me.ColorToPaint, Me.LineWidth)
+        GLplus.Lines(Me.p, Me.ColorToPaint, Me.LineWidth, Me.LineType)
 
     Endif
 

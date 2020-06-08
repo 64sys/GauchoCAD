@@ -23,15 +23,7 @@
 Create Static
 
 ' Lineas de puntos para Paint
-Public Dashes As Float[] = [5.0,  'ink
-    5.0,  'skip
-    5.0,  'ink
-    5.0]  'skip
-
-Public DashDot As Float[] = [40.0,  'ink
-    10.0,  'skip
-    10.0,  'ink
-    10.0]  'skip
+Public dashes As Integer
 
 ' ayudas al usuario en pantalla
 Public Struct HelperSt
@@ -169,15 +161,15 @@ Public Sub DrawEjes()
 
     ' helper de los ejes coordenados
     ' TODO:  no se porque el fondo de las dashes me sale gris y no blanco
-    paint.brush = Paint.Color(Color.RGB(0, 0, 0, 0))
-    paint.LineWidth = 1 / appmain.hFcad.ScaleZoom
-    paint.Dash = DashDot
-    paint.MoveTo(0 - (DashDot[0] + DashDot[1] + DashDot[2] / 2), 0) ' me voy al origen de coordenadas
-    paint.relLineTo(1000, 0)
-    paint.MoveTo(0, 0 - (DashDot[0] + DashDot[1] + DashDot[2] / 2)) ' me voy al origen de coordenadas
-    paint.relLineTo(0, 1000)
-    paint.Dash = []
-    paint.Stroke
+    ' paint.brush = Paint.Color(Color.RGB(0, 0, 0, 0))
+    ' paint.LineWidth = 1 / appmain.hFcad.ScaleZoom
+    ' paint.Dash = DashDot
+    ' paint.MoveTo(0 - (DashDot[0] + DashDot[1] + DashDot[2] / 2), 0) ' me voy al origen de coordenadas
+    ' paint.relLineTo(1000, 0)
+    ' paint.MoveTo(0, 0 - (DashDot[0] + DashDot[1] + DashDot[2] / 2)) ' me voy al origen de coordenadas
+    ' paint.relLineTo(0, 1000)
+    ' paint.Dash = []
+    ' paint.Stroke
 
 End
 

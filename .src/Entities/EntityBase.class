@@ -40,7 +40,7 @@ Public fParam As New Float[]                ' array of floats
 Public Layer As String = "0"                ' Capa o Layer que se guarda en el archivo
 Public Block As String                      ' Para tener la posibilidade de juntar cosas en un block
 Public colour As Integer                    ' 0=by layer, 1=by block, 10+=16 bit color code  ;  ths is not the color to be draw, ColorToPaint is, set in Finish()
-Public LineType As Integer                  ' 0=continuous, 1=dashed from flxDash
+Public LineTypeName As String               ' continuous, dashed , etc
 Public LineWidth As Integer = 1             ' this is it
 Public RefPointX As Float                   ' new
 Public RefPointY As Float
@@ -48,6 +48,7 @@ Public RefPointY As Float
 
 ' NOT SAVED
 ' construction and usage vars
+Public LineType As Integer                  ' 0=continuous, 1=dashed from flxDash
 Public LayerId As String = "00"                ' esta variable es la Key en la coleccion de layers
 Public BlockNumber As Integer
 Public ColorToPaint As Integer              ' este es el color que realmente se va a dibujar
@@ -228,6 +229,8 @@ Public Sub Finish(ParamsDone As Integer) As Boolean
     'Print "Finish en EntityBase"
     CreateBoundingPoligon
 
+    ' busco el tipo de linea, si hace falta
+    If Me.LineTypeName = "Dashed" Then Me.LineType = 1
     ' tareas finales de armado del objeto
     Me.b.resize(Me.P.count)
     Me.psel.resize(Me.p.count / 2)

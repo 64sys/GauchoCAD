@@ -149,7 +149,11 @@ Public hText As New Integer[1]
 
 ' new OpenGL stuff
 Public GLDrwList As New Integer[]                       ' all entities, each one
-Public GLDrwListEditing As New Integer[]                        ' all entities on edit by some tool, including new ones
+Public GLDrwListEditing As New Integer[]                ' all entities on edit by some tool, including new ones
+
+' lineas de puntos
+Public LineStipples As New Integer[]
+Public LineStippleScales As New Integer[]
 
 Public Sub Resize()
 
@@ -183,6 +187,28 @@ Public Sub Init(drwContext As Object) ' only glArea for now
         gl.ClearColor(1, 1, 1, 1)
 
     Endif
+
+    ' line stipples
+
+    ' continuo
+    LineStipples.Add(&X00000000000000001111111111111111)
+    LineStippleScales.Add(1)
+
+    ' Dashed
+    LineStipples.Add(&X00000000000000000000111100001111)
+    LineStippleScales.Add(1)
+
+    ' Dash-Dot
+    LineStipples.Add(&X00000000000000000001100011111111)
+    LineStippleScales.Add(1)
+
+    ' Dot
+    LineStipples.Add(&X00000000000000000001000100010001)
+    LineStippleScales.Add(1)
+
+    ' Divide
+    LineStipples.Add(&X00000000000000000011001100111111)
+    LineStippleScales.Add(1)
 
     ' borramos lo que haya dibujado
     gl.Clear(gl.DEPTH_BUFFER_BIT Or gl.COLOR_BUFFER_BIT)
@@ -299,7 +325,7 @@ Public Sub Rectangle2D(x1 As Float, y1 As Float, w As Float, h As Float, Optiona
 End
 
 '' Dibuja un serie de lineas
-Public Function Lines(vertices As Float[], Optional colour As Integer = 0, LineWidth As Float = 1, dashes As Float[])
+Public Function Lines(vertices As Float[], Optional colour As Integer = 0, LineWidth As Float = 1, dashes As Integer)
 
     ' TODO: dashes is for later use
 
@@ -307,6 +333,12 @@ Public Function Lines(vertices As Float[], Optional colour As Integer = 0, LineW
 
     'glColorRGB(colour)
     gl.LineWidth(LineWidth) ' obsoleto en WebGL
+    If dashes > 0 Then
+        gl.LineStipple(LineStippleScales[dashes], LineStipples[dashes])
+        gl.Enable(GL.LINE_STIPPLE)
+
+    Endif
+
     gl.Begin(gl.Lines)
 
     For i = 0 To vertices.Max Step 2
@@ -316,10 +348,12 @@ Public Function Lines(vertices As Float[], Optional colour As Integer = 0, LineW
     Next
     gl.end
 
+    If dashes > 0 Then gl.Disable(GL.LINE_STIPPLE)
+
 End
 
 '' Dibuja un seria de polilinea
-Public Function PolygonFilled(vertices As Float[], Optional colour As Integer = 0, FillColor As Integer = 0, LineWidth As Float = 1, dashes As Float[])
+Public Function PolygonFilled(vertices As Float[], Optional colour As Integer = 0, FillColor As Integer = 0, LineWidth As Float = 1, dashes As Integer)
 
     ' TODO: dashes is for later use
 
@@ -339,7 +373,7 @@ Public Function PolygonFilled(vertices As Float[], Optional colour As Integer = 
 End
 
 '' Dibuja un seria de polilinea
-Public Function Polygon(vertices As Float[], Optional colour As Integer = 0, FillColor As Integer = 0, LineWidth As Float = 1, dashes As Float[])
+Public Function Polygon(vertices As Float[], Optional colour As Integer = 0, FillColor As Integer = 0, LineWidth As Float = 1, dashes As Integer)
 
     ' TODO: dashes is for later use
 
@@ -361,7 +395,7 @@ End
 '' Siempre gira en sentido anti-horario
 '' Las medidas de los angulo inicial y recorrido estan en RADIANES
 
-Public Function Arc(Optional radio As Float, start_angle As Float, length As Float, colour As Integer = 0, LineWidth As Float = 1, dashes As Float[])
+Public Function Arc(Optional radio As Float, start_angle As Float, length As Float, colour As Integer = 0, LineWidth As Float = 1, dashes As Integer)
 
     GL.Begin(gl.LINE_STRIP)
     Dim theta, angle_increment As Float
@@ -380,7 +414,7 @@ Public Function Arc(Optional radio As Float, start_angle As Float, length As Flo
 End
 '' Dibuja un seria de polilinea
 
-Public Function PolyLines(vertices As Float[], Optional colour As Integer = 0, LineWidth As Float = 1, dashes As Float[])
+Public Function PolyLines(vertices As Float[], Optional colour As Integer = 0, LineWidth As Float = 1, dashes As Integer)
 
     ' TODO: dashes is for later use
 
@@ -400,7 +434,7 @@ Public Function PolyLines(vertices As Float[], Optional colour As Integer = 0, L
 End
 
 '' Dibuja un circulo
-Public Function Circle(center As Float[], radious As Float, Optional colour As Integer = 0, LineWidth As Float = 1, dashes As Float[])
+Public Function Circle(center As Float[], radious As Float, Optional colour As Integer = 0, LineWidth As Float = 1, dashes As Integer)
 
     ' TODO: dashes is for later use
 

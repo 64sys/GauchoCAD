@@ -323,7 +323,7 @@ End
 
 ' importing
 
-Public Function AddLine(Points As Float[], Optional colour As Integer = 0, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
+Public Function AddLine(Points As Float[], Optional colour As Integer = 0, Optional LineWidth As Float = 1, Optional Linetype As String, Optional Layer As String, Optional Block As String) As Boolean
 
     ' points are in x,y,x,y,x,y....
     Dim oEntity As Object                       ' creamos la entidad de la clase apropiada
@@ -333,6 +333,7 @@ Public Function AddLine(Points As Float[], Optional colour As Integer = 0, Optio
     oEntity.layer = Layer
     oEntity.colour = colour
     oEntity.LineWidth = LineWidth               ' datos CAD
+    oEntity.linetypename = linetype
     oEntity.Block = Block
     If oEntity.Block <> "" Then oEntity.visible = False
     APPMain.hFCAD.arrEntities.Add(oEntity)
