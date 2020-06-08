@@ -424,11 +424,31 @@ Public Function PolyLines(vertices As Float[], Optional colour As Integer = 0, L
     gl.LineWidth(LineWidth) ' obsoleto en WebGL
     gl.Begin(gl.LINE_STRIP)
 
-    For i = 0 To vertices.Max Step 2
+    ' Select vertices.Count
+    '     Case 2
+    '
+    '         For i = 0 To 1 ' Step 2
+    '             glColorRGB(colour)
+    '             gl.Vertex2f(vertices[i], vertices[i + 1])
+    '
+    '         Next
+    '     Case 3
+    '         For i = 0 To 2 'Step 2
+    '             glColorRGB(colour)
+    '             gl.Vertex2f(vertices[i], vertices[i + 1])
+    '         Next
+    '
+    '     Case Else
+    '
+    '         Print "Error mas puntos"
+    '
+    ' End Select
+    '
+    For i = 0 To vertices.Max Step 3
         glColorRGB(colour)
         gl.Vertex2f(vertices[i], vertices[i + 1])
-
     Next
+
     gl.end
 
 End

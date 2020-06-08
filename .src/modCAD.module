@@ -213,19 +213,19 @@ Public Function ImportEntities2(colData As Collection, obxEntities As Object[], 
                     'GoSub GetPoints
                     flxPoints.Add(colEnt["p"]["p0"][0])
                     flxPoints.Add(colEnt["p"]["p0"][1])
-                    AddText(flxPoints, colEnt["angle"], colEnt["h"], colEnt["text"], colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], BlockName)
+                    AddText(flxPoints, colEnt["angle"], colEnt["height"], colEnt["text"], colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], BlockName)
                     Inc iTotalEntities
 
                 Case "mtext"
                     'GoSub GetPoints
                     flxPoints.Add(colEnt["p"]["p0"][0])
                     flxPoints.Add(colEnt["p"]["p0"][1])
-                    AddMText(flxPoints, colEnt["angle"], colEnt["h"], colEnt["text"], colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], BlockName)
+                    AddMText(flxPoints, colEnt["angle"], colEnt["height"], colEnt["text"], colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], BlockName)
                     Inc iTotalEntities
 
                 Case "dimmension"
                     GoSub GetPoints
-                    AddDim(flxPoints, colEnt["angle"], colEnt["h"], colEnt["text"], colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], BlockName)
+                    AddDim(flxPoints, colEnt["angle"], colEnt["height"], colEnt["text"], colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], BlockName)
                     Inc iTotalEntities
 
             End Select
@@ -290,17 +290,17 @@ Public Function ImportEntities(colData As Collection, obxEntities As Object[], O
 
             Case "TEXT"
                 GoSub GetPoints
-                AddText(flxPoints, colEnt["a"], colEnt["h"], colEnt["text"], colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], "")
+                AddText(flxPoints, colEnt["a"], colEnt["height"], colEnt["text"], colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], "")
                 Inc iTotalEntities
 
             Case "MTEXT"
                 GoSub GetPoints
-                AddMText(flxPoints, colEnt["a"], colEnt["h"], colEnt["text"], colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], "")
+                AddMText(flxPoints, colEnt["a"], colEnt["height"], colEnt["text"], colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], "")
                 Inc iTotalEntities
 
             Case "DIMMENSION"
                 GoSub GetPoints
-                AddDim(flxPoints, colEnt["a"], colEnt["h"], colEnt["text"], colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], "")
+                AddDim(flxPoints, colEnt["a"], colEnt["height"], colEnt["text"], colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], "")
                 Inc iTotalEntities
 
         End Select
