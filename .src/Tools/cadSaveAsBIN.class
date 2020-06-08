@@ -3,7 +3,7 @@
 ' GauchoCAD
 ' A simple CAD made in Gambas
 '
-' Copyright (C) Ing Martin P Cristia
+' Copyright (C) Martin Belmonte y Martin Cristia
 '
 ' This program is free software; you can redistribute it and/or modify
 ' it under the terms of the GNU General Public License as published by
@@ -20,12 +20,20 @@
 ' Foundation, Inc., 51 Franklin St, Fifth Floor,
 ' Boston, MA  02110-1301  USA
 
-Inherits EntityBase
+Inherits ToolsBase
+Public Const GENDER As String = "SaveAsBIN"
 
-' this class gives more life to entities by adding capabilities to react to each other
+Public Function Start(Optional ElemToBuild As Variant, Optional _mode As Integer = 0) As Boolean
 
-' change shape and move across the board at time intervals
+    Dim xf As String[]
+    Dim f As String
 
-' they also will be able to receive and transmit things like electricity, fluid, gas, data, sounds, etc
-Public Conectors As Float[]
-Public Ensambles As Float[]
+    Dialog.SaveFile()
+    f = Dialog.Path
+    If File.Ext(f) <> "xml-bin" Then
+        f = f & ".xml-bin"
+    Endif
+    cadSaveBIN.SaveToFile(f) ' <--- Tincho
+    Me.Finish
+
+End

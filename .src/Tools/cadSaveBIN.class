@@ -3,7 +3,7 @@
 ' GauchoCAD
 ' A simple CAD made in Gambas
 '
-' Copyright (C) Martin Belmonte
+' Copyright (C) Martin Belmonte y Martin Cristia
 '
 ' This program is free software; you can redistribute it and/or modify
 ' it under the terms of the GNU General Public License as published by
@@ -21,16 +21,16 @@
 ' Boston, MA  02110-1301  USA
 
 Inherits ToolsBase
-Public Const GENDER As String = "Save"
+Public Const GENDER As String = "SaveBIN"
 
 Public Function Start(Optional ElemToBuild As Variant, Optional _mode As Integer = 0) As Boolean
 
-    SaveToFile(modCAD.FileName)
+    SaveToFileBIN(modCAD.FileName)
     Me.Finish
 
 End
 
-Public Function SaveToFile(nName As String) As Boolean
+Public Function SaveToFileBIN(nName As String) As Boolean
 
     Dim obj As Object
     Dim tm As New Collection
@@ -44,9 +44,9 @@ Public Function SaveToFile(nName As String) As Boolean
     'tm.Clear              ' Tincho
     'For Each lay In modCAD.cLayers
     ct.Add(APPMain.hFCAD.cModel, "layers")
-    ct.Add(APPMain.hFCAD.cModel, "colors")
-    ct.Add(APPMain.hFCAD.cModel, "styles")
-    ct.Add(APPMain.hFCAD.cModel, "weights")
+    'ct.Add(APPMain.hFCAD.cModel, "colors")
+    'ct.Add(APPMain.hFCAD.cModel, "styles")
+    'ct.Add(APPMain.hFCAD.cModel, "weights")
     'Next
     enty.Clear
     If nNAme = "" Then nName = modCAD.FileName

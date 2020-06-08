@@ -3,7 +3,7 @@
 ' GauchoCAD
 ' A simple CAD made in Gambas
 '
-' Copyright (C) Martin Belmonte
+' Copyright (C) Martin Belmonte y Martin Cristia
 '
 ' This program is free software; you can redistribute it and/or modify
 ' it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@
 ' Boston, MA  02110-1301  USA
 
 Inherits ToolsBase
-Public Const GENDER As String = "Load"
+Public Const GENDER As String = "LoadBIN"
 
 Public Function Start(Optional filename As Variant, Optional _mode As Integer = 0) As Boolean
 
@@ -29,7 +29,7 @@ Public Function Start(Optional filename As Variant, Optional _mode As Integer = 
     Dim f As String
 
     If filename = "" Then
-        Dialog.Filter = ["*.xml", ("Archivos de GambasCAD")]
+        Dialog.Filter = ["*.xml-bin", ("Archivos BIN de GambasCAD")]
         Dialog.OpenFile(False)
 
         f = Dialog.Path
@@ -103,35 +103,35 @@ Public Sub LoadFromFile(Optional FilePath As String)
                 modCAD.cLayers.Add(c.Copy(), ent.Attributes["id"])
                 'Inc ilayer
 
-            Case "color"
-                c.Clear
-                'c["id"] = icolor
-                c["id"] = ent.Attributes["id"]
-                c["type"] = ent.Attributes["type"]
-                'c["label"] = ent.Attributes["label"]
-                c["value"] = ent.Attributes["value"]
-                modCAD.cColors.Add(c.Copy(), ent.Attributes["id"])
-                'Inc icolor
-
-            Case "style"
-                c.Clear
-                'c["id"] = istyle
-                c["id"] = ent.Attributes["id"]
-                c["type"] = ent.Attributes["type"]
-                'c["label"] = ent.Attributes["value"]
-                c["value"] = ent.Attributes["value"]
-                modCAD.cStyles.Add(c.Copy(), ent.Attributes["id"])
-                'Inc istyle
-
-            Case "weight"
-                c.Clear
-                'c["id"] = iweight
-                c["id"] = ent.Attributes["id"]
-                c["type"] = ent.Attributes["type"]
-                'c["label"] = ent.Attributes["label"]
-                c["value"] = ent.Attributes["value"]
-                modCAD.cWeights.Add(c.Copy(), ent.Attributes["id"])
-                'Inc iweight
+            ' Case "color"
+            '     c.Clear
+            '     'c["id"] = icolor
+            '     c["id"] = ent.Attributes["id"]
+            '     c["type"] = ent.Attributes["type"]
+            '     'c["label"] = ent.Attributes["label"]
+            '     c["value"] = ent.Attributes["value"]
+            '     modCAD.cColors.Add(c.Copy(), ent.Attributes["id"])
+            '     'Inc icolor
+            ' 
+            ' Case "style"
+            '     c.Clear
+            '     'c["id"] = istyle
+            '     c["id"] = ent.Attributes["id"]
+            '     c["type"] = ent.Attributes["type"]
+            '     'c["label"] = ent.Attributes["value"]
+            '     c["value"] = ent.Attributes["value"]
+            '     modCAD.cStyles.Add(c.Copy(), ent.Attributes["id"])
+            '     'Inc istyle
+            ' 
+            ' Case "weight"
+            '     c.Clear
+            '     'c["id"] = iweight
+            '     c["id"] = ent.Attributes["id"]
+            '     c["type"] = ent.Attributes["type"]
+            '     'c["label"] = ent.Attributes["label"]
+            '     c["value"] = ent.Attributes["value"]
+            '     modCAD.cWeights.Add(c.Copy(), ent.Attributes["id"])
+            '     'Inc iweight
 
         End Select
     Next
