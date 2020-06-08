@@ -29,6 +29,155 @@ Export
 '' This load all the info form a gaucho xml file, then put it in a collection a
 '' nd return it.
 
+Public Function SaveGaucho(sFile As String, cMdl As Collection)
+
+    Dim writer As New XmlWriter
+    Dim var As Variant
+    Dim att As Variant
+    Dim v As Variant
+    Dim ety As Variant
+    Dim p As Variant
+    Dim ptx As New String[]
+    Dim sErr As String
+    Dim sEfl As String
+    Dim stx As New String[]
+    Dim atr As New Collection
+    Dim a As String
+
+    stx = ["entity", "handle", "layer", "style", "width", "colour", "p", "radius", "ratio", "start_angle", "end_angle", "angle", "scale", "block", "text", "height", "font", "oblique", "just_h", "just_v", "wfactor", "paper", "blkid"]
+
+    sErr = ""
+    sEfl = User.Home &/ "err.txt"
+    If Exist(sEfl) Then
+        Kill sEfl
+    Endif
+
+    writer.Open(sFile, True)                'True es para que le ponga los saltos de linea
+    writer.Comment(Application.Title & " v" & Application.Version)
+    writer.StartElement("svg")             ' Compatibility with SVG
+    writer.StartElement("metadata")        ' Compatibility with SVG
+    writer.Attribute("id", "metadata5")
+    writer.StartElement("dc:format")
+    writer.Text("image/svg+xml")
+    writer.EndElement
+    writer.EndElement
+
+    For Each var In cMdl
+        Print cMdl.Key
+        Select cMdl.Key
+                ' Case "File"
+                '
+                ' Case "Version"
+
+            Case "Layers", "Colors", "Styles", "Weights", "DimSts", "Fonts"
+                For Each att In var
+                    writer.StartElement("header")
+                    For Each v In att
+                        writer.Attribute(att.Key, v)
+                    Next
+                    writer.EndElement
+                Next
+
+            Case "Entities"
+                For Each ety In var
+                    For Each att In ety
+                        writer.StartElement("entity")
+                        For Each v In att
+                            If stx.Exist(att.Key) Then
+                                Print att.Key & ": " & ety.Key
+                                Select TypeOf(v)
+
+                                    Case gb.Null
+                                        atr.Add(v, att.Key)
+                                    Case gb.Boolean
+                                        atr.Add(v, att.Key)
+                                    Case gb.Byte, gb.Short, gb.Integer, gb.Long, gb.Single
+                                        atr.Add(v, att.Key)
+                                    Case gb.Float
+                                        atr.Add(v, att.Key)
+                                    Case gb.Date
+                                        atr.Add(Format(v, "yyyymmddhhnnss"), att.Key)
+                                    Case gb.String
+                                        atr.Add(v, att.Key)
+                                    Case gb.Variant
+                                        atr.Add(v, att.Key)
+                                    Case gb.Object
+                                        Select Object.Type(v)
+                                            Case "Collection"
+                                                For Each p In v
+                                                    ptx.Add(p[0] & ":" & p[1])
+                                                Next
+                                                Select ptx.Count
+                                                    Case 0
+                                                        atr.Add("", att.Key)
+                                                    Case 1
+                                                        atr.Add(ptx[0], att.Key)
+                                                        ptx.Clear
+
+                                                    Case Else
+                                                        atr.Add(ptx.Join(";"), att.Key)
+                                                        ptx.Clear
+
+                                                End Select
+
+                                            Case "FLoat[]"
+                                                For Each p In v
+                                                    ptx.Add(p)
+                                                Next
+                                                Select ptx.Count
+                                                    Case 0
+                                                        atr.Add("", att.Key)
+                                                    Case 1
+                                                        atr.Add(ptx[0], att.Key)
+                                                        ptx.Clear
+
+                                                    Case Else
+                                                        atr.Add(ptx.Join(":"), att.Key)
+                                                        ptx.Clear
+
+                                                End Select
+
+                                        End Select
+
+                                        'Case gb.Pointer
+                                        'Case gb.Function
+                                        'Case gb.Class
+
+                                        For Each a In stx
+                                            If atr.Exist(a) Then
+                                                writer.Attribute(a, atr[a])
+                                            Endif
+                                        Next
+                                        atr.Clear
+
+                                End Select
+
+                            Else
+
+                                sErr &= att.Key & ": " & ety.Key & "\n"
+                                Print att.Key & ": " & ety.Key
+                            Endif
+                        Next
+                        writer.EndElement
+                    Next
+                Next
+        End Select
+    Next
+    If sErr <> "" Then
+        File.Save(sEfl, sErr)
+        If Exist(sEfl) Then
+            Desktop.Open(sEfl)
+        Endif
+
+    Endif
+    writer.EndElement ' svg
+    writer.EndDocument
+
+End
+
+'' This load all the info form a gaucho xml file, then put it in a collection a
+'' nd return it.
+
 Public Function LoadGaucho(sFile As String) As Collection
 
     Dim c As New Collection
@@ -162,14 +311,14 @@ Public Function LoadGaucho(sFile As String) As Collection
                 c["p"] = EncodePoint(ent.Attributes["p"], "p")
                 c["angle"] = CFloat(ent.Attributes["angle"])        ' grados
                 c["text"] = ent.Attributes["t"]
-                c["h"] = ent.Attributes["h"]
-                c["f"] = ent.Attributes["f"]
+                c["height"] = ent.Attributes["height"]
+                c["font"] = ent.Attributes["font"]
 
             Case "insert"
                 c["p"] = EncodePoint(ent.Attributes["p"], "p")
                 c["angle"] = CFloat(ent.Attributes["angle"])            ' grados
                 c["scale"] = FloatList(ent.Attributes["scale"])
-                c["b"] = ent.Attributes["b"]
+                c["block"] = ent.Attributes["block"]
 
                 Print c["a"]
 
@@ -231,6 +380,9 @@ Private Function EncodePoint(sPoint As String, sTag As String) As Collection
     For Each sp In stx
         If InStr(sPoint, ":") > 0 Then
             fp = Split(sp, ":")
+            If fp.Count = 2 Then
+                fp.Add(0)
+            Endif
         Else
             fp.Add(sp)
         Endif
@@ -387,7 +539,7 @@ Public Function GetLayersList(sFile As String) As Collection
         For Each slay In stx
             If InStr(slay, "\t") > 0 Then
 
-                If String.Mid(slay, 1, 1) = "f" Then
+                If String.Mid(slay, 1, 1) = "font" Then
                     lay.Add(True, "Frozen")
                 Else
                     lay.Add(False, "Frozen")
@@ -1150,7 +1302,7 @@ Public Function DecodeEntity(c As Collection) As Collection
                             prp.Add(i, "Points")
                             For p = 0 To i
                                 sDec = "points[" & p & "]"
-                                sTag = "P" & CStr(p)
+                                sTag = "p" & CStr(p)
                                 If c.Exist(sDec) Then
                                     pt = DecodeCoord(CStr(c[sDec]))
                                     prp.Add(pt, sTag)
@@ -2314,17 +2466,12 @@ End
 
 Public Function GetDXFHeader(sCont As String) As Collection
 
-    'Dim tmx As New String[]
     Dim stx As New String[]
     Dim cTmp As New Collection
     Dim out As New Collection
     Dim i As Integer
     Dim item As String
     Dim vrt As Variant
-    'Dim v As Variant
-    'Dim f As Variant
-    'Dim s As String
-    'Dim d As String
 
     sCont = Replace(sCont, "  9\n$", "\t")
 
@@ -2497,8 +2644,6 @@ Private Function GetDXFLtypeList(sItem As String) As Collection
     Dim cDeco As New Collection
     Dim sLay As String
     Dim slx As String[]
-    'Dim s As String
-    'Dim lName As String
     Dim sTag As String
     Dim sVal As String
     Dim j As Integer
@@ -2918,9 +3063,9 @@ Private Function DecodeDXFEntity(sItem As String) As Collection
             Case "INSERT"
 
                 If cTmp.Exist("block") Then
-                    cTmp2.Add(cTmp["block"], "b")
+                    cTmp2.Add(cTmp["block"], "block")
                 Else
-                    cTmp2.Add("", "b")
+                    cTmp2.Add("", "block")
                 Endif
 
                 If cTmp.Exist("angle") Then
@@ -2973,26 +3118,26 @@ Private Function DecodeDXFEntity(sItem As String) As Collection
                     Select cTmp.Key
 
                         Case "texth"
-                            cTmp2.Add(CFloat(tg), "h")
+                            cTmp2.Add(CFloat(tg), "height")
                         Case "text"
                             cTmp2.Add(CStr(tg), "text")
                         Case "hjust"
-                            cTmp2.Add(CInt(tg), "jh")
+                            cTmp2.Add(CInt(tg), "just_h")
 
                         Case "vjust"
-                            cTmp2.Add(CInt(tg), "jv")
+                            cTmp2.Add(CInt(tg), "just_v")
 
                         Case "angle"
                             cTmp2.Add(CFloat(tg), "angle")
 
                         Case "wfactor"
-                            cTmp2.Add(CFloat(tg), "w")
+                            cTmp2.Add(CFloat(tg), "wfactor")
 
                         Case "tstyle"
-                            cTmp2.Add(CStr(tg), "f")
+                            cTmp2.Add(CStr(tg), "font")
 
                         Case "oblique"
-                            cTmp2.Add(CFloat(tg), "o")
+                            cTmp2.Add(CFloat(tg), "oblique")
 
                     End Select
                 Next
@@ -3007,7 +3152,7 @@ Private Function DecodeDXFEntity(sItem As String) As Collection
                     Select cTmp.Key
 
                         Case "texth"
-                            cTmp2.Add(CFloat(tg), "h")
+                            cTmp2.Add(CFloat(tg), "height")
                         Case "text"
                             If cTmp.Exist("text2") Then
                                 cTmp2.Add(CStr(tg) & cTmp["text2"], "text")
@@ -3025,6 +3170,12 @@ Private Function DecodeDXFEntity(sItem As String) As Collection
                     cTmp2.Add(0, "angle")
                 Endif
 
+            Case Else
+                For Each tg In cTmp
+                    'If stx.Exist(cTmp.Key) Then
+                    cTmp2.Add(tg, cTmp.Key)
+                    'Endif
+                Next
         End Select
 
         cTmp2.Add(0, "width")
