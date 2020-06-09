@@ -1865,7 +1865,7 @@ Public Function EntityCodes(Optional ent As String) As Collection
             cod.Add("text_height", "40")
             cod.Add("textv", "43")
             cod.Add("text", "1")
-            cod.Add("text2", "1")
+            cod.Add("text2", "3")
             cod.Add("attachment_point", "71")
             cod.Add("hjust", "72")
             cod.Add("vjust", "73")
