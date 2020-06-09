@@ -43,6 +43,8 @@ Public Function SaveGaucho(sFile As String, cMdl As Collection)
     Dim stx As New String[]
     Dim atr As New Collection
     Dim a As String
+    Dim pq As Integer
+    Dim pc As Integer
 
     stx = ["entity", "handle", "layer", "style", "width", "colour", "p", "radius", "ratio", "start_angle", "end_angle", "angle", "scale", "block", "text", "height", "font", "oblique", "just_h", "just_v", "wfactor", "paper", "blkid"]
 
@@ -146,6 +148,24 @@ Public Function SaveGaucho(sFile As String, cMdl As Collection)
                                         For Each a In stx
                                             If atr.Exist(a) Then
                                                 writer.Attribute(a, atr[a])
+
+                                                If a = "p" Then
+                                                    pq = String2.Count(atr[a], ";")
+                                                    pc = String2.Count(atr[a], ":")
+
+                                                    Select pq
+                                                        Case 0
+                                                            If String2.Count(atr[a], ":") <> 2 Then
+                                                                sErr &= atr["entity"] & "\t" & atr["handle"] & "\t" & atr["p"] & "\n"
+                                                            Endif
+                                                        Case Else
+                                                            If pc / (pq + 1) <> 2 Then
+                                                                sErr &= atr["entity"] & "\t" & atr["handle"] & "\t" & atr["p"] & "\n"
+                                                            Endif
+
+                                                    End Select
+                                                Endif
+
                                             Endif
                                         Next
                                         atr.Clear
@@ -154,8 +174,8 @@ Public Function SaveGaucho(sFile As String, cMdl As Collection)
 
                             Else
 
-                                sErr &= att.Key & ": " & ety.Key & "\n"
-                                Print att.Key & ": " & ety.Key
+                                'sErr &= att.Key & ": " & ety.Key & "\n"
+                                'Print att.Key & ": " & ety.Key
                             Endif
                         Next
                         writer.EndElement
@@ -1684,6 +1704,49 @@ End
 
 '' This return a codes collection for the given entity name
 
+Public Function EntityDefaults(Optional ent As String) As Collection
+
+    Dim cod As New Collection
+    'Common defaults
+    cod.Add("BYLAYER", "6")
+    cod.Add("BYLAYER", "347")
+    cod.Add(0, "370") ' Este no es el valor por defecto en el estandar pero lo puse asi porque a veces es omitido en el dxf
+    cod.Add(0, "60")
+    cod.Add(256, "62")
+    cod.Add(0, "67")
+    cod.Add(1.0, "48")
+
+    Select String.LCase(ent)
+        Case "insert"
+            cod.Add(1, "41")
+            cod.Add(1, "42")
+            cod.Add(1, "43")
+            cod.Add(0, "44")
+            cod.Add(0, "45")
+            cod.Add(0, "50")
+            cod.Add(1, "70")
+            cod.Add(1, "71")
+
+        Case "text"
+            cod.Add(0, "39")
+            cod.Add(0, "50")
+            cod.Add("STANDARD", "7")
+            cod.Add(1, "41")
+            cod.Add(0, "71")
+            cod.Add(0, "72")
+            cod.Add(0, "73")
+        Case "mtext"
+            cod.Add(1, "71")
+            cod.Add(0, "50")
+
+    End Select
+
+    Return cod
+
+End
+
+'' This return a codes collection for the given entity name
+
 Public Function EntityCodes(Optional ent As String) As Collection
 
     Dim cod As New Collection
@@ -1693,9 +1756,13 @@ Public Function EntityCodes(Optional ent As String) As Collection
     cod.Add("style", "6") '*
     cod.Add("layer", "8") '*
     cod.Add("colour", "62") '*
+    cod.Add("material", "347")
     cod.Add("width", "370") '*
+    cod.Add("linetype_scale", "48")
+
     cod.Add("visible", "60") '*
     cod.Add("paper", "67") '*
+    cod.Add("flag", "71")
     cod.Add("elev", "38")
     cod.Add("thick", "39")
     cod.Add("x0", "10")
@@ -1704,6 +1771,28 @@ Public Function EntityCodes(Optional ent As String) As Collection
     cod.Add("x1", "11")
     cod.Add("y1", "21")
     cod.Add("z1", "31")
+
+    cod.Add("x2", "12")
+    cod.Add("y2", "22")
+    cod.Add("z2", "32")
+
+    cod.Add("x3", "13")
+    cod.Add("y3", "23")
+    cod.Add("z3", "33")
+
+    ' used in dims
+    cod.Add("x4", "14")
+    cod.Add("y4", "24")
+    cod.Add("z4", "34")
+
+    cod.Add("x5", "15")
+    cod.Add("y5", "25")
+    cod.Add("z5", "35")
+
+    cod.Add("x6", "16")
+    cod.Add("y6", "26")
+    cod.Add("z6", "36")
+
     cod.Add("extrx", "210")
     cod.Add("extry", "220")
     cod.Add("extrz", "230")
@@ -1711,18 +1800,21 @@ Public Function EntityCodes(Optional ent As String) As Collection
 
     Select String.LCase(ent)
 
+        Case "3dsolid"
+            cod.Add("format", "70")
+
         Case "arc"
             cod.Add("radius", "40")
-            cod.Add("angle0", "50")
-            cod.Add("angle1", "51")
+            cod.Add("start_angle", "50")
+            cod.Add("end_angle", "51")
 
         Case "circle"
             cod.Add("radius", "40")
 
         Case "ellipse"
             cod.Add("ratio", "40")
-            cod.Add("angle0", "41")
-            cod.Add("angle1", "42")
+            cod.Add("start_angle", "41")
+            cod.Add("end_angle", "42")
 
         Case "lwpolyline"
             cod.Add("points", "90")
@@ -1735,14 +1827,15 @@ Public Function EntityCodes(Optional ent As String) As Collection
             cod.Add("scaley", "42")
             cod.Add("scalex", "43")
             cod.Add("angle", "50")
-            cod.Add("columns", "70")
-            cod.Add("rows", "71")
-            cod.Add("cspa", "44")
-            cod.Add("rspa", "44")
+            cod.Add("has_attribs", "66")
+            cod.Add("column_count", "70")
+            cod.Add("row_count", "71")
+            cod.Add("column_spacing", "44")
+            cod.Add("row_spacing", "45")
 
         Case "attdef"
-            cod.Add("texth", "40")
-            cod.Add("defval", "1")
+            cod.Add("text_height", "40")
+            cod.Add("default_value", "1")
             cod.Add("tag", "2")
             cod.Add("promt", "3")
             cod.Add("flen", "73")
@@ -1759,7 +1852,7 @@ Public Function EntityCodes(Optional ent As String) As Collection
             cod.Add("bdesc", "4")
 
         Case "text"
-            cod.Add("texth", "40")
+            cod.Add("text_height", "40")
             cod.Add("text", "1")
             cod.Add("hjust", "72")
             cod.Add("vjust", "73")
@@ -1769,10 +1862,11 @@ Public Function EntityCodes(Optional ent As String) As Collection
             cod.Add("oblique", "51")
 
         Case "mtext"
-            cod.Add("texth", "40")
+            cod.Add("text_height", "40")
             cod.Add("textv", "43")
             cod.Add("text", "1")
             cod.Add("text2", "1")
+            cod.Add("attachment_point", "71")
             cod.Add("hjust", "72")
             cod.Add("vjust", "73")
             cod.Add("angle", "50")
@@ -1781,6 +1875,24 @@ Public Function EntityCodes(Optional ent As String) As Collection
             cod.Add("lfactor", "44")
             cod.Add("tstyle", "7")
             cod.Add("oblique", "51")
+
+            'Dimensions
+        Case "arc_dimension"
+            'common
+            cod.Add("text", "1")
+            cod.Add("block", "2")
+            cod.Add("dimstyle", "3")
+            cod.Add("version", "280")
+            cod.Add("dimtype", "70")
+            cod.Add("attachment_point", "71")
+            cod.Add("text_style", "72")
+            cod.Add("leader_length", "40")
+            cod.Add("text_factor", "41")
+            cod.Add("measurement", "42")
+            cod.Add("rotation_angle", "53")
+            cod.Add("horizontal_direction", "51")
+            cod.Add("angle_rotated", "50")
+            cod.Add("angle_extensions", "52")
 
     End Select
 
@@ -2261,7 +2373,6 @@ Public Function GetDXFSections(sFile As String) As Collection
 
     Dim sContent As String
     Dim tmx As New String[]
-    'Dim stx As New String[]
     Dim sec As String
     Dim sSub As String
     Dim i As Integer
@@ -2311,9 +2422,9 @@ Public Function GetDXFSections(sFile As String) As Collection
                                     out.Add(isec.Copy(), cCont.Key)
                                 Next
 
-                            Case "BLOCKS"
-                                cCont = GetDXFBlocks(sCont)
-                                out.Add(cCont, "Blocks")
+                                ' Case "BLOCKS"
+                                '     cCont = GetDXFBlocks(sCont)
+                                '     out.Add(cCont, "Blocks")
 
                             Case "ENTITIES"
                                 cCont = GetDXFEntities(sCont)
@@ -2413,7 +2524,8 @@ Public Function GetDXFEntities(sCont As String) As Collection
             If InStr(stx[i], "  0\nLWPOLYLINE") > 0 Then
                 Print "x"
             Endif
-            cItem = DecodeDXFEntity(stx[i])
+            cItem = DecodeDXFItem(stx[i])
+            'cItem = DecodeDXFEntity(stx[i])
             If cItem.Count > 1 Then
                 sKey = ""
                 If cItem.Exist("handle") Then
@@ -2479,7 +2591,9 @@ Public Function GetDXFHeader(sCont As String) As Collection
 
     For Each item In stx
         If item <> "" Then
-            cTmp = DecodeDXFItem(item)
+            'cTmp = DecodeDXFItem(item)
+            cTmp = DecodeDXFHeader(item)
+
             Select cTmp.Count
                 Case 0
                     'skip
@@ -2977,8 +3091,6 @@ Private Function DecodeDXFEntity(sItem As String) As Collection
     Endif
 
     If cTmp.Exist("x0") Or cTmp.Exist("x0.1") Then
-        'Select cTmp["entity"]
-        '    Case "LWPOLYLINE", "LINE", "XLINE", "POLYLINE", "SPLINE", "ARC", "CIRCLE", "ELLIPSE", "VERTEX", "INSERT", "POINT", "ATTRIB", "ATTDEF"
         spt.Clear
         For Each e In cTmp
             If InStr(cTmp.Key, "x0") > 0 Or InStr(cTmp.Key, "x1") > 0 Then
@@ -3013,11 +3125,6 @@ Private Function DecodeDXFEntity(sItem As String) As Collection
                 End Select
             Endif
 
-            'If InStr(cTmp.Key, "x0") = 0 And InStr(cTmp.Key, "y0") = 0 And InStr(cTmp.Key, "z0") = 0 Then
-            '    If InStr(cTmp.Key, "x1") = 0 And InStr(cTmp.Key, "y1") = 0 And InStr(cTmp.Key, "z1") = 0 Then
-            '        cTmp2.Add(cTmp[cTmp.Key], cTmp.Key)
-            '    Endif
-            'Endif
             Select cTmp.Key
                 Case "entity", "handle", "layer", "style", "width", "colour", "blkid", "visible", "paper", "elev", "thick"
                     cTmp2.Add(cTmp[cTmp.Key], cTmp.Key)
@@ -3190,6 +3297,10 @@ Private Function DecodeDXFEntity(sItem As String) As Collection
 
 End
 
+Private Function dxfLine(stx As String[]) As Collection
+
+End
+
 '' In takes all the raw data in a block item from blocks section, listing each
 '' entity inside the block but also the block inset
 '' This function lists the content of a block, that is, all the entities that
@@ -3224,7 +3335,8 @@ Private Function DecodeDXFBlock(sItem As String) As Collection
 
     For i = 0 To btx.Max
         If InStr(btx[i], "100\nAcDbEntity") > 0 Then
-            cTmp = DecodeDXFEntity(btx[i])
+            'cTmp = DecodeDXFEntity(btx[i])
+            'cTmp = DecodeDXFItem(btx[i])
 
             If cTmp.Count > 0 Then
                 If cTmp.Exist("handle") Then
@@ -3272,47 +3384,335 @@ Private Function DecodeDXFItem(sItem As String) As Collection
     Dim x As Float
     Dim y As Float
     Dim z As Float
+    Dim codes As Collection
+    Dim sVal As String
+    Dim sKey As String
+    Dim cPts As New Collection
+    Dim p As Variant
+    Dim df As Variant
+    Dim defaults As New Collection
 
     stx = Split(sItem, "\n")
 
-    For i = 0 To stx.Max
-        If i = 0 Then
-            Select Replace(stx[i + 1], " ", "")
-                Case "1", "3"
-                    sTag = stx[i]
-                    vrt = stx[i + 2]
-                    cTmp.Add(vrt, sTag)
-                Case "70", "62", "370", "280", "290", "380"
-                    sTag = stx[i]
-                    vrt = CInt(Replace(stx[i + 2], " ", ""))
-                    cTmp.Add(vrt, sTag)
-                Case "40", "50"
-                    sTag = stx[i]
-                    vrt = CFloat(Replace(stx[i + 2], " ", ""))
-                    cTmp.Add(vrt, sTag)
-                Case "10"
-                    sTag = stx[i]
-                    x = CFloat(Replace(stx[i + 2], " ", ""))
-                    If Replace(stx[i + 3], " ", "") = "20" Then
-                        y = CFloat(Replace(stx[i + 4], " ", ""))
-                    Endif
-                    If Replace(stx[i + 5], " ", "") = "30" Then
-                        z = CFloat(Replace(stx[i + 6], " ", ""))
-                    Endif
-                    cTmp.Add([x, y, z], sTag)
-                Case "20", "30"
-                    'skip
-                Case Else
-                    sTag = stx[i]
-                    vrt = stx[i + 2]
-                    cTmp.Add(vrt, sTag)
-
-                    Select sTag
-                        Case "OLESTARTUP"
-                            Print sTag & ": " & vrt
-                    End Select
-            End Select
+    If stx[0] = "  0" Then
+        sTag = "entity"
+        sVal = stx[1]
+        cTmp.Add(sVal, sTag)
+        If sVal = "INSERT" Then
+            Print sVal
         Endif
+        codes = EntityCodes(sVal)
+        defaults = EntityDefaults(sVal)
+    Endif
+
+    For i = 0 To stx.Max - 1 Step 2
+        sKey = Replace(stx[i], " ", "")
+        sTag = sKey
+        Select sKey
+            Case "1", "3", "5", "6", "8"
+                If codes.Exist(sKey) Then
+                    sTag = codes[sKey]
+                Endif
+                vrt = stx[i + 1]
+                cTmp.Add(vrt, sTag)
+            Case "70", "62", "66", "370", "280", "290", "380", "90"
+                If codes.Exist(sKey) Then
+                    sTag = codes[sKey]
+                Endif
+                vrt = CInt(Replace(stx[i + 1], " ", ""))
+                cTmp.Add(vrt, sTag)
+            Case "40", "50", "41", "42", "43"
+                If codes.Exist(sKey) Then
+                    sTag = codes[sKey]
+                Endif
+                vrt = CFloat(Replace(stx[i + 1], " ", ""))
+                cTmp.Add(vrt, sTag)
+            Case "10", "20", "30", "11", "21", "31" ' coordenadas habituales
+
+            Case "12", "22", "32", "13", "23", "33" ' coordenadas extras
+
+            Case "14", "24", "34", "15", "25", "35" ' coordenadas de dimensiones
+
+            Case "16", "26", "36", "17", "27", "37" ' coordenadas de dimensiones
+
+            Case "100"
+                'skip
+
+            Case Else
+                If codes.Exist(sKey) Then
+                    sTag = codes[sKey]
+                Endif
+
+                vrt = stx[i + 1]
+                cTmp.Add(vrt, sTag)
+
+                Select sTag
+                    Case "OLESTARTUP"
+                        Print sTag & ": " & vrt
+                End Select
+        End Select
+    Next
+
+    'Check defalults
+    For Each df In defaults
+        If codes.Exist(defaults.Key) Then
+            sTag = codes[defaults.Key]
+        Else
+            sTag = defaults.Key
+        Endif
+        If cTmp.Exist(sTag) = False Then
+            cTmp.Add(df, sTag)
+        Endif
+
+    Next
+
+    ' If cTmp.Exist("style") = False Then
+    '     cTmp.Add(0, "style")
+    ' Endif
+    '
+    ' If cTmp.Exist("width") = False Then
+    '     cTmp.Add(0, "width")
+    ' Endif
+    '
+    ' If cTmp.Exist("colour") = False Then
+    '     cTmp.Add(0, "colour")
+    ' Endif
+
+    cPts = DecodeDXFCoords(sItem)
+
+    If cPts Then
+        For Each p In cPts
+            cTmp.Add(p.Copy(), cPts.Key)
+        Next
+    Endif
+    'cTmp.Add(cPts.Copy(), "p")
+
+    Return cTmp
+
+End
+
+Private Function DecodeDXFCoords(sItem As String) As Collection
+
+    Dim stx As String[]
+    Dim c As New Collection
+    Dim p As New Collection
+    Dim i As Integer
+    Dim vrt As Variant
+    Dim sTag As String
+    Dim x As Float
+    Dim y As Float
+    Dim z As Float
+    Dim codes As Collection
+    Dim sVal As String
+    Dim sKey As String
+    Dim rep As New Collection
+    Dim spt As New String[]
+    Dim e As Variant
+    Dim xTag As String
+    Dim xOrd As String
+    Dim pt As Variant
+    Dim cp As Collection
+    Dim ptx As New String[]
+    Dim k As Integer
+    Dim tp As String
+
+    stx = Split(sItem, "\n")
+
+    ptx = ["x0", "x1", "x2", "x3", "x4", "x5", "x6", "x7"]
+
+    If stx[0] = "  0" Then
+        ' sTag = "entity"
+        sVal = stx[1]
+        ' cTmp.Add(sVal, sTag)
+        If sVal = "LINE" Then
+            Print sVal
+        Endif
+        codes = EntityCodes(sVal)
+    Endif
+
+    For i = 0 To stx.Max - 1 Step 2
+        sKey = Replace(stx[i], " ", "")
+        Select sKey
+
+            Case "10", "20", "30", "11", "21", "31", "12", "22", "32", "13", "23", "33", "14", "24", "34", "15", "25", "35", "16", "26", "36", "17", "27", "37"
+                If codes.Exist(sKey) Then
+                    sTag = codes[sKey]
+                Else
+                    sTag = sKey
+                Endif
+                vrt = CFloat(Replace(stx[i + 1], " ", ""))
+                c.Add(vrt, sTag)
+        End Select
+    Next
+
+    For i = 0 To stx.Max Step 2
+        If stx[i] <> "" Then
+            sTag = Replace(stx[i], " ", "")
+            If codes.Exist(sTag) Then
+                sTag = codes[sTag]
+            Endif
+            If rep.Exist(sTag) = False Then
+                rep.Add([1, 0], sTag)
+            Else
+                rep[sTag][0] = rep[sTag][0] + 1
+            Endif
+        Endif
+    Next
+
+    For i = 0 To stx.Max Step 2
+        sKey = Replace(stx[i], " ", "")
+        Select sKey
+
+            Case "10", "20", "30", "11", "21", "31", "12", "22", "32", "13", "23", "33", "14", "24", "34", "15", "25", "35", "16", "26", "36", "17", "27", "37"
+                If codes.Exist(sKey) Then
+                    sTag = codes[sKey]
+                Else
+                    sTag = sKey
+                Endif
+                vrt = CFloat(Replace(stx[i + 1], " ", ""))
+
+                If rep.Exist(sTag) And rep[sTag][0] > 1 Then
+                    rep[sTag][1] = rep[sTag][1] + 1
+                    c.Add(vrt, sTag & "." & CStr(rep[sTag][1]))
+                Else
+                    c.Add(vrt, sTag)
+                Endif
+        End Select
+    Next
+
+    If c.Exist("x0") Or c.Exist("x0.1") Then
+        spt.Clear
+        For Each e In c
+            For Each tp In ptx
+                If InStr(c.Key, tp) > 0 Then
+
+                    If InStr(c.Key, ".") > 0 Then
+                        xTag = Split(c.Key, ".")[0]
+                        xOrd = "." & Split(c.Key, ".")[1]
+                    Else
+                        xTag = c.Key
+                        xOrd = ""
+                    Endif
+
+                    If ptx.Exist(xTag) Then
+                        k = ptx.Find(xTag)
+                        pt = c[c.Key]
+                        If c.Exist("y" & CStr(k) & xOrd) Then
+                            pt &= ":" & c["y" & CStr(k) & xOrd]
+                        Endif
+                        If c.Exist("z" & CStr(k) & xOrd) Then
+                            pt &= ":" & c["z" & CStr(k) & xOrd]
+                        Endif
+                        spt.Add(pt)
+                    Endif
+                Endif
+                'Break
+            Next
+
+            ' If InStr(c.Key, "x0") > 0 Or InStr(c.Key, "x1") > 0 Or InStr(c.Key, "x2") > 0 Or InStr(c.Key, "x3") > 0 Then
+            '     If InStr(c.Key, ".") > 0 Then
+            '         xTag = Split(c.Key, ".")[0]
+            '         xOrd = "." & Split(c.Key, ".")[1]
+            '     Else
+            '         xTag = c.Key
+            '         xOrd = ""
+            '     Endif
+            '
+            '     If ptx.Exist(xTag) Then
+            '         k = ptx.Find(xTag)
+            '         pt = c[c.Key]
+            '         If c.Exist("y" & CStr(k) & xOrd) Then
+            '             pt &= ":" & c["y" & CStr(k) & xOrd]
+            '         Endif
+            '         If c.Exist("z" & CStr(k) & xOrd) Then
+            '             pt &= ":" & c["z" & CStr(k) & xOrd]
+            '         Endif
+            '         spt.Add(pt)
+            '     Endif
+            '     ' Select xTag
+            '     '     Case "x0"
+            '     '         pt = c[c.Key]
+            '     '         If c.Exist("y0" & xOrd) Then
+            '     '             pt &= ":" & c["y0" & xOrd]
+            '     '         Endif
+            '     '         If c.Exist("z0" & xOrd) Then
+            '     '             pt &= ":" & c["z0" & xOrd]
+            '     '         Endif
+            '     '         spt.Add(pt)
+            '     '     Case "x1"
+            '     '         pt = c[c.Key]
+            '     '         If c.Exist("y1" & xOrd) Then
+            '     '             pt &= ":" & c["y1" & xOrd]
+            '     '         Endif
+            '     '         If c.Exist("z1" & xOrd) Then
+            '     '             pt &= ":" & c["z1" & xOrd]
+            '     '         Endif
+            '     '         spt.Add(pt)
+            '     '     Case "x2"
+            '     '         pt = c[c.Key]
+            '     '         If c.Exist("y2" & xOrd) Then
+            '     '             pt &= ":" & c["y2" & xOrd]
+            '     '         Endif
+            '     '         If c.Exist("z2" & xOrd) Then
+            '     '             pt &= ":" & c["z2" & xOrd]
+            '     '         Endif
+            '     '         spt.Add(pt)
+            '     '     Case "x3"
+            '     '         pt = c[c.Key]
+            '     '         If c.Exist("y3" & xOrd) Then
+            '     '             pt &= ":" & c["y3" & xOrd]
+            '     '         Endif
+            '     '         If c.Exist("z3" & xOrd) Then
+            '     '             pt &= ":" & c["z3" & xOrd]
+            '     '         Endif
+            '     '         spt.Add(pt)
+            '     ' End Select
+            ' Endif
+        Next
+        cp = EncodePoint(spt.Join(";"), "p")
+        p.Add(cp.Copy(), "p")
+        cp.Clear
+    Endif
+    Return p
+
+End
+
+Private Function DecodeDXFHeader(sItem As String) As Collection
+
+    Dim stx As String[]
+    Dim cTmp As New Collection
+    Dim i As Integer
+    Dim vrt As Variant
+    Dim sTag As String
+    Dim x As Float
+    Dim y As Float
+    Dim z As Float
+
+    stx = Split(sItem, "\n")
+
+    sTag = stx[0]
+
+    For i = 1 To stx.Max Step 2
+        Select Replace(stx[i], " ", "")
+            Case "1", "2", "3", "5", "6", "7" "8"
+                vrt = stx[i + 1]
+            Case "70", "62", "345", "346", "370", "280", "290", "380", "349" "390"
+                vrt = CInt(Replace(stx[i + 1], " ", ""))
+            Case "40", "50"
+                vrt = CFloat(Replace(stx[i + 1], " ", ""))
+            Case "10"
+                x = CFloat(Replace(stx[i + 1], " ", ""))
+                If Replace(stx[i + 2], " ", "") = "20" Then
+                    y = CFloat(Replace(stx[i + 3], " ", ""))
+                Endif
+                If Replace(stx[i + 4], " ", "") = "30" Then
+                    z = CFloat(Replace(stx[i + 5], " ", ""))
+                Endif
+                vrt = [x, y, z]
+                'Case "20", "30"
+                'skip
+        End Select
+        cTmp.Add(vrt, sTag)
     Next
     Return cTmp
 

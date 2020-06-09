@@ -300,8 +300,37 @@ Public Sub Task(sTask As String)
     Dim FileDef As String
     Dim i As Integer
     Dim mdl As New Collection
+    Dim template As Boolean
+
+    ' if the drawing is drawingX.xml, drawingX.gcad where X is a integer number then the Ssave is changed to Save As
 
     Select sTask
+
+        Case "save"
+            For i = 1 To 99
+                If File.Name(CurrentFile) = "drawing" & CStr(i) & "." & File.Ext(CurrentFile) Then
+                    template = True
+                    Break
+                Endif
+            Next
+
+            If template = True Then
+                Task("saveas")
+            Else
+                cad.SaveGaucho(CurrentFile, hFCAD.cModel)
+            Endif
+
+        Case "saveas"
+
+            Dialog.Filter = ["*.xml", "GauchoCAD"]
+            If Dialog.SaveFile() Then Return
+            FilePath = Dialog.Path
+            If File.Ext(FilePath) <> "xml" Then
+                FilePath = FilePath & ".xml"
+            Endif
+            cad.SaveGaucho(FilePath, hFCAD.cModel)
+        Catch
+            Message.Info(Error.Text)
 
         Case "import"
             stx = dsk.FileChooser(User.Home, ["dxf", "dwg"])
