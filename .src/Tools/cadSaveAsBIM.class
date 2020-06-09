@@ -33,7 +33,7 @@ Public Function Start(Optional ElemToBuild As Variant, Optional _mode As Integer
     If File.Ext(f) <> "xml-bin" Then
         f = f & ".xml-bin"
     Endif
-    cadSaveBIN.SaveToFile(f) ' <--- Tincho
+    cadSaveBIm.SaveToFile(f) ' <--- Tincho
     Me.Finish
 
 End

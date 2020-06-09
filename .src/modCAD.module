@@ -381,6 +381,8 @@ Public Function AddEllipse(Points As Float[], r As Float, angle1 As Float, angle
 
     oEntity = Object.New("cadEllipse")           ' create the new entity of proper class
     oEntity.P.insert(points)                    ' centro x1,y1
+    oEntity.p[2] += oEntity.p[0]                ' un pequeño truco porque gaucho usa los puntos de manera diferente a DXF
+    oEntity.p[3] += oEntity.p[1]
     oEntity.fParam.Add(r)                      ' radio
     oEntity.fParam.Add(angle1)                 ' radio
     oEntity.fParam.Add(angle2)                   ' angulo

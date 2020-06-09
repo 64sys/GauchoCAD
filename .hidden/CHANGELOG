@@ -6,7 +6,9 @@ Authors: Terco, Tincho, Postpase, Vuott
 
 VER       DATE      CHANGES
 --------------------------------------------------------------------------------------------------------------------
-0.0.56	06/06/20	Fix @ in entering coordinates. Added Area and Ruler tools. Patched on importing points in 3D 
+0.0.58	08/06/20	All entities are in 3D format from file to cModel collection. Started BIN again.
+
+0.0.56	06/06/20	Fix @ in entering coordinates. Added Area and Ruler tools. Patched on importing points in 3D
 
 0.0.54	03/06/20	Fix MText. Tools Trim. Added funtions to Puntos. Better mouse interaction.
 

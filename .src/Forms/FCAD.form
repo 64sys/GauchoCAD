@@ -91,49 +91,42 @@
     { mnuLine Menu entity
       Name = "mnuLine"
       Text = ("Line")
-      Picture = Picture["svg/line.svg"]
       Visible = False
       Tag = "line"
     }
     { mnuPolyline Menu entity
       Name = "mnuPolyline"
       Text = ("Polyline")
-      Picture = Picture["svg/polyline.svg"]
       Visible = False
       Tag = "pline"
     }
     { mnuCircle Menu entity
       Name = "mnuCircle"
       Text = ("Circle")
-      Picture = Picture["svg/circle.svg"]
       Visible = False
       Tag = "circle"
     }
     { mnuEllipse Menu entity
       Name = "mnuEllipse"
       Text = ("Ellipse")
-      Picture = Picture["svg/ellipse.svg"]
       Visible = False
       Tag = "ellipse"
     }
     { mnuArc Menu entity
       Name = "mnuArc"
       Text = ("Arc")
-      Picture = Picture["svg/arc.svg"]
       Visible = False
       Tag = "arc"
     }
     { mnuRectangle Menu entity
       Name = "mnuRectangle"
       Text = ("Rectangle")
-      Picture = Picture["svg/rectangle.svg"]
       Visible = False
       Tag = "rectangle"
     }
     { mnuText Menu entity
       Name = "mnuText"
       Text = ("Text")
-      Picture = Picture["svg/text.svg"]
       Visible = False
       Tag = "text"
     }
@@ -160,7 +153,6 @@
     { mnuHatch Menu entity
       Name = "mnuHatch"
       Text = ("Hatch")
-      Picture = Picture["svg/hatch.svg"]
       Enabled = False
       Visible = False
       Tag = "hatch"
@@ -178,21 +170,18 @@
     { mnuMove Menu tool
       Name = "mnuMove"
       Text = ("Move")
-      Picture = Picture["svg/move.svg"]
       Visible = False
       Tag = "move"
     }
     { mnuCopy Menu tool
       Name = "mnuCopy"
       Text = ("Copy")
-      Picture = Picture["svg/copy.svg"]
       Visible = False
       Tag = "copy"
     }
     { mnuScale Menu tool
       Name = "mnuScale"
       Text = ("Scale")
-      Picture = Picture["svg/scale.svg"]
       Visible = False
       Tag = "Scale"
     }
@@ -205,14 +194,12 @@
     { mnuRotate Menu tool
       Name = "mnuRotate"
       Text = ("Rotate")
-      Picture = Picture["svg/rotate.svg"]
       Visible = False
       Tag = "rotate"
     }
     { mnuStretch Menu tool
       Name = "mnuStretch"
       Text = ("Stretch")
-      Picture = Picture["svg/stretch.svg"]
       Visible = False
       Tag = "stretch"
     }
@@ -286,7 +273,7 @@
           Expand = True
           Arrangement = Arrange.Horizontal
           { !GLArea1 GLArea
-            MoveScaled(2,3,42,18)
+            MoveScaled(2,3,44,20)
             #Public = True
             Background = Color.Black
             Tracking = True
