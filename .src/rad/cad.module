@@ -2422,9 +2422,9 @@ Public Function GetDXFSections(sFile As String) As Collection
                                     out.Add(isec.Copy(), cCont.Key)
                                 Next
 
-                                ' Case "BLOCKS"
-                                '     cCont = GetDXFBlocks(sCont)
-                                '     out.Add(cCont, "Blocks")
+                            Case "BLOCKS"
+                                cCont = GetDXFBlocks(sCont)
+                                out.Add(cCont, "Blocks")
 
                             Case "ENTITIES"
                                 cCont = GetDXFEntities(sCont)
@@ -3336,7 +3336,7 @@ Private Function DecodeDXFBlock(sItem As String) As Collection
     For i = 0 To btx.Max
         If InStr(btx[i], "100\nAcDbEntity") > 0 Then
             'cTmp = DecodeDXFEntity(btx[i])
-            'cTmp = DecodeDXFItem(btx[i])
+            cTmp = DecodeDXFItem(btx[i])
 
             If cTmp.Count > 0 Then
                 If cTmp.Exist("handle") Then
