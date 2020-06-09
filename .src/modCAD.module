@@ -184,26 +184,26 @@ Public Function ImportEntities2(colData As Collection, obxEntities As Object[], 
                     ' Insert viene con el punto de insercion XYZ, no puedo usar la rutina lectora de puntos
                     'flxPoints.Add(colEnt["p"]["p0"][0])
                     'flxPoints.Add(colEnt["p"]["p0"][1])
-                    AddInsert(flxPoints, colEnt["scale"][0], colEnt["scale"][1], colEnt["angle"], colEnt["colour"], colEnt["style"], colEnt["layer"], BlockName)
+                    AddInsert(flxPoints, colEnt["scalex"], colEnt["scaley"], colEnt["angle"], colEnt["colour"], colEnt["style"], colEnt["layer"], BlockName)
                     Inc iTotalEntities
 
                 Case "text"
                     GoSub GetPoints
                     'flxPoints.Add(colEnt["p"]["p0"][0])
                     'flxPoints.Add(colEnt["p"]["p0"][1])
-                    AddText(flxPoints, colEnt["angle"], colEnt["height"], colEnt["text"], colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], BlockName)
+                    AddText(flxPoints, colEnt["angle"], colEnt["text_height"], colEnt["text"], colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], BlockName)
                     Inc iTotalEntities
 
                 Case "mtext"
                     GoSub GetPoints
                     'flxPoints.Add(colEnt["p"]["p0"][0])
                     'flxPoints.Add(colEnt["p"]["p0"][1])
-                    AddMText(flxPoints, colEnt["angle"], colEnt["height"], colEnt["text"], colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], BlockName)
+                    AddMText(flxPoints, colEnt["angle"], colEnt["text_height"], colEnt["text"], colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], BlockName)
                     Inc iTotalEntities
 
                 Case "dimmension"
                     GoSub GetPoints
-                    AddDim(flxPoints, colEnt["angle"], colEnt["height"], colEnt["text"], colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], BlockName)
+                    AddDim(flxPoints, colEnt["angle"], colEnt["text_height"], colEnt["text"], colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], BlockName)
                     Inc iTotalEntities
 
             End Select
