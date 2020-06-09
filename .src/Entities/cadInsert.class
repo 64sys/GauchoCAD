@@ -60,6 +60,8 @@ Public Sub Draw()
 
         ' modCAD.ScaleLines = (Abs(Me.fParam[0]) + Abs(Me.fParam[1])) / 2   ' ??????????????????
         For Each ET In appmain.hFCAD.arrBlocks[i].entities
+            et.visible = True
+            'If et.gender = "Ellipse" Then Stop
             et.Draw
         Next
         'modCAD.ScaleLines = 1

@@ -129,6 +129,7 @@ Public Function ImportBlocks(colData As Collection) ', obxEntities As Object[]) 
     If Not colData.Exist("Blocks") Then Return
     For Each colBlk In colData["Blocks"]
         Dim newBlock As New ArrBlockSt
+        newBlock.entities = New Object[]
         newBlock.name = colBlk["block"]
         APPMain.hFCAD.arrBlocks.Add(newBlock)
         ImportEntities2(colBlk["Entities"], newBlock.entities, newBlock.name)
@@ -137,78 +138,91 @@ Public Function ImportBlocks(colData As Collection) ', obxEntities As Object[]) 
 
 End
 
-'' Importa la clave entidades de la coleccion y las coloca en el array de objetos
-
-Public Function ImportEntities2(colData As Collection, obxEntities As Object[], Optional BlockName As String) As Integer
+Public Function ImportModel(colData As Collection, obxEntities As Object[], Optional BlockName As String) As Integer
 
     Dim i, iTotalEntities As Integer
     Dim colGrp As Collection
-    Dim colEnt As Collection
+
     Dim flxPoints As New Float[]
     Dim P As Float[]
     Dim ratio As Float
 
     For Each colGrp In colData
-        For Each colEnt In colGrp
-            flxPoints.Clear
-            Select colData.Key
 
-                Case "line"
-                    GoSub GetPoints
-                    AddLine(flxPoints, colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], BlockName)
-                    Inc iTotalEntities
+        ImportEntities2(colGrp, obxEntities, BlockName)
 
-                Case "lwpolyline", "polyline"
-                    GoSub GetPoints
-                    AddPolyLine(flxPoints, colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], BlockName)
-                    Inc iTotalEntities
+    Next
 
-                Case "ellipse"
-                    GoSub GetPoints
+End
+'' Importa la clave entidades de la coleccion y las coloca en el array de objetos
 
-                    AddEllipse(flxPoints, colEnt["ratio"], colEnt["start_angle"], colEnt["end_angle"], colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], BlockName)
-                    Inc iTotalEntities
+Public Function ImportEntities2(colGrp As Collection, obxEntities As Object[], Optional BlockName As String) As Integer
 
-                Case "circle"
-                    GoSub GetPoints
-                    AddCircle(flxPoints, colEnt["radius"], colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], BlockName)
-                    Inc iTotalEntities
+    Dim i, iTotalEntities As Integer
+    Dim flxPoints As New Float[]
+    Dim P As Float[]
+    Dim ratio As Float
+    Dim colEnt As Collection
 
-                Case "arc"
-                    GoSub GetPoints
-                    AddArc(flxPoints, colEnt["radius"], colEnt["start_angle"], colEnt["end_angle"], colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], BlockName)
-                    Inc iTotalEntities
+    For Each colEnt In colGrp
+        flxPoints.Clear
+        Select LCase$(colEnt["entity"]) 'colData.Key
 
-                Case "insert"
-                    GoSub GetPoints
-                    ' Insert viene con el punto de insercion XYZ, no puedo usar la rutina lectora de puntos
-                    'flxPoints.Add(colEnt["p"]["p0"][0])
-                    'flxPoints.Add(colEnt["p"]["p0"][1])
-                    AddInsert(flxPoints, colEnt["scalex"], colEnt["scaley"], colEnt["angle"], colEnt["colour"], colEnt["style"], colEnt["layer"], BlockName)
-                    Inc iTotalEntities
+            Case "line"
+                GoSub GetPoints
+                AddLine(obxEntities, flxPoints, colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], BlockName)
+                Inc iTotalEntities
 
-                Case "text"
-                    GoSub GetPoints
-                    'flxPoints.Add(colEnt["p"]["p0"][0])
-                    'flxPoints.Add(colEnt["p"]["p0"][1])
-                    AddText(flxPoints, colEnt["angle"], colEnt["text_height"], colEnt["text"], colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], BlockName)
-                    Inc iTotalEntities
+            Case "lwpolyline", "polyline", "solid"
+                GoSub GetPoints
+                AddPolyLine(obxEntities, flxPoints, colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], BlockName)
+                Inc iTotalEntities
 
-                Case "mtext"
-                    GoSub GetPoints
-                    'flxPoints.Add(colEnt["p"]["p0"][0])
-                    'flxPoints.Add(colEnt["p"]["p0"][1])
-                    AddMText(flxPoints, colEnt["angle"], colEnt["text_height"], colEnt["text"], colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], BlockName)
-                    Inc iTotalEntities
+            Case "ellipse"
+                GoSub GetPoints
 
-                Case "dimmension"
-                    GoSub GetPoints
-                    AddDim(flxPoints, colEnt["angle"], colEnt["text_height"], colEnt["text"], colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], BlockName)
-                    Inc iTotalEntities
+                AddEllipse(obxEntities, flxPoints, colEnt["ratio"], colEnt["start_angle"], colEnt["end_angle"], colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], BlockName)
+                Inc iTotalEntities
 
-            End Select
+            Case "circle"
+                GoSub GetPoints
+                AddCircle(obxEntities, flxPoints, colEnt["radius"], colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], BlockName)
+                Inc iTotalEntities
 
-        Next
+            Case "arc"
+                GoSub GetPoints
+                AddArc(obxEntities, flxPoints, colEnt["radius"], colEnt["start_angle"], colEnt["end_angle"], colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], BlockName)
+                Inc iTotalEntities
+
+            Case "insert"
+                GoSub GetPoints
+                ' Insert viene con el punto de insercion XYZ, no puedo usar la rutina lectora de puntos
+                'flxPoints.Add(colEnt["p"]["p0"][0])
+                'flxPoints.Add(colEnt["p"]["p0"][1])
+                AddInsert(obxEntities, flxPoints, colEnt["scalex"], colEnt["scaley"], colEnt["angle"], colEnt["colour"], colEnt["style"], colEnt["layer"], colEnt["block"])
+                Inc iTotalEntities
+
+            Case "text"
+                GoSub GetPoints
+                'flxPoints.Add(colEnt["p"]["p0"][0])
+                'flxPoints.Add(colEnt["p"]["p0"][1])
+                AddText(obxEntities, flxPoints, colEnt["angle"], colEnt["text_height"], colEnt["text"], colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], BlockName)
+                Inc iTotalEntities
+
+            Case "mtext"
+                GoSub GetPoints
+                'flxPoints.Add(colEnt["p"]["p0"][0])
+                'flxPoints.Add(colEnt["p"]["p0"][1])
+                AddMText(obxEntities, flxPoints, colEnt["angle"], colEnt["text_height"], colEnt["text"], colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], BlockName)
+                Inc iTotalEntities
+
+            Case "dimmension"
+                GoSub GetPoints
+                AddDim(obxEntities, flxPoints, colEnt["angle"], colEnt["text_height"], colEnt["text"], colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], BlockName)
+                Inc iTotalEntities
+
+        End Select
+
     Next
 
     Return iTotalEntities
@@ -229,7 +243,7 @@ End
 
 ' importing
 
-Public Function AddLine(Points As Float[], Optional colour As Integer = 0, Optional LineWidth As Float = 1, Optional Linetype As String, Optional Layer As String, Optional Block As String) As Boolean
+Public Function AddLine(obxContainer As Object[], Points As Float[], Optional colour As Integer = 0, Optional LineWidth As Float = 1, Optional Linetype As String, Optional Layer As String, Optional Block As String) As Boolean
 
     ' points are in x,y,x,y,x,y....
     Dim oEntity As Object                       ' creamos la entidad de la clase apropiada
@@ -238,17 +252,17 @@ Public Function AddLine(Points As Float[], Optional colour As Integer = 0, Optio
     oEntity.P.insert(points)                    ' recibimos los dos vertices de la linea x1,y1,x2,y2
     oEntity.layer = Layer
     oEntity.colour = colour
-    oEntity.LineWidth = LineWidth               ' datos CAD
+    oEntity.LineWidth = 1 'LineWidth               ' datos CAD
     oEntity.linetypename = linetype
     oEntity.Block = Block
     If oEntity.Block <> "" Then oEntity.visible = False
-    APPMain.hFCAD.arrEntities.Add(oEntity)
+    obxContainer.Add(oEntity)
     oEntity.finish(-1)
     oEntity = Null                  ' free object
 
 End
 
-Public Function AddPolyLine(Points As Float[], Optional colour As Integer = 0, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
+Public Function AddPolyLine(obxContainer As Object[], Points As Float[], Optional colour As Integer = 0, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
 
     ' points are in x,y,x,y,x,y....
 
@@ -260,16 +274,16 @@ Public Function AddPolyLine(Points As Float[], Optional colour As Integer = 0, O
 
     oEntity.layer = Layer
     oEntity.colour = colour
-    oEntity.LineWidth = LineWidth               ' datos CAD
+    oEntity.LineWidth = 1 ' LineWidth               ' datos CAD
     oEntity.Block = Block
     If oEntity.Block <> "" Then oEntity.visible = False
-    APPMain.hFCAD.arrEntities.Add(oEntity)
+    obxContainer.Add(oEntity)
     oEntity.finish(-1)
     oEntity = Null                  ' free object
 
 End
 
-Public Function AddDim(Points As Float[], bloque As String, medida As Float, texto As String, alineacion As Integer, angulo As Float, tipo As Integer, colour As Integer, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
+Public Function AddDim(obxContainer As Object[], Points As Float[], bloque As String, medida As Float, texto As String, alineacion As Integer, angulo As Float, tipo As Integer, colour As Integer, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
 
     Dim oEntity As Object                       ' creamos la entidad de la clase apropiada
 
@@ -287,13 +301,13 @@ Public Function AddDim(Points As Float[], bloque As String, medida As Float, tex
     oEntity.LineWidth = LineWidth               ' datos CAD
     oEntity.Block = Block
     If oEntity.Block <> "" Then oEntity.visible = False
-    APPMain.hFCAD.arrEntities.Add(oEntity)
+    obxContainer.Add(oEntity)
     oEntity.finish(-1)
     oEntity = Null                  ' free object
 
 End
 
-Public Function AddSolid(Points As Float[], Optional colour As Integer = 0, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
+Public Function AddSolid(obxContainer As Object[], Points As Float[], Optional colour As Integer = 0, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
 
     ' points are in x,y,x,y,x,y....
     ' points are in x,y,x,y,x,y....
@@ -308,13 +322,13 @@ Public Function AddSolid(Points As Float[], Optional colour As Integer = 0, Opti
     oEntity.LineWidth = LineWidth               ' datos CAD
     oEntity.Block = Block
     If oEntity.Block <> "" Then oEntity.visible = False
-    APPMain.hFCAD.arrEntities.Add(oEntity)
+    obxContainer.Add(oEntity)
     oEntity.finish(-1)
     oEntity = Null                  ' free object
 
 End
 
-Public Function AddSPLine(Points As Float[], Optional colour As Integer = 0, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
+Public Function AddSPLine(obxContainer As Object[], Points As Float[], Optional colour As Integer = 0, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
 
     ' points are in x,y,x,y,x,y....
     Dim oEntity As Object                       ' creamos la entidad de la clase apropiada
@@ -328,13 +342,13 @@ Public Function AddSPLine(Points As Float[], Optional colour As Integer = 0, Opt
     oEntity.LineWidth = LineWidth               ' datos CAD
     oEntity.Block = Block
     If oEntity.Block <> "" Then oEntity.visible = False
-    APPMain.hFCAD.arrEntities.Add(oEntity)
+    obxContainer.Add(oEntity)
     oEntity.finish(-1)
     oEntity = Null                  ' free object
 
 End
 
-Public Function AddCircle(Points As Float[], radious As Float, Optional colour As Integer = 0, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
+Public Function AddCircle(obxContainer As Object[], Points As Float[], radious As Float, Optional colour As Integer = 0, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
 
     ' points are in x,y,x,y,x,y....
     Dim oEntity As Object                       ' creamos la entidad de la clase apropiada
@@ -347,13 +361,13 @@ Public Function AddCircle(Points As Float[], radious As Float, Optional colour A
     oEntity.LineWidth = LineWidth               ' datos CAD
     oEntity.Block = Block
     If oEntity.Block <> "" Then oEntity.visible = False
-    APPMain.hFCAD.arrEntities.Add(oEntity)
+    obxContainer.Add(oEntity)
     oEntity.finish(-1)
     oEntity = Null                  ' free object
 
 End
 
-Public Function AddArc(Points As Float[], r As Float, angle1 As Float, angle2 As Float, Optional colour As Integer = 0, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
+Public Function AddArc(obxContainer As Object[], Points As Float[], r As Float, angle1 As Float, angle2 As Float, Optional colour As Integer = 0, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
 
     ' points are in x,y,x,y,x,y....
     Dim oEntity As Object                      ' creamos la entidad de la clase apropiada
@@ -368,13 +382,13 @@ Public Function AddArc(Points As Float[], r As Float, angle1 As Float, angle2 As
     oEntity.LineWidth = LineWidth               ' datos CAD
     oEntity.Block = Block
     If oEntity.Block <> "" Then oEntity.visible = False
-    APPMain.hFCAD.arrEntities.Add(oEntity)
+    obxContainer.Add(oEntity)
     oEntity.finish(-1)
     oEntity = Null                  ' free object
 
 End
 
-Public Function AddEllipse(Points As Float[], r As Float, angle1 As Float, angle2 As Float, Optional colour As Integer = 0, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
+Public Function AddEllipse(obxContainer As Object[], Points As Float[], r As Float, angle1 As Float, angle2 As Float, Optional colour As Integer = 0, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
 
     ' points are in x,y,x,y,x,y....
     Dim oEntity As Object                      ' creamos la entidad de la clase apropiada
@@ -383,21 +397,21 @@ Public Function AddEllipse(Points As Float[], r As Float, angle1 As Float, angle
     oEntity.P.insert(points)                    ' centro x1,y1
     oEntity.p[2] += oEntity.p[0]                ' un pequeño truco porque gaucho usa los puntos de manera diferente a DXF
     oEntity.p[3] += oEntity.p[1]
-    oEntity.fParam.Add(r)                      ' radio
-    oEntity.fParam.Add(angle1)                 ' radio
-    oEntity.fParam.Add(angle2)                   ' angulo
+    oEntity.fParam.Add(r)                      ' ratio minor/major
+    oEntity.fParam.Add(angle1 * 180 / Pi)     ' start angle
+    oEntity.fParam.Add(angle2 * 180 / Pi)      ' end angle
     oEntity.layer = Layer
     oEntity.colour = colour
     oEntity.LineWidth = LineWidth               ' datos CAD
     oEntity.Block = Block
     If oEntity.Block <> "" Then oEntity.visible = False
-    APPMain.hFCAD.arrEntities.Add(oEntity)
+    obxContainer.Add(oEntity)
     oEntity.finish(-1)
     oEntity = Null                  ' free object
 
 End
 
-Public Function AddText(Points As Float[], angle As Float, height As Float, _Text As String, Optional colour As Integer = Color.Blue, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
+Public Function AddText(obxContainer As Object[], Points As Float[], angle As Float, height As Float, _Text As String, Optional colour As Integer = Color.Blue, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
 
     Dim oEntity As Object                       ' creamos la entidad de la clase apropiada
 
@@ -411,13 +425,13 @@ Public Function AddText(Points As Float[], angle As Float, height As Float, _Tex
     oEntity.LineWidth = LineWidth               ' datos CAD
     oEntity.Block = Block
     If oEntity.Block <> "" Then oEntity.visible = False
-    APPMain.hFCAD.arrEntities.Add(oEntity)
+    obxContainer.Add(oEntity)
     oEntity.finish(-1)
     oEntity = Null                  ' free object
 
 End
 
-Public Function AddMText(Points As Float[], angle As Float, height As Float, _Text As String, Optional colour As Integer = Color.Blue, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
+Public Function AddMText(obxContainer As Object[], Points As Float[], angle As Float, height As Float, _Text As String, Optional colour As Integer = Color.Blue, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
 
     Dim oEntity As Object                       ' creamos la entidad de la clase apropiada
 
@@ -431,20 +445,20 @@ Public Function AddMText(Points As Float[], angle As Float, height As Float, _Te
     oEntity.LineWidth = LineWidth               ' datos CAD
     oEntity.Block = Block
     If oEntity.Block <> "" Then oEntity.visible = False
-    APPMain.hFCAD.arrEntities.Add(oEntity)
+    obxContainer.Add(oEntity)
     oEntity.finish(-1)
     oEntity = Null                  ' free object
 
 End
 
-Public Function AddCurve(Points As Float[], Optional colour As Integer = 0, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
+Public Function AddCurve(obxContainer As Object[], Points As Float[], Optional colour As Integer = 0, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
 
     ' points are in x,y,x,y,x,y....
     Dim o As Object
 
 End
 
-Public Function AddInsert(Points As Float[], scaleX As Float, scaleY As Float, angulo As Float, Optional colour As Integer = Color.Blue, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
+Public Function AddInsert(obxContainer As Object[], Points As Float[], scaleX As Float, scaleY As Float, angulo As Float, Optional colour As Integer = Color.Blue, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
 
     Dim oEntity As Object                       ' creamos la entidad de la clase apropiada
 
@@ -456,14 +470,14 @@ Public Function AddInsert(Points As Float[], scaleX As Float, scaleY As Float, a
     oEntity.layer = Layer
     oEntity.colour = colour
     oEntity.Block = Block
-    APPMain.hFCAD.arrEntities.Add(oEntity)
+    obxContainer.Add(oEntity)
     oEntity.finish(-1)
 
     oEntity = Null                  ' free object
 
 End
 
-Public Function AddBlock(Points As Float[], Optional Layer As String, Optional Block As String) As Boolean
+Public Function AddBlock(obxContainer As Object[], Points As Float[], Optional Layer As String, Optional Block As String) As Boolean
 
     Dim oEntity As Object                       ' creamos la entidad de la clase apropiada
 
@@ -471,7 +485,7 @@ Public Function AddBlock(Points As Float[], Optional Layer As String, Optional B
     oEntity.P.insert(points)                    ' basepoint , , siempre es 0,0 los objetos agregados a este bloque se refieren a este punto
     oEntity.layer = Layer
     oEntity.Block = Block
-    APPMain.hFCAD.arrEntities.Add(oEntity)
+    obxContainer.Add(oEntity)
     oEntity.finish(-1)
     oEntity = Null                  ' free object
 

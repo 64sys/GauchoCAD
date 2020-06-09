@@ -42,17 +42,18 @@ Public Sub Draw()
 
     major = Sqr((Me.p[2] - Me.p[0]) ^ 2 + (Me.p[3] - Me.p[1]) ^ 2)
     angle = Ang(Me.p[2] - Me.p[0], Me.p[3] - Me.p[1])          ' Los coordenadas del eje mayor son relativas al centro
+    If Not Me.Finished Then
+        If Me.stepsdone < 2 Then
+            Me.fParam[0] = 0.5
+            Me.start = 0
+            Me.recorrido = 2 * Pi
+            Minor = major * Me.fParam[0]
+        Else If Me.stepsdone < 3 Then
+            Minor = major * Me.fParam[0]
+            'If Me.fParam[0] > major Then Me.fParam[0] = major
+            'Minor = Me.fParam[0]
 
-    If Me.stepsdone < 2 Then
-        Me.fParam[0] = 0.5
-        Me.start = 0
-        Me.recorrido = 2 * Pi
-        Minor = major * Me.fParam[0]
-    Else If Me.stepsdone < 3 Then
-        Minor = major * Me.fParam[0]
-        'If Me.fParam[0] > major Then Me.fParam[0] = major
-        'Minor = Me.fParam[0]
-
+        Endif
     Endif
     Minor = major * Me.fParam[0]
     If major = 0 Then major = 1
