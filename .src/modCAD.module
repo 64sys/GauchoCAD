@@ -158,7 +158,7 @@ Public Function ImportEntities2(colData As Collection, obxEntities As Object[], 
                     AddLine(flxPoints, colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], BlockName)
                     Inc iTotalEntities
 
-                Case "polyline"
+                Case "lwpolyline", "polyline"
                     GoSub GetPoints
                     AddPolyLine(flxPoints, colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], BlockName)
                     Inc iTotalEntities
