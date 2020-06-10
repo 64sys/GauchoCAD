@@ -261,6 +261,41 @@
       Tag = "erase"
     }
   }
+  { grpSmart Menu
+    Text = ("Structures")
+    { mnuSlab4 Menu smart
+      Name = "mnuSlab4"
+      Text = ("Slab 4 sided")
+      Picture = Picture["svg/smart/slab4p.svg"]
+      Enabled = False
+      Tag = "slab4"
+    }
+    { mnuSlab3 Menu smart
+      Name = "mnuSlab3"
+      Text = ("Slab 3 sided")
+      Picture = Picture["svg/smart/slab3p.svg"]
+      Enabled = False
+      Tag = "slab3"
+    }
+    { mnuColumn Menu
+      Text = ("Column")
+      Picture = Picture["svg/smart/column.svg"]
+      Enabled = False
+      Tag = "column"
+    }
+    { mnuBeam Menu
+      Text = ("Beam")
+      Picture = Picture["svg/smart/beam.svg"]
+      Enabled = False
+      Tag = "beam"
+    }
+    { mnuWallcolumn Menu
+      Text = ("Wall column")
+      Picture = Picture["svg/smart/wallcolumn.svg"]
+      Enabled = False
+      Tag = "wallcolumn"
+    }
+  }
   { grpView Menu
     Text = ("View")
     { mnuZoomw Menu view
@@ -397,12 +432,14 @@
             Alignment = Align.Center
           }
         }
-        { pnlView Panel
+        { pnlSmart Panel
           MoveScaled(0,42,21,17)
           Expand = True
           Arrangement = Arrange.Row
-          { Spring1 Spring
-            MoveScaled(1,1,2,2)
+          { lblSmart Label
+            MoveScaled(0,1,20,3)
+            Text = (" Smart entities")
+            Alignment = Align.Center
           }
         }
       }

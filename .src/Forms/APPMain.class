@@ -82,6 +82,9 @@ Public Sub Run(cin As Collection)
                     Case "grpTools"
                         tob = New ToolButton(pnlTools) As "tool"
                         z = 48
+                    Case "grpSmart"
+                        tob = New ToolButton(pnlSmart) As "tool"
+                        z = 48
 
                     Case "grpFile"
                         tob = New ToolButton(pnlFile) As "menuapp"
@@ -112,7 +115,7 @@ Public Sub Run(cin As Collection)
                     If Exist(ictn[obj.Tag]) Then
                         If Stat(ictn[obj.Tag]).Type = gb.File Or Stat(ictn[obj.Tag]).Type = gb.Link Then
                             Select mnu.Name
-                                Case "grpFile", "grpOptions", "grpHelp", "grpView"
+                                Case "grpFile", "grpOptions", "grpHelp", "grpView", "grpSmart"
                                     tob.Picture = Image.Load(ictn[obj.Tag]).Stretch(z - 8, z - 8).Picture
 
                                 Case Else
