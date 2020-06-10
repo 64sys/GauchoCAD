@@ -314,6 +314,7 @@
         }
         { ColumnView1 ColumnView
           MoveScaled(2,30,16,16)
+          Visible = False
           Expand = True
           Border = False
         }
