@@ -17,7 +17,7 @@
    stroke-linejoin="round"
    xml:space="preserve"
    id="svg116"
-   sodipodi:docname="rectangle.svg"
+   sodipodi:docname="mirror.svg"
    inkscape:version="0.92.5 (2060ec1f9f, 2020-04-08)"><metadata
    id="metadata120"><rdf:RDF><cc:Work
        rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
@@ -34,9 +34,9 @@
    inkscape:window-height="1029"
    id="namedview118"
    showgrid="false"
-   inkscape:zoom="1.1062391"
-   inkscape:cx="130.87152"
-   inkscape:cy="202.97926"
+   inkscape:zoom="0.55311955"
+   inkscape:cx="223.78495"
+   inkscape:cy="430.06767"
    inkscape:window-x="1366"
    inkscape:window-y="25"
    inkscape:window-maximized="1"
@@ -272,14 +272,15 @@
       
       
       
-     <rect
-   style="fill:none;fill-opacity:1;stroke:#0066b3;stroke-width:343.95834351;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-   id="rect836-3"
-   width="8630.0332"
-   height="5716.7295"
-   x="1430.9144"
-   y="2742.0037"
-   ry="0" /></g>
+     <path
+   style="fill:#c0c0c0;stroke:#0066b3;stroke-width:343.9583319;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none;fill-opacity:0.49019608"
+   d="m 5046.8537,1172.1588 -48.9786,155.5824 V 10284.843 H 932.65527 Z"
+   id="path888"
+   inkscape:connector-curvature="0" /><path
+   style="fill:#c0c0c0;fill-opacity:0.49019608;stroke:#0066b3;stroke-width:343.95837402;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+   d="m 6066.0983,1172.158 48.9785,155.5825 v 8957.1025 h 4065.2212 z"
+   id="path888-3"
+   inkscape:connector-curvature="0" /></g>
    </g>
  </g>
 </svg>

@@ -17,7 +17,7 @@
    stroke-linejoin="round"
    xml:space="preserve"
    id="svg116"
-   sodipodi:docname="chamfler.svg"
+   sodipodi:docname="chamfer.svg"
    inkscape:version="0.92.5 (2060ec1f9f, 2020-04-08)"><metadata
    id="metadata120"><rdf:RDF><cc:Work
        rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
@@ -30,16 +30,16 @@
    guidetolerance="10"
    inkscape:pageopacity="0"
    inkscape:pageshadow="2"
-   inkscape:window-width="1920"
-   inkscape:window-height="1029"
+   inkscape:window-width="958"
+   inkscape:window-height="1024"
    id="namedview118"
    showgrid="false"
    inkscape:zoom="0.70710678"
-   inkscape:cx="101.63097"
+   inkscape:cx="238.95963"
    inkscape:cy="250.43615"
-   inkscape:window-x="1366"
+   inkscape:window-x="2326"
    inkscape:window-y="25"
-   inkscape:window-maximized="1"
+   inkscape:window-maximized="0"
    inkscape:current-layer="g108" />
  <defs
    class="ClipPathGroup"
@@ -309,12 +309,12 @@
       
       
      <path
-   style="fill:#c0c0c0;fill-opacity:1;stroke:#0066b3;stroke-width:132.29167175;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+   style="fill:#c0c0c0;fill-opacity:0.49019608;stroke:#0066b3;stroke-width:132.29167175;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;opacity:1"
    d="M 10011.985,6831.7358 4992.9715,1260.1028 m 0,0 -3585.9744,22.9411 V 9917.6934 H 10037.03 l -25.045,-3085.9576"
    id="path887"
    inkscape:connector-curvature="0"
    sodipodi:nodetypes="ccccccc" /><path
-   style="fill:none;stroke:#0066b3;stroke-width:476.24999802;stroke-linecap:round;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none"
+   style="fill:none;stroke:#b30077;stroke-width:793.74999669;stroke-linecap:round;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none"
    d="m 4992.9713,1260.1028 c 0,0 5019.0137,5571.633 5019.0137,5571.633"
    id="path1525"
    inkscape:connector-curvature="0"

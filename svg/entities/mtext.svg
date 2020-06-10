@@ -35,7 +35,7 @@
    id="namedview118"
    showgrid="false"
    inkscape:zoom="1.1062391"
-   inkscape:cx="353.93858"
+   inkscape:cx="9.5284045"
    inkscape:cy="154.31727"
    inkscape:window-x="1366"
    inkscape:window-y="25"
@@ -178,30 +178,34 @@
    y="2148.2554"
    x="2580.1885"
    class="BoundingBox" />
-      <text
-   xml:space="preserve"
-   style="font-style:normal;font-weight:normal;font-size:2662.24829102px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#0066b3;fill-opacity:1;stroke:#0066b3;stroke-width:0;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-   x="1623.1144"
-   y="4385.2261"
-   id="text3261"
-   transform="scale(1.0221784,0.97830281)"><tspan
-     sodipodi:role="line"
-     id="tspan3259"
-     x="1623.1144"
-     y="4385.2261"
-     style="fill:#0066b3;fill-opacity:1;stroke:#0066b3;stroke-width:0;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1">gaucho</tspan><tspan
-     sodipodi:role="line"
-     x="1623.1144"
-     y="7713.0366"
-     style="fill:#0066b3;fill-opacity:1;stroke:#0066b3;stroke-width:0;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-     id="tspan865">gaucho</tspan><tspan
-     sodipodi:role="line"
-     x="1623.1144"
-     y="11040.847"
-     style="fill:#0066b3;fill-opacity:1;stroke:#0066b3;stroke-width:0;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-     id="tspan867">gaucho</tspan></text>
+      
 
 
+
+<text
+   transform="scale(0.88042507,1.135815)"
+   id="text3261-3"
+   y="5241.4478"
+   x="2414.4795"
+   style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4428.72460938px;line-height:1.25;font-family:Vemana2000;-inkscape-font-specification:Vemana2000;letter-spacing:0px;word-spacing:0px;fill:#0066b3;fill-opacity:1;stroke:#0066b3;stroke-width:0;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+   xml:space="preserve"><tspan
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Vemana2000;-inkscape-font-specification:Vemana2000;fill:#0066b3;fill-opacity:1;stroke:#0066b3;stroke-width:0;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+     y="5241.4478"
+     x="2414.4795"
+     id="tspan3259-6"
+     sodipodi:role="line">Text</tspan></text>
+<text
+   transform="scale(0.88042507,1.135815)"
+   id="text3261-3-5"
+   y="9094.9619"
+   x="2686.1365"
+   style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4428.72460938px;line-height:1.25;font-family:Vemana2000;-inkscape-font-specification:Vemana2000;letter-spacing:0px;word-spacing:0px;fill:#0066b3;fill-opacity:1;stroke:#0066b3;stroke-width:0;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+   xml:space="preserve"><tspan
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Vemana2000;-inkscape-font-specification:Vemana2000;fill:#0066b3;fill-opacity:1;stroke:#0066b3;stroke-width:0;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+     y="9094.9619"
+     x="2686.1365"
+     id="tspan3259-6-9"
+     sodipodi:role="line">text</tspan></text>
 </g></g>
    </g>
  </g>

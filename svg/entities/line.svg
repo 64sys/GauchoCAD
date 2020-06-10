@@ -31,19 +31,22 @@
    inkscape:pageopacity="0"
    inkscape:pageshadow="2"
    inkscape:window-width="1920"
-   inkscape:window-height="1054"
+   inkscape:window-height="1029"
    id="namedview118"
    showgrid="false"
-   inkscape:zoom="1.5644584"
-   inkscape:cx="67.234354"
-   inkscape:cy="222.46347"
+   inkscape:zoom="0.55311957"
+   inkscape:cx="128.28371"
+   inkscape:cy="330.0548"
    inkscape:window-x="1366"
-   inkscape:window-y="0"
+   inkscape:window-y="25"
    inkscape:window-maximized="1"
-   inkscape:current-layer="g108" />
+   inkscape:current-layer="g68" />
  <defs
    class="ClipPathGroup"
-   id="defs8" />
+   id="defs8">
+        
+        
+       </defs>
  <defs
    class="TextShapeIndex"
    id="defs12" />
@@ -142,37 +145,20 @@
      <g
    class="com.sun.star.drawing.LineShape"
    id="g68">
-       <g
-   id="id5">
-        <rect
-   class="BoundingBox"
-   x="2698"
-   y="2698"
-   width="5898"
-   height="5898"
+       <rect
+   style="fill:none;stroke:none"
    id="rect63"
-   style="fill:none;stroke:none" />
-        <path
-   d="M 2823,8470 8470,2823"
-   id="path65"
+   height="5898"
+   width="5898"
+   y="2698"
+   x="2698"
+   class="BoundingBox" /><path
+   sodipodi:nodetypes="cc"
+   style="fill:none;stroke:#0066b3;stroke-width:343.9583319;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-linecap:round"
    inkscape:connector-curvature="0"
-   style="fill:none;stroke:#0066b3;stroke-width:353;stroke-linejoin:miter" />
-       </g>
-      </g><rect
-   id="rect3893"
-   width="1587.5"
-   height="1587.5"
-   x="1411"
-   y="8293.5"
-   style="opacity:1;fill:none;stroke:#0066b3;stroke-width:355.0708313;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-   ry="0" /><rect
-   id="rect3893-3"
-   width="1587.5002"
-   height="1587.5002"
-   x="8280.5"
-   y="1400"
-   style="opacity:1;fill:none;stroke:#0066b3;stroke-width:355.07086182;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-   ry="0" /></g>
+   id="path65"
+   d="M 1411,9881 9868,1400" />
+      </g></g>
    </g>
  </g>
 </svg>

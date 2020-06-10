@@ -205,11 +205,13 @@
     { mnuMirror Menu tool
       Name = "mnuMirror"
       Text = ("Mirror")
+      Picture = Picture["svg/tools/mirror.svg"]
       Tag = "mirror"
     }
     { mnuTrim Menu tool
       Name = "mnuTrim"
       Text = ("Trim")
+      Picture = Picture["svg/tools/trim.svg"]
       Tag = "trim"
     }
     { mnuFillet Menu tool
@@ -241,12 +243,14 @@
     { mnuOffset Menu tool
       Name = "mnuOffset"
       Text = ("Offset")
+      Picture = Picture["svg/tools/offset.svg"]
       Visible = False
       Tag = "offset"
     }
     { mnuDivide Menu tool
       Name = "mnuDivide"
       Text = ("Divide")
+      Picture = Picture["svg/tools/divide.svg"]
       Enabled = False
       Tag = "divide"
     }
@@ -262,17 +266,19 @@
     { mnuZoomw Menu view
       Name = "mnuZoomw"
       Text = ("Zoom window")
+      Picture = Picture["svg/tools/zoomw.svg"]
       Tag = "zoomw"
     }
     { mnuPan Menu view
       Name = "mnuPan"
       Text = ("Pan view")
+      Picture = Picture["svg/tools/pan.svg"]
       Tag = "pan"
     }
     { mnuZoome Menu view
       Name = "mnuZoome"
       Text = ("Zoom extents")
-      Picture = Picture["svg/layers/zoom-fit-best.svg"]
+      Picture = Picture["svg/tools/zoome.svg"]
       Tag = "zoome"
     }
   }

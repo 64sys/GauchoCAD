@@ -31,14 +31,14 @@
    inkscape:pageopacity="0"
    inkscape:pageshadow="2"
    inkscape:window-width="1920"
-   inkscape:window-height="1054"
+   inkscape:window-height="1029"
    id="namedview118"
    showgrid="false"
    inkscape:zoom="0.78222918"
-   inkscape:cx="225.7615"
-   inkscape:cy="244.46273"
+   inkscape:cx="116.94254"
+   inkscape:cy="347.27269"
    inkscape:window-x="1366"
-   inkscape:window-y="0"
+   inkscape:window-y="25"
    inkscape:window-maximized="1"
    inkscape:current-layer="g108" />
  <defs
@@ -139,22 +139,22 @@
       </g>
       
       
-     <rect
-   id="rect3893"
-   width="1587.5"
-   height="1587.5"
-   x="7205.6733"
-   y="-979.92957"
-   style="opacity:1;fill:none;stroke:#0066b3;stroke-width:355.0708313;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-   ry="0"
-   transform="rotate(46.183291)" /><ellipse
+     <ellipse
    id="circle6020"
    style="opacity:1;fill:none;fill-opacity:1;fill-rule:nonzero;stroke:#0066b3;stroke-width:370.41741381;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:3.99626684;stroke-opacity:1"
    transform="matrix(0.7061019,-0.70811023,0.7061019,0.70811023,0,0)"
    ry="3348.2932"
    rx="4923.9609"
    cy="7994.729"
-   cx="7.448555" /></g>
+   cx="7.448555" /><rect
+   id="rect3893-6"
+   width="536.44928"
+   height="536.44928"
+   x="7717.7378"
+   y="-463.3869"
+   style="opacity:1;fill:none;stroke:#0066b3;stroke-width:17.88164711;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+   ry="0"
+   transform="rotate(46.18329)" /></g>
    </g>
  </g>
 </svg>

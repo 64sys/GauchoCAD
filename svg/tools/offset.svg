@@ -17,7 +17,7 @@
    stroke-linejoin="round"
    xml:space="preserve"
    id="svg116"
-   sodipodi:docname="leader.svg"
+   sodipodi:docname="offset.svg"
    inkscape:version="0.92.5 (2060ec1f9f, 2020-04-08)"><metadata
    id="metadata120"><rdf:RDF><cc:Work
        rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
@@ -34,39 +34,16 @@
    inkscape:window-height="1029"
    id="namedview118"
    showgrid="false"
-   inkscape:zoom="0.55311956"
-   inkscape:cx="76.079268"
-   inkscape:cy="307.69181"
+   inkscape:zoom="0.39111459"
+   inkscape:cx="-459.47324"
+   inkscape:cy="-146.00199"
    inkscape:window-x="1366"
    inkscape:window-y="25"
    inkscape:window-maximized="1"
-   inkscape:current-layer="g68"
-   inkscape:snap-text-baseline="true" />
+   inkscape:current-layer="g68" />
  <defs
    class="ClipPathGroup"
-   id="defs8"><marker
-   inkscape:stockid="Arrow1Lend"
-   orient="auto"
-   refY="0.0"
-   refX="0.0"
-   id="Arrow1Lend"
-   style="overflow:visible;"
-   inkscape:isstock="true"><path
-     id="path842"
-     d="M 0.0,0.0 L 5.0,-5.0 L -12.5,0.0 L 5.0,5.0 L 0.0,0.0 z "
-     style="fill-rule:evenodd;stroke:#0066b3;stroke-width:1pt;stroke-opacity:1;fill:#0066b3;fill-opacity:1"
-     transform="scale(0.8) rotate(180) translate(12.5,0)" /></marker><marker
-   inkscape:stockid="Arrow1Lstart"
-   orient="auto"
-   refY="0.0"
-   refX="0.0"
-   id="Arrow1Lstart"
-   style="overflow:visible"
-   inkscape:isstock="true"><path
-     id="path839"
-     d="M 0.0,0.0 L 5.0,-5.0 L -12.5,0.0 L 5.0,5.0 L 0.0,0.0 z "
-     style="fill-rule:evenodd;stroke:#000000;stroke-width:1.0pt"
-     transform="scale(0.8) translate(12.5,0)" /></marker>
+   id="defs8">
         
         
        </defs>
@@ -117,8 +94,7 @@
       </g>
       <g
    class="com.sun.star.drawing.PolyPolygonShape"
-   id="g61"
-   transform="translate(-524.27622,-372.06699)">
+   id="g61">
        <g
    id="id4">
         <rect
@@ -168,38 +144,26 @@
       
      <g
    class="com.sun.star.drawing.LineShape"
-   id="g68"
-   transform="translate(-1065.4646,-1285.3223)">
+   id="g68">
        <rect
    style="fill:none;stroke:none"
    id="rect63"
    height="5898"
    width="5898"
-   y="2148.2554"
-   x="2580.1885"
+   y="2698"
+   x="2698"
    class="BoundingBox" /><path
-   style="fill:none;stroke:#0066b3;stroke-width:132.29167175;stroke-linejoin:miter;stroke-miterlimit:1;stroke-dasharray:none;marker-end:url(#Arrow1Lend)"
+   sodipodi:nodetypes="cc"
+   style="fill:none;stroke:#b30077;stroke-width:476.24999802;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:476.24999802,952.49999603;stroke-opacity:1;stroke-dashoffset:0"
    inkscape:connector-curvature="0"
    id="path65"
-   d="m 10193.729,9525.7062 634.749,1523.8608" />
+   d="M 2056.7691,10502.851 C 4669.8959,6151.5494 9489.6194,5449.3405 10513.769,2021.8517" />
       <path
-   style="fill:none;stroke:#0066b3;stroke-width:238.12499901;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none"
-   d="M 10246.646,9614.499 8356.898,5133.1809 H 2348.9318"
-   id="path3255"
-   inkscape:connector-curvature="0" /><text
-   xml:space="preserve"
-   style="font-style:normal;font-weight:normal;font-size:2764.07910156px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#0066b3;fill-opacity:1;stroke:#0066b3;stroke-width:0;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-   x="2397.875"
-   y="4003.9023"
-   id="text3261"
-   transform="scale(0.89185905,1.1212534)"><tspan
-     sodipodi:role="line"
-     id="tspan3259"
-     x="2397.875"
-     y="4003.9023"
-     style="fill:#0066b3;fill-opacity:1;stroke:#0066b3;stroke-width:0;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1">Note</tspan></text>
-
-</g></g>
+   sodipodi:nodetypes="cc"
+   style="fill:none;stroke:#0066b3;stroke-width:343.95837402;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none"
+   inkscape:connector-curvature="0"
+   id="path65-3"
+   d="M 746.59097,9454.6104 C 3359.7181,5103.3076 8179.4421,4401.0986 9203.5923,973.60944" /></g></g>
    </g>
  </g>
 </svg>
