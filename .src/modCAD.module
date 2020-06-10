@@ -825,7 +825,8 @@ Public Function DecodeColor() As Integer[]
     rgbx.Add("153:153:153")
     rgbx.Add("204:204:204")
     rgbx.Add("255:255:255")
-
+    rgbx.Add("255:255:255") '256
+    rgbx.Add("255:255:255") '257
     For i = 0 To rgbx.Max
         s = rgbx[i]
         If i = 0 Or i = 8 Or i = rgbx.Max Then
@@ -840,5 +841,71 @@ Public Function DecodeColor() As Integer[]
     Next
 
     Return rgb
+
+End
+
+Public Sub Benchmarks()
+    ' 1
+
+    ' Recorro la coleccion de entidades, leo y cambio propiedades
+    Dim cEntity As Collection, cTipos As Collection, oEntity As Object, c, i As Integer
+
+    Dim t As Float = Timer
+
+    For Each cTipos In APPMain.hFCAD.cModel["Entities"]
+        For Each cEntity In cTipos
+            cEntity["layer"] = "test"
+            c = cEntity["colour"]
+            Inc i
+        Next
+    Next
+    Debug "Recorrida de ", i, " objetos de la coleccion t=", Timer - t
+    i = 0
+    ' recorro los objetos, leo y cambio propiedades
+    t = Timer
+    For Each oEntity In APPMain.hFCAD.arrEntities
+        oEntity.layer = "test"
+        c = oEntity.colour
+        Inc i
+    Next
+    Debug "Recorrida de ", i, " objetos del array t=", Timer - t
+
+    ' 2
+
+    ' Referecio 3 entidades especifias, leo y cambio propiedades
+    t = Timer
+    Dim veces As Integer
+    For veces = 0 To 1e6
+
+        APPMain.hFCAD.cModel["Entities"]["line"]["20BB"]["layer"] = "test"
+        c = APPMain.hFCAD.cModel["Entities"]["line"]["20BB"]["colour"]
+
+        APPMain.hFCAD.cModel["Entities"]["line"]["16F4"]["layer"] = "test"
+        c = APPMain.hFCAD.cModel["Entities"]["line"]["16F4"]["colour"]
+
+        APPMain.hFCAD.cModel["Entities"]["line"]["1C57"]["layer"] = "test"
+        c = APPMain.hFCAD.cModel["Entities"]["line"]["1C57"]["colour"]
+
+        Inc i
+
+    Next
+    Debug "Referecio objetos de la coleccion t=", Timer - t
+    i = 0
+
+    ' idem para el array
+    t = Timer
+    For veces = 0 To 1e6
+        APPMain.hFCAD.arrEntities[3500].layer = "test"
+        c = APPMain.hFCAD.arrEntities[3500].colour
+
+        APPMain.hFCAD.arrEntities[2500].layer = "test"
+        c = APPMain.hFCAD.arrEntities[2500].colour
+
+        APPMain.hFCAD.arrEntities[1500].layer = "test"
+        c = APPMain.hFCAD.arrEntities[1500].colour
+
+        Inc i
+    Next
+    Debug "Referencio objetos del array t=", Timer - t
 
 End

@@ -82,6 +82,7 @@ Public Sub Finish(ParamsDone As Integer) As Boolean
     ' Me.fParam.add(iBlock)
     Me.Finished = True
     Me.B.Resize(Me.P.Count)
+    Me.psel.resize(Me.p.count / 2)
 
     ' For Each e In APPMain.hFCAD.arrEntities
     '     If e.Selected Then                      ' parto of this

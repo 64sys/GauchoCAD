@@ -6,6 +6,8 @@ Authors: Terco, Tincho, Postpase, Vuott
 
 VER       DATE      CHANGES
 --------------------------------------------------------------------------------------------------------------------
+0.0.60	09/06/20	Reading DXF blocks. Added Protractor tool.
+
 0.0.58	08/06/20	All entities are in 3D format from file to cModel collection. Started BIN again.
 
 0.0.56	06/06/20	Fix @ in entering coordinates. Added Area and Ruler tools. Patched on importing points in 3D
