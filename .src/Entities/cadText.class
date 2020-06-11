@@ -101,25 +101,36 @@ Public Sub Draw(oE As Object)
 
         glPlus.DrawText(oE.StringData, oE.p[0], oE.p[1], oE.fParam[0], oE.fParam[1], oE.ColorToPaint)
 
-        If oE.StringData <> "" Then CreateBoundingPoligon(oe)
-
     End If
 
 End
 
-Public Sub CreateBoundingPoligon(oE As Object)
+'' Creo los puntos de interes
+'' Build point of interest
 
-    Dim tRect As New Float[]
+Public Function BuildPOI(oE As Object, Optional arrIndex As Integer = -1) As Integer
 
-    oE.BoundingPoligon.Clear
+    If arrIndex < 0 Then arrIndex = appmain.hFCAD.arrEntities.Max       ' si este valor no es provisto , estos POI son de la ultima entidad
+
+    ' points
+    appmain.hFCAD.poiPoints.insert([oE.p[0], oE.p[1]])
+    appmain.hFCAD.poiType.Add(gcd.poiBasePoint)
+    APPMain.hFCAD.poiEntities.Add(arrIndex)
+
+    ' line
+
+    ' BoundingPoligon
+
+    Dim tRect As New Float[], poli As New Float[]
 
     tRect = glPlus.TextExtends(oE.StringData, oE.fParam[1])
+    poli.Insert([0, 0, tRect[0], 0, tRect[0], tRect[1], 0, tRect[1]]) ' armo el poligono , que ya tiene la escala
+    puntos.Rotate(Poli, oE.fParam[0] * Pi / 180)
+    puntos.Translate(Poli, oE.P[0], oE.P[1])
 
-    ' armo el poligono , que ya tiene la escala
-
-    oE.BoundingPoligon.Insert([0, 0, tRect[0], 0, tRect[0], tRect[1], 0, tRect[1]])
-
-    puntos.Rotate(oE.BoundingPoligon, oE.fParam[0] * Pi / 180)
-    puntos.Translate(oE.BoundingPoligon, oE.P[0], oE.P[1])
+    appmain.hFCAD.poiPoligons.Insert(poli)
+    appmain.hFCAD.poiPoligonStartIndex.Add(appmain.hFCAD.poiPoligons.Count - poli.Count)
+    appmain.hFCAD.poiPoligonElements.Add(poli.Count)
+    appmain.hFCAD.poiPoligonEntities.Add(arrIndex)
 
 End

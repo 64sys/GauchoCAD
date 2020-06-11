@@ -78,9 +78,18 @@ Public Xmayor As Float = -1E100
 Public Ymenor As Float = 1E100
 Public Ymayor As Float = -1E100
 
-' point of interests and entities
-Public POI As New Single[]                  ' xy pairs of points
-Public iEntities As New Integer[]           ' related entity
+' point of interests, lines, areas and entities: all this is generated n the entity creation
+Public poiPoints As New Float[]                 ' xy pairs of points
+Public poiType As New Integer[]                 ' tipe of poi
+Public poiEntities As New Integer[]             ' related entity
+
+Public poiLines As New Float[]                  ' x0y0x1y1 points
+Public poiLinesEntities As New Integer[]        ' related entity
+
+Public poiPoligons As New Float[]               ' this define multiple poligons to search for proximity
+Public poiPoligonStartIndex As New Integer[]
+Public poiPoligonElements As New Integer[]
+Public poiPoligonEntities As New Integer[]      ' related entity
 
 ' interaccion del mouse en pantalla
 Public iEntity As New Single[]             ' las coordenadas del punto encontrado y el tipo de punto
@@ -403,7 +412,7 @@ Public Sub form_KeyPress()
         'modCAD.AddText([0, -400], 20, 30, "Unica linea", 3, 1, 1, "0", "")
         'modCAD.ApplyLayerProperties
         'modCAD.AddLine([0, -200, 400, 0], 2, 1, "Dashed", "0", "")
-        ' modCAD.Benchmarks
+        modCAD.Benchmarks
 
         regen
         Return

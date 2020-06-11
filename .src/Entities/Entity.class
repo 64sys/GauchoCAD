@@ -61,8 +61,8 @@ Public Visible As Boolean = True            ' si esta entidad puede ser mostrada
 Public Finished As Boolean = False          ' colocar en true cuando se llegue a completar
 Public StepsDone As Integer                 ' esto lo cambia cls ElementBuilder durante la construccion
 Public Group As Integer = 0                 ' Pertenecemos a un grupo?
-Public flxDash As New Integer[]             ' DEPRECADO
 Public B As New Float[]                     ' Backup point
 Public Psel As New Boolean[]                ' selected points
 Public BoundingPoligon As New Float[]       ' this is a poligon built at element's contruction that defines a poligon used for detecting points inside me
 Public MyPoi As New Single[]                ' point of interest
+Public Stage As Integer                     ' 0 = creating; 1 = editing

@@ -192,7 +192,7 @@ End
 '' Creo los puntos de interes
 '' Build point of interest
 
-Public Function BuildPOI(oE As Object) As Integer
+Public Function BuildPOI(oE As Object, Optional arrIndex As Integer = -1) As Integer
 
 End
 
@@ -201,7 +201,8 @@ End
 Public Sub Finish(oE As Object, ParamsDone As Integer) As Boolean
 
     'Print "Finish en EntityBase"
-    CreateBoundingPoligon(oe)
+    'CreateBoundingPoligon(oe)
+    BuildPOI(oe)
 
     ' busco el tipo de linea, si hace falta
     If oE.LineTypeName = "Dashed" Then oE.LineType = 1

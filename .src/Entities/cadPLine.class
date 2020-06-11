@@ -63,6 +63,36 @@ Public Sub Draw(oE As Object)
 
 End
 
+'' Creo los puntos de interes
+'' Build point of interest
+
+Public Function BuildPOI(oE As Object, Optional arrIndex As Integer = -1) As Integer
+
+    If arrIndex < 0 Then arrIndex = appmain.hFCAD.arrEntities.Max       ' si este valor no es provisto , estos POI son de la ultima entidad
+    Dim i As Integer
+
+    appmain.hFCAD.poiPoints.insert([oE.P[0], oE.P[1]])
+    appmain.hFCAD.poiType.Add(gcd.poiEndPoint)
+    APPMain.hFCAD.poiEntities.Add(arrIndex)
+
+    For i = 0 To oE.P.count - 4 Step 2
+
+        appmain.hFCAD.poiPoints.insert([(oE.P[i + 0] + oE.P[i + 2]) / 2, (oE.P[i + 1] + oE.P[i + 3]) / 2])   ' mid
+        appmain.hFCAD.poiType.Add(gcd.poiMidPoint)
+        APPMain.hFCAD.poiEntities.Add(arrIndex)
+
+        appmain.hFCAD.poiPoints.insert([oE.P[i + 2], oE.P[i + 3]])
+        appmain.hFCAD.poiType.Add(gcd.poiEndPoint)
+        APPMain.hFCAD.poiEntities.Add(arrIndex)
+
+        ' line
+        appmain.hFCAD.poiLines.insert([oE.p[i], oE.p[i + 1], oE.p[i + 2], oE.p[i + 3]])
+        APPMain.hFCAD.poiLinesEntities.Add(arrIndex)
+
+    Next
+
+End
+
 '' Devuelve [x,y] punto de interes
 Public Function AboveMe(oE As Object, Xreal As Float, Yreal As Float, tolerance As Float, mode As Integer, fData As Float[]) As Boolean
     ' si una de las dos lineas de una cruz con centro en X,Y y largo Tolerance cruza la linea, estamos arriba

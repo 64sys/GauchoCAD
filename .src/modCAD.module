@@ -247,7 +247,7 @@ Public Function AddLine(obxContainer As Object[], Points As Float[], Optional co
 
     ' points are in x,y,x,y,x,y....
     Dim oEntity As New Entity
-    
+
     oEntity.ClassHandler = cadLine
     oEntity.P.insert(points)                    ' recibimos los dos vertices de la linea x1,y1,x2,y2
     oEntity.layer = Layer
@@ -269,7 +269,6 @@ Public Function AddPolyLine(obxContainer As Object[], Points As Float[], Optiona
 
     Dim oEntity As New Entity
 
-    
     oEntity.ClassHandler = cadPLine
     oEntity.P.insert(points)                    ' recibimos los dos vertices de la linea x1,y1,x2,y2
 
@@ -287,7 +286,7 @@ End
 Public Function AddDim(obxContainer As Object[], Points As Float[], bloque As String, medida As Float, texto As String, alineacion As Integer, angulo As Float, tipo As Integer, colour As Integer, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
 
     Dim oEntity As New Entity
-    
+
     oEntity.ClassHandler = cadDim              ' create the new entity of proper class
     oEntity.P.insert(points)                    ' recibimos los dos vertices de la linea x1,y1,x2,y2
     oEntity.fParam.Add(tipo)
@@ -312,8 +311,7 @@ Public Function AddSolid(obxContainer As Object[], Points As Float[], Optional c
     ' points are in x,y,x,y,x,y....
     ' points are in x,y,x,y,x,y....
     Dim oEntity As New Entity
-    
-    
+
     oEntity.ClassHandler = cadSolid             ' create the new entity of proper class
     oEntity.P.insert(points)                    ' recibimos los dos vertices de la linea x1,y1,x2,y2
 
@@ -851,6 +849,7 @@ Public Sub Benchmarks()
     Dim cEntity As Collection, cTipos As Collection, oEntity As Object, c, i As Integer
 
     Dim t As Float = Timer
+    Dim veces As Integer
 
     For Each cTipos In APPMain.hFCAD.cModel["Entities"]
         For Each cEntity In cTipos
@@ -873,39 +872,53 @@ Public Sub Benchmarks()
     ' 2
 
     ' Referecio 3 entidades especifias, leo y cambio propiedades
+    ' t = Timer
+
+    ' For veces = 0 To 1e6
+    '
+    '     APPMain.hFCAD.cModel["Entities"]["line"]["20BB"]["layer"] = "test"
+    '     c = APPMain.hFCAD.cModel["Entities"]["line"]["20BB"]["colour"]
+    '
+    '     APPMain.hFCAD.cModel["Entities"]["line"]["16F4"]["layer"] = "test"
+    '     c = APPMain.hFCAD.cModel["Entities"]["line"]["16F4"]["colour"]
+    '
+    '     APPMain.hFCAD.cModel["Entities"]["line"]["1C57"]["layer"] = "test"
+    '     c = APPMain.hFCAD.cModel["Entities"]["line"]["1C57"]["colour"]
+    '
+    '     Inc i
+    '
+    ' Next
+    ' Debug "Referecio objetos de la coleccion t=", Timer - t
+    ' i = 0
+    '
+    ' ' idem para el array
+    ' t = Timer
+    ' For veces = 0 To 1e6
+    '     APPMain.hFCAD.arrEntities[3500].layer = "test"
+    '     c = APPMain.hFCAD.arrEntities[3500].colour
+    '
+    '     APPMain.hFCAD.arrEntities[2500].layer = "test"
+    '     c = APPMain.hFCAD.arrEntities[2500].colour
+    '
+    '     APPMain.hFCAD.arrEntities[1500].layer = "test"
+    '     c = APPMain.hFCAD.arrEntities[1500].colour
+    '
+    '     Inc i
+    ' Next
+    ' Debug "Referencio objetos del array t=", Timer - t
+
+    ' 3 benchmark para POI
+
+    Dim flxPOI As New Float[], enco As New Float[]
     t = Timer
-    Dim veces As Integer
-    For veces = 0 To 1e6
-
-        APPMain.hFCAD.cModel["Entities"]["line"]["20BB"]["layer"] = "test"
-        c = APPMain.hFCAD.cModel["Entities"]["line"]["20BB"]["colour"]
-
-        APPMain.hFCAD.cModel["Entities"]["line"]["16F4"]["layer"] = "test"
-        c = APPMain.hFCAD.cModel["Entities"]["line"]["16F4"]["colour"]
-
-        APPMain.hFCAD.cModel["Entities"]["line"]["1C57"]["layer"] = "test"
-        c = APPMain.hFCAD.cModel["Entities"]["line"]["1C57"]["colour"]
-
-        Inc i
-
+    For veces = 0 To 2e6 - 1
+        flxPOI.Add(Rnd(-1000, 1000))
+        flxPOI.Add(Rnd(-1000, 1000))
     Next
-    Debug "Referecio objetos de la coleccion t=", Timer - t
-    i = 0
+    Debug "Creo array t=", Timer - t
 
-    ' idem para el array
     t = Timer
-    For veces = 0 To 1e6
-        APPMain.hFCAD.arrEntities[3500].layer = "test"
-        c = APPMain.hFCAD.arrEntities[3500].colour
-
-        APPMain.hFCAD.arrEntities[2500].layer = "test"
-        c = APPMain.hFCAD.arrEntities[2500].colour
-
-        APPMain.hFCAD.arrEntities[1500].layer = "test"
-        c = APPMain.hFCAD.arrEntities[1500].colour
-
-        Inc i
-    Next
-    Debug "Referencio objetos del array t=", Timer - t
+    enco = puntos.FindPOI(2000, 2000, flxPOI, 20)
+    Debug "Poi encontrado", enco[2], Timer - t
 
 End

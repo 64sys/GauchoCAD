@@ -51,6 +51,32 @@ Public Sub Draw(oE As Object)
 
 End
 
+'' Creo los puntos de interes
+'' Build point of interest
+
+Public Function BuildPOI(oE As Object, Optional arrIndex As Integer = -1) As Integer
+
+    If arrIndex < 0 Then arrIndex = appmain.hFCAD.arrEntities.Max       ' si este valor no es provisto , estos POI son de la ultima entidad
+
+    ' points: end-mid-end
+    appmain.hFCAD.poiPoints.insert([oE.p[0], oE.p[1]])
+    appmain.hFCAD.poiType.Add(gcd.poiEndPoint)
+    APPMain.hFCAD.poiEntities.Add(arrIndex)
+
+    appmain.hFCAD.poiPoints.insert([(oE.P[0] + oE.P[2]) / 2, (oE.P[1] + oE.P[3]) / 2])   ' mid
+    appmain.hFCAD.poiType.Add(gcd.poiMidPoint)
+    APPMain.hFCAD.poiEntities.Add(arrIndex)
+
+    appmain.hFCAD.poiPoints.insert([oE.p[2], oE.p[3]])
+    appmain.hFCAD.poiType.Add(gcd.poiEndPoint)
+    APPMain.hFCAD.poiEntities.Add(arrIndex)
+
+    ' line
+    appmain.hFCAD.poiLines.insert([oE.p[0], oE.p[1], oE.p[2], oE.p[3]])
+    APPMain.hFCAD.poiLinesEntities.Add(arrIndex)
+
+End
+
 '' Se fija si la posicion indicada esta aproximadamente sobre la entidad, de acuerdo a la tolerancia
 '' mode es para establecer si se busca especificamente algun punto y devolver su posicion y tipo.
 '' Mode:

@@ -39,13 +39,9 @@ Public GridSpacing As Float = 0.5
 Public GridActive As Boolean           ' use with F7: 0 = no grid, 1 = dots, 2 = lines
 
 '' Returns the index in the array of pairs that is near the given point using HookSize parameter
-Public Function FindPOI(xr As Float, yr As Float, arr As Single[], hook As Single) As Single[]
+Public Function FindPOI(xr As Float, yr As Float, arr As Float[], hook As Float) As Float[]
 
     Dim i As Integer
-
-    ' Xr = Xreal(x)
-    ' Yr = Yreal(y)
-    ' hook = Metros(HookSize)
 
     For i = 0 To arr.Max Step 2
 
@@ -62,6 +58,36 @@ Public Function FindPOI(xr As Float, yr As Float, arr As Single[], hook As Singl
     Next
 
     Return [0, 0, -1]           ' no points near
+
+End
+
+'' Returns the index in the array of pairs that is near the given point using HookSize parameter
+Public Function FindPOILines(xreal As Float, Yreal As Float, arr As Float[], tolerance As Float) As Integer
+
+    Dim i As Integer
+
+    For i = 0 To arr.count - 4 Step 4
+        If puntos.doIntersect(xreal - tolerance / 2, Yreal, Xreal + tolerance / 2, Yreal, arr[i + 0], arr[i + 1], arr[i + 2], arr[i + 3]) Or puntos.doIntersect(xreal, Yreal - tolerance / 2, Xreal, Yreal + tolerance / 2, arr[i + 0], arr[i + 1], arr[i + 2], arr[i + 3]) Then ' its above me
+
+            Return i / 4 + 1
+        End If
+    Next
+    Return -1
+
+End
+
+'' Returns the index in the array of pairs that is near the given point using HookSize parameter
+Public Function FindPOIPoligon(xr As Float, yr As Float, arr As Float[], arrIndexes As Integer[], arrNElements As Integer[]) As Integer
+
+    Dim i As Integer
+
+    For i = 0 To arrIndexes.Max
+
+        If isInside(arr, arrNElements[i], xr, yr, arrIndexes[i]) Then Return i
+
+    Next
+
+    Return -1
 
 End
 
@@ -223,7 +249,7 @@ End
 
 ' Returns True If the point p lies
 ' inside the polygon[] With n vertices
-Public Function isInside(polygon As Float[], Vertices As Integer, px As Float, py As Float) As Boolean
+Public Function isInside(polygon As Float[], Vertices As Integer, px As Float, py As Float, Optional StartIndex As Integer = 0) As Boolean
 
     ' There must be at least 3 vertices In polygon[]
     If (Vertices < 3) Then
@@ -240,7 +266,7 @@ Public Function isInside(polygon As Float[], Vertices As Integer, px As Float, p
     ' With sides Of polygon
     Dim count As Integer = 0, i As Integer = 0
     Dim next1 As Integer
-    For i = 0 To polygon.Max - 1 Step 2
+    For i = StartIndex To vertices * 2 - 1 Step 2
 
         Next1 = i + 2
         If i = polygon.max - 1 Then next1 = 0
