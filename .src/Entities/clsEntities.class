@@ -114,8 +114,8 @@ Public Sub FillEntity(o As Object)
     '  ' make all arrays acording to param list
     Dim n As Integer
 
-    For n = 1 To Len(o.ParamType)
-        Select Case UCase(Mid(o.ParamType, n, 1))
+    For n = 1 To Len(o.ClassHandler.ParamType)
+        Select Case UCase(Mid(o.ClassHandler.ParamType, n, 1))
             Case "P"
                 o.p.add(0)
                 o.p.add(0)
@@ -167,7 +167,7 @@ Public Sub CheckPOI(xr As Float, Yr As Float)
     Dim e As Object, t As Float = Timer
     For Each e In APPMain.hFCAD.arrEntities
 
-        If e.AboveMe(xr, yr, APPMain.hFCAD.Metros(10), 0, rDAta) Then
+        If e.ClassHandler.AboveMe(e, xr, yr, APPMain.hFCAD.Metros(10), 0, rDAta) Then
             'Debug "Nearest found at ", rData[0], rData[1]
             APPMain.hFCAD.iEntity.Insert(rData)
             APPMain.hFCAD.oEntity = e
@@ -195,7 +195,7 @@ Public Sub GLGenDrawList()
 
     For Each cosa In APPMain.hFCAD.arrEntities
 
-        cosa.Draw()
+        cosa.ClassHandler.Draw(cosa)
 
     Next
 
@@ -228,9 +228,9 @@ Public Sub Finish(Optional selected As Boolean = True)
     m = APPMain.hFCAD.arrEntities.Max
     For i = 0 To m
         If selected Then                                                    ' apply to only the selected ones
-            If APPMain.hFCAD.arrEntities[i].Selected Then APPMain.hFCAD.arrEntities[i].Finish(-1)
+            If APPMain.hFCAD.arrEntities[i].Selected Then APPMain.hFCAD.arrEntities[i].ClassHandler.Finish(APPMain.hFCAD.arrEntities[i], -1)
         Else                                                                ' apply to all
-            APPMain.hFCAD.arrEntities[i].Finish(-1)
+            APPMain.hFCAD.arrEntities[i].ClassHandler.Finish(APPMain.hFCAD.arrEntities[i], -1)
         End If
 
     Next
@@ -261,7 +261,7 @@ Public Sub ClonEntity(e As Object) As Object
 
     o = Object.New(Object.Class(e).Name)            ' create the New Class
     CopyElemData(e, o)                              ' copy important values
-    o.Finish(-1)                                    ' do all good stuff, -1 means self check
+    o.ClassHandler.Finish(o, -1)                       ' do all good stuff, -1 means self check
     BackUpPosition(o)                               ' backup vertices
 
     Return o
@@ -299,7 +299,7 @@ Public Function DeSelection(Optional elementos As String = "todo", Accion As Str
 
             Case "mover", "copiar", "borrar", "escalar" ' necesito que todos los puntos esten seleccionados
 
-                If cosa.SelFull() And (elementos = "todo" Or elementos = clase) Then
+                If cosa.ClassHandler.SelFull() And (elementos = "todo" Or elementos = clase) Then
 
                     APPMain.hFCAD.arrSelecIndex.Add(iii)
                     SelectElem(cosa)
@@ -313,7 +313,7 @@ Public Function DeSelection(Optional elementos As String = "todo", Accion As Str
 
             Case "estirar" ' necesito que dos puntos contiguos esten seleccionados
 
-                If cosa.SelPartial() And (elementos = "todo" Or elementos = clase) Then
+                If cosa.ClassHandler.SelPArtial() And (elementos = "todo" Or elementos = clase) Then
                     APPMain.hFCAD.arrSelecIndex.Add(iii)
                     SelectElem(cosa, False) ' dont touch the points
                     Inc i
@@ -540,7 +540,7 @@ Public Sub CopyElemData(origen As Object, destino As Object)
     For i = 0 To origen.fparam.Max
         destino.fparam[i] = origen.fparam[i]
     Next
-
+    destino.ClassHandler = origen.ClassHandler
     destino.layerID = origen.LayerID
     destino.RefPointX = origen.refpointX
     destino.RefPointY = origen.refpointY
@@ -641,7 +641,7 @@ Public Function SelectionSquare(X1real As Float, Y1real As Float, X2real As Floa
     For Each e In APPMain.hFCAD.arrEntities
         ' cada entidad debe decidir si esta seleccionada o no
         If crossing Then
-            If e.SelPartial(X1real, Y1real, X2real, Y2real) Then
+            If e.ClassHandler.SelPArtial(e, X1real, Y1real, X2real, Y2real) Then
                 ' el punto esta en el recuadro
                 If NuevaSumaResta <> "resta" Then
                     Inc TotalSeleccionados
@@ -655,7 +655,7 @@ Public Function SelectionSquare(X1real As Float, Y1real As Float, X2real As Floa
 
             Endif
         Else
-            If e.SelFull(X1real, Y1real, X2real, Y2real) Then
+            If e.ClassHandler.SelFull(e, X1real, Y1real, X2real, Y2real) Then
                 ' el punto esta en el recuadro
                 If NuevaSumaResta <> "resta" Then
                     Inc TotalSeleccionados

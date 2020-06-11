@@ -19,7 +19,7 @@
 ' along with this program; if not, write to the Free Software
 ' Foundation, Inc., 51 Franklin St, Fifth Floor,
 ' Boston, MA  02110-1301  USA
-
+Create Static
 Inherits EntityBase
 Public Const GENDER As String = "Ellipse"
 Public Const PointsToDraw As Integer = 1             ' minimal point requered for drawing something usefull
@@ -33,43 +33,43 @@ Public start As Float
 Public recorrido As Float
 Public angle As Float
 
-Public Sub Draw()
+Public Sub Draw(oE As Object)
 
-    If Not Me.DrawAble Or Not Me.Visible Then Return
-    If Me.Selected And Not modCAD.ToolActive Then Me.ColorToPaint = modCAD.ColorForSelected Else Me.ColorToPaint = modCAD.GetGBColor(Me.colour, Me.Layerid)
+    If Not oE.DrawAble Or Not oE.Visible Then Return
+    If oE.Selected And Not modCAD.ToolActive Then oE.ColorToPaint = modCAD.ColorForSelected Else oE.ColorToPaint = modCAD.GetGBColor(oE.colour, oE.Layerid)
 
     Dim major, minor, la As Float
 
-    major = Sqr((Me.p[2] - Me.p[0]) ^ 2 + (Me.p[3] - Me.p[1]) ^ 2)
-    angle = Ang(Me.p[2] - Me.p[0], Me.p[3] - Me.p[1])          ' Los coordenadas del eje mayor son relativas al centro
-    If Not Me.Finished Then
-        If Me.stepsdone < 2 Then
-            Me.fParam[0] = 0.5
+    major = Sqr((oE.p[2] - oE.p[0]) ^ 2 + (oE.p[3] - oE.p[1]) ^ 2)
+    angle = Ang(oE.p[2] - oE.p[0], oE.p[3] - oE.p[1])          ' Los coordenadas del eje mayor son relativas al centro
+    If Not oE.Finished Then
+        If oE.stepsdone < 2 Then
+            oE.fParam[0] = 0.5
             Me.start = 0
             Me.recorrido = 2 * Pi
-            Minor = major * Me.fParam[0]
-        Else If Me.stepsdone < 3 Then
-            Minor = major * Me.fParam[0]
-            'If Me.fParam[0] > major Then Me.fParam[0] = major
-            'Minor = Me.fParam[0]
+            Minor = major * oE.fParam[0]
+        Else If oE.stepsdone < 3 Then
+            Minor = major * oE.fParam[0]
+            'If oE.fParam[0] > major Then oE.fParam[0] = major
+            'Minor = oE.fParam[0]
 
         Endif
     Endif
-    Minor = major * Me.fParam[0]
+    Minor = major * oE.fParam[0]
     If major = 0 Then major = 1
 
     If modCAD.drwDrawingClass = modCAD.drwPaintClass Then
 
         paint.Save
-        If Me.flxDash Then paint.Dash = Me.flxDash
+        If oE.flxDash Then paint.Dash = oE.flxDash
 
-        paint.brush = Paint.Color(Me.ColorToPaint)
+        paint.brush = Paint.Color(oE.ColorToPaint)
 
-        paint.Translate(Me.p[0], Me.p[1])
+        paint.Translate(oE.p[0], oE.p[1])
         paint.Rotate(-angle)
         Paint.Scale(1, Minor / major)
-        paint.LineWidth = Me.LineWidth / appmain.hFcad.ScaleZoom / modCAD.ScaleLines
-        paint.arc(0, 0, major, Me.start, Me.recorrido)
+        paint.LineWidth = oE.LineWidth / appmain.hFcad.ScaleZoom / modCAD.ScaleLines
+        paint.arc(0, 0, major, oE.start, oE.recorrido)
         paint.Stroke
         paint.Restore
     End If
@@ -77,7 +77,12 @@ Public Sub Draw()
     If modCAD.drwDrawingClass = modCAD.drwOpenGLClass Then
         Dim x, y, theta, angle_increment As Float
         Dim i As Integer
-        Me.BoundingPoligon.Clear
+
+        Me.start = oE.fParam[1] * Pi / 180
+        Me.recorrido = oE.fParam[2] * Pi / 180 - Me.start
+        If Me.recorrido < 0 Then Me.recorrido = 2 * Pi + Me.recorrido
+
+        oE.BoundingPoligon.Clear
         GL.Begin(gl.LINE_STRIP)
 
         angle_increment = Pi * 2 / 360
@@ -85,18 +90,18 @@ Public Sub Draw()
             ' el punto considerando 0,0 al centro
             x = major * Cos(Me.start + theta)
             y = major * Sin(Me.start + theta)
-            Me.BoundingPoligon.Add(x)
-            Me.BoundingPoligon.Add(y)
+            oE.BoundingPoligon.Add(x)
+            oE.BoundingPoligon.Add(y)
 
             'GLplus.Vertex2D(radio * Cos(start_angle + theta), radio * Sin(start_angle + theta), colour)
         Next
 
         ' aplico las trnasformaciones
-        puntos.Scale(Me.BoundingPoligon, 1, minor / major)
-        puntos.Rotate(Me.BoundingPoligon, angle)
-        puntos.Translate(Me.BoundingPoligon, Me.p[0], Me.p[1])
-        For i = 0 To Me.BoundingPoligon.max Step 2
-            GLplus.Vertex2D(Me.BoundingPoligon[i], Me.BoundingPoligon[i + 1], Me.ColorToPaint)
+        puntos.Scale(oE.BoundingPoligon, 1, minor / major)
+        puntos.Rotate(oE.BoundingPoligon, angle)
+        puntos.Translate(oE.BoundingPoligon, oE.p[0], oE.p[1])
+        For i = 0 To oE.BoundingPoligon.max Step 2
+            GLplus.Vertex2D(oE.BoundingPoligon[i], oE.BoundingPoligon[i + 1], oE.ColorToPaint)
         Next
 
         GL.End
@@ -106,7 +111,7 @@ Public Sub Draw()
 End
 
 '' Devuelve [x,y] punto de interes
-Public Function AboveMe(Xreal As Float, Yreal As Float, tolerance As Float, mode As Integer, fData As Float[]) As Boolean
+Public Function AboveMe(oE As Object, Xreal As Float, Yreal As Float, tolerance As Float, mode As Integer, fData As Float[]) As Boolean
     ' si una de las dos lineas de una cruz con centro en X,Y y largo Tolerance cruza la linea, estamos arriba
 
     Dim i As Integer
@@ -115,30 +120,30 @@ Public Function AboveMe(Xreal As Float, Yreal As Float, tolerance As Float, mode
     mode = 1 + 2 ' endpoint+midpoint
 
     fData.Clear
-    For i = 0 To Me.BoundingPoligon.count - 4 Step 2
-        If puntos.doIntersect(xreal - tolerance / 2, Yreal, Xreal + tolerance / 2, Yreal, Me.BoundingPoligon[i + 0], Me.BoundingPoligon[i + 1], Me.BoundingPoligon[i + 2], Me.BoundingPoligon[i + 3]) Or puntos.doIntersect(xreal, Yreal - tolerance / 2, Xreal, Yreal + tolerance / 2, Me.BoundingPoligon[i + 0], Me.BoundingPoligon[i + 1], Me.BoundingPoligon[i + 2], Me.BoundingPoligon[i + 3]) Then ' its above me
+    For i = 0 To oE.BoundingPoligon.count - 4 Step 2
+        If puntos.doIntersect(xreal - tolerance / 2, Yreal, Xreal + tolerance / 2, Yreal, oE.BoundingPoligon[i + 0], oE.BoundingPoligon[i + 1], oE.BoundingPoligon[i + 2], oE.BoundingPoligon[i + 3]) Or puntos.doIntersect(xreal, Yreal - tolerance / 2, Xreal, Yreal + tolerance / 2, oE.BoundingPoligon[i + 0], oE.BoundingPoligon[i + 1], oE.BoundingPoligon[i + 2], oE.BoundingPoligon[i + 3]) Then ' its above me
 
             ' busco el punto exacto en la linea donde se produce la interseccion
-            fData.Insert(puntos.lineLineIntersection([xreal - tolerance / 2, Yreal], [Xreal + tolerance / 2, Yreal], [Me.BoundingPoligon[i + 0], Me.BoundingPoligon[i + 1]], [Me.BoundingPoligon[i + 2], Me.BoundingPoligon[i + 3]]))
+            fData.Insert(puntos.lineLineIntersection([xreal - tolerance / 2, Yreal], [Xreal + tolerance / 2, Yreal], [oE.BoundingPoligon[i + 0], oE.BoundingPoligon[i + 1]], [oE.BoundingPoligon[i + 2], oE.BoundingPoligon[i + 3]]))
             ' veo que punto esta mas cerca
-            fDist1 = puntos.distancia(Me.BoundingPoligon[i + 0], Me.BoundingPoligon[i + 1], fData[0], fData[1])   ' end 1
-            fDist2 = puntos.distancia((Me.BoundingPoligon[i + 0] + Me.BoundingPoligon[i + 2]) / 2, (Me.BoundingPoligon[i + 1] + Me.BoundingPoligon[i + 3]) / 2, fData[0], fData[1])   ' mid
-            fDist3 = puntos.distancia(Me.BoundingPoligon[i + 2], Me.BoundingPoligon[i + 3], fData[0], fData[1])   ' end 2
+            fDist1 = puntos.distancia(oE.BoundingPoligon[i + 0], oE.BoundingPoligon[i + 1], fData[0], fData[1])   ' end 1
+            fDist2 = puntos.distancia((oE.BoundingPoligon[i + 0] + oE.BoundingPoligon[i + 2]) / 2, (oE.BoundingPoligon[i + 1] + oE.BoundingPoligon[i + 3]) / 2, fData[0], fData[1])   ' mid
+            fDist3 = puntos.distancia(oE.BoundingPoligon[i + 2], oE.BoundingPoligon[i + 3], fData[0], fData[1])   ' end 2
             If fdist1 > fdist2 Then
                 If fDist2 > fDist3 Then         ' End 2
-                    fData[0] = Me.BoundingPoligon[i + 2]
-                    fData[1] = Me.BoundingPoligon[i + 3]
+                    fData[0] = oE.BoundingPoligon[i + 2]
+                    fData[1] = oE.BoundingPoligon[i + 3]
                     fData.Add(1)                 ' 1 = EndPoint
                     Return True
                 Else
-                    fData[0] = (Me.BoundingPoligon[i + 0] + Me.BoundingPoligon[i + 2]) / 2
-                    fData[1] = (Me.BoundingPoligon[i + 1] + Me.BoundingPoligon[i + 3]) / 2
+                    fData[0] = (oE.BoundingPoligon[i + 0] + oE.BoundingPoligon[i + 2]) / 2
+                    fData[1] = (oE.BoundingPoligon[i + 1] + oE.BoundingPoligon[i + 3]) / 2
                     fData.Add(2)                 ' 2 = MidPoint
                     Return True
                 Endif
             Else
-                fData[0] = Me.BoundingPoligon[i + 0]
-                fData[1] = Me.BoundingPoligon[i + 1]
+                fData[0] = oE.BoundingPoligon[i + 0]
+                fData[1] = oE.BoundingPoligon[i + 1]
                 fData.Add(1)                     ' 1 = EndPoint
                 Return True
 
@@ -153,28 +158,25 @@ End
 
 ' This function will return False if the element couldn't be created for some reason: bad or incomple user input
 ' True means all is good, False will instruct the clsEntityBuilder to delete it
-Public Sub Finish(ParamsDone As Integer) As Boolean
+Public Sub Finish(oE As Object, ParamsDone As Integer) As Boolean
 
     ' calculo el recorrido del arco como
     ' OJO en la ELLIPSE vienen en radianes, y en ARC en grados
-    Me.start = Me.fParam[1] * Pi / 180
-    Me.recorrido = Me.fParam[2] * Pi / 180 - Me.start
-    If Me.recorrido < 0 Then Me.recorrido = 2 * Pi + Me.recorrido
 
     'CreateBoundingPoligon
 
     ' tareas finales de armado del objeto
-    Me.b.resize(Me.P.count)
-    Me.psel.resize(Me.p.count / 2)
-    Me.ForDeletion = False
-    Me.DrawAble = True
-    Me.Selected = False
-    Me.Finished = True
+    oE.b.resize(oE.P.count)
+    oE.psel.resize(oE.p.count / 2)
+    oE.ForDeletion = False
+    oE.DrawAble = True
+    oE.Selected = False
+    oE.Finished = True
 
     If Not True Then
 
-        Me.ForDeletion = True
-        Me.DrawAble = False
+        oE.ForDeletion = True
+        oE.DrawAble = False
 
     End If
 

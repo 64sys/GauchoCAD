@@ -19,6 +19,7 @@
 ' along with this program; if not, write to the Free Software
 ' Foundation, Inc., 51 Franklin St, Fifth Floor,
 ' Boston, MA  02110-1301  USA
+Create Static
 
 Inherits EntityBase
 Public Const GENDER As String = "Arc"
@@ -32,48 +33,48 @@ Public Const ParamDefault As String = "0,0;1;0;90"
 Public start As Float
 Public recorrido As Float
 
-Public Sub Draw()
+Public Sub Draw(oE As Object)
 
     Dim x, y, theta, angle_increment As Float
     Dim i As Integer
     Dim difAng As Float
     Dim major, minor, angle, la As Float
 
-    If Not Me.DrawAble Or Not Me.Visible Then Return
+    If Not oE.DrawAble Or Not oE.Visible Then Return
 
-    If Me.Selected And Not modCAD.ToolActive Then Me.ColorToPaint = modCAD.ColorForSelected Else Me.ColorToPaint = modCAD.GetGBColor(Me.colour, Me.Layerid)
+    If oE.Selected And Not modCAD.ToolActive Then oE.ColorToPaint = modCAD.ColorForSelected Else oE.ColorToPaint = modCAD.GetGBColor(oE.colour, oE.Layerid)
 
     If modCAD.drwDrawingClass = modCAD.drwPaintClass Then
 
-        paint.LineWidth = Me.LineWidth / appmain.hFcad.ScaleZoom / modCAD.ScaleLines
+        paint.LineWidth = oE.LineWidth / appmain.hFcad.ScaleZoom / modCAD.ScaleLines
 
-        paint.brush = Paint.Color(Me.ColorToPaint)
+        paint.brush = Paint.Color(oE.ColorToPaint)
 
-        paint.Arc(Me.p[0], Me.p[1], Me.fParam[0], Me.start, Me.recorrido)
+        paint.Arc(oE.p[0], oE.p[1], oE.fParam[0], start, recorrido)
 
         paint.Stroke
     End If
 
     If modCAD.drwDrawingClass = modCAD.drwOpenGLClass Then
 
-        If Me.StepsDone = 1 Then
+        If oE.StepsDone = 1 Then
 
-            Me.fParam[2] = 360
+            oE.fParam[2] = 360
 
-        Else If Me.StepsDone = 2 Then
+        Else If oE.StepsDone = 2 Then
 
-            If Me.fParam[1] < 0 Then Me.fParam[1] = 360 + Me.fParam[1]
-            difang = (Me.fParam[2] - Me.fParam[1])
+            If oE.fParam[1] < 0 Then oE.fParam[1] = 360 + oE.fParam[1]
+            difang = (oE.fParam[2] - oE.fParam[1])
 
-            GLplus.Lines([Me.p[0], Me.p[1], Me.p[0] + Me.fParam[0] * Cos(Me.fParam[1] / 180 * Pi), Me.p[1] + Me.fParam[0] * Sin(Me.fParam[1] / 180 * Pi)], Me.ColorToPaint)
-            clsDrawingAids.Helper.texto = Format$(Me.fParam[1], ("0.0 deg"))
+            GLplus.Lines([oE.p[0], oE.p[1], oE.p[0] + oE.fParam[0] * Cos(oE.fParam[1] / 180 * Pi), oE.p[1] + oE.fParam[0] * Sin(oE.fParam[1] / 180 * Pi)], oE.ColorToPaint)
+            clsDrawingAids.Helper.texto = Format$(oE.fParam[1], ("0.0 deg"))
 
-        Else If Me.StepsDone = 3 Then
+        Else If oE.StepsDone = 3 Then
 
-            If Me.fParam[1] < 0 Then Me.fParam[1] = 360 + Me.fParam[1]
-            If Me.fParam[2] < 0 Then Me.fParam[2] = 360 + Me.fParam[2]              ' grados
-            Me.start = Me.fParam[1] / 180 * Pi                                      ' rad
-            Me.recorrido = (Me.fParam[2] - Me.fParam[1]) / 180 * Pi                 ' rad
+            If oE.fParam[1] < 0 Then oE.fParam[1] = 360 + oE.fParam[1]
+            If oE.fParam[2] < 0 Then oE.fParam[2] = 360 + oE.fParam[2]              ' grados
+            Me.start = oE.fParam[1] / 180 * Pi                                      ' rad
+            Me.recorrido = (oE.fParam[2] - oE.fParam[1]) / 180 * Pi                 ' rad
             If Me.recorrido < 0 Then
 
                 Me.recorrido += 2 * Pi
@@ -83,23 +84,32 @@ Public Sub Draw()
             GL.Begin(gl.LINE_STRIP)
             angle_increment = Pi * 2 / 360
             For theta = 0 To Me.recorrido Step angle_increment
-                GLplus.Vertex2D(Me.p[0] + Me.fParam[0] * Cos(Me.start + theta), Me.p[1] + Me.fParam[0] * Sin(Me.start + theta), Me.ColorToPaint)
+                GLplus.Vertex2D(oE.p[0] + oE.fParam[0] * Cos(oE.start + theta), oE.p[1] + oE.fParam[0] * Sin(oE.start + theta), oE.ColorToPaint)
             Next
             gl.End
 
-            clsDrawingAids.Helper.texto = Format$(Me.fParam[1], ("0.0 deg")) & (" to ") & Format$(Me.fParam[2], ("0.0 deg"))
+            clsDrawingAids.Helper.texto = Format$(oE.fParam[1], ("0.0 deg")) & (" to ") & Format$(oE.fParam[2], ("0.0 deg"))
         Else
+            If oE.fParam[1] < 0 Then oE.fParam[1] = 360 + oE.fParam[1]
+            If oE.fParam[2] < 0 Then oE.fParam[2] = 360 + oE.fParam[2]              ' grados
+            Me.start = oE.fParam[1] / 180 * Pi                                      ' rad
+            Me.recorrido = (oE.fParam[2] - oE.fParam[1]) / 180 * Pi                 ' rad
+            If Me.recorrido < 0 Then
 
-            Me.BoundingPoligon.Clear
+                Me.recorrido += 2 * Pi
+
+            Endif
+
+            oE.BoundingPoligon.Clear
             GL.Begin(gl.LINE_STRIP)
             angle_increment = Pi * 2 / 360
             For theta = 0 To Me.recorrido Step angle_increment
                 ' el punto considerando 0,0 al centro
-                x = Me.p[0] + Me.fParam[0] * Cos(Me.start + theta)
-                y = Me.p[1] + Me.fParam[0] * Sin(Me.start + theta)
-                Me.BoundingPoligon.Add(x)
-                Me.BoundingPoligon.Add(y)
-                GLplus.Vertex2D(x, y, Me.ColorToPaint)
+                x = oE.p[0] + oE.fParam[0] * Cos(Me.start + theta)
+                y = oE.p[1] + oE.fParam[0] * Sin(Me.start + theta)
+                oE.BoundingPoligon.Add(x)
+                oE.BoundingPoligon.Add(y)
+                GLplus.Vertex2D(x, y, oE.ColorToPaint)
             Next
             gl.End
         End If
@@ -109,32 +119,22 @@ End
 
 ' This function will return False if the element couldn't be created for some reason: bad or incomple user input
 ' True means all is good, False will instruct the clsEntityBuilder to delete it
-Public Sub Finish(ParamsDone As Integer) As Boolean
+Public Sub Finish(oE As Object, ParamsDone As Integer) As Boolean
 
     ' calculo el recorrido del arco como
 
-    If Me.fParam[1] < 0 Then Me.fParam[1] = 360 + Me.fParam[1]
-    If Me.fParam[2] < 0 Then Me.fParam[2] = 360 + Me.fParam[2]              ' grados
-    Me.start = Me.fParam[1] / 180 * Pi                                      ' rad
-    Me.recorrido = (Me.fParam[2] - Me.fParam[1]) / 180 * Pi                 ' rad
-    If Me.recorrido < 0 Then
-
-        Me.recorrido += 2 * Pi
-
-    Endif
-
     ' tareas finales de armado del objeto
-    Me.b.resize(Me.P.count)
-    Me.psel.resize(Me.p.count / 2)
-    Me.ForDeletion = False
-    Me.DrawAble = True
-    Me.Selected = False
-    Me.Finished = True
+    oE.b.resize(oE.P.count)
+    oE.psel.resize(oE.p.count / 2)
+    oE.ForDeletion = False
+    oE.DrawAble = True
+    oE.Selected = False
+    oE.Finished = True
 
     If Not True Then
 
-        Me.ForDeletion = True
-        Me.DrawAble = False
+        oE.ForDeletion = True
+        oE.DrawAble = False
 
     End If
 

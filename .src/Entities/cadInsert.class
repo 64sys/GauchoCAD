@@ -19,7 +19,7 @@
 ' along with this program; if not, write to the Free Software
 ' Foundation, Inc., 51 Franklin St, Fifth Floor,
 ' Boston, MA  02110-1301  USA
-
+Create Static
 Inherits EntityBase
 Public Const GENDER As String = "Insert"
 Public Const HelperTrabajo As String = ("Inserts a block")
@@ -30,19 +30,19 @@ Public Const ParamDefault As String = "<no name>; 0,0 ; 1 ;1 ; 0"
 Public obxInsertos As New Object[]
 Public ParentBlock As String
 
-Public Sub Draw()
+Public Sub Draw(oE As Object)
 
     '
     Dim ET As Object, i As Integer
 
-    i = clsEntities.FIndBlockID(Me.Block)
+    i = clsEntities.FIndBlockID(oE.Block)
     If i < 0 Then Return
     If modCAD.drwDrawingClass = modCAD.drwPaintClass Then
         paint.save
-        paint.Translate(appmain.hFcad.pixels(Me.p[0]) / appmain.hFcad.ScaleZoom, appmain.hFcad.pixels(Me.p[1]) / appmain.hFcad.ScaleZoom)
-        paint.Scale(Me.fParam[0], Me.fParam[1])
-        paint.Rotate(Me.fParam[2])
-        modCAD.ScaleLines = (Abs(Me.fParam[0]) + Abs(Me.fParam[1])) / 2
+        paint.Translate(appmain.hFcad.pixels(oE.p[0]) / appmain.hFcad.ScaleZoom, appmain.hFcad.pixels(oE.p[1]) / appmain.hFcad.ScaleZoom)
+        paint.Scale(oE.fParam[0], oE.fParam[1])
+        paint.Rotate(oE.fParam[2])
+        modCAD.ScaleLines = (Abs(oE.fParam[0]) + Abs(oE.fParam[1])) / 2
         For Each ET In appmain.hFCAD.arrBlocks[i].entities
             et.Draw
         Next
@@ -54,15 +54,15 @@ Public Sub Draw()
     If modCAD.drwDrawingClass = modCAD.drwOpenGLClass Then
 
         gl.PushMatrix
-        gl.Translatef(appmain.hFcad.pixels(Me.p[0]) / appmain.hFcad.ScaleZoom, appmain.hFcad.pixels(Me.p[1]) / appmain.hFcad.ScaleZoom, 0)
-        gl.Rotatef(Me.fParam[2], 0, 0, 1)
-        gl.Scalef(Me.fParam[0], Me.fParam[1], 1)
+        gl.Translatef(appmain.hFcad.pixels(oE.p[0]) / appmain.hFcad.ScaleZoom, appmain.hFcad.pixels(oE.p[1]) / appmain.hFcad.ScaleZoom, 0)
+        gl.Rotatef(oE.fParam[2], 0, 0, 1)
+        gl.Scalef(oE.fParam[0], oE.fParam[1], 1)
 
-        ' modCAD.ScaleLines = (Abs(Me.fParam[0]) + Abs(Me.fParam[1])) / 2   ' ??????????????????
+        ' modCAD.ScaleLines = (Abs(oE.fParam[0]) + Abs(oE.fParam[1])) / 2   ' ??????????????????
         For Each ET In appmain.hFCAD.arrBlocks[i].entities
             et.visible = True
             'If et.gender = "Ellipse" Then Stop
-            et.Draw
+            et.ClassHandler.Draw(et)
         Next
         'modCAD.ScaleLines = 1
         gl.PopMatrix
@@ -71,7 +71,7 @@ Public Sub Draw()
 
 End
 
-Public Sub Finish(ParamsDone As Integer) As Boolean
+Public Sub Finish(oE As Object, ParamsDone As Integer) As Boolean
 
     ' ' we set the block property of all entities selected
     '
@@ -79,10 +79,10 @@ Public Sub Finish(ParamsDone As Integer) As Boolean
     ' Dim e As Object, iBlock As Integer
     '
     ' iBlock = clsEntities.GetFreeBlockNumber()
-    ' Me.fParam.add(iBlock)
-    Me.Finished = True
-    Me.B.Resize(Me.P.Count)
-    Me.psel.resize(Me.p.count / 2)
+    ' oE.fParam.add(iBlock)
+    oE.Finished = True
+    oE.B.Resize(oE.P.Count)
+    oE.psel.resize(oE.p.count / 2)
 
     ' For Each e In APPMain.hFCAD.arrEntities
     '     If e.Selected Then                      ' parto of this

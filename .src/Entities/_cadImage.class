@@ -19,7 +19,7 @@
 ' along with this program; if not, write to the Free Software
 ' Foundation, Inc., 51 Franklin St, Fifth Floor,
 ' Boston, MA  02110-1301  USA
-
+Create Static
 Inherits EntityBase
 Public Const GENDER As String = "Image"
 Public Const DrawingOrder As Integer = 1        ' 1 = draws first
@@ -31,7 +31,7 @@ Public imagen As New Image
 Public HBRUSH As PaintBrush
 Public Loaded As Boolean
 
-Public Sub Draw()
+Public Sub Draw(oE As Object)
 
     If Me.StepsDone = 0 And Not Loaded Then            ' need the filename first
 

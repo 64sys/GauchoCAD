@@ -19,7 +19,7 @@
 ' along with this program; if not, write to the Free Software
 ' Foundation, Inc., 51 Franklin St, Fifth Floor,
 ' Boston, MA  02110-1301  USA
-
+Create Static
 Inherits EntityBase
 Public Const GENDER As String = "Line"
 Public Const DrawingOrder As Integer = 1        ' 1 = draws first
@@ -27,25 +27,25 @@ Public Const HelperTrabajo As String = ("a line")
 Public Const ParamType As String = "PP"                             ' that is Point, Point; could be Color Text, etc
 Public Const ParamHelper As String = "Start point;End point"
 
-Public Sub Draw()
+Public Sub Draw(oE As Object)
 
-    If Not Me.DrawAble Or Not Me.Visible Then Return
+    If Not oE.DrawAble Or Not oE.Visible Then Return
 
-    If Me.Selected And Not modCAD.ToolActive Then Me.ColorToPaint = modCAD.ColorForSelected Else Me.ColorToPaint = modCAD.GetGBColor(Me.colour, Me.Layerid)
+    If oE.Selected And Not modCAD.ToolActive Then oE.ColorToPaint = modCAD.ColorForSelected Else oE.ColorToPaint = modCAD.GetGBColor(oE.colour, oE.Layerid)
 
     If modCAD.drwDrawingClass = modCAD.drwPaintClass Then
 
-        paint.LineWidth = Me.LineWidth / appmain.hFcad.ScaleZoom / modCAD.ScaleLines
-        If Me.flxDash Then paint.Dash = Me.flxDash
-        paint.brush = Paint.Color(Me.ColorToPaint)
-        paint.MoveTo(Me.p[0], Me.p[1])
-        paint.LineTo(Me.p[2], Me.p[3])
+        paint.LineWidth = oE.LineWidth / appmain.hFcad.ScaleZoom / modCAD.ScaleLines
+        If oE.flxDash Then paint.Dash = oE.flxDash
+        paint.brush = Paint.Color(oE.ColorToPaint)
+        paint.MoveTo(oE.p[0], oE.p[1])
+        paint.LineTo(oE.p[2], oE.p[3])
         paint.Stroke
     End If
 
     If modCAD.drwDrawingClass = modCAD.drwOpenGLClass Then
 
-        GLplus.Lines(Me.p, Me.ColorToPaint, Me.LineWidth, Me.LineType)
+        GLplus.Lines(oE.p, oE.ColorToPaint, oE.LineWidth, oE.LineType)
 
     Endif
 
@@ -56,7 +56,7 @@ End
 '' Mode:
 
 '' Devuelve [x,y] punto de interes
-Public Function AboveMe(Xreal As Float, Yreal As Float, tolerance As Float, mode As Integer, fData As Float[]) As Boolean
+Public Function AboveMe(oE As Object, Xreal As Float, Yreal As Float, tolerance As Float, mode As Integer, fData As Float[]) As Boolean
     ' si una de las dos lineas de una cruz con centro en X,Y y largo Tolerance cruza la linea, estamos arriba
     'Dim fData As New Float[]
 
@@ -65,27 +65,27 @@ Public Function AboveMe(Xreal As Float, Yreal As Float, tolerance As Float, mode
     mode = 1 + 2 ' endpoint+midpoint
 
     fData.Clear
-    If puntos.doIntersect(xreal - tolerance / 2, Yreal, Xreal + tolerance / 2, Yreal, Me.P[0], Me.P[1], Me.P[2], Me.P[3]) Or puntos.doIntersect(xreal, Yreal - tolerance / 2, Xreal, Yreal + tolerance / 2, Me.P[0], Me.P[1], Me.P[2], Me.P[3]) Then ' its above me
+    If puntos.doIntersect(xreal - tolerance / 2, Yreal, Xreal + tolerance / 2, Yreal, oE.P[0], oE.P[1], oE.P[2], oE.P[3]) Or puntos.doIntersect(xreal, Yreal - tolerance / 2, Xreal, Yreal + tolerance / 2, oE.P[0], oE.P[1], oE.P[2], oE.P[3]) Then ' its above me
 
         ' busco el punto exacto en la linea donde se produce la interseccion
-        fData.Insert(puntos.lineLineIntersection([xreal - tolerance / 2, Yreal], [Xreal + tolerance / 2, Yreal], [Me.P[0], Me.P[1]], [Me.P[2], Me.P[3]]))
+        fData.Insert(puntos.lineLineIntersection([xreal - tolerance / 2, Yreal], [Xreal + tolerance / 2, Yreal], [oE.P[0], oE.P[1]], [oE.P[2], oE.P[3]]))
         ' veo que punto esta mas cerca
-        fDist1 = puntos.distancia(Me.P[0], Me.P[1], fData[0], fData[1])   ' end 1
-        fDist2 = puntos.distancia((Me.P[0] + Me.P[2]) / 2, (Me.P[1] + Me.P[3]) / 2, fData[0], fData[1])   ' mid
-        fDist3 = puntos.distancia(Me.P[2], Me.P[3], fData[0], fData[1])   ' end 2
+        fDist1 = puntos.distancia(oE.P[0], oE.P[1], fData[0], fData[1])   ' end 1
+        fDist2 = puntos.distancia((oE.P[0] + oE.P[2]) / 2, (oE.P[1] + oE.P[3]) / 2, fData[0], fData[1])   ' mid
+        fDist3 = puntos.distancia(oE.P[2], oE.P[3], fData[0], fData[1])   ' end 2
         If fdist1 > fdist2 Then
             If fDist2 > fDist3 Then         ' End 2
-                fData[0] = Me.P[2]
-                fData[1] = Me.P[3]
+                fData[0] = oE.P[2]
+                fData[1] = oE.P[3]
                 fData.Add(1)                 ' 1 = EndPoint
             Else
-                fData[0] = (Me.P[0] + Me.P[2]) / 2
-                fData[1] = (Me.P[1] + Me.P[3]) / 2
+                fData[0] = (oE.P[0] + oE.P[2]) / 2
+                fData[1] = (oE.P[1] + oE.P[3]) / 2
                 fData.Add(2)                 ' 2 = MidPoint
             Endif
         Else
-            fData[0] = Me.P[0]
-            fData[1] = Me.P[1]
+            fData[0] = oE.P[0]
+            fData[1] = oE.P[1]
             fData.Add(1)                     ' 1 = EndPoint
 
         Endif

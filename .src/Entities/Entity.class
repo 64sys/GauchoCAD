@@ -1,0 +1,68 @@
+' Gambas class file
+
+' GauchoCAD
+' A simple CAD made in Gambas
+'
+' Copyright (C) Ing Martin P Cristia
+'
+' This program is free software; you can redistribute it and/or modify
+' it under the terms of the GNU General Public License as published by
+' the Free Software Foundation; either version 3 of the License, or
+' (at your option) any later version.
+'
+' This program is distributed in the hope that it will be useful,
+' but WITHOUT ANY WARRANTY; without even the implied warranty of
+' MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+' GNU General Public License for more details.
+'
+' You should have received a copy of the GNU General Public License
+' along with this program; if not, write to the Free Software
+' Foundation, Inc., 51 Franklin St, Fifth Floor,
+' Boston, MA  02110-1301  USA
+
+Public Const GAUCHOENTITY As String = "Entity"
+Public GENDER As String = "Arc"
+Public USEWITH As String = "clsEntityBuilder"
+Public Const DrawingOrder As Integer = 0        ' 1 = draws first
+Public Const PointsToDraw As Integer = 1             ' minimal point requered for drawing something usefull
+Public Const OrtogonalIgnorado As Boolean = False
+Public Const OrtogonalForzado As Boolean = False
+Public Const ParamDefault As String = " "
+Public Const StretchAble As Boolean = True           ' Si lo puedo deformar
+
+' SAVE from this vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+' IMPORTANT: ALL CHANGES HERE MUST BE TRANSLATED TO cadLoad/Save and clsEntities.CopyElementData()                                                                                    |
+Public P As New Float[]                     ' X,Y pairs
+Public Level As New Float[]                 ' the future Z or elevation
+Public StringData As String                 ' split with "|" separator if neccesary, that's is Entity specific.
+Public StringData2 As String                ' split with "|" separator if neccesary, that's is Entity specific.
+Public StringData3 As String                ' split with "|" separator if neccesary, that's is Entity specific.
+Public fParam As New Float[]                ' array of floats
+Public Layer As String = "0"                ' Capa o Layer que se guarda en el archivo
+Public Block As String                      ' Para tener la posibilidade de juntar cosas en un block
+Public colour As Integer                    ' 0=by layer, 1=by block, 10+=16 bit color code  ;  ths is not the color to be draw, ColorToPaint is, set in Finish()
+Public LineTypeName As String               ' continuous, dashed , etc
+Public LineWidth As Integer = 1             ' this is it
+Public RefPointX As Float                   ' new
+Public RefPointY As Float
+' SAVE to here  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+' NOT SAVED
+' construction and usage vars
+Public ClassHandler As Object
+Public LineType As Integer                  ' 0=continuous, 1=dashed from flxDash
+Public LayerId As String = "00"                ' esta variable es la Key en la coleccion de layers
+Public BlockNumber As Integer
+Public ColorToPaint As Integer              ' este es el color que realmente se va a dibujar
+Public Selected As Boolean
+Public ForDeletion As Boolean = True        ' this must be falsed in Finish
+Public DrawAble As Boolean = False          ' True si durante la construccion ya tiene suficientes elementos para poder hacer una representacion digna
+Public Visible As Boolean = True            ' si esta entidad puede ser mostrada independientmente
+Public Finished As Boolean = False          ' colocar en true cuando se llegue a completar
+Public StepsDone As Integer                 ' esto lo cambia cls ElementBuilder durante la construccion
+Public Group As Integer = 0                 ' Pertenecemos a un grupo?
+Public flxDash As New Integer[]             ' DEPRECADO
+Public B As New Float[]                     ' Backup point
+Public Psel As New Boolean[]                ' selected points
+Public BoundingPoligon As New Float[]       ' this is a poligon built at element's contruction that defines a poligon used for detecting points inside me
+Public MyPoi As New Single[]                ' point of interest

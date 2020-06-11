@@ -19,7 +19,7 @@
 ' along with this program; if not, write to the Free Software
 ' Foundation, Inc., 51 Franklin St, Fifth Floor,
 ' Boston, MA  02110-1301  USA
-
+Create Static
 Inherits EntityBase
 Public Const GENDER As String = "MText"
 Public Const DrawingOrder As Integer = 100 ' 1 a 32.724 esto debe Drawse primero y ser sobreescrito por el resto
@@ -29,10 +29,10 @@ Public Const ParamType As String = "PAFT"
 Public Const ParamHelper As String = ("Start point;Angle;Heigth;")      ' a little text that is shown at the prompt waiting for user input during build
 Public Const ParamDefault As String = " ; 0 ; 10 ; "
 
-Public Sub Draw()
+Public Sub Draw(oE As Object)
 
-    If Not Me.DrawAble Or Not Me.Visible Then Return
-    If Me.Selected And Not modCAD.ToolActive Then Me.ColorToPaint = modCAD.ColorForSelected Else Me.ColorToPaint = modCAD.GetGBColor(Me.colour, Me.Layerid)
+    If Not oE.DrawAble Or Not oE.Visible Then Return
+    If oE.Selected And Not modCAD.ToolActive Then oE.ColorToPaint = modCAD.ColorForSelected Else oE.ColorToPaint = modCAD.GetGBColor(oE.colour, oE.Layerid)
 
     If modCAD.drwDrawingClass = modCAD.drwPaintClass Then
 
@@ -47,9 +47,9 @@ Public Sub Draw()
         paint.LineWidth = 1
         ' La cota puede estar inclinada, entonces debo rotarla
 
-        If Me.fParam.Count > 0 Then
+        If oE.fParam.Count > 0 Then
 
-            angulo = Me.fParam[0] / 180 * Pi
+            angulo = oE.fParam[0] / 180 * Pi
 
         Else
 
@@ -57,22 +57,22 @@ Public Sub Draw()
 
         End If
 
-        If Me.StringData = "" Then
+        If oE.StringData = "" Then
 
             ltext = "ABCdef123"
 
         Else
 
-            ltext = Me.StringData
+            ltext = oE.StringData
 
         End If
 
-        If Me.fParam.Count > 1 Then
+        If oE.fParam.Count > 1 Then
 
-            If Me.fParam[1] <= 0 Then
+            If oE.fParam[1] <= 0 Then
                 paint.Font.Size = 10
             Else ' FIXME: hay problemas con el ancho del total del texto que no acompaña el zooming
-                paint.Font.Size = Me.fParam[1]
+                paint.Font.Size = oE.fParam[1]
             End If
 
         Else
@@ -85,9 +85,9 @@ Public Sub Draw()
 
         htext = paint.TextExtents(ltext)
 
-        paint.brush = Paint.Color(Me.ColorToPaint)
+        paint.brush = Paint.Color(oE.ColorToPaint)
 
-        paint.Translate(Me.p[0], Me.p[1])
+        paint.Translate(oE.p[0], oE.p[1])
         paint.Rotate(-angulo)
         paint.Scale(1, -1)
 
@@ -101,28 +101,28 @@ Public Sub Draw()
 
     If modCAD.drwDrawingClass = modCAD.drwOpenGLClass Then
 
-        glPlus.DrawMultilineText(Me.StringData, Me.p[0], Me.p[1], Me.fParam[0], Me.fParam[1], Me.ColorToPaint)
+        glPlus.DrawMultilineText(oE.StringData, oE.p[0], oE.p[1], oE.fParam[0], oE.fParam[1], oE.ColorToPaint)
 
-        If Me.StringData <> "" Then CreateBoundingPoligon
+        If oE.StringData <> "" Then CreateBoundingPoligon(oe)
 
     End If
 
 End
 
-Public Sub CreateBoundingPoligon()
+Public Sub CreateBoundingPoligon(oE As Object)
 
     Dim tRect As New Float[]
 
-    Me.BoundingPoligon.Clear
+    oE.BoundingPoligon.Clear
 
-    tRect = glPlus.MTextExtends(Me.StringData, Me.p[0], Me.p[1], Me.fParam[1])
+    tRect = glPlus.MTextExtends(oE.StringData, oE.p[0], oE.p[1], oE.fParam[1])
 
     ' armo el poligono , que ya tiene la escala
 
-    Me.BoundingPoligon.Insert([tRect[0], tRect[1], tRect[0] + tRect[2], tRect[1], tRect[0] + tRect[2], tRect[1] + tRect[3], tRect[0], tRect[1] + tRect[3]])
+    oE.BoundingPoligon.Insert([tRect[0], tRect[1], tRect[0] + tRect[2], tRect[1], tRect[0] + tRect[2], tRect[1] + tRect[3], tRect[0], tRect[1] + tRect[3]])
 
-    puntos.Translate(Me.BoundingPoligon, -Me.P[0], -Me.P[1])
-    puntos.Rotate(Me.BoundingPoligon, Me.fParam[0] * Pi / 180)
-    puntos.Translate(Me.BoundingPoligon, Me.P[0], Me.P[1])
+    puntos.Translate(oE.BoundingPoligon, -oE.P[0], -oE.P[1])
+    puntos.Rotate(oE.BoundingPoligon, oE.fParam[0] * Pi / 180)
+    puntos.Translate(oE.BoundingPoligon, oE.P[0], oE.P[1])
 
 End

@@ -20,7 +20,10 @@
 ' Foundation, Inc., 51 Franklin St, Fifth Floor,
 ' Boston, MA  02110-1301  USA
 
+Create Static
+
 Public Const GAMBASCADENTITY As String = ("EntityBase")
+Public Const GENDER As String = "Arc"
 Public Const USEWITH As String = "clsEntityBuilder"
 Public Const DrawingOrder As Integer = 0        ' 1 = draws first
 Public Const PointsToDraw As Integer = 1             ' minimal point requered for drawing something usefull
@@ -28,42 +31,13 @@ Public Const OrtogonalIgnorado As Boolean = False
 Public Const OrtogonalForzado As Boolean = False
 Public Const ParamDefault As String = " "
 Public Const StretchAble As Boolean = True           ' Si lo puedo deformar
-
-' SAVE from this vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-' IMPORTANT: ALL CHANGES HERE MUST BE TRANSLATED TO cadLoad/Save and clsEntities.CopyElementData()                                                                                    |
-Public P As New Float[]                     ' X,Y pairs
-Public Level As New Float[]                 ' the future Z or elevation
-Public StringData As String                 ' split with "|" separator if neccesary, that's is Entity specific.
-Public StringData2 As String                ' split with "|" separator if neccesary, that's is Entity specific.
-Public StringData3 As String                ' split with "|" separator if neccesary, that's is Entity specific.
-Public fParam As New Float[]                ' array of floats
-Public Layer As String = "0"                ' Capa o Layer que se guarda en el archivo
-Public Block As String                      ' Para tener la posibilidade de juntar cosas en un block
-Public colour As Integer                    ' 0=by layer, 1=by block, 10+=16 bit color code  ;  ths is not the color to be draw, ColorToPaint is, set in Finish()
-Public LineTypeName As String               ' continuous, dashed , etc
-Public LineWidth As Integer = 1             ' this is it
-Public RefPointX As Float                   ' new
-Public RefPointY As Float
-' SAVE to here  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-' NOT SAVED
-' construction and usage vars
-Public LineType As Integer                  ' 0=continuous, 1=dashed from flxDash
-Public LayerId As String = "00"                ' esta variable es la Key en la coleccion de layers
-Public BlockNumber As Integer
-Public ColorToPaint As Integer              ' este es el color que realmente se va a dibujar
 Public Selected As Boolean
 Public ForDeletion As Boolean = True        ' this must be falsed in Finish
 Public DrawAble As Boolean = False          ' True si durante la construccion ya tiene suficientes elementos para poder hacer una representacion digna
 Public Visible As Boolean = True            ' si esta entidad puede ser mostrada independientmente
 Public Finished As Boolean = False          ' colocar en true cuando se llegue a completar
 Public StepsDone As Integer                 ' esto lo cambia cls ElementBuilder durante la construccion
-Public Group As Integer = 0                 ' Pertenecemos a un grupo?
-Public flxDash As New Integer[]             ' DEPRECADO
-Public B As New Float[]                     ' Backup point
-Public Psel As New Boolean[]                ' selected points
-Public BoundingPoligon As New Float[]       ' this is a poligon built at element's contruction that defines a poligon used for detecting points inside me
-Public MyPoi As New Single[]                ' point of interest
+' point of interest
 
 Public Sub _new()
 
@@ -77,47 +51,47 @@ End
 
 '' Las entidades pueden proveer un poligono que las envuelva
 '' el mismo su usara para seleccionarlas.
-Public Sub CreateBoundingPoligon()
+Public Sub CreateBoundingPoligon(oE As Object)
 
 End
 
-Public Sub Draw()
-
-    If Not Me.DrawAble Or Not Me.Visible Then Return
-
-    ' AQUI VAN LAS RUTINAS DE DIBUJO
-
-End
+' Public Sub Draw(oE As Object)
+'
+'     If Not oE.DrawAble Or Not oE.Visible Then Return
+'
+'     ' AQUI VAN LAS RUTINAS DE DIBUJO
+'
+' End
 
 '' Determines if the entity was selected by a rectanle surrounding al points
 '' by default, if ALL points are selected, it can.
-Public Function SelFull(X1real As Float, Y1real As Float, X2real As Float, Y2real As Float) As Boolean
+Public Function SelFull(oE As Object, X1real As Float, Y1real As Float, X2real As Float, Y2real As Float) As Boolean
 
     Dim i As Integer, puedo As Boolean
 
     ' Si tengo un bounding poligon, entonces verifico que todos los puntos esten dentro
-    If Me.BoundingPoligon.Count > 0 Then
+    If oE.BoundingPoligon.Count > 0 Then
 
-        Return puntos.IsPoligonInsideRect(BoundingPoligon, X1real, Y1real, X2real, Y2real)
+        Return puntos.IsPoligonInsideRect(oE.BoundingPoligon, X1real, Y1real, X2real, Y2real)
 
     Else    ' no tengo un poligono, entonces verifico que todos los puntos definitorios de al entidad esten dentro
 
         puedo = True                     ' supongamos que puedo, por ahora
-        For i = 0 To Me.p.max Step 2
-            If Not (Me.p[i] >= X1real And Me.p[i] <= X2real) And (Me.p[i + 1] >= Y1real And Me.p[i + 1] <= Y2real) Then
+        For i = 0 To oE.p.max Step 2
+            If Not (oE.p[i] >= X1real And oE.p[i] <= X2real) And (oE.p[i + 1] >= Y1real And oE.p[i + 1] <= Y2real) Then
                 puedo = False
             End If
         Next
 
         If puedo Then
-            For i = 0 To Me.PSel.Max
-                Me.PSel[i] = True
+            For i = 0 To oE.PSel.Max
+                oE.PSel[i] = True
             Next
 
             Return True
         Else
-            For i = 0 To Me.PSel.Max
-                Me.PSel[i] = False
+            For i = 0 To oE.PSel.Max
+                oE.PSel[i] = False
             Next
 
             Return False
@@ -128,21 +102,21 @@ End
 
 '' Determines if the entity can be stretched
 '' by default, if ANY point is selected, it can.
-Public Function SelPartial(X1real As Float, Y1real As Float, X2real As Float, Y2real As Float) As Boolean
+Public Function SelPartial(oE As Object, X1real As Float, Y1real As Float, X2real As Float, Y2real As Float) As Boolean
 
     Dim i As Integer, puedo As Boolean
 
     ' Si tengo un bounding poligon, entonces verifico que alguna linea lo cruce
-    If Me.BoundingPoligon.Count > 0 Then
+    If oE.BoundingPoligon.Count > 0 Then
 
-        Return puntos.IsPoligonCrossingRect(BoundingPoligon, X1real, Y1real, X2real, Y2real)
+        Return puntos.IsPoligonCrossingRect(oE.BoundingPoligon, X1real, Y1real, X2real, Y2real)
 
     Else    ' no tengo un poligono, entonces verifico que todos los puntos definitorios de al entidad esten dentro
 
         puedo = False
-        For i = 0 To Me.p.max Step 2
-            If (Me.p[i] >= X1real And Me.p[i] <= X2real) And (Me.p[i + 1] >= Y1real And Me.p[i + 1] <= Y2real) Then
-                Me.PSel[i / 2] = True
+        For i = 0 To oE.p.max Step 2
+            If (oE.p[i] >= X1real And oE.p[i] <= X2real) And (oE.p[i + 1] >= Y1real And oE.p[i + 1] <= Y2real) Then
+                oE.PSel[i / 2] = True
                 puedo = True
             End If
         Next
@@ -167,23 +141,23 @@ End
 ''      64      Perpendicular
 ''      128     Perpendicular
 ''      256     Perpendicular
-Public Function AboveMe(Xreal As Float, Yreal As Float, tolerance As Float, mode As Integer, returnData As Float[]) As Boolean
+Public Function AboveMe(oE As Object, Xreal As Float, Yreal As Float, tolerance As Float, mode As Integer, returnData As Float[]) As Boolean
 
     ' this could be overriden in the child
 
     returnData.Insert([0, 0, -1])               ' minimal response
-    If Me.P.Count = 0 Then Return
+    If oE.P.Count = 0 Then Return
 
-    If puntos.Around(Xreal, yreal, Me.P[0], Me.P[1], APPMain.hFCAD.Metros(10)) Then
+    If puntos.Around(Xreal, yreal, oE.P[0], oE.P[1], APPMain.hFCAD.Metros(10)) Then
 
-        returnData[0] = Me.P[0]
-        returnData[1] = Me.P[1]
+        returnData[0] = oE.P[0]
+        returnData[1] = oE.P[1]
         returnData[2] = 0
         Return True
 
-    Else If Me.BoundingPoligon.Count > 0 Then
+    Else If oE.BoundingPoligon.Count > 0 Then
 
-        If puntos.isInside(Me.BoundingPoligon, Me.BoundingPoligon.Count / 2, Xreal, yreal) Then
+        If puntos.isInside(oE.BoundingPoligon, oE.BoundingPoligon.Count / 2, Xreal, yreal) Then
             returnData[0] = Xreal
             returnData[1] = yreal
             returnData[2] = 0
@@ -199,13 +173,13 @@ Public Function AboveMe(Xreal As Float, Yreal As Float, tolerance As Float, mode
 
 End
 
-Public Sub PointClick(Xr As Float, Yr As Float) As Boolean
+Public Sub PointClick(oE As Object, Xr As Float, Yr As Float) As Boolean
 
     ' this could be overriden in the child
 
-    If Me.BoundingPoligon.Count = 0 Then Return False
+    If oE.BoundingPoligon.Count = 0 Then Return False
 
-    If puntos.isInside(Me.BoundingPoligon, Me.BoundingPoligon.Count / 2, xr, Yr) Then
+    If puntos.isInside(oE.BoundingPoligon, oE.BoundingPoligon.Count / 2, xr, Yr) Then
 
         Return True
     Else
@@ -218,31 +192,31 @@ End
 '' Creo los puntos de interes
 '' Build point of interest
 
-Public Function BuildPOI() As Integer
+Public Function BuildPOI(oE As Object) As Integer
 
 End
 
 ' This function will return False if the element couldn't be created for some reason: bad or incomple user input
 ' True means all is good, False will instruct the clsEntityBuilder to delete it
-Public Sub Finish(ParamsDone As Integer) As Boolean
+Public Sub Finish(oE As Object, ParamsDone As Integer) As Boolean
 
     'Print "Finish en EntityBase"
-    CreateBoundingPoligon
+    CreateBoundingPoligon(oe)
 
     ' busco el tipo de linea, si hace falta
-    If Me.LineTypeName = "Dashed" Then Me.LineType = 1
+    If oE.LineTypeName = "Dashed" Then oE.LineType = 1
     ' tareas finales de armado del objeto
-    Me.b.resize(Me.P.count)
-    Me.psel.resize(Me.p.count / 2)
-    Me.ForDeletion = False
-    Me.DrawAble = True
-    Me.Selected = False
-    Me.Finished = True
+    oE.b.resize(oE.P.count)
+    oE.psel.resize(oE.p.count / 2)
+    oE.ForDeletion = False
+    oE.DrawAble = True
+    oE.Selected = False
+    oE.Finished = True
 
     If Not True Then
 
-        Me.ForDeletion = True
-        Me.DrawAble = False
+        oE.ForDeletion = True
+        oE.DrawAble = False
 
     End If
 

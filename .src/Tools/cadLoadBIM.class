@@ -103,35 +103,35 @@ Public Sub LoadFromFile(Optional FilePath As String)
                 modCAD.cLayers.Add(c.Copy(), ent.Attributes["id"])
                 'Inc ilayer
 
-            ' Case "color"
-            '     c.Clear
-            '     'c["id"] = icolor
-            '     c["id"] = ent.Attributes["id"]
-            '     c["type"] = ent.Attributes["type"]
-            '     'c["label"] = ent.Attributes["label"]
-            '     c["value"] = ent.Attributes["value"]
-            '     modCAD.cColors.Add(c.Copy(), ent.Attributes["id"])
-            '     'Inc icolor
-            ' 
-            ' Case "style"
-            '     c.Clear
-            '     'c["id"] = istyle
-            '     c["id"] = ent.Attributes["id"]
-            '     c["type"] = ent.Attributes["type"]
-            '     'c["label"] = ent.Attributes["value"]
-            '     c["value"] = ent.Attributes["value"]
-            '     modCAD.cStyles.Add(c.Copy(), ent.Attributes["id"])
-            '     'Inc istyle
-            ' 
-            ' Case "weight"
-            '     c.Clear
-            '     'c["id"] = iweight
-            '     c["id"] = ent.Attributes["id"]
-            '     c["type"] = ent.Attributes["type"]
-            '     'c["label"] = ent.Attributes["label"]
-            '     c["value"] = ent.Attributes["value"]
-            '     modCAD.cWeights.Add(c.Copy(), ent.Attributes["id"])
-            '     'Inc iweight
+                ' Case "color"
+                '     c.Clear
+                '     'c["id"] = icolor
+                '     c["id"] = ent.Attributes["id"]
+                '     c["type"] = ent.Attributes["type"]
+                '     'c["label"] = ent.Attributes["label"]
+                '     c["value"] = ent.Attributes["value"]
+                '     modCAD.cColors.Add(c.Copy(), ent.Attributes["id"])
+                '     'Inc icolor
+                '
+                ' Case "style"
+                '     c.Clear
+                '     'c["id"] = istyle
+                '     c["id"] = ent.Attributes["id"]
+                '     c["type"] = ent.Attributes["type"]
+                '     'c["label"] = ent.Attributes["value"]
+                '     c["value"] = ent.Attributes["value"]
+                '     modCAD.cStyles.Add(c.Copy(), ent.Attributes["id"])
+                '     'Inc istyle
+                '
+                ' Case "weight"
+                '     c.Clear
+                '     'c["id"] = iweight
+                '     c["id"] = ent.Attributes["id"]
+                '     c["type"] = ent.Attributes["type"]
+                '     'c["label"] = ent.Attributes["label"]
+                '     c["value"] = ent.Attributes["value"]
+                '     modCAD.cWeights.Add(c.Copy(), ent.Attributes["id"])
+                '     'Inc iweight
 
         End Select
     Next

@@ -19,7 +19,7 @@
 ' along with this program; if not, write to the Free Software
 ' Foundation, Inc., 51 Franklin St, Fifth Floor,
 ' Boston, MA  02110-1301  USA
-
+Create Static
 Inherits EntityBase
 Public Const GENDER As String = "Circle"
 Public Const PointsToDraw As Integer = 1             ' minimal point requered for drawing something usefull
@@ -28,44 +28,44 @@ Public Const ParamType As String = "PL"                             ' that is Po
 Public Const ParamHelper As String = ("Start point;Radious")      ' a little text that is shown at the prompt waiting for user input during build
 Public Const ParamDefault As String = " ; 1 "
 
-Public Sub Draw()
+Public Sub Draw(oE As Object)
 
     Dim x, y, theta, angle_increment As Float
 
-    If Not Me.DrawAble Or Not Me.Visible Then Return
+    If Not oE.DrawAble Or Not oE.Visible Then Return
 
-    If Me.Selected And Not modCAD.ToolActive Then Me.ColorToPaint = modCAD.ColorForSelected Else Me.ColorToPaint = modCAD.GetGBColor(Me.colour, Me.Layerid)
+    If oE.Selected And Not modCAD.ToolActive Then oE.ColorToPaint = modCAD.ColorForSelected Else oE.ColorToPaint = modCAD.GetGBColor(oE.colour, oE.Layerid)
 
     If modCAD.drwDrawingClass = modCAD.drwPaintClass Then
 
-        paint.LineWidth = Me.LineWidth / appmain.hFcad.ScaleZoom / modCAD.ScaleLines
+        paint.LineWidth = oE.LineWidth / appmain.hFcad.ScaleZoom / modCAD.ScaleLines
 
-        paint.brush = Paint.Color(Me.ColorToPaint)
+        paint.brush = Paint.Color(oE.ColorToPaint)
 
-        paint.Arc(Me.p[0], Me.p[1], Me.fParam[0])
+        paint.Arc(oE.p[0], oE.p[1], oE.fParam[0])
 
         paint.Stroke
     End If
 
     If modCAD.drwDrawingClass = modCAD.drwOpenGLClass Then
 
-        Me.BoundingPoligon.Clear
+        oE.BoundingPoligon.Clear
         GL.Begin(gl.LINE_STRIP)
         angle_increment = Pi * 2 / 360
         For theta = 0 To 2 * Pi Step angle_increment
             ' el punto considerando 0,0 al centro
-            x = Me.p[0] + Me.fParam[0] * Cos(theta)
-            y = Me.p[1] + Me.fParam[0] * Sin(theta)
-            Me.BoundingPoligon.Add(x)
-            Me.BoundingPoligon.Add(y)
-            GLplus.Vertex2D(x, y, Me.ColorToPaint)
+            x = oE.p[0] + oE.fParam[0] * Cos(theta)
+            y = oE.p[1] + oE.fParam[0] * Sin(theta)
+            oE.BoundingPoligon.Add(x)
+            oE.BoundingPoligon.Add(y)
+            GLplus.Vertex2D(x, y, oE.ColorToPaint)
         Next
         gl.End
     End If
 
 End
 
-Public Function AboveMe(Xreal As Float, Yreal As Float, tolerance As Float, mode As Integer, fData As Float[]) As Boolean
+Public Function AboveMe(oE As Object, Xreal As Float, Yreal As Float, tolerance As Float, mode As Integer, fData As Float[]) As Boolean
     ' si una de las dos lineas de una cruz con centro en X,Y y largo Tolerance cruza la linea, estamos arriba
     'Dim fData As New Float[]
 
@@ -76,39 +76,39 @@ Public Function AboveMe(Xreal As Float, Yreal As Float, tolerance As Float, mode
     fData.Clear
 
     ' reviso el circulo
-    fDist1 = puntos.distancia(xreal, Yreal, Me.P[0], Me.P[1])
-    If (fdist1 <= Me.fParam[0] + tolerance) And (fdist1 >= Me.fParam[0] - tolerance) Then   ' estoy arriba
+    fDist1 = puntos.distancia(xreal, Yreal, oE.P[0], oE.P[1])
+    If (fdist1 <= oE.fParam[0] + tolerance) And (fdist1 >= oE.fParam[0] - tolerance) Then   ' estoy arriba
         fData.Insert([xreal, yreal, 0])
         ' puedo entregar un cuadrante como POI
-        If puntos.Around(xreal, Yreal, Me.P[0] + Me.fParam[0], Me.P[1], tolerance) Then
-            fData[0] = Me.P[0] + Me.fParam[0]
-            fData[1] = Me.P[1]
+        If puntos.Around(xreal, Yreal, oE.P[0] + oE.fParam[0], oE.P[1], tolerance) Then
+            fData[0] = oE.P[0] + oE.fParam[0]
+            fData[1] = oE.P[1]
             fData.Add(16)                 ' 16      Quadrant
         Endif
 
-        If puntos.Around(xreal, Yreal, Me.P[0] - Me.fParam[0], Me.P[1], tolerance) Then
-            fData[0] = Me.P[0] - Me.fParam[0]
-            fData[1] = Me.P[1]
+        If puntos.Around(xreal, Yreal, oE.P[0] - oE.fParam[0], oE.P[1], tolerance) Then
+            fData[0] = oE.P[0] - oE.fParam[0]
+            fData[1] = oE.P[1]
             fData.Add(16)                 ' 16      Quadrant
         Endif
-        If puntos.Around(xreal, Yreal, Me.P[0], Me.P[1] + Me.fParam[0], tolerance) Then
-            fData[0] = Me.P[0]
-            fData[1] = Me.P[1] + Me.fParam[0]
+        If puntos.Around(xreal, Yreal, oE.P[0], oE.P[1] + oE.fParam[0], tolerance) Then
+            fData[0] = oE.P[0]
+            fData[1] = oE.P[1] + oE.fParam[0]
             fData.Add(16)                 ' 16      Quadrant
         Endif
 
-        If puntos.Around(xreal, Yreal, Me.P[0], Me.P[1] - Me.fParam[0], tolerance) Then
-            fData[0] = Me.P[0]
-            fData[1] = Me.P[1] - Me.fParam[0]
+        If puntos.Around(xreal, Yreal, oE.P[0], oE.P[1] - oE.fParam[0], tolerance) Then
+            fData[0] = oE.P[0]
+            fData[1] = oE.P[1] - oE.fParam[0]
             fData.Add(16)                 ' 16      Quadrant
         Endif
         Return True
     End If
 
-    If puntos.Around(xreal, Yreal, Me.P[0], Me.P[1], tolerance) Then
+    If puntos.Around(xreal, Yreal, oE.P[0], oE.P[1], tolerance) Then
         fData.Insert([xreal, yreal, 0])
-        fData[0] = Me.P[0]
-        fData[1] = Me.P[1] - Me.fParam[0]
+        fData[0] = oE.P[0]
+        fData[1] = oE.P[1] - oE.fParam[0]
         fData.Add(8)                    ' 8      Center
         Return True
     Endif

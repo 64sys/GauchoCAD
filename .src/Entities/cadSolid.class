@@ -19,7 +19,7 @@
 ' along with this program; if not, write to the Free Software
 ' Foundation, Inc., 51 Franklin St, Fifth Floor,
 ' Boston, MA  02110-1301  USA
-
+Create Static
 Inherits EntityBase
 Public Const GENDER As String = "Solid"
 Public Const PointsToDraw As Integer = 0             ' minimal point requered for drawing something usefull
@@ -28,53 +28,53 @@ Public Const ParamType As String = "PPPP"                             ' that is 
 Public Const ParamHelper As String = ("First Point;Next Point;Next Point;Last Point")      ' a little text that is shown at the prompt waiting for user input during build
 Public Const ParamDefault As String = ""
 
-Public Sub Draw()
+Public Sub Draw(oE As Object)
 
-    If Not Me.DrawAble Or Not Me.Visible Then Return
-    If Me.Selected And Not modCAD.ToolActive Then Me.ColorToPaint = modCAD.ColorForSelected Else Me.ColorToPaint = modCAD.GetGBColor(Me.colour, Me.Layerid)
+    If Not oE.DrawAble Or Not oE.Visible Then Return
+    If oE.Selected And Not modCAD.ToolActive Then oE.ColorToPaint = modCAD.ColorForSelected Else oE.ColorToPaint = modCAD.GetGBColor(oE.colour, oE.Layerid)
 
     Dim i As Integer
     If modCAD.drwDrawingClass = modCAD.drwPaintClass Then
 
-        If Me.Selected And Not modCAD.ToolActive Then
+        If oE.Selected And Not modCAD.ToolActive Then
             paint.brush = Paint.Color(modCAD.ColorForSelected)
         Else
-            paint.brush = Paint.Color(Me.ColorToPaint)
+            paint.brush = Paint.Color(oE.ColorToPaint)
         Endif
 
-        Paint.Polygon(Me.p)
+        Paint.Polygon(oE.p)
 
         paint.Fill
     End If
 
     If modCAD.drwDrawingClass = modCAD.drwOpenGLClass Then
 
-        If Me.StepsDone < 1 Then
+        If oE.StepsDone < 1 Then
 
-            Me.P[2] = Me.P[0]
-            Me.P[3] = Me.P[1]
+            oE.P[2] = oE.P[0]
+            oE.P[3] = oE.P[1]
 
-            glPlus.Lines(Me.p, Me.ColorToPaint, Me.LineWidth)
-
-        End If
-
-        If Me.StepsDone < 2 Then
-
-            Me.P[4] = Me.P[2]
-            Me.P[5] = Me.P[3]
+            glPlus.Lines(oE.p, oE.ColorToPaint, oE.LineWidth)
 
         End If
 
-        If Me.StepsDone < 3 Then
+        If oE.StepsDone < 2 Then
 
-            Me.P[6] = Me.P[4]
-            Me.P[7] = Me.P[5]
+            oE.P[4] = oE.P[2]
+            oE.P[5] = oE.P[3]
+
+        End If
+
+        If oE.StepsDone < 3 Then
+
+            oE.P[6] = oE.P[4]
+            oE.P[7] = oE.P[5]
 
         Endif
 
-        Me.BoundingPoligon = Me.P
+        oE.BoundingPoligon = oE.P
 
-        GLplus.Polygon(Me.p, Me.ColorToPaint, Me.ColorToPaint, Me.LineWidth)
+        GLplus.Polygon(oE.p, oE.ColorToPaint, oE.ColorToPaint, oE.LineWidth)
 
     Endif
 

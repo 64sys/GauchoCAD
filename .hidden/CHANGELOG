@@ -6,6 +6,8 @@ Authors: Terco, Tincho, Postpase, Vuott
 
 VER       DATE      CHANGES
 --------------------------------------------------------------------------------------------------------------------
+0.0.62	10/06/20	Go to Static classes and instanced entity data only.
+
 0.0.60	09/06/20	Reading DXF blocks. Added Protractor tool.
 
 0.0.58	08/06/20	All entities are in 3D format from file to cModel collection. Started BIN again.

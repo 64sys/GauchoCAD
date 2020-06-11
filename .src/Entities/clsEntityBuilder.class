@@ -94,7 +94,8 @@ Public Function Start(ElemToBuild As Variant, Optional Mode As Integer = 0)
 
     Else                                                                                ' Valid entity
         ' start building the element
-        elem = elemtobuild
+        elem = New Entity
+        elem.ClassHandler = elemtobuild
 
     End If
 
@@ -109,13 +110,13 @@ Public Function Start(ElemToBuild As Variant, Optional Mode As Integer = 0)
     iString = 0
 
     Pointstotal = elem.p.count / 2                                          ' at this point P is either set or 0 if non determined
-    StepsTotal = Len(elem.ParamType)
+    StepsTotal = Len(elem.ClassHandler.ParamType)
 
     ' get the helper list, and parameter types from the element
-    Try Paramhelperlist = Split(elem.ParamHelper, ";")                      ' optional
-    Try Paramdefault = Split(elem.ParamDefault, ";")                        ' optional
+    Try Paramhelperlist = Split(elem.ClassHandler.ParamHelper, ";")                      ' optional
+    Try Paramdefault = Split(elem.ClassHandler.ParamDefault, ";")                        ' optional
 
-    NextParamType = UCase(Mid(elem.ParamType, elem.StepsDone + 1, 1))
+    NextParamType = UCase(Mid(elem.ClassHandler.ParamType, elem.StepsDone + 1, 1))
     clsDrawingAids.HelperTrabajoNext = ParamHelperList[0]
 
     ' instructions to FCAD
@@ -125,7 +126,7 @@ Public Function Start(ElemToBuild As Variant, Optional Mode As Integer = 0)
     elem.layer = appmain.CurrentLayer
     elem.layerid = modCAD.GetLayerID(appmain.CurrentLayer)
 
-    clsDrawingAids.HelperTrabajo = elem.HelperTrabajo
+    clsDrawingAids.HelperTrabajo = elem.ClassHandler.HelperTrabajo
 
 End
 
@@ -261,7 +262,7 @@ Public Sub AdvanceStep()
 
         ' prepare next stuff
         '
-        NextParamType = UCase(Mid(elem.ParamType, elem.StepsDone + 1, 1))
+        NextParamType = UCase(Mid(elem.ClassHandler.ParamType, elem.StepsDone + 1, 1))
         If NextParamType = "+" Then ' add another point
             elem.p.add(0)
             elem.p.add(0)
@@ -422,14 +423,14 @@ End
 
 Public Sub Draw()               ' called byappmain.hFCAD.drwArea_Draw
 
-    elem.draw
+    elem.ClassHandler.draw(elem)
 
 End
 
 Public Sub Finish()
 
-    elem.Finish(elem.StepsDone)
-    elem.buildPOI
+    elem.ClassHandler.Finish(elem, elem.StepsDone)
+    elem.ClassHandler.buildPOI(elem)
     clsEntities.BackUpPosition(elem)
     APPMain.hFCAD.arrEntities.Add(elem)
 

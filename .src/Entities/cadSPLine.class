@@ -3,6 +3,7 @@
 ' Represents a poli line
 ' Element maintained by Terco
 ' V2
+Create Static
 Inherits EntityBase
 Public Const GENDER As String = "SPLine"
 Public Const PointsToDraw As Integer = 0             ' minimal point requered for drawing something usefull
@@ -11,42 +12,42 @@ Public Const ParamType As String = "PPPP"                             ' that is 
 Public Const ParamHelper As String = ("First Point;Next Point;Next Point;Last Point")      ' a little text that is shown at the prompt waiting for user input during build
 Public Const ParamDefault As String = ""
 
-Public Sub Draw()
+Public Sub Draw(oE As Object)
 
     ' FIXME: requiere reparacion -> OpenGL
     Return
 
-    If Not Me.DrawAble Or Not Me.Visible Then Return
-    If Me.Selected And Not modCAD.ToolActive Then Me.ColorToPaint = modCAD.ColorForSelected Else Me.ColorToPaint = modCAD.GetGBColor(Me.colour, Me.Layerid)
+    If Not oE.DrawAble Or Not oE.Visible Then Return
+    If oE.Selected And Not modCAD.ToolActive Then oE.ColorToPaint = modCAD.ColorForSelected Else oE.ColorToPaint = modCAD.GetGBColor(oE.colour, oE.Layerid)
 
     Dim i As Integer
 
-    paint.LineWidth = Me.LineWidth / appmain.hFcad.ScaleZoom / modCAD.ScaleLines
-    If Me.flxDash Then paint.Dash = Me.flxDash
-    If Me.Selected And Not modCAD.ToolActive Then
+    paint.LineWidth = oE.LineWidth / appmain.hFcad.ScaleZoom / modCAD.ScaleLines
+    If oE.flxDash Then paint.Dash = oE.flxDash
+    If oE.Selected And Not modCAD.ToolActive Then
         paint.brush = Paint.Color(modCAD.ColorForSelected)
     Else
-        paint.brush = Paint.Color(Me.ColorToPaint)
+        paint.brush = Paint.Color(oE.ColorToPaint)
     Endif
 
-    If Me.StepsDone = 1 Then
-        paint.moveto(Me.p[0], Me.p[1])
-        paint.lineto(Me.p[2], Me.p[3])
+    If oE.StepsDone = 1 Then
+        paint.moveto(oE.p[0], oE.p[1])
+        paint.lineto(oE.p[2], oE.p[3])
 
-    Else If Me.StepsDone = 2 Then
-        paint.moveto(Me.p[0], Me.p[1])
-        paint.lineto(Me.p[2], Me.p[3])
-        paint.lineto(Me.p[4], Me.p[5])
+    Else If oE.StepsDone = 2 Then
+        paint.moveto(oE.p[0], oE.p[1])
+        paint.lineto(oE.p[2], oE.p[3])
+        paint.lineto(oE.p[4], oE.p[5])
 
-    Else If Me.StepsDone >= 3 Then 'If Me.P.Count / 2 < 5 Then
-        paint.moveto(Me.p[0], Me.p[1])
-        paint.curveto(Me.p[2], Me.p[3], Me.p[4], Me.p[5], Me.p[6], Me.p[7])
+    Else If oE.StepsDone >= 3 Then 'If oE.P.Count / 2 < 5 Then
+        paint.moveto(oE.p[0], oE.p[1])
+        paint.curveto(oE.p[2], oE.p[3], oE.p[4], oE.p[5], oE.p[6], oE.p[7])
         '
         ' Else
         '
-        '     'For i = 2 To Me.P.Max - 6 Step 2
-        '         paint.moveto(Me.p[i], Me.p[i + 1])
-        '         paint.curveto(Me.p[i + 2], Me.p[i + 3], Me.p[i + 4], Me.p[i + 5], Me.p[i + 6], Me.p[i + 7])
+        '     'For i = 2 To oE.P.Max - 6 Step 2
+        '         paint.moveto(oE.p[i], oE.p[i + 1])
+        '         paint.curveto(oE.p[i + 2], oE.p[i + 3], oE.p[i + 4], oE.p[i + 5], oE.p[i + 6], oE.p[i + 7])
         '
         '     'Next
     End If
@@ -56,30 +57,3 @@ Public Sub Draw()
 
 End
 
-'' Creo los puntos de interes
-'' Build point of interest
-
-Public Function BuildPOI() As Integer
-
-    Dim I, poiCount As Integer
-
-    Me.MyPoi.Clear
-    ' P0
-    Me.MyPoi.Insert([Me.p[0], Me.p[1]])
-
-    For i = 0 To Me.P.Max - 2 Step 2
-
-        ' MID
-        Me.MyPoi.Insert([(Me.p[i + 2] + Me.p[i]) / 2, (Me.p[i + 3] + Me.p[i + 1]) / 2])
-
-        ' Pi+1
-        Me.MyPoi.Insert([Me.p[i + 2], Me.p[i + 3]])
-
-        ' FIXME: this limit is for idiot plines
-        If i >= 100 Then Break
-
-    Next
-
-    Return Me.MyPoi.Count / 2
-
-End

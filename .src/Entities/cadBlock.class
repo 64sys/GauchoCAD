@@ -19,7 +19,7 @@
 ' along with this program; if not, write to the Free Software
 ' Foundation, Inc., 51 Franklin St, Fifth Floor,
 ' Boston, MA  02110-1301  USA
-
+Create Static
 Inherits EntityBase
 Public Const GENDER As String = "Block"
 Public Const HelperTrabajo As String = ("Block")
@@ -27,9 +27,9 @@ Public Const ParamType As String = "TP"                             ' that is Po
 Public Const ParamHelper As String = ("Name; Origin")      ' a little text that is shown at the prompt waiting for user input during build"
 Public Const ParamDefault As String = "<no name>; "
 
-Public Sub Draw()
+Public Sub Draw(oE As Object)
 
-    If Me.fParam.Count > 0 Then Return
+    If oE.fParam.Count > 0 Then Return
 
     ' nothing
     Dim n As Integer
@@ -39,17 +39,17 @@ Public Sub Draw()
 
         clsDrawingAids.ErrorMessage = ("Select two or mores entities first")
 
-        Me.ForDeletion = True
+        oE.ForDeletion = True
     Else
 
         clsDrawingAids.HelperTrabajo = Str(n) & " entities selected, enter block name:"
 
     Endif
-    Me.DrawAble = True
+    oE.DrawAble = True
 
 End
 
-Public Sub Finish(ParamsDone As Integer) As Boolean
+Public Sub Finish(oE As Object, ParamsDone As Integer) As Boolean
 
     ' we set the block property of all entities selected
 
@@ -57,9 +57,9 @@ Public Sub Finish(ParamsDone As Integer) As Boolean
     Dim e As Object, iBlock As Integer
 
     iBlock = clsEntities.GetFreeBlockNumber()
-    Me.fParam.add(iBlock)
-    Me.Finished = True
-    Me.B.Resize(Me.P.Count)
+    oE.fParam.add(iBlock)
+    oE.Finished = True
+    oE.B.Resize(oE.P.Count)
 
     For Each e In APPMain.hFCAD.arrEntities
         If e.Selected Then                      ' parto of this

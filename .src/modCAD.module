@@ -246,9 +246,9 @@ End
 Public Function AddLine(obxContainer As Object[], Points As Float[], Optional colour As Integer = 0, Optional LineWidth As Float = 1, Optional Linetype As String, Optional Layer As String, Optional Block As String) As Boolean
 
     ' points are in x,y,x,y,x,y....
-    Dim oEntity As Object                       ' creamos la entidad de la clase apropiada
-
-    oEntity = Object.New("cadline")             ' create the new entity of proper class
+    Dim oEntity As New Entity
+    
+    oEntity.ClassHandler = cadLine
     oEntity.P.insert(points)                    ' recibimos los dos vertices de la linea x1,y1,x2,y2
     oEntity.layer = Layer
     oEntity.colour = colour
@@ -257,7 +257,8 @@ Public Function AddLine(obxContainer As Object[], Points As Float[], Optional co
     oEntity.Block = Block
     If oEntity.Block <> "" Then oEntity.visible = False
     obxContainer.Add(oEntity)
-    oEntity.finish(-1)
+    oEntity.ClassHandler.finish(oEntity, -1)
+    'cadLine.finish(oEntity, -1)
     oEntity = Null                  ' free object
 
 End
@@ -266,10 +267,10 @@ Public Function AddPolyLine(obxContainer As Object[], Points As Float[], Optiona
 
     ' points are in x,y,x,y,x,y....
 
-    Dim oEntity As Object                       ' creamos la entidad de la clase apropiada
+    Dim oEntity As New Entity
 
-    oEntity = Object.New("cadPLine")             ' create the new entity of proper class
-
+    
+    oEntity.ClassHandler = cadPLine
     oEntity.P.insert(points)                    ' recibimos los dos vertices de la linea x1,y1,x2,y2
 
     oEntity.layer = Layer
@@ -278,17 +279,16 @@ Public Function AddPolyLine(obxContainer As Object[], Points As Float[], Optiona
     oEntity.Block = Block
     If oEntity.Block <> "" Then oEntity.visible = False
     obxContainer.Add(oEntity)
-    oEntity.finish(-1)
+    oEntity.ClassHandler.finish(oEntity, -1)
     oEntity = Null                  ' free object
 
 End
 
 Public Function AddDim(obxContainer As Object[], Points As Float[], bloque As String, medida As Float, texto As String, alineacion As Integer, angulo As Float, tipo As Integer, colour As Integer, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
 
-    Dim oEntity As Object                       ' creamos la entidad de la clase apropiada
-
-    oEntity = Object.New("cadDim")              ' create the new entity of proper class
-
+    Dim oEntity As New Entity
+    
+    oEntity.ClassHandler = cadDim              ' create the new entity of proper class
     oEntity.P.insert(points)                    ' recibimos los dos vertices de la linea x1,y1,x2,y2
     oEntity.fParam.Add(tipo)
     oEntity.fParam.Add(MEDIDA)
@@ -302,7 +302,7 @@ Public Function AddDim(obxContainer As Object[], Points As Float[], bloque As St
     oEntity.Block = Block
     If oEntity.Block <> "" Then oEntity.visible = False
     obxContainer.Add(oEntity)
-    oEntity.finish(-1)
+    oEntity.ClassHandler.finish(oEntity, -1)
     oEntity = Null                  ' free object
 
 End
@@ -311,10 +311,10 @@ Public Function AddSolid(obxContainer As Object[], Points As Float[], Optional c
 
     ' points are in x,y,x,y,x,y....
     ' points are in x,y,x,y,x,y....
-    Dim oEntity As Object                       ' creamos la entidad de la clase apropiada
-
-    oEntity = Object.New("cadSolid")             ' create the new entity of proper class
-
+    Dim oEntity As New Entity
+    
+    
+    oEntity.ClassHandler = cadSolid             ' create the new entity of proper class
     oEntity.P.insert(points)                    ' recibimos los dos vertices de la linea x1,y1,x2,y2
 
     oEntity.layer = Layer
@@ -323,7 +323,7 @@ Public Function AddSolid(obxContainer As Object[], Points As Float[], Optional c
     oEntity.Block = Block
     If oEntity.Block <> "" Then oEntity.visible = False
     obxContainer.Add(oEntity)
-    oEntity.finish(-1)
+    oEntity.ClassHandler.finish(oEntity, -1)
     oEntity = Null                  ' free object
 
 End
@@ -331,9 +331,9 @@ End
 Public Function AddSPLine(obxContainer As Object[], Points As Float[], Optional colour As Integer = 0, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
 
     ' points are in x,y,x,y,x,y....
-    Dim oEntity As Object                       ' creamos la entidad de la clase apropiada
+    Dim oEntity As New Entity
 
-    oEntity = Object.New("cadSPLine")             ' create the new entity of proper class
+    oEntity.ClassHandler = cadSPLine
 
     oEntity.P.insert(points)                    ' recibimos los dos vertices de la linea x1,y1,x2,y2
 
@@ -343,7 +343,7 @@ Public Function AddSPLine(obxContainer As Object[], Points As Float[], Optional 
     oEntity.Block = Block
     If oEntity.Block <> "" Then oEntity.visible = False
     obxContainer.Add(oEntity)
-    oEntity.finish(-1)
+    oEntity.ClassHandler.finish(oEntity, -1)
     oEntity = Null                  ' free object
 
 End
@@ -351,9 +351,9 @@ End
 Public Function AddCircle(obxContainer As Object[], Points As Float[], radious As Float, Optional colour As Integer = 0, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
 
     ' points are in x,y,x,y,x,y....
-    Dim oEntity As Object                       ' creamos la entidad de la clase apropiada
+    Dim oEntity As New Entity
 
-    oEntity = Object.New("cadCircle")             ' create the new entity of proper class
+    oEntity.ClassHandler = cadCircle
     oEntity.P.insert(points)                    ' centro x1,y1
     oEntity.fParam.Add(radious)                 ' radio
     oEntity.layer = Layer
@@ -362,7 +362,7 @@ Public Function AddCircle(obxContainer As Object[], Points As Float[], radious A
     oEntity.Block = Block
     If oEntity.Block <> "" Then oEntity.visible = False
     obxContainer.Add(oEntity)
-    oEntity.finish(-1)
+    oEntity.ClassHandler.finish(oEntity, -1)
     oEntity = Null                  ' free object
 
 End
@@ -370,9 +370,9 @@ End
 Public Function AddArc(obxContainer As Object[], Points As Float[], r As Float, angle1 As Float, angle2 As Float, Optional colour As Integer = 0, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
 
     ' points are in x,y,x,y,x,y....
-    Dim oEntity As Object                      ' creamos la entidad de la clase apropiada
+    Dim oEntity As New Entity
 
-    oEntity = Object.New("cadArc")           ' create the new entity of proper class
+    oEntity.ClassHandler = cadArc
     oEntity.P.insert(points)                    ' centro x1,y1
     oEntity.fParam.Add(r)                      ' radio
     oEntity.fParam.Add(angle1)                   ' angulo
@@ -383,7 +383,7 @@ Public Function AddArc(obxContainer As Object[], Points As Float[], r As Float, 
     oEntity.Block = Block
     If oEntity.Block <> "" Then oEntity.visible = False
     obxContainer.Add(oEntity)
-    oEntity.finish(-1)
+    oEntity.ClassHandler.finish(oEntity, -1)
     oEntity = Null                  ' free object
 
 End
@@ -391,9 +391,9 @@ End
 Public Function AddEllipse(obxContainer As Object[], Points As Float[], r As Float, angle1 As Float, angle2 As Float, Optional colour As Integer = 0, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
 
     ' points are in x,y,x,y,x,y....
-    Dim oEntity As Object                      ' creamos la entidad de la clase apropiada
+    Dim oEntity As New Entity
 
-    oEntity = Object.New("cadEllipse")           ' create the new entity of proper class
+    oEntity.ClassHandler = cadEllipse
     oEntity.P.insert(points)                    ' centro x1,y1
     oEntity.p[2] += oEntity.p[0]                ' un pequeño truco porque gaucho usa los puntos de manera diferente a DXF
     oEntity.p[3] += oEntity.p[1]
@@ -406,16 +406,16 @@ Public Function AddEllipse(obxContainer As Object[], Points As Float[], r As Flo
     oEntity.Block = Block
     If oEntity.Block <> "" Then oEntity.visible = False
     obxContainer.Add(oEntity)
-    oEntity.finish(-1)
+    oEntity.ClassHandler.finish(oEntity, -1)
     oEntity = Null                  ' free object
 
 End
 
 Public Function AddText(obxContainer As Object[], Points As Float[], angle As Float, height As Float, _Text As String, Optional colour As Integer = Color.Blue, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
 
-    Dim oEntity As Object                       ' creamos la entidad de la clase apropiada
+    Dim oEntity As New Entity
 
-    oEntity = Object.New("cadText")             ' create the new entity of proper class
+    oEntity.ClassHandler = cadText
     oEntity.P.insert(points)                    ' recibimos position x1,y1
     oEntity.fParam.Add(angle)                   ' grados
     oEntity.fParam.Add(height)                  ' alto letras
@@ -426,16 +426,16 @@ Public Function AddText(obxContainer As Object[], Points As Float[], angle As Fl
     oEntity.Block = Block
     If oEntity.Block <> "" Then oEntity.visible = False
     obxContainer.Add(oEntity)
-    oEntity.finish(-1)
+    oEntity.ClassHandler.finish(oEntity, -1)
     oEntity = Null                  ' free object
 
 End
 
 Public Function AddMText(obxContainer As Object[], Points As Float[], angle As Float, height As Float, _Text As String, Optional colour As Integer = Color.Blue, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
 
-    Dim oEntity As Object                       ' creamos la entidad de la clase apropiada
+    Dim oEntity As New Entity
 
-    oEntity = Object.New("cadMText")             ' create the new entity of proper class
+    oEntity.ClassHandler = cadMText
     oEntity.P.insert(points)                    ' recibimos position x1,y1
     oEntity.fParam.Add(angle)                  ' GRADOS
     oEntity.fParam.Add(height)                  ' alto letras
@@ -446,7 +446,7 @@ Public Function AddMText(obxContainer As Object[], Points As Float[], angle As F
     oEntity.Block = Block
     If oEntity.Block <> "" Then oEntity.visible = False
     obxContainer.Add(oEntity)
-    oEntity.finish(-1)
+    oEntity.ClassHandler.finish(oEntity, -1)
     oEntity = Null                  ' free object
 
 End
@@ -454,15 +454,15 @@ End
 Public Function AddCurve(obxContainer As Object[], Points As Float[], Optional colour As Integer = 0, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
 
     ' points are in x,y,x,y,x,y....
-    Dim o As Object
+    Dim oEntity As New Entity
 
 End
 
 Public Function AddInsert(obxContainer As Object[], Points As Float[], scaleX As Float, scaleY As Float, angulo As Float, Optional colour As Integer = Color.Blue, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
 
-    Dim oEntity As Object                       ' creamos la entidad de la clase apropiada
+    Dim oEntity As New Entity
 
-    oEntity = Object.New("cadInsert")             ' create the new entity of proper class
+    oEntity.ClassHandler = cadInsert
     oEntity.P.insert(points)                    ' recibimos position x1,y1
     oEntity.fParam.Add(scaleX)
     oEntity.fParam.Add(scaleY)
@@ -471,7 +471,7 @@ Public Function AddInsert(obxContainer As Object[], Points As Float[], scaleX As
     oEntity.colour = colour
     oEntity.Block = Block
     obxContainer.Add(oEntity)
-    oEntity.finish(-1)
+    oEntity.ClassHandler.finish(oEntity, -1)
 
     oEntity = Null                  ' free object
 
@@ -479,14 +479,14 @@ End
 
 Public Function AddBlock(obxContainer As Object[], Points As Float[], Optional Layer As String, Optional Block As String) As Boolean
 
-    Dim oEntity As Object                       ' creamos la entidad de la clase apropiada
+    Dim oEntity As New Entity
 
-    oEntity = Object.New("cadBlock")             ' create the new entity of proper class
+    oEntity.ClassHandler = cadBlock
     oEntity.P.insert(points)                    ' basepoint , , siempre es 0,0 los objetos agregados a este bloque se refieren a este punto
     oEntity.layer = Layer
     oEntity.Block = Block
     obxContainer.Add(oEntity)
-    oEntity.finish(-1)
+    oEntity.ClassHandler.finish(oEntity, -1)
     oEntity = Null                  ' free object
 
 End
