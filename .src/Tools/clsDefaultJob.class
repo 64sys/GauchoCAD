@@ -97,9 +97,12 @@ Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' esta rutina es l
         ' veo si el rectangulo es suficientemente grande como para representar una seleccion por rectangulo
         If (Me.SelEndX - Me.SelStartX + (-Me.SelEndy + Me.SelStartY)) > 10 Then
 
+            Dim t As Float = Timer
             Me.selectionCount = clsEntities.SelectionSquare(Me.SelStartXr, Me.SelStartYr, Me.SelEndXr, Me.SelEndyr, tipo, crossing)
+            Debug "Select parsing time ", Timer - t
+            t = Timer
             Appmain.hFCAD.regen
-
+            Debug "Regen parsing time ", Timer - t
         End If
 
         clsDrawingAids.HelperTrabajo = ("Selected ") & Str$(Me.selectionCount) & (" elements")

@@ -40,80 +40,82 @@ Public Sub Draw(oE As Object)
     Dim difAng As Float
     Dim major, minor, angle, la As Float
 
-    If Not oE.DrawAble Or Not oE.Visible Then Return
+    If Not oE.Visible Then Return
 
     If oE.Selected And Not modCAD.ToolActive Then oE.ColorToPaint = modCAD.ColorForSelected Else oE.ColorToPaint = modCAD.GetGBColor(oE.colour, oE.Layerid)
 
-    If modCAD.drwDrawingClass = modCAD.drwPaintClass Then
+    If oE.StepsDone = 1 Then
 
-        paint.LineWidth = oE.LineWidth / appmain.hFcad.ScaleZoom / modCAD.ScaleLines
+        oE.fParam[2] = 360
 
-        paint.brush = Paint.Color(oE.ColorToPaint)
+    Else If oE.StepsDone = 2 Then
 
-        paint.Arc(oE.p[0], oE.p[1], oE.fParam[0], start, recorrido)
+        If oE.fParam[1] < 0 Then oE.fParam[1] = 360 + oE.fParam[1]
+        difang = (oE.fParam[2] - oE.fParam[1])
 
-        paint.Stroke
+        GLplus.Lines([oE.p[0], oE.p[1], oE.p[0] + oE.fParam[0] * Cos(oE.fParam[1] / 180 * Pi), oE.p[1] + oE.fParam[0] * Sin(oE.fParam[1] / 180 * Pi)], oE.ColorToPaint)
+        clsDrawingAids.Helper.texto = Format$(oE.fParam[1], ("0.0 deg"))
+
+    Else If oE.StepsDone = 3 Then
+
+        If oE.fParam[1] < 0 Then oE.fParam[1] = 360 + oE.fParam[1]
+        If oE.fParam[2] < 0 Then oE.fParam[2] = 360 + oE.fParam[2]              ' grados
+        Me.start = oE.fParam[1] / 180 * Pi                                      ' rad
+        Me.recorrido = (oE.fParam[2] - oE.fParam[1]) / 180 * Pi                 ' rad
+        If Me.recorrido < 0 Then
+
+            Me.recorrido += 2 * Pi
+
+        Endif
+
+        GL.Begin(gl.LINE_STRIP)
+        angle_increment = Pi * 2 / 360
+        For theta = 0 To Me.recorrido Step angle_increment
+            GLplus.Vertex2D(oE.p[0] + oE.fParam[0] * Cos(Me.start + theta), oE.p[1] + oE.fParam[0] * Sin(Me.start + theta), oE.ColorToPaint)
+        Next
+        gl.End
+
+        clsDrawingAids.Helper.texto = Format$(oE.fParam[1], ("0.0 deg")) & (" to ") & Format$(oE.fParam[2], ("0.0 deg"))
+    Else
+        If oE.fParam[1] < 0 Then oE.fParam[1] = 360 + oE.fParam[1]
+        If oE.fParam[2] < 0 Then oE.fParam[2] = 360 + oE.fParam[2]              ' grados
+        Me.start = oE.fParam[1] / 180 * Pi                                      ' rad
+        Me.recorrido = (oE.fParam[2] - oE.fParam[1]) / 180 * Pi                 ' rad
+        If Me.recorrido < 0 Then
+
+            Me.recorrido += 2 * Pi
+
+        Endif
+
+        oE.BoundingPoligon.Clear
+        GL.Begin(gl.LINE_STRIP)
+        angle_increment = Pi * 2 / 360
+        For theta = 0 To Me.recorrido Step angle_increment
+            ' el punto considerando 0,0 al centro
+            x = oE.p[0] + oE.fParam[0] * Cos(Me.start + theta)
+            y = oE.p[1] + oE.fParam[0] * Sin(Me.start + theta)
+            oE.BoundingPoligon.Add(x)
+            oE.BoundingPoligon.Add(y)
+            GLplus.Vertex2D(x, y, oE.ColorToPaint)
+        Next
+        gl.End
     End If
 
-    If modCAD.drwDrawingClass = modCAD.drwOpenGLClass Then
+End
 
-        If oE.StepsDone = 1 Then
+Public Function Draw2(oE As Object)
 
-            oE.fParam[2] = 360
+    If Not oE.Visible Then Return
 
-        Else If oE.StepsDone = 2 Then
+    If oE.Selected And Not modCAD.ToolActive Then oE.ColorToPaint = modCAD.ColorForSelected Else oE.ColorToPaint = modCAD.GetGBColor(oE.colour, oE.Layerid)
 
-            If oE.fParam[1] < 0 Then oE.fParam[1] = 360 + oE.fParam[1]
-            difang = (oE.fParam[2] - oE.fParam[1])
+    paint.LineWidth = oE.LineWidth / appmain.hFcad.ScaleZoom / modCAD.ScaleLines
 
-            GLplus.Lines([oE.p[0], oE.p[1], oE.p[0] + oE.fParam[0] * Cos(oE.fParam[1] / 180 * Pi), oE.p[1] + oE.fParam[0] * Sin(oE.fParam[1] / 180 * Pi)], oE.ColorToPaint)
-            clsDrawingAids.Helper.texto = Format$(oE.fParam[1], ("0.0 deg"))
+    paint.brush = Paint.Color(oE.ColorToPaint)
 
-        Else If oE.StepsDone = 3 Then
+    paint.Arc(oE.p[0], oE.p[1], oE.fParam[0], start, recorrido)
 
-            If oE.fParam[1] < 0 Then oE.fParam[1] = 360 + oE.fParam[1]
-            If oE.fParam[2] < 0 Then oE.fParam[2] = 360 + oE.fParam[2]              ' grados
-            Me.start = oE.fParam[1] / 180 * Pi                                      ' rad
-            Me.recorrido = (oE.fParam[2] - oE.fParam[1]) / 180 * Pi                 ' rad
-            If Me.recorrido < 0 Then
-
-                Me.recorrido += 2 * Pi
-
-            Endif
-
-            GL.Begin(gl.LINE_STRIP)
-            angle_increment = Pi * 2 / 360
-            For theta = 0 To Me.recorrido Step angle_increment
-                GLplus.Vertex2D(oE.p[0] + oE.fParam[0] * Cos(oE.start + theta), oE.p[1] + oE.fParam[0] * Sin(oE.start + theta), oE.ColorToPaint)
-            Next
-            gl.End
-
-            clsDrawingAids.Helper.texto = Format$(oE.fParam[1], ("0.0 deg")) & (" to ") & Format$(oE.fParam[2], ("0.0 deg"))
-        Else
-            If oE.fParam[1] < 0 Then oE.fParam[1] = 360 + oE.fParam[1]
-            If oE.fParam[2] < 0 Then oE.fParam[2] = 360 + oE.fParam[2]              ' grados
-            Me.start = oE.fParam[1] / 180 * Pi                                      ' rad
-            Me.recorrido = (oE.fParam[2] - oE.fParam[1]) / 180 * Pi                 ' rad
-            If Me.recorrido < 0 Then
-
-                Me.recorrido += 2 * Pi
-
-            Endif
-
-            oE.BoundingPoligon.Clear
-            GL.Begin(gl.LINE_STRIP)
-            angle_increment = Pi * 2 / 360
-            For theta = 0 To Me.recorrido Step angle_increment
-                ' el punto considerando 0,0 al centro
-                x = oE.p[0] + oE.fParam[0] * Cos(Me.start + theta)
-                y = oE.p[1] + oE.fParam[0] * Sin(Me.start + theta)
-                oE.BoundingPoligon.Add(x)
-                oE.BoundingPoligon.Add(y)
-                GLplus.Vertex2D(x, y, oE.ColorToPaint)
-            Next
-            gl.End
-        End If
-    Endif
+    paint.Stroke
 
 End
 

@@ -20,6 +20,7 @@
 ' Foundation, Inc., 51 Franklin St, Fifth Floor,
 ' Boston, MA  02110-1301  USA
 Create Static
+Fast
 Inherits EntityBase
 Public Const GENDER As String = "Ellipse"
 Public Const PointsToDraw As Integer = 1             ' minimal point requered for drawing something usefull
@@ -35,7 +36,7 @@ Public angle As Float
 
 Public Sub Draw(oE As Object)
 
-    If Not oE.DrawAble Or Not oE.Visible Then Return
+    If Not oE.Visible Then Return
     If oE.Selected And Not modCAD.ToolActive Then oE.ColorToPaint = modCAD.ColorForSelected Else oE.ColorToPaint = modCAD.GetGBColor(oE.colour, oE.Layerid)
 
     Dim major, minor, la As Float
@@ -58,55 +59,77 @@ Public Sub Draw(oE As Object)
     Minor = major * oE.fParam[0]
     If major = 0 Then major = 1
 
-    If modCAD.drwDrawingClass = modCAD.drwPaintClass Then
+    Dim x, y, theta, angle_increment As Float
+    Dim i As Integer
 
-        paint.Save
-        If oE.flxDash Then paint.Dash = oE.flxDash
+    Me.start = oE.fParam[1] * Pi / 180
+    Me.recorrido = oE.fParam[2] * Pi / 180 - Me.start
+    If Me.recorrido < 0 Then Me.recorrido = 2 * Pi + Me.recorrido
 
-        paint.brush = Paint.Color(oE.ColorToPaint)
+    oE.BoundingPoligon.Clear
+    GL.Begin(gl.LINE_STRIP)
 
-        paint.Translate(oE.p[0], oE.p[1])
-        paint.Rotate(-angle)
-        Paint.Scale(1, Minor / major)
-        paint.LineWidth = oE.LineWidth / appmain.hFcad.ScaleZoom / modCAD.ScaleLines
-        paint.arc(0, 0, major, oE.start, oE.recorrido)
-        paint.Stroke
-        paint.Restore
-    End If
+    angle_increment = Pi * 2 / 360
+    For theta = 0 To Me.recorrido Step angle_increment
+        ' el punto considerando 0,0 al centro
+        x = major * Cos(Me.start + theta)
+        y = major * Sin(Me.start + theta)
+        oE.BoundingPoligon.Add(x)
+        oE.BoundingPoligon.Add(y)
 
-    If modCAD.drwDrawingClass = modCAD.drwOpenGLClass Then
-        Dim x, y, theta, angle_increment As Float
-        Dim i As Integer
+        'GLplus.Vertex2D(radio * Cos(start_angle + theta), radio * Sin(start_angle + theta), colour)
+    Next
 
-        Me.start = oE.fParam[1] * Pi / 180
-        Me.recorrido = oE.fParam[2] * Pi / 180 - Me.start
-        If Me.recorrido < 0 Then Me.recorrido = 2 * Pi + Me.recorrido
+    ' aplico las trnasformaciones
+    puntos.Scale(oE.BoundingPoligon, 1, minor / major)
+    puntos.Rotate(oE.BoundingPoligon, angle)
+    puntos.Translate(oE.BoundingPoligon, oE.p[0], oE.p[1])
+    For i = 0 To oE.BoundingPoligon.max Step 2
+        GLplus.Vertex2D(oE.BoundingPoligon[i], oE.BoundingPoligon[i + 1], oE.ColorToPaint)
+    Next
 
-        oE.BoundingPoligon.Clear
-        GL.Begin(gl.LINE_STRIP)
+    GL.End
 
-        angle_increment = Pi * 2 / 360
-        For theta = 0 To Me.recorrido Step angle_increment
-            ' el punto considerando 0,0 al centro
-            x = major * Cos(Me.start + theta)
-            y = major * Sin(Me.start + theta)
-            oE.BoundingPoligon.Add(x)
-            oE.BoundingPoligon.Add(y)
+End
 
-            'GLplus.Vertex2D(radio * Cos(start_angle + theta), radio * Sin(start_angle + theta), colour)
-        Next
+Public Function Draw2(oE As Object)
 
-        ' aplico las trnasformaciones
-        puntos.Scale(oE.BoundingPoligon, 1, minor / major)
-        puntos.Rotate(oE.BoundingPoligon, angle)
-        puntos.Translate(oE.BoundingPoligon, oE.p[0], oE.p[1])
-        For i = 0 To oE.BoundingPoligon.max Step 2
-            GLplus.Vertex2D(oE.BoundingPoligon[i], oE.BoundingPoligon[i + 1], oE.ColorToPaint)
-        Next
+    If Not oE.Visible Then Return
 
-        GL.End
+    If oE.Selected And Not modCAD.ToolActive Then oE.ColorToPaint = modCAD.ColorForSelected Else oE.ColorToPaint = modCAD.GetGBColor(oE.colour, oE.Layerid)
 
+    Dim major, minor, la As Float
+
+    major = Sqr((oE.p[2] - oE.p[0]) ^ 2 + (oE.p[3] - oE.p[1]) ^ 2)
+    angle = Ang(oE.p[2] - oE.p[0], oE.p[3] - oE.p[1])          ' Los coordenadas del eje mayor son relativas al centro
+    If Not oE.Finished Then
+        If oE.stepsdone < 2 Then
+            oE.fParam[0] = 0.5
+            Me.start = 0
+            Me.recorrido = 2 * Pi
+            Minor = major * oE.fParam[0]
+        Else If oE.stepsdone < 3 Then
+            Minor = major * oE.fParam[0]
+            'If oE.fParam[0] > major Then oE.fParam[0] = major
+            'Minor = oE.fParam[0]
+
+        Endif
     Endif
+    Minor = major * oE.fParam[0]
+    If major = 0 Then major = 1
+
+    paint.Save
+    If oE.flxDash Then paint.Dash = oE.flxDash
+
+    paint.brush = Paint.Color(oE.ColorToPaint)
+
+    paint.Translate(oE.p[0], oE.p[1])
+    paint.Rotate(-angle)
+    Paint.Scale(1, Minor / major)
+    paint.LineWidth = oE.LineWidth / appmain.hFcad.ScaleZoom / modCAD.ScaleLines
+    paint.arc(0, 0, major, oE.start, oE.recorrido)
+    paint.Stroke
+    paint.Restore
 
 End
 

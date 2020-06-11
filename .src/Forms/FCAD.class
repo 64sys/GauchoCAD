@@ -148,15 +148,14 @@ Public Sub form_Activate()
         EntitiesTransfer2()
         BlocksTransfer()
         LayersTransfer()
-
         LoadDrawingMap2()
         APPMain.LoadComboboxes(cModel)
         modCAD.ImportBlocks(cModel)
-
         modCAD.ImportModel(cModel["Entities"], arrEntities)
         cImport.Clear
         modCAD.ApplyLayerProperties(1)
         regen
+        clsEntities.ReBuildPOI
         cadZoomE.Start()
     Endif
 

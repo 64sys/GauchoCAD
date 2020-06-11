@@ -20,6 +20,7 @@
 ' Foundation, Inc., 51 Franklin St, Fifth Floor,
 ' Boston, MA  02110-1301  USA
 Create Static
+' Fast
 Inherits EntityBase
 Public Const GENDER As String = "MText"
 Public Const DrawingOrder As Integer = 100 ' 1 a 32.724 esto debe Drawse primero y ser sobreescrito por el resto
@@ -31,81 +32,81 @@ Public Const ParamDefault As String = " ; 0 ; 10 ; "
 
 Public Sub Draw(oE As Object)
 
-    If Not oE.DrawAble Or Not oE.Visible Then Return
+    If Not oE.Visible Then Return
     If oE.Selected And Not modCAD.ToolActive Then oE.ColorToPaint = modCAD.ColorForSelected Else oE.ColorToPaint = modCAD.GetGBColor(oE.colour, oE.Layerid)
 
-    If modCAD.drwDrawingClass = modCAD.drwPaintClass Then
+    glPlus.DrawMultilineText(oE.StringData, oE.p[0], oE.p[1], oE.fParam[0], oE.fParam[1], oE.ColorToPaint)
 
-        Dim angulo As Float, hText As New PaintExtents, lText As String
+    If oE.StringData <> "" Then CreateBoundingPoligon(oe)
 
-        Dim FontScalePrev As Float
+End
 
-        paint.Save
+Public Function Draw2(oE As Object)
 
-        'FontScalePrev = paint.FontScale
+    If Not oE.Visible Then Return
 
-        paint.LineWidth = 1
-        ' La cota puede estar inclinada, entonces debo rotarla
+    If oE.Selected And Not modCAD.ToolActive Then oE.ColorToPaint = modCAD.ColorForSelected Else oE.ColorToPaint = modCAD.GetGBColor(oE.colour, oE.Layerid)
 
-        If oE.fParam.Count > 0 Then
+    Dim angulo As Float, hText As New PaintExtents, lText As String
 
-            angulo = oE.fParam[0] / 180 * Pi
+    Dim FontScalePrev As Float
 
-        Else
+    paint.Save
 
-            angulo = 0
+    'FontScalePrev = paint.FontScale
 
-        End If
+    paint.LineWidth = 1
+    ' La cota puede estar inclinada, entonces debo rotarla
 
-        If oE.StringData = "" Then
+    If oE.fParam.Count > 0 Then
 
-            ltext = "ABCdef123"
+        angulo = oE.fParam[0] / 180 * Pi
 
-        Else
+    Else
 
-            ltext = oE.StringData
+        angulo = 0
 
-        End If
+    End If
 
-        If oE.fParam.Count > 1 Then
+    If oE.StringData = "" Then
 
-            If oE.fParam[1] <= 0 Then
-                paint.Font.Size = 10
-            Else ' FIXME: hay problemas con el ancho del total del texto que no acompaña el zooming
-                paint.Font.Size = oE.fParam[1]
-            End If
+        ltext = "ABCdef123"
 
-        Else
-            ' cuando ScaleZoom es 0.15 el texto coincide con DXF
-            ' entonces voy a trabajar con esa relacion
+    Else
 
+        ltext = oE.StringData
+
+    End If
+
+    If oE.fParam.Count > 1 Then
+
+        If oE.fParam[1] <= 0 Then
             paint.Font.Size = 10
-
+        Else ' FIXME: hay problemas con el ancho del total del texto que no acompaña el zooming
+            paint.Font.Size = oE.fParam[1]
         End If
 
-        htext = paint.TextExtents(ltext)
+    Else
+        ' cuando ScaleZoom es 0.15 el texto coincide con DXF
+        ' entonces voy a trabajar con esa relacion
 
-        paint.brush = Paint.Color(oE.ColorToPaint)
-
-        paint.Translate(oE.p[0], oE.p[1])
-        paint.Rotate(-angulo)
-        paint.Scale(1, -1)
-
-        paint.DrawText(ltext)
-
-        paint.Stroke
-
-        paint.Restore
+        paint.Font.Size = 10
 
     End If
 
-    If modCAD.drwDrawingClass = modCAD.drwOpenGLClass Then
+    htext = paint.TextExtents(ltext)
 
-        glPlus.DrawMultilineText(oE.StringData, oE.p[0], oE.p[1], oE.fParam[0], oE.fParam[1], oE.ColorToPaint)
+    paint.brush = Paint.Color(oE.ColorToPaint)
 
-        If oE.StringData <> "" Then CreateBoundingPoligon(oe)
+    paint.Translate(oE.p[0], oE.p[1])
+    paint.Rotate(-angulo)
+    paint.Scale(1, -1)
 
-    End If
+    paint.DrawText(ltext)
+
+    paint.Stroke
+
+    paint.Restore
 
 End
 

@@ -32,75 +32,80 @@ Public Sub Draw(oE As Object)
 
     Dim l As Float, angulo As Float, hText As New PaintExtents, lText As String, lPix As Integer
     Dim e As Float
-
-    If Not oE.DrawAble Or Not oE.Visible Then Return
-    If oE.Selected And Not modCAD.ToolActive Then oE.ColorToPaint = modCAD.ColorForSelected Else oE.ColorToPaint = modCAD.GetGBColor(oE.colour, oE.Layerid)
     Dim ET As Object, i As Integer
+
+    If Not oE.Visible Then Return
+    If oE.Selected And Not modCAD.ToolActive Then oE.ColorToPaint = modCAD.ColorForSelected Else oE.ColorToPaint = modCAD.GetGBColor(oE.colour, oE.Layerid)
+
     i = clsEntities.FIndBlockID(oE.StringData2)
     If i < 0 Then Return
 
-    If modCAD.drwDrawingClass = modCAD.drwPaintClass Then
+    gl.PushMatrix
+    'gl.Translatef(appmain.hFcad.pixels(oE.p[0]) / appmain.hFcad.ScaleZoom, appmain.hFcad.pixels(oE.p[1]) / appmain.hFcad.ScaleZoom, 0)
+    'gl.Rotatef(oE.fParam[2], 0, 0, 1)
+    'gl.Scalef(oE.fParam[0], oE.fParam[1], 1)
 
-        paint.Save
+    ' modCAD.ScaleLines = (Abs(oE.fParam[0]) + Abs(oE.fParam[1])) / 2   ' ??????????????????
+    For Each ET In appmain.hFCAD.arrBlocks[i].entities
+        et.Draw
+    Next
+    'modCAD.ScaleLines = 1
+    gl.PopMatrix
 
-        paint.LineWidth = oE.LineWidth / appmain.hFcad.ScaleZoom / modCAD.ScaleLines
-        If oE.flxDash Then paint.Dash = oE.flxDash
-        If oE.Selected And Not modCAD.ToolActive Then
-            paint.brush = Paint.Color(modCAD.ColorForSelected)
-        Else
-            paint.brush = Paint.Color(oE.ColorToPaint)
-        Endif
-        ' La cota puede estar inclinada, entonces debo rotarla
-        l = puntos.distancia(oE.p[0], oE.p[1], oE.p[2], oE.p[3])
-        lPix = appmain.hFcad.pixels(l)
-        ltext = Format(l, modCAD.FormatoCotas)
-        angulo = -Ang(oE.p[2] - oE.p[0], oE.p[1] - oE.p[3])
-        paint.Translate(oE.p[0], oE.p[1])
-        paint.Rotate(-angulo)
-        htext = paint.TextExtents(ltext)
-        ' e1 = puntos.distanciap(oE.p[0], oE.p[2])        ' lo que se separa la cota de los puntos marcados para acotar
-        ' e2 = puntos.distanciap(oE.p[1], oE.p[2])        ' lo que se separa la cota de los puntos marcados para acotar
-        ' If e1 > e2 Then e = e2 Else e = e1      ' tomo el menor, en metros
-        ' e = appmain.hFcad.pixels(e)                     ' paso a pixels
-        e = 0 ' TODO:  arregla esto
-        'paint.brush = Paint.Color(Color.White)
+End
 
-        paint.relLineTo(lPix, 0) ' linea horizontal
-        paint.relmoveto(0, -10)
-        paint.relLineTo(0, 20) ' linea vertical 1
-        paint.relmoveto(-lPix, 0)
-        paint.relLineTo(0, -20) ' linea vertical 2
-        paint.relmoveto(5, 5)
-        paint.relLineTo(-10, 10) ' linea vertical 2
-        paint.relmoveto(lPix, 0)
-        paint.relLineTo(10, -10) ' linea vertical 2
-        paint.Stroke
-        If hText.Width * 0.8 < lPix Then
-            paint.MoveTo(lPix / 2 - htext.Width / 2, htext.Height / 2 - 10 - e)
-            Paint.Scale(1, -1)
-            paint.Text(ltext)
-        Endif
+Public Function Draw2(oE As Object)
 
-        paint.Stroke
-        paint.Restore
+    Dim l As Float, angulo As Float, hText As New PaintExtents, lText As String, lPix As Integer
+    Dim e As Float
+    Dim ET As Object, i As Integer
 
-    End If
+    If Not oE.Visible Then Return
 
-    If modCAD.drwDrawingClass = modCAD.drwOpenGLClass Then
+    If oE.Selected And Not modCAD.ToolActive Then oE.ColorToPaint = modCAD.ColorForSelected Else oE.ColorToPaint = modCAD.GetGBColor(oE.colour, oE.Layerid)
 
-        gl.PushMatrix
-        'gl.Translatef(appmain.hFcad.pixels(oE.p[0]) / appmain.hFcad.ScaleZoom, appmain.hFcad.pixels(oE.p[1]) / appmain.hFcad.ScaleZoom, 0)
-        'gl.Rotatef(oE.fParam[2], 0, 0, 1)
-        'gl.Scalef(oE.fParam[0], oE.fParam[1], 1)
+    paint.Save
 
-        ' modCAD.ScaleLines = (Abs(oE.fParam[0]) + Abs(oE.fParam[1])) / 2   ' ??????????????????
-        For Each ET In appmain.hFCAD.arrBlocks[i].entities
-            et.Draw
-        Next
-        'modCAD.ScaleLines = 1
-        gl.PopMatrix
-
+    paint.LineWidth = oE.LineWidth / appmain.hFcad.ScaleZoom / modCAD.ScaleLines
+    If oE.flxDash Then paint.Dash = oE.flxDash
+    If oE.Selected And Not modCAD.ToolActive Then
+        paint.brush = Paint.Color(modCAD.ColorForSelected)
+    Else
+        paint.brush = Paint.Color(oE.ColorToPaint)
     Endif
+    ' La cota puede estar inclinada, entonces debo rotarla
+    l = puntos.distancia(oE.p[0], oE.p[1], oE.p[2], oE.p[3])
+    lPix = appmain.hFcad.pixels(l)
+    ltext = Format(l, modCAD.FormatoCotas)
+    angulo = -Ang(oE.p[2] - oE.p[0], oE.p[1] - oE.p[3])
+    paint.Translate(oE.p[0], oE.p[1])
+    paint.Rotate(-angulo)
+    htext = paint.TextExtents(ltext)
+    ' e1 = puntos.distanciap(oE.p[0], oE.p[2])        ' lo que se separa la cota de los puntos marcados para acotar
+    ' e2 = puntos.distanciap(oE.p[1], oE.p[2])        ' lo que se separa la cota de los puntos marcados para acotar
+    ' If e1 > e2 Then e = e2 Else e = e1      ' tomo el menor, en metros
+    ' e = appmain.hFcad.pixels(e)                     ' paso a pixels
+    e = 0 ' TODO:  arregla esto
+    'paint.brush = Paint.Color(Color.White)
+
+    paint.relLineTo(lPix, 0) ' linea horizontal
+    paint.relmoveto(0, -10)
+    paint.relLineTo(0, 20) ' linea vertical 1
+    paint.relmoveto(-lPix, 0)
+    paint.relLineTo(0, -20) ' linea vertical 2
+    paint.relmoveto(5, 5)
+    paint.relLineTo(-10, 10) ' linea vertical 2
+    paint.relmoveto(lPix, 0)
+    paint.relLineTo(10, -10) ' linea vertical 2
+    paint.Stroke
+    If hText.Width * 0.8 < lPix Then
+        paint.MoveTo(lPix / 2 - htext.Width / 2, htext.Height / 2 - 10 - e)
+        Paint.Scale(1, -1)
+        paint.Text(ltext)
+    Endif
+
+    paint.Stroke
+    paint.Restore
 
 End
 

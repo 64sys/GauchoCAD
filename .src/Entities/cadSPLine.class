@@ -12,12 +12,12 @@ Public Const ParamType As String = "PPPP"                             ' that is 
 Public Const ParamHelper As String = ("First Point;Next Point;Next Point;Last Point")      ' a little text that is shown at the prompt waiting for user input during build
 Public Const ParamDefault As String = ""
 
-Public Sub Draw(oE As Object)
+Public Sub Draw2(oE As Object)
 
     ' FIXME: requiere reparacion -> OpenGL
     Return
 
-    If Not oE.DrawAble Or Not oE.Visible Then Return
+    If Not oE.Visible Then Return
     If oE.Selected And Not modCAD.ToolActive Then oE.ColorToPaint = modCAD.ColorForSelected Else oE.ColorToPaint = modCAD.GetGBColor(oE.colour, oE.Layerid)
 
     Dim i As Integer
@@ -56,4 +56,3 @@ Public Sub Draw(oE As Object)
     paint.Stroke
 
 End
-

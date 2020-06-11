@@ -283,10 +283,6 @@ Public Sub AdvanceStep()
         Try elem.P[iPoints * 2] = elem.P[(iPoints - 1) * 2]
         Try elem.P[iPoints * 2 + 1] = elem.P[(iPoints - 1) * 2 + 1]
 
-        ' check if it can be drawn
-
-        If elem.StepsDone >= elem.PointsToDraw Then elem.DrawAble = True
-
     Endif
 
     appmain.hFCAD.redraw
@@ -429,10 +425,10 @@ End
 
 Public Sub Finish()
 
-    elem.ClassHandler.Finish(elem, elem.StepsDone)
-    elem.ClassHandler.buildPOI(elem)
     clsEntities.BackUpPosition(elem)
     APPMain.hFCAD.arrEntities.Add(elem)
+    elem.ClassHandler.buildPOI(elem)
+    elem.ClassHandler.Finish(elem, elem.StepsDone)
 
     LastEntity = elem                                       ' save it to repeat on rigth click
 

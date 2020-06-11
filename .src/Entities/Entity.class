@@ -66,3 +66,6 @@ Public Psel As New Boolean[]                ' selected points
 Public BoundingPoligon As New Float[]       ' this is a poligon built at element's contruction that defines a poligon used for detecting points inside me
 Public MyPoi As New Single[]                ' point of interest
 Public Stage As Integer                     ' 0 = creating; 1 = editing
+
+Public glDrwList As Integer                 ' drawing list
+Public glDrwListSel As Integer              ' drawing list for selected item

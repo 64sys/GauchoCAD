@@ -31,7 +31,7 @@
 
 Create Static
 Create Private
-'Fast
+Fast
 
 Public HookSize As Integer = 16                       ' for use with poi
 Public NumericTolerance As Float = 1e-7
@@ -49,7 +49,7 @@ Public Function FindPOI(xr As Float, yr As Float, arr As Float[], hook As Float)
 
             If ((arr[i + 1] - hook) < yr And (arr[i + 1] + hook) > yr) Or ((arr[i + 1] - hook) > yr And (arr[i + 1] + hook) < yr) Then
 
-                Return [arr[i], arr[i + 1], i]
+                Return [arr[i], arr[i + 1], i / 2]
 
             End If
 
@@ -57,7 +57,7 @@ Public Function FindPOI(xr As Float, yr As Float, arr As Float[], hook As Float)
 
     Next
 
-    Return [0, 0, -1]           ' no points near
+    Return [xr, yr, -1]           ' no points near
 
 End
 
@@ -69,7 +69,7 @@ Public Function FindPOILines(xreal As Float, Yreal As Float, arr As Float[], tol
     For i = 0 To arr.count - 4 Step 4
         If puntos.doIntersect(xreal - tolerance / 2, Yreal, Xreal + tolerance / 2, Yreal, arr[i + 0], arr[i + 1], arr[i + 2], arr[i + 3]) Or puntos.doIntersect(xreal, Yreal - tolerance / 2, Xreal, Yreal + tolerance / 2, arr[i + 0], arr[i + 1], arr[i + 2], arr[i + 3]) Then ' its above me
 
-            Return i / 4 + 1
+            Return i / 4
         End If
     Next
     Return -1

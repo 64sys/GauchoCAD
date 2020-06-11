@@ -21,6 +21,7 @@
 ' Boston, MA  02110-1301  USA
 
 Create Static
+Fast
 
 Public Const GAMBASCADENTITY As String = ("EntityBase")
 Public Const GENDER As String = "Arc"
@@ -57,7 +58,7 @@ End
 
 ' Public Sub Draw(oE As Object)
 '
-'     If Not oE.DrawAble Or Not oE.Visible Then Return
+'     If  Not oE.Visible Then Return
 '
 '     ' AQUI VAN LAS RUTINAS DE DIBUJO
 '

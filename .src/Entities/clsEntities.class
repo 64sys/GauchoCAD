@@ -143,13 +143,19 @@ Fast Public Sub ReBuildPOI()
 
     Dim i, ii, n As Integer, EPoi As New Integer[], nPois As Integer
 
-    APPMain.hFCAD.poi.Clear
+    APPMain.hFCAD.poiEntities.Clear
+    APPMain.hFCAD.poiLines.Clear
+    APPMain.hFCAD.poiLinesEntities.Clear
+    APPMain.hFCAD.poiPoints.Clear
+    APPMain.hFCAD.poiPoligonElements.Clear
+    APPMain.hFCAD.poiPoligonEntities.Clear
+    APPMain.hFCAD.poiPoligons.Clear
+    APPMain.hFCAD.poiPoligonStartIndex.Clear
+    APPMain.hFCAD.poiType.Clear
 
     For i = 0 To APPMain.hFCAD.arrEntities.Max
 
-        APPMain.hFCAD.arrEntities[i].buildpoi()               ' ask them to rebuild thir POI
-
-        APPMain.hFCAD.poi.Insert(APPMain.hFCAD.arrEntities[i].MyPOI)           ' and insert it
+        APPMain.hFCAD.arrEntities[i].ClassHandler.buidpoi(APPMain.hFCAD.arrEntities[i])
 
     Next
 
@@ -162,41 +168,32 @@ Public Sub CheckPOI(xr As Float, Yr As Float)
     Dim rData As New Float[]
     Dim i, iPoligon, iLine, iPoint As Integer
 
+    APPMain.hFCAD.iEntity.Clear
+    Dim t As Float = Timer
     iPoligon = puntos.FindPOIPoligon(xr, yr, APPMain.hFCAD.poiPoligons, APPMain.hFCAD.poiPoligonStartIndex, APPMain.hFCAD.poiPoligonElements)
     iLine = puntos.FindPOILines(xr, yr, APPMain.hFCAD.poiLines, APPMain.hFCAD.Metros(16))
     rdata = puntos.FindPOI(xr, yr, APPMain.hFCAD.poiPoints, APPMain.hFCAD.Metros(16))
-
+    Debug "total poi check time ", Timer - t, APPMain.hFCAD.poiPoligons.Count + APPMain.hFCAD.poiLines.Count + APPMain.hFCAD.poiPoints.Count, " points parsed"
     i = -1
     If iPoligon >= 0 Then
 
-        i = iPoligon
+        i = APPMain.hFCAD.poiPoligonEntities[iPoligon]
+
     Else If iLine >= 0 Then
-        i = iLine
+        i = APPMain.hFCAD.poiLinesEntities[iLine]
     Else If rdata[2] >= 0 Then
 
-        i = rdata[2]
+        i = APPMain.hFCAD.poiEntities[rdata[2]]
     Endif
 
     If i >= 0 Then
-        ' ' ' x,y, indice de la entidad que marco esos POI
-        APPMain.hFCAD.iEntity.Clear
-        ' ' APPMain.hFCAD.iEntity.Insert(puntos.FindPOI(mouseX, mouseY, APPMain.hFCAD.poi, 16))
 
-        '
-        ' Dim e As Object, t As Float = Timer
-        ' For Each e In APPMain.hFCAD.arrEntities
-        '
-        '     If e.ClassHandler.AboveMe(e, xr, yr, APPMain.hFCAD.Metros(10), 0, rDAta) Then
         Debug "Nearest found at ", rData[0], rData[1]
         APPMain.hFCAD.iEntity.Insert(rData)
         APPMain.hFCAD.oEntity = APPMain.hFCAD.arrEntities[i]
-        '
-        '         Return
-        '     Endif
-        '
-        ' Next
+
     Else
-        ' clsDrawingAids.Helper.texto = ""
+        clsDrawingAids.Helper.texto = ""
         APPMain.hFCAD.iEntity.Insert([0, 0, -1])
 
     End If

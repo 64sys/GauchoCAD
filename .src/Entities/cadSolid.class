@@ -20,6 +20,7 @@
 ' Foundation, Inc., 51 Franklin St, Fifth Floor,
 ' Boston, MA  02110-1301  USA
 Create Static
+Fast
 Inherits EntityBase
 Public Const GENDER As String = "Solid"
 Public Const PointsToDraw As Integer = 0             ' minimal point requered for drawing something usefull
@@ -30,52 +31,53 @@ Public Const ParamDefault As String = ""
 
 Public Sub Draw(oE As Object)
 
-    If Not oE.DrawAble Or Not oE.Visible Then Return
+    If Not oE.Visible Then Return
     If oE.Selected And Not modCAD.ToolActive Then oE.ColorToPaint = modCAD.ColorForSelected Else oE.ColorToPaint = modCAD.GetGBColor(oE.colour, oE.Layerid)
 
-    Dim i As Integer
-    If modCAD.drwDrawingClass = modCAD.drwPaintClass Then
+    If oE.StepsDone < 1 Then
 
-        If oE.Selected And Not modCAD.ToolActive Then
-            paint.brush = Paint.Color(modCAD.ColorForSelected)
-        Else
-            paint.brush = Paint.Color(oE.ColorToPaint)
-        Endif
+        oE.P[2] = oE.P[0]
+        oE.P[3] = oE.P[1]
 
-        Paint.Polygon(oE.p)
+        glPlus.Lines(oE.p, oE.ColorToPaint, oE.LineWidth)
 
-        paint.Fill
     End If
 
-    If modCAD.drwDrawingClass = modCAD.drwOpenGLClass Then
+    If oE.StepsDone < 2 Then
 
-        If oE.StepsDone < 1 Then
+        oE.P[4] = oE.P[2]
+        oE.P[5] = oE.P[3]
 
-            oE.P[2] = oE.P[0]
-            oE.P[3] = oE.P[1]
+    End If
 
-            glPlus.Lines(oE.p, oE.ColorToPaint, oE.LineWidth)
+    If oE.StepsDone < 3 Then
 
-        End If
-
-        If oE.StepsDone < 2 Then
-
-            oE.P[4] = oE.P[2]
-            oE.P[5] = oE.P[3]
-
-        End If
-
-        If oE.StepsDone < 3 Then
-
-            oE.P[6] = oE.P[4]
-            oE.P[7] = oE.P[5]
-
-        Endif
-
-        oE.BoundingPoligon = oE.P
-
-        GLplus.Polygon(oE.p, oE.ColorToPaint, oE.ColorToPaint, oE.LineWidth)
+        oE.P[6] = oE.P[4]
+        oE.P[7] = oE.P[5]
 
     Endif
+
+    oE.BoundingPoligon = oE.P
+
+    GLplus.Polygon(oE.p, oE.ColorToPaint, oE.ColorToPaint, oE.LineWidth)
+
+End
+
+Public Function Draw2(oE As Object)
+
+    If Not oE.Visible Then Return
+
+    If oE.Selected And Not modCAD.ToolActive Then oE.ColorToPaint = modCAD.ColorForSelected Else oE.ColorToPaint = modCAD.GetGBColor(oE.colour, oE.Layerid)
+    Dim i As Integer
+
+    If oE.Selected And Not modCAD.ToolActive Then
+        paint.brush = Paint.Color(modCAD.ColorForSelected)
+    Else
+        paint.brush = Paint.Color(oE.ColorToPaint)
+    Endif
+
+    Paint.Polygon(oE.p)
+
+    paint.Fill
 
 End

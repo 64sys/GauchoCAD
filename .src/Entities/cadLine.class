@@ -20,6 +20,7 @@
 ' Foundation, Inc., 51 Franklin St, Fifth Floor,
 ' Boston, MA  02110-1301  USA
 Create Static
+Fast
 Inherits EntityBase
 Public Const GENDER As String = "Line"
 Public Const DrawingOrder As Integer = 1        ' 1 = draws first
@@ -29,25 +30,25 @@ Public Const ParamHelper As String = "Start point;End point"
 
 Public Sub Draw(oE As Object)
 
-    If Not oE.DrawAble Or Not oE.Visible Then Return
+    If Not oE.Visible Then Return
 
     If oE.Selected And Not modCAD.ToolActive Then oE.ColorToPaint = modCAD.ColorForSelected Else oE.ColorToPaint = modCAD.GetGBColor(oE.colour, oE.Layerid)
 
-    If modCAD.drwDrawingClass = modCAD.drwPaintClass Then
+    GLplus.Lines(oE.p, oE.ColorToPaint, oE.LineWidth, oE.LineType)
 
-        paint.LineWidth = oE.LineWidth / appmain.hFcad.ScaleZoom / modCAD.ScaleLines
-        If oE.flxDash Then paint.Dash = oE.flxDash
-        paint.brush = Paint.Color(oE.ColorToPaint)
-        paint.MoveTo(oE.p[0], oE.p[1])
-        paint.LineTo(oE.p[2], oE.p[3])
-        paint.Stroke
-    End If
+End
 
-    If modCAD.drwDrawingClass = modCAD.drwOpenGLClass Then
+Public Function Draw2(oE As Object)
 
-        GLplus.Lines(oE.p, oE.ColorToPaint, oE.LineWidth, oE.LineType)
+    If Not oE.Visible Then Return
 
-    Endif
+    If oE.Selected And Not modCAD.ToolActive Then oE.ColorToPaint = modCAD.ColorForSelected Else oE.ColorToPaint = modCAD.GetGBColor(oE.colour, oE.Layerid)
+    paint.LineWidth = oE.LineWidth / appmain.hFcad.ScaleZoom / modCAD.ScaleLines
+    If oE.flxDash Then paint.Dash = oE.flxDash
+    paint.brush = Paint.Color(oE.ColorToPaint)
+    paint.MoveTo(oE.p[0], oE.p[1])
+    paint.LineTo(oE.p[2], oE.p[3])
+    paint.Stroke
 
 End
 

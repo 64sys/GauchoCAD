@@ -37,37 +37,39 @@ Public Sub Draw(oE As Object)
 
     i = clsEntities.FIndBlockID(oE.Block)
     If i < 0 Then Return
-    If modCAD.drwDrawingClass = modCAD.drwPaintClass Then
-        paint.save
-        paint.Translate(appmain.hFcad.pixels(oE.p[0]) / appmain.hFcad.ScaleZoom, appmain.hFcad.pixels(oE.p[1]) / appmain.hFcad.ScaleZoom)
-        paint.Scale(oE.fParam[0], oE.fParam[1])
-        paint.Rotate(oE.fParam[2])
-        modCAD.ScaleLines = (Abs(oE.fParam[0]) + Abs(oE.fParam[1])) / 2
-        For Each ET In appmain.hFCAD.arrBlocks[i].entities
-            et.Draw
-        Next
-        modCAD.ScaleLines = 1
-        paint.Restore
 
-    End If
+    gl.PushMatrix
+    gl.Translatef(appmain.hFcad.pixels(oE.p[0]) / appmain.hFcad.ScaleZoom, appmain.hFcad.pixels(oE.p[1]) / appmain.hFcad.ScaleZoom, 0)
+    gl.Rotatef(oE.fParam[2], 0, 0, 1)
+    gl.Scalef(oE.fParam[0], oE.fParam[1], 1)
 
-    If modCAD.drwDrawingClass = modCAD.drwOpenGLClass Then
+    ' modCAD.ScaleLines = (Abs(oE.fParam[0]) + Abs(oE.fParam[1])) / 2   ' ??????????????????
+    For Each ET In appmain.hFCAD.arrBlocks[i].entities
+        et.visible = True
+        'If et.gender = "Ellipse" Then Stop
+        et.ClassHandler.Draw(et)
+    Next
+    'modCAD.ScaleLines = 1
+    gl.PopMatrix
 
-        gl.PushMatrix
-        gl.Translatef(appmain.hFcad.pixels(oE.p[0]) / appmain.hFcad.ScaleZoom, appmain.hFcad.pixels(oE.p[1]) / appmain.hFcad.ScaleZoom, 0)
-        gl.Rotatef(oE.fParam[2], 0, 0, 1)
-        gl.Scalef(oE.fParam[0], oE.fParam[1], 1)
+End
 
-        ' modCAD.ScaleLines = (Abs(oE.fParam[0]) + Abs(oE.fParam[1])) / 2   ' ??????????????????
-        For Each ET In appmain.hFCAD.arrBlocks[i].entities
-            et.visible = True
-            'If et.gender = "Ellipse" Then Stop
-            et.ClassHandler.Draw(et)
-        Next
-        'modCAD.ScaleLines = 1
-        gl.PopMatrix
+Public Function Draw2(oE As Object)
 
-    Endif
+    If Not oE.Visible Then Return
+
+    If oE.Selected And Not modCAD.ToolActive Then oE.ColorToPaint = modCAD.ColorForSelected Else oE.ColorToPaint = modCAD.GetGBColor(oE.colour, oE.Layerid)
+    Dim ET As Object, i As Integer
+    paint.save
+    paint.Translate(appmain.hFcad.pixels(oE.p[0]) / appmain.hFcad.ScaleZoom, appmain.hFcad.pixels(oE.p[1]) / appmain.hFcad.ScaleZoom)
+    paint.Scale(oE.fParam[0], oE.fParam[1])
+    paint.Rotate(oE.fParam[2])
+    modCAD.ScaleLines = (Abs(oE.fParam[0]) + Abs(oE.fParam[1])) / 2
+    For Each ET In appmain.hFCAD.arrBlocks[i].entities
+        et.Draw
+    Next
+    modCAD.ScaleLines = 1
+    paint.Restore
 
 End
 

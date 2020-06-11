@@ -20,6 +20,7 @@
 ' Foundation, Inc., 51 Franklin St, Fifth Floor,
 ' Boston, MA  02110-1301  USA
 Create Static
+Fast
 Inherits EntityBase
 Public Const GENDER As String = "Text"
 Public Const DrawingOrder As Integer = 100 ' 1 a 32.724 esto debe Drawse primero y ser sobreescrito por el resto
@@ -32,76 +33,77 @@ Public Const StretchAble As Boolean = False
 
 Public Sub Draw(oE As Object)
 
-    If Not oE.DrawAble Or Not oE.Visible Then Return
+    If Not oE.Visible Then Return
     If oE.Selected And Not modCAD.ToolActive Then oE.ColorToPaint = modCAD.ColorForSelected Else oE.ColorToPaint = modCAD.GetGBColor(oE.colour, oE.Layerid)
 
-    If modCAD.drwDrawingClass = modCAD.drwPaintClass Then
+    glPlus.DrawText(oE.StringData, oE.p[0], oE.p[1], oE.fParam[0], oE.fParam[1], oE.ColorToPaint)
 
-        Dim angulo As Float, hText As New PaintExtents, lText As String
-        Dim FontScalePrev As Float
+End
 
-        paint.Save
+Public Function Draw2(oE As Object)
 
-        'FontScalePrev = paint.FontScale
-        paint.LineWidth = 1
-        ' La cota puede estar inclinada, entonces debo rotarla
+    If Not oE.Visible Then Return
 
-        If oE.fParam.Count > 0 Then
+    If oE.Selected And Not modCAD.ToolActive Then oE.ColorToPaint = modCAD.ColorForSelected Else oE.ColorToPaint = modCAD.GetGBColor(oE.colour, oE.Layerid)
 
-            angulo = oE.fParam[0] / 180 * Pi    ' ojo OPENGL--> GRADOS, GAMBAS-->RADIANESDXF
+    Dim angulo As Float, hText As New PaintExtents, lText As String
+    Dim FontScalePrev As Float
 
-        Else
+    paint.Save
 
-            angulo = 0
+    'FontScalePrev = paint.FontScale
+    paint.LineWidth = 1
+    ' La cota puede estar inclinada, entonces debo rotarla
 
-        End If
+    If oE.fParam.Count > 0 Then
 
-        If oE.StringData = "" Then
+        angulo = oE.fParam[0] / 180 * Pi    ' ojo OPENGL--> GRADOS, GAMBAS-->RADIANESDXF
 
-            ltext = "ABCdef123"
+    Else
 
-        Else
+        angulo = 0
 
-            ltext = oE.StringData
+    End If
 
-        End If
+    If oE.StringData = "" Then
 
-        If oE.fParam.Count > 1 Then
+        ltext = "ABCdef123"
 
-            If oE.fParam[1] <= 0 Then
-                paint.Font.Size = 10
-            Else ' FIXME: hay problemas con el ancho del total del texto que no acompaña el zooming
-                paint.Font.Size = oE.fParam[1]
-            End If
+    Else
 
-        Else
-            ' cuando ScaleZoom es 0.15 el texto coincide con DXF
-            ' entonces voy a trabajar con esa relacion
+        ltext = oE.StringData
 
+    End If
+
+    If oE.fParam.Count > 1 Then
+
+        If oE.fParam[1] <= 0 Then
             paint.Font.Size = 10
-
+        Else ' FIXME: hay problemas con el ancho del total del texto que no acompaña el zooming
+            paint.Font.Size = oE.fParam[1]
         End If
 
-        htext = paint.TextExtents(ltext)
+    Else
+        ' cuando ScaleZoom es 0.15 el texto coincide con DXF
+        ' entonces voy a trabajar con esa relacion
 
-        paint.brush = Paint.Color(oE.ColorToPaint)
-
-        paint.Translate(oE.p[0], oE.p[1])
-        paint.Rotate(-angulo)
-        paint.Scale(1, -1)
-
-        paint.DrawText(ltext)
-
-        paint.Stroke
-
-        paint.Restore
-    End If
-
-    If modCAD.drwDrawingClass = modCAD.drwOpenGLClass Then
-
-        glPlus.DrawText(oE.StringData, oE.p[0], oE.p[1], oE.fParam[0], oE.fParam[1], oE.ColorToPaint)
+        paint.Font.Size = 10
 
     End If
+
+    htext = paint.TextExtents(ltext)
+
+    paint.brush = Paint.Color(oE.ColorToPaint)
+
+    paint.Translate(oE.p[0], oE.p[1])
+    paint.Rotate(-angulo)
+    paint.Scale(1, -1)
+
+    paint.DrawText(ltext)
+
+    paint.Stroke
+
+    paint.Restore
 
 End
 
@@ -130,7 +132,7 @@ Public Function BuildPOI(oE As Object, Optional arrIndex As Integer = -1) As Int
 
     appmain.hFCAD.poiPoligons.Insert(poli)
     appmain.hFCAD.poiPoligonStartIndex.Add(appmain.hFCAD.poiPoligons.Count - poli.Count)
-    appmain.hFCAD.poiPoligonElements.Add(poli.Count)
+    appmain.hFCAD.poiPoligonElements.Add(poli.Count / 2)
     appmain.hFCAD.poiPoligonEntities.Add(arrIndex)
 
 End
