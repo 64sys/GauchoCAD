@@ -34,7 +34,7 @@ Public start As Float
 Public recorrido As Float
 Public angle As Float
 
-Public Sub Draw(oE As Object)
+Public Sub Draw(oE As Entity)
 
     If Not oE.Visible Then Return
     If oE.Selected And Not modCAD.ToolActive Then oE.ColorToPaint = modCAD.ColorForSelected Else oE.ColorToPaint = modCAD.GetGBColor(oE.colour, oE.Layerid)
@@ -92,7 +92,7 @@ Public Sub Draw(oE As Object)
 
 End
 
-Public Function Draw2(oE As Object)
+Public Function Draw2(oE As Entity)
 
     If Not oE.Visible Then Return
 
@@ -134,7 +134,7 @@ Public Function Draw2(oE As Object)
 End
 
 '' Devuelve [x,y] punto de interes
-Public Function AboveMe(oE As Object, Xreal As Float, Yreal As Float, tolerance As Float, mode As Integer, fData As Float[]) As Boolean
+Public Function AboveMe(oE As Entity, Xreal As Float, Yreal As Float, tolerance As Float, mode As Integer, fData As Float[]) As Boolean
     ' si una de las dos lineas de una cruz con centro en X,Y y largo Tolerance cruza la linea, estamos arriba
 
     Dim i As Integer
@@ -181,7 +181,7 @@ End
 
 ' This function will return False if the element couldn't be created for some reason: bad or incomple user input
 ' True means all is good, False will instruct the clsEntityBuilder to delete it
-Public Sub Finish(oE As Object, ParamsDone As Integer) As Boolean
+Public Sub Finish(oE As Entity, ParamsDone As Integer) As Boolean
 
     ' calculo el recorrido del arco como
     ' OJO en la ELLIPSE vienen en radianes, y en ARC en grados

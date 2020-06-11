@@ -52,11 +52,11 @@ End
 
 '' Las entidades pueden proveer un poligono que las envuelva
 '' el mismo su usara para seleccionarlas.
-Public Sub CreateBoundingPoligon(oE As Object)
+Public Sub CreateBoundingPoligon(oE As Entity)
 
 End
 
-' Public Sub Draw(oE As Object)
+' Public Sub Draw(oE As Entity)
 '
 '     If  Not oE.Visible Then Return
 '
@@ -66,7 +66,7 @@ End
 
 '' Determines if the entity was selected by a rectanle surrounding al points
 '' by default, if ALL points are selected, it can.
-Public Function SelFull(oE As Object, X1real As Float, Y1real As Float, X2real As Float, Y2real As Float) As Boolean
+Public Function SelFull(oE As Entity, X1real As Float, Y1real As Float, X2real As Float, Y2real As Float) As Boolean
 
     Dim i As Integer, puedo As Boolean
 
@@ -103,7 +103,7 @@ End
 
 '' Determines if the entity can be stretched
 '' by default, if ANY point is selected, it can.
-Public Function SelPartial(oE As Object, X1real As Float, Y1real As Float, X2real As Float, Y2real As Float) As Boolean
+Public Function SelPartial(oE As Entity, X1real As Float, Y1real As Float, X2real As Float, Y2real As Float) As Boolean
 
     Dim i As Integer, puedo As Boolean
 
@@ -142,7 +142,7 @@ End
 ''      64      Perpendicular
 ''      128     Perpendicular
 ''      256     Perpendicular
-Public Function AboveMe(oE As Object, Xreal As Float, Yreal As Float, tolerance As Float, mode As Integer, returnData As Float[]) As Boolean
+Public Function AboveMe(oE As Entity, Xreal As Float, Yreal As Float, tolerance As Float, mode As Integer, returnData As Float[]) As Boolean
 
     ' this could be overriden in the child
 
@@ -174,7 +174,7 @@ Public Function AboveMe(oE As Object, Xreal As Float, Yreal As Float, tolerance 
 
 End
 
-Public Sub PointClick(oE As Object, Xr As Float, Yr As Float) As Boolean
+Public Sub PointClick(oE As Entity, Xr As Float, Yr As Float) As Boolean
 
     ' this could be overriden in the child
 
@@ -193,13 +193,13 @@ End
 '' Creo los puntos de interes
 '' Build point of interest
 
-Public Function BuildPOI(oE As Object, Optional arrIndex As Integer = -1) As Integer
+Public Function BuildPOI(oE As Entity, Optional arrIndex As Integer = -1) As Integer
 
 End
 
 ' This function will return False if the element couldn't be created for some reason: bad or incomple user input
 ' True means all is good, False will instruct the clsEntityBuilder to delete it
-Public Sub Finish(oE As Object, ParamsDone As Integer) As Boolean
+Public Sub Finish(oE As Entity, ParamsDone As Integer) As Boolean
 
     'Print "Finish en EntityBase"
     'CreateBoundingPoligon(oe)

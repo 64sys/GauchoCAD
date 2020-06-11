@@ -28,7 +28,7 @@ Public Const HelperTrabajo As String = ("Insert an acotation")
 Public Const ParamType As String = "PP"                             ' that is Point, Point, Float; could be Color Text, etc
 Public Const ParamHelper As String = "Start point;End point"
 
-Public Sub Draw(oE As Object)
+Public Sub Draw(oE As Entity)
 
     Dim l As Float, angulo As Float, hText As New PaintExtents, lText As String, lPix As Integer
     Dim e As Float
@@ -54,7 +54,7 @@ Public Sub Draw(oE As Object)
 
 End
 
-Public Function Draw2(oE As Object)
+Public Function Draw2(oE As Entity)
 
     Dim l As Float, angulo As Float, hText As New PaintExtents, lText As String, lPix As Integer
     Dim e As Float
@@ -109,7 +109,7 @@ Public Function Draw2(oE As Object)
 
 End
 
-Public Sub CreateBoundingPoligon(oE As Object)
+Public Sub CreateBoundingPoligon(oE As Entity)
 
     ' checkk Viga / Beam to see how its done
 

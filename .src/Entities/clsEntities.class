@@ -222,6 +222,75 @@ Public Sub GLGenDrawList()
 
 End
 
+'' Borra la lista anterior y genera una nueva
+
+Public Sub GLGenDrawList2()
+
+    Dim cosa As Entity, idDrawing As Integer ' la instancia de dibujo en la que estamos
+    Dim i As Integer
+
+    ' si esxite esta lista, la borro
+    If Not gl.islist(APPMain.hFCAD.GlListAllEntities) Then APPMain.hFCAD.GlListAllEntities = gl.GenLists(1)
+    Dim t As Float = Timer
+    ' listas de entidades
+    For Each cosa In APPMain.hFCAD.arrEntities
+        If Not gl.islist(cosa.glDrwList) Then cosa.glDrwList = gl.GenLists(1)
+        gl.NewList(cosa.glDrwList, gl.COMPILE)
+        cosa.ClassHandler.Draw(cosa)
+        gl.EndList
+
+    Next
+    Debug "GLlista de entidades generada en  ", Timer - t
+
+    ' lista de entidaes seleccionadas
+    For Each cosa In APPMain.hFCAD.arrEntities
+        If Not gl.islist(cosa.glDrwListSel) Then cosa.glDrwListSel = gl.GenLists(1)
+        gl.NewList(cosa.glDrwListSel, gl.COMPILE)
+        cosa.Selected = True
+        cosa.ClassHandler.Draw(cosa)
+        cosa.Selected = False
+        gl.EndList
+
+    Next
+
+    ' lista de todas las entidades
+    t = Timer
+    gl.NewList(APPMain.hFCAD.GlListAllEntities, gl.COMPILE)
+
+    For Each cosa In APPMain.hFCAD.arrEntities
+
+        gl.CallList(cosa.glDrwList)
+
+    Next
+
+    gl.EndList
+    Debug "GLlista de todas generada en  ", Timer - t
+
+End
+
+'' Generates a GL list for the selected
+'' Mode: 0=Selected version 1=Normal version
+Public Sub GLGenDrawListSel(Optional mode As Integer = 0)
+
+    Dim cosa As Entity, idDrawing As Integer ' la instancia de dibujo en la que estamos
+    Dim i As Integer
+
+    If Not gl.islist(APPMain.hFCAD.GlListSelectedEntities) Then APPMain.hFCAD.GlListSelectedEntities = gl.GenLists(1)
+
+    gl.NewList(APPMain.hFCAD.GlListSelectedEntities, gl.COMPILE)
+
+    For Each cosa In APPMain.hFCAD.arrEntities
+
+        If cosa.Selected Then
+            If mode = 0 Then gl.CallList(cosa.glDrwListSel)
+            If mode = 1 Then gl.CallList(cosa.glDrwList)
+        End If
+    Next
+
+    gl.EndList
+
+End
+
 Public Sub DrawObjetos()
 
     Dim cosa As Object, idDrawing As Integer ' la instancia de dibujo en la que estamos
@@ -648,7 +717,7 @@ End
 Public Function SelectionSquare(X1real As Float, Y1real As Float, X2real As Float, Y2real As Float, Optional NuevaSumaResta As String = "nueva", crossing As Boolean) As Integer
 
     ' Veo que accion estoy tomando
-    Dim e As Object, i, TotalSeleccionados As Integer
+    Dim e As Entity, i, TotalSeleccionados As Integer
 
     NuevaSumaResta = LCase$(NuevaSumaResta)
 

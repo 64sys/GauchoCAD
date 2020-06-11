@@ -31,7 +31,7 @@ Public Const ParamHelper As String = ("Start point;Angle;Heigth;")      ' a litt
 Public Const ParamDefault As String = " ; 0 ; 10 ; "
 Public Const StretchAble As Boolean = False
 
-Public Sub Draw(oE As Object)
+Public Sub Draw(oE As Entity)
 
     If Not oE.Visible Then Return
     If oE.Selected And Not modCAD.ToolActive Then oE.ColorToPaint = modCAD.ColorForSelected Else oE.ColorToPaint = modCAD.GetGBColor(oE.colour, oE.Layerid)
@@ -40,7 +40,7 @@ Public Sub Draw(oE As Object)
 
 End
 
-Public Function Draw2(oE As Object)
+Public Function Draw2(oE As Entity)
 
     If Not oE.Visible Then Return
 
@@ -110,7 +110,7 @@ End
 '' Creo los puntos de interes
 '' Build point of interest
 
-Public Function BuildPOI(oE As Object, Optional arrIndex As Integer = -1) As Integer
+Public Function BuildPOI(oE As Entity, Optional arrIndex As Integer = -1) As Integer
 
     If arrIndex < 0 Then arrIndex = appmain.hFCAD.arrEntities.Max       ' si este valor no es provisto , estos POI son de la ultima entidad
 

@@ -12,7 +12,7 @@ Public Const ParamType As String = "PPPP"                             ' that is 
 Public Const ParamHelper As String = ("First Point;Next Point;Next Point;Last Point")      ' a little text that is shown at the prompt waiting for user input during build
 Public Const ParamDefault As String = ""
 
-Public Sub Draw2(oE As Object)
+Public Sub Draw2(oE As Entity)
 
     ' FIXME: requiere reparacion -> OpenGL
     Return

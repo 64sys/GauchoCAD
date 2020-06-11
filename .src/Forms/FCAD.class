@@ -80,7 +80,7 @@ Public Ymayor As Float = -1E100
 
 ' point of interests, lines, areas and entities: all this is generated n the entity creation
 Public poiPoints As New Float[]                 ' xy pairs of points
-Public poiType As New Integer[]                 ' tipe of poi
+Public poiType As New Integer[]                 ' tipe of poi: End, Mid, Quadrant, Tangent
 Public poiEntities As New Integer[]             ' related entity
 
 Public poiLines As New Float[]                  ' x0y0x1y1 points
@@ -155,7 +155,7 @@ Public Sub form_Activate()
         cImport.Clear
         modCAD.ApplyLayerProperties(1)
         regen
-        clsEntities.ReBuildPOI
+        'clsEntities.ReBuildPOI
         cadZoomE.Start()
     Endif
 
@@ -185,6 +185,8 @@ Public Sub GLArea1_draw()
     clsDrawingAids.DrawCoordenadas
 
     clsDrawingAids.DibujaHelper
+
+    gl.CallList(GlListSelectedEntities)
 
     gl.CallList(GlListAllEntities)                      ' si GL no tiene contexto, la lista no se genera. Es necesario que la instancia de FCAD este cargada.
 
@@ -474,7 +476,7 @@ End
 '' Regenera las listas de OpenGL
 Public Sub Regen()
 
-    clsEntities.GLGenDrawList
+    clsEntities.GLGenDrawList2
     redraw
 
 End

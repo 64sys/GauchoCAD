@@ -28,7 +28,7 @@ Public Const HelperTrabajo As String = ("a line")
 Public Const ParamType As String = "PP"                             ' that is Point, Point; could be Color Text, etc
 Public Const ParamHelper As String = "Start point;End point"
 
-Public Sub Draw(oE As Object)
+Public Sub Draw(oE As Entity)
 
     If Not oE.Visible Then Return
 
@@ -38,7 +38,7 @@ Public Sub Draw(oE As Object)
 
 End
 
-Public Function Draw2(oE As Object)
+Public Function Draw2(oE As Entity)
 
     If Not oE.Visible Then Return
 
@@ -55,7 +55,7 @@ End
 '' Creo los puntos de interes
 '' Build point of interest
 
-Public Function BuildPOI(oE As Object, Optional arrIndex As Integer = -1) As Integer
+Public Function BuildPOI(oE As Entity, Optional arrIndex As Integer = -1) As Integer
 
     If arrIndex < 0 Then arrIndex = appmain.hFCAD.arrEntities.Max       ' si este valor no es provisto , estos POI son de la ultima entidad
 
@@ -83,7 +83,7 @@ End
 '' Mode:
 
 '' Devuelve [x,y] punto de interes
-Public Function AboveMe(oE As Object, Xreal As Float, Yreal As Float, tolerance As Float, mode As Integer, fData As Float[]) As Boolean
+Public Function AboveMe(oE As Entity, Xreal As Float, Yreal As Float, tolerance As Float, mode As Integer, fData As Float[]) As Boolean
     ' si una de las dos lineas de una cruz con centro en X,Y y largo Tolerance cruza la linea, estamos arriba
     'Dim fData As New Float[]
 

@@ -101,7 +101,7 @@ Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' esta rutina es l
             Me.selectionCount = clsEntities.SelectionSquare(Me.SelStartXr, Me.SelStartYr, Me.SelEndXr, Me.SelEndyr, tipo, crossing)
             Debug "Select parsing time ", Timer - t
             t = Timer
-            Appmain.hFCAD.regen
+            clsEntities.GLGenDrawListSel
             Debug "Regen parsing time ", Timer - t
         End If
 

@@ -31,7 +31,7 @@ Public imagen As New Image
 Public HBRUSH As PaintBrush
 Public Loaded As Boolean
 
-Public Sub Draw(oE As Object)
+Public Sub Draw(oE As Entity)
 
     If Me.StepsDone = 0 And Not Loaded Then            ' need the filename first
 

@@ -29,7 +29,7 @@ Public Const ParamType As String = "PL"                             ' that is Po
 Public Const ParamHelper As String = ("Start point;Radious")      ' a little text that is shown at the prompt waiting for user input during build
 Public Const ParamDefault As String = " ; 1 "
 
-Public Sub Draw(oE As Object)
+Public Sub Draw(oE As Entity)
 
     Dim x, y, theta, angle_increment As Float
 
@@ -53,7 +53,7 @@ Public Sub Draw(oE As Object)
 
 End
 
-Public Function Draw2(oE As Object)
+Public Function Draw2(oE As Entity)
 
     If Not oE.Visible Then Return
 
@@ -73,7 +73,7 @@ End
 
 
 
-Public Function AboveMe(oE As Object, Xreal As Float, Yreal As Float, tolerance As Float, mode As Integer, fData As Float[]) As Boolean
+Public Function AboveMe(oE As Entity, Xreal As Float, Yreal As Float, tolerance As Float, mode As Integer, fData As Float[]) As Boolean
     ' si una de las dos lineas de una cruz con centro en X,Y y largo Tolerance cruza la linea, estamos arriba
     'Dim fData As New Float[]
 

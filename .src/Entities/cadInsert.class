@@ -30,7 +30,7 @@ Public Const ParamDefault As String = "<no name>; 0,0 ; 1 ;1 ; 0"
 Public obxInsertos As New Object[]
 Public ParentBlock As String
 
-Public Sub Draw(oE As Object)
+Public Sub Draw(oE As Entity)
 
     '
     Dim ET As Object, i As Integer
@@ -54,7 +54,7 @@ Public Sub Draw(oE As Object)
 
 End
 
-Public Function Draw2(oE As Object)
+Public Function Draw2(oE As Entity)
 
     If Not oE.Visible Then Return
 
@@ -73,7 +73,7 @@ Public Function Draw2(oE As Object)
 
 End
 
-Public Sub Finish(oE As Object, ParamsDone As Integer) As Boolean
+Public Sub Finish(oE As Entity, ParamsDone As Integer) As Boolean
 
     ' ' we set the block property of all entities selected
     '
