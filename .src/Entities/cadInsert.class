@@ -28,9 +28,6 @@ Public Const ParamType As String = "TPFFF"
 Public Const ParamHelper As String = ("BlockName; Position ; X scale ; Y scale ; Rotation")
 Public Const ParamDefault As String = "<no name>; 0,0 ; 1 ;1 ; 0"
 
-Public obxInsertos As New Entity[]
-Public ParentBlock As String
-
 Public Sub Draw(oE As Entity)
 
     '
@@ -71,34 +68,5 @@ Public Function Draw2(oE As Entity)
     Next
     modCAD.ScaleLines = 1
     paint.Restore
-
-End
-
-Public Sub Finish(oE As Entity, ParamsDone As Integer) As Boolean
-
-    ' ' we set the block property of all entities selected
-    '
-    ' ' if an entitty is part of other block, we look for that block
-    ' Dim e As entity, iBlock As Integer
-    '
-    ' iBlock = clsEntities.GetFreeBlockNumber()
-    ' oE.fParam.add(iBlock)
-    oE.Finished = True
-    oE.B.Resize(oE.P.Count)
-    oE.psel.resize(oE.p.count / 2)
-
-    ' For Each e In APPMain.hFCAD.arrEntities
-    '     If e.Selected Then                      ' parto of this
-    '         If e.Block > 0 Then                   ' entity is part of a block
-    '
-    '             ' nothing to do, as we will find the block and make it part of this one
-    '
-    '         Else
-    '             e.Block = iBlock
-    '         End If
-    '
-    '     Endif
-    '
-    ' Next
 
 End

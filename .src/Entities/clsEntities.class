@@ -30,6 +30,8 @@ Public Struct arrBlockSt
     entities As Entity[]
 End Struct
 
+Public flgSearchingPOI As Boolean
+
 Public Function FIndBlockID(BlockName As String) As Integer
 
     Dim i As Integer
@@ -161,30 +163,71 @@ Public Sub ReBuildPOI()
 
 End
 
+'' Veo si estoy sobre una entidad y la devuelvo
+Fast Unsafe Public Function CheckAboveEntity(xr As Float, Yr As Float, tolerance As Float) As Entity
+
+Dim rData As New Float[]
+Dim e, i, iPoligon, iLine, iPoint As Integer
+
+APPMain.hFCAD.iEntity.Clear
+
+' For Each e In APPMain.hFCAD.arrEntities
+For e = 0 To APPMain.hFCAD.arrEntities.Max      ' for each es 10 veces mas lento que recorrer el array
+    ' Text, MText, Solid y otros
+    If puntos.isInside(APPMain.hFCAD.arrEntities[e].Polygon, xr, yr) Then Return APPMain.hFCAD.arrEntities[e]
+
+    Select Case APPMain.hFCAD.arrEntities[e].Gender
+
+        Case "Line"
+
+            If puntos.doIntersect(xr - tolerance, yr, xr + tolerance, yr, APPMain.hFCAD.arrEntities[e].P[0], APPMain.hFCAD.arrEntities[e].P[1], APPMain.hFCAD.arrEntities[e].P[2], APPMain.hFCAD.arrEntities[e].P[3]) Or puntos.doIntersect(xr, yr - tolerance, xr, yr + tolerance, APPMain.hFCAD.arrEntities[e].P[0], APPMain.hFCAD.arrEntities[e].P[1], APPMain.hFCAD.arrEntities[e].P[2], APPMain.hFCAD.arrEntities[e].P[3]) Then Return APPMain.hFCAD.arrEntities[e]
+
+        Case "PLine"
+
+            For i = 0 To APPMain.hFCAD.arrEntities[e].P.count - 4 Step 2
+                If puntos.doIntersect(xr - tolerance, Yr, Xr + tolerance, Yr, APPMain.hFCAD.arrEntities[e].P[i + 0], APPMain.hFCAD.arrEntities[e].P[i + 1], APPMain.hFCAD.arrEntities[e].P[i + 2], APPMain.hFCAD.arrEntities[e].P[i + 3]) Or puntos.doIntersect(xr, Yr - tolerance, Xr, Yr + tolerance, APPMain.hFCAD.arrEntities[e].P[i + 0], APPMain.hFCAD.arrEntities[e].P[i + 1], APPMain.hFCAD.arrEntities[e].P[i + 2], APPMain.hFCAD.arrEntities[e].P[i + 3]) Then Return APPMain.hFCAD.arrEntities[e]
+            Next
+
+        Case "Circle"
+
+    End Select
+
+Next
+
+End
+
 '' This is called by MouseMove events, so make sure its fast
 '' and its called form there
 Public Sub CheckPOI(xr As Float, Yr As Float)
 
-    Dim rData As New Float[]
+    Dim rData As New Float[], e As Entity
     Dim i, iPoligon, iLine, iPoint As Integer
 
+    If Me.flgSearchingPOI Then Return   ' no nesting this
+    Me.flgSearchingPOI = True
+
     APPMain.hFCAD.iEntity.Clear
-    Dim t As Float = Timer
-    iPoligon = puntos.FindPOIPoligon(xr, yr, APPMain.hFCAD.poiPoligons, APPMain.hFCAD.poiPoligonStartIndex, APPMain.hFCAD.poiPoligonElements)
-    iLine = puntos.FindPOILines(xr, yr, APPMain.hFCAD.poiLines, APPMain.hFCAD.Metros(16))
+    'Dim t As Float = Timer
+    'iPoligon = puntos.FindPOIPoligon(xr, yr, APPMain.hFCAD.poiPoligons, APPMain.hFCAD.poiPoligonStartIndex, APPMain.hFCAD.poiPoligonElements)
+    'iLine = puntos.FindPOILines(xr, yr, APPMain.hFCAD.poiLines, APPMain.hFCAD.Metros(16))
     rdata = puntos.FindPOI(xr, yr, APPMain.hFCAD.poiPoints, APPMain.hFCAD.Metros(16))
     'Debug "total poi check time ", Timer - t, APPMain.hFCAD.poiPoligons.Count + APPMain.hFCAD.poiLines.Count + APPMain.hFCAD.poiPoints.Count, " points parsed"
+
+    t = Timer
+    e = CheckAboveEntity(xr, yr, APPMain.hFCAD.Metros(16))
+    'If e Then Debug "Checked above ", e.gender, Timer - t
+
     i = -1
-    If iPoligon >= 0 Then
-
-        i = APPMain.hFCAD.poiPoligonEntities[iPoligon]
-
-    Else If iLine >= 0 Then
-        i = APPMain.hFCAD.poiLinesEntities[iLine]
-    Else If rdata[2] >= 0 Then
-
-        i = APPMain.hFCAD.poiEntities[rdata[2]]
-    Endif
+    ' If iPoligon >= 0 Then
+    '
+    '     i = APPMain.hFCAD.poiPoligonEntities[iPoligon]
+    '
+    ' Else If iLine >= 0 Then
+    '     i = APPMain.hFCAD.poiLinesEntities[iLine]
+    ' Else If rdata[2] >= 0 Then
+    '
+    '     i = APPMain.hFCAD.poiEntities[rdata[2]]
+    ' Endif
 
     If i >= 0 Then
 
@@ -197,6 +240,7 @@ Public Sub CheckPOI(xr As Float, Yr As Float)
         APPMain.hFCAD.iEntity.Insert([0, 0, -1])
 
     End If
+    Me.flgSearchingPOI = False
 
 End
 
@@ -204,7 +248,7 @@ End
 
 Public Sub GLGenDrawList()
 
-    Dim cosa As Entity, idDrawing As Integer ' la instancia de dibujo en la que estamos
+    Dim idDrawing As Integer ' la instancia de dibujo en la que estamos
     Dim i As Integer
 
     ' si esxite esta lista, la borro
@@ -212,9 +256,9 @@ Public Sub GLGenDrawList()
     modCAD.drwDrawingClass = modCAD.drwOpenGLClass
     gl.NewList(APPMain.hFCAD.GlListAllEntities, gl.COMPILE)
 
-    For Each cosa In APPMain.hFCAD.arrEntities
+    For i = 0 To APPMain.hFCAD.arrEntities.Max
 
-        cosa.ClassHandler.Draw(cosa)
+        APPMain.hFCAD.arrEntities[i].ClassHandler.Draw(APPMain.hFCAD.arrEntities[i])
 
     Next
 
@@ -226,29 +270,29 @@ End
 
 Public Sub GLGenDrawList2()
 
-    Dim cosa As Entity, idDrawing As Integer ' la instancia de dibujo en la que estamos
+    Dim idDrawing As Integer ' la instancia de dibujo en la que estamos
     Dim i As Integer
 
     ' si esxite esta lista, la borro
     If Not gl.islist(APPMain.hFCAD.GlListAllEntities) Then APPMain.hFCAD.GlListAllEntities = gl.GenLists(1)
     Dim t As Float = Timer
     ' listas de entidades
-    For Each cosa In APPMain.hFCAD.arrEntities
-        If Not gl.islist(cosa.glDrwList) Then cosa.glDrwList = gl.GenLists(1)
-        gl.NewList(cosa.glDrwList, gl.COMPILE)
-        cosa.ClassHandler.Draw(cosa)
+    For i = 0 To APPMain.hFCAD.arrEntities.Max
+        If Not gl.islist(APPMain.hFCAD.arrEntities[i].glDrwList) Then APPMain.hFCAD.arrEntities[i].glDrwList = gl.GenLists(1)
+        gl.NewList(APPMain.hFCAD.arrEntities[i].glDrwList, gl.COMPILE)
+        APPMain.hFCAD.arrEntities[i].ClassHandler.Draw(APPMain.hFCAD.arrEntities[i])
         gl.EndList
 
     Next
     Debug "GLlista de entidades generada en  ", Timer - t
 
     ' lista de entidaes seleccionadas
-    For Each cosa In APPMain.hFCAD.arrEntities
-        If Not gl.islist(cosa.glDrwListSel) Then cosa.glDrwListSel = gl.GenLists(1)
-        gl.NewList(cosa.glDrwListSel, gl.COMPILE)
-        cosa.Selected = True
-        cosa.ClassHandler.Draw(cosa)
-        cosa.Selected = False
+    For i = 0 To APPMain.hFCAD.arrEntities.Max
+        If Not gl.islist(APPMain.hFCAD.arrEntities[i].glDrwListSel) Then APPMain.hFCAD.arrEntities[i].glDrwListSel = gl.GenLists(1)
+        gl.NewList(APPMain.hFCAD.arrEntities[i].glDrwListSel, gl.COMPILE)
+        APPMain.hFCAD.arrEntities[i].Selected = True
+        APPMain.hFCAD.arrEntities[i].ClassHandler.Draw(APPMain.hFCAD.arrEntities[i])
+        APPMain.hFCAD.arrEntities[i].Selected = False
         gl.EndList
 
     Next
@@ -257,9 +301,9 @@ Public Sub GLGenDrawList2()
     t = Timer
     gl.NewList(APPMain.hFCAD.GlListAllEntities, gl.COMPILE)
 
-    For Each cosa In APPMain.hFCAD.arrEntities
+    For i = 0 To APPMain.hFCAD.arrEntities.max
 
-        gl.CallList(cosa.glDrwList)
+        gl.CallList(APPMain.hFCAD.arrEntities[i].glDrwList)
 
     Next
 
@@ -272,39 +316,22 @@ End
 '' Mode: 0=Selected version 1=Normal version
 Public Sub GLGenDrawListSel(Optional mode As Integer = 0)
 
-    Dim cosa As Entity, idDrawing As Integer ' la instancia de dibujo en la que estamos
+    Dim idDrawing As Integer ' la instancia de dibujo en la que estamos
     Dim i As Integer
 
     If Not gl.islist(APPMain.hFCAD.GlListSelectedEntities) Then APPMain.hFCAD.GlListSelectedEntities = gl.GenLists(1)
 
     gl.NewList(APPMain.hFCAD.GlListSelectedEntities, gl.COMPILE)
 
-    For Each cosa In APPMain.hFCAD.arrEntities
+    For i = 0 To APPMain.hFCAD.arrEntities.Max
 
-        If cosa.Selected Then
-            If mode = 0 Then gl.CallList(cosa.glDrwListSel)
-            If mode = 1 Then gl.CallList(cosa.glDrwList)
+        If APPMain.hFCAD.arrEntities[i].Selected Then
+            If mode = 0 Then gl.CallList(APPMain.hFCAD.arrEntities[i].glDrwListSel)
+            If mode = 1 Then gl.CallList(APPMain.hFCAD.arrEntities[i].glDrwList)
         End If
     Next
 
     gl.EndList
-
-End
-
-Public Sub DrawObjetos()
-
-    Dim cosa As Entity, idDrawing As Integer ' la instancia de dibujo en la que estamos
-    Dim i As Integer
-
-    If modCAD.drwDrawingClass = modCAD.drwPaintClass Then
-
-        For Each cosa In APPMain.hFCAD.arrEntities
-
-            cosa.Draw()
-
-        Next
-
-    End If
 
 End
 
@@ -366,7 +393,7 @@ Public Function DeSelection(Optional elementos As String = "todo", Accion As Str
     ' tambien puede deseleccionar todo
     ' Devuelve la cantidad de elementos que quedaron seleccionados despues de filtrar
 
-    Dim i As Integer, c As Integer, cosa As Entity, Clase As String, iii As Integer
+    Dim i As Integer, c As Integer, Clase As String, iii As Integer
 
     ' por las dudas vengan alguna letra mayuscula
     If Accion = "" Then accion = "deseleccionar"
@@ -378,9 +405,7 @@ Public Function DeSelection(Optional elementos As String = "todo", Accion As Str
 
     For iii = 0 To APPMain.hFCAD.arrEntities.Max
 
-        cosa = APPMain.hFCAD.arrEntities[iii]
-
-        clase = cosa.Gender
+        clase = APPMain.hFCAD.arrEntities[iii].Gender
 
         Select Case accion
 
@@ -389,12 +414,12 @@ Public Function DeSelection(Optional elementos As String = "todo", Accion As Str
                 If SelFull() And (elementos = "todo" Or elementos = clase) Then
 
                     APPMain.hFCAD.arrSelecIndex.Add(iii)
-                    SelectElem(cosa)
+                    SelectElem(APPMain.hFCAD.arrEntities[iii])
                     Inc i
 
                 Else
 
-                    DeSelectElem(cosa)
+                    DeSelectElem(APPMain.hFCAD.arrEntities[iii])
 
                 End If
 
@@ -402,12 +427,12 @@ Public Function DeSelection(Optional elementos As String = "todo", Accion As Str
 
                 If SelPArtial() And (elementos = "todo" Or elementos = clase) Then
                     APPMain.hFCAD.arrSelecIndex.Add(iii)
-                    SelectElem(cosa, False) ' dont touch the points
+                    SelectElem(APPMain.hFCAD.arrEntities[iii], False) ' dont touch the points
                     Inc i
 
                 Else
 
-                    DeSelectElem(cosa)
+                    DeSelectElem(APPMain.hFCAD.arrEntities[iii])
 
                 End If
 
@@ -416,7 +441,7 @@ Public Function DeSelection(Optional elementos As String = "todo", Accion As Str
                 If (elementos = "todo" Or elementos = clase) Then
 
                     Inc i
-                    DeSelectElem(cosa)
+                    DeSelectElem(APPMain.hFCAD.arrEntities[iii])
 
                 End If
 
@@ -430,13 +455,13 @@ End
 
 Public Function GetSelectionCount() As Integer
 
-    Dim anO As Entity, i As Integer
+    Dim i, ii As Integer
 
-    For Each anO In APPMain.hFCAD.arrEntities
-        If anO.Selected Then Inc i
+    For i = 0 To APPMain.hFCAD.arrEntities.Max
+        If APPMain.hFCAD.arrEntities[i].Selected Then Inc ii
     Next
 
-    Return i
+    Return ii
 
 End Function
 
@@ -721,9 +746,9 @@ Public Function SelectionSquare(X1real As Float, Y1real As Float, X2real As Floa
 
     ' Veo que accion estoy tomando
     Dim e As Entity, i, i2, TotalSeleccionados As Integer
-    
+
     NuevaSumaResta = LCase$(NuevaSumaResta)
-    
+
     If NuevaSumaResta = "nueva" Then ' nueva seleccion
         For i = 0 To APPMain.hFCAD.arrEntities.Max
             APPMain.hFCAD.arrEntities[i].selected = False
@@ -733,7 +758,7 @@ Public Function SelectionSquare(X1real As Float, Y1real As Float, X2real As Floa
         Next
         TotalSeleccionados = 0
     End If
-    
+
     For Each e In APPMain.hFCAD.arrEntities
         ' cada entidad debe decidir si esta seleccionada o no
         If crossing Then
@@ -742,13 +767,13 @@ Public Function SelectionSquare(X1real As Float, Y1real As Float, X2real As Floa
                 If NuevaSumaResta <> "resta" Then
                     Inc TotalSeleccionados
                     Me.SelectElem(e, False)
-    
+
                 Else If NuevaSumaResta = "resta" Then
                     Dec TotalSeleccionados
                     Me.DeSelectElem(e, False)
-    
+
                 End If
-    
+
             Endif
         Else
             If SelFull(e, X1real, Y1real, X2real, Y2real) Then
@@ -756,30 +781,30 @@ Public Function SelectionSquare(X1real As Float, Y1real As Float, X2real As Floa
                 If NuevaSumaResta <> "resta" Then
                     Inc TotalSeleccionados
                     Me.SelectElem(e, False)
-    
+
                 Else If NuevaSumaResta = "resta" Then
                     Dec TotalSeleccionados
                     Me.DeSelectElem(e, False)
-    
+
                 End If
-    
+
             Endif
-    
+
         End If
     Next
-    
+
     Return TotalSeleccionados
 
 End
 
 ' Public Function SelectionSquare2(X1real As Float, Y1real As Float, X2real As Float, Y2real As Float, Optional NuevaSumaResta As String = "nueva", crossing As Boolean) As Integer
-' 
+'
 '     ' Veo que accion estoy tomando
 '     Dim e As Entity, i, i2, CurrentEntityIndex, TotalSeleccionados As Integer, Todos As Boolean
 '     Dim t As Float = Timer
-' 
+'
 '     NuevaSumaResta = LCase$(NuevaSumaResta)
-' 
+'
 '     If NuevaSumaResta = "nueva" Then
 '         For i = 0 To APPMain.hFCAD.arrEntities.Max
 '             APPMain.hFCAD.arrEntities[i].selected = False
@@ -789,23 +814,23 @@ End
 '         Next
 '     End If
 '     Debug "Deselect time ", Timer - t
-' 
+'
 '     ' reviso los poligonos
 '     For i = 0 To APPMain.hFCAD.poiPoligonEntities.Max
-' 
+'
 '         If crossing Then
 '             If puntos.IsPoligonCrossingRect(APPMain.hFCAD.poiPoligons, X1real, Y1real, X2real, Y2real, APPMain.hFCAD.poiPoligonStartIndex[i], APPMain.hFCAD.poiPoligonElements[i]) Then
 '                 ' el punto esta en el recuadro
 '                 If NuevaSumaResta <> "resta" Then
 '                     Inc TotalSeleccionados
 '                     APPMain.hFCAD.arrEntities[i].selected = True
-' 
+'
 '                 Else If NuevaSumaResta = "resta" Then
 '                     Dec TotalSeleccionados
 '                     APPMain.hFCAD.arrEntities[i].selected = False
-' 
+'
 '                 End If
-' 
+'
 '             Endif
 '         Else
 '             If puntos.IsPoligonInsideRect(APPMain.hFCAD.poiPoligons, X1real, Y1real, X2real, Y2real, APPMain.hFCAD.poiPoligonStartIndex[i], APPMain.hFCAD.poiPoligonElements[i]) Then
@@ -813,18 +838,18 @@ End
 '                 If NuevaSumaResta <> "resta" Then
 '                     Inc TotalSeleccionados
 '                     APPMain.hFCAD.arrEntities[i].selected = True
-' 
+'
 '                 Else If NuevaSumaResta = "resta" Then
 '                     Dec TotalSeleccionados
 '                     APPMain.hFCAD.arrEntities[i].selected = False
-' 
+'
 '                 End If
-' 
+'
 '             Endif
-' 
+'
 '         End If
 '     Next
-' 
+'
 '     ' reviso las lineas
 '     If crossing Then
 '         For i = 0 To APPMain.hFCAD.poiLines.Max Step 2                                                                                                  ' para cada punto
@@ -838,13 +863,13 @@ End
 '                     Dec TotalSeleccionados
 '                     APPMain.hFCAD.arrEntities[APPMain.hFCAD.poiLinesEntities[i / 4]].selected = False
 '                     APPMain.hFCAD.arrEntities[APPMain.hFCAD.poiLinesEntities[i / 4]].Psel[APPMain.hFCAD.poiLinesRelPoint[i / 2]] = False
-' 
+'
 '                 End If
-' 
+'
 '             Endif
-' 
+'
 '         Next
-' 
+'
 '     Else    ' full selection
 '         ' hago un crossing primero y luego me fijo si estan todos
 '         For i = 0 To APPMain.hFCAD.poiLines.Max Step 2                                                                                                  ' para cada punto
@@ -858,16 +883,16 @@ End
 '                     Dec TotalSeleccionados
 '                     APPMain.hFCAD.arrEntities[APPMain.hFCAD.poiLinesEntities[i / 4]].selected = False
 '                     APPMain.hFCAD.arrEntities[APPMain.hFCAD.poiLinesEntities[i / 4]].Psel[APPMain.hFCAD.poiLinesRelPoint[i / 2]] = False
-' 
+'
 '                 End If
-' 
+'
 '             Endif
-' 
+'
 '         Next
-' 
+'
 '         CurrentEntityIndex = 0
 '         For i = 0 To APPMain.hFCAD.arrEntities.Max
-' 
+'
 '             If APPMain.hFCAD.arrEntities[i].Selected Then 'chequeo si todos estan seleccionados
 '                 todos = True
 '                 For i2 = 0 To APPMain.hFCAD.arrEntities[i].Psel.Max
@@ -876,25 +901,25 @@ End
 '                         Break
 '                     Endif
 '                 Next
-' 
+'
 '                 If (todos And NuevaSumaResta = "resta") Or Not todos Then
 '                     Dec TotalSeleccionados
 '                     APPMain.hFCAD.arrEntities[i].selected = False
 '                     For i2 = 0 To APPMain.hFCAD.arrEntities[i].Psel.Max
 '                         APPMain.hFCAD.arrEntities[i].Psel = False
-' 
+'
 '                     Next
-' 
+'
 '                 End If
-' 
+'
 '             Endif
-' 
+'
 '         Next
-' 
+'
 '     Endif
-' 
+'
 '     Return TotalSeleccionados
-' 
+'
 ' End
 
 Public Sub ComputeLimits()
@@ -916,16 +941,16 @@ Public Sub ComputeLimits()
                 If e.p[i + 1] > APPMain.hFCAD.Ymayor Then APPMain.hFCAD.Ymayor = e.p[i + 1]
 
             Next
-            For i = 0 To e.boundingpoligon.max Step 2
+            For i = 0 To e.Polygon.max Step 2
                 'If e.p[i] > 0 Then Debug e.gender
 
-                If e.boundingpoligon[i] < APPMain.hFCAD.Xmenor Then APPMain.hFCAD.Xmenor = e.boundingpoligon[i]
+                If e.Polygon[i] < APPMain.hFCAD.Xmenor Then APPMain.hFCAD.Xmenor = e.Polygon[i]
 
-                If e.boundingpoligon[i + 1] < APPMain.hFCAD.Ymenor Then APPMain.hFCAD.Ymenor = e.boundingpoligon[i + 1]
+                If e.Polygon[i + 1] < APPMain.hFCAD.Ymenor Then APPMain.hFCAD.Ymenor = e.Polygon[i + 1]
 
-                If e.boundingpoligon[i] > APPMain.hFCAD.Xmayor Then APPMain.hFCAD.Xmayor = e.boundingpoligon[i]
+                If e.Polygon[i] > APPMain.hFCAD.Xmayor Then APPMain.hFCAD.Xmayor = e.Polygon[i]
 
-                If e.boundingpoligon[i + 1] > APPMain.hFCAD.Ymayor Then APPMain.hFCAD.Ymayor = e.boundingpoligon[i + 1]
+                If e.Polygon[i + 1] > APPMain.hFCAD.Ymayor Then APPMain.hFCAD.Ymayor = e.Polygon[i + 1]
 
             Next
         End If
@@ -935,63 +960,64 @@ End
 
 '' Determines if the entity was selected by a rectanle surrounding al points
 '' by default, if ALL points are selected, it can.
- Public Function SelFull(oE As Entity, X1real As Float, Y1real As Float, X2real As Float, Y2real As Float) As Boolean
+Public Function SelFull(oE As Entity, X1real As Float, Y1real As Float, X2real As Float, Y2real As Float) As Boolean
 
-Dim i As Integer, puedo As Boolean
+    Dim i As Integer, puedo As Boolean
 
-Select Case oe.Gender
+    Select Case oe.Gender
 
-    Case Else
+        Case Else
 
-        ' Si tengo un bounding poligon, entonces verifico que todos los puntos esten dentro
-        If oE.Polygon.Count > 0 Then
+            ' Si tengo un bounding poligon, entonces verifico que todos los puntos esten dentro
+            If oE.Polygon.Count > 0 Then
 
-            Return puntos.IsPoligonInsideRect(oE.Polygon, X1real, Y1real, X2real, Y2real)
+                Return puntos.IsPoligonInsideRect(oE.Polygon, X1real, Y1real, X2real, Y2real)
 
-        Else    ' no tengo un poligono, entonces verifico que todos los puntos definitorios de al entidad esten dentro
+            Else    ' no tengo un poligono, entonces verifico que todos los puntos definitorios de al entidad esten dentro
 
-            puedo = True                     ' supongamos que puedo, por ahora
-            For i = 0 To oE.p.max Step 2
-                If Not (oE.p[i] >= X1real And oE.p[i] <= X2real) And (oE.p[i + 1] >= Y1real And oE.p[i + 1] <= Y2real) Then
-                    puedo = False
+                puedo = True                     ' supongamos que puedo, por ahora
+                For i = 0 To oE.p.max Step 2
+                    If Not (oE.p[i] >= X1real And oE.p[i] <= X2real) And (oE.p[i + 1] >= Y1real And oE.p[i + 1] <= Y2real) Then
+                        puedo = False
+                    End If
+                Next
+
+                If puedo Then
+                    For i = 0 To oE.PSel.Max
+                        oE.PSel[i] = True
+                    Next
+
+                    Return True
+                Else
+                    For i = 0 To oE.PSel.Max
+                        oE.PSel[i] = False
+                    Next
+
+                    Return False
                 End If
-            Next
-
-            If puedo Then
-                For i = 0 To oE.PSel.Max
-                    oE.PSel[i] = True
-                Next
-
-                Return True
-            Else
-                For i = 0 To oE.PSel.Max
-                    oE.PSel[i] = False
-                Next
-
-                Return False
-            End If
-        Endif
-End Select
+            Endif
+    End Select
 
 End
 '
-' '' Determines if the entity 
+' '' Determines if the entity
 ' '' by default, if ANY point is selected, it can.
+
 Public Function SelPartial(oE As Entity, X1real As Float, Y1real As Float, X2real As Float, Y2real As Float) As Boolean
 
     Dim i As Integer, puedo As Boolean
-    
+
     Select Case oe.Gender
-    
+
         Case Else
-    
+
             ' Si tengo un bounding poligon, entonces verifico que alguna linea lo cruce
             If oE.Polygon.Count > 0 Then
-    
+
                 Return puntos.IsPoligonCrossingRect(oE.Polygon, X1real, Y1real, X2real, Y2real)
-    
+
             Else    ' no tengo un poligono, entonces verifico que todos los puntos definitorios de al entidad esten dentro
-    
+
                 puedo = False
                 For i = 0 To oE.p.max Step 2
                     If (oE.p[i] >= X1real And oE.p[i] <= X2real) And (oE.p[i + 1] >= Y1real And oE.p[i + 1] <= Y2real) Then
@@ -999,15 +1025,15 @@ Public Function SelPartial(oE As Entity, X1real As Float, Y1real As Float, X2rea
                         puedo = True
                     End If
                 Next
-    
+
                 If puedo Then
-    
+
                     Return True
                 Else
                     Return False
                 End If
             End If
-    
+
     End Select
 
 End

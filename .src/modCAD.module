@@ -863,21 +863,31 @@ Public Sub Benchmarks()
 
     Dim t As Float = Timer
     Dim veces As Integer
+    '
+    ' For Each cTipos In APPMain.hFCAD.cModel["Entities"]
+    '     For Each cEntity In cTipos
+    '         cEntity["layer"] = "test"
+    '         c = cEntity["colour"]
+    '         Inc i
+    '     Next
+    ' Next
+    ' Debug "Recorrida de ", i, " objetos de la coleccion t=", Timer - t
+    ' i = 0
 
-    For Each cTipos In APPMain.hFCAD.cModel["Entities"]
-        For Each cEntity In cTipos
-            cEntity["layer"] = "test"
-            c = cEntity["colour"]
-            Inc i
-        Next
-    Next
-    Debug "Recorrida de ", i, " objetos de la coleccion t=", Timer - t
-    i = 0
     ' recorro los objetos, leo y cambio propiedades
     t = Timer
     For Each oEntity In APPMain.hFCAD.arrEntities
         oEntity.layer = "test"
         c = oEntity.colour
+        Inc i
+    Next
+    Debug "Recorrida de FOR EACH ", i, " objetos del array t=", Timer - t
+
+    ' recorro los objetos, leo y cambio propiedades
+    t = Timer
+    For i = 0 To APPMain.hFCAD.arrEntities.max
+        APPMain.hFCAD.arrEntities[i].layer = "test"
+        c = APPMain.hFCAD.arrEntities[i].colour
         Inc i
     Next
     Debug "Recorrida de ", i, " objetos del array t=", Timer - t
@@ -922,16 +932,16 @@ Public Sub Benchmarks()
 
     ' 3 benchmark para POI
 
-    Dim flxPOI As New Float[], enco As New Float[]
-    t = Timer
-    For veces = 0 To 2e6 - 1
-        flxPOI.Add(Rnd(-1000, 1000))
-        flxPOI.Add(Rnd(-1000, 1000))
-    Next
-    Debug "Creo array t=", Timer - t
-
-    t = Timer
-    enco = puntos.FindPOI(2000, 2000, flxPOI, 20)
-    Debug "Poi encontrado", enco[2], Timer - t
+    ' Dim flxPOI As New Float[], enco As New Float[]
+    ' t = Timer
+    ' For veces = 0 To 2e6 - 1
+    '     flxPOI.Add(Rnd(-1000, 1000))
+    '     flxPOI.Add(Rnd(-1000, 1000))
+    ' Next
+    ' Debug "Creo array t=", Timer - t
+    '
+    ' t = Timer
+    ' enco = puntos.FindPOI(2000, 2000, flxPOI, 20)
+    ' Debug "Poi encontrado", enco[2], Timer - t
 
 End

@@ -31,7 +31,7 @@
 
 Create Static
 Create Private
-
+Fast Unsafe
 Public HookSize As Integer = 16                       ' for use with poi
 Public NumericTolerance As Float = 1e-7
 Public GridSpacing As Float = 0.5
@@ -82,7 +82,7 @@ Public Function FindPOIPoligon(xr As Float, yr As Float, arr As Float[], arrInde
 
     For i = 0 To arrIndexes.Max
 
-        If isInside(arr, arrNElements[i], xr, yr, arrIndexes[i]) Then Return i
+        If isInside(arr, xr, yr, arrIndexes[i], arrNElements[i]) Then Return i
 
     Next
 
@@ -248,9 +248,11 @@ End
 
 ' Returns True If the point p lies
 ' inside the polygon[] With n vertices
-Public Function isInside(polygon As Float[], Vertices As Integer, px As Float, py As Float, Optional StartIndex As Integer = 0) As Boolean
+Public Function isInside(polygon As Float[], px As Float, py As Float, Optional StartIndex As Integer = 0, Vertices As Integer = 0) As Boolean
 
     ' There must be at least 3 vertices In polygon[]
+    If vertices = 0 Then vertices = polygon.Count / 2
+
     If (Vertices < 3) Then
         Return False
     Endif

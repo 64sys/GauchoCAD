@@ -182,7 +182,7 @@ Public Function AboveMe(Xreal As Float, Yreal As Float, tolerance As Float, mode
 
     Else If Me.Polygon.Count > 0 Then
 
-        If puntos.isInside(Me.Polygon, Me.Polygon.Count / 2, Xreal, yreal) Then
+        If puntos.isInside(Me.Polygon, Xreal, yreal) Then
             returnData[0] = Xreal
             returnData[1] = yreal
             returnData[2] = 0
@@ -204,7 +204,7 @@ Public Sub PointClick(Xr As Float, Yr As Float) As Boolean
 
     If Me.Polygon.Count = 0 Then Return False
 
-    If puntos.isInside(Me.Polygon, Me.Polygon.Count / 2, xr, Yr) Then
+    If puntos.isInside(Me.Polygon, xr, Yr) Then
 
         Return True
     Else

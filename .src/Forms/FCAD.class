@@ -269,7 +269,7 @@ Public Sub GLArea1_MouseMove()
             flgShowPOIinfo = False
             modCAD.clsJob.MouseMove(mouse.x, mouse.y) ' dispatch event to the Job
 
-            clsEntities.CheckPOI(Xreal(mouse.x), Yreal(mouse.y))
+            If Not modCAD.clsJob.active Then clsEntities.CheckPOI(Xreal(mouse.x), Yreal(mouse.y))
 
             If APPMain.flgShowInspector Then
 
@@ -401,11 +401,11 @@ Public Sub form_KeyPress()
         modCAD.DrawBounds = Not modCAD.DrawBounds
         Dim i As Integer
 
-        For i = 0 To 50000
-
-            modCAD.AddLine(arrEntities, [Rnd(-20, 20), Rnd(-20, 20), Rnd(-20, 20), Rnd(-20, 20)], 0, 1, 0, "0")
-            'arrEntities.Last.gbcolor = Color.RGB(Rnd(0, 255), Rnd(0, 255), Rnd(0, 255))
-        Next
+        ' For i = 0 To 50000
+        '
+        '     modCAD.AddLine(arrEntities, [Rnd(-20, 20), Rnd(-20, 20), Rnd(-20, 20), Rnd(-20, 20)], 0, 1, 0, "0")
+        '     'arrEntities.Last.gbcolor = Color.RGB(Rnd(0, 255), Rnd(0, 255), Rnd(0, 255))
+        ' Next
         '        modCAD.AddEllipse([10, 10, 150, 150], 0.5, 0, Pi)
 
         'modCAD.AddMText([0, 0], 20, 30, "Primera linea" & gb.Cr & "Segunda linea", 3, 1, 1, "0", "")
