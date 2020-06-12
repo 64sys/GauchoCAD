@@ -460,11 +460,14 @@ Public Function Scale(points As Float[], Sx As Float, Sy As Float) As Boolean
 End
 
 '' Devuelve True si el poligono esta dentro del rectangulo
-Public Function IsPoligonInsideRect(poligon As Float[], x0 As Float, y0 As Float, x1 As Float, y1 As Float) As Boolean
+Public Function IsPoligonInsideRect(poligon As Float[], x0 As Float, y0 As Float, x1 As Float, y1 As Float, Optional StartIndex As Integer = 0, TotalElements As Integer = 0) As Boolean
 
     Dim i As Integer
 
-    For i = 0 To poligon.max Step 2
+    Dec TotalElements
+    If totalelements < 0 Then TotalElements = poligon.Max
+
+    For i = StartIndex To TotalElements Step 2
         If poligon[i] < x0 Then Return False
         If poligon[i] > x1 Then Return False
         If poligon[i + 1] < y0 Then Return False
@@ -475,29 +478,32 @@ Public Function IsPoligonInsideRect(poligon As Float[], x0 As Float, y0 As Float
 End
 
 '' Devuelve True si el poligono cruza la linea x0,y0 - x1,y1
-Public Function IsPoligonCrossingLine(poligon As Float[], x0 As Float, y0 As Float, x1 As Float, y1 As Float) As Boolean
+Public Function IsPoligonCrossingLine(poligon As Float[], x0 As Float, y0 As Float, x1 As Float, y1 As Float, Optional StartIndex As Integer = 0, TotalElements As Integer = 0) As Boolean
 
     Dim i As Integer
 
-    For i = 0 To poligon.count - 4 Step 2
+    Dec TotalElements
+    If totalelements < 0 Then TotalElements = poligon.Max
+
+    For i = StartIndex To TotalElements - 3 Step 2
         If doIntersect(poligon[i], poligon[i + 1], poligon[i + 2], poligon[i + 3], x0, y0, x1, y1) Then Return True
     Next
     ' cierre del poligono, puntos inicial y final
-    If doIntersect(poligon[0], poligon[1], poligon[poligon.max - 1], poligon[poligon.max], x0, y0, x1, y1) Then Return True
+    If doIntersect(poligon[StartIndex], poligon[StartIndex + 1], poligon[TotalElements - 1], poligon[TotalElements], x0, y0, x1, y1) Then Return True
 
     Return False
 
 End
 
 '' Devuelve True si el poligono cruza la linea x0,y0 - x1,y1
-Public Function IsPoligonCrossingRect(poligon As Float[], x0 As Float, y0 As Float, x1 As Float, y1 As Float) As Boolean
+Public Function IsPoligonCrossingRect(poligon As Float[], x0 As Float, y0 As Float, x1 As Float, y1 As Float, Optional StartIndex As Integer = 0, TotalElements As Integer = 0) As Boolean
 
     Dim i As Integer
 
-    If IsPoligonCrossingLine(poligon, x0, y0, x1, y0) Then Return True
-    If IsPoligonCrossingLine(poligon, x0, y1, x1, y1) Then Return True
-    If IsPoligonCrossingLine(poligon, x0, y0, x0, y1) Then Return True
-    If IsPoligonCrossingLine(poligon, x1, y0, x1, y1) Then Return True
+    If IsPoligonCrossingLine(poligon, x0, y0, x1, y0, StartIndex, TotalElements) Then Return True
+    If IsPoligonCrossingLine(poligon, x0, y1, x1, y1, StartIndex, TotalElements) Then Return True
+    If IsPoligonCrossingLine(poligon, x0, y0, x0, y1, StartIndex, TotalElements) Then Return True
+    If IsPoligonCrossingLine(poligon, x1, y0, x1, y1, StartIndex, TotalElements) Then Return True
     Return False
 
 End

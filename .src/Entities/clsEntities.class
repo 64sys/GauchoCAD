@@ -27,7 +27,7 @@ Public Struct arrBlockSt
     x As Float
     y As Float
     layer As String
-    entities As Object[]
+    entities As Entity[]
 End Struct
 
 Public Function FIndBlockID(BlockName As String) As Integer
@@ -139,7 +139,7 @@ End
 '' Creo el array de POI
 '' son los puntos que van a enganchar el mouse
 
-Fast Public Sub ReBuildPOI()
+Public Sub ReBuildPOI()
 
     Dim i, ii, n As Integer, EPoi As New Integer[], nPois As Integer
 
@@ -155,7 +155,7 @@ Fast Public Sub ReBuildPOI()
 
     For i = 0 To APPMain.hFCAD.arrEntities.Max
 
-        APPMain.hFCAD.arrEntities[i].ClassHandler.buidpoi(APPMain.hFCAD.arrEntities[i])
+        APPMain.hFCAD.arrEntities[i].ClassHandler.buildpoi(APPMain.hFCAD.arrEntities[i])
 
     Next
 
@@ -173,7 +173,7 @@ Public Sub CheckPOI(xr As Float, Yr As Float)
     iPoligon = puntos.FindPOIPoligon(xr, yr, APPMain.hFCAD.poiPoligons, APPMain.hFCAD.poiPoligonStartIndex, APPMain.hFCAD.poiPoligonElements)
     iLine = puntos.FindPOILines(xr, yr, APPMain.hFCAD.poiLines, APPMain.hFCAD.Metros(16))
     rdata = puntos.FindPOI(xr, yr, APPMain.hFCAD.poiPoints, APPMain.hFCAD.Metros(16))
-    Debug "total poi check time ", Timer - t, APPMain.hFCAD.poiPoligons.Count + APPMain.hFCAD.poiLines.Count + APPMain.hFCAD.poiPoints.Count, " points parsed"
+    'Debug "total poi check time ", Timer - t, APPMain.hFCAD.poiPoligons.Count + APPMain.hFCAD.poiLines.Count + APPMain.hFCAD.poiPoints.Count, " points parsed"
     i = -1
     If iPoligon >= 0 Then
 
@@ -188,7 +188,7 @@ Public Sub CheckPOI(xr As Float, Yr As Float)
 
     If i >= 0 Then
 
-        Debug "Nearest found at ", rData[0], rData[1]
+        'Debug "Nearest found at ", rData[0], rData[1]
         APPMain.hFCAD.iEntity.Insert(rData)
         APPMain.hFCAD.oEntity = APPMain.hFCAD.arrEntities[i]
 
@@ -588,16 +588,17 @@ Public Sub DeSelectAllElemFromBlock(iBlock As String, Optional AndItsPoints As B
 
 End
 
-Public Sub DeSelectElem(elem As Object, Optional AndItsPoints As Boolean = True)
+Public Sub DeSelectElem(elem As Entity, Optional AndItsPoints As Boolean = True)
 
     Dim i As Integer
 
-    For i = 0 To elem.Psel.Max
-        If AndItsPoints Then elem.Psel[i] = False
-    Next
+    If AndItsPoints Then
+        For i = 0 To elem.Psel.Max
+            elem.Psel[i] = False
+        Next
+    End If
 
     elem.selected = False
-
     ' but, its part of a block?
 
     If elem.Block <> "" Then
@@ -759,6 +760,131 @@ Public Function SelectionSquare(X1real As Float, Y1real As Float, X2real As Floa
 
         End If
     Next
+
+    Return TotalSeleccionados
+
+End
+
+Public Function SelectionSquare2(X1real As Float, Y1real As Float, X2real As Float, Y2real As Float, Optional NuevaSumaResta As String = "nueva", crossing As Boolean) As Integer
+
+    ' Veo que accion estoy tomando
+    Dim e As Entity, i, i2, CurrentEntityIndex, TotalSeleccionados As Integer, Todos As Boolean
+    Dim t As Float = Timer
+
+    NuevaSumaResta = LCase$(NuevaSumaResta)
+
+    If NuevaSumaResta = "nueva" Then
+        For i = 0 To APPMain.hFCAD.arrEntities.Max
+            APPMain.hFCAD.arrEntities[i].selected = False
+            For i2 = 0 To APPMain.hFCAD.arrEntities[i].Psel.max
+                APPMain.hFCAD.arrEntities[i].Psel[i2] = False
+            Next
+        Next
+    End If
+    Debug "Deselect time ", Timer - t
+
+    ' reviso los poligonos
+    For i = 0 To APPMain.hFCAD.poiPoligonEntities.Max
+
+        If crossing Then
+            If puntos.IsPoligonCrossingRect(APPMain.hFCAD.poiPoligons, X1real, Y1real, X2real, Y2real, APPMain.hFCAD.poiPoligonStartIndex[i], APPMain.hFCAD.poiPoligonElements[i]) Then
+                ' el punto esta en el recuadro
+                If NuevaSumaResta <> "resta" Then
+                    Inc TotalSeleccionados
+                    APPMain.hFCAD.arrEntities[i].selected = True
+
+                Else If NuevaSumaResta = "resta" Then
+                    Dec TotalSeleccionados
+                    APPMain.hFCAD.arrEntities[i].selected = False
+
+                End If
+
+            Endif
+        Else
+            If puntos.IsPoligonInsideRect(APPMain.hFCAD.poiPoligons, X1real, Y1real, X2real, Y2real, APPMain.hFCAD.poiPoligonStartIndex[i], APPMain.hFCAD.poiPoligonElements[i]) Then
+                ' el punto esta en el recuadro
+                If NuevaSumaResta <> "resta" Then
+                    Inc TotalSeleccionados
+                    APPMain.hFCAD.arrEntities[i].selected = True
+
+                Else If NuevaSumaResta = "resta" Then
+                    Dec TotalSeleccionados
+                    APPMain.hFCAD.arrEntities[i].selected = False
+
+                End If
+
+            Endif
+
+        End If
+    Next
+
+    ' reviso las lineas
+    If crossing Then
+        For i = 0 To APPMain.hFCAD.poiLines.Max Step 2                                                                                                  ' para cada punto
+            If puntos.InBetween(APPMain.hFCAD.poiLines[i], X1real, X2real) And puntos.InBetween(APPMain.hFCAD.poiLines[i + 1], Y1real, Y2real) Then     ' esta dentro
+                ' el punto esta en el recuadro
+                If NuevaSumaResta <> "resta" Then
+                    Inc TotalSeleccionados
+                    APPMain.hFCAD.arrEntities[APPMain.hFCAD.poiLinesEntities[i / 4]].selected = True
+                    APPMain.hFCAD.arrEntities[APPMain.hFCAD.poiLinesEntities[i / 4]].Psel[APPMain.hFCAD.poiLinesRelPoint[i / 2]] = True
+                Else If NuevaSumaResta = "resta" Then
+                    Dec TotalSeleccionados
+                    APPMain.hFCAD.arrEntities[APPMain.hFCAD.poiLinesEntities[i / 4]].selected = False
+                    APPMain.hFCAD.arrEntities[APPMain.hFCAD.poiLinesEntities[i / 4]].Psel[APPMain.hFCAD.poiLinesRelPoint[i / 2]] = False
+
+                End If
+
+            Endif
+
+        Next
+
+    Else    ' full selection
+        ' hago un crossing primero y luego me fijo si estan todos
+        For i = 0 To APPMain.hFCAD.poiLines.Max Step 2                                                                                                  ' para cada punto
+            If puntos.InBetween(APPMain.hFCAD.poiLines[i], X1real, X2real) And puntos.InBetween(APPMain.hFCAD.poiLines[i + 1], Y1real, Y2real) Then     ' esta dentro
+                ' el punto esta en el recuadro
+                If NuevaSumaResta <> "resta" Then
+                    Inc TotalSeleccionados
+                    APPMain.hFCAD.arrEntities[APPMain.hFCAD.poiLinesEntities[i / 4]].selected = True
+                    APPMain.hFCAD.arrEntities[APPMain.hFCAD.poiLinesEntities[i / 4]].Psel[APPMain.hFCAD.poiLinesRelPoint[i / 2]] = True
+                Else If NuevaSumaResta = "resta" Then
+                    Dec TotalSeleccionados
+                    APPMain.hFCAD.arrEntities[APPMain.hFCAD.poiLinesEntities[i / 4]].selected = False
+                    APPMain.hFCAD.arrEntities[APPMain.hFCAD.poiLinesEntities[i / 4]].Psel[APPMain.hFCAD.poiLinesRelPoint[i / 2]] = False
+
+                End If
+
+            Endif
+
+        Next
+
+        CurrentEntityIndex = 0
+        For i = 0 To APPMain.hFCAD.arrEntities.Max
+
+            If APPMain.hFCAD.arrEntities[i].Selected Then 'chequeo si todos estan seleccionados
+                todos = True
+                For i2 = 0 To APPMain.hFCAD.arrEntities[i].Psel.Max
+                    If APPMain.hFCAD.arrEntities[i].Psel = False Then
+                        todos = False
+                        Break
+                    Endif
+                Next
+
+                If (todos And NuevaSumaResta = "resta") Or Not todos Then
+                    Dec TotalSeleccionados
+                    APPMain.hFCAD.arrEntities[i].selected = False
+                    For i2 = 0 To APPMain.hFCAD.arrEntities[i].Psel.Max
+                        APPMain.hFCAD.arrEntities[i].Psel = False
+
+                    Next
+
+                End If
+
+            Endif
+
+        Next
+
+    Endif
 
     Return TotalSeleccionados
 

@@ -20,7 +20,7 @@
 ' Foundation, Inc., 51 Franklin St, Fifth Floor,
 ' Boston, MA  02110-1301  USA
 Create Static
-Fast
+'Fast
 Inherits EntityBase
 Public Const GENDER As String = "Circle"
 Public Const PointsToDraw As Integer = 1             ' minimal point requered for drawing something usefull
@@ -37,19 +37,18 @@ Public Sub Draw(oE As Entity)
 
     If oE.Selected And Not modCAD.ToolActive Then oE.ColorToPaint = modCAD.ColorForSelected Else oE.ColorToPaint = modCAD.GetGBColor(oE.colour, oE.Layerid)
 
-
-        oE.BoundingPoligon.Clear
-        GL.Begin(gl.LINE_STRIP)
-        angle_increment = Pi * 2 / 360
-        For theta = 0 To 2 * Pi Step angle_increment
-            ' el punto considerando 0,0 al centro
-            x = oE.p[0] + oE.fParam[0] * Cos(theta)
-            y = oE.p[1] + oE.fParam[0] * Sin(theta)
-            oE.BoundingPoligon.Add(x)
-            oE.BoundingPoligon.Add(y)
-            GLplus.Vertex2D(x, y, oE.ColorToPaint)
-        Next
-        gl.End
+    oE.BoundingPoligon.Clear
+    GL.Begin(gl.LINE_STRIP)
+    angle_increment = Pi * 2 / 360
+    For theta = 0 To 2 * Pi Step angle_increment
+        ' el punto considerando 0,0 al centro
+        x = oE.p[0] + oE.fParam[0] * Cos(theta)
+        y = oE.p[1] + oE.fParam[0] * Sin(theta)
+        oE.BoundingPoligon.Add(x)
+        oE.BoundingPoligon.Add(y)
+        GLplus.Vertex2D(x, y, oE.ColorToPaint)
+    Next
+    gl.End
 
 End
 
@@ -59,7 +58,6 @@ Public Function Draw2(oE As Entity)
 
     If oE.Selected And Not modCAD.ToolActive Then oE.ColorToPaint = modCAD.ColorForSelected Else oE.ColorToPaint = modCAD.GetGBColor(oE.colour, oE.Layerid)
 
-  
     paint.LineWidth = oE.LineWidth / appmain.hFcad.ScaleZoom / modCAD.ScaleLines
 
     paint.brush = Paint.Color(oE.ColorToPaint)
@@ -67,11 +65,8 @@ Public Function Draw2(oE As Entity)
     paint.Arc(oE.p[0], oE.p[1], oE.fParam[0])
 
     paint.Stroke
-  
-    
+
 End
-
-
 
 Public Function AboveMe(oE As Entity, Xreal As Float, Yreal As Float, tolerance As Float, mode As Integer, fData As Float[]) As Boolean
     ' si una de las dos lineas de una cruz con centro en X,Y y largo Tolerance cruza la linea, estamos arriba

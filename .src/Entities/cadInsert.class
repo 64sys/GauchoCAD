@@ -21,6 +21,7 @@
 ' Boston, MA  02110-1301  USA
 Create Static
 Inherits EntityBase
+
 Public Const GENDER As String = "Insert"
 Public Const HelperTrabajo As String = ("Inserts a block")
 Public Const ParamType As String = "TPFFF"

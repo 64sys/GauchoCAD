@@ -66,11 +66,11 @@ Public Struct arrBlockSt
     x As Float
     y As Float
     layer As String
-    entities As Object[]
+    entities As Entity[]
 End Struct
 
 Public arrBlocks As New ArrBlockSt[]
-Public arrEntities As New Object[]             ' were al elements live
+Public arrEntities As New Entity[]             ' were al elements live
 Public arrSelecIndex As New Integer[]          ' indice en el array de entidades
 
 Public Xmenor As Float = 1E100
@@ -85,6 +85,7 @@ Public poiEntities As New Integer[]             ' related entity
 
 Public poiLines As New Float[]                  ' x0y0x1y1 points
 Public poiLinesEntities As New Integer[]        ' related entity
+Public poiLinesRelPoint As New Integer[]        ' related point in entity
 
 Public poiPoligons As New Float[]               ' this define multiple poligons to search for proximity
 Public poiPoligonStartIndex As New Integer[]
@@ -93,7 +94,7 @@ Public poiPoligonEntities As New Integer[]      ' related entity
 
 ' interaccion del mouse en pantalla
 Public iEntity As New Single[]             ' las coordenadas del punto encontrado y el tipo de punto
-Public oEntity As Object                   ' la entidad
+Public oEntity As Entity                   ' la entidad
 Public flgShowPOIinfo As Boolean = True
 
 ' OpenGl stuff
@@ -144,7 +145,7 @@ Public Sub form_Activate()
         DrawingReady = True
     Endif
     If cImport.Count > 0 Then
-        'LoadDrawingMap()
+
         EntitiesTransfer2()
         BlocksTransfer()
         LayersTransfer()
@@ -155,7 +156,7 @@ Public Sub form_Activate()
         cImport.Clear
         modCAD.ApplyLayerProperties(1)
         regen
-        'clsEntities.ReBuildPOI
+        clsEntities.ReBuildPOI
         cadZoomE.Start()
     Endif
 

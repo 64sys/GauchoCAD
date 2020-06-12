@@ -57,7 +57,7 @@ Public Struct arrBlockSt
     x As Float
     y As Float
     layer As String
-    entities As Object[]
+    entities As Entity[]
 End Struct
 
 Public gColor As New Integer[]
@@ -122,14 +122,14 @@ Public Sub Main()
 
 End
 
-Public Function ImportBlocks(colData As Collection) ', obxEntities As Object[]) As Integer
+Public Function ImportBlocks(colData As Collection) ', obxEntities As Entity[]) As Integer
 
     Dim iTotalEntities As Integer, colent, colBlk As Collection, flxPoints As New Float[], P As Float[]
 
     If Not colData.Exist("Blocks") Then Return
     For Each colBlk In colData["Blocks"]
         Dim newBlock As New ArrBlockSt
-        newBlock.entities = New Object[]
+        newBlock.entities = New Entity[]
         newBlock.name = colBlk["block"]
         APPMain.hFCAD.arrBlocks.Add(newBlock)
         ImportEntities2(colBlk["Entities"], newBlock.entities, newBlock.name)
@@ -138,7 +138,7 @@ Public Function ImportBlocks(colData As Collection) ', obxEntities As Object[]) 
 
 End
 
-Public Function ImportModel(colData As Collection, obxEntities As Object[], Optional BlockName As String) As Integer
+Public Function ImportModel(colData As Collection, obxEntities As Entity[], Optional BlockName As String) As Integer
 
     Dim i, iTotalEntities As Integer
     Dim colGrp As Collection
@@ -156,7 +156,7 @@ Public Function ImportModel(colData As Collection, obxEntities As Object[], Opti
 End
 '' Importa la clave entidades de la coleccion y las coloca en el array de objetos
 
-Public Function ImportEntities2(colGrp As Collection, obxEntities As Object[], Optional BlockName As String) As Integer
+Public Function ImportEntities2(colGrp As Collection, obxEntities As Entity[], Optional BlockName As String) As Integer
 
     Dim i, iTotalEntities As Integer
     Dim flxPoints As New Float[]
@@ -243,7 +243,7 @@ End
 
 ' importing
 
-Public Function AddLine(obxContainer As Object[], Points As Float[], Optional colour As Integer = 0, Optional LineWidth As Float = 1, Optional Linetype As String, Optional Layer As String, Optional Block As String) As Boolean
+Public Function AddLine(obxContainer As Entity[], Points As Float[], Optional colour As Integer = 0, Optional LineWidth As Float = 1, Optional Linetype As String, Optional Layer As String, Optional Block As String) As Boolean
 
     ' points are in x,y,x,y,x,y....
     Dim oEntity As New Entity
@@ -263,7 +263,7 @@ Public Function AddLine(obxContainer As Object[], Points As Float[], Optional co
 
 End
 
-Public Function AddPolyLine(obxContainer As Object[], Points As Float[], Optional colour As Integer = 0, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
+Public Function AddPolyLine(obxContainer As Entity[], Points As Float[], Optional colour As Integer = 0, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
 
     ' points are in x,y,x,y,x,y....
 
@@ -283,7 +283,7 @@ Public Function AddPolyLine(obxContainer As Object[], Points As Float[], Optiona
 
 End
 
-Public Function AddDim(obxContainer As Object[], Points As Float[], bloque As String, medida As Float, texto As String, alineacion As Integer, angulo As Float, tipo As Integer, colour As Integer, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
+Public Function AddDim(obxContainer As Entity[], Points As Float[], bloque As String, medida As Float, texto As String, alineacion As Integer, angulo As Float, tipo As Integer, colour As Integer, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
 
     Dim oEntity As New Entity
 
@@ -306,7 +306,7 @@ Public Function AddDim(obxContainer As Object[], Points As Float[], bloque As St
 
 End
 
-Public Function AddSolid(obxContainer As Object[], Points As Float[], Optional colour As Integer = 0, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
+Public Function AddSolid(obxContainer As Entity[], Points As Float[], Optional colour As Integer = 0, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
 
     ' points are in x,y,x,y,x,y....
     ' points are in x,y,x,y,x,y....
@@ -326,7 +326,7 @@ Public Function AddSolid(obxContainer As Object[], Points As Float[], Optional c
 
 End
 
-Public Function AddSPLine(obxContainer As Object[], Points As Float[], Optional colour As Integer = 0, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
+Public Function AddSPLine(obxContainer As Entity[], Points As Float[], Optional colour As Integer = 0, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
 
     ' points are in x,y,x,y,x,y....
     Dim oEntity As New Entity
@@ -346,7 +346,7 @@ Public Function AddSPLine(obxContainer As Object[], Points As Float[], Optional 
 
 End
 
-Public Function AddCircle(obxContainer As Object[], Points As Float[], radious As Float, Optional colour As Integer = 0, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
+Public Function AddCircle(obxContainer As Entity[], Points As Float[], radious As Float, Optional colour As Integer = 0, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
 
     ' points are in x,y,x,y,x,y....
     Dim oEntity As New Entity
@@ -365,7 +365,7 @@ Public Function AddCircle(obxContainer As Object[], Points As Float[], radious A
 
 End
 
-Public Function AddArc(obxContainer As Object[], Points As Float[], r As Float, angle1 As Float, angle2 As Float, Optional colour As Integer = 0, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
+Public Function AddArc(obxContainer As Entity[], Points As Float[], r As Float, angle1 As Float, angle2 As Float, Optional colour As Integer = 0, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
 
     ' points are in x,y,x,y,x,y....
     Dim oEntity As New Entity
@@ -386,7 +386,7 @@ Public Function AddArc(obxContainer As Object[], Points As Float[], r As Float, 
 
 End
 
-Public Function AddEllipse(obxContainer As Object[], Points As Float[], r As Float, angle1 As Float, angle2 As Float, Optional colour As Integer = 0, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
+Public Function AddEllipse(obxContainer As Entity[], Points As Float[], r As Float, angle1 As Float, angle2 As Float, Optional colour As Integer = 0, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
 
     ' points are in x,y,x,y,x,y....
     Dim oEntity As New Entity
@@ -409,7 +409,7 @@ Public Function AddEllipse(obxContainer As Object[], Points As Float[], r As Flo
 
 End
 
-Public Function AddText(obxContainer As Object[], Points As Float[], angle As Float, height As Float, _Text As String, Optional colour As Integer = Color.Blue, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
+Public Function AddText(obxContainer As Entity[], Points As Float[], angle As Float, height As Float, _Text As String, Optional colour As Integer = Color.Blue, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
 
     Dim oEntity As New Entity
 
@@ -429,7 +429,7 @@ Public Function AddText(obxContainer As Object[], Points As Float[], angle As Fl
 
 End
 
-Public Function AddMText(obxContainer As Object[], Points As Float[], angle As Float, height As Float, _Text As String, Optional colour As Integer = Color.Blue, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
+Public Function AddMText(obxContainer As Entity[], Points As Float[], angle As Float, height As Float, _Text As String, Optional colour As Integer = Color.Blue, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
 
     Dim oEntity As New Entity
 
@@ -449,14 +449,14 @@ Public Function AddMText(obxContainer As Object[], Points As Float[], angle As F
 
 End
 
-Public Function AddCurve(obxContainer As Object[], Points As Float[], Optional colour As Integer = 0, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
+Public Function AddCurve(obxContainer As Entity[], Points As Float[], Optional colour As Integer = 0, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
 
     ' points are in x,y,x,y,x,y....
     Dim oEntity As New Entity
 
 End
 
-Public Function AddInsert(obxContainer As Object[], Points As Float[], scaleX As Float, scaleY As Float, angulo As Float, Optional colour As Integer = Color.Blue, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
+Public Function AddInsert(obxContainer As Entity[], Points As Float[], scaleX As Float, scaleY As Float, angulo As Float, Optional colour As Integer = Color.Blue, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
 
     Dim oEntity As New Entity
 
@@ -475,7 +475,7 @@ Public Function AddInsert(obxContainer As Object[], Points As Float[], scaleX As
 
 End
 
-Public Function AddBlock(obxContainer As Object[], Points As Float[], Optional Layer As String, Optional Block As String) As Boolean
+Public Function AddBlock(obxContainer As Entity[], Points As Float[], Optional Layer As String, Optional Block As String) As Boolean
 
     Dim oEntity As New Entity
 

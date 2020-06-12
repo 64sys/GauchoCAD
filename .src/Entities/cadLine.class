@@ -20,7 +20,7 @@
 ' Foundation, Inc., 51 Franklin St, Fifth Floor,
 ' Boston, MA  02110-1301  USA
 Create Static
-Fast
+'Fast
 Inherits EntityBase
 Public Const GENDER As String = "Line"
 Public Const DrawingOrder As Integer = 1        ' 1 = draws first
@@ -75,6 +75,7 @@ Public Function BuildPOI(oE As Entity, Optional arrIndex As Integer = -1) As Int
     ' line
     appmain.hFCAD.poiLines.insert([oE.p[0], oE.p[1], oE.p[2], oE.p[3]])
     APPMain.hFCAD.poiLinesEntities.Add(arrIndex)
+    appmain.hFCAD.poiLinesRelPoint.Insert([0, 1])
 
 End
 
