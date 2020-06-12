@@ -24,7 +24,7 @@
 ' Tool maintained by Terco
 Inherits ToolsBase
 Create Static
-Public Const GENDER As String = "Array"
+Public Const Gender As String = "Array"
 
 Public Nx As Integer
 Public Ny As Integer
@@ -150,7 +150,7 @@ End
 
 Public Sub Finish()
 
-    Dim Rx, Ry, i As Integer, o As Object, newO As Object
+    Dim Rx, Ry, i As Integer, o As Entity, newO As Entity
 
     If Me.mode = 1 And Me.PointsDone = 6 Then               ' me.mode orto finished correctly
 

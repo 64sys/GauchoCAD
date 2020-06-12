@@ -23,7 +23,7 @@
 ' Tool maintained by Terco
 Inherits ToolsBase
 Create Static
-Public Const GENDER As String = "Protractor"
+Public Const Gender As String = "Protractor"
 
 Private Poli As New Float[]
 

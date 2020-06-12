@@ -24,7 +24,7 @@
 ' Element maintained by Terco
 ' V3
 Inherits BIMEntityBase
-Public Const GENDER As String = "Slab"
+Public Const Gender As String = "Slab"
 Public Const DrawingOrder As Integer = 1        ' 1 = draws first
 Public Const PointsToDraw As Integer = 1             ' minimal point requered for drawing something usefull
 Public Const OrtogonalIgnorado As Boolean = True
@@ -79,7 +79,7 @@ End
 ' True means all is good, False will instruct the clsEntityBuilder to delete it
 Public Sub Finish(ParamsDone As Integer) As Boolean
 
-    Me.CreateBoundingPoligon
+    Me.CreatePolygon
     Me.ForDeletion = False
     Me.DrawAble = True
     Me.Selected = False
@@ -95,7 +95,7 @@ Public Sub Finish(ParamsDone As Integer) As Boolean
 
 End
 
-Public Sub CreateBoundingPoligon()
+Public Sub CreatePolygon()
 
     ' this is entity specific
 
@@ -110,7 +110,7 @@ Public Sub CreateBoundingPoligon()
     '                  3+------------+4
     '                                 me.p[2],me.p[3]
     '
-    Me.BoundingPoligon.Clear
-    Me.BoundingPoligon.Insert([Me.p[0], Me.p[1], Me.p[2], Me.p[1], Me.p[2], Me.p[3], Me.p[0], Me.p[3]])
+    Me.Polygon.Clear
+    Me.Polygon.Insert([Me.p[0], Me.p[1], Me.p[2], Me.p[1], Me.p[2], Me.p[3], Me.p[0], Me.p[3]])
 
 End

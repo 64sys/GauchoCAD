@@ -22,7 +22,7 @@
 
 Inherits ToolsBase
 Create Static
-Public Const GENDER As String = "Explode"
+Public Const Gender As String = "Explode"
 
 Public Function Start(Optional ElemToBuild As Variant, Optional _Mode As Integer = 0) As Boolean
 

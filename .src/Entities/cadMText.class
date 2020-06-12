@@ -22,7 +22,7 @@
 Create Static
 ' Fast
 Inherits EntityBase
-Public Const GENDER As String = "MText"
+Public Const Gender As String = "MText"
 Public Const DrawingOrder As Integer = 100 ' 1 a 32.724 esto debe Drawse primero y ser sobreescrito por el resto
 Public Const PointsToDraw As Integer = 1             ' minimal point requered for drawing something usefull
 Public Const HelperTrabajo As String = ("Inserts a multiline text")
@@ -37,7 +37,7 @@ Public Sub Draw(oE As Entity)
 
     glPlus.DrawMultilineText(oE.StringData, oE.p[0], oE.p[1], oE.fParam[0], oE.fParam[1], oE.ColorToPaint)
 
-    If oE.StringData <> "" Then CreateBoundingPoligon(oe)
+    If oE.StringData <> "" Then CreatePolygon(oe)
 
 End
 
@@ -110,20 +110,20 @@ Public Function Draw2(oE As Entity)
 
 End
 
-Public Sub CreateBoundingPoligon(oE As Entity)
+Public Sub CreatePolygon(oE As Entity)
 
     Dim tRect As New Float[]
 
-    oE.BoundingPoligon.Clear
+    oE.Polygon.Clear
 
     tRect = glPlus.MTextExtends(oE.StringData, oE.p[0], oE.p[1], oE.fParam[1])
 
     ' armo el poligono , que ya tiene la escala
 
-    oE.BoundingPoligon.Insert([tRect[0], tRect[1], tRect[0] + tRect[2], tRect[1], tRect[0] + tRect[2], tRect[1] + tRect[3], tRect[0], tRect[1] + tRect[3]])
+    oE.Polygon.Insert([tRect[0], tRect[1], tRect[0] + tRect[2], tRect[1], tRect[0] + tRect[2], tRect[1] + tRect[3], tRect[0], tRect[1] + tRect[3]])
 
-    puntos.Translate(oE.BoundingPoligon, -oE.P[0], -oE.P[1])
-    puntos.Rotate(oE.BoundingPoligon, oE.fParam[0] * Pi / 180)
-    puntos.Translate(oE.BoundingPoligon, oE.P[0], oE.P[1])
+    puntos.Translate(oE.Polygon, -oE.P[0], -oE.P[1])
+    puntos.Rotate(oE.Polygon, oE.fParam[0] * Pi / 180)
+    puntos.Translate(oE.Polygon, oE.P[0], oE.P[1])
 
 End

@@ -5,7 +5,7 @@
 ' V2
 Create Static
 Inherits EntityBase
-Public Const GENDER As String = "SPLine"
+Public Const Gender As String = "SPLine"
 Public Const PointsToDraw As Integer = 0             ' minimal point requered for drawing something usefull
 Public Const HelperTrabajo As String = ("SPLine")
 Public Const ParamType As String = "PPPP"                             ' that is Point, Point, Float; could be Color Text, etc

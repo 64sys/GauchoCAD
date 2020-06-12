@@ -23,7 +23,7 @@
 ' Tool maintained by Terco
 Inherits ToolsBase
 Create Static
-Public Const GENDER As String = "Mirror"
+Public Const Gender As String = "Mirror"
 
 Private Radianes As Float
 Private KeepOriginal As Boolean
@@ -203,7 +203,7 @@ Public Sub Finish()
             puntos.Translate(appmain.hFCAD.arrEntities[Me.inxSelected[i]].p, Me.SelStartXr, Me.SelStartYr)    ' y regreso
 
             ' en algunos casos, algo mas
-            Select Case LCase$(appmain.hFCAD.arrEntities[Me.inxSelected[i]].GENDER)
+            Select Case LCase$(appmain.hFCAD.arrEntities[Me.inxSelected[i]].Gender)
                 Case "text", "mtext"
                     appmain.hFCAD.arrEntities[Me.inxSelected[i]].fParam[0] += Radianes * 180 / Pi
                     If appmain.hFCAD.arrEntities[Me.inxSelected[i]].fParam[0] >= 360 Then appmain.hFCAD.arrEntities[Me.inxSelected[i]].fParam[0] -= 360

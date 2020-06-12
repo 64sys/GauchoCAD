@@ -24,7 +24,7 @@
 ' Element maintained by Terco
 ' V3
 Inherits BIMEntityBase
-Public Const GENDER As String = "Column"
+Public Const Gender As String = "Column"
 Public Const DrawingOrder As Integer = 30
 Public Const PointsToDraw As Integer = 0
 Public Const AllowStretching As Boolean = False                     ' true if element admits deformation of its shape
@@ -79,7 +79,7 @@ Public Sub Finish(ParamsDone As Integer) As Boolean
         Me.fParam.Add(0.2)         ' z side of column
     End If
     Me.B.Resize(Me.P.Count)
-    Me.CreateBoundingPoligon()
+    Me.CreatePolygon()
     Me.ForDeletion = False
     Me.DrawAble = True
     Me.Selected = False
@@ -87,7 +87,7 @@ Public Sub Finish(ParamsDone As Integer) As Boolean
 
 End
 
-Public Sub CreateBoundingPoligon()
+Public Sub CreatePolygon()
 
     ' this is entity specific
 
@@ -103,7 +103,7 @@ Public Sub CreateBoundingPoligon()
 
     '                   |<fParam[0]->|
 
-    Me.BoundingPoligon.Clear
-    Me.BoundingPoligon.Insert([Me.p[0] - Me.fParam[0], Me.p[1] - Me.fParam[1], Me.p[0] + Me.fParam[0], Me.p[1] - Me.fParam[1], Me.p[0] - Me.fParam[0], Me.p[1] + Me.fParam[1], Me.p[0] + Me.fParam[0], Me.p[1] + Me.fParam[1]])
+    Me.Polygon.Clear
+    Me.Polygon.Insert([Me.p[0] - Me.fParam[0], Me.p[1] - Me.fParam[1], Me.p[0] + Me.fParam[0], Me.p[1] - Me.fParam[1], Me.p[0] - Me.fParam[0], Me.p[1] + Me.fParam[1], Me.p[0] + Me.fParam[0], Me.p[1] + Me.fParam[1]])
 
 End

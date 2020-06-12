@@ -59,7 +59,7 @@ Public StepsDone As Integer                 ' esto lo cambia cls ElementBuilder 
 Public Group As Integer = 0                 ' Pertenecemos a un grupo?
 Public B As New Float[]                     ' Backup point
 Public Psel As New Boolean[]                ' selected points
-Public BoundingPoligon As New Float[]       ' this is a poligon built at element's contruction that defines a poligon used for detecting points inside me
+Public Polygon As New Float[]       ' this is a poligon built at element's contruction that defines a poligon used for detecting points inside me
 Public MyPoi As New Single[]                ' point of interest
 Public Conectors As Float[]
 Public Ensambles As Float[]
@@ -76,7 +76,7 @@ End
 
 '' Las entidades pueden proveer un poligono que las envuelva
 '' el mismo su usara para seleccionarlas.
-Public Sub CreateBoundingPoligon()
+Public Sub CreatePolygon()
 
 End
 
@@ -95,9 +95,9 @@ Public Function SelFull(X1real As Float, Y1real As Float, X2real As Float, Y2rea
     Dim i As Integer, puedo As Boolean
 
     ' Si tengo un bounding poligon, entonces verifico que todos los puntos esten dentro
-    If Me.BoundingPoligon.Count > 0 Then
+    If Me.Polygon.Count > 0 Then
 
-        Return puntos.IsPoligonInsideRect(BoundingPoligon, X1real, Y1real, X2real, Y2real)
+        Return puntos.IsPoligonInsideRect(Polygon, X1real, Y1real, X2real, Y2real)
 
     Else    ' no tengo un poligono, entonces verifico que todos los puntos definitorios de al entidad esten dentro
 
@@ -132,9 +132,9 @@ Public Function SelPartial(X1real As Float, Y1real As Float, X2real As Float, Y2
     Dim i As Integer, puedo As Boolean
 
     ' Si tengo un bounding poligon, entonces verifico que alguna linea lo cruce
-    If Me.BoundingPoligon.Count > 0 Then
+    If Me.Polygon.Count > 0 Then
 
-        Return puntos.IsPoligonCrossingRect(BoundingPoligon, X1real, Y1real, X2real, Y2real)
+        Return puntos.IsPoligonCrossingRect(Polygon, X1real, Y1real, X2real, Y2real)
 
     Else    ' no tengo un poligono, entonces verifico que todos los puntos definitorios de al entidad esten dentro
 
@@ -180,9 +180,9 @@ Public Function AboveMe(Xreal As Float, Yreal As Float, tolerance As Float, mode
         returnData[2] = 0
         Return True
 
-    Else If Me.BoundingPoligon.Count > 0 Then
+    Else If Me.Polygon.Count > 0 Then
 
-        If puntos.isInside(Me.BoundingPoligon, Me.BoundingPoligon.Count / 2, Xreal, yreal) Then
+        If puntos.isInside(Me.Polygon, Me.Polygon.Count / 2, Xreal, yreal) Then
             returnData[0] = Xreal
             returnData[1] = yreal
             returnData[2] = 0
@@ -202,9 +202,9 @@ Public Sub PointClick(Xr As Float, Yr As Float) As Boolean
 
     ' this could be overriden in the child
 
-    If Me.BoundingPoligon.Count = 0 Then Return False
+    If Me.Polygon.Count = 0 Then Return False
 
-    If puntos.isInside(Me.BoundingPoligon, Me.BoundingPoligon.Count / 2, xr, Yr) Then
+    If puntos.isInside(Me.Polygon, Me.Polygon.Count / 2, xr, Yr) Then
 
         Return True
     Else
@@ -226,7 +226,7 @@ End
 Public Sub Finish(ParamsDone As Integer) As Boolean
 
     'Print "Finish en EntityBase"
-    CreateBoundingPoligon
+    CreatePolygon
 
     ' busco el tipo de linea, si hace falta
     If Me.LineTypeName = "Dashed" Then Me.LineType = 1

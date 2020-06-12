@@ -22,7 +22,7 @@
 Create Static
 'Fast
 Inherits EntityBase
-Public Const GENDER As String = "Arc"
+Public Const Gender As String = "Arc"
 Public Const PointsToDraw As Integer = 1             ' minimal point requered for drawing something usefull
 Public Const HelperTrabajo As String = ("Draws an arc")
 Public Const ParamType As String = "PLAA"                             ' that is Point, Point, Float; could be Color Text, etc
@@ -87,15 +87,15 @@ Public Sub Draw(oE As Entity)
 
         Endif
 
-        oE.BoundingPoligon.Clear
+        oE.Polygon.Clear
         GL.Begin(gl.LINE_STRIP)
         angle_increment = Pi * 2 / 360
         For theta = 0 To Me.recorrido Step angle_increment
             ' el punto considerando 0,0 al centro
             x = oE.p[0] + oE.fParam[0] * Cos(Me.start + theta)
             y = oE.p[1] + oE.fParam[0] * Sin(Me.start + theta)
-            oE.BoundingPoligon.Add(x)
-            oE.BoundingPoligon.Add(y)
+            oE.Polygon.Add(x)
+            oE.Polygon.Add(y)
             GLplus.Vertex2D(x, y, oE.ColorToPaint)
         Next
         gl.End

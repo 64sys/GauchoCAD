@@ -22,7 +22,7 @@
 Create Static
 Fast
 Inherits EntityBase
-Public Const GENDER As String = "Ellipse"
+Public Const Gender As String = "Ellipse"
 Public Const PointsToDraw As Integer = 1             ' minimal point requered for drawing something usefull
 Public Const HelperTrabajo As String = ("Draw an ellipse")
 Public Const ParamType As String = "PPFFF"
@@ -66,7 +66,7 @@ Public Sub Draw(oE As Entity)
     Me.recorrido = oE.fParam[2] * Pi / 180 - Me.start
     If Me.recorrido < 0 Then Me.recorrido = 2 * Pi + Me.recorrido
 
-    oE.BoundingPoligon.Clear
+    oE.Polygon.Clear
     GL.Begin(gl.LINE_STRIP)
 
     angle_increment = Pi * 2 / 360
@@ -74,18 +74,18 @@ Public Sub Draw(oE As Entity)
         ' el punto considerando 0,0 al centro
         x = major * Cos(Me.start + theta)
         y = major * Sin(Me.start + theta)
-        oE.BoundingPoligon.Add(x)
-        oE.BoundingPoligon.Add(y)
+        oE.Polygon.Add(x)
+        oE.Polygon.Add(y)
 
         'GLplus.Vertex2D(radio * Cos(start_angle + theta), radio * Sin(start_angle + theta), colour)
     Next
 
     ' aplico las trnasformaciones
-    puntos.Scale(oE.BoundingPoligon, 1, minor / major)
-    puntos.Rotate(oE.BoundingPoligon, angle)
-    puntos.Translate(oE.BoundingPoligon, oE.p[0], oE.p[1])
-    For i = 0 To oE.BoundingPoligon.max Step 2
-        GLplus.Vertex2D(oE.BoundingPoligon[i], oE.BoundingPoligon[i + 1], oE.ColorToPaint)
+    puntos.Scale(oE.Polygon, 1, minor / major)
+    puntos.Rotate(oE.Polygon, angle)
+    puntos.Translate(oE.Polygon, oE.p[0], oE.p[1])
+    For i = 0 To oE.Polygon.max Step 2
+        GLplus.Vertex2D(oE.Polygon[i], oE.Polygon[i + 1], oE.ColorToPaint)
     Next
 
     GL.End
@@ -143,30 +143,30 @@ Public Function AboveMe(oE As Entity, Xreal As Float, Yreal As Float, tolerance 
     mode = 1 + 2 ' endpoint+midpoint
 
     fData.Clear
-    For i = 0 To oE.BoundingPoligon.count - 4 Step 2
-        If puntos.doIntersect(xreal - tolerance / 2, Yreal, Xreal + tolerance / 2, Yreal, oE.BoundingPoligon[i + 0], oE.BoundingPoligon[i + 1], oE.BoundingPoligon[i + 2], oE.BoundingPoligon[i + 3]) Or puntos.doIntersect(xreal, Yreal - tolerance / 2, Xreal, Yreal + tolerance / 2, oE.BoundingPoligon[i + 0], oE.BoundingPoligon[i + 1], oE.BoundingPoligon[i + 2], oE.BoundingPoligon[i + 3]) Then ' its above me
+    For i = 0 To oE.Polygon.count - 4 Step 2
+        If puntos.doIntersect(xreal - tolerance / 2, Yreal, Xreal + tolerance / 2, Yreal, oE.Polygon[i + 0], oE.Polygon[i + 1], oE.Polygon[i + 2], oE.Polygon[i + 3]) Or puntos.doIntersect(xreal, Yreal - tolerance / 2, Xreal, Yreal + tolerance / 2, oE.Polygon[i + 0], oE.Polygon[i + 1], oE.Polygon[i + 2], oE.Polygon[i + 3]) Then ' its above me
 
             ' busco el punto exacto en la linea donde se produce la interseccion
-            fData.Insert(puntos.lineLineIntersection([xreal - tolerance / 2, Yreal], [Xreal + tolerance / 2, Yreal], [oE.BoundingPoligon[i + 0], oE.BoundingPoligon[i + 1]], [oE.BoundingPoligon[i + 2], oE.BoundingPoligon[i + 3]]))
+            fData.Insert(puntos.lineLineIntersection([xreal - tolerance / 2, Yreal], [Xreal + tolerance / 2, Yreal], [oE.Polygon[i + 0], oE.Polygon[i + 1]], [oE.Polygon[i + 2], oE.Polygon[i + 3]]))
             ' veo que punto esta mas cerca
-            fDist1 = puntos.distancia(oE.BoundingPoligon[i + 0], oE.BoundingPoligon[i + 1], fData[0], fData[1])   ' end 1
-            fDist2 = puntos.distancia((oE.BoundingPoligon[i + 0] + oE.BoundingPoligon[i + 2]) / 2, (oE.BoundingPoligon[i + 1] + oE.BoundingPoligon[i + 3]) / 2, fData[0], fData[1])   ' mid
-            fDist3 = puntos.distancia(oE.BoundingPoligon[i + 2], oE.BoundingPoligon[i + 3], fData[0], fData[1])   ' end 2
+            fDist1 = puntos.distancia(oE.Polygon[i + 0], oE.Polygon[i + 1], fData[0], fData[1])   ' end 1
+            fDist2 = puntos.distancia((oE.Polygon[i + 0] + oE.Polygon[i + 2]) / 2, (oE.Polygon[i + 1] + oE.Polygon[i + 3]) / 2, fData[0], fData[1])   ' mid
+            fDist3 = puntos.distancia(oE.Polygon[i + 2], oE.Polygon[i + 3], fData[0], fData[1])   ' end 2
             If fdist1 > fdist2 Then
                 If fDist2 > fDist3 Then         ' End 2
-                    fData[0] = oE.BoundingPoligon[i + 2]
-                    fData[1] = oE.BoundingPoligon[i + 3]
+                    fData[0] = oE.Polygon[i + 2]
+                    fData[1] = oE.Polygon[i + 3]
                     fData.Add(1)                 ' 1 = EndPoint
                     Return True
                 Else
-                    fData[0] = (oE.BoundingPoligon[i + 0] + oE.BoundingPoligon[i + 2]) / 2
-                    fData[1] = (oE.BoundingPoligon[i + 1] + oE.BoundingPoligon[i + 3]) / 2
+                    fData[0] = (oE.Polygon[i + 0] + oE.Polygon[i + 2]) / 2
+                    fData[1] = (oE.Polygon[i + 1] + oE.Polygon[i + 3]) / 2
                     fData.Add(2)                 ' 2 = MidPoint
                     Return True
                 Endif
             Else
-                fData[0] = oE.BoundingPoligon[i + 0]
-                fData[1] = oE.BoundingPoligon[i + 1]
+                fData[0] = oE.Polygon[i + 0]
+                fData[1] = oE.Polygon[i + 1]
                 fData.Add(1)                     ' 1 = EndPoint
                 Return True
 
@@ -186,7 +186,7 @@ Public Sub Finish(oE As Entity, ParamsDone As Integer) As Boolean
     ' calculo el recorrido del arco como
     ' OJO en la ELLIPSE vienen en radianes, y en ARC en grados
 
-    'CreateBoundingPoligon
+    'CreatePolygon
 
     ' tareas finales de armado del objeto
     oE.b.resize(oE.P.count)

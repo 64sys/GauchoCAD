@@ -22,7 +22,7 @@
 
 Inherits ToolsBase
 Create Static
-Public Const GENDER As String = "Trim"
+Public Const Gender As String = "Trim"
 
 Public arrTijeras As New Integer[]
 
@@ -71,13 +71,13 @@ End
 
 Public Function MouseDown(mouseX As Integer, mouseY As Integer)
 
-    Dim i As Integer, oTijera As Object, v1, v2, flxIntersec As New Float[]
+    Dim i As Integer, oTijera As Entity, v1, v2, flxIntersec As New Float[]
 
     If Mouse.Left Then
 
         If appmain.hFcad.iEntity[2] >= 0 Then                               ' hay una entidad para recortar
 
-            Select Case appmain.hFcad.oEntity.GENDER                  ' tengo que ver cada caso particular
+            Select Case appmain.hFcad.oEntity.Gender                  ' tengo que ver cada caso particular
                 Case "Line"
                     ' busco las tijeras
                     For i = 0 To arrTijeras.Max
@@ -189,13 +189,13 @@ Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' called by FCAD->
 End
 
 '' Esta sub recorta una cosa con otra cosa
-Public Sub Recortar(oRecortar As Object, Xcorte As Float, Ycorte As Float, oTijera As Object)
+Public Sub Recortar(oRecortar As Entity, Xcorte As Float, Ycorte As Float, oTijera As Entity)
 
     Dim i, iii As Integer, v1, v2, flxIntersecMin, flxIntersec As New Float[], dIntersect, dIntersectMin As Float = 1e20
     Dim flxObjeto, flxTijera As Float[]
     Dim s1 As Integer
 
-    Select Case oTijera.GENDER
+    Select Case oTijera.Gender
         Case "Line"             ' recorto linea con linea
             If puntos.doIntersect(oRecortar.p[0], oRecortar.p[1], oRecortar.p[2], oRecortar.p[3], oTijera.p[0], oTijera.p[1], oTijera.p[2], oTijera.p[3]) Then
 
@@ -280,8 +280,8 @@ Public Sub Recortar(oRecortar As Object, Xcorte As Float, Ycorte As Float, oTije
             ' yo tengo que encontrar , para cada cruce de la tijera y la entidad , la distancia (o mejor dicho recorrido)
             ' entre el cruce y el click del usuario porque eso determina la parte a recortar
 
-            flxTijera = oTijera.BoundingPoligon
-            flxObjeto = oRecortar.BoundingPoligon
+            flxTijera = oTijera.Polygon
+            flxObjeto = oRecortar.Polygon
 
             ' Paso 1: encontrar el cruce que esta mas cerca del click del user sobre la entidad a recortar
             Do

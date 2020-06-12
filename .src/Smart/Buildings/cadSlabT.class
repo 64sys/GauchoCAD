@@ -25,7 +25,7 @@
 ' Elem V3
 Inherits BimEntityBase
 
-Public Const GENDER As String = "SlabT"
+Public Const Gender As String = "SlabT"
 Public Const DrawingOrder As Integer = 1
 Public Const PointsToDraw As Integer = 1
 Public Const OrtogonalForzado As Boolean = True
@@ -112,7 +112,7 @@ Public Sub Finish(ParamsDone As Integer) As Boolean
         Swap Me.p[1], Me.p[5]
 
     End If
-    Me.CreateBoundingPoligon
+    Me.CreatePolygon
     Me.ForDeletion = False
     Me.DrawAble = True
     Me.Selected = False
@@ -129,9 +129,9 @@ Public Sub Finish(ParamsDone As Integer) As Boolean
 
 End
 
-Public Sub CreateBoundingPoligon()
+Public Sub CreatePolygon()
 
-    Me.BoundingPoligon.Clear
-    Me.BoundingPoligon.Insert(Me.P.Copy())
+    Me.Polygon.Clear
+    Me.Polygon.Insert(Me.P.Copy())
 
 End

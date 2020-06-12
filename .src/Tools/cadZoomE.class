@@ -23,7 +23,7 @@
 ' Tool maintained by Terco
 Inherits ToolsBase
 Create Static
-Public Const GENDER As String = "ZoomE"
+Public Const Gender As String = "ZoomE"
 
 '  PanX y PanY estanen coordenadas de pantalla, o sea pixeles
 '  por lo tanto algo que este en la posicion Px se dibujara en el pixel xPix = Px + PanX

@@ -24,7 +24,7 @@
 ' Element maintained by Terco
 ' V3
 Inherits BIMEntityBase
-Public Const GENDER As String = "WallColumn"
+Public Const Gender As String = "WallColumn"
 Public Const DrawingOrder As Integer = 20 ' 1 a 100 esto debe Drawse primero y ser sobreescrito por el resto
 Public Const PointsToDraw As Integer = 1             ' minimal point requered for drawing something usefull
 Public Const HelperTrabajo As String = ("Insert a Wall Column")
@@ -85,7 +85,7 @@ Public Sub Finish(ParamsDone As Integer) As Boolean
     ' FIXME: eliminar variables que no se usan
 
     Me.fParam.add(0.2)         ' TODO: fix this when having params entered correctly
-    Me.CreateBoundingPoligon
+    Me.CreatePolygon
     Me.ForDeletion = False
     Me.DrawAble = True
     Me.Selected = False
@@ -101,11 +101,11 @@ Public Sub Finish(ParamsDone As Integer) As Boolean
 
 End
 
-Public Sub CreateBoundingPoligon()
+Public Sub CreatePolygon()
 
     ' checkk Viga / Beam to see how its done
 
-    Me.BoundingPoligon.Clear
+    Me.Polygon.Clear
 
     Dim BpX, BpZ, l As Float, Rotated As Float[]
     l = puntos.distancia(Me.p[0], Me.p[1], Me.p[2], Me.p[3])
@@ -118,7 +118,7 @@ Public Sub CreateBoundingPoligon()
     ' and, the rotated are
 
     rotated = puntos.RotateFromPointWithSinCos(Me.p[0], Me.p[1], (Me.p[3] - Me.p[1]) / l, (Me.p[2] - Me.p[0]) / l, BpX, Bpz)
-    Me.BoundingPoligon.Insert(rotated)     ' pair
+    Me.Polygon.Insert(rotated)     ' pair
 
     ' 2
     BpX = Me.p[0] + l
@@ -127,7 +127,7 @@ Public Sub CreateBoundingPoligon()
     ' and, the rotated are
 
     rotated = puntos.RotateFromPointWithSinCos(Me.p[0], Me.p[1], (Me.p[3] - Me.p[1]) / l, (Me.p[2] - Me.p[0]) / l, BpX, Bpz)
-    Me.BoundingPoligon.Insert(rotated)     ' pair
+    Me.Polygon.Insert(rotated)     ' pair
 
     ' 3
     BpX = Me.p[0] + l
@@ -136,7 +136,7 @@ Public Sub CreateBoundingPoligon()
     ' and, the rotated are
 
     rotated = puntos.RotateFromPointWithSinCos(Me.p[0], Me.p[1], (Me.p[3] - Me.p[1]) / l, (Me.p[2] - Me.p[0]) / l, BpX, Bpz)
-    Me.BoundingPoligon.Insert(rotated)     ' pair
+    Me.Polygon.Insert(rotated)     ' pair
 
     ' 4
     BpX = Me.p[0]
@@ -145,6 +145,6 @@ Public Sub CreateBoundingPoligon()
     ' and, the rotated are
 
     rotated = puntos.RotateFromPointWithSinCos(Me.p[0], Me.p[1], (Me.p[3] - Me.p[1]) / l, (Me.p[2] - Me.p[0]) / l, BpX, Bpz)
-    Me.BoundingPoligon.Insert(rotated)     ' pair
+    Me.Polygon.Insert(rotated)     ' pair
 
 End

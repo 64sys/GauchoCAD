@@ -22,19 +22,19 @@
 Create Static
 Inherits EntityBase
 
-Public Const GENDER As String = "Insert"
+Public Const Gender As String = "Insert"
 Public Const HelperTrabajo As String = ("Inserts a block")
 Public Const ParamType As String = "TPFFF"
 Public Const ParamHelper As String = ("BlockName; Position ; X scale ; Y scale ; Rotation")
 Public Const ParamDefault As String = "<no name>; 0,0 ; 1 ;1 ; 0"
 
-Public obxInsertos As New Object[]
+Public obxInsertos As New Entity[]
 Public ParentBlock As String
 
 Public Sub Draw(oE As Entity)
 
     '
-    Dim ET As Object, i As Integer
+    Dim ET As Entity, i As Integer
 
     i = clsEntities.FIndBlockID(oE.Block)
     If i < 0 Then Return
@@ -60,7 +60,7 @@ Public Function Draw2(oE As Entity)
     If Not oE.Visible Then Return
 
     If oE.Selected And Not modCAD.ToolActive Then oE.ColorToPaint = modCAD.ColorForSelected Else oE.ColorToPaint = modCAD.GetGBColor(oE.colour, oE.Layerid)
-    Dim ET As Object, i As Integer
+    Dim ET As Entity, i As Integer
     paint.save
     paint.Translate(appmain.hFcad.pixels(oE.p[0]) / appmain.hFcad.ScaleZoom, appmain.hFcad.pixels(oE.p[1]) / appmain.hFcad.ScaleZoom)
     paint.Scale(oE.fParam[0], oE.fParam[1])
@@ -79,7 +79,7 @@ Public Sub Finish(oE As Entity, ParamsDone As Integer) As Boolean
     ' ' we set the block property of all entities selected
     '
     ' ' if an entitty is part of other block, we look for that block
-    ' Dim e As Object, iBlock As Integer
+    ' Dim e As entity, iBlock As Integer
     '
     ' iBlock = clsEntities.GetFreeBlockNumber()
     ' oE.fParam.add(iBlock)

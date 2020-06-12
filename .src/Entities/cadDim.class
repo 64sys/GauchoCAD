@@ -21,7 +21,7 @@
 ' Boston, MA  02110-1301  USA
 Create Static
 Inherits EntityBase
-Public Const GENDER As String = "Cota"
+Public Const Gender As String = "Cota"
 Public Const DrawingOrder As Integer = 100 ' 1 a 32.724 esto debe Drawse primero y ser sobreescrito por el resto
 Public Const PointsToDraw As Integer = 1             ' minimal point requered for drawing something usefull
 Public Const HelperTrabajo As String = ("Insert an acotation")
@@ -32,7 +32,7 @@ Public Sub Draw(oE As Entity)
 
     Dim l As Float, angulo As Float, hText As New PaintExtents, lText As String, lPix As Integer
     Dim e As Float
-    Dim ET As Object, i As Integer
+    Dim ET As Entity, i As Integer
 
     If Not oE.Visible Then Return
     If oE.Selected And Not modCAD.ToolActive Then oE.ColorToPaint = modCAD.ColorForSelected Else oE.ColorToPaint = modCAD.GetGBColor(oE.colour, oE.Layerid)
@@ -58,7 +58,7 @@ Public Function Draw2(oE As Entity)
 
     Dim l As Float, angulo As Float, hText As New PaintExtents, lText As String, lPix As Integer
     Dim e As Float
-    Dim ET As Object, i As Integer
+    Dim ET As Entity, i As Integer
 
     If Not oE.Visible Then Return
 
@@ -109,11 +109,11 @@ Public Function Draw2(oE As Entity)
 
 End
 
-Public Sub CreateBoundingPoligon(oE As Entity)
+Public Sub CreatePolygon(oE As Entity)
 
     ' checkk Viga / Beam to see how its done
 
-    oE.BoundingPoligon.Clear
+    oE.Polygon.Clear
 
     Dim BpX, BpZ, l As Float, Rotated As Float[]
     l = puntos.distancia(oE.p[0], oE.p[1], oE.p[2], oE.p[3])
@@ -126,7 +126,7 @@ Public Sub CreateBoundingPoligon(oE As Entity)
     ' and, the rotated are
 
     rotated = puntos.RotateFromPointWithSinCos(oE.p[0], oE.p[1], (oE.p[3] - oE.p[1]) / l, (oE.p[2] - oE.p[0]) / l, BpX, Bpz)
-    oE.BoundingPoligon.Insert(rotated)     ' pair
+    oE.Polygon.Insert(rotated)     ' pair
 
     ' 2
     BpX = oE.p[0] + l
@@ -135,7 +135,7 @@ Public Sub CreateBoundingPoligon(oE As Entity)
     ' and, the rotated are
 
     rotated = puntos.RotateFromPointWithSinCos(oE.p[0], oE.p[1], (oE.p[3] - oE.p[1]) / l, (oE.p[2] - oE.p[0]) / l, BpX, Bpz)
-    oE.BoundingPoligon.Insert(rotated)     ' pair
+    oE.Polygon.Insert(rotated)     ' pair
 
     ' 3
     BpX = oE.p[0] + l
@@ -144,7 +144,7 @@ Public Sub CreateBoundingPoligon(oE As Entity)
     ' and, the rotated are
 
     rotated = puntos.RotateFromPointWithSinCos(oE.p[0], oE.p[1], (oE.p[3] - oE.p[1]) / l, (oE.p[2] - oE.p[0]) / l, BpX, Bpz)
-    oE.BoundingPoligon.Insert(rotated)     ' pair
+    oE.Polygon.Insert(rotated)     ' pair
 
     ' 4
     BpX = oE.p[0]
@@ -153,6 +153,6 @@ Public Sub CreateBoundingPoligon(oE As Entity)
     ' and, the rotated are
 
     rotated = puntos.RotateFromPointWithSinCos(oE.p[0], oE.p[1], (oE.p[3] - oE.p[1]) / l, (oE.p[2] - oE.p[0]) / l, BpX, Bpz)
-    oE.BoundingPoligon.Insert(rotated)     ' pair
+    oE.Polygon.Insert(rotated)     ' pair
 
 End

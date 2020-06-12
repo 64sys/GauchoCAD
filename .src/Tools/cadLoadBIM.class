@@ -21,7 +21,7 @@
 ' Boston, MA  02110-1301  USA
 
 Inherits ToolsBase
-Public Const GENDER As String = "LoadBIN"
+Public Const Gender As String = "LoadBIN"
 
 Public Function Start(Optional filename As Variant, Optional _mode As Integer = 0) As Boolean
 

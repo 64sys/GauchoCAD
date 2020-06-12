@@ -98,7 +98,6 @@ Public oEntity As Entity                   ' la entidad
 Public flgShowPOIinfo As Boolean = True
 
 ' OpenGl stuff
-
 Public GlListAllEntities As Integer
 Public GlListSelectedEntities As Integer
 
@@ -181,7 +180,7 @@ Public Sub GLArea1_draw()
     ' Primero la grid
     ' clsDrawingAids.DrawGrid
 
-    If modCAD.DrawBounds Then clsDrawingAids.DrawBoundingPoligons
+    If modCAD.DrawBounds Then clsDrawingAids.DrawPolygons
 
     clsDrawingAids.DrawCoordenadas
 

@@ -222,9 +222,9 @@ Public Sub DrawCaudricula()
 
 End
 
-Public Sub DrawBoundingPoligons() ' and other debugging stuff
+Public Sub DrawPolygons() ' and other debugging stuff
 
-    Dim e As Object, i As Integer, p0, p1 As Float
+    Dim e As Entity, i As Integer, p0, p1 As Float
 
     HelperTrabajo2 = "modCAD.clsJob: " & Str(modCAD.clsJob) & "->" & Str(clsEntityBuilder.elem)
     '
@@ -239,7 +239,7 @@ Public Sub DrawBoundingPoligons() ' and other debugging stuff
 
     For Each e In APPMain.hFCAD.arrEntities
 
-        If e.boundingpoligon.count > 0 Then glPlus.Polygon(e.boundingpoligon, Color.Blue, 1)
+        If e.Polygon.count > 0 Then glPlus.Polygon(e.Polygon, Color.Blue, 1)
 
     Next
 

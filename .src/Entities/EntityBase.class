@@ -24,7 +24,7 @@ Create Static
 Fast
 
 Public Const GAMBASCADENTITY As String = ("EntityBase")
-Public Const GENDER As String = "Arc"
+Public Const Gender As String = "Arc"
 Public Const USEWITH As String = "clsEntityBuilder"
 Public Const DrawingOrder As Integer = 0        ' 1 = draws first
 Public Const PointsToDraw As Integer = 1             ' minimal point requered for drawing something usefull
@@ -52,7 +52,7 @@ End
 
 '' Las entidades pueden proveer un poligono que las envuelva
 '' el mismo su usara para seleccionarlas.
-Public Sub CreateBoundingPoligon(oE As Entity)
+Public Sub CreatePolygon(oE As Entity)
 
 End
 
@@ -66,71 +66,72 @@ End
 
 '' Determines if the entity was selected by a rectanle surrounding al points
 '' by default, if ALL points are selected, it can.
-' Public Function SelFull(oE As Entity, X1real As Float, Y1real As Float, X2real As Float, Y2real As Float) As Boolean
-'
-'     Dim i As Integer, puedo As Boolean
-'
-'     ' Si tengo un bounding poligon, entonces verifico que todos los puntos esten dentro
-'     If oE.BoundingPoligon.Count > 0 Then
-'
-'         Return puntos.IsPoligonInsideRect(oE.BoundingPoligon, X1real, Y1real, X2real, Y2real)
-'
-'     Else    ' no tengo un poligono, entonces verifico que todos los puntos definitorios de al entidad esten dentro
-'
-'         puedo = True                     ' supongamos que puedo, por ahora
-'         For i = 0 To oE.p.max Step 2
-'             If Not (oE.p[i] >= X1real And oE.p[i] <= X2real) And (oE.p[i + 1] >= Y1real And oE.p[i + 1] <= Y2real) Then
-'                 puedo = False
-'             End If
-'         Next
-'
-'         If puedo Then
-'             For i = 0 To oE.PSel.Max
-'                 oE.PSel[i] = True
-'             Next
-'
-'             Return True
-'         Else
-'             For i = 0 To oE.PSel.Max
-'                 oE.PSel[i] = False
-'             Next
-'
-'             Return False
-'         End If
-'     Endif
-'
-' End
+Public Function SelFull(oE As Entity, X1real As Float, Y1real As Float, X2real As Float, Y2real As Float) As Boolean
+
+    Dim i As Integer, puedo As Boolean
+
+    ' Si tengo un bounding poligon, entonces verifico que todos los puntos esten dentro
+    If oE.Polygon.Count > 0 Then
+
+        Return puntos.IsPoligonInsideRect(oE.Polygon, X1real, Y1real, X2real, Y2real)
+
+    Else    ' no tengo un poligono, entonces verifico que todos los puntos definitorios de al entidad esten dentro
+
+        puedo = True                     ' supongamos que puedo, por ahora
+        For i = 0 To oE.p.max Step 2
+            If Not (oE.p[i] >= X1real And oE.p[i] <= X2real) And (oE.p[i + 1] >= Y1real And oE.p[i + 1] <= Y2real) Then
+                puedo = False
+            End If
+        Next
+
+        If puedo Then
+            For i = 0 To oE.PSel.Max
+                oE.PSel[i] = True
+            Next
+
+            Return True
+        Else
+            For i = 0 To oE.PSel.Max
+                oE.PSel[i] = False
+            Next
+
+            Return False
+        End If
+    Endif
+
+End
 '
 ' '' Determines if the entity can be stretched
 ' '' by default, if ANY point is selected, it can.
-' Public Function SelPartial(oE As Entity, X1real As Float, Y1real As Float, X2real As Float, Y2real As Float) As Boolean
-'
-'     Dim i As Integer, puedo As Boolean
-'
-'     ' Si tengo un bounding poligon, entonces verifico que alguna linea lo cruce
-'     If oE.BoundingPoligon.Count > 0 Then
-'
-'         Return puntos.IsPoligonCrossingRect(oE.BoundingPoligon, X1real, Y1real, X2real, Y2real)
-'
-'     Else    ' no tengo un poligono, entonces verifico que todos los puntos definitorios de al entidad esten dentro
-'
-'         puedo = False
-'         For i = 0 To oE.p.max Step 2
-'             If (oE.p[i] >= X1real And oE.p[i] <= X2real) And (oE.p[i + 1] >= Y1real And oE.p[i + 1] <= Y2real) Then
-'                 oE.PSel[i / 2] = True
-'                 puedo = True
-'             End If
-'         Next
-'
-'         If puedo Then
-'
-'             Return True
-'         Else
-'             Return False
-'         End If
-'     End If
-'
-' End
+
+Public Function SelPartial(oE As Entity, X1real As Float, Y1real As Float, X2real As Float, Y2real As Float) As Boolean
+
+    Dim i As Integer, puedo As Boolean
+
+    ' Si tengo un bounding poligon, entonces verifico que alguna linea lo cruce
+    If oE.Polygon.Count > 0 Then
+
+        Return puntos.IsPoligonCrossingRect(oE.Polygon, X1real, Y1real, X2real, Y2real)
+
+    Else    ' no tengo un poligono, entonces verifico que todos los puntos definitorios de al entidad esten dentro
+
+        puedo = False
+        For i = 0 To oE.p.max Step 2
+            If (oE.p[i] >= X1real And oE.p[i] <= X2real) And (oE.p[i + 1] >= Y1real And oE.p[i + 1] <= Y2real) Then
+                oE.PSel[i / 2] = True
+                puedo = True
+            End If
+        Next
+
+        If puedo Then
+
+            Return True
+        Else
+            Return False
+        End If
+    End If
+
+End
 
 ''      0 No busca nada en particular = Nearest
 ''      1       Endpoint
@@ -156,9 +157,9 @@ End
 '         returnData[2] = 0
 '         Return True
 '
-'     Else If oE.BoundingPoligon.Count > 0 Then
+'     Else If oE.Polygon.Count > 0 Then
 '
-'         If puntos.isInside(oE.BoundingPoligon, oE.BoundingPoligon.Count / 2, Xreal, yreal) Then
+'         If puntos.isInside(oE.Polygon, oE.Polygon.Count / 2, Xreal, yreal) Then
 '             returnData[0] = Xreal
 '             returnData[1] = yreal
 '             returnData[2] = 0
@@ -178,9 +179,9 @@ Public Sub PointClick(oE As Entity, Xr As Float, Yr As Float) As Boolean
 
     ' this could be overriden in the child
 
-    If oE.BoundingPoligon.Count = 0 Then Return False
+    If oE.Polygon.Count = 0 Then Return False
 
-    If puntos.isInside(oE.BoundingPoligon, oE.BoundingPoligon.Count / 2, xr, Yr) Then
+    If puntos.isInside(oE.Polygon, oE.Polygon.Count / 2, xr, Yr) Then
 
         Return True
     Else
@@ -202,7 +203,7 @@ End
 Public Sub Finish(oE As Entity, ParamsDone As Integer) As Boolean
 
     'Print "Finish en EntityBase"
-    'CreateBoundingPoligon(oe)
+    'CreatePolygon(oe)
     BuildPOI(oe)
 
     ' busco el tipo de linea, si hace falta
