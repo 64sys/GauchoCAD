@@ -93,6 +93,7 @@ Public poiPoligonElements As New Integer[]
 Public poiPoligonEntities As New Integer[]      ' related entity
 
 ' interaccion del mouse en pantalla
+Public LastPoint As New Float[]                ' ultimo punto marcado o null si no existe
 Public iEntity As New Single[]             ' las coordenadas del punto encontrado y el tipo de punto
 Public oEntity As Entity                   ' la entidad
 Public flgShowPOIinfo As Boolean = True
@@ -284,10 +285,7 @@ Public Sub GLArea1_MouseMove()
         Case Else
             flgShowPOIinfo = True
             clsEntities.CheckPOI(Xreal(mouse.x), Yreal(mouse.y))
-            If iEntity[2] = 16 Then clsDrawingAids.Helper.texto = ("Quadrant")
-            If iEntity[2] = 8 Then clsDrawingAids.Helper.texto = ("Center")
-            If iEntity[2] = 2 Then clsDrawingAids.Helper.texto = ("MidPoint")
-            If iEntity[2] = 1 Then clsDrawingAids.Helper.texto = ("EndPoint")
+
             clsDrawingAids.Helper.dX = 15
             clsDrawingAids.Helper.dY = 15
             clsDrawingAids.Helper.fColor = Color.DarkBlue

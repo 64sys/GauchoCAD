@@ -202,12 +202,25 @@ Public Sub CheckPOI(xr As Float, Yr As Float)
 
     Dim rData As New Float[], e As Entity
     Dim i, iPoligon, iLine, iPoint As Integer
+    Dim pend1, base1, pend2, base2 As Float ' vars para las ecuacionesde las rectas
+    Dim puntoB, puntoA As New Float[]
+
+    ' distancias  los enganches, para determinar cual es el mas cercano al puntero
+    Dim DistPer As Float = 1e6
+    Dim DistEnd1 As Float = 1e6
+    Dim DistEnd2 As Float = 1e6
+    Dim DistMid As Float = 1e6
+    Dim DistBase As Float = 1e6
+    Dim DistTang As Float = 1e6
+    Dim DistQuad As Float = 1e6
+    Dim DistCenter As Float = 1e6
+    Dim Dist As Float = 1e7  ' el menor
 
     If Me.flgSearchingPOI Then Return   ' no nesting this
     Me.flgSearchingPOI = True
 
     APPMain.hFCAD.iEntity.Clear
-    'Dim t As Float = Timer
+    Dim t As Float = Timer
     'iPoligon = puntos.FindPOIPoligon(xr, yr, APPMain.hFCAD.poiPoligons, APPMain.hFCAD.poiPoligonStartIndex, APPMain.hFCAD.poiPoligonElements)
     'iLine = puntos.FindPOILines(xr, yr, APPMain.hFCAD.poiLines, APPMain.hFCAD.Metros(16))
     rdata = puntos.FindPOI(xr, yr, APPMain.hFCAD.poiPoints, APPMain.hFCAD.Metros(16))
@@ -215,25 +228,115 @@ Public Sub CheckPOI(xr As Float, Yr As Float)
 
     t = Timer
     e = CheckAboveEntity(xr, yr, APPMain.hFCAD.Metros(16))
-    'If e Then Debug "Checked above ", e.gender, Timer - t
+    If e Then                                               ' ofrezco opciones de enganche
 
-    i = -1
-    ' If iPoligon >= 0 Then
-    '
-    '     i = APPMain.hFCAD.poiPoligonEntities[iPoligon]
-    '
-    ' Else If iLine >= 0 Then
-    '     i = APPMain.hFCAD.poiLinesEntities[iLine]
-    ' Else If rdata[2] >= 0 Then
-    '
-    '     i = APPMain.hFCAD.poiEntities[rdata[2]]
-    ' Endif
+        If APPMain.hFCAD.LastPoint Then                     ' tengo un punto anterior
 
-    If i >= 0 Then
+            Select Case e.Gender
 
-        'Debug "Nearest found at ", rData[0], rData[1]
-        APPMain.hFCAD.iEntity.Insert(rData)
-        APPMain.hFCAD.oEntity = APPMain.hFCAD.arrEntities[i]
+                Case "Line"
+
+                    ' perpendicular
+
+                    If e.P[2] - e.P[0] <> 0 Then
+                        pend1 = (e.P[3] - e.P[1]) / (e.P[2] - e.P[0])
+                        base1 = e.P[1] - pend1 * e.P[0]                 ' Y = pend1 X + base1
+
+                        ' ecuacion de la recta perpendicular que pasa por el punto anterior
+                        pend2 = -1 / pend1
+                        base2 = APPMain.hFCAD.LastPoint[1] - pend2 * APPMain.hFCAD.LastPoint[0]
+
+                        ' necesito otro punto
+                        If APPMain.hFCAD.LastPoint[0] <> 0 Then
+                            puntoA.Add(0)
+                            puntoA.Add(base2)
+                        Else
+                            puntoA.Add(1)
+                            puntoA.Add(pend2 + base2)
+
+                        End If
+
+                        ' determino la interseccion de ambas
+                        puntoB = puntos.lineLineIntersection(APPMain.hFCAD.LastPoint, puntoA, [e.P[0], e.P[1]], [e.P[2], e.P[3]])
+
+                    Else        ' la recta es vertical
+
+                        puntoB.Add(e.P[0])
+                        puntoB.Add(APPMain.hFCAD.LastPoint[1])
+
+                    End If
+
+                    ' veo si el punto b esta entre los extremos de la linea , aunque deberia estarlo!!!
+                    If puntos.onSegment(e.P[0], e.P[1], puntoB[0], puntoB[1], e.P[2], e.P[3]) Then
+
+                        ' determino la distancia al puntero para ofrecerlo como opcion de enganche
+                        DistPer = puntos.distancia(puntoB[0], puntoB[1], xr, yr)
+
+                    Endif
+            End Select
+        End If
+
+        Select Case e.Gender
+            Case "Line"
+                ' otros puntos
+                DistEnd1 = puntos.distancia(e.P[0], e.P[1], xr, yr)
+
+                DistEnd2 = puntos.distancia(e.P[2], e.P[3], xr, yr)
+
+                DistMid = puntos.distancia((e.P[2] + e.P[0]) / 2, (e.P[3] + e.P[1]) / 2, xr, yr)
+
+            Case "Text", "MText"
+
+                DistBase = puntos.distancia(e.P[0], e.P[1], xr, yr)
+
+            Case "Circle", "Ellipse", "Arc"
+
+                DistCenter = puntos.distancia(e.P[0], e.P[1], xr, yr)
+
+        End Select
+
+        ' veo cual es la opcion mas cercana al puntero
+
+        ' dist = Min(DistBase, DistCenter, DistEnd1, DistEnd2, DistMid, DistPer, DistQuad) ' NO FUNCIONA
+
+        If Dist > DistBase Then dist = DistBase
+        If Dist > DistCenter Then dist = DistCenter
+        If Dist > DistEnd1 Then dist = DistEnd1
+        If Dist > DistEnd2 Then dist = DistEnd2
+        If Dist > DistMid Then dist = DistMid
+        If Dist > DistPer Then dist = DistPer
+        If Dist > DistQuad Then dist = DistQuad
+        If Dist > DistTang Then dist = DistTang
+
+        ' ofrezco ese punto
+        If dist = DistEnd1 Then
+            APPMain.hFCAD.iEntity.Insert([e.P[0], e.P[1], gcd.poiEndPoint])
+            clsDrawingAids.Helper.texto = "EndPoint"
+        End If
+
+        ' ofrezco ese punto
+        If dist = DistEnd2 Then
+            APPMain.hFCAD.iEntity.Insert([e.P[2], e.P[3], gcd.poiEndPoint])
+            clsDrawingAids.Helper.texto = "EndPoint"
+        End If
+
+        ' ofrezco ese punto
+        If dist = DistMid Then
+            APPMain.hFCAD.iEntity.Insert([(e.P[2] + e.P[0]) / 2, (e.P[3] + e.P[1]) / 2, gcd.poiMidPoint])
+            clsDrawingAids.Helper.texto = "MidPoint"
+        End If
+
+        ' ofrezco ese punto
+        If dist = DistPer Then
+            APPMain.hFCAD.iEntity.Insert([puntoB[0], puntoB[1], gcd.poiPerpendicular])
+            clsDrawingAids.Helper.texto = "Perpendicular"
+        End If
+
+        APPMain.hFCAD.oEntity = e
+        If APPMain.hFCAD.iEntity.Count = 0 Then ' situacion no prevista aun
+            clsDrawingAids.Helper.texto = ""
+            APPMain.hFCAD.iEntity.Insert([0, 0, -1])
+        End If
 
     Else
         clsDrawingAids.Helper.texto = ""

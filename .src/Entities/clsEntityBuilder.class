@@ -281,6 +281,10 @@ Public Sub AdvanceStep()
             If ParamDefault[elem.StepsDone] <> "" Then clsDrawingAids.HelperTrabajoNext &= "[" & ParamDefault[elem.StepsDone] & "]"           ' try in case of lack of desciption or keep last
         End If
 
+        ' last point
+        appmain.hFCAD.LastPoint.Clear
+        Try appmain.hFCAD.LastPoint.Insert([elem.P[(iPoints - 1) * 2], elem.P[(iPoints - 1) * 2 + 1]])
+
         ' we set the next point in the same position of this
         Try elem.P[iPoints * 2] = elem.P[(iPoints - 1) * 2]
         Try elem.P[iPoints * 2 + 1] = elem.P[(iPoints - 1) * 2 + 1]
