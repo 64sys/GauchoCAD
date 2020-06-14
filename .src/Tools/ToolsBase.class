@@ -41,6 +41,7 @@ Public PointsDone As Integer
 Public PointsTotal As Integer
 
 Public Active As Boolean = False
+Public PoiChecking As Boolean = False
 Public Mode As Integer
 
 Public inxSelected As New Integer[]

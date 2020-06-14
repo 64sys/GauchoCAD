@@ -39,29 +39,19 @@ Public Finished As Boolean = False          ' colocar en true cuando se llegue a
 Public StepsDone As Integer                 ' esto lo cambia cls ElementBuilder durante la construccion
 ' point of interest
 
-Public Sub _new()
-
-End
-
-Public Function _compare(cosas As Object) As Integer
-
-    Return Sgn(Me.DrawingOrder - cosas.DrawingOrder)
-
-End
-
 '' Las entidades pueden proveer un poligono que las envuelva
 '' el mismo su usara para seleccionarlas.
 Public Sub CreatePolygon(oE As Entity)
 
 End
 
-' Public Sub Draw(oE As Entity)
-'
-'     If Not oE.Visible Then Return
-'
-'     ' AQUI VAN LAS RUTINAS DE DIBUJO
-'
-' End
+Public Sub Draw(oE As Entity)
+
+    If Not oE.Visible Then Return
+
+    ' AQUI VAN LAS RUTINAS DE DIBUJO
+
+End
 
 ''      0 No busca nada en particular = Nearest
 ''      1       Endpoint

@@ -33,6 +33,7 @@ Public Function Start(Optional ElemToBuild As Variant, Optional _Mode As Integer
     '       1 = Stretch, selection may be partial, each element is called to see if the support stretching
 
     Me.Mode = _Mode
+    Me.PoiChecking = True
 
 End
 
@@ -59,7 +60,7 @@ Public Function MouseDown(mouseX As Integer, mouseY As Integer) ' esta rutina es
 
             Me.SelEndX = Me.SelStartX
             Me.SelEndy = Me.SelStartY
-
+            Me.PoiChecking = False
             Me.Active = True
         End If
     End If
@@ -75,6 +76,7 @@ Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' esta rutina es l
         Dim Crossing As Boolean = False
         ' corrijo para start<end
         Me.Active = False
+        Me.PoiChecking = True
         If Me.SelStartX > Me.SelEndX Then
             crossing = True
             Swap Me.SelStartX, Me.SelEndX

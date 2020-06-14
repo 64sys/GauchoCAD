@@ -21,13 +21,25 @@
 ' Boston, MA  02110-1301  USA
 Create Static
 'Fast
-Inherits EntityBase
+
 Public Const Gender As String = "Circle"
 Public Const PointsToDraw As Integer = 1             ' minimal point requered for drawing something usefull
 Public Const HelperTrabajo As String = ("Draw a circle")
 Public Const ParamType As String = "PL"                             ' that is Point, Point, Float; could be Color Text, etc
 Public Const ParamHelper As String = ("Start point;Radious")      ' a little text that is shown at the prompt waiting for user input during build
 Public Const ParamDefault As String = " ; 1 "
+Public Const GAMBASCADENTITY As String = ("EntityBase")
+Public Const USEWITH As String = "clsEntityBuilder"
+Public Const DrawingOrder As Integer = 0        ' 1 = draws first
+Public Const OrtogonalIgnorado As Boolean = False
+Public Const OrtogonalForzado As Boolean = False
+Public Const StretchAble As Boolean = True           ' Si lo puedo deformar
+Public Selected As Boolean
+Public ForDeletion As Boolean = True        ' this must be falsed in Finish
+Public DrawAble As Boolean = False          ' True si durante la construccion ya tiene suficientes elementos para poder hacer una representacion digna
+Public Visible As Boolean = True            ' si esta entidad puede ser mostrada independientmente
+Public Finished As Boolean = False          ' colocar en true cuando se llegue a completar
+Public StepsDone As Integer                 ' esto lo cambia cls ElementBuilder durante la construccion
 
 Public Sub Draw(oE As Entity)
 
@@ -37,18 +49,26 @@ Public Sub Draw(oE As Entity)
 
     If oE.Selected And Not modCAD.ToolActive Then oE.ColorToPaint = modCAD.ColorForSelected Else oE.ColorToPaint = modCAD.GetGBColor(oE.colour, oE.Layerid)
 
-    oE.Polygon.Clear
+    oE.polyline.Clear
     GL.Begin(gl.LINE_STRIP)
     angle_increment = Pi * 2 / 360
     For theta = 0 To 2 * Pi Step angle_increment
         ' el punto considerando 0,0 al centro
         x = oE.p[0] + oE.fParam[0] * Cos(theta)
         y = oE.p[1] + oE.fParam[0] * Sin(theta)
-        oE.Polygon.Add(x)
-        oE.Polygon.Add(y)
+        oE.polyline.Add(x)
+        oE.polyline.Add(y)
         GLplus.Vertex2D(x, y, oE.ColorToPaint)
     Next
     gl.End
+
+End
+
+'' A fat version of the entity
+Public Sub DrawRemark(oE As Entity)
+
+    GLplus.PolyLines(oE.PolyLine, modCAD.WindowBackColor, oE.LineWidth, gcd.stiDashed)
+    GLplus.PolyLines(oE.PolyLine, oE.ColorToPaint, oE.LineWidth + 2, oE.LineType)
 
 End
 
@@ -67,55 +87,36 @@ Public Function Draw2(oE As Entity)
     paint.Stroke
 
 End
+'' Creo los puntos de interes
+'' Build point of interest
 
-Public Function AboveMe(oE As Entity, Xreal As Float, Yreal As Float, tolerance As Float, mode As Integer, fData As Float[]) As Boolean
-    ' si una de las dos lineas de una cruz con centro en X,Y y largo Tolerance cruza la linea, estamos arriba
-    'Dim fData As New Float[]
+Public Function BuildPOI(oE As Entity, Optional arrIndex As Integer = -1) As Integer
 
-    Dim fDist1, fDist2, fDist3, fDist4 As Float
-    'TODO: para debug, agrego esto
-    mode = 1 + 2 ' endpoint+midpoint
+End
+' This function will return False if the element couldn't be created for some reason: bad or incomple user input
+' True means all is good, False will instruct the clsEntityBuilder to delete it
 
-    fData.Clear
+Public Sub Finish(oE As Entity, ParamsDone As Integer) As Boolean
 
-    ' reviso el circulo
-    fDist1 = puntos.distancia(xreal, Yreal, oE.P[0], oE.P[1])
-    If (fdist1 <= oE.fParam[0] + tolerance) And (fdist1 >= oE.fParam[0] - tolerance) Then   ' estoy arriba
-        fData.Insert([xreal, yreal, 0])
-        ' puedo entregar un cuadrante como POI
-        If puntos.Around(xreal, Yreal, oE.P[0] + oE.fParam[0], oE.P[1], tolerance) Then
-            fData[0] = oE.P[0] + oE.fParam[0]
-            fData[1] = oE.P[1]
-            fData.Add(16)                 ' 16      Quadrant
-        Endif
+    'Print "Finish en EntityBase"
+    'CreatePolygon(oe)
+    BuildPOI(oe)
 
-        If puntos.Around(xreal, Yreal, oE.P[0] - oE.fParam[0], oE.P[1], tolerance) Then
-            fData[0] = oE.P[0] - oE.fParam[0]
-            fData[1] = oE.P[1]
-            fData.Add(16)                 ' 16      Quadrant
-        Endif
-        If puntos.Around(xreal, Yreal, oE.P[0], oE.P[1] + oE.fParam[0], tolerance) Then
-            fData[0] = oE.P[0]
-            fData[1] = oE.P[1] + oE.fParam[0]
-            fData.Add(16)                 ' 16      Quadrant
-        Endif
+    ' busco el tipo de linea, si hace falta
+    If oE.LineTypeName = "Dashed" Then oE.LineType = 1
+    ' tareas finales de armado del objeto
+    oE.b.resize(oE.P.count)
+    oE.psel.resize(oE.p.count / 2)
+    oE.ForDeletion = False
+    oE.DrawAble = True
+    oE.Selected = False
+    oE.Finished = True
 
-        If puntos.Around(xreal, Yreal, oE.P[0], oE.P[1] - oE.fParam[0], tolerance) Then
-            fData[0] = oE.P[0]
-            fData[1] = oE.P[1] - oE.fParam[0]
-            fData.Add(16)                 ' 16      Quadrant
-        Endif
-        Return True
+    If Not True Then
+
+        oE.ForDeletion = True
+        oE.DrawAble = False
+
     End If
-
-    If puntos.Around(xreal, Yreal, oE.P[0], oE.P[1], tolerance) Then
-        fData.Insert([xreal, yreal, 0])
-        fData[0] = oE.P[0]
-        fData[1] = oE.P[1] - oE.fParam[0]
-        fData.Add(8)                    ' 8      Center
-        Return True
-    Endif
-
-    Return False
 
 End

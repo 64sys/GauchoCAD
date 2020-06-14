@@ -6,6 +6,8 @@ Authors: Terco, Tincho, Postpase, Vuott
 
 VER       DATE      CHANGES
 --------------------------------------------------------------------------------------------------------------------
+0.0.66	14/06/20	Added entity remark when hovering.
+
 0.0.64	11/06/20	Entity classes are now responsible for deciding if they're drawable or not
 
 0.0.62	10/06/20	Go to Static classes and instanced entity data only.

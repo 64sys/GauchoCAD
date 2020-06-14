@@ -20,13 +20,25 @@
 ' Foundation, Inc., 51 Franklin St, Fifth Floor,
 ' Boston, MA  02110-1301  USA
 Create Static
-Inherits EntityBase
 
 Public Const Gender As String = "Insert"
 Public Const HelperTrabajo As String = ("Inserts a block")
 Public Const ParamType As String = "TPFFF"
 Public Const ParamHelper As String = ("BlockName; Position ; X scale ; Y scale ; Rotation")
 Public Const ParamDefault As String = "<no name>; 0,0 ; 1 ;1 ; 0"
+Public Const GAMBASCADENTITY As String = ("EntityBase")
+Public Const USEWITH As String = "clsEntityBuilder"
+Public Const DrawingOrder As Integer = 0        ' 1 = draws first
+Public Const PointsToDraw As Integer = 1             ' minimal point requered for drawing something usefull
+Public Const OrtogonalIgnorado As Boolean = False
+Public Const OrtogonalForzado As Boolean = False
+Public Const StretchAble As Boolean = True           ' Si lo puedo deformar
+Public Selected As Boolean
+Public ForDeletion As Boolean = True        ' this must be falsed in Finish
+Public DrawAble As Boolean = False          ' True si durante la construccion ya tiene suficientes elementos para poder hacer una representacion digna
+Public Visible As Boolean = True            ' si esta entidad puede ser mostrada independientmente
+Public Finished As Boolean = False          ' colocar en true cuando se llegue a completar
+Public StepsDone As Integer                 ' esto lo cambia cls ElementBuilder durante la construccion
 
 Public Sub Draw(oE As Entity)
 
@@ -52,6 +64,11 @@ Public Sub Draw(oE As Entity)
 
 End
 
+'' A fat version of the entity
+Public Sub DrawRemark(oE As Entity)
+
+End
+
 Public Function Draw2(oE As Entity)
 
     If Not oE.Visible Then Return
@@ -68,5 +85,32 @@ Public Function Draw2(oE As Entity)
     Next
     modCAD.ScaleLines = 1
     paint.Restore
+
+End
+
+' This function will return False if the element couldn't be created for some reason: bad or incomple user input
+' True means all is good, False will instruct the clsEntityBuilder to delete it
+Public Sub Finish(oE As Entity, ParamsDone As Integer) As Boolean
+
+    'Print "Finish en EntityBase"
+    'CreatePolygon(oe)
+    'BuildPOI(oe)
+
+    ' busco el tipo de linea, si hace falta
+    If oE.LineTypeName = "Dashed" Then oE.LineType = 1
+    ' tareas finales de armado del objeto
+    oE.b.resize(oE.P.count)
+    oE.psel.resize(oE.p.count / 2)
+    oE.ForDeletion = False
+    oE.DrawAble = True
+    oE.Selected = False
+    oE.Finished = True
+
+    If Not True Then
+
+        oE.ForDeletion = True
+        oE.DrawAble = False
+
+    End If
 
 End

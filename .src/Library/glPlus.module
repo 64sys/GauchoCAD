@@ -327,8 +327,6 @@ End
 '' Dibuja un serie de lineas
 Public Function Lines(vertices As Float[], Optional colour As Integer = 0, LineWidth As Float = 1, dashes As Integer)
 
-    ' TODO: dashes is for later use
-
     Dim i As Integer
 
     'glColorRGB(colour)
@@ -336,6 +334,9 @@ Public Function Lines(vertices As Float[], Optional colour As Integer = 0, LineW
     If dashes > 0 Then
         gl.LineStipple(LineStippleScales[dashes], LineStipples[dashes])
         gl.Enable(GL.LINE_STIPPLE)
+    Else
+
+        gl.Disable(GL.LINE_STIPPLE)
 
     Endif
 
@@ -355,12 +356,20 @@ End
 '' Dibuja un seria de polilinea
 Public Function PolygonFilled(vertices As Float[], Optional colour As Integer = 0, FillColor As Integer = 0, LineWidth As Float = 1, dashes As Integer)
 
-    ' TODO: dashes is for later use
-
     Dim i As Integer
 
     'glColorRGB(colour)
     gl.LineWidth(LineWidth) ' obsoleto en WebGL
+
+    If dashes > 0 Then
+        gl.LineStipple(LineStippleScales[dashes], LineStipples[dashes])
+        gl.Enable(GL.LINE_STIPPLE)
+    Else
+
+        gl.Disable(GL.LINE_STIPPLE)
+
+    Endif
+
     gl.Begin(gl.POLYGON)
 
     For i = 0 To vertices.Max Step 2
@@ -373,14 +382,21 @@ Public Function PolygonFilled(vertices As Float[], Optional colour As Integer = 
 End
 
 '' Dibuja un seria de polilinea
-Public Function Polygon(vertices As Float[], Optional colour As Integer = 0, FillColor As Integer = 0, LineWidth As Float = 1, dashes As Integer)
-
-    ' TODO: dashes is for later use
+Public Function Polygon(vertices As Float[], Optional colour As Integer = 0, LineWidth As Float = 1, dashes As Integer)
 
     Dim i As Integer
 
     'glColorRGB(colour)
     gl.LineWidth(LineWidth) ' obsoleto en WebGL
+    If dashes > 0 Then
+        gl.LineStipple(LineStippleScales[dashes], LineStipples[dashes])
+        gl.Enable(GL.LINE_STIPPLE)
+    Else
+
+        gl.Disable(GL.LINE_STIPPLE)
+
+    Endif
+
     gl.Begin(gl.LINE_LOOP)
 
     For i = 0 To vertices.Max Step 2
@@ -389,6 +405,8 @@ Public Function Polygon(vertices As Float[], Optional colour As Integer = 0, Fil
 
     Next
     gl.end
+
+    If dashes > 0 Then gl.Disable(GL.LINE_STIPPLE)
 
 End
 '' Dibuja un arco, suponiendo que el centro esta en 0,0 (despues de un Translate())
@@ -416,12 +434,19 @@ End
 
 Public Function PolyLines(vertices As Float[], Optional colour As Integer = 0, LineWidth As Float = 1, dashes As Integer)
 
-    ' TODO: dashes is for later use
-
     Dim i As Integer
 
     'glColorRGB(colour)
     gl.LineWidth(LineWidth) ' obsoleto en WebGL
+    If dashes > 0 Then
+        gl.LineStipple(LineStippleScales[dashes], LineStipples[dashes])
+        gl.Enable(GL.LINE_STIPPLE)
+    Else
+
+        gl.Disable(GL.LINE_STIPPLE)
+
+    Endif
+
     gl.Begin(gl.LINE_STRIP)
 
     ' Select vertices.Count
@@ -450,13 +475,12 @@ Public Function PolyLines(vertices As Float[], Optional colour As Integer = 0, L
     Next
 
     gl.end
+    If dashes > 0 Then gl.Disable(GL.LINE_STIPPLE)
 
 End
 
 '' Dibuja un circulo
 Public Function Circle(center As Float[], radious As Float, Optional colour As Integer = 0, LineWidth As Float = 1, dashes As Integer)
-
-    ' TODO: dashes is for later use
 
     Dim i As Integer, q As New GluQuadric
 

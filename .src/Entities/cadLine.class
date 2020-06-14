@@ -21,12 +21,25 @@
 ' Boston, MA  02110-1301  USA
 Create Static
 'Fast
-Inherits EntityBase
+
 Public Const Gender As String = "Line"
 Public Const DrawingOrder As Integer = 1        ' 1 = draws first
 Public Const HelperTrabajo As String = ("a line")
 Public Const ParamType As String = "PP"                             ' that is Point, Point; could be Color Text, etc
 Public Const ParamHelper As String = "Start point;End point"
+Public Const GAMBASCADENTITY As String = ("EntityBase")
+Public Const USEWITH As String = "clsEntityBuilder"
+Public Const PointsToDraw As Integer = 1             ' minimal point requered for drawing something usefull
+Public Const OrtogonalIgnorado As Boolean = False
+Public Const OrtogonalForzado As Boolean = False
+Public Const ParamDefault As String = " "
+Public Const StretchAble As Boolean = True           ' Si lo puedo deformar
+Public Selected As Boolean
+Public ForDeletion As Boolean = True        ' this must be falsed in Finish
+Public DrawAble As Boolean = False          ' True si durante la construccion ya tiene suficientes elementos para poder hacer una representacion digna
+Public Visible As Boolean = True            ' si esta entidad puede ser mostrada independientmente
+Public Finished As Boolean = False          ' colocar en true cuando se llegue a completar
+Public StepsDone As Integer                 ' esto lo cambia cls ElementBuilder durante la construccion
 
 Public Sub Draw(oE As Entity)
 
@@ -35,6 +48,18 @@ Public Sub Draw(oE As Entity)
     If oE.Selected And Not modCAD.ToolActive Then oE.ColorToPaint = modCAD.ColorForSelected Else oE.ColorToPaint = modCAD.GetGBColor(oE.colour, oE.Layerid)
 
     GLplus.Lines(oE.p, oE.ColorToPaint, oE.LineWidth, oE.LineType)
+
+End
+
+'' A fat version of the line
+Public Sub DrawRemark(oE As Entity)
+
+    If Not oE.Visible Then Return
+
+    If oE.Selected And Not modCAD.ToolActive Then oE.ColorToPaint = modCAD.ColorForSelected Else oE.ColorToPaint = modCAD.GetGBColor(oE.colour, oE.Layerid)
+
+    GLplus.Lines(oE.p, modCAD.WindowBackColor, oE.LineWidth, gcd.stiDashed)
+    GLplus.Lines(oE.p, oE.ColorToPaint, oE.LineWidth + 2, oE.LineType)
 
 End
 
@@ -75,53 +100,33 @@ Public Function BuildPOI(oE As Entity, Optional arrIndex As Integer = -1) As Int
     ' line
     appmain.hFCAD.poiLines.insert([oE.p[0], oE.p[1], oE.p[2], oE.p[3]])
     APPMain.hFCAD.poiLinesEntities.Add(arrIndex)
-    appmain.hFCAD.poiLinesRelPoint.Insert([0, 1])
+    'appmain.hFCAD.poiLinesRelPoint.Insert([0, 1])
 
 End
 
-'' Se fija si la posicion indicada esta aproximadamente sobre la entidad, de acuerdo a la tolerancia
-'' mode es para establecer si se busca especificamente algun punto y devolver su posicion y tipo.
-'' Mode:
+' This function will return False if the element couldn't be created for some reason: bad or incomple user input
+' True means all is good, False will instruct the clsEntityBuilder to delete it
+Public Sub Finish(oE As Entity, ParamsDone As Integer) As Boolean
 
-'' Devuelve [x,y] punto de interes
-Public Function AboveMe(oE As Entity, Xreal As Float, Yreal As Float, tolerance As Float, mode As Integer, fData As Float[]) As Boolean
-    ' si una de las dos lineas de una cruz con centro en X,Y y largo Tolerance cruza la linea, estamos arriba
-    'Dim fData As New Float[]
+    'Print "Finish en EntityBase"
+    'CreatePolygon(oe)
+    BuildPOI(oe)
 
-    Dim fDist1, fDist2, fDist3, fDist4 As Float
-    'TODO: para debug, agrego esto
-    mode = 1 + 2 ' endpoint+midpoint
+    ' busco el tipo de linea, si hace falta
+    If oE.LineTypeName = "Dashed" Then oE.LineType = 1
+    ' tareas finales de armado del objeto
+    oE.b.resize(oE.P.count)
+    oE.psel.resize(oE.p.count / 2)
+    oE.ForDeletion = False
+    oE.DrawAble = True
+    oE.Selected = False
+    oE.Finished = True
 
-    fData.Clear
-    If puntos.doIntersect(xreal - tolerance / 2, Yreal, Xreal + tolerance / 2, Yreal, oE.P[0], oE.P[1], oE.P[2], oE.P[3]) Or puntos.doIntersect(xreal, Yreal - tolerance / 2, Xreal, Yreal + tolerance / 2, oE.P[0], oE.P[1], oE.P[2], oE.P[3]) Then ' its above me
+    If Not True Then
 
-        ' busco el punto exacto en la linea donde se produce la interseccion
-        fData.Insert(puntos.lineLineIntersection([xreal - tolerance / 2, Yreal], [Xreal + tolerance / 2, Yreal], [oE.P[0], oE.P[1]], [oE.P[2], oE.P[3]]))
-        ' veo que punto esta mas cerca
-        fDist1 = puntos.distancia(oE.P[0], oE.P[1], fData[0], fData[1])   ' end 1
-        fDist2 = puntos.distancia((oE.P[0] + oE.P[2]) / 2, (oE.P[1] + oE.P[3]) / 2, fData[0], fData[1])   ' mid
-        fDist3 = puntos.distancia(oE.P[2], oE.P[3], fData[0], fData[1])   ' end 2
-        If fdist1 > fdist2 Then
-            If fDist2 > fDist3 Then         ' End 2
-                fData[0] = oE.P[2]
-                fData[1] = oE.P[3]
-                fData.Add(1)                 ' 1 = EndPoint
-            Else
-                fData[0] = (oE.P[0] + oE.P[2]) / 2
-                fData[1] = (oE.P[1] + oE.P[3]) / 2
-                fData.Add(2)                 ' 2 = MidPoint
-            Endif
-        Else
-            fData[0] = oE.P[0]
-            fData[1] = oE.P[1]
-            fData.Add(1)                     ' 1 = EndPoint
+        oE.ForDeletion = True
+        oE.DrawAble = False
 
-        Endif
-
-        Return True
-
-    Endif
-
-    Return False
+    End If
 
 End

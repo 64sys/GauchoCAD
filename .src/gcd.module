@@ -22,6 +22,7 @@
 ' Boston, MA  02110-1301  USA
 ' Gambas class file
 
+' Point of Interest
 Public Const poiEndPoint As Integer = 1
 Public Const poiMidPoint As Integer = 2
 Public Const poiQuadrant As Integer = 4
@@ -31,3 +32,6 @@ Public Const poiIntersection As Integer = 32
 Public Const poiPerpendicular As Integer = 64
 Public Const poiNearest As Integer = 128
 Public Const poiBasePoint As Integer = 256
+
+' Stipple lines
+Public Const stiDashed As Integer = 1

@@ -20,8 +20,8 @@
 ' Foundation, Inc., 51 Franklin St, Fifth Floor,
 ' Boston, MA  02110-1301  USA
 Create Static
-Fast
-Inherits EntityBase
+' Fast
+
 Public Const Gender As String = "Text"
 Public Const DrawingOrder As Integer = 100 ' 1 a 32.724 esto debe Drawse primero y ser sobreescrito por el resto
 Public Const PointsToDraw As Integer = 1             ' minimal point requered for drawing something usefull
@@ -30,6 +30,16 @@ Public Const ParamType As String = "PAFT"
 Public Const ParamHelper As String = ("Start point;Angle;Heigth;")      ' a little text that is shown at the prompt waiting for user input during build
 Public Const ParamDefault As String = " ; 0 ; 10 ; "
 Public Const StretchAble As Boolean = False
+Public Const GAMBASCADENTITY As String = ("EntityBase")
+Public Const USEWITH As String = "clsEntityBuilder"
+Public Const OrtogonalIgnorado As Boolean = False
+Public Const OrtogonalForzado As Boolean = False
+Public Selected As Boolean
+Public ForDeletion As Boolean = True        ' this must be falsed in Finish
+Public DrawAble As Boolean = False          ' True si durante la construccion ya tiene suficientes elementos para poder hacer una representacion digna
+Public Visible As Boolean = True            ' si esta entidad puede ser mostrada independientmente
+Public Finished As Boolean = False          ' colocar en true cuando se llegue a completar
+Public StepsDone As Integer                 ' esto lo cambia cls ElementBuilder durante la construccion
 
 Public Sub Draw(oE As Entity)
 
@@ -37,6 +47,17 @@ Public Sub Draw(oE As Entity)
     If oE.Selected And Not modCAD.ToolActive Then oE.ColorToPaint = modCAD.ColorForSelected Else oE.ColorToPaint = modCAD.GetGBColor(oE.colour, oE.Layerid)
 
     glPlus.DrawText(oE.StringData, oE.p[0], oE.p[1], oE.fParam[0], oE.fParam[1], oE.ColorToPaint)
+
+End
+
+'' A fat version of the line
+Public Sub DrawRemark(oE As Entity)
+
+    If Not oE.Visible Then Return
+
+    If oE.Selected And Not modCAD.ToolActive Then oE.ColorToPaint = modCAD.ColorForSelected Else oE.ColorToPaint = modCAD.GetGBColor(oE.colour, oE.Layerid)
+
+    GLplus.Polygon(oE.Polygon, oE.ColorToPaint, oE.LineWidth, gcd.stiDashed)
 
 End
 
@@ -130,9 +151,34 @@ Public Function BuildPOI(oE As Entity, Optional arrIndex As Integer = -1) As Int
     puntos.Rotate(Poli, oE.fParam[0] * Pi / 180)
     puntos.Translate(Poli, oE.P[0], oE.P[1])
 
-    appmain.hFCAD.poiPoligons.Insert(poli)
-    appmain.hFCAD.poiPoligonStartIndex.Add(appmain.hFCAD.poiPoligons.Count - poli.Count)
-    appmain.hFCAD.poiPoligonElements.Add(poli.Count / 2)
-    appmain.hFCAD.poiPoligonEntities.Add(arrIndex)
+    oe.Polygon.Clear
+    oe.Polygon.Insert(poli)
+
+End
+' This function will return False if the element couldn't be created for some reason: bad or incomple user input
+' True means all is good, False will instruct the clsEntityBuilder to delete it
+
+Public Sub Finish(oE As Entity, ParamsDone As Integer) As Boolean
+
+    'Print "Finish en EntityBase"
+    'CreatePolygon(oe)
+    BuildPOI(oe)
+
+    ' busco el tipo de linea, si hace falta
+    If oE.LineTypeName = "Dashed" Then oE.LineType = 1
+    ' tareas finales de armado del objeto
+    oE.b.resize(oE.P.count)
+    oE.psel.resize(oE.p.count / 2)
+    oE.ForDeletion = False
+    oE.DrawAble = True
+    oE.Selected = False
+    oE.Finished = True
+
+    If Not True Then
+
+        oE.ForDeletion = True
+        oE.DrawAble = False
+
+    End If
 
 End

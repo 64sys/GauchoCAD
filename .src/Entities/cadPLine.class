@@ -20,14 +20,26 @@
 ' Foundation, Inc., 51 Franklin St, Fifth Floor,
 ' Boston, MA  02110-1301  USA
 Create Static
-Fast
-Inherits EntityBase
+' Fast
+
 Public Const Gender As String = "PLine"
 Public Const PointsToDraw As Integer = 0             ' minimal point requered for drawing something usefull
 Public Const HelperTrabajo As String = ("Polyline")
 Public Const ParamType As String = "P+"                             ' that is Point, Point, Float; could be Color Text, etc
 Public Const ParamHelper As String = ("Next Point")      ' a little text that is shown at the prompt waiting for user input during build
 Public Const ParamDefault As String = "Close/Undo"
+Public Const GAMBASCADENTITY As String = ("EntityBase")
+Public Const USEWITH As String = "clsEntityBuilder"
+Public Const DrawingOrder As Integer = 0        ' 1 = draws first
+Public Const OrtogonalIgnorado As Boolean = False
+Public Const OrtogonalForzado As Boolean = False
+Public Const StretchAble As Boolean = True           ' Si lo puedo deformar
+Public Selected As Boolean
+Public ForDeletion As Boolean = True        ' this must be falsed in Finish
+Public DrawAble As Boolean = False          ' True si durante la construccion ya tiene suficientes elementos para poder hacer una representacion digna
+Public Visible As Boolean = True            ' si esta entidad puede ser mostrada independientmente
+Public Finished As Boolean = False          ' colocar en true cuando se llegue a completar
+Public StepsDone As Integer                 ' esto lo cambia cls ElementBuilder durante la construccion
 
 Public Sub Draw(oE As Entity)
 
@@ -36,6 +48,18 @@ Public Sub Draw(oE As Entity)
     If oE.Selected And Not modCAD.ToolActive Then oE.ColorToPaint = modCAD.ColorForSelected Else oE.ColorToPaint = modCAD.GetGBColor(oE.colour, oE.Layerid)
 
     GLplus.PolyLines(oE.p, oE.ColorToPaint, oE.LineWidth, oe.linetype)
+
+End
+
+'' A fat version of the line
+Public Sub DrawRemark(oE As Entity)
+
+    If Not oE.Visible Then Return
+
+    If oE.Selected And Not modCAD.ToolActive Then oE.ColorToPaint = modCAD.ColorForSelected Else oE.ColorToPaint = modCAD.GetGBColor(oE.colour, oE.Layerid)
+
+    GLplus.PolyLines(oE.p, modCAD.WindowBackColor, oE.LineWidth, gcd.stiDashed)
+    GLplus.PolyLines(oE.p, oE.ColorToPaint, oE.LineWidth + 2, oE.LineType)
 
 End
 
@@ -90,54 +114,35 @@ Public Function BuildPOI(oE As Entity, Optional arrIndex As Integer = -1) As Int
         ' line
         appmain.hFCAD.poiLines.insert([oE.p[i], oE.p[i + 1], oE.p[i + 2], oE.p[i + 3]])
         APPMain.hFCAD.poiLinesEntities.Add(arrIndex)
-        appmain.hFCAD.poiLinesRelPoint.Insert([i / 2, i / 2 + 1])
+        ' appmain.hFCAD.poiLinesRelPoint.Insert([i / 2, i / 2 + 1])
 
     Next
 
 End
 
-'' Devuelve [x,y] punto de interes
-Public Function AboveMe(oE As Entity, Xreal As Float, Yreal As Float, tolerance As Float, mode As Integer, fData As Float[]) As Boolean
-    ' si una de las dos lineas de una cruz con centro en X,Y y largo Tolerance cruza la linea, estamos arriba
+' This function will return False if the element couldn't be created for some reason: bad or incomple user input
+' True means all is good, False will instruct the clsEntityBuilder to delete it
+Public Sub Finish(oE As Entity, ParamsDone As Integer) As Boolean
 
-    Dim i As Integer
-    Dim fDist1, fDist2, fDist3, fDist4 As Float
-    'TODO: para debug, agrego esto
-    mode = 1 + 2 ' endpoint+midpoint
+    'Print "Finish en EntityBase"
+    'CreatePolygon(oe)
+    BuildPOI(oe)
 
-    fData.Clear
-    For i = 0 To oE.P.count - 4 Step 2
-        If puntos.doIntersect(xreal - tolerance / 2, Yreal, Xreal + tolerance / 2, Yreal, oE.P[i + 0], oE.P[i + 1], oE.P[i + 2], oE.P[i + 3]) Or puntos.doIntersect(xreal, Yreal - tolerance / 2, Xreal, Yreal + tolerance / 2, oE.P[i + 0], oE.P[i + 1], oE.P[i + 2], oE.P[i + 3]) Then ' its above me
+    ' busco el tipo de linea, si hace falta
+    If oE.LineTypeName = "Dashed" Then oE.LineType = 1
+    ' tareas finales de armado del objeto
+    oE.b.resize(oE.P.count)
+    oE.psel.resize(oE.p.count / 2)
+    oE.ForDeletion = False
+    oE.DrawAble = True
+    oE.Selected = False
+    oE.Finished = True
 
-            ' busco el punto exacto en la linea donde se produce la interseccion
-            fData.Insert(puntos.lineLineIntersection([xreal - tolerance / 2, Yreal], [Xreal + tolerance / 2, Yreal], [oE.P[i + 0], oE.P[i + 1]], [oE.P[i + 2], oE.P[i + 3]]))
-            ' veo que punto esta mas cerca
-            fDist1 = puntos.distancia(oE.P[i + 0], oE.P[i + 1], fData[0], fData[1])   ' end 1
-            fDist2 = puntos.distancia((oE.P[i + 0] + oE.P[i + 2]) / 2, (oE.P[i + 1] + oE.P[i + 3]) / 2, fData[0], fData[1])   ' mid
-            fDist3 = puntos.distancia(oE.P[i + 2], oE.P[i + 3], fData[0], fData[1])   ' end 2
-            If fdist1 > fdist2 Then
-                If fDist2 > fDist3 Then         ' End 2
-                    fData[0] = oE.P[i + 2]
-                    fData[1] = oE.P[i + 3]
-                    fData.Add(1)                 ' 1 = EndPoint
-                    Return True
-                Else
-                    fData[0] = (oE.P[i + 0] + oE.P[i + 2]) / 2
-                    fData[1] = (oE.P[i + 1] + oE.P[i + 3]) / 2
-                    fData.Add(2)                 ' 2 = MidPoint
-                    Return True
-                Endif
-            Else
-                fData[0] = oE.P[i + 0]
-                fData[1] = oE.P[i + 1]
-                fData.Add(1)                     ' 1 = EndPoint
-                Return True
+    If Not True Then
 
-            Endif
+        oE.ForDeletion = True
+        oE.DrawAble = False
 
-        Endif
-    Next
-
-    Return False
+    End If
 
 End

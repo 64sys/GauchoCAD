@@ -55,7 +55,7 @@ Public CursorX As Integer
 Public CursorY As Integer
 
 Public elem As Entity
-
+Public PoiChecking As Boolean = True
 Public LastEntity As Entity
 
 Public XYreal As Float[]
