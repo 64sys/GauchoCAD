@@ -198,15 +198,10 @@ Fast Unsafe Public Function CheckAboveEntity(xr As Float, Yr As Float, tolerance
 Dim rData As New Float[]
 Dim e, i, breathe, iPoligon, iLine, iPoint As Integer
 
-APPMain.hFCAD.iEntity.Clear
-
 Dim T As Float = Timer
+
 For e = 0 To APPMain.hFCAD.arrEntities.Max      ' for each es 10 veces mas lento que recorrer el array
-    ' Inc breathe
-    ' If breathe = 1000 Then
-    '     breathe = 0
-    '     Wait 0.0001
-    ' Endif
+
     Select Case APPMain.hFCAD.arrEntities[e].Gender
 
         Case "Line"
@@ -262,17 +257,16 @@ Public Sub CheckPOI(xr As Float, Yr As Float)
     Dim DistInter As Float = 1e6
     Dim Dist As Float = 1e5  ' el menor
 
-    If Me.flgSearchingPOI Then Return   ' no nesting this
-    Me.flgSearchingPOI = True
-
-    APPMain.hFCAD.iEntity.Clear
+    ' If Me.flgSearchingPOI Then Return   ' no nesting this
+    ' Me.flgSearchingPOI = True
 
     Dim t As Float = Timer
+
     iPoligon = -1
     iLine = -1
 
-    iPoligon = puntos.FindPOIPoligon(xr, yr, APPMain.hFCAD.poiPoligons, APPMain.hFCAD.poiPoligonStartIndex, APPMain.hFCAD.poiPoligonElements)
-    iLine = puntos.FindPOILines(xr, yr, APPMain.hFCAD.poiLines, APPMain.hFCAD.Metros(16))
+    'iPoligon = puntos.FindPOIPoligon(xr, yr, APPMain.hFCAD.poiPoligons, APPMain.hFCAD.poiPoligonStartIndex, APPMain.hFCAD.poiPoligonElements)
+    'iLine = puntos.FindPOILines(xr, yr, APPMain.hFCAD.poiLines, APPMain.hFCAD.Metros(16))
     'rdata = puntos.FindPOI(xr, yr, APPMain.hFCAD.poiPoints, APPMain.hFCAD.Metros(16))
     'Debug "total poi check time ", Timer - t, APPMain.hFCAD.poiPoligons.Count + APPMain.hFCAD.poiLines.Count + APPMain.hFCAD.poiPoints.Count, " points parsed"
 
@@ -465,67 +459,86 @@ Public Sub CheckPOI(xr As Float, Yr As Float)
 
         ' ofrezco ese punto
         If dist = DistEnd1 Then
-            APPMain.hFCAD.iEntity.Insert([e.P[0], e.P[1], gcd.poiEndPoint])
+            APPMain.hFCAD.iEntity[0] = e.P[0]
+            APPMain.hFCAD.iEntity[1] = e.P[1]
+            APPMain.hFCAD.iEntity[2] = gcd.poiEndPoint
             clsDrawingAids.Helper.texto = "EndPoint"
         End If
 
         ' ofrezco ese punto
         If dist = DistEnd2 Then
-            APPMain.hFCAD.iEntity.Insert([e.P[2], e.P[3], gcd.poiEndPoint])
+            APPMain.hFCAD.iEntity[0] = e.P[2]
+            APPMain.hFCAD.iEntity[1] = e.P[3]
+            APPMain.hFCAD.iEntity[2] = gcd.poiEndPoint
             clsDrawingAids.Helper.texto = "EndPoint"
         End If
 
         ' ofrezco ese punto
         If dist = DistMid Then
-            APPMain.hFCAD.iEntity.Insert([(e.P[2] + e.P[0]) / 2, (e.P[3] + e.P[1]) / 2, gcd.poiMidPoint])
+            APPMain.hFCAD.iEntity[0] = (e.P[2] + e.P[0]) / 2
+            APPMain.hFCAD.iEntity[1] = (e.P[3] + e.P[1]) / 2
+            APPMain.hFCAD.iEntity[2] = gcd.poiMidPoint
             clsDrawingAids.Helper.texto = "MidPoint"
         End If
 
         ' ofrezco ese punto
         If dist = DistInter Then
-            APPMain.hFCAD.iEntity.Insert([pInter[0], pInter[1], gcd.poiIntersection])
+            APPMain.hFCAD.iEntity[0] = pInter[0]
+            APPMain.hFCAD.iEntity[1] = pInter[1]
+            APPMain.hFCAD.iEntity[2] = gcd.poiIntersection
             clsDrawingAids.Helper.texto = "Intersection"
         End If
 
         ' ofrezco ese punto
         If dist = DistPer Then
-            APPMain.hFCAD.iEntity.Insert([puntoB[0], puntoB[1], gcd.poiPerpendicular])
+
+            APPMain.hFCAD.iEntity[0] = puntoB[0]
+            APPMain.hFCAD.iEntity[1] = puntoB[1]
+            APPMain.hFCAD.iEntity[2] = gcd.poiPerpendicular
             clsDrawingAids.Helper.texto = "Perpendicular"
         End If
 
         If dist = DistTang Then
-            APPMain.hFCAD.iEntity.Insert([tx, ty, gcd.poiTangent])
+
+            APPMain.hFCAD.iEntity[0] = tx
+            APPMain.hFCAD.iEntity[1] = ty
+            APPMain.hFCAD.iEntity[2] = gcd.poiTangent
             clsDrawingAids.Helper.texto = "Tangent"
         End If
 
         If dist = DistCenter Then
-            APPMain.hFCAD.iEntity.Insert([cx, cy, gcd.poiCenter])
+
+            APPMain.hFCAD.iEntity[0] = e.p[0]
+            APPMain.hFCAD.iEntity[1] = e.p[1]
+            APPMain.hFCAD.iEntity[2] = gcd.poiCenter
             clsDrawingAids.Helper.texto = "Center"
         End If
 
         If dist = DistQuad Then
-            APPMain.hFCAD.iEntity.Insert([qx, qy, gcd.poiQuadrant])
+            APPMain.hFCAD.iEntity[0] = qx
+            APPMain.hFCAD.iEntity[1] = qy
+            APPMain.hFCAD.iEntity[2] = gcd.poiQuadrant
             clsDrawingAids.Helper.texto = "Quadrant"
         End If
 
         If dist = DistBase Then
-            APPMain.hFCAD.iEntity.Insert([e.P[0], e.P[1], gcd.poiBasePoint])
+            APPMain.hFCAD.iEntity[0] = e.P[0]
+            APPMain.hFCAD.iEntity[1] = e.P[1]
+            APPMain.hFCAD.iEntity[2] = gcd.poiBasePoint
             clsDrawingAids.Helper.texto = "BasePoint"
         End If
 
         APPMain.hFCAD.oEntity = e
-        If APPMain.hFCAD.iEntity.Count = 0 Then ' situacion no prevista aun
-            clsDrawingAids.Helper.texto = ""
-            APPMain.hFCAD.iEntity.Insert([0, 0, -1])
-        End If
 
     Else
         Debug "Sin POI", Timer - t
         clsDrawingAids.Helper.texto = ""
-        APPMain.hFCAD.iEntity.Insert([0, 0, -1])
+        APPMain.hFCAD.iEntity[0] = xr
+        APPMain.hFCAD.iEntity[1] = yr
+        APPMain.hFCAD.iEntity[2] = -1
         APPMain.hFCAD.oEntity = Null
     End If
-    Me.flgSearchingPOI = False
+    'Me.flgSearchingPOI = False
 
 End
 

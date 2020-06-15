@@ -1,0 +1,19 @@
+' Gambas class file
+
+Inherits Task
+
+Public Sx As Float
+Public Sy As Float
+
+Public Sub Main()
+
+    clsEntities.CheckPOI(sX, SY)
+
+End
+
+' Public Sub Search(Sx As Float, Sy As Float)
+'
+'     clsEntities.CheckPOI(sX, SY)
+'     If APPMain.hFCAD.iEntity[2] > 0 Then Debug APPMain.hFCAD.oentity.gender
+'
+' End
