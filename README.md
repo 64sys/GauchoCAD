@@ -16,6 +16,10 @@ GauchoCAD is currently under development and the status is as follows:
 ## Using
 
 # Entities
+| Icon | Name | Description |
+|------|:----:|------------:|
+| <img src="./svg/entities/arc.svg" width="48" height="48"> | arc | tool to made arcs  |
+
 arc<img src="./svg/entities/arc.svg" width="48" height="48">
 circle<img src="./svg/entities/circle.svg" width="48" height="48">
 dim<img src="./svg/entities/dim.svg" width="48" height="48">
