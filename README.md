@@ -16,6 +16,8 @@ GauchoCAD is currently under development and the status is as follows:
 ## Using
 
 # Entities
+<img src="./svg/arc.svg" width="48" height="48">
+
 ![arc](./svg/entities/arc.svg =48x)
 ![circle](./svg/entities/circle.svg) <img src="./svg/circle.svg">
 ![dim](./svg/entities/dim.svg) <img src="./svg/dim.svg">
