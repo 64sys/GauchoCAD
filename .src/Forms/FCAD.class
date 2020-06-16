@@ -274,10 +274,9 @@ Public Sub GLArea1_MouseMove()
         Endif
     End If
     'clsEntities.CheckPOI(Xreal(mouse.x), Yreal(mouse.y))
-    
+
     CursorX = mouse.x
     CursorY = mouse.y
-
 
     Select Case modCAD.clsJob.gender
 

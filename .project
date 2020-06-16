@@ -1,7 +1,7 @@
 # Gambas Project File 3.0
 Title=GauchoCAD
 Startup=Main
-Icon=png/bosquejo2.png
+Icon=logo.png
 Version=0.0.62
 Component=gb.image
 Component=gb.cairo
@@ -12,6 +12,7 @@ Component=gb.db.sqlite3
 Component=gb.desktop
 Component=gb.settings
 Component=gb.form.mdi
+Component=gb.form.stock
 Component=gb.qt5.opengl
 Component=gb.opengl
 Component=gb.logging

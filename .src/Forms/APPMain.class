@@ -140,6 +140,274 @@ Public Sub Run(cin As Collection)
 
 End
 
+Public Sub Action_Activate(sTask As String) As Boolean
+
+    '     'Dim hFImport As FImport                 '' Impor from others formats
+
+    Dim FileDef As String
+    Dim i As Integer
+    Dim FilePath As String            ''Nombre del archivo que se abrira
+    Dim cModel As New Collection
+    Dim wtag As String
+    Dim w As Window
+    Dim template As Boolean
+    Dim stx As New String[]
+    Dim mdl As New Collection
+    Dim s As String
+    Dim ctn As New Collection
+    Dim hFConfig As FConfig                 '' Edit program configuration
+    Dim cfg As New Collection
+    Dim hFAbout As FAbout                  '' Formulario que muestra informacin del programa
+
+    Select sTask
+        Case "new"
+            FileDef = adi &/ "default.xml"
+            If Exist(FileDef) = False Then
+                Copy "./def.xml" To FileDef
+            Endif
+
+            For i = 1 To 99
+                FilePath = User.Home &/ "drawing" & CStr(i) & ".xml"
+                If ExistWin(FilePath, Workspace1) = False Then
+                    Break
+                Endif
+            Next
+
+            FileDef = adi &/ "default.xml"
+            If Exist(FileDef) Then
+                If Exist(FilePath) = False Then
+                    Copy FileDef To FilePath
+                Endif
+            Endif
+
+            cModel = cad.LoadGaucho(FilePath)
+            LoadComboboxes(cModel.Copy())
+
+            wtag = FilePath
+            If Workspace1.Count = 0 Or ExistWin(wtag, Workspace1) = False Then
+
+                hFCAD = New FCAD(cModel)
+                hFCAD.Tag = wtag
+                hFCAD.Title = File.Name(FilePath)
+                Workspace1.Add(hFCAD)
+            Else
+                For Each w In Workspace1.Windows
+                    If w.Tag = wtag Then
+                        Workspace1.ActiveWindow = w
+                        Break
+                    Endif
+                Next
+            Endif
+
+        Case "open"
+            Dialog.Filter = ["*.xml", "GauchoCAD"]
+            Dialog.OpenFile(False)
+            FilePath = Dialog.Path
+
+            If Exist(FilePath) Then
+                Select String.LCase(File.Ext(FilePath))
+                    Case "xml"
+                        'cModel = FileLoad(FilePath)
+                        cModel = cad.LoadGaucho(FilePath)
+                        LoadComboboxes(cModel)
+
+                        wtag = FilePath
+                        If Workspace1.Count = 0 Or ExistWin(wtag, Workspace1) = False Then
+                            hFCAD = New FCAD(cModel.Copy())
+                            hFCAD.Tag = wtag
+                            hFCAD.Title = File.Name(FilePath)
+                            Workspace1.Add(hFCAD)
+                        Else
+                            For Each w In Workspace1.Windows
+                                If w.Tag = wtag Then
+                                    Workspace1.ActiveWindow = w
+                                    Break
+                                Endif
+                            Next
+                        Endif
+                End Select
+            Endif
+
+        Case "save"
+            For i = 1 To 99
+                If File.Name(CurrentFile) = "drawing" & CStr(i) & "." & File.Ext(CurrentFile) Then
+                    template = True
+                    Break
+                Endif
+            Next
+
+            If template = True Then
+                Task("saveas")
+            Else
+                cad.SaveGaucho(CurrentFile, hFCAD.cModel)
+            Endif
+
+        Case "saveas"
+            Dialog.Filter = ["*.xml", "GauchoCAD"]
+            If Dialog.SaveFile() Then Return
+            FilePath = Dialog.Path
+            If File.Ext(FilePath) <> "xml" Then
+                FilePath = FilePath & ".xml"
+            Endif
+            cad.SaveGaucho(FilePath, hFCAD.cModel)
+        Catch
+            Message.Info(Error.Text)
+
+        Case "import"
+            stx = dsk.FileChooser(User.Home, ["dxf", "dwg"])
+            If stx.count > 0 Then
+                FilePath = stx[0]
+
+                Select String.LCase(File.Ext(FilePath))
+                    Case "dxf"
+                        mdl = cad.ImportDxf(FilePath)
+                        If mdl.Count > 0 Then
+                            hFCAD.cImport = mdl
+                        Endif
+
+                    Case "dwg"
+                        Message.Info(("Not implemented yet"))
+                        ' mdl = cad.ImportDwg(FilePath)
+                        ' If mdl.Count > 0 Then
+                        '     hFCAD.cImport = mdl
+                        ' Endif
+                End Select
+
+            Endif
+
+        Case "export"
+
+        Case "print"
+
+        Case "close"
+
+        Case "quit"
+            Me.Close
+
+        Case "options"
+            wtag = sTask
+            If Workspace1.Count = 0 Or ExistWin(wtag, Workspace1) = False Then
+                '---------------------------------------------------
+                s = adi &/ "cfg.xml"
+                If Exist(File.Dir(s)) = False Then
+                    Mkdir File.Dir(s)
+                Endif
+                If Exist(s) = False Then
+                    'ctn = xmg.XmlIni()
+                    ctn = cad.CADConfig()
+                    xmg.XmlConfMaker(s, ctn, Application.Name)
+                Endif
+                hFConfig = New FConfig(cex)
+                hFConfig.Title = ("Configuration")
+                hFConfig.Tag = wtag
+                Workspace1.Add(hFConfig)
+                '---------------------------------------------------
+            Else
+                For Each w In Workspace1.Windows
+                    If w.Tag = wtag Then
+                        Workspace1.ActiveWindow = w
+                        Break
+                    Endif
+                Next
+            Endif
+
+        Case "line"
+
+        Case "pline"
+
+        Case "circle"
+
+        Case "arc"
+
+        Case "ellipse"
+
+        Case "solid"
+
+        Case "text"
+
+        Case "mtext"
+
+        Case "block"
+
+        Case "dim"
+
+        Case "leader"
+
+        Case "spline"
+
+        Case "hatch"
+
+        Case "rectangle"
+
+        Case "point"
+
+        Case "move"
+
+        Case "copy"
+
+        Case "Scale"
+
+        Case "rotate"
+
+        Case "mirror"
+
+        Case "trim"
+
+        Case "fillet"
+
+        Case "chamfer"
+
+        Case "array"
+
+        Case "stretch"
+
+        Case "offset"
+
+        Case "divide"
+
+        Case "erase"
+
+        Case "slab4"
+
+        Case "slab3"
+
+        Case "column"
+
+        Case "beam"
+
+        Case "wallcolumn"
+
+        Case "zoomw"
+
+        Case "pan"
+
+        Case "zoome"
+
+        Case "info"
+            wtag = sTask
+            If Workspace1.Count = 0 Or ExistWin(wtag, Workspace1) = False Then
+                File.Save("/tmp/apppath.txt", Application.Dir)
+                cfg = sog.ProjInfo(Application.Path & "/.project")
+                hFAbout = New FAbout(cfg)
+                hFAbout.Tag = wtag
+                hFAbout.Title = ("About") & " " & Application.Name
+                Workspace1.Add(hFAbout)
+            Else
+                For Each w In Workspace1.Windows
+                    If w.Tag = wtag Then
+                        Workspace1.ActiveWindow = w
+                        Break
+                    Endif
+                Next
+            Endif
+
+        Case "help"
+            Print "Help"
+
+    End Select
+
+End
+
 Public Sub Form_Open()
 
     Dim n As Integer
@@ -158,7 +426,7 @@ Public Sub Form_Open()
 
     Me.Maximized = True
 
-    Task("new")
+    'new
 
 End
 
@@ -285,210 +553,210 @@ Public Sub LoadComboboxes(cMdl As Collection)
 
 End
 
-Public Sub Task(sTask As String)
-
-    Dim s As String
-    Dim cModel As New Collection
-    Dim ctn As New Collection
-    Dim cfg As New Collection
-
-    Dim hFConfig As FConfig                 '' Edit program configuration
-    Dim hFAbout As FAbout                  '' Formulario que muestra informacin del programa
-    'Dim hFImport As FImport                 '' Impor from others formats
-    Dim w As Window
-    Dim wtag As String
-
-    Dim stx As New String[]
-    Dim FilePath As String            ''Nombre del archivo que se abrira
-    Dim FileDef As String
-    Dim i As Integer
-    Dim mdl As New Collection
-    Dim template As Boolean
-
-    ' if the drawing is drawingX.xml, drawingX.gcad where X is a integer number then the Ssave is changed to Save As
-
-    Select sTask
-
-        Case "save"
-            For i = 1 To 99
-                If File.Name(CurrentFile) = "drawing" & CStr(i) & "." & File.Ext(CurrentFile) Then
-                    template = True
-                    Break
-                Endif
-            Next
-
-            If template = True Then
-                Task("saveas")
-            Else
-                cad.SaveGaucho(CurrentFile, hFCAD.cModel)
-            Endif
-
-        Case "saveas"
-
-            Dialog.Filter = ["*.xml", "GauchoCAD"]
-            If Dialog.SaveFile() Then Return
-            FilePath = Dialog.Path
-            If File.Ext(FilePath) <> "xml" Then
-                FilePath = FilePath & ".xml"
-            Endif
-            cad.SaveGaucho(FilePath, hFCAD.cModel)
-        Catch
-            Message.Info(Error.Text)
-
-        Case "import"
-            stx = dsk.FileChooser(User.Home, ["dxf", "dwg"])
-            If stx.count > 0 Then
-                FilePath = stx[0]
-
-                Select String.LCase(File.Ext(FilePath))
-                    Case "dxf"
-                        mdl = cad.ImportDxf(FilePath)
-                        If mdl.Count > 0 Then
-                            hFCAD.cImport = mdl
-                        Endif
-
-                    Case "dwg"
-                        Message.Info(("Not implemented yet"))
-                        ' mdl = cad.ImportDwg(FilePath)
-                        ' If mdl.Count > 0 Then
-                        '     hFCAD.cImport = mdl
-                        ' Endif
-                End Select
-
-            Endif
-
-            'mdl = cad.Import(FilePath)
-
-            'wtag = sTask
-            'hFImport = New FImport(cex)
-            'hFImport.Tag = wtag
-            'hFImport.Title = ("Import")
-            'hFImport.Show()
-
-        Case "open"
-
-            Dialog.Filter = ["*.xml", "GauchoCAD"]
-            Dialog.OpenFile(False)
-            FilePath = Dialog.Path
-
-            If Exist(FilePath) Then
-                Select String.LCase(File.Ext(FilePath))
-                    Case "xml"
-                        'cModel = FileLoad(FilePath)
-                        cModel = cad.LoadGaucho(FilePath)
-                        LoadComboboxes(cModel)
-
-                        wtag = FilePath
-                        If Workspace1.Count = 0 Or ExistWin(wtag, Workspace1) = False Then
-                            hFCAD = New FCAD(cModel.Copy())
-                            hFCAD.Tag = wtag
-                            hFCAD.Title = File.Name(FilePath)
-                            Workspace1.Add(hFCAD)
-                        Else
-                            For Each w In Workspace1.Windows
-                                If w.Tag = wtag Then
-                                    Workspace1.ActiveWindow = w
-                                    Break
-                                Endif
-                            Next
-                        Endif
-                End Select
-            Endif
-        Case "new"
-
-            FileDef = adi &/ "default.xml"
-            If Exist(FileDef) = False Then
-                Copy "./def.xml" To FileDef
-            Endif
-
-            For i = 1 To 99
-                FilePath = User.Home &/ "drawing" & CStr(i) & ".xml"
-                If ExistWin(FilePath, Workspace1) = False Then
-                    Break
-                Endif
-            Next
-
-            FileDef = adi &/ "default.xml"
-            If Exist(FileDef) Then
-                If Exist(FilePath) = False Then
-                    Copy FileDef To FilePath
-                Endif
-            Endif
-
-            'cModel = FileLoad(FilePath)
-            cModel = cad.LoadGaucho(FilePath)
-            LoadComboboxes(cModel.Copy())
-
-            wtag = FilePath
-            If Workspace1.Count = 0 Or ExistWin(wtag, Workspace1) = False Then
-
-                hFCAD = New FCAD(cModel)
-                hFCAD.Tag = wtag
-                hFCAD.Title = File.Name(FilePath)
-                Workspace1.Add(hFCAD)
-            Else
-                For Each w In Workspace1.Windows
-                    If w.Tag = wtag Then
-                        Workspace1.ActiveWindow = w
-                        Break
-                    Endif
-                Next
-            Endif
-
-        Case "info"
-            wtag = sTask
-            If Workspace1.Count = 0 Or ExistWin(wtag, Workspace1) = False Then
-                File.Save("/tmp/apppath.txt", Application.Dir)
-                cfg = sog.ProjInfo(Application.Path & "/.project")
-                hFAbout = New FAbout(cfg)
-                hFAbout.Tag = wtag
-                hFAbout.Title = ("About") & " " & Application.Name
-                Workspace1.Add(hFAbout)
-            Else
-                For Each w In Workspace1.Windows
-                    If w.Tag = wtag Then
-                        Workspace1.ActiveWindow = w
-                        Break
-                    Endif
-                Next
-            Endif
-
-        Case "help"
-            Print "Help"
-
-        Case "options"
-            wtag = sTask
-            If Workspace1.Count = 0 Or ExistWin(wtag, Workspace1) = False Then
-                '---------------------------------------------------
-                s = adi &/ "cfg.xml"
-                If Exist(File.Dir(s)) = False Then
-                    Mkdir File.Dir(s)
-                Endif
-                If Exist(s) = False Then
-                    'ctn = xmg.XmlIni()
-                    ctn = cad.CADConfig()
-                    xmg.XmlConfMaker(s, ctn, Application.Name)
-                Endif
-                hFConfig = New FConfig(cex)
-                hFConfig.Title = ("Configuration")
-                hFConfig.Tag = wtag
-                Workspace1.Add(hFConfig)
-                '---------------------------------------------------
-            Else
-                For Each w In Workspace1.Windows
-                    If w.Tag = wtag Then
-                        Workspace1.ActiveWindow = w
-                        Break
-                    Endif
-                Next
-            Endif
-
-        Case "quit"
-            Me.Close
-
-    End Select
-
-End
+' Public Sub Task(sTask As String)
+'
+'     Dim s As String
+'     Dim cModel As New Collection
+'     Dim ctn As New Collection
+'     Dim cfg As New Collection
+'
+'     Dim hFConfig As FConfig                 '' Edit program configuration
+'     Dim hFAbout As FAbout                  '' Formulario que muestra informacin del programa
+'     'Dim hFImport As FImport                 '' Impor from others formats
+'     Dim w As Window
+'     Dim wtag As String
+'
+'     Dim stx As New String[]
+'     Dim FilePath As String            ''Nombre del archivo que se abrira
+'     Dim FileDef As String
+'     Dim i As Integer
+'     Dim mdl As New Collection
+'     Dim template As Boolean
+'
+'     ' if the drawing is drawingX.xml, drawingX.gcad where X is a integer number then the Ssave is changed to Save As
+'
+'     Select sTask
+'
+'         Case "save"
+'             For i = 1 To 99
+'                 If File.Name(CurrentFile) = "drawing" & CStr(i) & "." & File.Ext(CurrentFile) Then
+'                     template = True
+'                     Break
+'                 Endif
+'             Next
+'
+'             If template = True Then
+'                 Task("saveas")
+'             Else
+'                 cad.SaveGaucho(CurrentFile, hFCAD.cModel)
+'             Endif
+'
+'         Case "saveas"
+'
+'             Dialog.Filter = ["*.xml", "GauchoCAD"]
+'             If Dialog.SaveFile() Then Return
+'             FilePath = Dialog.Path
+'             If File.Ext(FilePath) <> "xml" Then
+'                 FilePath = FilePath & ".xml"
+'             Endif
+'             cad.SaveGaucho(FilePath, hFCAD.cModel)
+'         Catch
+'             Message.Info(Error.Text)
+'
+'         Case "import"
+'             stx = dsk.FileChooser(User.Home, ["dxf", "dwg"])
+'             If stx.count > 0 Then
+'                 FilePath = stx[0]
+'
+'                 Select String.LCase(File.Ext(FilePath))
+'                     Case "dxf"
+'                         mdl = cad.ImportDxf(FilePath)
+'                         If mdl.Count > 0 Then
+'                             hFCAD.cImport = mdl
+'                         Endif
+'
+'                     Case "dwg"
+'                         Message.Info(("Not implemented yet"))
+'                         ' mdl = cad.ImportDwg(FilePath)
+'                         ' If mdl.Count > 0 Then
+'                         '     hFCAD.cImport = mdl
+'                         ' Endif
+'                 End Select
+'
+'             Endif
+'
+'             'mdl = cad.Import(FilePath)
+'
+'             'wtag = sTask
+'             'hFImport = New FImport(cex)
+'             'hFImport.Tag = wtag
+'             'hFImport.Title = ("Import")
+'             'hFImport.Show()
+'
+'         Case "open"
+'
+'             Dialog.Filter = ["*.xml", "GauchoCAD"]
+'             Dialog.OpenFile(False)
+'             FilePath = Dialog.Path
+'
+'             If Exist(FilePath) Then
+'                 Select String.LCase(File.Ext(FilePath))
+'                     Case "xml"
+'                         'cModel = FileLoad(FilePath)
+'                         cModel = cad.LoadGaucho(FilePath)
+'                         LoadComboboxes(cModel)
+'
+'                         wtag = FilePath
+'                         If Workspace1.Count = 0 Or ExistWin(wtag, Workspace1) = False Then
+'                             hFCAD = New FCAD(cModel.Copy())
+'                             hFCAD.Tag = wtag
+'                             hFCAD.Title = File.Name(FilePath)
+'                             Workspace1.Add(hFCAD)
+'                         Else
+'                             For Each w In Workspace1.Windows
+'                                 If w.Tag = wtag Then
+'                                     Workspace1.ActiveWindow = w
+'                                     Break
+'                                 Endif
+'                             Next
+'                         Endif
+'                 End Select
+'             Endif
+'         Case "new"
+'
+'             FileDef = adi &/ "default.xml"
+'             If Exist(FileDef) = False Then
+'                 Copy "./def.xml" To FileDef
+'             Endif
+'
+'             For i = 1 To 99
+'                 FilePath = User.Home &/ "drawing" & CStr(i) & ".xml"
+'                 If ExistWin(FilePath, Workspace1) = False Then
+'                     Break
+'                 Endif
+'             Next
+'
+'             FileDef = adi &/ "default.xml"
+'             If Exist(FileDef) Then
+'                 If Exist(FilePath) = False Then
+'                     Copy FileDef To FilePath
+'                 Endif
+'             Endif
+'
+'             'cModel = FileLoad(FilePath)
+'             cModel = cad.LoadGaucho(FilePath)
+'             LoadComboboxes(cModel.Copy())
+'
+'             wtag = FilePath
+'             If Workspace1.Count = 0 Or ExistWin(wtag, Workspace1) = False Then
+'
+'                 hFCAD = New FCAD(cModel)
+'                 hFCAD.Tag = wtag
+'                 hFCAD.Title = File.Name(FilePath)
+'                 Workspace1.Add(hFCAD)
+'             Else
+'                 For Each w In Workspace1.Windows
+'                     If w.Tag = wtag Then
+'                         Workspace1.ActiveWindow = w
+'                         Break
+'                     Endif
+'                 Next
+'             Endif
+'
+'         Case "info"
+'             wtag = sTask
+'             If Workspace1.Count = 0 Or ExistWin(wtag, Workspace1) = False Then
+'                 File.Save("/tmp/apppath.txt", Application.Dir)
+'                 cfg = sog.ProjInfo(Application.Path & "/.project")
+'                 hFAbout = New FAbout(cfg)
+'                 hFAbout.Tag = wtag
+'                 hFAbout.Title = ("About") & " " & Application.Name
+'                 Workspace1.Add(hFAbout)
+'             Else
+'                 For Each w In Workspace1.Windows
+'                     If w.Tag = wtag Then
+'                         Workspace1.ActiveWindow = w
+'                         Break
+'                     Endif
+'                 Next
+'             Endif
+'
+'         Case "help"
+'             Print "Help"
+'
+'         Case "options"
+'             wtag = sTask
+'             If Workspace1.Count = 0 Or ExistWin(wtag, Workspace1) = False Then
+'                 '---------------------------------------------------
+'                 s = adi &/ "cfg.xml"
+'                 If Exist(File.Dir(s)) = False Then
+'                     Mkdir File.Dir(s)
+'                 Endif
+'                 If Exist(s) = False Then
+'                     'ctn = xmg.XmlIni()
+'                     ctn = cad.CADConfig()
+'                     xmg.XmlConfMaker(s, ctn, Application.Name)
+'                 Endif
+'                 hFConfig = New FConfig(cex)
+'                 hFConfig.Title = ("Configuration")
+'                 hFConfig.Tag = wtag
+'                 Workspace1.Add(hFConfig)
+'                 '---------------------------------------------------
+'             Else
+'                 For Each w In Workspace1.Windows
+'                     If w.Tag = wtag Then
+'                         Workspace1.ActiveWindow = w
+'                         Break
+'                     Endif
+'                 Next
+'             Endif
+'
+'         Case "quit"
+'             Me.Close
+'
+'     End Select
+'
+' End
 
 '' This vierify if the drawing is already opened
 
