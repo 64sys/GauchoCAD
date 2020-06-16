@@ -50,16 +50,14 @@ zoome<img src="./svg/tools/zoome.svg" width="48" height="48">
 zoomw<img src="./svg/tools/zoomw.svg" width="48" height="48">
 
 # Layers
-layers<img src="./svg/layers/layers/.svg" width="48" height="48">
+layers<img src="./svg/layers/layers.svg" width="48" height="48">
 
 # Smart - concret structures
-beam<img src="./svg/smart/beam/.svg" width="48" height="48">
-column<img src="./svg/smart/column/.svg" width="48" height="48">
-slab3p<img src="./svg/smart/slab3p/.svg" width="48" height="48">
-slab4p<img src="./svg/smart/slab4p/.svg" width="48" height="48">
-wallcolumn<img src="./svg/smart/wallcolumn/.svg" width="48" height="48">
-
-
+beam<img src="./svg/smart/beam.svg" width="48" height="48">
+column<img src="./svg/smart/column.svg" width="48" height="48">
+slab3p<img src="./svg/smart/slab3p.svg" width="48" height="48">
+slab4p<img src="./svg/smart/slab4p.svg" width="48" height="48">
+wallcolumn<img src="./svg/smart/wallcolumn.svg" width="48" height="48">
 
 ## Contact
 gauchocad@gmail.com
