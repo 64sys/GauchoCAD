@@ -16,50 +16,51 @@ GauchoCAD is currently under development and the status is as follows:
 ## Using
 
 # Entities
-![arc](./svg/arc.svg) <img src="./svg/arc.svg">
-![circle](./svg/circle.svg) <img src="./svg/circle.svg">
-![dim](./svg/dim.svg) <img src="./svg/dim.svg">
-![ellipse](./svg/ellipse.svg) <img src="./svg/ellipse.svg">
-![hatch](./svg/hatch.svg) <img src="./svg/hatch.svg">
-![insert](./svg/insert.svg) <img src="./svg/insert.svg">
-![leader](./svg/leader.svg) <img src="./svg/leader.svg">
-![line](./svg/line.svg) <img src="./svg/line.svg">
-![list.txt](./svg/list.txt.svg) <img src="./svg/list.txt.svg">
-![mtext](./svg/mtext.svg) <img src="./svg/mtext.svg">
-![polyline](./svg/polyline.svg) <img src="./svg/polyline.svg">
-![rectangle](./svg/rectangle.svg) <img src="./svg/rectangle.svg">
-![solid](./svg/solid.svg) <img src="./svg/solid.svg">
-![spline](./svg/spline.svg) <img src="./svg/spline.svg">
-![text](./svg/text.svg) <img src="./svg/text.svg">
+![arc](./svg/entities/arc.svg) <img src="./svg/arc.svg">
+![circle](./svg/entities/circle.svg) <img src="./svg/circle.svg">
+![dim](./svg/entities/dim.svg) <img src="./svg/dim.svg">
+![ellipse](./svg/entities/ellipse.svg) <img src="./svg/ellipse.svg">
+![hatch](./svg/entities/hatch.svg) <img src="./svg/hatch.svg">
+![insert](./svg/entities/insert.svg) <img src="./svg/insert.svg">
+![leader](./svg/entities/leader.svg) <img src="./svg/leader.svg">
+![line](./svg/entities/line.svg) <img src="./svg/line.svg">
+![list.txt](./svg/entities/list.txt.svg) <img src="./svg/list.txt.svg">
+![mtext](./svg/entities/mtext.svg) <img src="./svg/mtext.svg">
+![polyline](./svg/entities/polyline.svg) <img src="./svg/polyline.svg">
+![rectangle](./svg/entities/rectangle.svg) <img src="./svg/rectangle.svg">
+![solid](./svg/entities/solid.svg) <img src="./svg/solid.svg">
+![spline](./svg/entities/spline.svg) <img src="./svg/spline.svg">
+![text](./svg/entities/text.svg) <img src="./svg/text.svg">
 
 # Tools 
-![chamfer](./svg/chamfer.svg) <img src="./svg/chamfer.svg">
-![copy](./svg/copy.svg) <img src="./svg/copy.svg">
-![divide](./svg/divide.svg) <img src="./svg/divide.svg">
-![erase](./svg/erase.svg) <img src="./svg/erase.svg">
-![extend](./svg/extend.svg) <img src="./svg/extend.svg">
-![fillet](./svg/fillet.svg) <img src="./svg/fillet.svg">
-![mirror](./svg/mirror.svg) <img src="./svg/mirror.svg">
-![move](./svg/move.svg) <img src="./svg/move.svg">
-![offset](./svg/offset.svg) <img src="./svg/offset.svg">
-![pan](./svg/pan.svg) <img src="./svg/pan.svg">
-![rotate](./svg/rotate.svg) <img src="./svg/rotate.svg">
-![scale](./svg/scale.svg) <img src="./svg/scale.svg">
-![stretch](./svg/stretch.svg) <img src="./svg/stretch.svg">
-![trim](./svg/trim.svg) <img src="./svg/trim.svg">
-![zoome](./svg/zoome.svg) <img src="./svg/zoome.svg">
-![zoomw](./svg/zoomw.svg) <img src="./svg/zoomw.svg">
+![chamfer](./svg/tools/chamfer.svg) <img src="./svg/chamfer.svg">
+![copy](./svg/tools/copy.svg) <img src="./svg/copy.svg">
+![divide](./svg/tools/divide.svg) <img src="./svg/divide.svg">
+![erase](./svg/tools/erase.svg) <img src="./svg/erase.svg">
+![extend](./svg/tools/extend.svg) <img src="./svg/extend.svg">
+![fillet](./svg/tools/fillet.svg) <img src="./svg/fillet.svg">
+![mirror](./svg/tools/mirror.svg) <img src="./svg/mirror.svg">
+![move](./svg/tools/move.svg) <img src="./svg/move.svg">
+![offset](./svg/tools/offset.svg) <img src="./svg/offset.svg">
+![pan](./svg/tools/pan.svg) <img src="./svg/pan.svg">
+![rotate](./svg/tools/rotate.svg) <img src="./svg/rotate.svg">
+![scale](./svg/tools/scale.svg) <img src="./svg/scale.svg">
+![stretch](./svg/tools/stretch.svg) <img src="./svg/stretch.svg">
+![trim](./svg/tools/trim.svg) <img src="./svg/trim.svg">
+![zoome](./svg/tools/zoome.svg) <img src="./svg/zoome.svg">
+![zoomw](./svg/tools/zoomw.svg) <img src="./svg/zoomw.svg">
+
 
 # Layers
-![layers](./svg/layers.svg) <img src="./svg/layers.svg">
+![layers](./svg/layers/layers.svg) <img src="./svg/layers.svg">
 
 # Smart - concret structures
-![beam](./svg/beam.svg) <img src="./svg/beam.svg">
-![column](./svg/column.svg) <img src="./svg/column.svg">
-![list.txt](./svg/list.txt.svg) <img src="./svg/list.txt.svg">
-![slab3p](./svg/slab3p.svg) <img src="./svg/slab3p.svg">
-![slab4p](./svg/slab4p.svg) <img src="./svg/slab4p.svg">
-![wallcolumn](./svg/wallcolumn.svg) <img src="./svg/wallcolumn.svg">
+![beam](./svg/smart/beam.svg) <img src="./svg/beam.svg">
+![column](./svg/smart/column.svg) <img src="./svg/column.svg">
+![list.txt](./svg/smart/list.txt.svg) <img src="./svg/list.txt.svg">
+![slab3p](./svg/smart/slab3p.svg) <img src="./svg/slab3p.svg">
+![slab4p](./svg/smart/slab4p.svg) <img src="./svg/slab4p.svg">
+![wallcolumn](./svg/smart/wallcolumn.svg) <img src="./svg/wallcolumn.svg">
 
 
 ## Contact
