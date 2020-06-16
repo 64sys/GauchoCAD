@@ -33,7 +33,7 @@ GauchoCAD is currently under development and the status is as follows:
 ![text](./svg/entities/text.svg) <img src="./svg/text.svg">
 
 # Tools 
-![chamfer](./svg/tools/chamfer.svg) <img src="./svg/chamfer.svg">
+![chamfer](./svg/tools/chamfer.svg width="48" height="48") <img src="./svg/chamfer.svg">
 ![copy](./svg/tools/copy.svg) <img src="./svg/copy.svg">
 ![divide](./svg/tools/divide.svg) <img src="./svg/divide.svg">
 ![erase](./svg/tools/erase.svg) <img src="./svg/erase.svg">
