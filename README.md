@@ -16,48 +16,48 @@ GauchoCAD is currently under development and the status is as follows:
 ## Using
 
 # Entities
-arc<img src="./svg//entitiesarc/.svg" width="48" height="48">
-circle<img src="./svg//entitiescircle/.svg" width="48" height="48">
-dim<img src="./svg//entitiesdim/.svg" width="48" height="48">
-ellipse<img src="./svg//entitiesellipse/.svg" width="48" height="48">
-hatch<img src="./svg//entitieshatch/.svg" width="48" height="48">
-insert<img src="./svg//entitiesinsert/.svg" width="48" height="48">
-leader<img src="./svg//entitiesleader/.svg" width="48" height="48">
-line<img src="./svg//entitiesline/.svg" width="48" height="48">
-mtext<img src="./svg//entitiesmtext/.svg" width="48" height="48">
-polyline<img src="./svg//entitiespolyline/.svg" width="48" height="48">
-rectangle<img src="./svg//entitiesrectangle/.svg" width="48" height="48">
-solid<img src="./svg//entitiessolid/.svg" width="48" height="48">
-spline<img src="./svg//entitiesspline/.svg" width="48" height="48">
-text<img src="./svg//entitiestext/.svg" width="48" height="48">
+arc<img src="./svg/entities/arc.svg" width="48" height="48">
+circle<img src="./svg/entities/circle.svg" width="48" height="48">
+dim<img src="./svg/entities/dim.svg" width="48" height="48">
+ellipse<img src="./svg/entities/ellipse.svg" width="48" height="48">
+hatch<img src="./svg/entities/hatch.svg" width="48" height="48">
+insert<img src="./svg/entities/insert.svg" width="48" height="48">
+leader<img src="./svg/entities/leader.svg" width="48" height="48">
+line<img src="./svg/entities/line.svg" width="48" height="48">
+mtext<img src="./svg/entities/mtext.svg" width="48" height="48">
+polyline<img src="./svg/entities/polyline.svg" width="48" height="48">
+rectangle<img src="./svg/entities/rectangle.svg" width="48" height="48">
+solid<img src="./svg/entities/solid.svg" width="48" height="48">
+spline<img src="./svg/entities/spline.svg" width="48" height="48">
+text<img src="./svg/entities/text.svg" width="48" height="48">
 
 # Tools 
-chamfer<img src="./svg//toolschamfer/.svg" width="48" height="48">
-copy<img src="./svg//toolscopy/.svg" width="48" height="48">
-divide<img src="./svg//toolsdivide/.svg" width="48" height="48">
-erase<img src="./svg//toolserase/.svg" width="48" height="48">
-extend<img src="./svg//toolsextend/.svg" width="48" height="48">
-fillet<img src="./svg//toolsfillet/.svg" width="48" height="48">
-mirror<img src="./svg//toolsmirror/.svg" width="48" height="48">
-move<img src="./svg//toolsmove/.svg" width="48" height="48">
-offset<img src="./svg//toolsoffset/.svg" width="48" height="48">
-pan<img src="./svg//toolspan/.svg" width="48" height="48">
-rotate<img src="./svg//toolsrotate/.svg" width="48" height="48">
-scale<img src="./svg//toolsscale/.svg" width="48" height="48">
-stretch<img src="./svg//toolsstretch/.svg" width="48" height="48">
-trim<img src="./svg//toolstrim/.svg" width="48" height="48">
-zoome<img src="./svg//toolszoome/.svg" width="48" height="48">
-zoomw<img src="./svg//toolszoomw/.svg" width="48" height="48">
+chamfer<img src="./svg/tools/chamfer.svg" width="48" height="48">
+copy<img src="./svg/tools/copy.svg" width="48" height="48">
+divide<img src="./svg/tools/divide.svg" width="48" height="48">
+erase<img src="./svg/tools/erase.svg" width="48" height="48">
+extend<img src="./svg/tools/extend.svg" width="48" height="48">
+fillet<img src="./svg/tools/fillet.svg" width="48" height="48">
+mirror<img src="./svg/tools/mirror.svg" width="48" height="48">
+move<img src="./svg/tools/move.svg" width="48" height="48">
+offset<img src="./svg/tools/offset.svg" width="48" height="48">
+pan<img src="./svg/tools/pan.svg" width="48" height="48">
+rotate<img src="./svg/tools/rotate.svg" width="48" height="48">
+scale<img src="./svg/tools/scale.svg" width="48" height="48">
+stretch<img src="./svg/tools/stretch.svg" width="48" height="48">
+trim<img src="./svg/tools/trim.svg" width="48" height="48">
+zoome<img src="./svg/tools/zoome.svg" width="48" height="48">
+zoomw<img src="./svg/tools/zoomw.svg" width="48" height="48">
 
 # Layers
-layers<img src="./svg//layerslayers/.svg" width="48" height="48">
+layers<img src="./svg/layers/layers/.svg" width="48" height="48">
 
 # Smart - concret structures
-beam<img src="./svg//smartbeam/.svg" width="48" height="48">
-column<img src="./svg//smartcolumn/.svg" width="48" height="48">
-slab3p<img src="./svg//smartslab3p/.svg" width="48" height="48">
-slab4p<img src="./svg//smartslab4p/.svg" width="48" height="48">
-wallcolumn<img src="./svg//smartwallcolumn/.svg" width="48" height="48">
+beam<img src="./svg/smart/beam/.svg" width="48" height="48">
+column<img src="./svg/smart/column/.svg" width="48" height="48">
+slab3p<img src="./svg/smart/slab3p/.svg" width="48" height="48">
+slab4p<img src="./svg/smart/slab4p/.svg" width="48" height="48">
+wallcolumn<img src="./svg/smart/wallcolumn/.svg" width="48" height="48">
 
 
 
