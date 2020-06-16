@@ -31,7 +31,8 @@ solid<img src="./svg/entities/solid.svg" width="48" height="48">
 spline<img src="./svg/entities/spline.svg" width="48" height="48">
 text<img src="./svg/entities/text.svg" width="48" height="48">
 
-# Tools 
+# Tools
+<img src="./svg/tools/chamfer.svg" width="48" height="48">- Chamfer
 chamfer<img src="./svg/tools/chamfer.svg" width="48" height="48">
 copy<img src="./svg/tools/copy.svg" width="48" height="48">
 divide<img src="./svg/tools/divide.svg" width="48" height="48">
