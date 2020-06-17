@@ -1,7 +1,7 @@
 # Gambas Form File 3.0
 
 { Form Form
-  MoveScaled(0,0,137,82)
+  MoveScaled(0,0,137,95)
   Background = Color.TextBackground
   Icon = Picture["logo.svg"]
   Arrangement = Arrange.Vertical
@@ -333,7 +333,7 @@
     }
   }
   { Panel1 Panel
-    MoveScaled(1,1,134,76)
+    MoveScaled(1,1,134,85)
     Expand = True
     Arrangement = Arrange.Vertical
     { Panel2 Panel
@@ -401,7 +401,7 @@
       }
     }
     { PanEdit1 Panel
-      MoveScaled(1,8,106,66)
+      MoveScaled(3,8,128,57)
       Expand = True
       Arrangement = Arrange.Horizontal
       Spacing = True
@@ -444,11 +444,31 @@
         }
       }
       { Workspace1 Workspace
-        MoveScaled(32,4,71,59)
+        MoveScaled(28,4,75,49)
         Background = Color.TextBackground
         Expand = True
         Orientation = Align.Bottom
         Border = False
+      }
+    }
+    { Panel4 Panel
+      MoveScaled(3,80,129,5)
+      Arrangement = Arrange.Horizontal
+      { lblCommand Label
+        MoveScaled(1,0,12,4)
+        Font = Font["Bold,+1"]
+        Text = ("Command")
+      }
+      { txoCom TextBox
+        MoveScaled(13,0,43,4)
+        Font = Font["Bold,+1"]
+        Background = Color.TextBackground
+      }
+      { pnlLocks Panel
+        MoveScaled(79,0,47,4)
+        Expand = True
+        Arrangement = Arrange.Horizontal
+        Spacing = True
       }
     }
   }
