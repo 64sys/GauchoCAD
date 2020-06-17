@@ -425,6 +425,8 @@ End
 
 Public Sub Draw()               ' called byappmain.hFCAD.drwArea_Draw
 
+    If Me.iPoints < elem.ClassHandler.pointstodraw Then Return
+
     elem.ClassHandler.draw(elem)
 
 End
@@ -433,7 +435,7 @@ Public Sub Finish()
 
     clsEntities.BackUpPosition(elem)
     APPMain.hFCAD.arrEntities.Add(elem)
-    elem.ClassHandler.buildPOI(elem)
+    'elem.ClassHandler.buildPOI(elem)
     elem.ClassHandler.Finish(elem, elem.StepsDone)
 
     LastEntity = elem                                       ' save it to repeat on rigth click
@@ -443,7 +445,8 @@ Public Sub Finish()
     clsDrawingAids.CleanTexts
 
     ' sort them
-    APPMain.hFCAD.arrEntities.Sort()
+    'APPMain.hFCAD.arrEntities.Sort()
+    clsMouseTracking.ReBuildPOIPoints
     clsEntities.GLGenDrawList
 
     appmain.hFCAD.redraw

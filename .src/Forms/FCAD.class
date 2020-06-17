@@ -96,7 +96,7 @@ Public LastPoint As New Float[]                ' ultimo punto marcado o null si 
 Public iEntity As New Single[]             ' las coordenadas del punto encontrado y el tipo de punto
 Public oEntity As Entity                   ' la entidad
 Public flgShowPOIinfo As Boolean = True
-Public tskPOI As New TskPoiTracking             ' la instancia de busqueda de puntos en backgroung
+Public tskPOI As TskPoiTracking             ' la instancia de busqueda de puntos en backgroung
 
 ' OpenGl stuff
 Public GlListAllEntities As Integer
@@ -155,7 +155,7 @@ Public Sub form_Activate()
         cImport.Clear
         modCAD.ApplyLayerProperties(1)
         regen
-        clsEntities.ReBuildPOI
+        clsMouseTracking.ReBuildPOIPoints
         cadZoomE.Start()
     Endif
 
@@ -183,7 +183,7 @@ Public Sub GLArea1_draw()
     If modCAD.DrawBounds Then clsDrawingAids.DrawPolygons
 
     ' entidad resaltada
-    If oEntity Then oEntity.ClassHandler.DrawRemark(oEntity)
+    If iEntity[3] >= 0 Then arrEntities[iEntity[3]].ClassHandler.DrawRemark(arrEntities[iEntity[3]])
 
     clsDrawingAids.DrawCoordenadas
 
@@ -241,7 +241,6 @@ Public Sub GLArea1_MouseDown()
 
     If Mouse.Right Then Return  'handled in MouseUp
 
-    'If modCAD.clsJob.poichecking Then clsEntities.CheckPOI(Xreal(mouse.x), Yreal(mouse.y))
     Select Case modCAD.clsJob.gender
 
         Case "Default"                                                  ' 1. Seleccionando
@@ -264,38 +263,61 @@ End
 
 Public Sub GLArea1_MouseMove()
 
-    If modCAD.clsJob.poichecking Then
-        If Not tskPOI.Running Then
-            tskPOI = New TskPoiTracking
-            tskPOI.Sx = Xreal(mouse.x)
-            tskPOI.Sy = Yreal(mouse.Y)
-            tskPOI.Main
-            Debug "New track"
-        Endif
-    End If
-    'clsEntities.CheckPOI(Xreal(mouse.x), Yreal(mouse.y))
-    
+    ' If modCAD.clsJob.poichecking Then
+    '     If tskPOI = Null Then
+    '         tskPOI = New TskPoiTracking As "NewTskPOI"
+    '         tskPOI.Sx = Xreal(mouse.x)
+    '         tskPOI.Sy = Yreal(mouse.Y)
+    '         'tskPOI.Main
+    '
+    '     Else
+    '
+    '         If tskPOI.value Then iEntity = tskPOI.value
+    '
+    '     Endif
+    ' End If
+    '
+    ' If tskPoi.value Then iEntity = tskPoi.value
+
     CursorX = mouse.x
     CursorY = mouse.y
-
 
     Select Case modCAD.clsJob.gender
 
         Case "Default"                                                  ' 1. Seleccionando
             flgShowPOIinfo = False
+            If modCAD.clsJob.poichecking Then
+                If Not clsMouseTracking.flgSearchingEntity Then
+                    iEntity[3] = clsMouseTracking.CheckAboveEntity(Xreal(mouse.x), Yreal(mouse.Y), Metros(16))
+                End If
+            End If
             modCAD.clsJob.MouseMove(mouse.x, mouse.y) ' dispatch event to the Job
 
             If modCAD.ShowInspector Then
 
-                If iEntity[2] >= 0 Then
+                If iEntity[3] >= 0 Then
 
-                    FInspector.Run(oEntity)
+                    FInspector.Run(arrEntities[iEntity[3]])
                 Else
                     FInspector.Close
 
                 Endif
             End If
         Case Else
+
+            If modCAD.clsJob.poichecking Then
+                If Not clsMouseTracking.flgSearchingPOI Then
+                    iEntity = clsMouseTracking.CheckPOI(Xreal(mouse.x), Yreal(mouse.Y))
+                Else    ' estoy buscando, pero me movi, asi que me desengancho del POI anterior
+
+                    iEntity[0] = Xreal(mouse.x)
+                    iEntity[1] = Yreal(mouse.y)
+                    iEntity[2] = -1                 ' POI type
+                    iEntity[3] = -1                 ' Hooked entity
+
+                End If
+            End If
+
             flgShowPOIinfo = True
 
             clsDrawingAids.Helper.dX = 15
@@ -402,8 +424,6 @@ End
 
 Public Sub form_KeyPress()
 
-    Debug tskPOI.Running
-
     If (Key.Code = Key.Enter) Or (Key.Code = Key.Return) Then
         Debug KeysAccumulator
         modCAD.clsJob.KeyText(KeysAccumulator)
@@ -507,7 +527,7 @@ End
 
 Public Sub _new(cin As Collection)
 
-    iEntity.Insert([0, 0, -1])
+    iEntity.Insert([0, 0, -1, -1])
     Run(cin)
 
 End

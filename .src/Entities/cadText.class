@@ -136,9 +136,9 @@ Public Function BuildPOI(oE As Entity, Optional arrIndex As Integer = -1) As Int
     If arrIndex < 0 Then arrIndex = appmain.hFCAD.arrEntities.Max       ' si este valor no es provisto , estos POI son de la ultima entidad
 
     ' points
-    appmain.hFCAD.poiPoints.insert([oE.p[0], oE.p[1]])
-    appmain.hFCAD.poiType.Add(gcd.poiBasePoint)
-    APPMain.hFCAD.poiEntities.Add(arrIndex)
+    oe.poiPoints.insert([oE.p[0], oE.p[1]])
+    oe.poiType.Add(gcd.poiBasePoint)
+    'oe.poiEntities.Add(arrIndex)
 
     ' line
 

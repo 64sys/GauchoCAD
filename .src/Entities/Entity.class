@@ -65,7 +65,9 @@ Public B As New Float[]                     ' Backup point
 Public Psel As New Boolean[]                ' selected points
 Public Polygon As New Float[]               ' this is a poligon built at element's contruction that defines a poligon used for detecting points inside me
 Public PolyLine As New Float[]              ' this is a poliline built at element's contruction that defines a poligon used for detecting points inside me
-Public MyPoi As New Single[]                ' point of interest
+Public PoiPoints As New Float[]                ' point of interest
+Public PoiType As New Integer[]
+Public poiCount As Integer
 Public Stage As Integer                     ' 0 = creating; 1 = editing
 
 Public glDrwList As Integer                 ' drawing list

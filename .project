@@ -2,7 +2,7 @@
 Title=GauchoCAD
 Startup=Main
 Icon=png/bosquejo2.png
-Version=0.0.62
+Version=0.0.68
 Component=gb.image
 Component=gb.cairo
 Component=gb.qt5
