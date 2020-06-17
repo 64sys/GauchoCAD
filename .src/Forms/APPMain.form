@@ -1,7 +1,7 @@
 # Gambas Form File 3.0
 
 { Form Form
-  MoveScaled(0,0,137,85)
+  MoveScaled(0,0,137,82)
   Background = Color.TextBackground
   Icon = Picture["logo.svg"]
   Arrangement = Arrange.Vertical
@@ -333,11 +333,11 @@
     }
   }
   { Panel1 Panel
-    MoveScaled(2,2,134,78)
+    MoveScaled(1,1,134,76)
     Expand = True
     Arrangement = Arrange.Vertical
     { Panel2 Panel
-      MoveScaled(1,1,132,5)
+      MoveScaled(1,2,132,5)
       Arrangement = Arrange.Horizontal
       { pnlFile Panel
         MoveScaled(0,0,24,5)
@@ -401,7 +401,7 @@
       }
     }
     { PanEdit1 Panel
-      MoveScaled(1,11,106,66)
+      MoveScaled(1,8,106,66)
       Expand = True
       Arrangement = Arrange.Horizontal
       Spacing = True
