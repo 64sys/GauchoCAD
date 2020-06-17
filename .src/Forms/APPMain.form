@@ -447,7 +447,6 @@
         MoveScaled(28,4,75,49)
         Background = Color.TextBackground
         Expand = True
-        Orientation = Align.Bottom
         Border = False
       }
     }
