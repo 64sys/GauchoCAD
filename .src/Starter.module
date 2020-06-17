@@ -38,6 +38,7 @@ Public WindowInfoColor As Integer           ' habria que agrupar todas las vars 
 Public WindowTextColor As Integer           ' una struct "flags" o ponerles un prefijo flg, ej: flgWindowMode
 Public WindowCursorColor As Integer         ' me gusta mas la segunda opcion porque con un Seach+Replace solucionas todo de un saque
 '----------------------
+Public cCommands As New Collection   '' Commands list
 
 ' Variables de un solo uso
 Private ldd As Boolean              '' Testigo de finalización de carga.
@@ -90,6 +91,9 @@ Public Sub Run()
     '' Applying the environments vars
     SetEnvironmentVars()
 
+    '' Load the commands list
+    cCommands = LoadCommandsList()
+
     '' Abrir el formulario principal del programa
     cex.Add(adi, "AppDir")
     cex.Add(apc, "AppCfg")
@@ -134,5 +138,53 @@ Private Sub SetEnvironmentVars()
     '         WindowMode = 1
     '
     ' End Select
+
+End
+
+Private Function LoadCommandsList() As Collection
+
+    Dim cComm As New Collection
+
+    cComm.Add(["chamfer", "cd"], "chamfer")
+    cComm.Add(["copy", "c"], "copy")
+    cComm.Add(["divide", "dx"], "divide")
+    cComm.Add(["erase", "de"], "erase")
+    cComm.Add(["extend", "e"], "extend")
+    cComm.Add(["fillet", "f"], "fillet")
+    cComm.Add(["mirror", "mn"], "mirror")
+    cComm.Add(["move", "m"], "move")
+    cComm.Add(["offset", "fg"], "offset")
+    cComm.Add(["pan", "zc"], "pan")
+    cComm.Add(["rotate", "rt"], "rotate")
+    cComm.Add(["scale", "sc"], "scale")
+    cComm.Add(["stretch", "s"], "stretch")
+    cComm.Add(["trim", "tr"], "trim")
+    cComm.Add(["zoome", "zx"], "zoome")
+    cComm.Add(["zoomw", "z"], "zoomw")
+
+    cComm.Add(["arc", "a"], "arc")
+    cComm.Add(["circle", "cv"], "circle")
+    cComm.Add(["dim", "dw"], "dim")
+    cComm.Add(["ellipse", "ew"], "ellipse")
+    cComm.Add(["hatch", "ht"], "hatch")
+    cComm.Add(["insert", "b"], "insert")
+    cComm.Add(["leader", "li"], "leader")
+    cComm.Add(["line", "l"], "line")
+    cComm.Add(["mtext", "tt"], "mtext")
+    cComm.Add(["polyline", "po"], "polyline")
+    cComm.Add(["rectangle", "re"], "rectangle")
+    cComm.Add(["solid", "sa"], "solid")
+    cComm.Add(["spline", "sq"], "spline")
+    cComm.Add(["text", "t"], "text")
+
+    cComm.Add(["beam", "w1"], "beam")
+    cComm.Add(["column", "w2"], "column")
+    cComm.Add(["slab3p", "w3"], "slab3p")
+    cComm.Add(["slab4p", "w4"], "slab4p")
+    cComm.Add(["wallcolumn", "w5"], "wallcolumn")
+
+    cComm.Add(["layers", "lk"], "layers")
+
+    Return cComm
 
 End
