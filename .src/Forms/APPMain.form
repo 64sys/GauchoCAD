@@ -1,7 +1,7 @@
 # Gambas Form File 3.0
 
 { Form Form
-  MoveScaled(0,0,137,95)
+  MoveScaled(0,0,137,78)
   Background = Color.TextBackground
   Icon = Picture["logo.svg"]
   Arrangement = Arrange.Vertical
@@ -333,7 +333,7 @@
     }
   }
   { Panel1 Panel
-    MoveScaled(1,1,134,85)
+    MoveScaled(1,1,134,72)
     Expand = True
     Arrangement = Arrange.Vertical
     { Panel2 Panel
@@ -451,7 +451,7 @@
       }
     }
     { Panel4 Panel
-      MoveScaled(3,80,129,5)
+      MoveScaled(3,66,129,5)
       Arrangement = Arrange.Horizontal
       { lblCommand Label
         MoveScaled(1,0,12,4)

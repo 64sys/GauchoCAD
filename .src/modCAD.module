@@ -121,7 +121,7 @@ Public Sub Main()
     'FileName = User.Home &/ "autosaveV5.xml"
 
     FontList = glPlus.LoadFonts(Application.Path &/ "Fonts/LFF")
-    glPlus.SelectFont("romans")
+    glPlus.SelectFont("romanc")
 
 End
 

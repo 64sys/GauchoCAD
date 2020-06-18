@@ -861,33 +861,48 @@ Public Sub txoCom_KeyRelease()
                                         Case 0
                                             enty.P[0] = x
                                             enty.P[1] = y
-                                            Inc p
+                                            p = p + 2
+                                            lblCommand.Text = obj.ParamHelperList[1]
+                                            txoCom.Text = ""
+                                        Case -1
+                                            txoCom.Text = ""
+                                            lblCommand.Text = "Command"
 
                                         Case Else
 
                                             enty.P[0 + p] = x
                                             enty.P[1 + p] = y
-                                            p = 0
+                                            enty.Finished = True
+                                            'p = -1
+                                            txoCom.Text = ""
 
                                     End Select
 
                                 Endif
+
                         End Select
+                    Case Else
+                        If sCom <> "" Then
+                            If Starter.cCommands.Exist(sCom) Then
+                                HistoCom.Push(sCom)
+                                Print sCom
+                                If Workspace1.ActiveWindow Then
+                                    modCAD.clsJob.KeyText(sCom)
+
+                                    obj = modCAD.clsJob
+                                    Select Object.Type(obj)
+                                        Case "clsEntityBuilder"
+                                            txoCom.Text = ""
+                                            lblCommand.Text = obj.ParamHelperList[0]
+
+                                        Case Else
+                                            p = 0
+                                    End Select
+                                Endif
+                            Endif
+                        Endif
                 End Select
             Endif
-
-            If sCom <> "" Then
-                If Starter.cCommands.Exist(sCom) Then
-
-                Endif
-                HistoCom.Push(sCom)
-                Print sCom
-                If Workspace1.ActiveWindow Then
-                    modCAD.clsJob.KeyText(sCom)
-                Endif
-                txoCom.Text = ""
-            Endif
-
     End Select
 
 End
