@@ -42,7 +42,10 @@ Public CurrentLayer As String
 
 'variables de ambiente
 Public flgShowInspector As Boolean = True
-Public HistoCom As New String[]     '' Command history
+Public HistoCom As New String[]     '' Commands history
+Public ListCom As New String[]      '' Commands list
+Public AliasCom As New String[]     '' Commands alias
+Private p As Integer
 
 Public cMod As New Collection       '' All drawings common collection
 
@@ -427,7 +430,7 @@ Public Sub Form_Open()
 
     Me.Maximized = True
 
-    Task("new")
+    gTask("new")
 
 End
 
@@ -461,7 +464,7 @@ Public Sub menuapp_Click()
 
     obj = Last
 
-    Task(obj.Tag)
+    gTask(obj.Tag)
 
 End
 
@@ -554,7 +557,7 @@ Public Sub LoadComboboxes(cMdl As Collection)
 
 End
 
-Public Sub Task(sTask As String)
+Public Sub gTask(sTask As String)
 
     Dim s As String
     Dim cModel As New Collection
@@ -587,7 +590,7 @@ Public Sub Task(sTask As String)
             Next
 
             If template = True Then
-                Task("saveas")
+                gTask("saveas")
             Else
                 cad.SaveGaucho(CurrentFile, hFCAD.cModel)
             Endif
@@ -829,32 +832,61 @@ Public Sub dprop_Click()
 
 End
 
-Public Sub PanEdit1_MouseDown()
-
-End
-
-Public Sub txoCom_KeyPress()
-
-End
-
 Public Sub txoCom_KeyRelease()
 
     Dim sCom As String
     Dim i As Integer
+    Dim obj As Object
+    Dim enty As Entity
+
+    Dim x As Float
+    Dim y As Float
 
     Select Key.Code
         Case Key.Enter, Key.Return, Key.Space
-            If sCom <> "" Then
-                HistoCom.Push(sCom)
+            sCom = txoCom.Text
+            If Workspace1.ActiveWindow Then
+                obj = modCAD.clsJob
+                Select Object.Type(obj)
+                    Case "clsEntityBuilder"
+                        enty = obj.elem
+                        Select enty.Gender
+                            Case "Line"
+                                If InStr(sCom, ",") > 0 Then
 
+                                    x = Split(sCom, ",")[0]
+                                    y = Split(sCom, ",")[1]
+
+                                    Select p ' P es una variable global tipo Private
+                                        Case 0
+                                            enty.P[0] = x
+                                            enty.P[1] = y
+                                            Inc p
+
+                                        Case Else
+
+                                            enty.P[0 + p] = x
+                                            enty.P[1 + p] = y
+                                            p = 0
+
+                                    End Select
+
+                                Endif
+                        End Select
+                End Select
             Endif
 
-        Case Key.Esc
+            If sCom <> "" Then
+                If Starter.cCommands.Exist(sCom) Then
 
-        Case Key.Up
-
-        Case Else
-            sCom &= sCom & Asc(Key.Code)
+                Endif
+                HistoCom.Push(sCom)
+                Print sCom
+                If Workspace1.ActiveWindow Then
+                    modCAD.clsJob.KeyText(sCom)
+                Endif
+                txoCom.Text = ""
+            Endif
 
     End Select
 
