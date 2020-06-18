@@ -169,7 +169,7 @@ Public Function CheckAboveEntity(xr As Float, Yr As Float, tolerance As Float) A
             Case "PLine"
 
                 For i = 0 To APPMain.hFCAD.arrEntities[e].P.count - 4 Step 2
-                    If puntos.doIntersect(xr - tolerance, Yr, Xr + tolerance, Yr, APPMain.hFCAD.arrEntities[e].P[i + 0], APPMain.hFCAD.arrEntities[e].P[i + 1], APPMain.hFCAD.arrEntities[e].P[i + 2], APPMain.hFCAD.arrEntities[e].P[i + 3]) Or puntos.doIntersect(xr, Yr - tolerance, Xr, Yr + tolerance, APPMain.hFCAD.arrEntities[e].P[i + 0], APPMain.hFCAD.arrEntities[e].P[i + 1], APPMain.hFCAD.arrEntities[e].P[i + 2], APPMain.hFCAD.arrEntities[e].P[i + 3]) Then Break
+                    If puntos.doIntersect(xr - tolerance, Yr, Xr + tolerance, Yr, APPMain.hFCAD.arrEntities[e].P[i + 0], APPMain.hFCAD.arrEntities[e].P[i + 1], APPMain.hFCAD.arrEntities[e].P[i + 2], APPMain.hFCAD.arrEntities[e].P[i + 3]) Or puntos.doIntersect(xr, Yr - tolerance, Xr, Yr + tolerance, APPMain.hFCAD.arrEntities[e].P[i + 0], APPMain.hFCAD.arrEntities[e].P[i + 1], APPMain.hFCAD.arrEntities[e].P[i + 2], APPMain.hFCAD.arrEntities[e].P[i + 3]) Then Goto ExitSearch
                 Next
             Case "Circle"
 
@@ -235,6 +235,9 @@ Public Function CheckAboveEntity(xr As Float, Yr As Float, tolerance As Float) A
         modUtils.DoEvents(0.100)
 
     Next
+
+ExitSearch:
+
     flgSearchingEntity = False
     Debug "Above entity en ", Timer - t
     If e = APPMain.hFCAD.arrEntities.Count Then

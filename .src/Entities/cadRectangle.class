@@ -1,0 +1,92 @@
+' Gambas class file
+
+' GauchoCAD
+' A simple CAD made in Gambas
+'
+' Copyright (C) Ing Martin P Cristia
+'
+' This program is free software; you can redistribute it and/or modify
+' it under the terms of the GNU General Public License as published by
+' the Free Software Foundation; either version 3 of the License, or
+' (at your option) any later version.
+'
+' This program is distributed in the hope that it will be useful,
+' but WITHOUT ANY WARRANTY; without even the implied warranty of
+' MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+' GNU General Public License for more details.
+'
+' You should have received a copy of the GNU General Public License
+' along with this program; if not, write to the Free Software
+' Foundation, Inc., 51 Franklin St, Fifth Floor,
+' Boston, MA  02110-1301  USA
+Create Static
+'Fast
+
+Public Const Gender As String = "Rectangle"
+Public Const DrawingOrder As Integer = 1        ' 1 = draws first
+Public Const HelperTrabajo As String = ("a line")
+Public Const ParamType As String = "PP"                             ' that is Point, Point; could be Color Text, etc
+Public Const ParamHelper As String = "Start point;End point"
+Public Const GAMBASCADENTITY As String = ("EntityBase")
+Public Const USEWITH As String = "clsEntityBuilder"
+Public Const PointsToDraw As Integer = 1             ' minimal point requered for drawing something usefull
+Public Const OrtogonalIgnorado As Boolean = False
+Public Const OrtogonalForzado As Boolean = False
+Public Const ParamDefault As String = " "
+Public Const StretchAble As Boolean = True           ' Si lo puedo deformar
+Public Selected As Boolean
+Public ForDeletion As Boolean = True        ' this must be falsed in Finish
+Public DrawAble As Boolean = False          ' True si durante la construccion ya tiene suficientes elementos para poder hacer una representacion digna
+Public Visible As Boolean = True            ' si esta entidad puede ser mostrada independientmente
+Public Finished As Boolean = False          ' colocar en true cuando se llegue a completar
+Public StepsDone As Integer                 ' esto lo cambia cls ElementBuilder durante la construccion
+
+Public Sub Draw(oE As Entity)
+
+    If Not oE.Visible Then Return
+
+    If oE.Selected And Not modCAD.ToolActive Then oE.ColorToPaint = modCAD.ColorForSelected Else oE.ColorToPaint = modCAD.GetGBColor(oE.colour, oE.Layerid)
+
+    GLplus.Rectangle2D(oE.p[0], oE.p[1], oE.p[2] - oE.p[0], oE.p[3] - oE.p[1],,,,, oE.ColorToPaint, oe.LineWidth, oe.LineType, 2)
+
+End
+
+' This function will return False if the element couldn't be created for some reason: bad or incomple user input
+' True means all is good, False will instruct the clsEntityBuilder to delete it
+Public Sub Finish(oE As Entity, ParamsDone As Integer) As Boolean
+
+    ' aca vamos a trasnformar la entidad en una polilinea
+    oe.gender = "PLine"
+    oe.ClassHandler = cadPLine
+    Dim w, h As Float
+    w = oE.p[2] - oE.p[0]
+    h = oE.p[3] - oE.p[1]
+    oE.p[2] = oE.p[0] + w
+    oe.P[3] = oE.p[1]
+    oE.P.add(oE.p[0] + w)
+    oe.P.add(oE.p[1] + h)
+    oE.P.add(oE.p[0])
+    oe.P.add(oE.p[1] + h)
+    oE.P.add(oE.p[0])
+    oe.P.add(oE.p[1])
+
+    cadPLine.BuildPOI(oe)
+
+    ' busco el tipo de linea, si hace falta
+    If oE.LineTypeName = "Dashed" Then oE.LineType = 1
+    ' tareas finales de armado del objeto
+    oE.b.resize(oE.P.count)
+    oE.psel.resize(oE.p.count / 2)
+    oE.ForDeletion = False
+    oE.DrawAble = True
+    oE.Selected = False
+    oE.Finished = True
+
+    If Not True Then
+
+        oE.ForDeletion = True
+        oE.DrawAble = False
+
+    End If
+
+End
