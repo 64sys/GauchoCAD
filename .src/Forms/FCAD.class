@@ -155,7 +155,7 @@ Public Sub form_Activate()
         cImport.Clear
         modCAD.ApplyLayerProperties(1)
         regen
-        clsMouseTracking.ReBuildPOIPoints
+        'clsMouseTracking.ReBuildPOIPoints
         cadZoomE.Start()
     Endif
 
