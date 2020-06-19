@@ -8,9 +8,9 @@ Create Static
 Public Const Gender As String = "SPLine"
 Public Const PointsToDraw As Integer = 0             ' minimal point requered for drawing something usefull
 Public Const HelperTrabajo As String = ("SPLine")
-Public Const ParamType As String = "PPPP"                             ' that is Point, Point, Float; could be Color Text, etc
-Public Const ParamHelper As String = ("First Point;Next Point;Next Point;Last Point")      ' a little text that is shown at the prompt waiting for user input during build
-Public Const ParamDefault As String = ""
+Public Const ParamType As String = "P+"                             ' that is Point, Point, Float; could be Color Text, etc
+Public Const ParamHelper As String = ("Next Point")      ' a little text that is shown at the prompt waiting for user input during build
+Public Const ParamDefault As String = "Close/Undo"
 Public Const GAMBASCADENTITY As String = ("EntityBase")
 Public Const USEWITH As String = "clsEntityBuilder"
 Public Const DrawingOrder As Integer = 0        ' 1 = draws first
@@ -23,6 +23,24 @@ Public DrawAble As Boolean = False          ' True si durante la construccion ya
 Public Visible As Boolean = True            ' si esta entidad puede ser mostrada independientmente
 Public Finished As Boolean = False          ' colocar en true cuando se llegue a completar
 Public StepsDone As Integer                 ' esto lo cambia cls ElementBuilder durante la construccion
+Public drawingPoints As New Float[]
+
+Public numDrawingPoints As Integer = 100
+
+Public Sub Draw(oE As Entity)
+
+    If Not oE.Visible Then Return
+
+    If oE.Selected And Not modCAD.ToolActive Then oE.ColorToPaint = modCAD.ColorForSelected Else oE.ColorToPaint = modCAD.GetGBColor(oE.colour, oE.Layerid)
+    drawingPoints.Clear
+
+    'oe.P.Clear
+    'oe.P.Insert([10, 10, 70, 310, 210, 210, 210, 10])
+
+    calculateDrawingPoints(oe.p)
+    GLplus.PolyLines(drawingPoints, oE.ColorToPaint, oE.LineWidth, oe.linetype)
+
+End
 
 Public Sub Draw2(oE As Entity)
 
@@ -99,5 +117,54 @@ Public Sub Finish(oE As Entity, ParamsDone As Integer) As Boolean
         oE.DrawAble = False
 
     End If
+
+End
+
+Public Function calculateNewPoint(points As Float[], t As Float) As Float[]
+    ' Coordinates calculated using the general formula are relative To
+    ' origin at bottom left.
+
+    Dim x As Float = 0
+    Dim y As Float = 0
+    Dim n As Integer = points.Count / 2 - 1
+    Dim i As Integer
+    Dim bin As Float
+
+    For i = 0 To n
+        bin = C(n, i) * (1 - t) ^ (n - i) * t ^ i
+        x += bin * points[i * 2]
+        y += bin * points[i * 2 + 1]
+    Next
+    Return [x, y]
+
+End
+
+Public Function calculateDrawingPoints(points As Float[])
+
+    Dim interval As Float = 1 / numDrawingPoints
+    Dim t As Float = interval
+    Dim i As Integer
+
+    drawingPoints.insert(calculateNewPoint(points, 0))
+    For i = 0 To numDrawingPoints - 1
+        drawingPoints.insert(calculateNewPoint(points, t))
+        t += interval
+    Next
+
+End
+
+Public Function C(n As Integer, k As Integer) As Float
+
+    Dim coeff As Float = 1
+    Dim x As Float
+
+    For x = n - k + 1 To n
+        coeff *= x
+
+    Next
+    For x = 1 To k
+        coeff /= x
+    Next
+    Return coeff
 
 End
