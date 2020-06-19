@@ -19,3 +19,141 @@
 ' along with this program; if not, write to the Free Software
 ' Foundation, Inc., 51 Franklin St, Fifth Floor,
 ' Boston, MA  02110-1301  USA
+Create Static
+' Fast
+
+Public Const Gender As String = "Leader"
+Public Const PointsToDraw As Integer = 0             ' minimal point requered for drawing something usefull
+Public Const HelperTrabajo As String = ("Leader")
+Public Const ParamType As String = "TFP+"
+Public Const ParamHelper As String = ("Text; Height; Next Point")      ' a little text that is shown at the prompt waiting for user input during build
+Public Const ParamDefault As String = " ;20; <enter>"
+Public Const GAMBASCADENTITY As String = ("EntityBase")
+Public Const USEWITH As String = "clsEntityBuilder"
+Public Const DrawingOrder As Integer = 0        ' 1 = draws first
+Public Const OrtogonalIgnorado As Boolean = False
+Public Const OrtogonalForzado As Boolean = False
+Public Const StretchAble As Boolean = True           ' Si lo puedo deformar
+Public Selected As Boolean
+Public ForDeletion As Boolean = True        ' this must be falsed in Finish
+Public DrawAble As Boolean = False          ' True si durante la construccion ya tiene suficientes elementos para poder hacer una representacion digna
+Public Visible As Boolean = True            ' si esta entidad puede ser mostrada independientmente
+Public Finished As Boolean = False          ' colocar en true cuando se llegue a completar
+Public StepsDone As Integer                 ' esto lo cambia cls ElementBuilder durante la construccion
+
+Public Sub Draw(oE As Entity)
+
+    Dim angle As Float
+
+    If Not oE.Visible Then Return
+    If oe.P.Count < 4 Then Return
+
+    If oE.Selected And Not modCAD.ToolActive Then oE.ColorToPaint = modCAD.ColorForSelected Else oE.ColorToPaint = modCAD.GetGBColor(oE.colour, oE.Layerid)
+
+    Dim tRect As New Float[], poli As New Float[]
+
+    tRect = glPlus.TextExtends(oE.StringData, oE.fParam[0])
+
+    angle = Ang((oE.p[oE.p.max - 1] - oE.p[oE.p.max - 3]), (oE.p[oE.p.max] - oE.p[oE.p.max - 2]))
+    glPlus.DrawText(oE.StringData, (oE.p[oE.p.max - 1] + oE.p[oE.p.max - 3]) / 2 - tRect[0] / 2, (oE.p[oE.p.Max] + oE.p[oE.p.max - 2]) / 2 + tRect[1] / 2, Angle, oe.fParam[0], oE.ColorToPaint)
+    ' TODO: arrow head cuando tengamos los parametros de Dim , como ser tamaño de la flecha, etc
+    GLplus.PolyLines(oE.p, oE.ColorToPaint, oE.LineWidth, oe.linetype)
+
+End
+
+'' A fat version of the line
+Public Sub DrawRemark(oE As Entity)
+
+    If Not oE.Visible Then Return
+
+    If oE.Selected And Not modCAD.ToolActive Then oE.ColorToPaint = modCAD.ColorForSelected Else oE.ColorToPaint = modCAD.GetGBColor(oE.colour, oE.Layerid)
+
+    GLplus.Polygon(oE.Polygon, oE.ColorToPaint, oE.LineWidth, gcd.stiDashed)
+    GLplus.PolyLines(oE.p, modCAD.WindowBackColor, oE.LineWidth, gcd.stiDashed)
+    GLplus.PolyLines(oE.p, oE.ColorToPaint, oE.LineWidth + 2, oE.LineType)
+    GLplus.lines([oE.P[0], oE.P[1], (oE.P[0] + oE.P[2]) / 8, (oE.P[1] + oE.P[3]) / 8], oE.ColorToPaint, oE.ColorToPaint, oE.LineWidth * 3, oe.LineType)
+
+End
+
+Public Function Draw2(oE As Entity)
+
+    Dim i As Integer
+
+    If Not oE.Visible Then Return
+
+    If oE.Selected And Not modCAD.ToolActive Then oE.ColorToPaint = modCAD.ColorForSelected Else oE.ColorToPaint = modCAD.GetGBColor(oE.colour, oE.Layerid)
+
+    paint.LineWidth = oE.LineWidth / appmain.hFcad.ScaleZoom / modCAD.ScaleLines
+    If oE.flxDash Then paint.Dash = oE.flxDash
+    If oE.Selected And Not modCAD.ToolActive Then
+        paint.brush = Paint.Color(modCAD.ColorForSelected)
+    Else
+        paint.brush = Paint.Color(oE.ColorToPaint)
+    Endif
+
+    paint.moveto(oE.p[0], oE.p[1])
+    For i = 2 To oE.P.Max Step 2
+        paint.lineto(oE.p[i], oE.p[i + 1])
+
+    Next
+
+    paint.Stroke
+
+End
+
+'' Creo los puntos de interes
+'' Build point of interest
+
+Public Function BuildPOI(oE As Entity, Optional arrIndex As Integer = -1) As Integer
+
+    cadPLine.BuildPOI(oe)
+
+    ' points
+    oe.poiPoints.insert([oE.p[0], oE.p[1]])
+    oe.poiType.Add(gcd.poiBasePoint)
+    'oe.poiEntities.Add(arrIndex)
+
+    ' line
+
+    ' Polygon
+
+    Dim tRect As New Float[], poli As New Float[]
+
+    tRect = glPlus.TextExtends(oE.StringData, oE.fParam[0])
+    poli.Insert([0, 0, tRect[0], 0, tRect[0], tRect[1], 0, tRect[1]]) ' armo el poligono , que ya tiene la escala
+    puntos.Rotate(Poli, oE.fParam[0] * Pi / 180)
+    puntos.Translate(Poli, oE.P[0], oE.P[1])
+
+    oe.Polygon.Clear
+    oe.Polygon.Insert(poli)
+
+    puntos.Translate(oe.Polygon, (oE.p[oE.p.max - 1] + oE.p[oE.p.max - 3]) / 2 - oE.P[0], (oE.p[oE.p.Max] + oE.p[oE.p.max - 2]) / 2 - oE.P[1])
+
+End
+
+' This function will return False if the element couldn't be created for some reason: bad or incomple user input
+' True means all is good, False will instruct the clsEntityBuilder to delete it
+Public Sub Finish(oE As Entity, ParamsDone As Integer) As Boolean
+
+    'Print "Finish en EntityBase"
+    'CreatePolygon(oe)
+    BuildPOI(oe)
+
+    ' busco el tipo de linea, si hace falta
+    If oE.LineTypeName = "Dashed" Then oE.LineType = 1
+    ' tareas finales de armado del objeto
+    oE.b.resize(oE.P.count)
+    oE.psel.resize(oE.p.count / 2)
+    oE.ForDeletion = False
+    oE.DrawAble = True
+    oE.Selected = False
+    oE.Finished = True
+
+    If Not True Then
+
+        oE.ForDeletion = True
+        oE.DrawAble = False
+
+    End If
+
+End

@@ -60,7 +60,7 @@ Public Group As Integer = 0                 ' Pertenecemos a un grupo?
 Public B As New Float[]                     ' Backup point
 Public Psel As New Boolean[]                ' selected points
 Public Polygon As New Float[]       ' this is a poligon built at element's contruction that defines a poligon used for detecting points inside me
-Public MyPoi As New Single[]                ' point of interest
+Public MyPoi As New Float[]                ' point of interest
 Public Conectors As Float[]
 Public Ensambles As Float[]
 

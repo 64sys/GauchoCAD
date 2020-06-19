@@ -97,23 +97,23 @@ Public Function BuildPOI(oE As Entity, Optional arrIndex As Integer = -1) As Int
     If arrIndex < 0 Then arrIndex = appmain.hFCAD.arrEntities.Max       ' si este valor no es provisto , estos POI son de la ultima entidad
     Dim i As Integer
 
-    appmain.hFCAD.poiPoints.insert([oE.P[0], oE.P[1]])
-    appmain.hFCAD.poiType.Add(gcd.poiEndPoint)
-    APPMain.hFCAD.poiEntities.Add(arrIndex)
+    oe.poiPoints.insert([oE.P[0], oE.P[1]])
+    oe.poiType.Add(gcd.poiEndPoint)
+    'oe.poiEntities.Add(arrIndex)
 
     For i = 0 To oE.P.count - 4 Step 2
 
-        appmain.hFCAD.poiPoints.insert([(oE.P[i + 0] + oE.P[i + 2]) / 2, (oE.P[i + 1] + oE.P[i + 3]) / 2])   ' mid
-        appmain.hFCAD.poiType.Add(gcd.poiMidPoint)
-        APPMain.hFCAD.poiEntities.Add(arrIndex)
+        oe.poiPoints.insert([(oE.P[i + 0] + oE.P[i + 2]) / 2, (oE.P[i + 1] + oE.P[i + 3]) / 2])   ' mid
+        oe.poiType.Add(gcd.poiMidPoint)
+        'oe.poiEntities.Add(arrIndex)
 
-        appmain.hFCAD.poiPoints.insert([oE.P[i + 2], oE.P[i + 3]])
-        appmain.hFCAD.poiType.Add(gcd.poiEndPoint)
-        APPMain.hFCAD.poiEntities.Add(arrIndex)
+        oe.poiPoints.insert([oE.P[i + 2], oE.P[i + 3]])
+        oe.poiType.Add(gcd.poiEndPoint)
+        'oe.poiEntities.Add(arrIndex)
 
         ' line
-        appmain.hFCAD.poiLines.insert([oE.p[i], oE.p[i + 1], oE.p[i + 2], oE.p[i + 3]])
-        APPMain.hFCAD.poiLinesEntities.Add(arrIndex)
+        'appmain.hFCAD.poiLines.insert([oE.p[i], oE.p[i + 1], oE.p[i + 2], oE.p[i + 3]])
+        'APPMain.hFCAD.poiLinesEntities.Add(arrIndex)
         ' appmain.hFCAD.poiLinesRelPoint.Insert([i / 2, i / 2 + 1])
 
     Next

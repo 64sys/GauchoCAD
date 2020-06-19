@@ -92,6 +92,26 @@ End
 
 Public Function BuildPOI(oE As Entity, Optional arrIndex As Integer = -1) As Integer
 
+    ' CENTER
+    oe.poiPoints.insert([oE.p[0], oE.p[1]])
+    oe.poiType.Add(gcd.poiCenter)
+
+    ' quadrant
+    oe.poiPoints.insert([oE.p[0] + oe.fParam[0], oE.p[1]])
+    oe.poiType.Add(gcd.poiQuadrant)
+
+    ' quadrant
+    oe.poiPoints.insert([oE.p[0] - oe.fParam[0], oE.p[1]])
+    oe.poiType.Add(gcd.poiQuadrant)
+
+    ' quadrant
+    oe.poiPoints.insert([oE.p[0], oE.p[1] + oe.fParam[0]])
+    oe.poiType.Add(gcd.poiQuadrant)
+
+    ' quadrant
+    oe.poiPoints.insert([oE.p[0], oE.p[1] - oe.fParam[0]])
+    oe.poiType.Add(gcd.poiQuadrant)
+
 End
 ' This function will return False if the element couldn't be created for some reason: bad or incomple user input
 ' True means all is good, False will instruct the clsEntityBuilder to delete it

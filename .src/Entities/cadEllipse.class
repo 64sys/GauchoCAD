@@ -80,23 +80,28 @@ Public Sub Draw(oE As Entity)
     angle_increment = Pi * 2 / 360
     For theta = 0 To Me.recorrido Step angle_increment
         ' el punto considerando 0,0 al centro
-        x = major * Cos(Me.start + theta)
-        y = major * Sin(Me.start + theta)
-        oE.PolyLine.Add(x)
-        oE.PolyLine.Add(y)
+        x = major * Cos(Me.start + theta) * Cos(angle) - minor * Sin(Me.start + theta) * Sin(angle)
+        y = major * Cos(Me.start + theta) * Sin(angle) + minor * Sin(Me.start + theta) * Cos(angle)
+        oE.PolyLine.Add(x + oE.p[0])
+        oE.PolyLine.Add(y + oE.p[1])
 
         'GLplus.Vertex2D(radio * Cos(start_angle + theta), radio * Sin(start_angle + theta), colour)
     Next
 
-    ' aplico las trnasformaciones
-    puntos.Scale(oE.PolyLine, 1, minor / major)
-    puntos.Rotate(oE.PolyLine, angle)
-    puntos.Translate(oE.PolyLine, oE.p[0], oE.p[1])
-    For i = 0 To oE.PolyLine.max Step 2
-        GLplus.Vertex2D(oE.PolyLine[i], oE.PolyLine[i + 1], oE.ColorToPaint)
-    Next
+    ' ' aplico las trnasformaciones
+    ' puntos.Scale(oE.PolyLine, 1, minor / major)
+    ' puntos.Rotate(oE.PolyLine, angle)
+    'puntos.Translate(oE.PolyLine, oE.p[0], oE.p[1])
+    'For i = 0 To oE.PolyLine.max Step 2
+    '    GLplus.Vertex2D(oE.PolyLine[i], oE.PolyLine[i + 1], oE.ColorToPaint)
+    'Next
 
     GL.End
+    GLplus.PolyLines(oE.PolyLine, oE.ColorToPaint, oe.LineWidth, oe.LineType)
+
+    ' For i = 0 To oE.PolyLine.max Step 2
+    '     GLplus.Vertex2D(oE.PolyLine[i], oE.PolyLine[i + 1], oE.ColorToPaint)
+    ' Next
 
 End
 
