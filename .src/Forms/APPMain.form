@@ -122,15 +122,12 @@
       Name = "mnuMText"
       Text = ("Multi Text")
       Picture = Picture["svg/entities/mtext.svg"]
-      Enabled = False
       Tag = "mtext"
     }
     { mnuBlock Menu entity
       Name = "mnuBlock"
       Text = ("Block")
       Picture = Picture["svg/entities/insert.svg"]
-      Enabled = False
-      Visible = False
       Tag = "block"
     }
     { mnuDim Menu entity
@@ -144,7 +141,6 @@
       Name = "mnuLeader"
       Text = ("Ledader")
       Picture = Picture["svg/entities/leader.svg"]
-      Enabled = False
       Tag = "leader"
     }
     { mnuSpline Menu entity
@@ -165,9 +161,12 @@
       Name = "mnuRectangle"
       Text = ("Rectangle")
       Picture = Picture["svg/entities/rectangle.svg"]
-      Enabled = False
-      Visible = False
       Tag = "rectangle"
+    }
+    { mnuPolygon Menu
+      Text = ("Polygon")
+      Picture = Picture["svg/entities/polygon.svg"]
+      Tag = "polygon"
     }
     { mnuPoint Menu entity
       Name = "mnuPoint"
