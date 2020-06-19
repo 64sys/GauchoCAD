@@ -148,7 +148,7 @@ Public Sub Run(cin As Collection)
 
 End
 
-Public Sub LoadColors()
+Public Sub LoadColorsOriginalDeTincho()
 
     Dim hMenu As Menu
     Dim mui As Menu
@@ -180,6 +180,50 @@ Public Sub LoadColors()
 
         If cCol.Key = "7" Then
             mubColors.Picture = Image.Load(isvg).Stretch(16, 16).Picture
+            mubColors.Tooltip = ix[0]
+            mubColors.Text = ix[0]
+            'mubColors.Refresh
+        Endif
+
+    Next
+
+End
+
+Public Sub LoadColors()
+
+    Dim hMenu As Menu
+    Dim mui As Menu
+    Dim cCol As Collection
+    Dim ix As Variant[]
+    Dim isvg As String
+    Dim imgColorCircle As Image
+
+    cCol = Starter.cColors
+
+    mubColors.Menu = "Clx"
+
+    ' Relleno el Menu del MenuButton
+    hMenu = New Menu(Me) As "Clx" '' Crea el menu inicial
+
+    For Each ix In cCol
+        mui = New Menu(hMenu) As "Clx"
+        mui.Text = ix[0]
+        mui.Tag = ix[1]
+
+        imgColorCircle = New Image(16, 16, mubColors.Background)    ' creo la imagen dinamicamente de tamaño 16x16 , pero puede ser cualquiera
+
+        Paint.Begin(imgColorCircle)                                 ' voy a dibujar sobre la imagen que acabo de crear
+        Paint.Arc(8, 8, 7, 0, 2 * Pi)                               ' le agrego un circulo, pero podria ser cualquier forma
+        Paint.Brush = Paint.Color(modCAD.gColor[Val(cCol.Key)])     ' el color lo saco directamente de la tabla de colores CAD
+        Paint.Fill(True)                                            ' relleno
+        Paint.Brush = Paint.Color(Color.Black)                      ' opcionalmente le dibujo el contorno que hace mejor contraste con el menubutton
+        Paint.Stroke()                                              ' contorno
+        Paint.End                                                   ' fin del ciclo Paint sobre esta imagen
+
+        mui.Picture = imgColorCircle.Picture                        ' la inserto en el Button
+
+        If cCol.Key = "7" Then                                      ' si es la 7, la elijo como default
+            mubColors.Picture = imgColorCircle.Picture
             mubColors.Tooltip = ix[0]
             mubColors.Text = ix[0]
             'mubColors.Refresh

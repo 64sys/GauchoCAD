@@ -11,10 +11,10 @@
 
 Public Sub Main()
 
-    Starter.Run()
+    'Starter.Run()
 
     modCAD.Main
 
-    'Starter.Run()
+    Starter.Run()
 
 End
