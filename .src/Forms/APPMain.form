@@ -165,6 +165,7 @@
     }
     { mnuPolygon Menu
       Text = ("Polygon")
+      Picture = Picture["svg/entities/polygon.svg"]
       Tag = "polygon"
     }
     { mnuPoint Menu entity
