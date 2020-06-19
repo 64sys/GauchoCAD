@@ -140,7 +140,112 @@ Public Sub Run(cin As Collection)
         Next
     Next
 
+    'Loading menu colors
+    LoadColors()
+    LoadLocks()
+
     Me.Show()
+
+End
+
+Public Sub LoadColors()
+
+    Dim hMenu As Menu
+    Dim mui As Menu
+    Dim cCol As Collection
+    Dim ix As Variant[]
+    Dim isvg As String
+
+    cCol = Starter.cColors
+
+    mubColors.Menu = "Clx"
+
+    ' Relleno el Menu del MenuButton
+    hMenu = New Menu(Me) As "Clx" '' Crea el menu inicial
+
+    For Each ix In cCol
+        mui = New Menu(hMenu) As "Clx"
+        mui.Text = ix[0]
+        mui.Tag = ix[1]
+        Select ix[1]
+            Case 255, 256, 0
+                isvg = "./svg/colors/" & "7" & ".svg"
+            Case 1, 2, 3, 4, 5, 6, 7
+                isvg = "./svg/colors/" & cCol.Key & ".svg"
+        End Select
+
+        If Exist(isvg) Then
+            mui.Picture = Image.Load(isvg).Stretch(16, 16).Picture
+        Endif
+
+        If cCol.Key = "7" Then
+            mubColors.Picture = Image.Load(isvg).Stretch(16, 16).Picture
+            mubColors.Tooltip = ix[0]
+            mubColors.Text = ix[0]
+            'mubColors.Refresh
+        Endif
+
+    Next
+
+End
+
+Public Sub Clx_Click()
+
+    Dim obj As Object
+
+    obj = Last
+
+    CurrentColor = obj.Tag
+    mubColors.Picture = obj.Picture
+    mubColors.Text = obj.Text
+    mubColors.Tooltip = obj.Text
+
+    txaDebug.Pos = 0
+    txaDebug.Insert(obj.Text & " is the current color\n")
+
+End
+
+Public Sub LoadLocks()
+
+    Dim obj As Object
+
+    For Each obj In pnlLocks.Children
+        Select Object.Type(obj)
+            Case "ToolButton"
+                Select obj.Tag
+                    Case "grid"
+                        obj.Picture = Image.Load("./svg/locks/grid.svg").Stretch(22, 22).Picture
+
+                    Case "debug"
+                        obj.Picture = Image.Load("./svg/locks/debug.svg").Stretch(22, 22).Picture
+
+                End Select
+
+        End Select
+
+    Next
+
+End
+
+Public Sub locks_Click()
+
+    Dim obj As Object
+
+    obj = Last
+
+    Select obj.Tag
+        Case "grid"
+
+        Case "debug"
+            If pnlDebug.Visible = False Then
+                pnlDebug.Visible = True
+                ToolButton1.Value = True
+            Else
+                pnlDebug.Visible = False
+                ToolButton1.Value = False
+            Endif
+
+    End Select
 
 End
 
@@ -441,7 +546,9 @@ Public Sub entity_Click()
     obj = Last
 
     If Workspace1.ActiveWindow Then
-        modCAD.clsJob.KeyText(String.UCaseFirst(obj.Tag))
+        txoCom.Text = obj.Tag & "\n"
+        'modCAD.clsJob.KeyText(String.UCaseFirst(obj.Tag))
+
     Endif
 
 End
@@ -453,6 +560,7 @@ Public Sub tool_Click()
     obj = Last
 
     If Workspace1.ActiveWindow Then
+        'txoCom.Text = obj.Tag & Key.Enter
         modCAD.clsJob.KeyText(String.UCaseFirst(obj.Tag))
     Endif
 
@@ -832,7 +940,84 @@ Public Sub dprop_Click()
 
 End
 
-Public Sub txoCom_KeyRelease()
+' Public Sub txoCom_KeyRelease()
+'
+'     Dim sCom As String
+'     Dim i As Integer
+'     Dim obj As Object
+'     Dim enty As Entity
+'
+'     Dim x As Float
+'     Dim y As Float
+'
+'     Select Key.Code
+'         Case Key.Enter, Key.Return, Key.Space
+'             sCom = txoCom.Text
+'             If Workspace1.ActiveWindow Then
+'                 obj = modCAD.clsJob
+'                 Select Object.Type(obj)
+'                     Case "clsEntityBuilder"
+'                         enty = obj.elem
+'                         txaDebug.Pos = 0
+'                         txaDebug.Insert(enty.Gender & " command\n")
+'                         Select enty.Gender
+'
+'                             Case "Line"
+'                                 If InStr(sCom, ",") > 0 Then
+'
+'                                     x = Split(sCom, ",")[0]
+'                                     y = Split(sCom, ",")[1]
+'
+'                                     Select p ' P es una variable global tipo Private
+'                                         Case 0
+'                                             enty.P[0] = x
+'                                             enty.P[1] = y
+'                                             p = p + 2
+'                                             lblCommand.Text = obj.ParamHelperList[1]
+'                                             txoCom.Text = ""
+'                                         Case -1
+'                                             txoCom.Text = ""
+'                                             lblCommand.Text = "Command"
+'
+'                                         Case Else
+'
+'                                             enty.P[0 + p] = x
+'                                             enty.P[1 + p] = y
+'                                             enty.Finished = True
+'                                             'p = -1
+'                                             txoCom.Text = ""
+'
+'                                     End Select
+'
+'                                 Endif
+'
+'                         End Select
+'                     Case Else
+'                         If sCom <> "" Then
+'                             If Starter.cCommands.Exist(sCom) Then
+'                                 HistoCom.Push(sCom)
+'                                 Print sCom
+'                                 If Workspace1.ActiveWindow Then
+'                                     modCAD.clsJob.KeyText(sCom)
+'
+'                                     obj = modCAD.clsJob
+'                                     Select Object.Type(obj)
+'                                         Case "clsEntityBuilder"
+'                                             txoCom.Text = ""
+'                                             lblCommand.Text = obj.ParamHelperList[0]
+'
+'                                         Case Else
+'                                             p = 0
+'                                     End Select
+'                                 Endif
+'                             Endif
+'                         Endif
+'                 End Select
+'             Endif
+'     End Select
+'
+' End
+Public Sub txoCom_Change()
 
     Dim sCom As String
     Dim i As Integer
@@ -842,67 +1027,98 @@ Public Sub txoCom_KeyRelease()
     Dim x As Float
     Dim y As Float
 
-    Select Key.Code
-        Case Key.Enter, Key.Return, Key.Space
-            sCom = txoCom.Text
-            If Workspace1.ActiveWindow Then
-                obj = modCAD.clsJob
-                Select Object.Type(obj)
-                    Case "clsEntityBuilder"
-                        enty = obj.elem
-                        Select enty.Gender
-                            Case "Line"
-                                If InStr(sCom, ",") > 0 Then
+    If String.Len(txoCom.Text) > 0 Then
+        Select String.Right(txoCom.Text)
+            Case " ", "\n"
+                'Select Key.Code
+                'Case Key.Enter, Key.Return, Key.Space
+                sCom = String.Mid(txoCom.Text, 1, String.Len(txoCom.Text) - 1)
+                If Workspace1.ActiveWindow Then
+                    obj = modCAD.clsJob
+                    Select Object.Type(obj)
+                        Case "clsEntityBuilder"
+                            'KillJob()
+                            enty = obj.elem
+                            ' txaDebug.Pos = 0
+                            ' txaDebug.Insert(enty.Gender & " command\n")
+                            ' txaDebug.Refresh
+                            Select enty.Gender
 
-                                    x = Split(sCom, ",")[0]
-                                    y = Split(sCom, ",")[1]
+                                Case "Line"
+                                    If InStr(sCom, ",") > 0 Then
 
-                                    Select p ' P es una variable global tipo Private
-                                        Case 0
-                                            enty.P[0] = x
-                                            enty.P[1] = y
-                                            p = p + 2
-                                            lblCommand.Text = obj.ParamHelperList[1]
-                                            txoCom.Text = ""
-                                        Case -1
-                                            txoCom.Text = ""
-                                            lblCommand.Text = "Command"
+                                        x = Split(sCom, ",")[0]
+                                        y = Split(sCom, ",")[1]
 
-                                        Case Else
+                                        Select p ' P es una variable global tipo Private
+                                            Case 0
+                                                enty.P[0] = x
+                                                enty.P[1] = y
+                                                p = p + 2
+                                                lblCommand.Text = obj.ParamHelperList[1]
+                                                txoCom.Text = ""
+                                            Case -1
+                                                txoCom.Text = ""
+                                                lblCommand.Text = "Command"
 
-                                            enty.P[0 + p] = x
-                                            enty.P[1 + p] = y
-                                            enty.Finished = True
-                                            'p = -1
-                                            txoCom.Text = ""
+                                            Case Else
 
-                                    End Select
+                                                enty.P[0 + p] = x
+                                                enty.P[1 + p] = y
+                                                enty.Finished = True
+                                                'p = -1
+                                                txoCom.Text = ""
 
-                                Endif
+                                        End Select
 
-                        End Select
-                    Case Else
-                        If sCom <> "" Then
-                            If Starter.cCommands.Exist(sCom) Then
-                                HistoCom.Push(sCom)
-                                Print sCom
-                                If Workspace1.ActiveWindow Then
-                                    modCAD.clsJob.KeyText(sCom)
+                                    Endif
 
-                                    obj = modCAD.clsJob
-                                    Select Object.Type(obj)
-                                        Case "clsEntityBuilder"
-                                            txoCom.Text = ""
-                                            lblCommand.Text = obj.ParamHelperList[0]
+                            End Select
+                        Case Else
+                            If sCom <> "" Then
+                                If Starter.cCommands.Exist(sCom) Then
+                                    HistoCom.Push(sCom)
 
-                                        Case Else
-                                            p = 0
-                                    End Select
+                                    Print sCom
+                                    If Workspace1.ActiveWindow Then
+                                        'KillJob()
+                                        modCAD.clsJob.KeyText(sCom)
+
+                                        obj = modCAD.clsJob
+                                        Select Object.Type(obj)
+                                            Case "clsEntityBuilder"
+                                                enty = obj.elem
+
+                                                txaDebug.Pos = 0
+                                                txaDebug.Insert(enty.Gender & " command\n")
+                                                txaDebug.Refresh
+                                                txoCom.Text = ""
+                                                lblCommand.Text = obj.ParamHelperList[0]
+
+                                            Case Else
+                                                p = 0
+                                        End Select
+                                    Endif
                                 Endif
                             Endif
-                        Endif
-                End Select
-            Endif
-    End Select
+                    End Select
+                Endif
+        End Select
+    Endif
+
+End
+
+Public Sub KillJob() ' no funciona bien
+    ''TODO: Mejorar esta sub o hacer una nueva para CANCELAR el comando actual
+
+    modCAD.clsJob.Finish()
+    modCAD.clsJobPrevious = modCAD.clsJob
+    modCAD.clsJob = clsDefaultJob
+    'redraw
+    'Return
+
+End
+
+Public Sub mubColors_Menu()
 
 End

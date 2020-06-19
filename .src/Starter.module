@@ -39,6 +39,7 @@ Public WindowTextColor As Integer           ' una struct "flags" o ponerles un p
 Public WindowCursorColor As Integer         ' me gusta mas la segunda opcion porque con un Seach+Replace solucionas todo de un saque
 '----------------------
 Public cCommands As New Collection   '' Commands list
+Public cColors As New Collection     '' Colors list
 
 ' Variables de un solo uso
 Private ldd As Boolean              '' Testigo de finalización de carga.
@@ -93,6 +94,9 @@ Public Sub Run()
 
     '' Load the commands list
     cCommands = LoadCommandsList()
+
+    '' Load the commands list
+    cColors = LoadColors()
 
     '' Abrir el formulario principal del programa
     cex.Add(adi, "AppDir")
@@ -186,5 +190,23 @@ Private Function LoadCommandsList() As Collection
     cComm.Add(["layers", "lk"], "layers")
 
     Return cComm
+
+End
+
+Private Function LoadColors() As Collection
+
+    Dim cColor As New Collection
+
+    cColor.Add([("ByBlock"), 0], "0")
+    cColor.Add([("ByLayer"), 256], "256")
+    cColor.Add([("Red"), 1], "1")
+    cColor.Add([("Yellow"), 2], "2")
+    cColor.Add([("Green"), 3], "3")
+    cColor.Add([("Cyan"), 4], "4")
+    cColor.Add([("Blue"), 5], "5")
+    cColor.Add([("Magenta"), 6], "6")
+    cColor.Add([("White"), 7], "7")
+
+    Return cColor
 
 End

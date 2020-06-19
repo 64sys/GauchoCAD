@@ -346,13 +346,17 @@
         Spacing = True
       }
       { ColorPalette1 ColorPalette
-        MoveScaled(26,0,20,5)
+        MoveScaled(25,0,9,5)
+        Visible = False
         Expand = True
         Border = False
       }
+      { mubColors MenuButton
+        MoveScaled(32,0,16,5)
+      }
       { cboLayers ComboBox dprop
         Name = "cboLayers"
-        MoveScaled(47,0,15,5)
+        MoveScaled(49,0,15,5)
         Tag = "layer"
         ToolTip = ("Layers")
         ReadOnly = True
@@ -378,13 +382,13 @@
       }
       { cboDimSts ComboBox dprop
         Name = "cboDimSts"
-        MoveScaled(100,0,14,5)
+        MoveScaled(99,0,14,5)
         Tag = "style"
         ToolTip = ("Dimmension styles")
         ReadOnly = True
       }
       { pnlToolsH Panel
-        MoveScaled(115,0,15,5)
+        MoveScaled(120,0,10,5)
         Expand = True
         Arrangement = Arrange.Horizontal
         Spacing = True
@@ -449,6 +453,16 @@
         Expand = True
         Border = False
       }
+      { pnlDebug Panel
+        MoveScaled(104,1,23,55)
+        Visible = False
+        Arrangement = Arrange.Vertical
+        { txaDebug TextArea
+          MoveScaled(3,8,16,16)
+          Font = Font["Noto Mono"]
+          Expand = True
+        }
+      }
     }
     { Panel4 Panel
       MoveScaled(3,66,129,5)
@@ -464,10 +478,30 @@
         Background = Color.TextBackground
       }
       { pnlLocks Panel
-        MoveScaled(79,0,47,4)
+        MoveScaled(95,0,31,5)
         Expand = True
         Arrangement = Arrange.Horizontal
         Spacing = True
+        { Spring1 Spring
+          MoveScaled(5,1,6,3)
+        }
+        { ToolButton1 ToolButton locks
+          Name = "ToolButton1"
+          MoveScaled(12,0,5,5)
+          Tag = "debug"
+          Border = True
+          Toggle = True
+        }
+        { ToolButton2 ToolButton locks
+          Name = "ToolButton2"
+          MoveScaled(18,0,5,5)
+          Tag = "grid"
+          Border = True
+          Toggle = True
+        }
+        { Panel5 Panel
+          MoveScaled(28,1,2,3)
+        }
       }
     }
   }
