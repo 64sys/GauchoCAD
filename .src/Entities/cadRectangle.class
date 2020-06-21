@@ -49,6 +49,8 @@ Public Sub Draw(oE As Entity)
 
     GLplus.Rectangle2D(oE.p[0], oE.p[1], oE.p[2] - oE.p[0], oE.p[3] - oE.p[1],,,,, oE.ColorToPaint, oe.LineWidth, oe.LineType, 2)
 
+    ' test
+
 End
 
 ' This function will return False if the element couldn't be created for some reason: bad or incomple user input

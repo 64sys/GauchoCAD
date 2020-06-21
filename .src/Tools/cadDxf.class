@@ -174,6 +174,8 @@ Public fp As File
 Public lpCode As String
 Public lpValue As String
 
+Public arrToFill As Entity[]
+
 ' Add more if needed
 
 Public Function Start(Optional ElemToBuild As Variant, Optional _mode As Integer = 0) As Boolean
@@ -184,6 +186,12 @@ Public Function Start(Optional ElemToBuild As Variant, Optional _mode As Integer
     Me.PointsTotal = 2                 ' orto: Punto base + Nx + Dx + Ny + Dy   , polar = Punto base + N + angulo
 
     Me.mode = _mode
+
+    If Not ElemToBuild Then
+
+        arrToFill = APPMain.hFCAD.arrEntities
+
+    Endif
 
     Dim sDXF As String
 
@@ -286,7 +294,7 @@ Public Procedure LoadFile(stn As String)
 
             ' Print "Line", mLine.layer, mLine.x1, mLine.y1, mLine.x2, mLine.y2
             '
-            modCAD.AddLine([mLine.x1, mLine.y1, mLine.x2, mLine.y2], mCommon.bColor, 1, mCommon.linetype, mCommon.layer, mBlock.block_name)
+            modCAD.AddLine(arrToFill, [mLine.x1, mLine.y1, mLine.x2, mLine.y2], mCommon.bColor, 1, mCommon.linetype, mCommon.layer, mBlock.block_name)
 
             '-----------------------------------------------------------
             ' DIM
@@ -325,7 +333,7 @@ Public Procedure LoadFile(stn As String)
             Wend
 
             Inc mDimCount
-            modCAD.AddDim(mDim.p, mDim.bloque, mDim.medida, mDim.texto, mDim.alineacion, mDim.angulo, mDim.tipo, mCommon.bColor, 1, mCommon.linetype, mCommon.layer, mBlock.block_name)
+            modCAD.AddDim(arrToFill, mDim.p, mDim.bloque, mDim.medida, mDim.texto, mDim.alineacion, mDim.angulo, mDim.tipo, mCommon.bColor, 1, mCommon.linetype, mCommon.layer, mBlock.block_name)
 
             '-----------------------------------------------------------
             ' LWPOLYLINE
@@ -355,7 +363,7 @@ Public Procedure LoadFile(stn As String)
             End If
             mPolyLinePointsCount += mPolyLine.p.Count / 2
             Inc mPolyLineCount
-            modCAD.AddPolyLine(mPolyLine.p, mCommon.bColor, 1, mCommon.linetype, mCommon.layer, mBlock.block_name)
+            modCAD.AddPolyLine(arrToFill, mPolyLine.p, mCommon.bColor, 1, mCommon.linetype, mCommon.layer, mBlock.block_name)
 
             '-----------------------------------------------------------
             ' LAYER
@@ -427,7 +435,7 @@ Public Procedure LoadFile(stn As String)
                 ReadData
             Wend
             Inc mSolidCount
-            modCAD.AddSolid(mSolid.p, mCommon.bColor, 1, mCommon.linetype, mCommon.layer, mBlock.block_name)
+            modCAD.AddSolid(arrToFill, mSolid.p, mCommon.bColor, 1, mCommon.linetype, mCommon.layer, mBlock.block_name)
 
             '-----------------------------------------------------------
             ' CIRCLE
@@ -446,7 +454,7 @@ Public Procedure LoadFile(stn As String)
             Wend
             Inc mCircleCount
             ' Print "Circle", mCircle.layer, mCircle.x, mCircle.y, mCircle.r
-            modCAD.AddCircle([mCircle.x, mCircle.y], mCircle.r, mCommon.bColor, 1, mCommon.linetype, mCommon.layer, mBlock.block_name)
+            modCAD.AddCircle(arrToFill, [mCircle.x, mCircle.y], mCircle.r, mCommon.bColor, 1, mCommon.linetype, mCommon.layer, mBlock.block_name)
 
             '-----------------------------------------------------------
             ' ELLIPSE
@@ -471,7 +479,7 @@ Public Procedure LoadFile(stn As String)
             Wend
             Inc mEllipseCount
             '
-            modCAD.AddEllipse([mEllipse.xc, mEllipse.yc, mEllipse.xm, mEllipse.ym], mEllipse.relacion, mEllipse.StartAngle, mEllipse.EndAngle, mCommon.bColor, 1, mCommon.linetype, mCommon.layer, mBlock.block_name)
+            modCAD.AddEllipse(arrToFill, [mEllipse.xc, mEllipse.yc, mEllipse.xm, mEllipse.ym], mEllipse.relacion, mEllipse.StartAngle, mEllipse.EndAngle, mCommon.bColor, 1, mCommon.linetype, mCommon.layer, mBlock.block_name)
 
             '-----------------------------------------------------------
             ' ARC
@@ -494,7 +502,7 @@ Public Procedure LoadFile(stn As String)
             Wend
             Inc mArcCount
             ' Print "Arc", mCommon.layer, mArc.x, mArc.y, mArc.r, mArc.sa, mArc.ea
-            modCAD.Addarc([mArc.x, mArc.y], mArc.r, mArc.sa, mArc.ea, mCommon.bColor, 1, mCommon.linetype, mCommon.layer, mBlock.block_name)
+            modCAD.Addarc(arrToFill, [mArc.x, mArc.y], mArc.r, mArc.sa, mArc.ea, mCommon.bColor, 1, mCommon.linetype, mCommon.layer, mBlock.block_name)
 
             '
             '-----------------------------------------------------------
@@ -516,7 +524,7 @@ Public Procedure LoadFile(stn As String)
 
             Inc mSplineCount
 
-            modCAD.AddSPLine(mSpline.p, mCommon.bColor, 1, mCommon.linetype, mCommon.layer, mBlock.block_name)
+            modCAD.AddSPLine(arrToFill, mSpline.p, mCommon.bColor, 1, mCommon.linetype, mCommon.layer, mBlock.block_name)
 
             '-----------------------------------------------------------
             ' TEXT
@@ -550,7 +558,7 @@ Public Procedure LoadFile(stn As String)
             Wend
 
             Inc mTextCount
-            modCAD.AddText([mText.x, mText.y], mText.rotacion, mText.altura, mText.texto, mCommon.bColor, 1, mCommon.linetype, mCommon.layer, mBlock.block_name)
+            modCAD.AddText(arrToFill, [mText.x, mText.y], mText.rotacion, mText.altura, mText.texto, mCommon.bColor, 1, mCommon.linetype, mCommon.layer, mBlock.block_name)
 
             '-----------------------------------------------------------
             ' MTEXT
@@ -573,7 +581,7 @@ Public Procedure LoadFile(stn As String)
                 ReadData
             Wend
             Inc mMTextCount
-            modCAD.AddMText([mMText.x, mMText.y], mMText.rotacion, mMText.altura, mMText.texto, mCommon.bColor, 1, mCommon.linetype, mCommon.layer, mBlock.block_name)
+            modCAD.AddMText(arrToFill, [mMText.x, mMText.y], mMText.rotacion, mMText.altura, mMText.texto, mCommon.bColor, 1, mCommon.linetype, mCommon.layer, mBlock.block_name)
 
             '-----------------------------------------------------------
             ' INSERT
@@ -597,7 +605,7 @@ Public Procedure LoadFile(stn As String)
             Wend
 
             Inc mInsertCount
-            modCAD.AddInsert([mInsert.x, mInsert.y], mInsert.escX, mInsert.escY, mInsert.rotacion, mCommon.bColor, mCommon.linetype, mCommon.layer, mInsert.block_name)
+            modCAD.AddInsert(arrToFill, [mInsert.x, mInsert.y], mInsert.escX, mInsert.escY, mInsert.rotacion, mCommon.bColor, mCommon.linetype, mCommon.layer, mInsert.block_name)
 
             '-----------------------------------------------------------
             ' BLOCK
@@ -618,7 +626,7 @@ Public Procedure LoadFile(stn As String)
 
             Wend
 
-            modCAD.AddBlock([mBlock.x, mBlock.y], mBlock.layer, mBlock.block_name)
+            modCAD.AddBlock(arrToFill, [mBlock.x, mBlock.y], mBlock.layer, mBlock.block_name)
 
             Inc mBlockCount
 

@@ -22,12 +22,12 @@
 Create Static
 ' Fast
 
-Public Const Gender As String = "Solid"
+Public Const Gender As String = "Hatch"
 Public Const PointsToDraw As Integer = 0             ' minimal point requered for drawing something usefull
-Public Const HelperTrabajo As String = ("Solid")
-Public Const ParamType As String = "PPPP"                             ' that is Point, Point, Float; could be Color Text, etc
-Public Const ParamHelper As String = ("First Point;Next Point;Next Point;Last Point")      ' a little text that is shown at the prompt waiting for user input during build
-Public Const ParamDefault As String = ""
+Public Const HelperTrabajo As String = ("Hatch")
+Public Const ParamType As String = "PTF"                             ' that is Point, Point, Float; could be Color Text, etc
+Public Const ParamHelper As String = ("Point;Texture;Scale")      ' a little text that is shown at the prompt waiting for user input during build
+Public Const ParamDefault As String = " ;Concrete;1"
 Public Const GAMBASCADENTITY As String = ("EntityBase")
 Public Const USEWITH As String = "clsEntityBuilder"
 Public Const DrawingOrder As Integer = 0        ' 1 = draws first
@@ -43,37 +43,42 @@ Public StepsDone As Integer                 ' esto lo cambia cls ElementBuilder 
 
 Public Sub Draw(oE As Entity)
 
+    Dim e As Integer
+
     If Not oE.Visible Then Return
+
     If oE.Selected And Not modCAD.ToolActive Then oE.ColorToPaint = modCAD.ColorForSelected Else oE.ColorToPaint = modCAD.GetGBColor(oE.colour, oE.Layerid)
 
-    If oE.StepsDone < 1 Then
+    Select Case StepsDone
+        Case 1                              ' acaba de marcarse un punto
+            ' intento buscar una entidad
+            e = clsMouseTracking.CheckAboveEntity(oe.P[0], oe.P[1], appmain.hFCAD.Metros(8))
+            If e < 0 Then ' es un punto, no un  posible contorno
 
-        oE.P[2] = oE.P[0]
-        oE.P[3] = oE.P[1]
+            Else ' verifico si es una entidad cerrada
+                Select Case appmain.hFCAD.arrEntities[e].Gender
+                    Case "Line", "Arc", "Text", "MText", "Leader", "Solid", "Insert"
+                        ' no se puede rellenar eso
+                        clsDrawingAids.ErrorMessage = "Can't do hatch in that entity"
+                        StepsDone -= 1
+                    Case "PLine"
+                        ' verifico que el punto inicial y final sean el mismo
+                        If appmain.hFCAD.arrEntities[e].P[0] = appmain.hFCAD.arrEntities[e].P[appmain.hFCAD.arrEntities[e].max - 1] And appmain.hFCAD.arrEntities[e].P[1] = appmain.hFCAD.arrEntities[e].P[appmain.hFCAD.arrEntities[e].max] And appmain.hFCAD.arrEntities[e].P.count > 5 Then
 
-        glPlus.Lines(oE.p, oE.ColorToPaint, oE.LineWidth)
+                            oe.Polygon = appmain.hFCAD.arrEntities[e].P
 
-    End If
+                        Endif
 
-    If oE.StepsDone < 2 Then
+                End Select
 
-        oE.P[4] = oE.P[2]
-        oE.P[5] = oE.P[3]
+            Endif
+        Case 2                          ' ya tenemos un contorno, ahora preguntamos el nombre de la textura
 
-    End If
+        Case 3
 
-    If oE.StepsDone < 3 Then
+    End Select
 
-        oE.P[6] = oE.P[4]
-        oE.P[7] = oE.P[5]
-
-    Endif
-
-    oE.Polygon = oE.P
-    If oE.StepsDone < 2 Then Return
-    glPlus.TexturedTriangle2D(oe.P[0], oe.P[1], oe.P[2], oe.P[3], oe.P[4], oe.P[5], 0, 1)
-
-    'GLplus.PolygonFilled(oE.p, oE.ColorToPaint, oE.ColorToPaint, oE.LineWidth, oe.LineType)
+    GLplus.PolyLines(oE.p, oE.ColorToPaint, oE.LineWidth, oe.linetype)
 
 End
 
@@ -84,27 +89,34 @@ Public Sub DrawRemark(oE As Entity)
 
     If oE.Selected And Not modCAD.ToolActive Then oE.ColorToPaint = modCAD.ColorForSelected Else oE.ColorToPaint = modCAD.GetGBColor(oE.colour, oE.Layerid)
 
-    GLplus.Polygon(oE.p, modCAD.WindowBackColor, oE.LineWidth, gcd.stiDashed)
-    GLplus.Polygon(oE.p, oE.ColorToPaint, oE.LineWidth + 2, oE.LineType)
+    GLplus.PolyLines(oE.p, modCAD.WindowBackColor, oE.LineWidth, gcd.stiDashed)
+    GLplus.PolyLines(oE.p, oE.ColorToPaint, oE.LineWidth + 2, oE.LineType)
 
 End
 
 Public Function Draw2(oE As Entity)
 
+    Dim i As Integer
+
     If Not oE.Visible Then Return
 
     If oE.Selected And Not modCAD.ToolActive Then oE.ColorToPaint = modCAD.ColorForSelected Else oE.ColorToPaint = modCAD.GetGBColor(oE.colour, oE.Layerid)
-    Dim i As Integer
 
+    paint.LineWidth = oE.LineWidth / appmain.hFcad.ScaleZoom / modCAD.ScaleLines
+    If oE.flxDash Then paint.Dash = oE.flxDash
     If oE.Selected And Not modCAD.ToolActive Then
         paint.brush = Paint.Color(modCAD.ColorForSelected)
     Else
         paint.brush = Paint.Color(oE.ColorToPaint)
     Endif
 
-    Paint.Polygon(oE.p)
+    paint.moveto(oE.p[0], oE.p[1])
+    For i = 2 To oE.P.Max Step 2
+        paint.lineto(oE.p[i], oE.p[i + 1])
 
-    paint.Fill
+    Next
+
+    paint.Stroke
 
 End
 
@@ -113,12 +125,34 @@ End
 
 Public Function BuildPOI(oE As Entity, Optional arrIndex As Integer = -1) As Integer
 
-    cadPLine.BuildPOI(oe)
+    If arrIndex < 0 Then arrIndex = appmain.hFCAD.arrEntities.Max       ' si este valor no es provisto , estos POI son de la ultima entidad
+    Dim i As Integer
+
+    oe.poiPoints.insert([oE.P[0], oE.P[1]])
+    oe.poiType.Add(gcd.poiEndPoint)
+    'oe.poiEntities.Add(arrIndex)
+
+    For i = 0 To oE.P.count - 4 Step 2
+
+        oe.poiPoints.insert([(oE.P[i + 0] + oE.P[i + 2]) / 2, (oE.P[i + 1] + oE.P[i + 3]) / 2])   ' mid
+        oe.poiType.Add(gcd.poiMidPoint)
+        'oe.poiEntities.Add(arrIndex)
+
+        oe.poiPoints.insert([oE.P[i + 2], oE.P[i + 3]])
+        oe.poiType.Add(gcd.poiEndPoint)
+        'oe.poiEntities.Add(arrIndex)
+
+        ' line
+        'appmain.hFCAD.poiLines.insert([oE.p[i], oE.p[i + 1], oE.p[i + 2], oE.p[i + 3]])
+        'APPMain.hFCAD.poiLinesEntities.Add(arrIndex)
+        ' appmain.hFCAD.poiLinesRelPoint.Insert([i / 2, i / 2 + 1])
+
+    Next
 
 End
+
 ' This function will return False if the element couldn't be created for some reason: bad or incomple user input
 ' True means all is good, False will instruct the clsEntityBuilder to delete it
-
 Public Sub Finish(oE As Entity, ParamsDone As Integer) As Boolean
 
     'Print "Finish en EntityBase"

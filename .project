@@ -7,6 +7,7 @@ Component=gb.image
 Component=gb.cairo
 Component=gb.qt5
 Component=gb.form
+Component=gb.clipper
 Component=gb.db
 Component=gb.db.sqlite3
 Component=gb.desktop

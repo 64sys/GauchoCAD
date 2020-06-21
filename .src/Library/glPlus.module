@@ -111,6 +111,15 @@ Public FontsCAllLists As Integer[]          ' listas de listas de caracteres
 
 Public glFont As New FontSt[]
 
+Public Struct textureSt
+    FileName As String
+    TextureName As String
+    handle As Integer
+    hImage As Image
+End Struct
+
+Public glTextures As New TextureSt[]
+
 Public Struct punto3d
     x As Float
     Y As Float
@@ -145,7 +154,7 @@ Public escalaGL As Float
 Public ViewportWidth As Integer
 Public ViewportHeight As Integer
 
-Public hText As New Integer[1]
+Public hText As New Integer[]
 
 ' new OpenGL stuff
 Public GLDrwList As New Integer[]                       ' all entities, each one
@@ -225,8 +234,6 @@ Public Sub Init(drwContext As Object) ' only glArea for now
     ' Gl.Enable(Gl.LIGHT0)
     ' esto le dice que las normales las tiene que normalizar a 1
     Gl.Enable(Gl.NORMALIZE)
-
-    hText = Gl.GenTextures(1)
 
     ' las coordenadas que le pasemos deberan estar entre -1 y 1
     ' todo lo que sea > 1 NO SE MOSTRARA
@@ -1019,5 +1026,73 @@ Public Function MTextExtends(UTFMultiString As String, posX As Float, posY As Fl
         Yadvance = 0
     Next
     Return tRect
+
+End
+
+'' Lee todas las texturas del directorio provisto y devuelve un listado con sus nombres
+Public Function LoadTextures(DirPath As String) As String[]
+
+    Dim sFilename As String, fFile As File, sData, sCoord As String
+    Dim sPuntos As String[], Lista As New String[]
+    Dim imgTexture As Image
+    Dim picTexture As Picture
+    Dim iTexture As Integer = 0
+    Dim newTexture As TextureSt
+
+    hText = Gl.GenTextures(1)
+
+    For Each sFilename In Dir(DirPath, "*.png")
+
+        newTexture = New TextureSt
+
+        glTextures.Add(newTexture)
+
+        newTexture.FileName = Left$(sFilename, -4)                          ' agrego el nombre de la textura a la lista que voy a retornar
+
+        lista.Add(newTexture.FileName)
+
+        newTexture.hImage = Image.Load(DirPath &/ sFilename)                                  ' cargo la imagen en memoria
+
+        Gl.TexImage2D(newTexture.hImage)                                           ' genero un objeto OpenGL
+
+        Gl.TexParameteri(Gl.TEXTURE_2D, Gl.TEXTURE_MIN_FILTER, Gl.NEAREST)  ' parametros basicos opengl
+
+        Gl.TexParameteri(Gl.TEXTURE_2D, Gl.TEXTURE_MAG_FILTER, Gl.NEAREST)  ' parametros basicos opengl
+
+        gl.BindTexture(gl.TEXTURE_2D, hText[iTexture])                      ' enlazo la textura a una handle
+
+        newTexture.handle = hText[iTexture]
+
+        Inc iTexture
+        Break
+    Next
+
+    Debug "Leidas ", iTexture, " texturas en ", sFilename
+
+    Return lista
+
+End
+
+'' Dibuja un triangulo con una textura ya cargada
+
+Public Sub TexturedTriangle2D(x1 As Float, y1 As Float, x2 As Float, y2 As Float, x3 As Float, y3 As Float, TextureHandle As Integer, Scale As Float)
+
+    Gl.TexImage2D(glTextures[TextureHandle].hImage)                                           ' genero un objeto OpenGL
+    gl.BindTexture(gl.TEXTURE_2D, hText[TextureHandle])                      ' enlazo la textura a una handle
+    gl.begin(gl.TRIANGLES)
+
+    gl.TexCoord2f(0, 0)
+
+    gl.Vertex2f(x1, y1)
+
+    gl.TexCoord2f((x2 - x1) / scale / 1000, (y2 - y1) / scale / 1000)
+
+    gl.Vertex2f(x2, y2)
+
+    gl.TexCoord2f((x3 - x1) / scale / 1000, (y3 - y1) / scale / 1000)
+
+    gl.Vertex2f(x3, y3)
+
+    gl.End
 
 End

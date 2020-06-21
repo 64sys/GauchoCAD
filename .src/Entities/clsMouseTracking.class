@@ -239,7 +239,7 @@ Public Function CheckAboveEntity(xr As Float, Yr As Float, tolerance As Float) A
 ExitSearch:
 
     flgSearchingEntity = False
-    Debug "Above entity en ", Timer - t
+    'Debug "Above entity en ", Timer - t
     If e = APPMain.hFCAD.arrEntities.Count Then
 
         Return -1

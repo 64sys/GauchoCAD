@@ -24,7 +24,7 @@
 Inherits ToolsBase
 Create Static
 Public Const Gender As String = "Area"
-
+Private clpPolygon As New Polygon
 Private Poli As New Float[]
 
 Public Function Start(Optional ElemToBuild As Variant, Optional _Mode As Integer = 0) As Boolean
@@ -38,6 +38,7 @@ Public Function Start(Optional ElemToBuild As Variant, Optional _Mode As Integer
     clsDrawingAids.HelperTrabajo = ("Area : mark points")
     Poli.Add(0)
     Poli.Add(0)
+    clpPolygon.Add(0, 0)
 
     Me.Active = True
     modCAD.ToolActive = True
@@ -53,8 +54,12 @@ Public Function MouseUp(mouseX As Integer, mouseY As Integer)
     Me.SelEndXr = puntos.Near(appmain.hFcad.Xreal(mousex))
     Me.SelEndyr = puntos.Near(appmain.hFcad.Yreal(mouseY))
 
+    clpPolygon[clpPolygon.Max].X = Me.SelEndXr
+    clpPolygon[clpPolygon.Max].Y = Me.SelEndYr
     Poli[Poli.max - 1] = Me.SelEndXr
     Poli[Poli.max] = Me.SelEndYr
+
+    clpPolygon.Add(Me.SelEndXr, Me.SelEndYr)
     Poli.Add(Me.SelEndXr)
     Poli.Add(Me.SelEndYr)
 
@@ -67,6 +72,8 @@ Public Function MouseMove(mouseX As Integer, mouseY As Integer) ' called by FCAD
     Me.SelEndyr = puntos.Near(appmain.hFcad.Yreal(mouseY))
     Poli[Poli.max - 1] = Me.SelEndXr
     Poli[Poli.max] = Me.SelEndYr
+    clpPolygon[clpPolygon.Max].X = Me.SelEndXr
+    clpPolygon[clpPolygon.Max].Y = Me.SelEndYr
 
     appmain.hFCAD.redraw
     ' appmain.hFCAD.Regen
@@ -100,6 +107,9 @@ Public Sub Finish()
     If Me.PointsDone > 2 Then
 
         clsDrawingAids.HelperTrabajo = ("Area = ") & Str(puntos.PoligonArea(poli)) & (" - Perimeter = ") & Str(puntos.PoligonLength(poli, True))
+        clpPolygon.Simplify(Clipper.FillEvenOdd)
+
+        Debug "Segun Clipper ", clpPolygon.Area
 
     Endif
 
