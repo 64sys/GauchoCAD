@@ -6,6 +6,8 @@ Authors: Terco, Tincho, Postpase, Vuott
 
 VER       DATE      CHANGES
 --------------------------------------------------------------------------------------------------------------------
+0.0.70	21/06/20	Added SPline. Added Hatch form.
+
 0.0.68	18/06/20	Added rectangle. Added polygons.
 
 0.0.66	14/06/20	Added entity remark when hovering.

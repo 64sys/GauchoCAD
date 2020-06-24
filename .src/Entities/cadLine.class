@@ -69,7 +69,7 @@ Public Function Draw2(oE As Entity)
 
     If oE.Selected And Not modCAD.ToolActive Then oE.ColorToPaint = modCAD.ColorForSelected Else oE.ColorToPaint = modCAD.GetGBColor(oE.colour, oE.Layerid)
     paint.LineWidth = oE.LineWidth / appmain.hFcad.ScaleZoom / modCAD.ScaleLines
-    If oE.flxDash Then paint.Dash = oE.flxDash
+
     paint.brush = Paint.Color(oE.ColorToPaint)
     paint.MoveTo(oE.p[0], oE.p[1])
     paint.LineTo(oE.p[2], oE.p[3])

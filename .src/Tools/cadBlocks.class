@@ -1,0 +1,119 @@
+' Gambas class file
+
+' GauchoCAD
+' A simple CAD made in Gambas
+'
+' Copyright (C) Martin Belmonte
+'
+' This program is free software; you can redistribute it and/or modify
+' it under the terms of the GNU General Public License as published by
+' the Free Software Foundation; either version 3 of the License, or
+' (at your option) any later version.
+'
+' This program is distributed in the hope that it will be useful,
+' but WITHOUT ANY WARRANTY; without even the implied warranty of
+' MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+' GNU General Public License for more details.
+'
+' You should have received a copy of the GNU General Public License
+' along with this program; if not, write to the Free Software
+' Foundation, Inc., 51 Franklin St, Fifth Floor,
+' Boston, MA  02110-1301  USA
+
+Inherits ToolsBase
+Public Const Gender As String = "Blocks"
+
+Public Struct arrBlockSt
+    name As String
+    x As Float
+    y As Float
+    scaleX As Float
+    scaleY As Float
+    degRotation As Float
+    mirrored As Boolean
+    layer As String
+    entities As Entity[]
+End Struct
+
+Public eBlock As New ArrBlockSt
+
+Public Function Start(Optional filename As Variant, Optional _mode As Integer = 0) As Boolean
+
+    Dim xf As String[]
+    Dim f As String
+    Dim iREt As Integer
+
+    eBlock.entities = New Entity[]
+    iRet = FBlock.Showmodal()
+
+    If iret = 0 Then Me.Finish
+
+    ' el user eligio un bloque y lo quiere insertar en algun punto
+
+End
+
+Public Sub Draw()
+
+    Dim ET As Entity, i As Integer
+
+    If FBlock.entyBlock.Count = 0 Then Return
+
+    gl.PushMatrix
+    gl.Translatef(fBlock.x / appmain.hFcad.ScaleZoom, fBlock.y / appmain.hFcad.ScaleZoom, 0)
+    gl.Rotatef(FBlock.degRotation, 0, 0, 1)
+    gl.Scalef(FBlock.scaleX, fBlock.scaleY, 1)
+
+    For Each ET In FBlock.entyBlock
+        'et.visible = True
+
+        et.ClassHandler.Draw(et)
+    Next
+
+    gl.PopMatrix
+
+End
+
+Public Function MouseMove(mouseX As Integer, mouseY As Integer) ' esta rutina es llamada por FCAD en el evento DrawingArea_MouseMove
+
+    fBlock.x = puntos.Near(appmain.hFcad.Xreal(mouseX))
+    fBlock.y = puntos.Near(appmain.hFcad.Yreal(mouseY))
+
+    ' y si tengo enganche?
+
+    If appmain.hFcad.iEntity[2] >= 0 Then
+
+        ' esto re enganchado
+
+        fBlock.x = appmain.hFcad.iEntity[0]
+        fBlock.y = appmain.hFcad.iEntity[1]
+
+    End If
+
+End
+
+Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' called by FCAD-> DrawingArea_MouseUp
+
+    Inc Me.PointsDone
+
+    If Me.PointsDone = 1 Then ' acabo de marcar el punto base
+
+        ' ya tengo cosas seleccionadas
+        clsDrawingAids.Helper.texto = ("Final point")
+
+        ' punto real base
+        Me.SelStartXr = puntos.Near(appmain.hFcad.Xreal(mousex))
+        Me.SelStartYr = puntos.Near(appmain.hFcad.Yreal(mouseY))
+
+        ' prevenir acciones tontas como hacer click en otro elemento antes de terminar con el actual
+        ' TODO: reparar -> appmain.hFCAD.DesHabilitarBotones
+    Else If Me.PointsDone = 2 Then ' acabo de marcar el punto destino
+        ' permitir otros trabajos
+        ' TODO: reparar -> appmain.hFCAD.HabilitarBotones
+
+        ' we have the point set from MouseMove
+
+        Me.Finish()
+
+    Endif
+
+End

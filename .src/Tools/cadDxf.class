@@ -265,6 +265,21 @@ Public Procedure LoadFile(stn As String)
     Dim i As Integer
     Dim mLoadStatus As Boolean
 
+    mBlockCount = 0
+    mInsertCount = 0
+    mTextcount = 0
+    mMTextcount = 0
+    mLineCount = 0
+    mPolyLineCount = 0
+    mPolyLinePointsCount = 0
+    mCircleCount = 0
+    mEllipseCount = 0
+    mArcCount = 0
+    mSplineCount = 0
+    mSolidCount = 0
+    mDimCount = 0
+    mLayerCount = 0
+
     mPolyLine.p = New Float[]
 
     mSpline.p = New Float[]

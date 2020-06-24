@@ -56,6 +56,10 @@ Public Struct arrBlockSt
     name As String
     x As Float
     y As Float
+    scaleX As Float
+    scaleY As Float
+    degRotation As Float
+    mirrored As Boolean
     layer As String
     entities As Entity[]
 End Struct
@@ -78,7 +82,6 @@ Public WindowBackColor As Integer '= Color.Blac  '' Window backgrount color
 Public WindowTextColor As Integer   '' Window helper text color
 Public WindowCursorColor As Integer '' Window cursor color
 Public WhiteAndBlack As Integer     '' El color blanco/negro siempre sera distinto al
-
 Public ShowInspector As Boolean = False ' TODO: Tincho, agregar a la configuracion y a un Toggle button
 '---------------------------------------------------------------
 
