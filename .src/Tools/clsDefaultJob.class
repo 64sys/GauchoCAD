@@ -151,6 +151,8 @@ Public Function KeyText(EnteredText As String)
 
     End If
 
+    Return
+
     ' TODO: dejar comentado mientras hagamos debug
     'Catch
 

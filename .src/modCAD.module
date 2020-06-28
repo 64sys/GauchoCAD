@@ -129,6 +129,8 @@ Public Sub Main()
 
     texturelist = glPlus.LoadTextures(Application.Path &/ "Textures")
 
+    Print puntos.PointToLineDistance([1, 1], [0, 0, 2, 1])
+
 End
 
 Public Function ImportBlocks(colData As Collection) ', obxEntities As Entity[]) As Integer

@@ -31,7 +31,7 @@
 
 Create Static
 Create Private
-Fast Unsafe
+'Fast Unsafe
 Public HookSize As Integer = 16                       ' for use with poi
 Public NumericTolerance As Float = 1e-7
 Public GridSpacing As Float = 0.5
@@ -381,6 +381,34 @@ Public Function lineLineIntersection(A As Float[], B As Float[], C As Float[], D
         Dim y As Float = (a1 * c2 - a2 * c1) / determinant
         Return [x, y]
     End If
+
+End
+
+Public Function PointToLineDistance(fPoint As Float[], fLine As Float[]) As Float
+
+    ' adaptado de
+    ' https://www.mathopenref.com/coordpointdisttrig.html
+    Dim E As Float[]
+
+    Dim CE, angE As Float
+
+    ' veo los casos mas simples
+
+    If fLine[0] = fLine[2] Then ' la linea es vertical
+        Return fPoint[0] - fLine[0]
+
+    Else If fLine[1] = fLine[3] Then ' la linea es horizontal
+        Return fPoint[1] - fLine[1]
+
+    Endif
+
+    e = lineLineIntersection(fPoint, [1e10, fPoint[1]], [fLine[0], fLine[1]], [fLine[2], fLine[3]])
+
+    CE = fPoint[0] - e[0]
+
+    angE = ATan2(fLine[2] - fLine[0], fLine[3] - fLine[1])
+
+    Return CE * Sin(angE)
 
 End
 

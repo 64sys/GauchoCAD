@@ -93,27 +93,53 @@ End
 
 Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' called by FCAD-> DrawingArea_MouseUp
 
-    Inc Me.PointsDone
+    ' creo el bloque (si no existe y luego el insert)
+    Dim entInsert As New Entity
+    Dim i, ie As Integer
+    Dim sBloque As String
+    Dim entPart As Entity
 
-    If Me.PointsDone = 1 Then ' acabo de marcar el punto base
+    ' busco el bloque
 
-        ' ya tengo cosas seleccionadas
-        clsDrawingAids.Helper.texto = ("Final point")
+    For i = 0 To appmain.hFCAD.arrBlocks.Max
 
-        ' punto real base
-        Me.SelStartXr = puntos.Near(appmain.hFcad.Xreal(mousex))
-        Me.SelStartYr = puntos.Near(appmain.hFcad.Yreal(mouseY))
+        If appmain.hFCAD.arrBlocks[i].name = FBlock.BlockName Then Break
 
-        ' prevenir acciones tontas como hacer click en otro elemento antes de terminar con el actual
-        ' TODO: reparar -> appmain.hFCAD.DesHabilitarBotones
-    Else If Me.PointsDone = 2 Then ' acabo de marcar el punto destino
-        ' permitir otros trabajos
-        ' TODO: reparar -> appmain.hFCAD.HabilitarBotones
+    Next
 
-        ' we have the point set from MouseMove
+    If i = appmain.hFCAD.arrBlocks.Count Then ' armo el bloque
 
-        Me.Finish()
+        appmain.hFCAD.arrBlocks.Add(eBlock)
+        eBlock.name = FBlock.BlockName
+        For ie = 0 To FBlock.entyBlock.Max
+            eBlock.entities.Add(clsEntities.ClonEntity(FBlock.entyBlock[ie]))
+        Next
 
-    Endif
+    End If
+
+    ' ahora creo el insert
+
+    appmain.hFCAD.arrEntities.Add(entInsert)
+    entInsert.Block = eBlock.name
+    entInsert.ClassHandler = cadInsert
+    entInsert.Layer = appmain.CurrentLayer
+    entInsert.Gender = cadInsert.Gender
+    entInsert.P.Add(fBlock.x)
+    entInsert.P.Add(fBlock.y)
+
+    entInsert.fParam.Add(FBlock.scaleX)
+    entInsert.fParam.Add(FBlock.scaleY)
+    entInsert.fParam.Add(FBlock.degRotation)
+    entInsert.ClassHandler.Finish(entInsert, -1)
+
+    clsEntities.BackUpPosition(entInsert)
+
+    clsEntityBuilder.LastEntity = entInsert                                       ' save it to repeat on rigth click
+
+    modCAD.clsJobPrevious = Me
+    modCAD.clsJob = clsDefaultJob
+    clsDrawingAids.CleanTexts
+
+    appmain.hFCAD.Regen
 
 End

@@ -788,6 +788,17 @@ Public Sub gTask(sTask As String)
             'hFImport.Tag = wtag
             'hFImport.Title = ("Import")
             'hFImport.Show()
+        Case "export"
+
+            ' Dialog.Filter = ["*.dxf", "DXF files"]
+            ' If Dialog.SaveFile() Then Return
+            ' FilePath = Dialog.Path
+            ' If File.Ext(FilePath) <> "dxf" Then
+            '     FilePath = FilePath & ".dxf"
+            ' Endif
+            cadDxf.Start(, 1)
+            ' Catch
+            '     Message.Info(Error.Text)
 
         Case "open"
 

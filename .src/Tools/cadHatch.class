@@ -180,3 +180,12 @@ Public Sub Finish(oE As Entity, ParamsDone As Integer) As Boolean
     End If
 
 End
+
+Public Sub Cancel()
+
+    modCAD.clsJobPrevious = Me
+    modCAD.clsJob = clsDefaultJob
+    clsDrawingAids.CleanTexts
+    appmain.hFCAD.redraw
+
+End

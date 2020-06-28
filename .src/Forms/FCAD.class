@@ -112,6 +112,7 @@ Private WindowBackMode As String
 Public Sub Form_Open()
 
     Debug "open " & Me.Title
+    ScaleZoom = modCAD.ScreenDensity
 
 End
 

@@ -7,6 +7,7 @@ Public scaleX As Float
 Public scaleY As Float
 Public degRotation As Float
 Public mirrored As Boolean
+Public BlockName As String
 
 Public Sub form_Open()
 
@@ -57,6 +58,8 @@ Public Sub ListBox1_Click()
     cadDxf.arrToFill = entyBlock
 
     cadDxf.LoadFile(DirView1.Current &/ listBox1.Text & ".dxf")         ' cargo la entidad
+
+    BlockName = listBox1.Text
 
     flxLimits = clsEntities.ComputeLimits(entyBlock)                    ' computo el tamaño de la entidad, y luego determino la escala
 
