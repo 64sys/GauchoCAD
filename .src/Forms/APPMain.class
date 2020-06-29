@@ -39,6 +39,12 @@ Public CurrentForm As Form
 Public CurrentFile As String
 Public CurrentColor As Integer
 Public CurrentLayer As String
+Public CurrentLtype As Integer
+
+Public SelectedLayer As Boolean
+Public SelectedLtype As Boolean
+Public SelectedColour As Boolean
+Public SelectedWidth As Boolean
 
 'variables de ambiente
 Public flgShowInspector As Boolean = True
@@ -58,8 +64,9 @@ Public Sub Run(cin As Collection)
     Dim i As Integer
     Dim iSet As String
     Dim z As Integer
+    Dim ctr As Object
 
-    CurrentColor = Color.Green
+    'CurrentColor = Color.Green
 
     '------------------------------------------------------------------------------
     '' Estableciendo las variables de conexion y otras más
@@ -71,8 +78,8 @@ Public Sub Run(cin As Collection)
     etx = cin["AppEdi"]           ' Editor de texto plano por defecto
     lgg = cin["AppLog"]           ' Registro de eventos de la aplicación.
     '------------------------------------------------------------------------------
-    'iSet = xmg.GetVar("Desktop.Icons", apc)
-    iSet = "/usr/share/icons/Numix/64"
+    iSet = xmg.GetVar("Desktop.Icons", apc)
+    'iSet = "/usr/share/icons/Numix/64"
     ictn = dsk.GNumix(iSet & "/")
     '------------------------------------------------------------------------------
     For Each mnu In Me.Menus
@@ -84,7 +91,7 @@ Public Sub Run(cin As Collection)
                         tob = New ToolButton(pnlEntities) As "entity"
                         z = 48
                     Case "grpTools"
-                        tob = New ToolButton(pnlTools) As "tool"
+                        tob = New ToolButton(pnlEntities) As "tool"
                         z = 48
                     Case "grpSmart"
                         tob = New ToolButton(pnlSmart) As "tool"
@@ -99,12 +106,15 @@ Public Sub Run(cin As Collection)
                         z = 32
 
                     Case "grpView"
-                        tob = New ToolButton(pnlToolsH) As "tool"
+                        'tob = New ToolButton(pnlToolsH) As "tool"
+                        tob = New ToolButton(pnlFile) As "tool"
                         z = 32
+                        'Case "grpHelp"
+                        'Skip
 
-                    Case Else
-                        tob = New ToolButton(pnlFile) As "menuapp"
-                        z = 32
+                        ' Case Else
+                        '     tob = New ToolButton(pnlFile) As "menuapp"
+                        '     z = 32
                 End Select
 
                 With tob
@@ -116,33 +126,67 @@ Public Sub Run(cin As Collection)
                     .W = z
                     .H = z
 
-                    If Exist(ictn[obj.Tag]) Then
-                        If Stat(ictn[obj.Tag]).Type = gb.File Or Stat(ictn[obj.Tag]).Type = gb.Link Then
-                            Select mnu.Name
-                                Case "grpFile", "grpOptions", "grpHelp", "grpView", "grpSmart"
+                    ' If Exist(ictn[obj.Tag]) Then
+                    '     If Stat(ictn[obj.Tag]).Type = gb.File Or Stat(ictn[obj.Tag]).Type = gb.Link Then
+                    Select mnu.Name
+                        Case "grpFile", "grpOptions" ', '"grpHelp" ', "grpView" ', "grpSmart", "grpEntities"
+                            If Exist(ictn[obj.Tag]) Then
+                                If Stat(ictn[obj.Tag]).Type = gb.File Or Stat(ictn[obj.Tag]).Type = gb.Link Then
                                     tob.Picture = Image.Load(ictn[obj.Tag]).Stretch(z - 8, z - 8).Picture
-
-                                Case Else
+                                Else
                                     tob.Picture = obj.Picture
                                     .Border = True
-                            End Select
-                        Else
-                            tob.Picture = obj.Picture
+                                Endif
+                            Else
+                                tob.Picture = obj.Picture
+                                .Border = True
+                            Endif
+
+                        Case "grpSmart", "grpEntities", "grpView", "grpTools"
+                            tob.Picture = obj.Picture.Image.Stretch(z - 8, z - 8).Picture
                             .Border = True
-                        Endif
-                    Else
-                        tob.Picture = obj.Picture
-                        .Border = True
-                    Endif
+
+                            ' Case "grpHelp"
+                            '     'Skip
+                            '
+                            ' Case Else
+                            '     tob.Picture = obj.Picture
+                            '     .Border = True
+                    End Select
+
                 End With
+
+                obj.Picture = obj.Picture.Image.Stretch(22, 22).Picture
+
             Endif
             Inc i
+
         Next
     Next
 
+    'For Each ctr In Panel2.Children
+    'If Object.Type(ctr) <> "Panel" Then
+    btnLayers.Reparent(pnlFile)
+    btnLtypes.Reparent(pnlFile)
+    mubColors.Reparent(pnlFile)
+    cboLayers.Reparent(pnlFile)
+    tobLayers.Reparent(pnlFile)
+    'cboStyles.Reparent(pnlFile)
+    cboWidths.Reparent(pnlFile)
+    cboDimSts.Reparent(pnlFile)
+    'Endif
+    'Next
+
     'Loading menu colors
-    LoadColors()
-    LoadLocks()
+    'LoadColors()
+    AddColorsPics()
+
+    AddLtypesPics()
+    btnLtypes.Picture = Starter.cLtypes["0"][2].Picture
+    btnLtypes.Tooltip = Starter.cLtypes["0"][1]
+
+    ' 'LoadLtypes()
+    'LoadLocks()
 
     Me.Show()
 
@@ -214,7 +258,7 @@ Public Sub LoadColors()
 
         Paint.Begin(imgColorCircle)                                 ' voy a dibujar sobre la imagen que acabo de crear
         Paint.Arc(8, 8, 7, 0, 2 * Pi)                               ' le agrego un circulo, pero podria ser cualquier forma
-        Paint.Brush = Paint.Color(modCAD.gColor[Val(cCol.Key)])     ' el color lo saco directamente de la tabla de colores CAD
+        Paint.Brush = Paint.Color(Starter.gColor[Val(cCol.Key)])     ' el color lo saco directamente de la tabla de colores CAD
         Paint.Fill(True)                                            ' relleno
         Paint.Brush = Paint.Color(Color.Black)                      ' opcionalmente le dibujo el contorno que hace mejor contraste con el menubutton
         Paint.Stroke()                                              ' contorno
@@ -226,7 +270,6 @@ Public Sub LoadColors()
             mubColors.Picture = imgColorCircle.Picture
             mubColors.Tooltip = ix[0]
             mubColors.Text = ix[0]
-            'mubColors.Refresh
         Endif
 
     Next
@@ -248,6 +291,154 @@ Public Sub Clx_Click()
     txaDebug.Insert(obj.Text & " is the current color\n")
 
 End
+
+Public Sub AddLtypesPics()
+
+    'Dim lty As Collection
+    Dim lt As Variant
+    Dim dash As Float[]
+    Dim img As Image
+
+    'lty = Starter.cLtypes
+
+    For Each lt In Starter.cLtypes
+
+        dash = lt[0]
+
+        img = New Image(btnLtypes.Width, 8, btnLtypes.Background)
+
+        Paint.Begin(img)
+        Paint.NewPath
+        Select dash.Count
+            Case 0, 1
+
+            Case Else
+                Paint.Dash = dash
+
+        End Select
+
+        Select Starter.flgWhiteAndBlack
+            Case 0
+                Paint.Brush = Paint.Color(Color.Black)
+            Case Else
+                Paint.Brush = Paint.Color(Color.White)
+        End Select
+
+        Paint.LineWidth = 1
+        Paint.MoveTo(4, 4)
+        Paint.LineTo(btnLtypes.Width - 4, 4)
+        Paint.Stroke
+        Paint.End
+
+        Starter.cLtypes[Starter.cLtypes.Key].Add(img)
+
+    Next
+
+End
+
+Public Sub AddColorsPics()
+
+    Dim lt As Variant
+    Dim img As Image
+
+    For Each lt In Starter.cColors
+
+        img = New Image(16, 16, btnLtypes.Background)
+
+        Paint.Begin(img)
+        Paint.NewPath
+
+        Select Starter.flgWhiteAndBlack
+            Case 0
+                Paint.Brush = Paint.Color(Color.Black)
+            Case Else
+                Paint.Brush = Paint.Color(Color.White)
+        End Select
+
+        Paint.Begin(img)
+        Paint.Arc(8, 8, 7, 0, 2 * Pi)
+        Paint.Brush = Paint.Color(Val(Starter.cColors.Key))
+        Paint.Fill(True)
+        Paint.Brush = Paint.Color(Color.Black)
+        Paint.Stroke()
+        Paint.End
+
+        Starter.cColors[Starter.cColors.Key].Add(img)
+
+    Next
+
+End
+
+' Public Sub LoadLtypes()
+'
+'     Dim hMenu As Menu
+'     Dim mui As Menu
+'     Dim cCol As Collection
+'     Dim ix As Variant[]
+'     Dim isvg As String
+'     Dim img As Image
+'     Dim lty As New Collection
+'     Dim dash As Variant
+'     Dim lt As Integer
+'     Dim ctr As Menu
+'
+'     lty.Add([1], "Continous", "0") '1
+'     lty.Add([12, 2, 2, 2], "Center", "1") '1
+'     lty.Add([8, 4, 1, 4], "Dashdot", "2") '2
+'     lty.Add([8, 4], "Dashed", "3") '3
+'     lty.Add([4, 2, 1, 2, 1, 2], "Divide", "4") '4
+'     lty.Add([1, 2], "Dot", "5") '6
+'     lty.Add([4, 2], "Hidden", "6") '7
+'     lty.Add([2, 1], "Hidden2", "7") '8
+'     lty.Add([10, 2, 2, 2, 2, 2], "Phantom", "8") '9
+'     lty.Add([1], "ByBLock", "9") '1
+'     lty.Add([1], "ByLayer", "10") '1
+'
+'     mubLtypes.Menu = "Ltx"
+'
+'     ' Relleno el Menu del MenuButton
+'     hMenu = New Menu(Me) As "Ltx"
+'
+'     For Each dash In lty
+'
+'         mui = New Menu(hMenu) As "Ltx"
+'         img = New Image(128, 8, Color.White)
+'
+'         Paint.Begin(img)
+'         Paint.Dash = dash
+'
+'         Paint.NewPath
+'         Paint.Brush = Paint.Color(Color.Black)
+'         Paint.LineWidth = 1
+'         Paint.MoveTo(0, 4)
+'         Paint.LineTo(128, 4)
+'         Paint.Stroke
+'         Paint.End
+'
+'         mui.Picture = img.Stretch(218, 8).Picture
+'         mui.Text = lty.Key
+'         mui.Tag = lt
+'
+'         Inc lt
+'     Next
+'
+' End
+
+' Public Sub Ltx_Click()
+'
+'     Dim obj As Object
+'
+'     obj = Last
+'
+'     CurrentLineType = obj.Tag
+'     mubLtypes.Picture = obj.Picture
+'     mubLtypes.Text = obj.Text
+'     mubLtypes.Tooltip = obj.Text
+'
+'     txaDebug.Pos = 0
+'     txaDebug.Insert(obj.Text & " is the current linetype\n")
+'
+' End
 
 Public Sub LoadLocks()
 
@@ -660,7 +851,7 @@ Public Sub LoadComboboxes(cMdl As Collection)
     cMod = cMdl
 
     cboLayers.Clear
-    cboStyles.Clear
+    'cboStyles.Clear
     cboWidths.Clear
     cboDimSts.Clear
 
@@ -675,15 +866,15 @@ Public Sub LoadComboboxes(cMdl As Collection)
             Next
         Endif
 
-        If cMdl.Exist("Styles") Then
-            For Each aStyle In cMdl["Styles"]
-                cboStyles.Add(aStyle["name"])
-            Next
-            For Each aStyle In cMdl["Styles"]
-                cboStyles.Text = aStyle["name"]
-                Break
-            Next
-        Endif
+        ' If cMdl.Exist("Styles") Then
+        '     For Each aStyle In cMdl["Styles"]
+        '         cboStyles.Add(aStyle["name"])
+        '     Next
+        '     For Each aStyle In cMdl["Styles"]
+        '         cboStyles.Text = aStyle["name"]
+        '         Break
+        '     Next
+        ' Endif
 
         If cMdl.Exist("Widths") Then
             For Each aWidth In cMdl["Widths"]
@@ -788,17 +979,6 @@ Public Sub gTask(sTask As String)
             'hFImport.Tag = wtag
             'hFImport.Title = ("Import")
             'hFImport.Show()
-        Case "export"
-
-            ' Dialog.Filter = ["*.dxf", "DXF files"]
-            ' If Dialog.SaveFile() Then Return
-            ' FilePath = Dialog.Path
-            ' If File.Ext(FilePath) <> "dxf" Then
-            '     FilePath = FilePath & ".dxf"
-            ' Endif
-            cadDxf.Start(, 1)
-            ' Catch
-            '     Message.Info(Error.Text)
 
         Case "open"
 
@@ -974,16 +1154,17 @@ Public Sub tobLayers_Click()
 
 End
 
-Public Sub ColorPalette1_Click()
-
-    CurrentColor = ColorPalette1.Current
-    Print CurrentColor
-
-End
+' Public Sub ColorPalette1_Click()
+'
+'     CurrentColor = ColorPalette1.Current
+'     Print CurrentColor
+'
+' End
 
 Public Sub dprop_Click()
 
     Dim obj As Object
+    Dim FLay As FLayers
 
     obj = Last
 
@@ -991,6 +1172,9 @@ Public Sub dprop_Click()
         Case "layer"
             CurrentLayer = obj.Text
             Print CurrentLayer
+        Case "OpenFormLayer"
+            FLay = New FLayers
+            FLay.Run(hFCAD.cModel)
     End Select
 
 End
@@ -1174,6 +1358,60 @@ Public Sub KillJob() ' no funciona bien
 
 End
 
-Public Sub mubColors_Menu()
+Public Sub btnLtypes_MouseDown()
+
+    Dim lst As FLtypes
+    Dim lty As New Collection
+    Dim vrx As Variant[]
+    Dim img2 As Image
+
+    lst = New FLtypes(Starter.cLtypes, [btnLtypes.ScreenX, btnLtypes.ScreenY + btnLtypes.H])
+
+    Print btnLtypes.Value
+
+    If SelectedLtype = False Then
+        lst.Run()
+        Do
+            If SelectedLtype = True Then
+                vrx = Starter.cLtypes[CStr(CurrentLtype)]
+                If vrx.Count > 2 Then
+                    If Object.Type(vrx[2]) = "Image" Then
+                        img2 = vrx[2]
+                        btnLtypes.Picture = img2.Picture
+                        btnLtypes.Tooltip = vrx[1]
+                        'SelectedLineType = False
+                    Endif
+                Endif
+                SelectedLtype = False
+                Break
+            Else
+                Wait 0.1
+            Endif
+        Loop
+    Endif
+
+End
+
+Public Sub btnLayers_MouseDown()
+
+    Dim FLay As FLayers1
+
+    FLay = New FLayers1([Workspace1.ScreenX, Workspace1.ScreenY])
+
+    FLay.Border = False
+
+    FLay.Run(hFCAD.cModel)
+
+End
+
+Public Sub btnColors_MouseDown()
+
+    Dim FClr As FColors
+
+    FClr = New FColors([Workspace1.ScreenX, Workspace1.ScreenY])
+
+    FClr.Border = False
+
+    FClr.Run()
 
 End

@@ -2162,6 +2162,8 @@ Public Function RGBColors() As String[]
     rgbx.Add("153,153,153")
     rgbx.Add("204,204,204")
     rgbx.Add("255,255,255")
+    rgbx.Add("255,255,255")
+    rgbx.Add("255,255,255")
 
     Return rgbx
 

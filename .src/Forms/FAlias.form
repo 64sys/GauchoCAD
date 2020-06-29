@@ -51,7 +51,7 @@
     }
   }
   { pnlHide Panel
-    MoveScaled(33,48,10,17)
+    MoveScaled(27,48,10,17)
     Visible = False
     { txo TextBox
       MoveScaled(0,0,9,4)

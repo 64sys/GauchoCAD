@@ -24,7 +24,6 @@
 Inherits ToolsBase
 Create Static
 Public Const Gender As String = "ZoomE"
-Public limits As New Float[]
 
 '  PanX y PanY estanen coordenadas de pantalla, o sea pixeles
 '  por lo tanto algo que este en la posicion Px se dibujara en el pixel xPix = Px + PanX
@@ -36,15 +35,8 @@ Public limits As New Float[]
 
 Public Function Start(Optional ElemToBuild As Variant, Optional _Mode As Integer = 0) As Boolean
 
-    If _mode <> 1 Then
+    If _mode <> 1 Then clsEntities.ComputeLimits
 
-        limits = clsEntities.ComputeLimits()
-
-        appmain.hFcad.xmenor = limits[0]
-        appmain.hFcad.Ymenor = limits[1]
-        appmain.hFcad.xmayor = limits[2]
-        appmain.hFcad.ymayor = limits[3]
-    End If
     If APPMain.hFCAD.arrEntities.Count = 0 Then Return
 
     Dim SZx As Float

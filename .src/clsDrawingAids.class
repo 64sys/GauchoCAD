@@ -109,7 +109,7 @@ Public Sub DibujaHelper()
     trabajoYteclado = HelperTrabajo & " > " & sNext & appmain.hFCAD.KeysAccumulator & PromtSlash
 
     'Texting(trabajoYteclado, 10 - appmain.hFcad.glarea1.w / 2, 10 - appmain.hFcad.glarea1.h / 2, color.blue)
-    Texting(trabajoYteclado, 10 - appmain.hFcad.glarea1.w / 2, 10 - appmain.hFcad.glarea1.h / 2, Starter.WindowInfoColor) ' Tincho - toma color de la configuración
+    Texting(trabajoYteclado, 10 - appmain.hFcad.glarea1.w / 2, 10 - appmain.hFcad.glarea1.h / 2, Starter.flgWindowInfoColor) ' Tincho - toma color de la configuración
 
     HelperDibujo = ""
     If modCAD.Ortogonal Then HelperDibujo = "F8-Ortho"
@@ -117,7 +117,7 @@ Public Sub DibujaHelper()
     ' and so on...
 
     'texting(HelperDibujo, 40, 10 - appmain.hFcad.glarea1.h / 2, color.blue)
-    texting(HelperDibujo, 40, 10 - appmain.hFcad.glarea1.h / 2, Starter.WindowInfoColor) ' Tincho - toma color de la configuración
+    texting(HelperDibujo, 40, 10 - appmain.hFcad.glarea1.h / 2, Starter.flgWindowInfoColor) ' Tincho - toma color de la configuración
 
     ' helper del mouse
     If Len(Helper.Texto) = 0 Then Return
@@ -151,9 +151,9 @@ Public Sub DrawCoordenadas()
     z = appmain.hFcad.Metros(1) ' metros por pixel segun la ampliacion del usuario (rueda del mouse)
     lEsc = "Esc 1:" & Format$(1 / appmain.hFcad.ScaleZoom * 100 * ScreenDensity, "0")
 
-    Texting(l, 10 - appmain.hFcad.glarea1.w / 2, appmain.hFcad.glarea1.h / 2 - 15, Starter.WindowInfoColor)
-    Texting(l2, 10 - appmain.hFcad.glarea1.w / 2, appmain.hFcad.glarea1.h / 2 - 35, Starter.WindowInfoColor)
-    Texting(lEsc, appmain.hFcad.glarea1.w / 2 - 100, 10 - appmain.hFcad.glarea1.h / 2, Starter.WindowInfoColor)
+    Texting(l, 10 - appmain.hFcad.glarea1.w / 2, appmain.hFcad.glarea1.h / 2 - 15, Starter.flgWindowInfoColor)
+    Texting(l2, 10 - appmain.hFcad.glarea1.w / 2, appmain.hFcad.glarea1.h / 2 - 35, Starter.flgWindowInfoColor)
+    Texting(lEsc, appmain.hFcad.glarea1.w / 2 - 100, 10 - appmain.hFcad.glarea1.h / 2, Starter.flgWindowInfoColor)
 
 End
 

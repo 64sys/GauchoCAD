@@ -2,16 +2,11 @@
 
 { Form Form
   MoveScaled(0,0,53,31)
-  Resizable = False
   { DrawingArea1 DrawingArea
-    MoveScaled(1,5,25,25)
-    Background = Color.Black
+    MoveScaled(1,5,26,25)
   }
   { ComboBox1 ComboBox
-    MoveScaled(10,1,16,3)
-    #Translate = False
-    ReadOnly = True
-    Sorted = True
+    MoveScaled(10,1,17,3)
   }
   { Label1 Label
     MoveScaled(1,1,8,4)

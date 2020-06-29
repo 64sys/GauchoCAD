@@ -1,7 +1,7 @@
 # Gambas Form File 3.0
 
 { Form Form
-  MoveScaled(0,0,137,78)
+  MoveScaled(0,0,163,78)
   Background = Color.TextBackground
   Icon = Picture["logo.svg"]
   Arrangement = Arrange.Vertical
@@ -147,14 +147,12 @@
       Name = "mnuSpline"
       Text = ("Spline")
       Picture = Picture["svg/entities/spline.svg"]
-      Enabled = False
       Tag = "spline"
     }
     { mnuHatch Menu entity
       Name = "mnuHatch"
       Text = ("Hatch")
       Picture = Picture["svg/entities/hatch.svg"]
-      Enabled = False
       Tag = "hatch"
     }
     { mnuRectangle Menu entity
@@ -336,45 +334,43 @@
     Expand = True
     Arrangement = Arrange.Vertical
     { Panel2 Panel
-      MoveScaled(1,2,132,5)
+      MoveScaled(3,2,132,5)
       Arrangement = Arrange.Horizontal
       { pnlFile Panel
-        MoveScaled(0,0,24,5)
+        MoveScaled(0,0,7,5)
         Expand = True
         Arrangement = Arrange.Horizontal
         Spacing = True
       }
-      { ColorPalette1 ColorPalette
-        MoveScaled(25,0,9,5)
-        Visible = False
-        Expand = True
-        Border = False
+      { btnLtypes Button
+        MoveScaled(8,0,15,5)
+      }
+      { btnLayers Button
+        MoveScaled(24,0,15,5)
+      }
+      { btnColors Button
+        MoveScaled(41,0,15,5)
       }
       { mubColors MenuButton
-        MoveScaled(32,0,16,5)
+        MoveScaled(57,0,15,5)
+        Arrow = False
+        MenuOnly = True
       }
       { cboLayers ComboBox dprop
         Name = "cboLayers"
-        MoveScaled(49,0,15,5)
+        MoveScaled(62,0,15,5)
         Tag = "layer"
         ToolTip = ("Layers")
         ReadOnly = True
       }
       { tobLayers ToolButton
-        MoveScaled(64,0,5,5)
+        MoveScaled(78,0,5,5)
         Picture = Picture["svg/layers/layers.svg"]
         Border = True
       }
-      { cboStyles ComboBox dprop
-        Name = "cboStyles"
-        MoveScaled(71,0,15,5)
-        Tag = "style"
-        ToolTip = ("Line styles")
-        ReadOnly = True
-      }
       { cboWidths ComboBox dprop
         Name = "cboWidths"
-        MoveScaled(87,0,11,5)
+        MoveScaled(84,0,14,5)
         Tag = "weight"
         ToolTip = ("Line widths")
         ReadOnly = True
@@ -385,22 +381,6 @@
         Tag = "style"
         ToolTip = ("Dimmension styles")
         ReadOnly = True
-      }
-      { pnlToolsH Panel
-        MoveScaled(120,0,10,5)
-        Expand = True
-        Arrangement = Arrange.Horizontal
-        Spacing = True
-        Padding = 2
-        { Separator1 Separator
-          MoveScaled(21,0,1,4)
-        }
-        { Separator2 Separator
-          MoveScaled(42,0,1,4)
-        }
-        { Separator3 Separator
-          MoveScaled(56,0,1,4)
-        }
       }
     }
     { PanEdit1 Panel
@@ -420,28 +400,20 @@
           Spacing = True
           { lblEntities Label
             MoveScaled(1,0,20,3)
+            Visible = False
             Text = ("Entities")
             Alignment = Align.Center
           }
         }
         { pnlTools Panel
           MoveScaled(0,23,22,18)
+          Visible = False
           Expand = True
           Arrangement = Arrange.Row
           Spacing = True
           { lblTools Label
             MoveScaled(0,0,20,3)
             Text = ("Tools")
-            Alignment = Align.Center
-          }
-        }
-        { pnlSmart Panel
-          MoveScaled(0,42,21,17)
-          Expand = True
-          Arrangement = Arrange.Row
-          { lblSmart Label
-            MoveScaled(0,1,20,3)
-            Text = (" Smart entities")
             Alignment = Align.Center
           }
         }
@@ -456,8 +428,19 @@
         MoveScaled(104,1,23,55)
         Visible = False
         Arrangement = Arrange.Vertical
+        { pnlSmart Panel
+          MoveScaled(1,1,21,17)
+          Expand = True
+          Arrangement = Arrange.Row
+          { lblSmart Label
+            MoveScaled(0,1,20,3)
+            Visible = False
+            Text = (" Smart entities")
+            Alignment = Align.Center
+          }
+        }
         { txaDebug TextArea
-          MoveScaled(3,8,16,16)
+          MoveScaled(4,21,16,16)
           Font = Font["Noto Mono"]
           Expand = True
         }

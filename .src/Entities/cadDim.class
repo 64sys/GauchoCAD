@@ -21,13 +21,14 @@
 ' Boston, MA  02110-1301  USA
 Create Static
 
-Public Const Gender As String = "Dimension"
+Public Const Gender As String = "Cota"
 Public Const DrawingOrder As Integer = 100 ' 1 a 32.724 esto debe Drawse primero y ser sobreescrito por el resto
 Public Const PointsToDraw As Integer = 1             ' minimal point requered for drawing something usefull
 Public Const HelperTrabajo As String = ("Insert an acotation")
-Public ParamType As String = "TPP"                             ' that is Point, Point, Float; could be Color Text, etc
-Public ParamHelper As String = "Start point;End point"
-Public Const USEWITH As String = ""
+Public Const ParamType As String = "PP"                             ' that is Point, Point, Float; could be Color Text, etc
+Public Const ParamHelper As String = "Start point;End point"
+Public Const GAMBASCADENTITY As String = ("EntityBase")
+Public Const USEWITH As String = "clsEntityBuilder"
 Public Const OrtogonalIgnorado As Boolean = False
 Public Const OrtogonalForzado As Boolean = False
 Public Const ParamDefault As String = " "
@@ -39,576 +40,34 @@ Public Visible As Boolean = True            ' si esta entidad puede ser mostrada
 Public Finished As Boolean = False          ' colocar en true cuando se llegue a completar
 Public StepsDone As Integer                 ' esto lo cambia cls ElementBuilder durante la construccion
 
-' dimstyle: Todas las variables numericas Float estaran multiplicadas por DimScale
-Public DimType As Integer = 0            ' = fParam[0] and &X1111
-Public DimAtatchPoint As Integer = 2     ' = fParam[1]
-Public DimScale As Integer = 1           ' = fParam[2]
-Public DimFormat As String = "0.00"      '
-Public DimFormatAng As String = "0.0"    '
-Public DimArrowSize As Float = 0.3       ' el largo de la flecha
-Public DimArrowWidth As Float = 0.1      ' ancho de la flecha
-Public DimTickSize As Float = 0.3        ' el tamaño de la diagonal
-Public DimArrowOrThick As Boolean = True ' flecha (True) o diagonal (False)
-Public DimTextHeight As Float = 0.3      '
-Public DimSeparation As Float = 0.5      ' la separacion entre el punto que define la cota y el inicio de la linea q marca inicio y fin
-Public DimExtension As Float = 0.5       ' la continuacion de esas lineas
-
-' Pixeles
-
-Public LastMouseDownX As Integer    ' change in MouseDown
-Public LastMouseDownY As Integer
-Public SelStartX As Integer         ' change in MouseDown
-Public SelStartY As Integer
-Public SelEndX As Integer           ' change in MouseMove/MouseUp
-Public SelEndY As Integer
-
-' Metros
-Public SelStartXr As Float          ' Seleccion libre rectangular
-Public SelStartZr As Float          ' en metros
-Public SelEndXr As Float            ' aca Y es Z
-Public SelEndZr As Float
-
-' Clicks en Metros
-Public ClickXr As Float
-Public ClickYr As Float
-Public ClickPrevXr As Float
-Public ClickPrevYr As Float
-
-Public TextEntry As String
-
-' indicadores
-'Public elem.StepsDone As Integer = 0          ' La cantidad de puntos que marco para el trabajo actual--->Gurdado en la entidad
-Public StepsTotal As Integer = 0          ' Tomado de la lista de tipo de paramtros
-Public PointsTotal As Integer = 0          ' Tomado de la lista de tipo de paramtros
-Public NextParamType As String          ' What kind of input the element expects P=point, F=float, C=color, S=string, M=mixed either Point, or Float that is taken from Max(Px-Px', Pz-Pz')
-Public ParamHelperList As String[]
-
-' indices de valores ingresados
-Public iPoints As Integer
-Public iFloat As Integer
-Public iString As Integer
-
-' conserva los ultimos valores del mouse
-Public CursorX As Integer
-Public CursorY As Integer
-
-Public elem As Entity
-
-Public PoiChecking As Boolean = True
-Public LastEntity As Entity
-
-Public XYreal As Float[]
-
-Public extension As Float
-
-' Para mejor generalidad y para compatibilidad futura usaremos los P[] asi con los CODE del DXF
-' P[] = DXF CODE
-' 0 = 10
-' 1 = 20
-' 2 = 30    Definition points
-' 3 = 11
-' 4 = 12
-' ......
-' 20 = 36
-
-' 21 = 210
-' 22 = 220	Extrusion direction(Optional ; Default = 0, 0, 1)
-' 23 = 230
-
-' fParam[] = DXF CODE
-' se usara asi
-' 0 =  70, Dimension type:  Values 0 - 6 are integer values that represent the dimension type.Values 32, 64, And 128 are bit values, which are added To the integer values(value 32 Is Always set In R13 And later releases)
-'       0 = Rotated; 1 = Aligned; 2 = Angular; 3 = Diameter; 4 = Radius; 5 = Angular3point; 6 = Ordinate
-'       32 = Indicates that the block reference(group code 2) Is Referenced by this dimension only
-'       64 = Ordinate type.This Is A bit value(bit 7)used only With integer value 6. If set, ordinate Is X - type; If Not set, ordinate Is Y - type
-'       128 = This Is A bit value(bit 8)added To the other group 70 values If the dimension text has been positioned at a user - defined location rather than at the Default location
-'
-' 1 =  71 Attachment point:
-'       1 = Top left ; 2 = Top center; 3 = Top right; 4 = Middle left; 5 = Middle center; 6 = Middle right; 7 = Bottom left; 8 = Bottom center; 9 = Bottom right
-
-' 2 = DimScale
-
-'' Mode = DimType ver gcd.DimXXXX constants
-Public Function Start(Optional Mode As Integer = -1)
-
-    elem = New Entity
-
-    Me.DimType = Mode
-
-    elem.Gender = Me.Gender
-    elem.ClassHandler = Me
-    elem.p.Resize(24)
-    elem.fParam.Resize(6)
-    elem.Visible = False
-
-    ' init arrays
-    Select Case DimType
-        Case -1                 ' tengo que pregunta que dim quiere
-            clsDrawingAids.HelperTrabajo = "DimType? Horizontal;Vertical;Aligned;aNgular;rOtated,Radial;Diameter"
-            NextParamType = "T"
-
-        Case gcd.DimAligned
-            Me.StepsTotal = 3 ' 1-punto 2-punto 3-ubicacion del texto
-            NextParamType = "P"
-
-        Case gcd.dimAngular
-            Me.StepsTotal = 3 ' 1-centro 2-punto 3-punto 4-ubicacion del texto
-            NextParamType = "P"
-
-    End Select
-
-    'elem.gbcolor = appmain.CurrentColor
-
-    iPoints = 0
-    iFloat = 0
-    iString = 0
-
-    ' Pointstotal = elem.p.count / 2                                          ' at this point P is either set or 0 if non determined
-    ' StepsTotal = Len(elem.ClassHandler.ParamType)
-    '
-    ' NextParamType = UCase(Mid(elem.ClassHandler.ParamType, elem.StepsDone + 1, 1))
-    ' clsDrawingAids.HelperTrabajoNext = ParamHelperList[0]
-
-    ' instructions to FCAD
-    modCAD.OrtogonalIgnorado = elem.OrtogonalIgnorado
-    modCAD.OrtogonalForzado = elem.OrtogonalForzado
-
-    elem.layer = appmain.CurrentLayer
-    elem.layerid = modCAD.GetLayerID(appmain.CurrentLayer)
-
-    clsDrawingAids.HelperTrabajo = elem.ClassHandler.HelperTrabajo
-
-End
-
-Public Sub Draw()
+Public Sub Draw(oE As Entity)
 
     Dim l As Float, angulo As Float, hText As New PaintExtents, lText As String, lPix As Integer
-    Dim e, fExtX, fExtY As Float
+    Dim e As Float
     Dim ET As Entity, i As Integer
-    Dim fArrow, fExt, txtRect As Float[]
 
-    If Not elem.Visible Then Return
+    If Not oE.Visible Then Return
+    If oE.Selected And Not modCAD.ToolActive Then oE.ColorToPaint = modCAD.ColorForSelected Else oE.ColorToPaint = modCAD.GetGBColor(oE.colour, oE.Layerid)
 
-    If elem.Selected And Not modCAD.ToolActive Then elem.ColorToPaint = modCAD.ColorForSelected Else elem.ColorToPaint = modCAD.GetGBColor(elem.colour, elem.Layerid)
+    i = clsEntities.FIndBlockID(oE.StringData2)
+    If i < 0 Then Return
 
-    Select Case DimType
-        Case gcd.DimAligned
-            angulo = Ang(elem.P[4] - elem.P[0], elem.P[5] - elem.P[1])
+    gl.PushMatrix
+    'gl.Translatef(appmain.hFcad.pixels(oE.p[0]) / appmain.hFcad.ScaleZoom, appmain.hFcad.pixels(oE.p[1]) / appmain.hFcad.ScaleZoom, 0)
+    'gl.Rotatef(oE.fParam[2], 0, 0, 1)
+    'gl.Scalef(oE.fParam[0], oE.fParam[1], 1)
 
-            ' lineas de extension
-            fExt = puntos.RotateFromPointWithAngle(0, 0, angulo, 0, -extension)
-            txtRect = glPlus.TextExtends(Format$(puntos.distancia(elem.P[0], elem.P[1], elem.P[4], elem.P[5]), DimFormat), DimTextHeight)
-            puntos.Rotate(txtRect, angulo)
-            ' raya horizontal
-            glPlus.Lines([elem.P[0] + fExt[0], elem.P[1] + fExt[1], elem.P[4] + fExt[0], elem.P[5] + fExt[1]], elem.ColorToPaint, elem.LineWidth, elem.LineType)
-
-            ' texto
-            elem.P[2] = (elem.P[4] + elem.P[0]) / 2 + fExt[0] + txtRect[0] * 0.25
-            elem.P[3] = (elem.P[5] + elem.P[1]) / 2 + fExt[1] + txtRect[1] * 0.25
-
-            glPlus.DrawText(Format$(puntos.distancia(elem.P[0], elem.P[1], elem.P[4], elem.P[5]), DimFormat), elem.P[2], elem.P[3], Angulo * 180 / Pi, DimTextHeight, elem.ColorToPaint)
-
-            ' flechas
-            fArrow = [0, 0, DimArrowSize, DimArrowWidth / 2, DimArrowSize, -DimArrowWidth / 2]
-            puntos.Rotate(farrow, angulo)
-            puntos.Translate(fArrow, elem.P[0] + fExt[0], elem.P[1] + fExt[1])
-            glPlus.PolygonFilled(fArrow, elem.ColorToPaint, elem.ColorToPaint)
-
-            fArrow = [0, 0, -DimArrowSize, DimArrowWidth / 2, -DimArrowSize, -DimArrowWidth / 2]
-            puntos.Rotate(farrow, angulo)
-            puntos.Translate(fArrow, elem.P[4] + fExt[0], elem.P[5] + fExt[1])
-            glPlus.PolygonFilled(fArrow, elem.ColorToPaint, elem.ColorToPaint)
-
-        Case gcd.dimAngular
-
-        Case gcd.dimRadius
-            ' P0=centro P1=texto P5=flecha
-
-        Case gcd.dimDiameter
-            ' P0=flecha P1=texto P5=flecha
-
-            angulo = Ang(elem.P[4] - elem.P[0], elem.P[5] - elem.P[1])
-
-            ' lineas de extension
-            fExt = puntos.RotateFromPointWithAngle(0, 0, angulo, 0, -extension)
-            txtRect = glPlus.TextExtends(Format$(puntos.distancia(elem.P[0], elem.P[1], elem.P[4], elem.P[5]), DimFormat), DimTextHeight)
-            puntos.Rotate(txtRect, angulo)
-
-            ' raya horizontal
-            glPlus.Lines([elem.P[0], elem.P[1], elem.P[4], elem.P[5]], elem.ColorToPaint, elem.LineWidth, elem.LineType)
-
-            ' texto
-            elem.P[2] = (elem.P[4] + elem.P[0]) / 2 + fExt[0] + txtRect[0] * 0.25
-            elem.P[3] = (elem.P[5] + elem.P[1]) / 2 + fExt[1] + txtRect[1] * 0.25
-
-            glPlus.DrawText(Format$(puntos.distancia(elem.P[0], elem.P[1], elem.P[4], elem.P[5]), DimFormat), elem.P[2], elem.P[3], Angulo * 180 / Pi, DimTextHeight, elem.ColorToPaint)
-
-            ' flechas
-            fArrow = [0, 0, DimArrowSize, DimArrowWidth / 2, DimArrowSize, -DimArrowWidth / 2]
-            puntos.Rotate(farrow, angulo)
-            puntos.Translate(fArrow, elem.P[0], elem.P[1])
-            glPlus.PolygonFilled(fArrow, elem.ColorToPaint, elem.ColorToPaint)
-
-            fArrow = [0, 0, -DimArrowSize, DimArrowWidth / 2, -DimArrowSize, -DimArrowWidth / 2]
-            puntos.Rotate(farrow, angulo)
-            puntos.Translate(fArrow, elem.P[4], elem.P[5])
-            glPlus.PolygonFilled(fArrow, elem.ColorToPaint, elem.ColorToPaint)
-
-    End Select
+    ' modCAD.ScaleLines = (Abs(oE.fParam[0]) + Abs(oE.fParam[1])) / 2   ' ??????????????????
+    For Each ET In appmain.hFCAD.arrBlocks[i].entities
+        et.Draw
+    Next
+    'modCAD.ScaleLines = 1
+    gl.PopMatrix
 
 End
 
 '' A fat version of the entity
 Public Sub DrawRemark(oE As Entity)
-
-End
-
-' This function will return False if the element couldn't be created for some reason: bad or incomple user input
-' True means all is good, False will instruct the clsEntityBuilder to delete it
-Public Sub Finish(oE As Entity, ParamsDone As Integer) As Boolean
-
-    'Print "Finish en EntityBase"
-    'CreatePolygon(oe)
-    BuildPOI(oe)
-
-    ' busco el tipo de linea, si hace falta
-    If elem.LineTypeName = "Dashed" Then elem.LineType = 1
-    ' tareas finales de armado del objeto
-    elem.b.resize(elem.P.count)
-    elem.psel.resize(elem.p.count / 2)
-    elem.ForDeletion = False
-    elem.DrawAble = True
-    elem.Selected = False
-    elem.Finished = True
-
-    If Not True Then
-
-        elem.ForDeletion = True
-        elem.DrawAble = False
-
-    End If
-    clsEntities.BackUpPosition(elem)
-    APPMain.hFCAD.arrEntities.Add(elem)
-    'elem.ClassHandler.buildPOI(elem)
-    elem.ClassHandler.Finish(elem, elem.StepsDone)
-
-    LastEntity = elem                                       ' save it to repeat on rigth click
-
-    modCAD.clsJobPrevious = Me
-    modCAD.clsJob = clsDefaultJob
-    clsDrawingAids.CleanTexts
-
-    ' sort them
-    'APPMain.hFCAD.arrEntities.Sort()
-    clsMouseTracking.ReBuildPOIPoints
-    clsEntities.GLGenDrawList
-
-    appmain.hFCAD.redraw
-
-End
-
-Public Function KeyText(EnteredText As String) ' esta rutina es llamada por FCAD en el evento FCAD_KeyPress cuando recibe una texto + <Enter>
-
-    ' this could be many things, but lets concentrate in what to expect and check if its correct
-    ' The element provides a constant called ParamType wich is a string like "PPFCTB"
-    ' P = point in X,Y format with decimal point as dot "."
-    '     it can also be @X,Y wich means that the coordinates are relative to the last point
-    ' F = float, thats any number
-    ' T = a text or a single character too
-    ' C = color input
-    ' B = boolean, Yes/Si or No
-    ' Lets see what are we expecting
-    Dim Xt, Zt As Float, ErrTxt As String, Relative As Boolean
-
-    Select Case NextParamType
-
-        Case "P", "+"
-            errtxt = ", expected a valid point like 12.4,9.5  or @12.34,10.5"
-            ' lets filter
-            EnteredText = Trim$(UCase$(EnteredText))
-            ' So we expect a position x,y , but in some cases it can be
-            ' C = close
-            ' U = undo, delete last segment
-            ' and others
-
-            If Left(EnteredText, 1) = "C" Then          ' close the element
-                ' got othe first point and exit
-                elem.P[iPoints * 2] = elem.P[0]
-                elem.P[iPoints * 2 + 1] = elem.P[1]
-                Me.Finish
-
-            Else If Left(EnteredText, 1) = "U" Then     ' undo last command and go
-
-                elem.P.remove(elem.P.max)
-                elem.P.remove(elem.P.max)
-                Me.Finish
-            Else                                        ' an X,Y or @X,Y
-
-                If InStr(EnteredText, "@") > 0 Then    ' may be a point
-                    Relative = True
-                    EnteredText = Replace(EnteredText, "@", "")
-                Endif
-                Xt = CFloat(Split(EnteredText, ",")[0])
-                Zt = CFloat(Split(EnteredText, ",")[1])
-
-                ' if we are stll here, input was good
-                elem.P[iPoints * 2] = Xt
-                elem.P[iPoints * 2 + 1] = Zt
-
-                If Relative And (elem.P.count > 2) Then
-                    elem.P[iPoints * 2] += elem.P[(iPoints - 1) * 2]
-                    elem.P[iPoints * 2 + 1] += elem.P[(iPoints - 1) * 2 + 1]
-
-                Endif
-                Inc iPoints
-                AdvanceStep
-
-            End If
-
-        Case "T"
-            errtxt = ", expected text, not a point"
-
-            TextEntry = EnteredText
-
-            AdvanceStep
-
-        Case "F", "M", "A", "L"                 ' Float, Mixed, Angle, Longitud
-            errtxt = "enter a valid text size"
-
-            If EnteredText = "" Then
-
-                Try elem.fParam[iFloat] = ParamDefault[elem.StepsDone]
-
-            Else
-
-                elem.fParam[iFloat] = CFloat(EnteredText)
-
-            Endif
-
-            Inc iFloat
-            AdvanceStep
-
-        Case "C"                                ' color
-            If Dialog.SelectColor() Then
-                elem.fParam[iFloat] = CFloat(Dialog.Color)
-                Inc iFloat
-                AdvanceStep
-
-            Endif
-            Key.Cod
-
-    End Select
-
-Finally
-
-    Return
-
-Catch
-
-    ' unexpected input
-    clsDrawingAids.ErrorMessage = ("Bad input" & ErrTxt)
-
-End
-
-Public Sub AdvanceStep()
-
-    Select Case DimType
-        Case -1 'clsDrawingAids.HelperTrabajo = "DimType? Horizontal;Vertical;Aligned;aNgular;rOtated,Radial;Diameter"
-            Select Case UCase(TextEntry)
-                Case "H"
-                    DimType = gcd.dimHorizontal
-                Case "V"
-                    DimType = gcd.dimVertical
-                Case "A"
-                    DimType = gcd.dimAligned
-                Case "N"
-                    DimType = gcd.dimAngular
-                Case "O"
-                    DimType = gcd.dimRotated
-                Case "R"
-                    DimType = gcd.dimRadius
-                Case "D"
-                    DimType = gcd.dimDiameter
-                Case Else
-                    clsDrawingAids.ErrorMessage = ("Bad input")
-                    Return
-            End Select
-            ' good input
-
-        Case gcd.DimAligned
-            If iPoints = 1 Then ' marco el primer punto
-                elem.P[0] = ClickXr
-                elem.P[1] = ClickYr
-                elem.Visible = True
-            Else If iPoints = 2 Then ' marco el segundo punto
-                elem.P[4] = ClickXr ' 2 y 3  son la posicion del texto
-                elem.P[5] = ClickYr
-            Else If iPoints = 3 Then ' marco la extension
-
-                extension = puntos.PointToLineDistance([ClickXr, ClickYr], [elem.P[0], elem.P[1], elem.P[4], elem.P[5]])
-                'elem.P[2] = ClickXr
-                'elem.P[3] = ClickYr
-
-            End If
-
-        Case gcd.dimDiameter
-            If iPoints = 1 Then ' marco el primer punto
-                elem.P[0] = ClickXr
-                elem.P[1] = ClickYr
-                elem.Visible = True
-            Else If iPoints = 2 Then ' marco el segundo punto
-                elem.P[4] = ClickXr ' 2 y 3  son la posicion del texto
-                elem.P[5] = ClickYr
-            Else If iPoints = 3 Then ' marco la extension
-
-                extension = puntos.PointToLineDistance([ClickXr, ClickYr], [elem.P[0], elem.P[1], elem.P[4], elem.P[5]])
-                'elem.P[2] = ClickXr
-                'elem.P[3] = ClickYr
-
-            End If
-
-    End Select
-    Inc elem.StepsDone
-
-    appmain.hFCAD.redraw
-
-End
-
-Public Function MouseMove(mouseX As Integer, mouseY As Integer) ' esta rutina es llamada por FCAD en el evento DrawingArea_MouseMove
-
-    If InStr("LAP", NextParamType) = 0 Then Return ' we are expecting a parameter
-
-    ' if we expect a parameter, it will be passed
-    If NextParamType = "A" Then
-
-        ' return the angle from horizontal to us
-        elem.fParam[iFloat] = Ang(appmain.hFcad.Xreal(mouseX) - elem.p[elem.p.max - 1], appmain.hFcad.Yreal(mouseY) - elem.p[elem.p.max])
-        elem.fParam[iFloat] *= 180 / Pi
-        appmain.hFCAD.redraw
-        Return              ' nothing more to do here
-    End If
-
-    If NextParamType = "L" Then
-
-        ' return the angle from horizontal to us
-        elem.fParam[iFloat] = puntos.distancia(puntos.Near(appmain.hFcad.Xreal(mouseX)), puntos.Near(appmain.hFcad.Yreal(mouseY)), elem.p[elem.p.max - 1], elem.p[elem.p.max])
-
-        appmain.hFCAD.redraw
-        Return              ' nothing more to do here
-    End If
-
-    ' we are waiting for a point
-    ClickXr = puntos.Near(appmain.hFcad.Xreal(mouseX))
-    ClickYr = puntos.Near(appmain.hFcad.Yreal(mouseY))
-
-    ' y si tengo enganche?
-    If (appmain.hFcad.iEntity[2] >= 0) And (modCAD.OrtogonalForzado = False) Then
-
-        ' esto re enganchado
-        ClickXr = appmain.hFcad.iEntity[0]
-        ClickYr = appmain.hFcad.iEntity[1]
-
-        ' aca tengo que verificar el ortogonal
-    Else If elem.StepsDone > 0 Then                                                                          ' puedo hacer ortogonal
-        If modCAD.OrtogonalForzado Or (Not modCAD.OrtogonalIgnorado And modCAD.Ortogonal) Then          ' hablame de operadores logicos
-
-            If Abs(ClickXr - ClickPrevXr) > Abs(ClickYr - ClickPrevYr) Then ' prevalece X
-                ClickYr = ClickPrevYr
-            Else
-                ClickXr = ClickPrevXr
-            Endif
-
-        End If
-
-    End If
-
-    Select Case DimType
-        Case gcd.DimAligned
-            If iPoints = 1 Then ' marco el primer punto
-                elem.P[0] = ClickXr
-                elem.P[1] = ClickYr
-            Else If iPoints = 2 Then ' marco el segundo punto
-                elem.P[4] = ClickXr
-                elem.P[5] = ClickYr
-                ' ' 2 y 3  son la posicion del texto
-                ' elem.P[2] = (elem.P[4] + elem.P[0]) / 2
-                ' elem.P[3] = (elem.P[5] + elem.P[1]) / 2
-            Else If iPoints = 3 Then ' marco el segundo punto
-                extension = puntos.PointToLineDistance([ClickXr, ClickYr], [elem.P[0], elem.P[1], elem.P[4], elem.P[5]])
-                'elem.P[2] = ClickXr ' 2 y 3  son la posicion del texto
-                'elem.P[3] = ClickYr
-
-            End If
-    End Select
-
-    appmain.hFCAD.redraw
-
-End
-
-Public Function MouseDown(mouseX As Integer, mouseY As Integer) ' esta rutina es llamada por FCAD en el evento DrawingArea_MouseDown
-
-    clsDrawingAids.ErrorMessage = ""
-    If InStr("LAP", NextParamType) = 0 Then Return ' we are expecting a parameter
-
-    ' if we expect a parameter, it will be passed
-    If NextParamType = "A" Then
-
-        ' return the angle from horizontal to us
-        elem.fParam[iFloat] = Ang(appmain.hFcad.Xreal(mouseX) - elem.p[elem.p.max - 1], appmain.hFcad.Yreal(mouseY) - elem.p[elem.p.max])
-        elem.fParam[iFloat] *= 180 / Pi
-
-        Inc iFloat
-        AdvanceStep
-        Return              ' nothing more to do here
-    End If
-
-    If NextParamType = "L" Then
-
-        ' return the angle from horizontal to us
-        elem.fParam[iFloat] = puntos.distancia(puntos.Near(appmain.hFcad.Xreal(mouseX)), puntos.Near(appmain.hFcad.Yreal(mouseY)), elem.p[elem.p.max - 1], elem.p[elem.p.max])
-        Inc iFloat
-        AdvanceStep
-        Return              ' nothing more to do here
-    End If
-
-    ' we are waiting for a point
-
-    ClickXr = puntos.Near(appmain.hFcad.Xreal(mouseX))
-    ClickYr = puntos.Near(appmain.hFcad.Yreal(mouseY))
-
-    ' y si tengo enganche?
-
-    If (appmain.hFcad.iEntity[2] >= 0) And (modCAD.OrtogonalForzado = False) Then
-
-        ' esto re enganchado
-
-        ClickXr = appmain.hFcad.iEntity[0]
-        ClickYr = appmain.hFcad.iEntity[1]
-
-        ' aca tengo que verificar el ortogonal
-
-    Else If elem.StepsDone > 0 Then                                                                          ' puedo hacer ortogonal
-        If modCAD.OrtogonalForzado Or (Not modCAD.OrtogonalIgnorado And modCAD.Ortogonal) Then          ' hablame de operadores logicos
-
-            If Abs(ClickXr - ClickPrevXr) > Abs(ClickYr - ClickPrevYr) Then ' prevalece X
-                ClickYr = ClickPrevYr
-            Else
-                ClickXr = ClickPrevXr
-            Endif
-
-        End If
-
-    End If
-
-    ClickPrevXr = ClickXr
-    ClickPrevYr = ClickYr
-
-    Inc iPoints
-    AdvanceStep
-
-End
-
-Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' esta rutina es llamada por FCAD en el evento DrawingArea_MouseUp
 
 End
 
@@ -618,29 +77,29 @@ Public Function Draw2(oE As Entity)
     Dim e As Float
     Dim ET As Entity, i As Integer
 
-    If Not elem.Visible Then Return
+    If Not oE.Visible Then Return
 
-    If elem.Selected And Not modCAD.ToolActive Then elem.ColorToPaint = modCAD.ColorForSelected Else elem.ColorToPaint = modCAD.GetGBColor(elem.colour, elem.Layerid)
+    If oE.Selected And Not modCAD.ToolActive Then oE.ColorToPaint = modCAD.ColorForSelected Else oE.ColorToPaint = modCAD.GetGBColor(oE.colour, oE.Layerid)
 
     paint.Save
 
-    paint.LineWidth = elem.LineWidth / appmain.hFcad.ScaleZoom / modCAD.ScaleLines
-
-    If elem.Selected And Not modCAD.ToolActive Then
+    paint.LineWidth = oE.LineWidth / appmain.hFcad.ScaleZoom / modCAD.ScaleLines
+    If oE.flxDash Then paint.Dash = oE.flxDash
+    If oE.Selected And Not modCAD.ToolActive Then
         paint.brush = Paint.Color(modCAD.ColorForSelected)
     Else
-        paint.brush = Paint.Color(elem.ColorToPaint)
+        paint.brush = Paint.Color(oE.ColorToPaint)
     Endif
     ' La cota puede estar inclinada, entonces debo rotarla
-    l = puntos.distancia(elem.p[0], elem.p[1], elem.p[2], elem.p[3])
+    l = puntos.distancia(oE.p[0], oE.p[1], oE.p[2], oE.p[3])
     lPix = appmain.hFcad.pixels(l)
     ltext = Format(l, modCAD.FormatoCotas)
-    angulo = -Ang(elem.p[2] - elem.p[0], elem.p[1] - elem.p[3])
-    paint.Translate(elem.p[0], elem.p[1])
+    angulo = -Ang(oE.p[2] - oE.p[0], oE.p[1] - oE.p[3])
+    paint.Translate(oE.p[0], oE.p[1])
     paint.Rotate(-angulo)
     htext = paint.TextExtents(ltext)
-    ' e1 = puntos.distanciap(elem.p[0], elem.p[2])        ' lo que se separa la cota de los puntos marcados para acotar
-    ' e2 = puntos.distanciap(elem.p[1], elem.p[2])        ' lo que se separa la cota de los puntos marcados para acotar
+    ' e1 = puntos.distanciap(oE.p[0], oE.p[2])        ' lo que se separa la cota de los puntos marcados para acotar
+    ' e2 = puntos.distanciap(oE.p[1], oE.p[2])        ' lo que se separa la cota de los puntos marcados para acotar
     ' If e1 > e2 Then e = e2 Else e = e1      ' tomo el menor, en metros
     ' e = appmain.hFcad.pixels(e)                     ' paso a pixels
     e = 0 ' TODO:  arregla esto
@@ -671,60 +130,79 @@ Public Sub CreatePolygon(oE As Entity)
 
     ' checkk Viga / Beam to see how its done
 
-    elem.Polygon.Clear
+    oE.Polygon.Clear
 
     Dim BpX, BpZ, l As Float, Rotated As Float[]
-    l = puntos.distancia(elem.p[0], elem.p[1], elem.p[2], elem.p[3])
+    l = puntos.distancia(oE.p[0], oE.p[1], oE.p[2], oE.p[3])
 
     ' From an unrotated point of view, our bouding points look like
     ' 1
-    BpX = elem.p[0]
-    BpZ = elem.p[1] - elem.fParam[0] / 2  ' thats wall thickness
+    BpX = oE.p[0]
+    BpZ = oE.p[1] - oE.fParam[0] / 2  ' thats wall thickness
 
     ' and, the rotated are
 
-    rotated = puntos.RotateFromPointWithSinCos(elem.p[0], elem.p[1], (elem.p[3] - elem.p[1]) / l, (elem.p[2] - elem.p[0]) / l, BpX, Bpz)
-    elem.Polygon.Insert(rotated)     ' pair
+    rotated = puntos.RotateFromPointWithSinCos(oE.p[0], oE.p[1], (oE.p[3] - oE.p[1]) / l, (oE.p[2] - oE.p[0]) / l, BpX, Bpz)
+    oE.Polygon.Insert(rotated)     ' pair
 
     ' 2
-    BpX = elem.p[0] + l
-    BpZ = elem.p[1] - elem.fParam[0] / 2
+    BpX = oE.p[0] + l
+    BpZ = oE.p[1] - oE.fParam[0] / 2
 
     ' and, the rotated are
 
-    rotated = puntos.RotateFromPointWithSinCos(elem.p[0], elem.p[1], (elem.p[3] - elem.p[1]) / l, (elem.p[2] - elem.p[0]) / l, BpX, Bpz)
-    elem.Polygon.Insert(rotated)     ' pair
+    rotated = puntos.RotateFromPointWithSinCos(oE.p[0], oE.p[1], (oE.p[3] - oE.p[1]) / l, (oE.p[2] - oE.p[0]) / l, BpX, Bpz)
+    oE.Polygon.Insert(rotated)     ' pair
 
     ' 3
-    BpX = elem.p[0] + l
-    BpZ = elem.p[1] + elem.fParam[0] / 2
+    BpX = oE.p[0] + l
+    BpZ = oE.p[1] + oE.fParam[0] / 2
 
     ' and, the rotated are
 
-    rotated = puntos.RotateFromPointWithSinCos(elem.p[0], elem.p[1], (elem.p[3] - elem.p[1]) / l, (elem.p[2] - elem.p[0]) / l, BpX, Bpz)
-    elem.Polygon.Insert(rotated)     ' pair
+    rotated = puntos.RotateFromPointWithSinCos(oE.p[0], oE.p[1], (oE.p[3] - oE.p[1]) / l, (oE.p[2] - oE.p[0]) / l, BpX, Bpz)
+    oE.Polygon.Insert(rotated)     ' pair
 
     ' 4
-    BpX = elem.p[0]
-    BpZ = elem.p[1] + elem.fParam[0] / 2
+    BpX = oE.p[0]
+    BpZ = oE.p[1] + oE.fParam[0] / 2
 
     ' and, the rotated are
 
-    rotated = puntos.RotateFromPointWithSinCos(elem.p[0], elem.p[1], (elem.p[3] - elem.p[1]) / l, (elem.p[2] - elem.p[0]) / l, BpX, Bpz)
-    elem.Polygon.Insert(rotated)     ' pair
+    rotated = puntos.RotateFromPointWithSinCos(oE.p[0], oE.p[1], (oE.p[3] - oE.p[1]) / l, (oE.p[2] - oE.p[0]) / l, BpX, Bpz)
+    oE.Polygon.Insert(rotated)     ' pair
 
 End
+'' Creo los puntos de interes
+'' Build point of interest
 
 Public Function BuildPOI(oE As Entity, Optional arrIndex As Integer = -1) As Integer
 
 End
 
-Public Sub Cancel()
+' This function will return False if the element couldn't be created for some reason: bad or incomple user input
+' True means all is good, False will instruct the clsEntityBuilder to delete it
+Public Sub Finish(oE As Entity, ParamsDone As Integer) As Boolean
 
-    elem = Null
-    modCAD.clsJobPrevious = Me
-    modCAD.clsJob = clsDefaultJob
-    clsDrawingAids.CleanTexts
-    appmain.hFCAD.redraw
+    'Print "Finish en EntityBase"
+    'CreatePolygon(oe)
+    BuildPOI(oe)
+
+    ' busco el tipo de linea, si hace falta
+    If oE.LineTypeName = "Dashed" Then oE.LineType = 1
+    ' tareas finales de armado del objeto
+    oE.b.resize(oE.P.count)
+    oE.psel.resize(oE.p.count / 2)
+    oE.ForDeletion = False
+    oE.DrawAble = True
+    oE.Selected = False
+    oE.Finished = True
+
+    If Not True Then
+
+        oE.ForDeletion = True
+        oE.DrawAble = False
+
+    End If
 
 End

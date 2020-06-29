@@ -569,7 +569,7 @@ Public Sub CheckPOI(xr As Float, Yr As Float) As Float[]
         rData[2] = -1
         rData[3] = -1
     End If
-    ' Debug "pois checked"
+    Debug "pois checked"
     Me.flgSearchingPOI = False
     Return rData
 

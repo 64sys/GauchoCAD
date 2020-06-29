@@ -140,6 +140,7 @@ Public Function Draw2(oE As Entity)
     If major = 0 Then major = 1
 
     paint.Save
+    If oE.flxDash Then paint.Dash = oE.flxDash
 
     paint.brush = Paint.Color(oE.ColorToPaint)
 
@@ -147,7 +148,7 @@ Public Function Draw2(oE As Entity)
     paint.Rotate(-angle)
     Paint.Scale(1, Minor / major)
     paint.LineWidth = oE.LineWidth / appmain.hFcad.ScaleZoom / modCAD.ScaleLines
-    paint.arc(0, 0, major, Me.start, Me.recorrido)
+    paint.arc(0, 0, major, oE.start, oE.recorrido)
     paint.Stroke
     paint.Restore
 

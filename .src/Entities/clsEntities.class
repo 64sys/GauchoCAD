@@ -26,10 +26,6 @@ Public Struct arrBlockSt
     name As String
     x As Float
     y As Float
-    scaleX As Float
-    scaleY As Float
-    degRotation As Float
-    mirrored As Boolean
     layer As String
     entities As Entity[]
 End Struct
@@ -818,48 +814,39 @@ End
 '
 ' End
 
-'Return bound limits for all verices in the array of entities
-Public Function ComputeLimits(Optional entities As Entity[], OnlyVisibles As Boolean = True) As Float[]
+Public Sub ComputeLimits()
+    ' bound limits for all verices in current plant
 
     Dim e As Entity, i As Integer
-    Dim entGroup As Entity[]
-    Dim Xmenor As Float = 1e10, Ymenor As Float = 1e10, Xmayor As Float = -1e10, Ymayor As Float = -1e10
 
-    If Not entities Then entGroup = APPMain.hFCAD.arrEntities Else entGroup = Entities
+    For Each e In APPMain.hFCAD.arrEntities
+        If e.block = "" And e.visible Then
+            For i = 0 To e.p.max Step 2
+                'If e.p[i] > 0 Then Debug e.gender
 
-    For Each e In entGroup
-        If e.block = "" Then
-            If (OnlyVisibles And e.Visible) Or Not OnlyVisibles Then
+                If e.p[i] < APPMain.hFCAD.Xmenor Then APPMain.hFCAD.Xmenor = e.p[i]
 
-                For i = 0 To e.p.max Step 2
-                    'If e.p[i] > 0 Then Debug e.gender
+                If e.p[i + 1] < APPMain.hFCAD.Ymenor Then APPMain.hFCAD.Ymenor = e.p[i + 1]
 
-                    If e.p[i] < Xmenor Then Xmenor = e.p[i]
+                If e.p[i] > APPMain.hFCAD.Xmayor Then APPMain.hFCAD.Xmayor = e.p[i]
 
-                    If e.p[i + 1] < Ymenor Then Ymenor = e.p[i + 1]
+                If e.p[i + 1] > APPMain.hFCAD.Ymayor Then APPMain.hFCAD.Ymayor = e.p[i + 1]
 
-                    If e.p[i] > Xmayor Then Xmayor = e.p[i]
+            Next
+            For i = 0 To e.Polygon.max Step 2
+                'If e.p[i] > 0 Then Debug e.gender
 
-                    If e.p[i + 1] > Ymayor Then Ymayor = e.p[i + 1]
+                If e.Polygon[i] < APPMain.hFCAD.Xmenor Then APPMain.hFCAD.Xmenor = e.Polygon[i]
 
-                Next
-                For i = 0 To e.Polygon.max Step 2
-                    'If e.p[i] > 0 Then Debug e.gender
+                If e.Polygon[i + 1] < APPMain.hFCAD.Ymenor Then APPMain.hFCAD.Ymenor = e.Polygon[i + 1]
 
-                    If e.Polygon[i] < Xmenor Then Xmenor = e.Polygon[i]
+                If e.Polygon[i] > APPMain.hFCAD.Xmayor Then APPMain.hFCAD.Xmayor = e.Polygon[i]
 
-                    If e.Polygon[i + 1] < Ymenor Then Ymenor = e.Polygon[i + 1]
+                If e.Polygon[i + 1] > APPMain.hFCAD.Ymayor Then APPMain.hFCAD.Ymayor = e.Polygon[i + 1]
 
-                    If e.Polygon[i] > Xmayor Then Xmayor = e.Polygon[i]
-
-                    If e.Polygon[i + 1] > Ymayor Then Ymayor = e.Polygon[i + 1]
-
-                Next
-            End If
+            Next
         End If
     Next
-
-    Return [Xmenor, Ymenor, Xmayor, Ymayor]
 
 End
 

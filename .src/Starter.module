@@ -31,15 +31,25 @@ Private dbn As String               '' Nombre de la base de datos
 Private sql As String               '' Sentencia SQL de creacion de la base de datos varia segun el tipo de base de datos.
 Private lgg As Logger               '' Registro de eventos de la aplicación.
 
+' Global vars
+Public sFonts As String             '' Fonts directory
+Public sTextures As String          '' Textures directory
+Public gColor As New Integer[]      '' Colors list
+'Tincho
+'Vars direct or derivated from config xml
+Public flgWindowBackColor As Integer '= Color.Blac  '' Window backgrount color
+Public flgWindowTextColor As Integer   '' Window helper text color
+Public flgWindowCursorColor As Integer '' Window cursor color
+Public flgWhiteAndBlack As Integer     '' El color blanco/negro siempre sera distinto al
+
 ''Vars for environment
-Public WindowMode As Integer
-Public WindowBackColor As Integer           ' ->Tincho
-Public WindowInfoColor As Integer           ' habria que agrupar todas las vars de ambiente, hay dos opciones simples
-Public WindowTextColor As Integer           ' una struct "flags" o ponerles un prefijo flg, ej: flgWindowMode
-Public WindowCursorColor As Integer         ' me gusta mas la segunda opcion porque con un Seach+Replace solucionas todo de un saque
+Public flgWindowMode As Integer
+Public flgWindowInfoColor As Integer           ' habria que agrupar todas las vars de ambiente, hay dos opciones simples
+
 '----------------------
 Public cCommands As New Collection   '' Commands list
 Public cColors As New Collection     '' Colors list
+Public cLtypes As New Collection     '' Linetypes list
 
 ' Variables de un solo uso
 Private ldd As Boolean              '' Testigo de finalización de carga.
@@ -49,17 +59,54 @@ Public Sub Run()
     '    Dim sFile As String
     Dim cex As New Collection         '' Colección con variables para pasar al siguiente módulo o formulario
     '    Dim rpl As New Collection         '' Lista de nombres de tablas y campos y sus titulos para reemplazar nombres por titulos en el xml cuando es creado
-    '    Dim thx As New String[]           '' Lista d etemas del editor interno
-    '    Dim i As Integer
+    Dim thx As New String[]           '' Lista d etemas del editor interno
+    Dim i As Integer
     Dim CADConfigData As New Collection
 
     '' Verificar que existe el direcotrio del porgrama en Home
     adi = User.Home &/ "." & String.LCase(vag.NoSymbols(Application.Title))
+    sFonts = adi &/ "fonts/lfe"
+    sTextures = adi &/ "textures"
+
     apc = adi &/ "cfg.xml"
     lgf = adi &/ Format(Now(), "yyyy") & ".log"
 
     If Exist(adi) = False Then
         Shell "mkdir -p " & adi Wait
+    Endif
+
+    If Exist(sFonts) = False Then
+        Shell "mkdir -p " & sFonts Wait
+    Endif
+
+    thx.Clear
+    thx = fil.RListFiles("./fonts/lfe", ["lff"])
+
+    If thx.Count > 0 Then
+        For i = 0 To thx.Max
+            If Exist(thx[i]) Then
+                If Exist(sFonts &/ File.Name(thx[i])) = False Then
+                    Copy thx[i] To sFonts &/ File.Name(thx[i])
+                Endif
+            Endif
+        Next
+    Endif
+
+    If Exist(sTextures) = False Then
+        Shell "mkdir -p " & sTextures Wait
+    Endif
+
+    thx.Clear
+    thx = fil.RListFiles("./textures", ["jpg", "jpeg", "png"])
+
+    If thx.Count > 0 Then
+        For i = 0 To thx.Max
+            If Exist(thx[i]) Then
+                If Exist(sTextures &/ File.Name(thx[i])) = False Then
+                    Copy thx[i] To sTextures &/ File.Name(thx[i])
+                Endif
+            Endif
+        Next
     Endif
 
     '' Estableciendo las variables de entorno especiales con un archivo XML
@@ -95,8 +142,18 @@ Public Sub Run()
     '' Load the commands list
     cCommands = LoadCommandsList()
 
-    '' Load the commands list
+    '' Load the colors list
     cColors = LoadColors()
+
+    '' Load the linetypes list
+    cLtypes = LoadLtypes()
+
+    gcolor = cad.DecodeColor()
+
+    ' corrijo los colores que no se ven contra el fondo
+    gcolor[0] = flgWhiteAndBlack
+    gcolor[7] = flgWhiteAndBlack
+    gcolor[255] = flgWhiteAndBlack
 
     '' Abrir el formulario principal del programa
     cex.Add(adi, "AppDir")
@@ -116,18 +173,20 @@ Private Sub SetEnvironmentVars()
 
     Select xmg.GetVar("Application.window-background", apc)
         Case "Light"
-            WindowBackColor = Color.White
-            WindowInfoColor = &HFFFF00
-            WindowTextColor = Color.Blue
-            WindowCursorColor = Color.Black
+            flgWindowBackColor = Color.White
+            flgWindowInfoColor = &HFFFF00
+            flgWindowTextColor = Color.Blue
+            flgWindowCursorColor = Color.Black
+            flgWhiteAndBlack = Color.Black
         Case Else
             'WindowBackColor = &1B2224
-            WindowBackColor = Color.Black
-            WindowInfoColor = &HA0A000
+            flgWindowBackColor = Color.Black
+            flgWindowInfoColor = &HA0A000
             'WindowTextColor = &C09209
             'WindowCursorColor = &5F5FBF
-            WindowTextColor = Color.Yellow
-            WindowCursorColor = Color.White
+            flgWindowTextColor = Color.Yellow
+            flgWindowCursorColor = Color.White
+            flgWhiteAndBlack = Color.White
 
     End Select
 
@@ -208,5 +267,25 @@ Private Function LoadColors() As Collection
     cColor.Add([("White"), 7], "7")
 
     Return cColor
+
+End
+
+Public Function LoadLtypes() As Collection
+
+    Dim lty As New Collection
+
+    lty.Add([[3], "Continous"], "0") '1
+    lty.Add([[14, 4, 4, 4], "Center"], "1") '1
+    lty.Add([[10, 6, 3, 6], "Dashdot"], "2") '2
+    lty.Add([[10, 6], "Dashed"], "3") '3
+    lty.Add([[6, 4, 3, 4, 3, 4], "Divide"], "4") '4
+    lty.Add([[3, 4], "Dot"], "5") '6
+    lty.Add([[6, 4], "Hidden"], "6") '7
+    lty.Add([[4, 3], "Hidden2"], "7") '8
+    lty.Add([[12, 4, 4, 4, 4, 4], "Phantom"], "8") '9
+    lty.Add([[3], "ByBLock"], "9") '1
+    lty.Add([[3], "ByLayer"], "10") '1
+
+    Return lty
 
 End

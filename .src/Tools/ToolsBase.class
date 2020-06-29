@@ -81,12 +81,3 @@ Public Sub Finish()
     clsDrawingAids.CleanTexts
 
 End
-
-Public Sub Cancel()
-
-    modCAD.clsJobPrevious = Me
-    modCAD.clsJob = clsDefaultJob
-    clsDrawingAids.CleanTexts
-    appmain.hFCAD.redraw
-
-End

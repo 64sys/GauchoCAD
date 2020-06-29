@@ -22,12 +22,12 @@
 Create Static
 ' Fast
 
-Public Const Gender As String = "PLine"
+Public Const Gender As String = "Hatch"
 Public Const PointsToDraw As Integer = 0             ' minimal point requered for drawing something usefull
-Public Const HelperTrabajo As String = ("Polyline")
-Public Const ParamType As String = "P+"                             ' that is Point, Point, Float; could be Color Text, etc
-Public Const ParamHelper As String = ("Next Point")      ' a little text that is shown at the prompt waiting for user input during build
-Public Const ParamDefault As String = "Close/Undo"
+Public Const HelperTrabajo As String = ("Hatch")
+Public Const ParamType As String = "PTF"                             ' that is Point, Point, Float; could be Color Text, etc
+Public Const ParamHelper As String = ("Point;Texture;Scale")      ' a little text that is shown at the prompt waiting for user input during build
+Public Const ParamDefault As String = " ;Concrete;1"
 Public Const GAMBASCADENTITY As String = ("EntityBase")
 Public Const USEWITH As String = "clsEntityBuilder"
 Public Const DrawingOrder As Integer = 0        ' 1 = draws first
@@ -43,9 +43,40 @@ Public StepsDone As Integer                 ' esto lo cambia cls ElementBuilder 
 
 Public Sub Draw(oE As Entity)
 
+    Dim e As Integer
+
     If Not oE.Visible Then Return
 
     If oE.Selected And Not modCAD.ToolActive Then oE.ColorToPaint = modCAD.ColorForSelected Else oE.ColorToPaint = modCAD.GetGBColor(oE.colour, oE.Layerid)
+
+    Select Case StepsDone
+        Case 1                              ' acaba de marcarse un punto
+            ' intento buscar una entidad
+            e = clsMouseTracking.CheckAboveEntity(oe.P[0], oe.P[1], appmain.hFCAD.Metros(8))
+            If e < 0 Then ' es un punto, no un  posible contorno
+
+            Else ' verifico si es una entidad cerrada
+                Select Case appmain.hFCAD.arrEntities[e].Gender
+                    Case "Line", "Arc", "Text", "MText", "Leader", "Solid", "Insert"
+                        ' no se puede rellenar eso
+                        clsDrawingAids.ErrorMessage = "Can't do hatch in that entity"
+                        StepsDone -= 1
+                    Case "PLine"
+                        ' verifico que el punto inicial y final sean el mismo
+                        If appmain.hFCAD.arrEntities[e].P[0] = appmain.hFCAD.arrEntities[e].P[appmain.hFCAD.arrEntities[e].max - 1] And appmain.hFCAD.arrEntities[e].P[1] = appmain.hFCAD.arrEntities[e].P[appmain.hFCAD.arrEntities[e].max] And appmain.hFCAD.arrEntities[e].P.count > 5 Then
+
+                            oe.Polygon = appmain.hFCAD.arrEntities[e].P
+
+                        Endif
+
+                End Select
+
+            Endif
+        Case 2                          ' ya tenemos un contorno, ahora preguntamos el nombre de la textura
+
+        Case 3
+
+    End Select
 
     GLplus.PolyLines(oE.p, oE.ColorToPaint, oE.LineWidth, oe.linetype)
 

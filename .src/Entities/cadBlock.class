@@ -67,11 +67,6 @@ Public Sub DrawRemark(oE As Entity)
 
 End
 
-'' A fat version of the entity
-Public Sub Draw2(oE As Entity)
-
-End
-
 Public Sub Finish(oE As Entity, ParamsDone As Integer) As Boolean
 
     ' we set the block property of all entities selected

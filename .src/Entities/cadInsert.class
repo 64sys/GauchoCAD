@@ -42,6 +42,7 @@ Public StepsDone As Integer                 ' esto lo cambia cls ElementBuilder 
 
 Public Sub Draw(oE As Entity)
 
+    '
     Dim ET As Entity, i As Integer
 
     i = clsEntities.FIndBlockID(oE.Block)
@@ -52,32 +53,19 @@ Public Sub Draw(oE As Entity)
     gl.Rotatef(oE.fParam[2], 0, 0, 1)
     gl.Scalef(oE.fParam[0], oE.fParam[1], 1)
 
+    ' modCAD.ScaleLines = (Abs(oE.fParam[0]) + Abs(oE.fParam[1])) / 2   ' ??????????????????
     For Each ET In appmain.hFCAD.arrBlocks[i].entities
         et.visible = True
+        'If et.gender = "Ellipse" Then Stop
         et.ClassHandler.Draw(et)
     Next
+    'modCAD.ScaleLines = 1
     gl.PopMatrix
 
 End
 
 '' A fat version of the entity
 Public Sub DrawRemark(oE As Entity)
-
-    Dim ET As Entity, i As Integer
-
-    i = clsEntities.FIndBlockID(oE.Block)
-    If i < 0 Then Return
-
-    gl.PushMatrix
-    gl.Translatef(appmain.hFcad.pixels(oE.p[0]) / appmain.hFcad.ScaleZoom, appmain.hFcad.pixels(oE.p[1]) / appmain.hFcad.ScaleZoom, 0)
-    gl.Rotatef(oE.fParam[2], 0, 0, 1)
-    gl.Scalef(oE.fParam[0], oE.fParam[1], 1)
-
-    For Each ET In appmain.hFCAD.arrBlocks[i].entities
-        et.visible = True
-        et.ClassHandler.DrawRemark(et)
-    Next
-    gl.PopMatrix
 
 End
 

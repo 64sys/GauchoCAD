@@ -53,7 +53,7 @@ Public Sub Draw2(oE As Entity)
     Dim i As Integer
 
     paint.LineWidth = oE.LineWidth / appmain.hFcad.ScaleZoom / modCAD.ScaleLines
-
+    If oE.flxDash Then paint.Dash = oE.flxDash
     If oE.Selected And Not modCAD.ToolActive Then
         paint.brush = Paint.Color(modCAD.ColorForSelected)
     Else

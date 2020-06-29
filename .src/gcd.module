@@ -35,14 +35,3 @@ Public Const poiBasePoint As Integer = 256
 
 ' Stipple lines
 Public Const stiDashed As Integer = 1
-
-' dim types
-Public Const dimRotated As Integer = 0
-Public Const dimAligned As Integer = 1
-Public Const dimAngular As Integer = 2
-Public Const dimDiameter As Integer = 3
-Public Const dimRadius As Integer = 4
-Public Const dimAngular3point As Integer = 5
-Public Const dimOrdinate As Integer = 6
-Public Const dimHorizontal As Integer = 7
-Public Const dimVertical As Integer = 8

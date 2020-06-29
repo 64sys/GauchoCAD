@@ -36,30 +36,31 @@ Private CurrentKey As String
 Private CurrentRow As Integer
 Private loading As Boolean
 
+Private Coords As Integer[]
+
+Public Sub _new(cor As Integer[])
+
+    'ltypes = lty
+    Coords = cor
+
+End
+
 Public Sub Run(cMod As Collection)
 
     Dim col As String
     Dim i As Integer
     Dim lbl As String
+    Dim xs As Variant
+
+    'Coords = cor
+    xStyles.Clear
+    For Each xs In Starter.cLtypes
+        xStyles.Add(xs[1])
+    Next
 
     If cMod.Exist("Layers") Then
         cLayers = cMod["Layers"]
     Endif
-
-    'For i = 0 To modCAD.cStyles.Count - 1
-    '    xStyles.Add(CStr(i))
-    'Next
-
-    'For i = 0 To modCAD.cWeights.Count - 1
-    '    xWeights.Add(CStr(i))
-    'Next
-
-    'For i = 0 To modCAD.cColors.Count - 1
-    '    xColors.Add(CStr(i))
-    'Next
-
-    ' Made a copy for job
-    'draft = modCAD.cLayers.Copy()
 
     stx = [("id"), ("Name"), ("Show"), ("Frozen"), ("Lock"), ("Color"), ("Style"), ("Width"), ("Print")]
     lbx = ["id", "name", "show", "frozen", "locked", "colour", "style", "width", "print"]
@@ -85,15 +86,21 @@ Public Sub Run(cMod As Collection)
                 TableView1.Columns[i].Title = "i"
         End Select
 
-        'Inc i
     Next
 
     TableView1.Rows.Count = 0
-    'TableView1.Rows.Count = draft.Count 'modCAD.cLayers.Count '+ 1
     TableView1.Rows.Count = cLayers.Count
     Me.Title = ("Layers")
 
-    Me.ShowModal()
+    'Me.ShowModal()
+    Me.Show
+
+End
+
+Public Sub Form_Open()
+
+    Me.Move(Coords[0], Coords[1])
+    TableView1.Select(1, 1)
 
 End
 
@@ -154,7 +161,8 @@ Public Sub TableView1_Data(Row As Integer, Column As Integer)
                     TableView1[row, Column].Text = st
 
                 Case "style"
-                    TableView1[row, Column].Text = st
+                    'TableView1[row, Column].Picture = Starter.cLtypes[st][2].Picture
+                    TableView1[row, Column].Text = Starter.cLtypes[st][1]
 
                 Case "width"
                     TableView1[row, Column].Text = st
@@ -169,9 +177,6 @@ Public Sub TableView1_Data(Row As Integer, Column As Integer)
                         TableView1[row, Column].Picture = pic
                         TableView1[row, Column].WordWrap = False
                     Endif
-
-                    ' Case Else
-                    '     TableView1[row, Column].Text = st
 
             End Select
             'Break
@@ -191,11 +196,18 @@ Public Sub LMenu_Click()
     Dim drf As Variant
     Dim n As Variant
 
-    'If modCAD.FileName <> "" Then
-
     obj = Last
 
-    Select obj.Tag
+    LTask(obj.Tag)
+
+End
+
+Public Sub LTask(lTask As String)
+
+    Dim drf As Variant
+    Dim n As Variant
+
+    Select lTask 'obj.Tag
         Case "add"
             For Each drf In cLayers 'draft
                 If drf["name"] = "0" Then
@@ -238,13 +250,13 @@ Public Sub LMenu_Click()
 
             ' aplicamos los parametros de los layers a las entidades
             modCAD.ApplyLayerProperties
-            Debug "apply properties time ", Timer - t           ' IGNORAR: estos Timers y Debug son para monitorear el tiempo de actualizacion
-            t = Timer                                           ' IGNORAR: estos Timers y Debug son para monitorear el tiempo de actualizacion
+            'Debug "apply properties time ", Timer - t           ' IGNORAR: estos Timers y Debug son para monitorear el tiempo de actualizacion
+            't = Timer                                           ' IGNORAR: estos Timers y Debug son para monitorear el tiempo de actualizacion
 
             ' regeneramos el grafico
             clsEntities.GLGenDrawList
 
-            Debug "Regen time ", Timer - t                      ' IGNORAR: estos Timers y Debug son para monitorear el tiempo de actualizacion
+            'Debug "Regen time ", Timer - t                      ' IGNORAR: estos Timers y Debug son para monitorear el tiempo de actualizacion
             Me.Close
 
         Case "cancel"
@@ -351,6 +363,7 @@ Public Sub TableView1_Save(Row As Integer, Column As Integer, Value As String)
     Dim pdat As String
     Dim pkey As String
     Dim v As Variant
+    Dim lt As Variant
 
     pdat = lbx[TableView1.Column]
     pkey = TableView1[Row, 0].Text
@@ -359,15 +372,39 @@ Public Sub TableView1_Save(Row As Integer, Column As Integer, Value As String)
 
     Select pdat
         Case "name"
-            For Each v In draft
-                If v["id"] = CInt(pkey) Then
+            For Each v In cLayers 'draft
+                'If v["id"] = CInt(pkey) Then
+                If v["id"] = pkey Then
                     v[pdat] = Value
                 Endif
             Next
-        Case "colour", "width", "style"
-            For Each v In draft
-                If v["id"] = CInt(pkey) Then
+        Case "width" ', "style"
+            For Each v In cLayers 'draft
+                'If v["id"] = CInt(pkey) Then
+                If v["id"] = pkey Then
                     v[pdat] = Value
+                Endif
+            Next
+        Case "colour"
+            For Each v In cLayers 'draft
+                If v["id"] = pkey Then
+                    For Each lt In Starter.cColors
+                        If lt[1] = Value Then
+
+                            v[pdat] = CInt(Starter.cLtypes.Key)
+                        Endif
+                    Next
+                Endif
+            Next
+
+        Case "style"
+            For Each v In cLayers 'draft
+                If v["id"] = pkey Then
+                    For Each lt In Starter.cLtypes
+                        If lt[1] = Value Then
+                            v[pdat] = CInt(Starter.cLtypes.Key)
+                        Endif
+                    Next
                 Endif
             Next
     End Select
@@ -381,5 +418,13 @@ Public Sub TableView1_Select()
         CurrentKey = TableView1[CurrentRow, 0].Text
         Print CurrentRow
     Endif
+
+End
+
+Public Sub Form_LostFocus()
+
+    Me.Close
+
+    'LTask("close")
 
 End

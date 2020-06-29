@@ -100,7 +100,6 @@
   }
   { IconPanel1 IconPanel
     MoveScaled(2,12,55,41)
-    Background = Color.Transparent
     Expand = True
     Arrangement = Arrange.Vertical
     Margin = True
