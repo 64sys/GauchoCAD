@@ -63,13 +63,25 @@ Public Sub DrawRemark(oE As Entity)
 
 End
 
+'' the selected version of the entity
+' Public Sub Draw(oE As Entity)
+'
+'     If Not oE.Visible Then Return
+'
+'     If oE.Selected And Not modCAD.ToolActive Then oE.ColorToPaint = modCAD.ColorForSelected Else oE.ColorToPaint = modCAD.GetGBColor(oE.colour, oE.Layerid)
+'
+'     GLplus.Lines(oE.p, oE.ColorToPaint, oE.LineWidth, oE.LineType)
+'
+' End
+
+'' The paint version of the entity
 Public Function Draw2(oE As Entity)
 
     If Not oE.Visible Then Return
 
     If oE.Selected And Not modCAD.ToolActive Then oE.ColorToPaint = modCAD.ColorForSelected Else oE.ColorToPaint = modCAD.GetGBColor(oE.colour, oE.Layerid)
     paint.LineWidth = oE.LineWidth / appmain.hFcad.ScaleZoom / modCAD.ScaleLines
-    If oE.flxDash Then paint.Dash = oE.flxDash
+
     paint.brush = Paint.Color(oE.ColorToPaint)
     paint.MoveTo(oE.p[0], oE.p[1])
     paint.LineTo(oE.p[2], oE.p[3])

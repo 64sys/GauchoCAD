@@ -452,3 +452,13 @@ Public Sub Finish()
     appmain.hFCAD.redraw
 
 End
+
+Public Sub Cancel()
+
+    elem = Null
+    modCAD.clsJobPrevious = Me
+    modCAD.clsJob = clsDefaultJob
+    clsDrawingAids.CleanTexts
+    appmain.hFCAD.redraw
+
+End

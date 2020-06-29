@@ -65,6 +65,10 @@ Public Struct arrBlockSt
     name As String
     x As Float
     y As Float
+    scaleX As Float
+    scaleY As Float
+    degRotation As Float
+    mirrored As Boolean
     layer As String
     entities As Entity[]
 End Struct
@@ -94,9 +98,7 @@ Public poiPoligonEntities As New Integer[]      ' related entity
 ' interaccion del mouse en pantalla
 Public LastPoint As New Float[]                ' ultimo punto marcado o null si no existe
 Public iEntity As New Single[]             ' las coordenadas del punto encontrado y el tipo de punto
-Public oEntity As Entity                   ' la entidad
 Public flgShowPOIinfo As Boolean = True
-Public tskPOI As TskPoiTracking             ' la instancia de busqueda de puntos en backgroung
 
 ' OpenGl stuff
 Public GlListAllEntities As Integer
@@ -262,22 +264,6 @@ Public Sub GLArea1_MouseDown()
 End
 
 Public Sub GLArea1_MouseMove()
-
-    ' If modCAD.clsJob.poichecking Then
-    '     If tskPOI = Null Then
-    '         tskPOI = New TskPoiTracking As "NewTskPOI"
-    '         tskPOI.Sx = Xreal(mouse.x)
-    '         tskPOI.Sy = Yreal(mouse.Y)
-    '         'tskPOI.Main
-    '
-    '     Else
-    '
-    '         If tskPOI.value Then iEntity = tskPOI.value
-    '
-    '     Endif
-    ' End If
-    '
-    ' If tskPoi.value Then iEntity = tskPoi.value
 
     CursorX = mouse.x
     CursorY = mouse.y
@@ -510,7 +496,7 @@ End
 '' Regenera las listas de OpenGL
 Public Sub Regen()
 
-    clsEntities.GLGenDrawList2
+    clsEntities.GLGenDrawList
     redraw
 
 End

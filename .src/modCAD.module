@@ -56,6 +56,10 @@ Public Struct arrBlockSt
     name As String
     x As Float
     y As Float
+    scaleX As Float
+    scaleY As Float
+    degRotation As Float
+    mirrored As Boolean
     layer As String
     entities As Entity[]
 End Struct

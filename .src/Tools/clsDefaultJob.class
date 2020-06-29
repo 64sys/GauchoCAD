@@ -41,15 +41,15 @@ Public Function MouseDown(mouseX As Integer, mouseY As Integer) ' esta rutina es
 
     If Mouse.Left Then
 
-        If appmain.hFcad.iEntity[2] >= 0 Then                         ' 1.1.2 el mouse no esta enganchado, pero esta arriba de una entidad
+        If appmain.hFcad.iEntity[3] >= 0 Then                         ' 1.1.2 el mouse no esta enganchado, pero esta arriba de una entidad
 
-            If appmain.hFcad.oEntity.selected Then
-                clsEntities.deSelectElem(appmain.hFcad.oEntity)               '   -> la deselecciono
+            If appmain.hFcad.arrEntities[appmain.hFcad.iEntity[3]].selected Then
+                clsEntities.deSelectElem(appmain.hFcad.arrEntities[appmain.hFcad.iEntity[3]])               '   -> la deselecciono
             Else
-                clsEntities.SelectElem(appmain.hFcad.oEntity)                 '   -> la selecciono
+                clsEntities.SelectElem(appmain.hFcad.arrEntities[appmain.hFcad.iEntity[3]])                 '   -> la selecciono
             Endif
             Me.Active = False
-            clsEntities.GLGenDrawListSel
+            clsEntities.GLGenDrawListSel(1)
 
         Else
 
@@ -60,6 +60,10 @@ Public Function MouseDown(mouseX As Integer, mouseY As Integer) ' esta rutina es
 
             Me.SelEndX = Me.SelStartX
             Me.SelEndy = Me.SelStartY
+
+            Me.SelEndXr = Me.SelStartXr
+            Me.SelEndyr = Me.SelStartYr
+
             Me.PoiChecking = False
             Me.Active = True
         End If
@@ -151,6 +155,8 @@ Public Function KeyText(EnteredText As String)
 
     End If
 
+    Return
+
     ' TODO: dejar comentado mientras hagamos debug
     'Catch
 
@@ -167,11 +173,11 @@ Public Sub Draw() ' esta rutina es llamada por FCAD en el evento DrawingArea_Dra
 
     If Me.SelStartX > Me.SelEndX Then                               ' Seleccion crossing, o sea que si cualquier arista del rectangulo cruza el bounding poligon, queda seleccionado
 
-        GLplus.Rectangle2D(Me.SelStartXr, Me.SelStartYr, Me.SelEndXr - Me.SelStartXr, Me.SelEndyr - Me.SelStartYr, Color.RGB(224, 220, 207, 215),,,, Color.red, 1, 2)
+        GLplus.Rectangle2D(Me.SelStartXr, Me.SelStartYr, Me.SelEndXr - Me.SelStartXr, Me.SelEndyr - Me.SelStartYr, Color.RGB(224, 220, 207, 215),,,, Color.red, 1, 1, 2)
 
     Else                                                            ' seleccion full, todos los puntos deben estar adentro
 
-        GLplus.Rectangle2D(Me.SelStartXr, Me.SelStartYr, Me.SelEndXr - Me.SelStartXr, Me.SelEndyr - Me.SelStartYr, Color.RGB(224, 220, 207, 215),,,, Color.Green, 1, 2)
+        GLplus.Rectangle2D(Me.SelStartXr, Me.SelStartYr, Me.SelEndXr - Me.SelStartXr, Me.SelEndyr - Me.SelStartYr, Color.RGB(224, 220, 207, 215),,,, Color.Green, 1, 1, 2)
 
     End If
 
