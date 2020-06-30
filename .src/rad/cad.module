@@ -600,6 +600,7 @@ Public Function GetEntityList() As Collection
     entity.Add(True, "CIRCLE") 'ok
     entity.Add(False, "DIMENSION")
     entity.Add(True, "ELLIPSE") 'ok
+    entity.Add(False, "ENDBLK") ' solo de referencia
     entity.Add(True, "HATCH")
     entity.Add(False, "HELIX")
     entity.Add(False, "IMAGE")
@@ -3338,15 +3339,21 @@ Private Function DecodeDXFBlock(sItem As String) As Collection
     For i = 0 To btx.Max
         If InStr(btx[i], "100\nAcDbEntity") > 0 Then
             'cTmp = DecodeDXFEntity(btx[i])
+            ' If InStr(btx[i], "100\nAcDbBlockEnd") > 0 Then
+            '
+            ' Endif
             cTmp = DecodeDXFItem(btx[i])
 
             If cTmp.Count > 0 Then
                 If cTmp.Exist("handle") Then
                     raw.Add(cTmp.Copy(), cTmp["handle"])
-                    cTmp.Clear
+                    'cTmp.Clear
                 Endif
             Endif
+
+            cTmp.Clear
         Endif
+
     Next
     ' ok now
     cTmp.Clear

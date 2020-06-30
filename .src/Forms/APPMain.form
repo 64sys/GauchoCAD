@@ -330,7 +330,7 @@
     }
   }
   { Panel1 Panel
-    MoveScaled(1,1,134,72)
+    MoveScaled(1,1,156,72)
     Expand = True
     Arrangement = Arrange.Vertical
     { Panel2 Panel
@@ -384,7 +384,7 @@
       }
     }
     { PanEdit1 Panel
-      MoveScaled(3,8,128,57)
+      MoveScaled(3,8,149,57)
       Expand = True
       Arrangement = Arrange.Horizontal
       Spacing = True
@@ -424,25 +424,47 @@
         Expand = True
         Border = False
       }
-      { pnlDebug Panel
-        MoveScaled(104,1,23,55)
-        Visible = False
-        Arrangement = Arrange.Vertical
-        { pnlSmart Panel
-          MoveScaled(1,1,21,17)
-          Expand = True
-          Arrangement = Arrange.Row
-          { lblSmart Label
-            MoveScaled(0,1,20,3)
-            Visible = False
-            Text = (" Smart entities")
-            Alignment = Align.Center
+      { SidePanel1 SidePanel
+        MoveScaled(110,2,37,53)
+        Arrangement = Arrange.Horizontal
+        Orientation = Align.Left
+        { pnlDebug Panel
+          MoveScaled(0,2,19,48)
+          Visible = False
+          Arrangement = Arrange.Vertical
+          { pnlSmart Panel
+            MoveScaled(1,1,21,17)
+            Expand = True
+            Arrangement = Arrange.Row
+            { lblSmart Label
+              MoveScaled(0,1,20,3)
+              Visible = False
+              Text = (" Smart entities")
+              Alignment = Align.Center
+            }
+          }
+          { txaDebug TextArea
+            MoveScaled(2,24,16,16)
+            Font = Font["Noto Mono"]
+            Expand = True
           }
         }
-        { txaDebug TextArea
-          MoveScaled(4,21,16,16)
-          Font = Font["Noto Mono"]
+        { pnlProperties Panel
+          MoveScaled(21,0,18,50)
+          Visible = False
           Expand = True
+          Arrangement = Arrange.Vertical
+          { Button1 Button
+            MoveScaled(1,2,16,4)
+          }
+          { ComboBox1 ComboBox
+            MoveScaled(1,7,16,4)
+            ReadOnly = True
+          }
+          { TableView1 TableView
+            MoveScaled(2,13,14,35)
+            Border = False
+          }
         }
       }
     }
@@ -465,20 +487,30 @@
         Arrangement = Arrange.Horizontal
         Spacing = True
         { Spring1 Spring
-          MoveScaled(5,1,6,3)
+          MoveScaled(2,1,6,3)
         }
         { ToolButton1 ToolButton locks
           Name = "ToolButton1"
-          MoveScaled(12,0,5,5)
+          MoveScaled(10,0,5,5)
           Tag = "debug"
           Border = True
+          Radio = True
           Toggle = True
         }
         { ToolButton2 ToolButton locks
           Name = "ToolButton2"
-          MoveScaled(18,0,5,5)
-          Tag = "grid"
+          MoveScaled(16,0,5,5)
+          Tag = "properties"
           Border = True
+          Radio = True
+          Toggle = True
+        }
+        { ToolButton3 ToolButton locks
+          Name = "ToolButton3"
+          MoveScaled(22,0,5,5)
+          Tag = "off"
+          Border = True
+          Radio = True
           Toggle = True
         }
         { Panel5 Panel

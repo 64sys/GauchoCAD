@@ -97,7 +97,7 @@ Public Sub Run(cin As Collection)
                         tob = New ToolButton(pnlSmart) As "tool"
                         z = 48
 
-                    Case "grpFile"
+                    Case "grpFile", "grpHelp"
                         tob = New ToolButton(pnlFile) As "menuapp"
                         z = 32
 
@@ -129,7 +129,7 @@ Public Sub Run(cin As Collection)
                     ' If Exist(ictn[obj.Tag]) Then
                     '     If Stat(ictn[obj.Tag]).Type = gb.File Or Stat(ictn[obj.Tag]).Type = gb.Link Then
                     Select mnu.Name
-                        Case "grpFile", "grpOptions" ', '"grpHelp" ', "grpView" ', "grpSmart", "grpEntities"
+                        Case "grpFile", "grpOptions", "grpHelp" ', "grpView" ', "grpSmart", "grpEntities"
                             If Exist(ictn[obj.Tag]) Then
                                 If Stat(ictn[obj.Tag]).Type = gb.File Or Stat(ictn[obj.Tag]).Type = gb.Link Then
                                     tob.Picture = Image.Load(ictn[obj.Tag]).Stretch(z - 8, z - 8).Picture
@@ -469,16 +469,27 @@ Public Sub locks_Click()
     obj = Last
 
     Select obj.Tag
-        Case "grid"
+
+        Case "off"
+            pnlDebug.Visible = False
+            pnlProperties.Visible = False
+
+        Case "properties"
+            pnlDebug.Visible = False
+            pnlProperties.Visible = True
 
         Case "debug"
-            If pnlDebug.Visible = False Then
-                pnlDebug.Visible = True
-                ToolButton1.Value = True
-            Else
-                pnlDebug.Visible = False
-                ToolButton1.Value = False
-            Endif
+
+            pnlProperties.Visible = False
+            pnlDebug.Visible = True
+
+            'If pnlDebug.Visible = False Then
+            '    pnlDebug.Visible = True
+            '    ToolButton1.Value = True
+            'Else
+            '    pnlDebug.Visible = False
+            '    ToolButton1.Value = False
+            'Endif
 
     End Select
 
@@ -1413,5 +1424,38 @@ Public Sub btnColors_MouseDown()
     FClr.Border = False
 
     FClr.Run()
+
+End
+
+Public Sub Button1_Click()
+
+    Dim e As Entity
+
+    Dim etype As New String[]
+    Dim i As Integer
+    Dim j As Integer
+    Dim inx As New Integer[]
+
+    For i = 0 To APPMain.hFCAD.arrEntities.Max
+        e = APPMain.hFCAD.arrEntities[i]
+
+        If e.Selected Then
+            inx.Add(i)
+            If etype.Exist(e.Gender) = False Then
+                etype.Add(e.Gender)
+            Endif
+        Endif
+    Next
+
+    ComboBox1.Add(("All"))
+
+    If etype.Count > 0 Then
+        For j = 0 To etype.Max
+            ComboBox1.Add(etype[j])
+        Next
+
+    Endif
+
+    ComboBox1.Text = ("All")
 
 End
