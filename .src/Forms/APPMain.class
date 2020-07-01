@@ -54,6 +54,7 @@ Public AliasCom As New String[]     '' Commands alias
 Private p As Integer
 
 Public cMod As New Collection       '' All drawings common collection
+Public cProp As New Collection      '' Properties list
 
 Public Sub Run(cin As Collection)
 
@@ -1428,34 +1429,162 @@ Public Sub btnColors_MouseDown()
 End
 
 Public Sub Button1_Click()
+    ''TODO: Poner esta accion en otro evento, por ejemplo despues de seleccionar entidades.
 
     Dim e As Entity
-
     Dim etype As New String[]
     Dim i As Integer
     Dim j As Integer
-    Dim inx As New Integer[]
+    'Dim inx As New Integer[]
+
+    ComboBox1.Clear
+    ComboBox1.Text = ""
+    cProp.Clear
+    TableView1.Clear
 
     For i = 0 To APPMain.hFCAD.arrEntities.Max
         e = APPMain.hFCAD.arrEntities[i]
 
         If e.Selected Then
-            inx.Add(i)
+            'inx.Add(i)
             If etype.Exist(e.Gender) = False Then
                 etype.Add(e.Gender)
             Endif
         Endif
     Next
 
-    ComboBox1.Add(("All"))
+    Select etype.Count
+        Case 0
+            'Aca se puede poner en off el panel de seleccion ya que no hay entidades seleccionadas
+            'skip
 
-    If etype.Count > 0 Then
-        For j = 0 To etype.Max
-            ComboBox1.Add(etype[j])
-        Next
+        Case 1
+            ComboBox1.Add(etype[0])
+            ComboBox1.Text = etype[0]
+            LoadPropertiesList(etype[0])
+        Case Else
+            ComboBox1.Add(("All"))
+            For j = 0 To etype.Max
+                ComboBox1.Add(etype[j])
+            Next
+            ComboBox1.Text = ("All")
+            LoadPropertiesList("varies")
+    End Select
 
-    Endif
+End
 
-    ComboBox1.Text = ("All")
+Public Sub ComboBox1_Click()
+
+    'Print ComboBox1.Text
+    LoadPropertiesList(ComboBox1.Text)
+
+End
+
+Public Sub LoadPropertiesList(eFilter As String)
+
+    Dim e As Entity
+    Dim i As Integer
+
+    cProp.Clear
+    TableView1.Clear
+
+    For i = 0 To APPMain.hFCAD.arrEntities.Max
+        e = APPMain.hFCAD.arrEntities[i]
+
+        If e.Selected Then
+
+            ' Layers
+            If cProp.Exist("Layer") = False Then
+                cProp.Add([e.Layer], "Layer")
+            Else
+                If cProp["Layer"].Exist(e.Layer) = False Then
+                    cProp["Layer"].Add(e.Layer)
+                Endif
+            Endif
+
+            'Colors
+            If cProp.Exist("Color") = False Then
+                cProp.Add([e.colour], "Color")
+            Else
+                If cProp["Color"].Exist(e.colour) = False Then
+                    cProp["Color"].Add(e.colour)
+                Endif
+            Endif
+
+        Endif
+    Next
+
+    TableView1.Columns.Count = 2
+    TableView1.Rows.Count = 0
+    TableView1.Rows.Count = cProp.Count
+
+End
+
+Public Sub TableView1_Data(Row As Integer, Column As Integer)
+
+    Dim prop As Variant
+    Dim i As Integer
+
+    For Each prop In cProp
+        If i = Row Then
+            Select Column
+                Case 0
+                    TableView1[Row, Column].Text = cProp.Key
+                Case 1
+                    Select Object.Type(prop)
+                        Case "String[]"
+                            Select prop.count
+                                Case 0
+                                    'TableView1[Row, Column].Text = 0
+                                Case 1
+                                    TableView1[Row, Column].Text = prop[0]
+
+                                Case Else
+                                    TableView1[Row, Column].Text = "*" & ("varies") & "*"
+
+                            End Select
+
+                    End Select
+
+            End Select
+
+        Endif
+
+        Inc i
+    Next
+
+End
+
+Public Sub TableView1_Click()
+
+    Dim lrx As New String[]         ''Layers list
+    Dim lay As Variant
+
+    For Each lay In APPMain.hFCAD.cModel["Layers"]
+        lrx.Add(lay["name"])
+    Next
+
+    lrx.Add("*" & ("varies") & "*")
+
+    Select TableView1[TableView1.Row, 0].Text
+        Case "Layer"
+            TableView1.Edit(lrx, True)
+    End Select
+
+End
+
+Public Sub TableView1_Save(Row As Integer, Column As Integer, Value As String)
+
+    TableView1[Row, Column].Text = Value
+
+    Select TableView1[Row, 0].Text
+        Case "Layer"
+            TableView1[Row, Column].Text = Value
+
+        Case "Color"
+
+        Case "Style"
+
+    End Select
 
 End

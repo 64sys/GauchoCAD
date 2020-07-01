@@ -2407,6 +2407,7 @@ Public Function GetDXFSections(sFile As String) As Collection
             If tmx.count > 0 Then
                 For Each sec In tmx
                     If sec <> "" Then
+                        'File.Save(User.Home &/ ".txt", sec)
                         sName = Split(sec, "\n")[0]
                         sCont = String.Mid(sec, String.Len(sName & "\n") + 1)
 
@@ -2516,7 +2517,6 @@ Public Function GetDXFEntities(sCont As String) As Collection
         sCont = Replace(sCont, "  0\n" & cEnty.Key & "\n  5\n", "\t  0\n" & cEnty.Key & "\n  5\n")
     Next
     'sCont = Replace(sCont, "  0\n", "\t  0\n")
-
     '  0\nLWPOLYLINE\n  5\n
 
     stx = Split(sCont, "\t")
