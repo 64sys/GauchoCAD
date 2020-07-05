@@ -188,7 +188,7 @@ Public Sub GLArea1_draw()
     If modCAD.DrawBounds Then clsDrawingAids.DrawPolygons
 
     ' entidad resaltada
-    If iEntity[3] >= 0 Then
+    If iEntity[3] >= 0 And iEntity[3] < arrEntities.Count Then
 
         ' si no esta seleccionada, la resalto
         If Not arrEntities[iEntity[3]].Selected Then

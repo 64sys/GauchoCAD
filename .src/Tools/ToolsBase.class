@@ -94,6 +94,8 @@ End
 
 Public Sub Finish()
 
+    appmain.hFCAD.iEntity.Clear
+    appmain.hFCAD.iEntity.Insert([0, 0, -1, -1])
     modCAD.clsJobPrevious = Me
     modCAD.clsJob = clsDefaultJob
     clsDrawingAids.CleanTexts
