@@ -1589,3 +1589,18 @@ Public Sub TableView1_Save(Row As Integer, Column As Integer, Value As String)
     End Select
 
 End
+
+Public Sub Form_KeyPress()
+
+    Print Key.Code
+
+    If Workspace1.ActiveWindow Then
+        Select Key.Code
+            Case Key.Del
+                modCAD.clsJob.KeyText("Erase")
+
+        End Select
+
+    Endif
+
+End
