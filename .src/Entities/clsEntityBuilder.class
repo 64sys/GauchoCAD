@@ -128,6 +128,9 @@ Public Function Start(ElemToBuild As Variant, Optional Mode As Integer = 0)
     elem.layer = appmain.CurrentLayer
     elem.layerid = modCAD.GetLayerID(appmain.CurrentLayer)
 
+    elem.colour = appmain.CurrentColor
+    elem.ColorToPaint = Starter.gColor[elem.colour]
+
     clsDrawingAids.HelperTrabajo = elem.ClassHandler.HelperTrabajo
 
 End
@@ -269,8 +272,7 @@ Public Sub AdvanceStep()
             elem.p.add(0)
             elem.p.add(0)
             elem.level.add(0)
-            elem.b.add(0)
-            elem.b.add(0)
+
             elem.Psel.add(0)
             Dec elem.StepsDone
         Endif
@@ -433,7 +435,6 @@ End
 
 Public Sub Finish()
 
-    clsEntities.BackUpPosition(elem)
     APPMain.hFCAD.arrEntities.Add(elem)
     'elem.ClassHandler.buildPOI(elem)
     elem.ClassHandler.Finish(elem, elem.StepsDone)
@@ -446,7 +447,7 @@ Public Sub Finish()
 
     ' sort them
     'APPMain.hFCAD.arrEntities.Sort()
-    clsMouseTracking.ReBuildPOIPoints
+    'clsMouseTracking.ReBuildPOIPoints
     clsEntities.GLGenDrawList
 
     appmain.hFCAD.redraw

@@ -41,10 +41,34 @@ Public Visible As Boolean = True            ' si esta entidad puede ser mostrada
 Public Finished As Boolean = False          ' colocar en true cuando se llegue a completar
 Public StepsDone As Integer                 ' esto lo cambia cls ElementBuilder durante la construccion
 
+Public Sub Translate(e As Entity, dX As Float, dY As Float)
+
+    puntos.Translate(e.p, dx, dy)
+
+End
+
+Public Sub Rotate(e As Entity, radians As Float)
+
+    puntos.Rotate(e.P, radians)
+
+End
+
+Public Sub Scale(e As Entity, sX As Float, sY As Float)
+
+    Dim i As Integer
+
+    For i = 0 To e.p.max Step 2
+
+        e.P[i] = e.P[i] * sX
+        e.P[i + 1] = e.P[i + 1] * sY
+
+    Next
+
+End
+
 Public Sub Draw(oE As Entity)
 
     If Not oE.Visible Then Return
-    If oE.Selected And Not modCAD.ToolActive Then oE.ColorToPaint = modCAD.ColorForSelected Else oE.ColorToPaint = modCAD.GetGBColor(oE.colour, oE.Layerid)
 
     If oE.StepsDone < 1 Then
 
@@ -71,18 +95,20 @@ Public Sub Draw(oE As Entity)
 
     oE.Polygon = oE.P
     If oE.StepsDone < 2 Then Return
-    glPlus.TexturedTriangle2D(oe.P[0], oe.P[1], oe.P[2], oe.P[3], oe.P[4], oe.P[5], 0, 1)
+    GLplus.PolygonFilled(oE.p, oE.ColorToPaint, oE.ColorToPaint, oE.LineWidth, oe.LineType)
 
-    'GLplus.PolygonFilled(oE.p, oE.ColorToPaint, oE.ColorToPaint, oE.LineWidth, oe.LineType)
+End
+
+'' A fat version of the entity
+Public Sub DrawSelected(oE As Entity)
+
+    GLplus.Polygon(oE.p, modCAD.WindowBackColor, oE.LineWidth, gcd.stiDashed)
+    GLplus.Polygon(oE.p, modCAD.ColorForSelected, oE.LineWidth, oE.LineType)
 
 End
 
 '' A fat version of the line
 Public Sub DrawRemark(oE As Entity)
-
-    If Not oE.Visible Then Return
-
-    If oE.Selected And Not modCAD.ToolActive Then oE.ColorToPaint = modCAD.ColorForSelected Else oE.ColorToPaint = modCAD.GetGBColor(oE.colour, oE.Layerid)
 
     GLplus.Polygon(oE.p, modCAD.WindowBackColor, oE.LineWidth, gcd.stiDashed)
     GLplus.Polygon(oE.p, oE.ColorToPaint, oE.LineWidth + 2, oE.LineType)
@@ -93,7 +119,6 @@ Public Function Draw2(oE As Entity)
 
     If Not oE.Visible Then Return
 
-    If oE.Selected And Not modCAD.ToolActive Then oE.ColorToPaint = modCAD.ColorForSelected Else oE.ColorToPaint = modCAD.GetGBColor(oE.colour, oE.Layerid)
     Dim i As Integer
 
     If oE.Selected And Not modCAD.ToolActive Then
@@ -128,7 +153,7 @@ Public Sub Finish(oE As Entity, ParamsDone As Integer) As Boolean
     ' busco el tipo de linea, si hace falta
     If oE.LineTypeName = "Dashed" Then oE.LineType = 1
     ' tareas finales de armado del objeto
-    oE.b.resize(oE.P.count)
+
     oE.psel.resize(oE.p.count / 2)
     oE.ForDeletion = False
     oE.DrawAble = True

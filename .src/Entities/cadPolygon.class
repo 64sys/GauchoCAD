@@ -41,11 +41,43 @@ Public Visible As Boolean = True            ' si esta entidad puede ser mostrada
 Public Finished As Boolean = False          ' colocar en true cuando se llegue a completar
 Public StepsDone As Integer                 ' esto lo cambia cls ElementBuilder durante la construccion
 
+' Public Sub Translate(e As Entity, dX As Float, dY As Float)
+'
+'     puntos.Translate(e.p, dx, dy)
+'     puntos.Translate(e.Polygon, dx, dy)
+'
+' End
+'
+' Public Sub Rotate(e As Entity, radians As Float)
+'
+'     puntos.Rotate(e.P, radians)
+'     puntos.Rotate(e.Polygon, radians)
+'
+' End
+'
+' Public Sub Scale(e As Entity, sX As Float, sY As Float)
+'
+'     Dim i As Integer
+'
+'     For i = 0 To e.Polygon.max Step 2
+'
+'         e.Polygon[i] = e.Polygon[i] * sX
+'         e.Polygon[i + 1] = e.Polygon[i + 1] * sY
+'
+'     Next
+'
+'     For i = 0 To e.p.max Step 2
+'
+'         e.P[i] = e.P[i] * sX
+'         e.P[i + 1] = e.P[i + 1] * sY
+'
+'     Next
+'
+' End
+
 Public Sub Draw(oE As Entity)
 
     If Not oE.Visible Then Return
-
-    If oE.Selected And Not modCAD.ToolActive Then oE.ColorToPaint = modCAD.ColorForSelected Else oE.ColorToPaint = modCAD.GetGBColor(oE.colour, oE.Layerid)
 
     Dim angle, xangle, x, y, z, r As Float
     Dim i As Integer
@@ -87,7 +119,7 @@ Public Sub Finish(oE As Entity, ParamsDone As Integer) As Boolean
     ' busco el tipo de linea, si hace falta
     If oE.LineTypeName = "Dashed" Then oE.LineType = 1
     ' tareas finales de armado del objeto
-    oE.b.resize(oE.P.count)
+
     oE.psel.resize(oE.p.count / 2)
     oE.ForDeletion = False
     oE.DrawAble = True

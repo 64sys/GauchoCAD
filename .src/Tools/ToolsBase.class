@@ -46,6 +46,21 @@ Public Mode As Integer
 
 Public inxSelected As New Integer[]
 
+' this affects the gl Drawing list
+Public glTranslate As New Float[]         ' dX, dY, dZ
+Public glRotate As New Float[]            ' rX, rY, rZ
+Public glAngle As Float
+Public glScale As New Float[]             ' sX, sY, sZ
+
+Public Sub _new()
+
+    Me.glTranslate.Insert([0, 0, 0])         ' dX, dY, dZ
+    Me.glRotate.Insert([0, 0, 1])            ' rX, rY, rZ
+    Me.glAngle = 0
+    Me.glScale.Insert([1, 1, 1])             ' sX, sY, sZ
+
+End
+
 Public Function MouseDown(mouseX As Integer, mouseY As Integer) ' called by FCAD-> DrawingArea_MouseDown
 
     ' This too does nothing here, but you can use it
@@ -62,11 +77,14 @@ End
 
 Public Sub Draw()               ' called by appmain.hFCAD.drwArea_Draw
 
-    Dim iii As Integer
+    gl.PushMatrix
 
-    For iii = 0 To APPMain.hFCAD.arrSelecIndex.Max
-        APPMain.hFCAD.arrEntities[APPMain.hFCAD.arrSelecIndex[iii]].draw
-    Next
+    gl.Translatef(glTranslate[0], glTranslate[1], glTranslate[2])
+    gl.Rotatef(glAngle, glRotate[0], glRotate[1], glRotate[2])
+    gl.Scalef(glScale[0], glScale[1], glScale[2])
+    gl.CallList(appmain.hFCAD.GlListSelectedEntities)                      ' si GL no tiene contexto, la lista no se genera. Es necesario que la instancia de FCAD este cargada.
+
+    gl.PopMatrix
 
 End
 
@@ -79,6 +97,11 @@ Public Sub Finish()
     modCAD.clsJobPrevious = Me
     modCAD.clsJob = clsDefaultJob
     clsDrawingAids.CleanTexts
+    clsEntities.DeSelection()
+    modCAD.DrawOriginals = False
+    appmain.hFCAD.Regen
+    Me.Active = False
+    modCAD.ToolActive = False
 
 End
 

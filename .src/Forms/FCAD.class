@@ -165,6 +165,8 @@ End
 
 Public Sub GLArea1_draw()
 
+    Dim iParent As Integer
+
     If Not DrawingReady Then Return
 
     modCAD.drwDrawingClass = modCAD.drwOpenGLClass
@@ -185,27 +187,33 @@ Public Sub GLArea1_draw()
     If modCAD.DrawBounds Then clsDrawingAids.DrawPolygons
 
     ' entidad resaltada
-    If iEntity[3] >= 0 Then arrEntities[iEntity[3]].ClassHandler.DrawRemark(arrEntities[iEntity[3]])
+    If iEntity[3] >= 0 Then
 
+        ' si no esta seleccionada, la resalto
+        If Not arrEntities[iEntity[3]].Selected Then
+            iParent = clsEntities.GetParentBlock(iEntity[3]) ' esto verifica si tiene que resaltar el bloque completo
+            arrEntities[iParent].ClassHandler.DrawRemark(arrEntities[iParent])
+        End If
+
+    End If
     clsDrawingAids.DrawCoordenadas
 
     clsDrawingAids.DibujaHelper
 
-    gl.CallList(GlListSelectedEntities)
+    modCAD.clsJob.Draw
 
     gl.CallList(GlListAllEntities)                      ' si GL no tiene contexto, la lista no se genera. Es necesario que la instancia de FCAD este cargada.
 
-    modCAD.clsJob.Draw
-
+    ' POI dinamicos
     If flgShowPOIinfo Then
 
-        Select Case iEntity[2]
-            Case 0, 1
-                glPlus.Rectangle2D(iEntity[0] - Metros(4), iEntity[1] - Metros(4), Metros(8), Metros(8), Color.Blue,,,, Color.Blue, 1, 1)
-            Case 2
-                glPlus.PolygonFilled([iEntity[0] - Metros(4), iEntity[1], iEntity[0], iEntity[1] + Metros(4), iEntity[0] + Metros(4), iEntity[1], iEntity[0], iEntity[1] - Metros(4)], Color.Blue, Color.Green)
+        ' Select Case iEntity[2]
+        '     Case gcd.poimi
+        glPlus.Rectangle2D(iEntity[0] - Metros(4), iEntity[1] - Metros(4), Metros(8), Metros(8), Color.Blue,,,, Color.Blue, 1, 1)
+        ' Case 2
+        '     glPlus.PolygonFilled([iEntity[0] - Metros(4), iEntity[1], iEntity[0], iEntity[1] + Metros(4), iEntity[0] + Metros(4), iEntity[1], iEntity[0], iEntity[1] - Metros(4)], Color.Blue, Color.Green)
 
-        End Select
+        'End Select
 
     Endif
 
@@ -420,7 +428,7 @@ Public Sub form_KeyPress()
     If Key.Code = Key.f6 Then
         modCAD.DrawBounds = Not modCAD.DrawBounds
         Dim i As Integer
-
+        TransferToCollections
         ' For i = 0 To 50000
         '
         '     modCAD.AddLine(arrEntities, [Rnd(-20, 20), Rnd(-20, 20), Rnd(-20, 20), Rnd(-20, 20)], 0, 1, 0, "0")
@@ -433,8 +441,8 @@ Public Sub form_KeyPress()
         'modCAD.AddText([0, -400], 20, 30, "Unica linea", 3, 1, 1, "0", "")
         'modCAD.ApplyLayerProperties
         'modCAD.AddLine([0, -200, 400, 0], 2, 1, "Dashed", "0", "")
-        modCAD.Benchmarks
-
+        ' modCAD.Benchmarks
+        '
         regen
         Return
     Endif
@@ -497,7 +505,15 @@ End
 Public Sub Regen()
 
     clsEntities.GLGenDrawList
+    clsEntities.glGenDrawListSel
     redraw
+
+End
+
+Public Sub TransferToCollections()
+
+    modCAD.ExportBlocks(cModel)
+    modCAD.ExportEntities(cModel["Entities"], arrEntities)
 
 End
 

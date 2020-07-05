@@ -6,7 +6,9 @@ Authors: Terco, Tincho, Postpase, Vuott
 
 VER       DATE      CHANGES
 --------------------------------------------------------------------------------------------------------------------
-0.0.70	21/06/20	Added SPline. Added Hatch form.
+0.0.72	21/06/20	Inserts now create entities. Added basic editing funtions to entities.
+
+0.0.70	21/06/20	Added SPline. Added Hatch form. Added blocks form.
 
 0.0.68	18/06/20	Added rectangle. Added polygons.
 

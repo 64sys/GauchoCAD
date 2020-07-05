@@ -179,7 +179,6 @@ Public Sub LoadFromFile(Optional FilePath As String)
         newObj.RefPointY = CFloat(ent.Attributes["refy"])   ' nuevos
 
         newObj.Finish(-1)
-        clsEntities.BackUpPosition(newObj)
 
     Next
 

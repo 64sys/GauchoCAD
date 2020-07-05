@@ -53,6 +53,7 @@ Public ClassHandler As Object               '' The class used for drawing, creat
 Public LineType As Integer                  '' 0=continuous, 1=dashed from flxDash
 Public LayerId As String = "00"             '' Esta variable es la Key en la coleccion de layers
 Public BlockNumber As Integer
+Public iInsert As Integer = -1
 Public ColorToPaint As Integer              '' Este es el color que realmente se va a dibujar
 Public Selected As Boolean                  '' The entity is selected in drawing
 Public ForDeletion As Boolean = True        '' This must be falsed in Finish
@@ -61,13 +62,13 @@ Public Visible As Boolean = True            '' Si esta entidad puede ser mostrad
 Public Finished As Boolean = False          '' Colocar en true cuando se llegue a completar
 Public StepsDone As Integer                 '' DEPRECADO
 Public Group As Integer = 0                 '' Pertenecemos a un grupo?
-Public B As New Float[]                     '' Backup point
+
 Public Psel As New Boolean[]                '' Selected points
 Public Polygon As New Float[]               '' This is a poligon built at element's contruction that defines a poligon used for detecting points inside me
 Public PolyLine As New Float[]              '' This is a poliline built at element's contruction that defines a poligon used for detecting points inside me
 Public PoiPoints As New Float[]             '' Point of interest
 Public PoiType As New Integer[]
-Public poiCount As Integer
+
 Public Stage As Integer                     '' DEPRECADO
 
 Public glDrwList As Integer                 '' drawing list

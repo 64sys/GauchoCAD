@@ -47,7 +47,6 @@ Public Sub Draw(oE As Entity)
 
     If Not oE.Visible Then Return
 
-    If oE.Selected And Not modCAD.ToolActive Then oE.ColorToPaint = modCAD.ColorForSelected Else oE.ColorToPaint = modCAD.GetGBColor(oE.colour, oE.Layerid)
     FHatch.ShowModal
     Select Case StepsDone
         Case 1                              ' acaba de marcarse un punto
@@ -90,8 +89,6 @@ Public Sub DrawRemark(oE As Entity)
 
     If Not oE.Visible Then Return
 
-    If oE.Selected And Not modCAD.ToolActive Then oE.ColorToPaint = modCAD.ColorForSelected Else oE.ColorToPaint = modCAD.GetGBColor(oE.colour, oE.Layerid)
-
     GLplus.PolyLines(oE.p, modCAD.WindowBackColor, oE.LineWidth, gcd.stiDashed)
     GLplus.PolyLines(oE.p, oE.ColorToPaint, oE.LineWidth + 2, oE.LineType)
 
@@ -102,8 +99,6 @@ Public Function Draw2(oE As Entity)
     Dim i As Integer
 
     If Not oE.Visible Then Return
-
-    If oE.Selected And Not modCAD.ToolActive Then oE.ColorToPaint = modCAD.ColorForSelected Else oE.ColorToPaint = modCAD.GetGBColor(oE.colour, oE.Layerid)
 
     paint.LineWidth = oE.LineWidth / appmain.hFcad.ScaleZoom / modCAD.ScaleLines
 
@@ -165,7 +160,7 @@ Public Sub Finish(oE As Entity, ParamsDone As Integer) As Boolean
     ' busco el tipo de linea, si hace falta
     If oE.LineTypeName = "Dashed" Then oE.LineType = 1
     ' tareas finales de armado del objeto
-    oE.b.resize(oE.P.count)
+
     oE.psel.resize(oE.p.count / 2)
     oE.ForDeletion = False
     oE.DrawAble = True

@@ -67,7 +67,6 @@ End
 Public Sub Finish(ParamsDone As Integer) As Boolean
     ' FIXME: eliminar variables que no se usan
 
-    Me.B.Resize(Me.P.Count)
     Me.fParam.add(0.2)         ' TODO: fix this when having params entered correctly
     Me.CreatePolygon
     Me.ForDeletion = False

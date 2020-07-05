@@ -40,9 +40,39 @@ Public Visible As Boolean = True            ' si esta entidad puede ser mostrada
 Public Finished As Boolean = False          ' colocar en true cuando se llegue a completar
 Public StepsDone As Integer                 ' esto lo cambia cls ElementBuilder durante la construccion
 
+Public Sub Translate(e As Entity, dX As Float, dY As Float)
+
+    puntos.Translate(e.p, dx, dy)
+
+End
+
+Public Sub Rotate(e As Entity, radians As Float)
+
+    puntos.Rotate(e.P, radians)
+    E.fParam[2] += radians
+
+End
+
+Public Sub Scale(e As Entity, sX As Float, sY As Float)
+
+    Dim i As Integer
+
+    E.fParam[0] *= sX
+    E.fParam[1] *= sY
+    For i = 0 To e.p.max Step 2
+
+        e.P[i] = e.P[i] * sX
+        e.P[i + 1] = e.P[i + 1] * sY
+
+    Next
+
+End
+
 Public Sub Draw(oE As Entity)
 
     Dim ET As Entity, i As Integer
+
+    If oe.Finished Then Return
 
     i = clsEntities.FIndBlockID(oE.Block)
     If i < 0 Then Return
@@ -60,8 +90,34 @@ Public Sub Draw(oE As Entity)
 
 End
 
+'' A selected version of the entity
+Public Sub DrawSelected(oE As Entity)
+
+    Dim ET As Entity, i As Integer
+
+    For i = oe.iInsert + 1 To appmain.hFCAD.arrEntities.max
+        If appmain.hFCAD.arrEntities[i].iInsert <> oe.iInsert Then Break
+        appmain.hFCAD.arrEntities[i].ClassHandler.DrawSelected(appmain.hFCAD.arrEntities[i])
+
+    Next
+
+End
+
 '' A fat version of the entity
 Public Sub DrawRemark(oE As Entity)
+
+    Dim ET As Entity, i As Integer
+
+    For i = oe.iInsert + 1 To appmain.hFCAD.arrEntities.max
+        If appmain.hFCAD.arrEntities[i].iInsert <> oe.iInsert Then Break
+        appmain.hFCAD.arrEntities[i].ClassHandler.DrawRemark(appmain.hFCAD.arrEntities[i])
+
+    Next
+
+End
+
+'' A fat version of the entity
+Public Sub DrawRemarkBackup(oE As Entity)
 
     Dim ET As Entity, i As Integer
 
@@ -85,7 +141,6 @@ Public Function Draw2(oE As Entity)
 
     If Not oE.Visible Then Return
 
-    If oE.Selected And Not modCAD.ToolActive Then oE.ColorToPaint = modCAD.ColorForSelected Else oE.ColorToPaint = modCAD.GetGBColor(oE.colour, oE.Layerid)
     Dim ET As Entity, i As Integer
     paint.save
     paint.Translate(appmain.hFcad.pixels(oE.p[0]) / appmain.hFcad.ScaleZoom, appmain.hFcad.pixels(oE.p[1]) / appmain.hFcad.ScaleZoom)
@@ -99,24 +154,57 @@ Public Function Draw2(oE As Entity)
     paint.Restore
 
 End
+'' Creo los puntos de interes
+'' Build point of interest
+
+Public Function BuildPOI(oE As Entity, Optional arrIndex As Integer = -1) As Integer
+
+    If arrIndex < 0 Then arrIndex = appmain.hFCAD.arrEntities.Max       ' si este valor no es provisto , estos POI son de la ultima entidad
+
+    oe.PoiPoints.Clear
+    oe.PoiType.Clear
+
+    ' points
+    oe.poiPoints.insert([oE.p[0], oE.p[1]])
+    oe.poiType.Add(gcd.poiBasePoint)
+    'oe.poiEntities.Add(arrIndex)
+
+End
 
 ' This function will return False if the element couldn't be created for some reason: bad or incomple user input
 ' True means all is good, False will instruct the clsEntityBuilder to delete it
 Public Sub Finish(oE As Entity, ParamsDone As Integer) As Boolean
 
+    Dim ET As Entity, i, iInsert As Integer
+
     'Print "Finish en EntityBase"
-    'CreatePolygon(oe)
-    'BuildPOI(oe)
+
+    BuildPOI(oe)
 
     ' busco el tipo de linea, si hace falta
     If oE.LineTypeName = "Dashed" Then oE.LineType = 1
-    ' tareas finales de armado del objeto
-    oE.b.resize(oE.P.count)
+
     oE.psel.resize(oE.p.count / 2)
     oE.ForDeletion = False
     oE.DrawAble = True
     oE.Selected = False
     oE.Finished = True
+
+    i = clsEntities.FIndBlockID(oE.Block)
+    If i < 0 Then Return
+
+    ' en este momento la ultima entidad es este Insert, guardo el numero
+
+    iInsert = appmain.hFCAD.arrEntities.Max
+    appmain.hFCAD.arrEntities.Last.iInsert = iInsert
+    For Each ET In appmain.hFCAD.arrBlocks[i].entities
+        appmain.hFCAD.arrEntities.Add(clsEntities.ClonEntity(et))
+        appmain.hFCAD.arrEntities.Last.Block = oe.block
+        appmain.hFCAD.arrEntities.Last.iInsert = iInsert
+        appmain.hFCAD.arrEntities.Last.ClassHandler.Scale(appmain.hFCAD.arrEntities.Last, oe.fParam[0], oE.fParam[1])
+        appmain.hFCAD.arrEntities.Last.ClassHandler.Rotate(appmain.hFCAD.arrEntities.Last, oE.fParam[2] * Pi / 180)
+        appmain.hFCAD.arrEntities.Last.ClassHandler.Translate(appmain.hFCAD.arrEntities.Last, oE.p[0], oE.p[1])
+    Next
 
     If Not True Then
 

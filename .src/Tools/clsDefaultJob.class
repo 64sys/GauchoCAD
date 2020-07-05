@@ -44,12 +44,12 @@ Public Function MouseDown(mouseX As Integer, mouseY As Integer) ' esta rutina es
         If appmain.hFcad.iEntity[3] >= 0 Then                         ' 1.1.2 el mouse no esta enganchado, pero esta arriba de una entidad
 
             If appmain.hFcad.arrEntities[appmain.hFcad.iEntity[3]].selected Then
-                clsEntities.deSelectElem(appmain.hFcad.arrEntities[appmain.hFcad.iEntity[3]])               '   -> la deselecciono
+                clsEntities.deSelectElem(appmain.hFcad.iEntity[3])               '   -> la deselecciono
             Else
-                clsEntities.SelectElem(appmain.hFcad.arrEntities[appmain.hFcad.iEntity[3]])                 '   -> la selecciono
+                clsEntities.SelectElem(appmain.hFcad.iEntity[3])                 '   -> la selecciono
             Endif
             Me.Active = False
-            clsEntities.GLGenDrawListSel(1)
+            clsEntities.GLGenDrawListSel(0)
 
         Else
 
@@ -107,13 +107,14 @@ Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' esta rutina es l
             Me.selectionCount = clsEntities.SelectionSquare(Me.SelStartXr, Me.SelStartYr, Me.SelEndXr, Me.SelEndyr, tipo, crossing)
             Debug "Select parsing time ", Timer - t
 
-            clsEntities.GLGenDrawListSel
+            clsEntities.GLGenDrawListSel(0)
 
         End If
 
         clsDrawingAids.HelperTrabajo = ("Selected ") & Str$(Me.selectionCount) & (" elements")
 
     Else
+        ' fue un point selection
 
     End If
 
@@ -169,15 +170,21 @@ End
 Public Sub Draw() ' esta rutina es llamada por FCAD en el evento DrawingArea_Draw
     ' por ultimo, y para que se vea arriba, la seleccion
 
-    If Not Me.Active Then Return
+    If Me.Active Then
 
-    If Me.SelStartX > Me.SelEndX Then                               ' Seleccion crossing, o sea que si cualquier arista del rectangulo cruza el bounding poligon, queda seleccionado
+        If Me.SelStartX > Me.SelEndX Then                               ' Seleccion crossing, o sea que si cualquier arista del rectangulo cruza el bounding poligon, queda seleccionado
 
-        GLplus.Rectangle2D(Me.SelStartXr, Me.SelStartYr, Me.SelEndXr - Me.SelStartXr, Me.SelEndyr - Me.SelStartYr, Color.RGB(224, 220, 207, 215),,,, Color.red, 1, 1, 2)
+            GLplus.Rectangle2D(Me.SelStartXr, Me.SelStartYr, Me.SelEndXr - Me.SelStartXr, Me.SelEndyr - Me.SelStartYr, Color.RGB(224, 220, 207, 215),,,, Color.red, 1, 1, 2)
 
-    Else                                                            ' seleccion full, todos los puntos deben estar adentro
+        Else                                                            ' seleccion full, todos los puntos deben estar adentro
 
-        GLplus.Rectangle2D(Me.SelStartXr, Me.SelStartYr, Me.SelEndXr - Me.SelStartXr, Me.SelEndyr - Me.SelStartYr, Color.RGB(224, 220, 207, 215),,,, Color.Green, 1, 1, 2)
+            GLplus.Rectangle2D(Me.SelStartXr, Me.SelStartYr, Me.SelEndXr - Me.SelStartXr, Me.SelEndyr - Me.SelStartYr, Color.RGB(224, 220, 207, 215),,,, Color.Green, 1, 1, 2)
+
+        End If
+    Else
+
+        gl.CallList(appmain.hFCAD.GlListSelectedEntities)
+        clsEntities.DrawPoiSymbolsAll
 
     End If
 

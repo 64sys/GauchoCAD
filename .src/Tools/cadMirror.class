@@ -51,7 +51,7 @@ Public Function Start(Optional ElemToBuild As Variant, Optional _Mode As Integer
 
     Else                                                                    ' need the first point
 
-        clsEntities.BackUp(True)
+        Me.inxSelected.Clear
         clsDrawingAids.Helper.texto = clsDrawingAids.HelperTrabajo & (": Base point")
         clsDrawingAids.HelperTrabajo = clsDrawingAids.HelperTrabajo & Str(Me.SelectionCount) & (" elements")
 
@@ -59,6 +59,11 @@ Public Function Start(Optional ElemToBuild As Variant, Optional _Mode As Integer
             If appmain.hFCAD.arrEntities[i].selected Then Me.inxSelected.Add(i)                               ' y las meto en un  array
 
         Next
+
+        ' genero drawing lists
+
+        clsEntities.GLGenDrawListAll(False)
+        appmain.hFCAD.redraw
 
     Endif
     Me.Active = True
@@ -81,13 +86,18 @@ Public Function MouseUp(mouseX As Integer, mouseY As Integer)
         Me.SelStartXr = puntos.Near(appmain.hFcad.Xreal(mousex))
         Me.SelStartYr = puntos.Near(appmain.hFcad.Yreal(mouseY))
 
-        glSelectedList = gl.GenLists(1)                             ' genero una lista de openGL
-        gl.NewList(glSelectedList, gl.COMPILE)                      ' genero los graficos dentro de la lista
+        Me.glTranslate[0] = Me.SelStartXr
+        Me.glTranslate[1] = Me.SelStartYr
+        Me.glTranslate[2] = 0
+
+        gl.PushMatrix
+        gl.NewList(appmain.hFCAD.GlListSelectedEntities, gl.COMPILE)                      ' genero los graficos dentro de la lista
         gl.Translatef(-Me.SelStartXr, -Me.SelStartYr, 0)
-        For i = 0 To Me.inxSelected.Max
-            appmain.hFCAD.arrEntities[i].Draw                   ' y las voy dibujando para la lista
+        For i = 0 To appmain.hFCAD.arrEntities.Max 'Me.inxSelected.Max
+            If appmain.hFCAD.arrEntities[i].selected Then gl.CallList(APPMain.hFCAD.arrEntities[i].glDrwList)
         Next
         gl.EndList
+        gl.PopMatrix
 
         ' prevenir acciones tontas como hacer click en otro elemento antes de terminar con el actual
         ' TODO: reparar -> appmain.hFCAD.DesHabilitarBotones
@@ -117,37 +127,14 @@ Public Function MouseMove(mouseX As Integer, mouseY As Integer) ' called by FCAD
         Me.SelEndyr = puntos.Near(appmain.hFcad.Yreal(mouseY))
 
         Radianes = 2 * Ang(Me.SelEndXr - Me.SelStartXr, Me.SelEndYr - Me.SelStartYr)
-        '
-        '     If modCAD.Ortogonal Then
-        '
-        '         If Abs(Me.SelEndXr - Me.SelStartXr) > Abs(Me.SelEndyr - Me.SelStartYr) Then ' X prevails
-        '
-        '             Me.SelEndyr = Me.SelStartYr
-        '
-        '         Else
-        '
-        '             Me.SelEndXr = Me.SelStartXr
-        '
-        '         Endif
-        '
-        '     End If
-        '
-        '     clsEntities.MoveFromBackUp(Me.SelEndXr - Me.SelStartXr, Me.SelEndyr - Me.SelStartYr, True)
-        '
+
+        Me.glAngle = Radianes * 180 / Pi
+
+        Me.glScale[0] = 1
+        Me.glScale[1] = -1
+        Me.glScale[2] = 1
     End If
     appmain.hFCAD.redraw
-    ' appmain.hFCAD.Regen
-
-End
-
-Public Sub Draw()               ' called by appmain.hFCAD.drwArea_Draw
-
-    gl.PushMatrix
-    gl.Translatef(Me.SelStartXr, Me.SelStartYr, 0)
-    gl.scalef(1, -1, 1)
-    gl.Rotatef(-Radianes * 180 / Pi, 0, 0, 1)
-    gl.CallList(glSelectedList)
-    gl.PopMatrix
 
 End
 
@@ -192,60 +179,18 @@ Public Sub Finish()
 
     If Me.PointsDone = Me.PointsTotal Then
 
-        If KeepOriginal Then clsEntities.ClonElements()
+        If KeepOriginal Then clsEntities.ClonElements(True)
 
-        For i = 0 To Me.inxSelected.max
+        ' en todos los casos, roto los puntos
+        clsEntities.Move(-Me.SelStartXr, -Me.SelStartYr, True)
+        clsEntities.Scale(1, -1, True)
+        clsEntities.Rotate(Radianes, True)
+        clsEntities.Move(Me.SelStartXr, Me.SelStartYr, True)
 
-            ' en todos los casos, roto los puntos
-            puntos.Translate(appmain.hFCAD.arrEntities[Me.inxSelected[i]].p, -Me.SelStartXr, -Me.SelStartYr)  ' pero primero translado
-            puntos.Scale(appmain.hFCAD.arrEntities[Me.inxSelected[i]].p, 1, -1)
-            puntos.Rotate(appmain.hFCAD.arrEntities[Me.inxSelected[i]].p, Radianes)
-            puntos.Translate(appmain.hFCAD.arrEntities[Me.inxSelected[i]].p, Me.SelStartXr, Me.SelStartYr)    ' y regreso
-
-            ' en algunos casos, algo mas
-            Select Case LCase$(appmain.hFCAD.arrEntities[Me.inxSelected[i]].Gender)
-                Case "text", "mtext"
-                    appmain.hFCAD.arrEntities[Me.inxSelected[i]].fParam[0] += Radianes * 180 / Pi
-                    If appmain.hFCAD.arrEntities[Me.inxSelected[i]].fParam[0] >= 360 Then appmain.hFCAD.arrEntities[Me.inxSelected[i]].fParam[0] -= 360
-
-                Case "insert"
-                    appmain.hFCAD.arrEntities[Me.inxSelected[i]].fParam[2] += Radianes * 180 / Pi
-                    If appmain.hFCAD.arrEntities[Me.inxSelected[i]].fParam[2] >= 360 Then appmain.hFCAD.arrEntities[Me.inxSelected[i]].fParam[2] -= 360
-
-                Case "arc"
-                    ' start
-                    appmain.hFCAD.arrEntities[Me.inxSelected[i]].fParam[1] += Radianes * 180 / Pi
-                    If appmain.hFCAD.arrEntities[Me.inxSelected[i]].fParam[1] >= 360 Then appmain.hFCAD.arrEntities[Me.inxSelected[i]].fParam[1] -= 360
-
-                    ' finish
-                    appmain.hFCAD.arrEntities[Me.inxSelected[i]].fParam[2] += Radianes * 180 / Pi
-                    If appmain.hFCAD.arrEntities[Me.inxSelected[i]].fParam[2] >= 360 Then appmain.hFCAD.arrEntities[Me.inxSelected[i]].fParam[2] -= 360
-
-                Case "ellipse"
-                    ' start
-                    appmain.hFCAD.arrEntities[Me.inxSelected[i]].fParam[1] += Radianes
-                    If appmain.hFCAD.arrEntities[Me.inxSelected[i]].fParam[1] >= 2 * Pi Then appmain.hFCAD.arrEntities[Me.inxSelected[i]].fParam[1] -= 2 * Pi
-
-                    ' finish
-                    appmain.hFCAD.arrEntities[Me.inxSelected[i]].fParam[2] += Radianes
-                    If appmain.hFCAD.arrEntities[Me.inxSelected[i]].fParam[2] >= 2 * Pi Then appmain.hFCAD.arrEntities[Me.inxSelected[i]].fParam[2] -= 2 * Pi
-
-            End Select
-
-        Next
-
-        ' and bak them up
-        clsEntities.BackUp(True)
         clsEntities.Finish
-
-    Else
-
-        ' user cancelled the operation
-        clsEntities.Restore(True)
 
     Endif
 
-    gl.DeleteLists(glSelectedList, 1)
     modCAD.clsJobPrevious = Me
     modCAD.clsJob = clsDefaultJob
     clsDrawingAids.CleanTexts

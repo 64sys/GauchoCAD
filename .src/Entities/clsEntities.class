@@ -71,8 +71,8 @@ Public Function ReconstruirBloques() As Boolean
                         PartesEncontradas = True
                         Dim o2 As Entity
                         o2 = ClonEntity(APPMain.hFCAD.arrEntities[i2])
-                        CopyElemData(APPMain.hFCAD.arrEntities[i2], o2)
-                        o2.finish(-1)
+
+                        o2.ClassHandler.finish(o2, -1)
                         newBlock.entities.Add(o2)
                     End If
                 Else
@@ -124,8 +124,7 @@ Public Sub FillEntity(o As Entity)
                 o.p.add(0)
                 o.p.add(0)
                 o.level.add(0)
-                o.b.add(0)
-                o.b.add(0)
+
                 o.psel.add(0)
             Case "F", "A", "M", "L"
                 o.fParam.Add(0)
@@ -161,10 +160,9 @@ End
 '     gl.EndList
 '
 ' End
-
+'' Genera las listas GL de cada entidad individual, y la version seleccionada
 '' Borra la lista anterior y genera una nueva
-
-Public Sub GLGenDrawList()
+Public Sub glGenDrawList()
 
     Dim idDrawing As Integer ' la instancia de dibujo en la que estamos
     Dim i As Integer
@@ -174,6 +172,7 @@ Public Sub GLGenDrawList()
     Dim t As Float = Timer
     ' listas de entidades
     For i = 0 To APPMain.hFCAD.arrEntities.Max
+
         If Not gl.islist(APPMain.hFCAD.arrEntities[i].glDrwList) Then APPMain.hFCAD.arrEntities[i].glDrwList = gl.GenLists(1)
         gl.NewList(APPMain.hFCAD.arrEntities[i].glDrwList, gl.COMPILE)
         APPMain.hFCAD.arrEntities[i].ClassHandler.Draw(APPMain.hFCAD.arrEntities[i])
@@ -181,36 +180,28 @@ Public Sub GLGenDrawList()
 
     Next
     Debug "GLlista de entidades generada en  ", Timer - t
-
     ' lista de entidaes seleccionadas
     For i = 0 To APPMain.hFCAD.arrEntities.Max
         If Not gl.islist(APPMain.hFCAD.arrEntities[i].glDrwListSel) Then APPMain.hFCAD.arrEntities[i].glDrwListSel = gl.GenLists(1)
         gl.NewList(APPMain.hFCAD.arrEntities[i].glDrwListSel, gl.COMPILE)
-        APPMain.hFCAD.arrEntities[i].Selected = True
-        APPMain.hFCAD.arrEntities[i].ClassHandler.Draw(APPMain.hFCAD.arrEntities[i])
-        APPMain.hFCAD.arrEntities[i].Selected = False
-        gl.EndList
 
+        APPMain.hFCAD.arrEntities[i].ClassHandler.DrawSelected(APPMain.hFCAD.arrEntities[i])
+        'Me.DrawPoiSymbols(APPMain.hFCAD.arrEntities[i])
+
+        gl.EndList
     Next
 
     ' lista de todas las entidades
     t = Timer
-    gl.NewList(APPMain.hFCAD.GlListAllEntities, gl.COMPILE)
+    GLGenDrawListAll
 
-    For i = 0 To APPMain.hFCAD.arrEntities.max
-
-        gl.CallList(APPMain.hFCAD.arrEntities[i].glDrwList)
-
-    Next
-
-    gl.EndList
     Debug "GLlista de todas generada en  ", Timer - t
 
 End
 
 '' Generates a GL list for the selected
 '' Mode: 0=Selected version 1=Normal version
-Public Sub GLGenDrawListSel(Optional mode As Integer = 0)
+Public Sub glGenDrawListSel(Optional mode As Integer = 0)
 
     Dim idDrawing As Integer ' la instancia de dibujo en la que estamos
     Dim i As Integer
@@ -231,6 +222,68 @@ Public Sub GLGenDrawListSel(Optional mode As Integer = 0)
 
 End
 
+'' Generates a GL list for the selected
+'' Mode: 0=Selected version 1=Normal version
+Public Sub glGenDrawListAll(Optional ExcludeSelected As Boolean = False)
+
+    Dim i As Integer
+
+    gl.NewList(APPMain.hFCAD.GlListAllEntities, gl.COMPILE)
+
+    For i = 0 To APPMain.hFCAD.arrEntities.max
+        If Not (APPMain.hFCAD.arrEntities[i].Selected And ExcludeSelected) Then gl.CallList(APPMain.hFCAD.arrEntities[i].glDrwList)
+
+    Next
+
+    gl.EndList
+
+End
+
+Public Sub DrawPoiSymbolsAll()
+
+    Dim i, total As Integer
+
+    For i = 0 To APPMain.hFCAD.arrEntities.Max
+
+        If APPMain.hFCAD.arrEntities[i].Selected Then
+
+            If (APPMain.hFCAD.arrEntities[i].iInsert < 0) Or (APPMain.hFCAD.arrEntities[i].Gender = "Insert") Then
+                DrawPoiSymbols(APPMain.hFCAD.arrEntities[i])
+                Inc total
+            End If
+        End If
+        If total = 100 Then Break                           ' limitamos la cantidad de enganches a un numero sensato
+    Next
+
+End
+
+Public Sub DrawPoiSymbols(oE As Entity)
+
+    Dim i As Integer
+
+    For i = 0 To oe.PoiPoints.Max Step 2
+        Select Case oe.PoiType[i / 2]
+            Case gcd.poiEndPoint
+                glPlus.Rectangle2D(oe.PoiPoints[i] - gcd.Metros(4), oe.PoiPoints[i + 1] - gcd.Metros(4), gcd.Metros(8), gcd.Metros(8), Color.Blue,,,, Color.Cyan, 1, 1)
+
+            Case gcd.poiMidPoint
+                glPlus.Rectangle2D(oe.PoiPoints[i] - gcd.Metros(4), oe.PoiPoints[i + 1] - gcd.Metros(4), gcd.Metros(8), gcd.Metros(8), Color.Cyan,,,, Color.Blue, 1, 1)
+
+            Case gcd.poiCenter
+                glPlus.Rectangle2D(oe.PoiPoints[i] - gcd.Metros(4), oe.PoiPoints[i + 1] - gcd.Metros(4), gcd.Metros(8), gcd.Metros(8), Color.Cyan,,,, Color.Blue, 1, 1)
+
+            Case gcd.poiQuadrant
+                glPlus.Rectangle2D(oe.PoiPoints[i] - gcd.Metros(4), oe.PoiPoints[i + 1] - gcd.Metros(4), gcd.Metros(8), gcd.Metros(8), Color.Blue,,,, Color.Cyan, 1, 1)
+
+            Case gcd.poiBasePoint
+                glPlus.Rectangle2D(oe.PoiPoints[i] - gcd.Metros(4), oe.PoiPoints[i + 1] - gcd.Metros(4), gcd.Metros(8), gcd.Metros(8), Color.Cyan,,,, Color.Blue, 1, 1)
+
+        End Select
+
+    Next
+
+End
+
 Public Sub Finish(Optional selected As Boolean = True)
 
     ' creo copias de cada elemento seleccionado
@@ -248,15 +301,25 @@ Public Sub Finish(Optional selected As Boolean = True)
 
 End
 
-Public Sub ClonElements(Optional selected As Boolean = True)
+Public Sub ClonElements(Optional selected As Boolean = True, SkipParts As Boolean = True)
 
     ' creo copias de cada elemento seleccionado
-    Dim m As Integer, i As Integer
+    Dim m, i As Integer
 
     m = APPMain.hFCAD.arrEntities.Max
     For i = 0 To m
         If APPMain.hFCAD.arrEntities[i].Selected Then
-            APPMain.hFCAD.arrEntities.Add(ClonEntity(APPMain.hFCAD.arrEntities[i]))
+
+            If SkipParts Then
+                If (APPMain.hFCAD.arrEntities[i].iInsert < 0) Or (APPMain.hFCAD.arrEntities[i].iInsert = i) Then
+                    APPMain.hFCAD.arrEntities.Add(ClonEntity(APPMain.hFCAD.arrEntities[i]))
+                    APPMain.hFCAD.arrEntities.Last.ClassHandler.finish(APPMain.hFCAD.arrEntities.Last, -1)
+                End If
+            Else
+                APPMain.hFCAD.arrEntities.Add(ClonEntity(APPMain.hFCAD.arrEntities[i]))
+                APPMain.hFCAD.arrEntities.Last.ClassHandler.finish(APPMain.hFCAD.arrEntities.Last, -1)
+
+            Endif
 
         End If
     Next
@@ -271,8 +334,7 @@ Public Sub ClonEntity(e As Entity) As Entity
     Dim o As New Entity
 
     CopyElemData(e, o)                              ' copy important values
-    o.ClassHandler.Finish(o, -1)                       ' do all good stuff, -1 means self check
-    BackUpPosition(o)                               ' backup vertices
+    'o.ClassHandler.Finish(o, -1)                       ' do all good stuff, -1 means self check
 
     Return o
 
@@ -310,12 +372,12 @@ Public Function DeSelection(Optional elementos As String = "todo", Accion As Str
                 If SelFull() And (elementos = "todo" Or elementos = clase) Then
 
                     APPMain.hFCAD.arrSelecIndex.Add(iii)
-                    SelectElem(APPMain.hFCAD.arrEntities[iii])
+                    SelectElem(iii)
                     Inc i
 
                 Else
 
-                    DeSelectElem(APPMain.hFCAD.arrEntities[iii])
+                    DeSelectElem(iii)
 
                 End If
 
@@ -323,12 +385,12 @@ Public Function DeSelection(Optional elementos As String = "todo", Accion As Str
 
                 If SelPArtial() And (elementos = "todo" Or elementos = clase) Then
                     APPMain.hFCAD.arrSelecIndex.Add(iii)
-                    SelectElem(APPMain.hFCAD.arrEntities[iii], False) ' dont touch the points
+                    SelectElem(iii, False) ' dont touch the points
                     Inc i
 
                 Else
 
-                    DeSelectElem(APPMain.hFCAD.arrEntities[iii])
+                    DeSelectElem(iii)
 
                 End If
 
@@ -337,7 +399,7 @@ Public Function DeSelection(Optional elementos As String = "todo", Accion As Str
                 If (elementos = "todo" Or elementos = clase) Then
 
                     Inc i
-                    DeSelectElem(APPMain.hFCAD.arrEntities[iii])
+                    DeSelectElem(iii)
 
                 End If
 
@@ -416,119 +478,99 @@ Public Sub DrawPoint(x As Float, y As Float, Optional colour As Integer = -1, Op
 
 End
 
-Public Sub BackUpPosition(elem As Entity)
-
-    Dim i As Integer
-
-    For i = 0 To elem.P.Max
-        elem.B[i] = elem.P[i]
-
-    Next
-
-End
-
-Public Sub RestorePosition(elem As Entity)
-
-    Dim i As Integer
-
-    For i = 0 To elem.P.Max
-
-        elem.P[i] = elem.B[i]
-    Next
-
-End
-
-Public Sub SelectElem(elem As Entity, Optional AndItsPoints As Boolean = True)
+Public Sub SelectElem(iEntity As Integer, Optional AndItsPoints As Boolean = True)
 
     ' select all points and myself
 
     Dim i As Integer
 
+    If APPMain.hFCAD.arrEntities[iEntity].iInsert >= 0 Then
+        ' es parte de un bloque, lo selecciono completo
+        i = GetParentBlock(iEntity)
+        SelectAllElemFromBlock(iEntity, AndItsPoints)
+        Return
+    Endif
+
     If AndItsPoints Then
-        For i = 0 To elem.Psel.Max
-            elem.Psel[i] = True
+        For i = 0 To APPMain.hFCAD.arrEntities[iEntity].Psel.Max
+            APPMain.hFCAD.arrEntities[iEntity].Psel[i] = True
         Next
 
     End If
-    elem.selected = True
-
-    ' but, its part of a block?
-
-    ' If elem.Block <> "" Then
-    '
-    '     SelectAllElemFromBlock(elem.Block)
-    '
-    ' Endif
+    APPMain.hFCAD.arrEntities[iEntity].selected = True
 
 End
 
-Public Sub SelectAllElemFromBlock(iBlock As String, Optional AndItsPoints As Boolean = True)
+Public Sub SelectAllElemFromBlock(iBlock As Integer, Optional AndItsPoints As Boolean = True)
 
     ' select all elements from a block
 
-    Dim e As Entity
+    Dim i, ii, iii As Integer
 
-    For Each e In APPMain.hFCAD.arrEntities
-        If e.Selected Then Continue
+    APPMain.hFCAD.arrEntities[iBlock].selected = True                                                   ' seleccionamos el insert
 
-        If e.Block = iBlock Then
-            SelectElem(e)
-            If e.gender = "Block" Then
+    For i = appmain.hFCAD.arrEntities[iBlock].iInsert + 1 To appmain.hFCAD.arrEntities.max             ' y sus entidades
 
-                ' FIXME: esto no funciona
-                'SelectAllElemFromBlock(e.fParam[0]) ' recursively call up
+        If appmain.hFCAD.arrEntities[i].iInsert <> appmain.hFCAD.arrEntities[iBlock].iInsert Then Break
 
-            Endif
+        If AndItsPoints Then
+            For ii = 0 To APPMain.hFCAD.arrEntities[i].Psel.Max
+                APPMain.hFCAD.arrEntities[i].Psel[ii] = True                                      ' y sus puntos
+            Next
 
         End If
+
+        APPMain.hFCAD.arrEntities[i].selected = True
 
     Next
 
 End
 
-Public Sub DeSelectAllElemFromBlock(iBlock As String, Optional AndItsPoints As Boolean = True)
+Public Sub DeSelectAllElemFromBlock(iBlock As Integer, Optional AndItsPoints As Boolean = True)
 
-    ' select all elements from a block
+    ' deselect all elements from a block
 
-    Dim e As Entity
+    Dim i, ii, iii As Integer
 
-    For Each e In APPMain.hFCAD.arrEntities
-        If Not e.Selected Then Continue
+    APPMain.hFCAD.arrEntities[iBlock].selected = False                                                   ' seleccionamos el insert
 
-        If e.Block = iBlock Then
-            DeSelectElem(e)
-            If e.gender = "Block" Then
+    For i = appmain.hFCAD.arrEntities[iBlock].iInsert + 1 To appmain.hFCAD.arrEntities.max             ' y sus entidades
 
-                ' FIXME: esto no funciona
-                'DeSelectAllElemFromBlock(e.fParam[0]) ' recursively call up
+        If appmain.hFCAD.arrEntities[i].iInsert <> appmain.hFCAD.arrEntities[iBlock].iInsert Then Break
 
-            Endif
+        If AndItsPoints Then
+            For ii = 0 To APPMain.hFCAD.arrEntities[i].Psel.Max
+                APPMain.hFCAD.arrEntities[i].Psel[ii] = False                                      ' y sus puntos
+            Next
 
         End If
+
+        APPMain.hFCAD.arrEntities[i].selected = False
 
     Next
 
 End
 
-Public Sub DeSelectElem(elem As Entity, Optional AndItsPoints As Boolean = True)
+Public Sub DeSelectElem(iEntity As Integer, Optional AndItsPoints As Boolean = True)
+
+    ' deselect all points and myself
 
     Dim i As Integer
 
+    If APPMain.hFCAD.arrEntities[iEntity].iInsert >= 0 Then
+        ' es parte de un bloque, lo selecciono completo
+        i = GetParentBlock(iEntity)
+        deSelectAllElemFromBlock(iEntity, AndItsPoints)
+        Return
+    Endif
+
     If AndItsPoints Then
-        For i = 0 To elem.Psel.Max
-            elem.Psel[i] = False
+        For i = 0 To APPMain.hFCAD.arrEntities[iEntity].Psel.Max
+            APPMain.hFCAD.arrEntities[iEntity].Psel[i] = False
         Next
+
     End If
-
-    elem.selected = False
-    ' but, its part of a block?
-    ' FIXME: this works bad
-
-    ' If elem.Block <> "" Then
-    '
-    '     DeSelectAllElemFromBlock(elem.Block)
-    '
-    ' Endif
+    APPMain.hFCAD.arrEntities[iEntity].selected = False
 
 End
 
@@ -540,7 +582,6 @@ Public Sub CopyElemData(origen As Entity, destino As Entity)
     destino.p.resize(origen.p.count)
     destino.fparam.resize(origen.fparam.count)
     destino.level.resize(origen.level.count)
-    destino.b.resize(origen.b.count)
     destino.psel.resize(origen.psel.count)
 
     For i = 0 To origen.p.Max
@@ -552,88 +593,66 @@ Public Sub CopyElemData(origen As Entity, destino As Entity)
     For i = 0 To origen.fparam.Max
         destino.fparam[i] = origen.fparam[i]
     Next
+    destino.Gender = origen.Gender
     destino.ClassHandler = origen.ClassHandler
     destino.layerID = origen.LayerID
     destino.RefPointX = origen.refpointX
     destino.RefPointY = origen.refpointY
     destino.stringdata = origen.Stringdata
+    destino.Block = origen.Block
     destino.Layer = origen.Layer
     destino.Group = origen.Group
     destino.colour = origen.colour
+    destino.ColorToPaint = origen.ColorToPaint
     destino.LineType = origen.LineType
     destino.LineWidth = origen.LineWidth
 
 End
 
-Public Function BackUp(Optional OnlySelected As Boolean = False, OnlyPointSelected As Boolean = False) As Integer
-
-    Dim e As Entity, c, i As Integer
-
-    For Each e In APPMain.hFCAD.arrEntities
-        If (e.selected And OnlySelected) Or Not OnlySelected Then
-            BackUpPosition(e)
-        Endif
-
-    Next
-    Return c
-
-End
-
-Public Function Restore(Optional OnlySelected As Boolean = False, OnlyPointSelected As Boolean = False) As Integer
-
-    ' restores to the position backups
-    Dim e As Entity, c, i As Integer
-
-    For Each e In APPMain.hFCAD.arrEntities
-        If (e.selected And OnlySelected) Or Not OnlySelected Then
-            RestorePosition(e)
-        Endif
-
-    Next
-    Return c
-
-End
-
-Public Sub Move(dX As Float, dZ As Float, Optional OnlySelected As Boolean = False, OnlyPointSelected As Boolean = False)
+Public Sub Move(dX As Float, dY As Float, Optional OnlySelected As Boolean = False, OnlyPointSelected As Boolean = False)
 
     ' crea un backup de todos los puntos
     Dim e As Entity, i As Integer
 
     For Each e In APPMain.hFCAD.arrEntities
         If (e.selected And OnlySelected) Or Not OnlySelected Then
-            For i = 0 To e.p.max Step 2
 
-                If (e.Psel[i / 2] And OnlyPointSelected) Or Not OnlyPointSelected Then
+            e.ClassHandler.Translate(e, dX, dY)
 
-                    e.P[i] += dx
-                    e.p[i + 1] += dZ
-
-                End If
-            Next
         Endif
 
     Next
 
 End
 
-Public Sub MoveFromBackUp(dX As Float, dZ As Float, Optional OnlySelected As Boolean = False, OnlyPointSelected As Boolean = False)
+Public Sub Rotate(degAngle As Float, Optional OnlySelected As Boolean = False, OnlyPointSelected As Boolean = False)
 
     ' crea un backup de todos los puntos
     Dim e As Entity, i As Integer
 
     For Each e In APPMain.hFCAD.arrEntities
-        If e.visible Then
-            If (e.selected And OnlySelected) Or Not OnlySelected Then
-                For i = 0 To e.p.max Step 2
-                    If (e.Psel[i / 2] And OnlyPointSelected) Or Not OnlyPointSelected Then
+        If (e.selected And OnlySelected) Or Not OnlySelected Then
 
-                        e.P[i] = e.B[i] + dX
-                        e.P[i + 1] = e.B[i + 1] + dZ
+            e.ClassHandler.Rotate(e, degAngle)
 
-                    End If
-                Next
-            Endif
-        End If
+        Endif
+
+    Next
+
+End
+
+Public Sub Scale(sX As Float, sY As Float, Optional sZ As Float = 1, OnlySelected As Boolean = False, OnlyPointSelected As Boolean = False)
+
+    ' crea un backup de todos los puntos
+    Dim e As Entity, i As Integer
+
+    For Each e In APPMain.hFCAD.arrEntities
+        If (e.selected And OnlySelected) Or Not OnlySelected Then
+
+            e.ClassHandler.Scale(e, sX, sY)
+
+        Endif
+
     Next
 
 End
@@ -655,32 +674,32 @@ Public Function SelectionSquare(X1real As Float, Y1real As Float, X2real As Floa
         TotalSeleccionados = 0
     End If
 
-    For Each e In APPMain.hFCAD.arrEntities
+    For i = 0 To APPMain.hFCAD.arrEntities.Max
         ' cada entidad debe decidir si esta seleccionada o no
         If crossing Then
-            If SelPArtial(e, X1real, Y1real, X2real, Y2real) Then
+            If SelPArtial(i, X1real, Y1real, X2real, Y2real) Then
                 ' el punto esta en el recuadro
                 If NuevaSumaResta <> "resta" Then
                     Inc TotalSeleccionados
-                    Me.SelectElem(e, False)
+                    Me.SelectElem(i, False)
 
                 Else If NuevaSumaResta = "resta" Then
                     Dec TotalSeleccionados
-                    Me.DeSelectElem(e, False)
+                    Me.DeSelectElem(i, False)
 
                 End If
 
             Endif
         Else
-            If SelFull(e, X1real, Y1real, X2real, Y2real) Then
+            If SelFull(i, X1real, Y1real, X2real, Y2real) Then
                 ' el punto esta en el recuadro
                 If NuevaSumaResta <> "resta" Then
                     Inc TotalSeleccionados
-                    Me.SelectElem(e, False)
+                    Me.SelectElem(i, False)
 
                 Else If NuevaSumaResta = "resta" Then
                     Dec TotalSeleccionados
-                    Me.DeSelectElem(e, False)
+                    Me.DeSelectElem(i, False)
 
                 End If
 
@@ -828,35 +847,35 @@ Public Function ComputeLimits(Optional entities As Entity[], OnlyVisibles As Boo
     If Not entities Then entGroup = APPMain.hFCAD.arrEntities Else entGroup = Entities
 
     For Each e In entGroup
-        If e.block = "" Then
-            If (OnlyVisibles And e.Visible) Or Not OnlyVisibles Then
+        'If e.block = "" Then
+        If (OnlyVisibles And e.Visible) Or Not OnlyVisibles Then
 
-                For i = 0 To e.p.max Step 2
-                    'If e.p[i] > 0 Then Debug e.gender
+            For i = 0 To e.p.max Step 2
+                'If e.p[i] > 0 Then Debug e.gender
 
-                    If e.p[i] < Xmenor Then Xmenor = e.p[i]
+                If e.p[i] < Xmenor Then Xmenor = e.p[i]
 
-                    If e.p[i + 1] < Ymenor Then Ymenor = e.p[i + 1]
+                If e.p[i + 1] < Ymenor Then Ymenor = e.p[i + 1]
 
-                    If e.p[i] > Xmayor Then Xmayor = e.p[i]
+                If e.p[i] > Xmayor Then Xmayor = e.p[i]
 
-                    If e.p[i + 1] > Ymayor Then Ymayor = e.p[i + 1]
+                If e.p[i + 1] > Ymayor Then Ymayor = e.p[i + 1]
 
-                Next
-                For i = 0 To e.Polygon.max Step 2
-                    'If e.p[i] > 0 Then Debug e.gender
+            Next
+            For i = 0 To e.Polygon.max Step 2
+                'If e.p[i] > 0 Then Debug e.gender
 
-                    If e.Polygon[i] < Xmenor Then Xmenor = e.Polygon[i]
+                If e.Polygon[i] < Xmenor Then Xmenor = e.Polygon[i]
 
-                    If e.Polygon[i + 1] < Ymenor Then Ymenor = e.Polygon[i + 1]
+                If e.Polygon[i + 1] < Ymenor Then Ymenor = e.Polygon[i + 1]
 
-                    If e.Polygon[i] > Xmayor Then Xmayor = e.Polygon[i]
+                If e.Polygon[i] > Xmayor Then Xmayor = e.Polygon[i]
 
-                    If e.Polygon[i + 1] > Ymayor Then Ymayor = e.Polygon[i + 1]
+                If e.Polygon[i + 1] > Ymayor Then Ymayor = e.Polygon[i + 1]
 
-                Next
-            End If
+            Next
         End If
+        'End If
     Next
 
     Return [Xmenor, Ymenor, Xmayor, Ymayor]
@@ -865,37 +884,37 @@ End
 
 '' Determines if the entity was selected by a rectanle surrounding al points
 '' by default, if ALL points are selected, it can.
-Public Function SelFull(oE As Entity, X1real As Float, Y1real As Float, X2real As Float, Y2real As Float) As Boolean
+Public Function SelFull(i As Integer, X1real As Float, Y1real As Float, X2real As Float, Y2real As Float) As Boolean
 
-    Dim i As Integer, puedo As Boolean
+    Dim ii As Integer, puedo As Boolean
 
-    Select Case oe.Gender
+    Select Case APPMain.hFCAD.arrEntities[i].Gender
 
         Case Else
 
             ' Si tengo un bounding poligon, entonces verifico que todos los puntos esten dentro
-            If oE.Polygon.Count > 0 Then
+            If APPMain.hFCAD.arrEntities[i].Polygon.Count > 0 Then
 
-                Return puntos.IsPoligonInsideRect(oE.Polygon, X1real, Y1real, X2real, Y2real)
+                Return puntos.IsPoligonInsideRect(APPMain.hFCAD.arrEntities[i].Polygon, X1real, Y1real, X2real, Y2real)
 
             Else    ' no tengo un poligono, entonces verifico que todos los puntos definitorios de al entidad esten dentro
 
                 puedo = True                     ' supongamos que puedo, por ahora
-                For i = 0 To oE.p.max Step 2
-                    If Not (oE.p[i] >= X1real And oE.p[i] <= X2real) And (oE.p[i + 1] >= Y1real And oE.p[i + 1] <= Y2real) Then
+                For ii = 0 To APPMain.hFCAD.arrEntities[i].p.max Step 2
+                    If Not (APPMain.hFCAD.arrEntities[i].p[ii] >= X1real And APPMain.hFCAD.arrEntities[i].p[ii] <= X2real) And (APPMain.hFCAD.arrEntities[i].p[ii + 1] >= Y1real And APPMain.hFCAD.arrEntities[i].p[ii + 1] <= Y2real) Then
                         puedo = False
                     End If
                 Next
 
                 If puedo Then
-                    For i = 0 To oE.PSel.Max
-                        oE.PSel[i] = True
+                    For ii = 0 To APPMain.hFCAD.arrEntities[i].PSel.Max
+                        APPMain.hFCAD.arrEntities[i].PSel[ii] = True
                     Next
 
                     Return True
                 Else
-                    For i = 0 To oE.PSel.Max
-                        oE.PSel[i] = False
+                    For ii = 0 To APPMain.hFCAD.arrEntities[i].PSel.Max
+                        APPMain.hFCAD.arrEntities[i].PSel[ii] = False
                     Next
 
                     Return False
@@ -908,25 +927,25 @@ End
 ' '' Determines if the entity
 ' '' by default, if ANY point is selected, it can.
 
-Public Function SelPartial(oE As Entity, X1real As Float, Y1real As Float, X2real As Float, Y2real As Float) As Boolean
+Public Function SelPartial(i As Integer, X1real As Float, Y1real As Float, X2real As Float, Y2real As Float) As Boolean
 
-    Dim i As Integer, puedo As Boolean
+    Dim ii As Integer, puedo As Boolean
 
-    Select Case oe.Gender
+    Select Case APPMain.hFCAD.arrEntities[i].Gender
 
         Case Else
 
             ' Si tengo un bounding poligon, entonces verifico que alguna linea lo cruce
-            If oE.Polygon.Count > 0 Then
+            If APPMain.hFCAD.arrEntities[i].Polygon.Count > 0 Then
 
-                Return puntos.IsPoligonCrossingRect(oE.Polygon, X1real, Y1real, X2real, Y2real)
+                Return puntos.IsPoligonCrossingRect(APPMain.hFCAD.arrEntities[i].Polygon, X1real, Y1real, X2real, Y2real)
 
             Else    ' no tengo un poligono, entonces verifico que todos los puntos definitorios de al entidad esten dentro
 
                 puedo = False
-                For i = 0 To oE.p.max Step 2
-                    If (oE.p[i] >= X1real And oE.p[i] <= X2real) And (oE.p[i + 1] >= Y1real And oE.p[i + 1] <= Y2real) Then
-                        oE.PSel[i / 2] = True
+                For Ii = 0 To APPMain.hFCAD.arrEntities[i].p.max Step 2
+                    If (APPMain.hFCAD.arrEntities[i].p[iI] >= X1real And APPMain.hFCAD.arrEntities[i].p[Ii] <= X2real) And (APPMain.hFCAD.arrEntities[i].p[iI + 1] >= Y1real And APPMain.hFCAD.arrEntities[i].p[iI + 1] <= Y2real) Then
+                        APPMain.hFCAD.arrEntities[i].PSel[iI / 2] = True
                         puedo = True
                     End If
                 Next
@@ -940,5 +959,25 @@ Public Function SelPartial(oE As Entity, X1real As Float, Y1real As Float, X2rea
             End If
 
     End Select
+
+End
+
+Public Function GetParentBlock(iEntity As Integer) As Integer
+
+    Dim iParent As Integer
+
+    iParent = iEntity
+    Do
+
+        If APPMain.hFCAD.arrEntities[iParent].iInsert >= 0 Then
+            If iParent = APPMain.hFCAD.arrEntities[iParent].iInsert Then Break
+            iParent = APPMain.hFCAD.arrEntities[iParent].iInsert
+        Else
+            Break
+        End If
+
+    Loop
+
+    Return iParent
 
 End

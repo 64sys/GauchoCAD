@@ -179,7 +179,7 @@ Public arrToFill As Entity[]
 
 ' Add more if needed
 
-Public Function Start(Optional ElemToBuild As Variant, Optional _mode As Integer = 1) As Boolean
+Public Function Start(Optional ElemToBuild As Variant, Optional _mode As Integer = 0) As Boolean
     ' Llamada por FCAD al inicio de la aplicacion de esta herramienta
 
     ' Aprovechamos para establecer los helpers (comentarios de ayuda en pantalla)
@@ -283,6 +283,7 @@ Public Procedure LoadFile(stn As String)
 
     Dim i As Integer
     Dim mLoadStatus As Boolean
+    Dim enxArray As Entity[]
 
     mBlockCount = 0
     mInsertCount = 0
@@ -660,7 +661,9 @@ Public Procedure LoadFile(stn As String)
 
             Wend
 
-            modCAD.AddBlock(arrToFill, [mBlock.x, mBlock.y], mBlock.layer, mBlock.block_name)
+            enxArray = arrToFill
+
+            arrToFill = modCAD.AddBlock([mBlock.x, mBlock.y], mBlock.block_name)
 
             Inc mBlockCount
 
@@ -668,6 +671,7 @@ Public Procedure LoadFile(stn As String)
             ReadData
             flgReadingBlock = False
             mBlock.block_name = ""
+            arrToFill = enxArray
 
         Else
             ReadData
@@ -3417,241 +3421,6 @@ Private Function dxfSave4Blocks() As Integer
     ' Print #hFIle, "0"
     ' Print #hFIle, "BLOCK"
     ' Print #hFIle, "5"
-    ' Print #hFIle, "4F"
-    ' Print #hFIle, "330"
-    ' Print #hFIle, "4E"
-    ' Print #hFIle, "100"
-    ' Print #hFIle, "AcDbEntity"
-    ' Print #hFIle, "8"
-    ' Print #hFIle, "0"
-    ' Print #hFIle, "100"
-    ' Print #hFIle, "AcDbBlockBegin"
-    ' Print #hFIle, "2"
-    ' Print #hFIle, "*D1"
-    ' Print #hFIle, "70"
-    ' Print #hFIle, "1"
-    ' Print #hFIle, "10"
-    ' Print #hFIle, "0"
-    ' Print #hFIle, "20"
-    ' Print #hFIle, "0"
-    ' Print #hFIle, "3"
-    ' Print #hFIle, "*D1"
-    ' Print #hFIle, "1"
-    ' Print #hFIle, ""
-    ' Print #hFIle, "0"
-    ' Print #hFIle, "LINE"
-    ' Print #hFIle, "5"
-    ' Print #hFIle, "57"
-    ' Print #hFIle, "100"
-    ' Print #hFIle, "AcDbEntity"
-    ' Print #hFIle, "8"
-    ' Print #hFIle, "0"
-    ' Print #hFIle, "6"
-    ' Print #hFIle, "ByBlock"
-    ' Print #hFIle, "62"
-    ' Print #hFIle, "0"
-    ' Print #hFIle, "370"
-    ' Print #hFIle, "-2"
-    ' Print #hFIle, "100"
-    ' Print #hFIle, "AcDbLine"
-    ' Print #hFIle, "10"
-    ' Print #hFIle, "58.89724803027502"
-    ' Print #hFIle, "20"
-    ' Print #hFIle, "91.41223171692978"
-    ' Print #hFIle, "11"
-    ' Print #hFIle, "95.15428860684773"
-    ' Print #hFIle, "21"
-    ' Print #hFIle, "91.41223171692978"
-    ' Print #hFIle, "0"
-    ' Print #hFIle, "SOLID"
-    ' Print #hFIle, "5"
-    ' Print #hFIle, "58"
-    ' Print #hFIle, "100"
-    ' Print #hFIle, "AcDbEntity"
-    ' Print #hFIle, "8"
-    ' Print #hFIle, "0"
-    ' Print #hFIle, "6"
-    ' Print #hFIle, "ByBlock"
-    ' Print #hFIle, "62"
-    ' Print #hFIle, "0"
-    ' Print #hFIle, "370"
-    ' Print #hFIle, "-2"
-    ' Print #hFIle, "100"
-    ' Print #hFIle, "AcDbTrace"
-    ' Print #hFIle, "10"
-    ' Print #hFIle, "58.89724803027502"
-    ' Print #hFIle, "20"
-    ' Print #hFIle, "91.41223171692978"
-    ' Print #hFIle, "30"
-    ' Print #hFIle, "0"
-    ' Print #hFIle, "11"
-    ' Print #hFIle, "61.39724803027502"
-    ' Print #hFIle, "21"
-    ' Print #hFIle, "91.82851637470262"
-    ' Print #hFIle, "31"
-    ' Print #hFIle, "0"
-    ' Print #hFIle, "12"
-    ' Print #hFIle, "61.39724803027502"
-    ' Print #hFIle, "22"
-    ' Print #hFIle, "90.99594705915695"
-    ' Print #hFIle, "32"
-    ' Print #hFIle, "0"
-    ' Print #hFIle, "13"
-    ' Print #hFIle, "61.39724803027502"
-    ' Print #hFIle, "23"
-    ' Print #hFIle, "90.99594705915695"
-    ' Print #hFIle, "33"
-    ' Print #hFIle, "0"
-    ' Print #hFIle, "0"
-    ' Print #hFIle, "SOLID"
-    ' Print #hFIle, "5"
-    ' Print #hFIle, "59"
-    ' Print #hFIle, "100"
-    ' Print #hFIle, "AcDbEntity"
-    ' Print #hFIle, "8"
-    ' Print #hFIle, "0"
-    ' Print #hFIle, "6"
-    ' Print #hFIle, "ByBlock"
-    ' Print #hFIle, "62"
-    ' Print #hFIle, "0"
-    ' Print #hFIle, "370"
-    ' Print #hFIle, "-2"
-    ' Print #hFIle, "100"
-    ' Print #hFIle, "AcDbTrace"
-    ' Print #hFIle, "10"
-    ' Print #hFIle, "95.15428860684773"
-    ' Print #hFIle, "20"
-    ' Print #hFIle, "91.41223171692978"
-    ' Print #hFIle, "30"
-    ' Print #hFIle, "0"
-    ' Print #hFIle, "11"
-    ' Print #hFIle, "92.65428860684773"
-    ' Print #hFIle, "21"
-    ' Print #hFIle, "90.99594705915695"
-    ' Print #hFIle, "31"
-    ' Print #hFIle, "0"
-    ' Print #hFIle, "12"
-    ' Print #hFIle, "92.65428860684773"
-    ' Print #hFIle, "22"
-    ' Print #hFIle, "91.82851637470262"
-    ' Print #hFIle, "32"
-    ' Print #hFIle, "0"
-    ' Print #hFIle, "13"
-    ' Print #hFIle, "92.65428860684773"
-    ' Print #hFIle, "23"
-    ' Print #hFIle, "91.82851637470262"
-    ' Print #hFIle, "33"
-    ' Print #hFIle, "0"
-    ' Print #hFIle, "0"
-    ' Print #hFIle, "MTEXT"
-    ' Print #hFIle, "5"
-    ' Print #hFIle, "5A"
-    ' Print #hFIle, "100"
-    ' Print #hFIle, "AcDbEntity"
-    ' Print #hFIle, "8"
-    ' Print #hFIle, "0"
-    ' Print #hFIle, "6"
-    ' Print #hFIle, "CONTINUOUS"
-    ' Print #hFIle, "62"
-    ' Print #hFIle, "0"
-    ' Print #hFIle, "370"
-    ' Print #hFIle, "-2"
-    ' Print #hFIle, "100"
-    ' Print #hFIle, "AcDbMText"
-    ' Print #hFIle, "10"
-    ' Print #hFIle, "77.02576831856138"
-    ' Print #hFIle, "20"
-    ' Print #hFIle, "93.28723171692978"
-    ' Print #hFIle, "30"
-    ' Print #hFIle, "0"
-    ' Print #hFIle, "40"
-    ' Print #hFIle, "2.5"
-    ' Print #hFIle, "41"
-    ' Print #hFIle, "7.916666666667132"
-    ' Print #hFIle, "71"
-    ' Print #hFIle, "5"
-    ' Print #hFIle, "72"
-    ' Print #hFIle, "1"
-    ' Print #hFIle, "1"
-    ' Print #hFIle, "36,26"
-    ' Print #hFIle, "7"
-    ' Print #hFIle, "STANDARD"
-    ' Print #hFIle, "210"
-    ' Print #hFIle, "0"
-    ' Print #hFIle, "220"
-    ' Print #hFIle, "0"
-    ' Print #hFIle, "230"
-    ' Print #hFIle, "1"
-    ' Print #hFIle, "50"
-    ' Print #hFIle, "0"
-    ' Print #hFIle, "73"
-    ' Print #hFIle, "2"
-    ' Print #hFIle, "44"
-    ' Print #hFIle, "1"
-    ' Print #hFIle, "0"
-    ' Print #hFIle, "LINE"
-    ' Print #hFIle, "5"
-    ' Print #hFIle, "5B"
-    ' Print #hFIle, "100"
-    ' Print #hFIle, "AcDbEntity"
-    ' Print #hFIle, "8"
-    ' Print #hFIle, "0"
-    ' Print #hFIle, "6"
-    ' Print #hFIle, "ByBlock"
-    ' Print #hFIle, "62"
-    ' Print #hFIle, "0"
-    ' Print #hFIle, "370"
-    ' Print #hFIle, "-2"
-    ' Print #hFIle, "100"
-    ' Print #hFIle, "AcDbLine"
-    ' Print #hFIle, "10"
-    ' Print #hFIle, "58.89724803027502"
-    ' Print #hFIle, "20"
-    ' Print #hFIle, "90.18584474544767"
-    ' Print #hFIle, "11"
-    ' Print #hFIle, "58.89724803027501"
-    ' Print #hFIle, "21"
-    ' Print #hFIle, "92.66223171692978"
-    ' Print #hFIle, "0"
-    ' Print #hFIle, "LINE"
-    ' Print #hFIle, "5"
-    ' Print #hFIle, "5C"
-    ' Print #hFIle, "100"
-    ' Print #hFIle, "AcDbEntity"
-    ' Print #hFIle, "8"
-    ' Print #hFIle, "0"
-    ' Print #hFIle, "6"
-    ' Print #hFIle, "ByBlock"
-    ' Print #hFIle, "62"
-    ' Print #hFIle, "0"
-    ' Print #hFIle, "370"
-    ' Print #hFIle, "-2"
-    ' Print #hFIle, "100"
-    ' Print #hFIle, "AcDbLine"
-    ' Print #hFIle, "10"
-    ' Print #hFIle, "95.15428860684773"
-    ' Print #hFIle, "20"
-    ' Print #hFIle, "90.00474608235277"
-    ' Print #hFIle, "11"
-    ' Print #hFIle, "95.15428860684773"
-    ' Print #hFIle, "21"
-    ' Print #hFIle, "92.66223171692978"
-    ' Print #hFIle, "0"
-    ' Print #hFIle, "ENDBLK"
-    ' Print #hFIle, "5"
-    ' Print #hFIle, "50"
-    ' Print #hFIle, "330"
-    ' Print #hFIle, "4E"
-    ' Print #hFIle, "100"
-    ' Print #hFIle, "AcDbEntity"
-    ' Print #hFIle, "8"
-    ' Print #hFIle, "0"
-    ' Print #hFIle, "100"
-    ' Print #hFIle, "AcDbBlockEnd"
-    '===========================================================================================================
-    ' Print #hFIle, "0"
-    ' Print #hFIle, "BLOCK"
-    ' Print #hFIle, "5"
     ' Print #hFIle, "52"
     ' Print #hFIle, "330"
     ' Print #hFIle, "51"
@@ -3907,7 +3676,7 @@ Private Function dxfSave4Blocks() As Integer
     ' Print #hFIle, "3"
     ' Print #hFIle, "3 circulos"
     ' Print #hFIle, "1"
-    ' Print #hFIle, ""
+    ' Print #hFIle, ""  '-------------------------------hasta aca el el block header, luego siguen las entidades
     ' Print #hFIle, "0"
     ' Print #hFIle, "CIRCLE"
     ' Print #hFIle, "5"
@@ -3974,7 +3743,7 @@ Private Function dxfSave4Blocks() As Integer
     ' Print #hFIle, "26.88675741840225"
     ' Print #hFIle, "40"
     ' Print #hFIle, "35"
-    ' Print #hFIle, "0"
+    ' Print #hFIle, "0"     '-----------------------------------------------de aqui al final es el block end
     ' Print #hFIle, "ENDBLK"
     ' Print #hFIle, "5"
     ' Print #hFIle, "56"
@@ -3995,12 +3764,35 @@ End
 
 Private Function dxfSave5Entities() As Integer
 
+    Dim e As Entity
+
     Print #hFIle, "0"
     Print #hFIle, "SECTION"
     Print #hFIle, "2"
     Print #hFIle, "ENTITIES"
 
     ' here go all entities
+    For Each e In APPMain.hFCAD.arrEntities
+        Select Case e.Gender
+            Case "Line"
+                dxfSaveLine(e.p, e.Layer, e.colour,, e.LineWidth)
+            Case "PLine"
+                dxfSavePLine(e.p, e.Layer, e.colour,, e.LineWidth)
+            Case "SPLine"
+                dxfSaveSPLine(e.p, e.Layer, e.colour,, e.LineWidth)
+            Case "Circle"
+                dxfSaveCircle(e.p, e.fParam[0], e.Layer, e.colour,, e.LineWidth)
+            Case "Arc"
+                dxfSaveArc(e.p, e.fParam[0], e.fParam[1], e.fParam[2], e.Layer, e.colour,, e.LineWidth)
+            Case "Ellipse"
+                dxfSaveEllipse(e.p, e.fParam[0], e.fParam[1], e.fParam[2], e.Layer, e.colour,, e.LineWidth)
+            Case "Text"
+                dxfSaveText(e.StringData, e.p, e.fParam[1], e.fParam[0], e.Layer, e.colour,, e.LineWidth)
+            Case "MText"
+                dxfSaveMText(e.StringData, e.p, e.fParam[1], e.fParam[0], e.Layer, e.colour,, e.LineWidth)
+
+        End Select
+    Next
 
     ' end section code
     Print #hFIle, "0"
@@ -4074,6 +3866,78 @@ Public Function dxfSaveLine(fPuntos As Float[], Optional layer As String = "0", 
 
 End
 
+Public Function dxfSavePLine(fPuntos As Float[], Optional layer As String = "0", colour As Integer = "256", LineType As String = "ByLayer", LineWidth As Float = "1")
+
+    Dim i As Integer
+
+    Print #hFIle, "0"                       ' Entity type
+    Print #hFIle, "LWPOLYLINE"
+    Print #hFIle, "5"                       ' handle
+    Print #hFIle, "77"
+    Print #hFIle, "100"                     ' Subclass marker
+    Print #hFIle, "AcDbEntity"
+    Print #hFIle, "8"                       ' Layer
+    Print #hFIle, layer
+    Print #hFIle, "6"                       ' Linetype name (present if not BYLAYER). The special name BYBLOCK indicates a floating linetype (optional)
+    Print #hFIle, LineType
+    Print #hFIle, "62"                      ' Color number (present if not BYLAYER); zero indicates the BYBLOCK (floating) color; 256 indicates BYLAYER;
+    Print #hFIle, colour
+    Print #hFIle, "370"                     ' Lineweight enum value. Stored and moved around as a 16-bit integer.
+    Print #hFIle, LineWidth
+    Print #hFIle, "100"                     ' Subclass marker
+    Print #hFIle, "AcDbPolyline"
+    Print #hFIle, "90"                      ' cantidad de puntos
+    Print #hFIle, fPuntos.Count
+    Print #hFIle, "70"                      ' 0 = abierta; 1 = cerrada
+    Print #hFIle, "0"
+    Print #hFIle, "43"                      ' constant width  0 = constant
+    Print #hFIle, "0"
+    For i = 0 To fPuntos.Max Step 2
+        Print #hFIle, "10"                      ' Xi
+        Print #hFIle, fPuntos[i]
+        Print #hFIle, "20"                      ' Yi
+        Print #hFIle, fPuntos[i + 1]
+    Next
+
+End
+
+Public Function dxfSaveSolid(fPuntos As Float[], Optional layer As String = "0", colour As Integer = "256", LineType As String = "ByLayer", LineWidth As Float = "1")
+
+    Dim i As Integer
+
+    Print #hFIle, "0"                       ' Entity type
+    Print #hFIle, "SOLID"
+    Print #hFIle, "5"                       ' handle
+    Print #hFIle, "77"
+    Print #hFIle, "100"                     ' Subclass marker
+    Print #hFIle, "AcDbEntity"
+    Print #hFIle, "8"                       ' Layer
+    Print #hFIle, layer
+    Print #hFIle, "6"                       ' Linetype name (present if not BYLAYER). The special name BYBLOCK indicates a floating linetype (optional)
+    Print #hFIle, LineType
+    Print #hFIle, "62"                      ' Color number (present if not BYLAYER); zero indicates the BYBLOCK (floating) color; 256 indicates BYLAYER;
+    Print #hFIle, colour
+    Print #hFIle, "370"                     ' Lineweight enum value. Stored and moved around as a 16-bit integer.
+    Print #hFIle, LineWidth
+    Print #hFIle, "100"                     ' Subclass marker
+    Print #hFIle, "AcDbTrace"
+    Print #hFIle, "90"                      ' cantidad de puntos
+    Print #hFIle, fPuntos.Count
+    Print #hFIle, "70"                      ' 0 = abierta; 1 = cerrada
+    Print #hFIle, "0"
+    Print #hFIle, "43"                      ' constant width  0 = constant
+    Print #hFIle, "0"
+    For i = 0 To fPuntos.Max Step 2
+        Print #hFIle, "1" & Trim$(Str$(Int(i / 2)))                      ' Xi
+        Print #hFIle, fPuntos[i]
+        Print #hFIle, "2" & Trim$(Str$(Int(i / 2)))
+        Print #hFIle, fPuntos[i + 1]
+        Print #hFIle, "3" & Trim$(Str$(Int(i / 2)))
+        Print #hFIle, "0"
+    Next
+
+End
+
 Public Function dxfSaveText(texto As String, fPuntos As Float[], heigth As Float, Optional angle As Float = 0, layer As String = "0", colour As Integer = "256", LineType As String = "ByLayer", LineWidth As Float = "1", txtStyle As String = "romanc")
 
     Print #hFIle, "0"
@@ -4117,9 +3981,9 @@ Public Function dxfSaveText(texto As String, fPuntos As Float[], heigth As Float
     ' 0 = Left 1 = Center  2 = Right 3 = Aligned( If vertical alignment = 0)  4 = Middle( If vertical alignment = 0) 5 = Fit( If vertical alignment = 0)
     Print #hFIle, "3"
     Print #hFIle, "11"                      ' second point
-    Print #hFIle, fPuntos[2]
+    Print #hFIle, "0" 'fPuntos[2]  TODO: fix this
     Print #hFIle, "21"
-    Print #hFIle, fPuntos[3]
+    Print #hFIle, "0" ' fPuntos[3]
     Print #hFIle, "31"
     Print #hFIle, "0"
 
@@ -4162,6 +4026,72 @@ Public Function dxfSaveCircle(fCentro As Float[], radious As Float, Optional lay
     Print #hFIle, fCentro[1]
     Print #hFIle, "40"                      ' radious
     Print #hFIle, radious
+
+End
+
+Public Function dxfSaveArc(fCentro As Float[], radious As Float, fStart As Float, fEnd As Float, Optional layer As String = "0", colour As Integer = "256", LineType As String = "ByLayer", LineWidth As Float = "1")
+
+    Print #hFIle, "0"
+    Print #hFIle, "ARC"
+    Print #hFIle, "5"
+    Print #hFIle, "6E"
+    Print #hFIle, "100"
+    Print #hFIle, "AcDbEntity"
+    Print #hFIle, "8"                       ' Layer
+    Print #hFIle, layer
+    Print #hFIle, "6"                       ' Linetype name (present if not BYLAYER). The special name BYBLOCK indicates a floating linetype (optional)
+    Print #hFIle, LineType
+    Print #hFIle, "62"                      ' Color number (present if not BYLAYER); zero indicates the BYBLOCK (floating) color; 256 indicates BYLAYER;
+    Print #hFIle, colour
+    Print #hFIle, "370"                     ' Lineweight enum value. Stored and moved around as a 16-bit integer.
+    Print #hFIle, LineWidth
+    Print #hFIle, "100"
+    Print #hFIle, "AcDbArc"
+    Print #hFIle, "10"                      ' X0
+    Print #hFIle, fCentro[0]
+    Print #hFIle, "20"                      ' Y0
+    Print #hFIle, fCentro[1]
+    Print #hFIle, "40"                      ' radious
+    Print #hFIle, radious
+    Print #hFIle, "50"                      ' start angle
+    Print #hFIle, fStart
+    Print #hFIle, "51"                      ' end angle
+    Print #hFIle, fEnd
+
+End
+
+Public Function dxfSaveEllipse(fCentro As Float[], ratio As Float, fStart As Float, fEnd As Float, Optional layer As String = "0", colour As Integer = "256", LineType As String = "ByLayer", LineWidth As Float = "1")
+
+    Print #hFIle, "0"
+    Print #hFIle, "ELLIPSE"
+    Print #hFIle, "5"
+    Print #hFIle, "6E"
+    Print #hFIle, "100"
+    Print #hFIle, "AcDbEntity"
+    Print #hFIle, "8"                       ' Layer
+    Print #hFIle, layer
+    Print #hFIle, "6"                       ' Linetype name (present if not BYLAYER). The special name BYBLOCK indicates a floating linetype (optional)
+    Print #hFIle, LineType
+    Print #hFIle, "62"                      ' Color number (present if not BYLAYER); zero indicates the BYBLOCK (floating) color; 256 indicates BYLAYER;
+    Print #hFIle, colour
+    Print #hFIle, "370"                     ' Lineweight enum value. Stored and moved around as a 16-bit integer.
+    Print #hFIle, LineWidth
+    Print #hFIle, "100"
+    Print #hFIle, "AcDbEllipse"
+    Print #hFIle, "10"                      ' X0
+    Print #hFIle, fCentro[0]
+    Print #hFIle, "20"                      ' Y0
+    Print #hFIle, fCentro[1]
+    Print #hFIle, "11"                      ' X1 eje major
+    Print #hFIle, fCentro[2]
+    Print #hFIle, "21"                      ' Y1 eje major
+    Print #hFIle, fCentro[3]
+    Print #hFIle, "40"                      ' ratio
+    Print #hFIle, ratio
+    Print #hFIle, "41"                      ' start angle
+    Print #hFIle, fStart
+    Print #hFIle, "42"                      ' end angle
+    Print #hFIle, fEnd
 
 End
 
@@ -4323,5 +4253,63 @@ Public Function dxfSaveDimension(BlockName As String, fPuntos As Float[], Option
     Print #hFIle, "0"
     Print #hFIle, "100"
     Print #hFIle, "AcDbRotatedDimension"
+
+End
+
+Public Function dxfSaveSPLine(fPuntos As Float[], Optional layer As String = "0", colour As Integer = "256", LineType As String = "ByLayer", LineWidth As Float = "1")
+
+    Dim i As Integer
+
+    Print #hFIle, "0"                       ' Entity type
+    Print #hFIle, "SPLINE"
+    Print #hFIle, "5"                       ' handle
+    Print #hFIle, "77"
+    Print #hFIle, "100"                     ' Subclass marker
+    Print #hFIle, "AcDbEntity"
+    Print #hFIle, "8"                       ' Layer
+    Print #hFIle, layer
+    Print #hFIle, "6"                       ' Linetype name (present if not BYLAYER). The special name BYBLOCK indicates a floating linetype (optional)
+    Print #hFIle, LineType
+    Print #hFIle, "62"                      ' Color number (present if not BYLAYER); zero indicates the BYBLOCK (floating) color; 256 indicates BYLAYER;
+    Print #hFIle, colour
+    Print #hFIle, "370"                     ' Lineweight enum value. Stored and moved around as a 16-bit integer.
+    Print #hFIle, LineWidth
+    Print #hFIle, "100"                     ' Subclass marker
+    Print #hFIle, "AcDbSpline"
+    Print #hFIle, "210"                     ' vector normal
+    Print #hFIle, "0"
+    Print #hFIle, "220"
+    Print #hFIle, "0"
+    Print #hFIle, "230"
+    Print #hFIle, "0"
+    Print #hFIle, "70"                      ' Spline flag (bit coded):1 = Closed spline 2 = Periodic spline 4 = Rational spline 8 = Planar 16 = Linear(planar bit Is Also set)
+    Print #hFIle, "8"
+    Print #hFIle, "71"                      ' grado de la ecuacion
+    Print #hFIle, "2"
+    Print #hFIle, "72"                      ' cantidad de puntos
+    Print #hFIle, fPuntos.Count
+    Print #hFIle, "73"                      ' cantidad de puntos de control ?????????????
+    Print #hFIle, fPuntos.Count
+    Print #hFIle, "74"                      ' cantidad de fit points
+    Print #hFIle, "0"
+    Print #hFIle, "42"                      ' Knot tolerance (default = 0.0000001)
+    Print #hFIle, "1e-07"
+    Print #hFIle, "43"                      ' Control-point tolerance (default = 0.0000001)
+    Print #hFIle, "1e-07"
+    Print #hFIle, "44"                      ' Fit tolerance (default = 0.0000000001)
+    Print #hFIle, "1e-10"
+    For i = 0 To fPuntos.Max Step 2
+        Print #hFIle, "40"                      ' Knot value ???
+        Print #hFIle, "0"
+    Next
+    For i = 0 To fPuntos.Max Step 2
+        Print #hFIle, "10"                      ' Xi
+        Print #hFIle, fPuntos[i]
+        Print #hFIle, "20"                      ' Yi
+        Print #hFIle, fPuntos[i + 1]
+        Print #hFIle, "30"                      ' Zi
+        Print #hFIle, "0"
+
+    Next
 
 End

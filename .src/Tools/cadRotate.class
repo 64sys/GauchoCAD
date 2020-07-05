@@ -51,14 +51,18 @@ Public Function Start(Optional ElemToBuild As Variant, Optional _Mode As Integer
 
     Else                                                                    ' need the first point
 
-        clsEntities.BackUp(True)
         clsDrawingAids.Helper.texto = clsDrawingAids.HelperTrabajo & (": Base point")
         clsDrawingAids.HelperTrabajo = clsDrawingAids.HelperTrabajo & Str(Me.SelectionCount) & (" elements")
-
+        Me.inxSelected.Clear
         For i = 0 To appmain.hFCAD.arrEntities.Max                  ' recolecto las entidades a modificar
             If appmain.hFCAD.arrEntities[i].selected Then Me.inxSelected.Add(i)                               ' y las meto en un  array
 
         Next
+
+        ' genero drawing lists
+
+        clsEntities.GLGenDrawListAll(True)
+        appmain.hFCAD.redraw
 
     Endif
     Me.Active = True
@@ -81,13 +85,18 @@ Public Function MouseUp(mouseX As Integer, mouseY As Integer)
         Me.SelStartXr = puntos.Near(appmain.hFcad.Xreal(mousex))
         Me.SelStartYr = puntos.Near(appmain.hFcad.Yreal(mouseY))
 
-        glSelectedList = gl.GenLists(1)                             ' genero una lista de openGL
-        gl.NewList(glSelectedList, gl.COMPILE)                      ' genero los graficos dentro de la lista
+        Me.glTranslate[0] = Me.SelStartXr
+        Me.glTranslate[1] = Me.SelStartYr
+        Me.glTranslate[2] = 0
+
+        gl.PushMatrix
+        gl.NewList(appmain.hFCAD.GlListSelectedEntities, gl.COMPILE)                      ' genero los graficos dentro de la lista
         gl.Translatef(-Me.SelStartXr, -Me.SelStartYr, 0)
-        For i = 0 To Me.inxSelected.Max
-            appmain.hFCAD.arrEntities[i].Draw                   ' y las voy dibujando para la lista
+        For i = 0 To appmain.hFCAD.arrEntities.Max 'Me.inxSelected.Max
+            If appmain.hFCAD.arrEntities[i].selected Then gl.CallList(APPMain.hFCAD.arrEntities[i].glDrwList)
         Next
         gl.EndList
+        gl.PopMatrix
 
         ' prevenir acciones tontas como hacer click en otro elemento antes de terminar con el actual
         ' TODO: reparar -> appmain.hFCAD.DesHabilitarBotones
@@ -105,6 +114,20 @@ Public Function MouseUp(mouseX As Integer, mouseY As Integer)
 
 End
 
+' Public Sub Draw()               ' called by appmain.hFCAD.drwArea_Draw
+'
+'     gl.PushMatrix
+'
+'     gl.Translatef(-Me.glTranslate[0], -Me.glTranslate[1], -Me.glTranslate[2])
+'     gl.Rotatef(Me.glAngle, Me.glRotate[0], Me.glRotate[1], Me.glRotate[2])
+'     gl.Translatef(Me.glTranslate[0], Me.glTranslate[1], Me.glTranslate[2])
+'     gl.Scalef(Me.glScale[0], Me.glScale[1], Me.glScale[2])
+'     gl.CallList(appmain.hFCAD.GlListSelectedEntities)                      ' si GL no tiene contexto, la lista no se genera. Es necesario que la instancia de FCAD este cargada.
+'
+'     gl.PopMatrix
+'
+' End
+
 Public Function MouseMove(mouseX As Integer, mouseY As Integer) ' called by FCAD-> DrawingArea_MouseMove
 
     If Me.PointsDone = 1 Then
@@ -117,36 +140,15 @@ Public Function MouseMove(mouseX As Integer, mouseY As Integer) ' called by FCAD
         Me.SelEndyr = puntos.Near(appmain.hFcad.Yreal(mouseY))
 
         Radianes = Ang(Me.SelEndXr - Me.SelStartXr, Me.SelEndYr - Me.SelStartYr)
-        '
-        '     If modCAD.Ortogonal Then
-        '
-        '         If Abs(Me.SelEndXr - Me.SelStartXr) > Abs(Me.SelEndyr - Me.SelStartYr) Then ' X prevails
-        '
-        '             Me.SelEndyr = Me.SelStartYr
-        '
-        '         Else
-        '
-        '             Me.SelEndXr = Me.SelStartXr
-        '
-        '         Endif
-        '
-        '     End If
-        '
-        '     clsEntities.MoveFromBackUp(Me.SelEndXr - Me.SelStartXr, Me.SelEndyr - Me.SelStartYr, True)
-        '
+
+        Me.glAngle = Radianes * 180 / Pi
+
+        clsDrawingAids.Helper.texto = clsDrawingAids.HelperTrabajo & (": Angle [90]?") & Format$(Me.glAngle, "0.0")
+
     End If
-    appmain.hFCAD.redraw
-    ' appmain.hFCAD.Regen
 
-End
-
-Public Sub Draw()               ' called by appmain.hFCAD.drwArea_Draw
-
-    gl.PushMatrix
-    gl.Translatef(Me.SelStartXr, Me.SelStartYr, 0)
-    gl.Rotatef(Radianes * 180 / Pi, 0, 0, 1)
-    gl.CallList(glSelectedList)
-    gl.PopMatrix
+    Debug Me.glAngle, Me.glTranslate[0], Me.glTranslate[1], Me.glTranslate[2]
+    gcd.Redraw
 
 End
 
@@ -218,14 +220,7 @@ Public Sub Finish()
 
         Next
 
-        ' and bak them up
-        clsEntities.BackUp(True)
         clsEntities.Finish
-
-    Else
-
-        ' user cancelled the operation
-        clsEntities.Restore(True)
 
     Endif
 

@@ -78,7 +78,7 @@ Public Sub Finish(ParamsDone As Integer) As Boolean
     Else If Me.fParam.Count = 1 Then
         Me.fParam.Add(0.2)         ' z side of column
     End If
-    Me.B.Resize(Me.P.Count)
+
     Me.CreatePolygon()
     Me.ForDeletion = False
     Me.DrawAble = True

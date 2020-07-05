@@ -139,6 +139,34 @@ Public Sub Main()
 
 End
 
+Public Function ExportBlocks(colData As Collection) ', obxEntities As Entity[]) As Integer
+
+    Dim i, iTE As Integer, colEnt, colBlk, colBlocks As New Collection, flxPoints As New Float[], P As Float[]
+
+    If Not colData.Exist("Blocks") Then
+        colData.Add(colBlocks, "Blocks")
+    Else
+        colData.Remove("Blocks")
+        colData.Add(colBlocks, "Blocks")
+    End If
+
+    For i = 0 To APPMain.hFCAD.arrBlocks.max
+        colBlk = New Collection
+        colData["Blocks"].Add(colBlk, APPMain.hFCAD.arrBlocks[i].name)
+
+        colData["Blocks"][APPMain.hFCAD.arrBlocks[i].name].Add("BLOCK", "entity")
+        colData["Blocks"][APPMain.hFCAD.arrBlocks[i].name].Add(APPMain.hFCAD.arrBlocks[i].name, "block")
+        colData["Blocks"][APPMain.hFCAD.arrBlocks[i].name].Add("BYLAYER", "style")
+        colEnt = New Collection
+        colData["Blocks"][APPMain.hFCAD.arrBlocks[i].name].Add(colEnt, "Entities")
+        For iTE = 0 To APPMain.hFCAD.arrBlocks[i].entities.Max
+            ExportEntities(colData["Blocks"]["Entities"], APPMain.hFCAD.arrBlocks[i].entities)
+        Next
+
+    Next
+
+End
+
 Public Function ImportBlocks(colData As Collection) ', obxEntities As Entity[]) As Integer
 
     Dim iTotalEntities As Integer, colent, colBlk As Collection, flxPoints As New Float[], P As Float[]
@@ -150,6 +178,23 @@ Public Function ImportBlocks(colData As Collection) ', obxEntities As Entity[]) 
         newBlock.name = colBlk["block"]
         APPMain.hFCAD.arrBlocks.Add(newBlock)
         ImportEntities2(colBlk["Entities"], newBlock.entities, newBlock.name)
+
+    Next
+
+End
+
+Public Function ExportModel(colData As Collection, obxEntities As Entity[], Optional BlockName As String) As Integer
+
+    Dim i, iTotalEntities As Integer
+    Dim colGrp As Collection
+
+    Dim flxPoints As New Float[]
+    Dim P As Float[]
+    Dim ratio As Float
+
+    For Each colGrp In colData
+
+        ImportEntities2(colGrp, obxEntities, BlockName)
 
     Next
 
@@ -171,6 +216,46 @@ Public Function ImportModel(colData As Collection, obxEntities As Entity[], Opti
     Next
 
 End
+
+'' Pasa del arrEntities a la coleccion
+Public Function ExportEntities(colGrp As Collection, obxEntities As Entity[], Optional BlockName As String) As Integer
+
+    Dim i, eCount As Integer
+    Dim flxPoints As New Float[]
+    Dim P, Pn As New Collection
+    Dim ratio As Float
+    Dim colEnt As New Collection
+    Dim e As Entity
+
+    For Each e In obxEntities
+        flxPoints.Clear
+        colGrp.Add(colEnt, Str$(eCount))
+        Select Case e.Gender
+            Case "Line"
+                colgrp[Str$(eCount)].Add("LINE", "entity")
+                colgrp[Str$(eCount)].Add(e.Layer, "layer")
+                colgrp[Str$(eCount)].Add(e.LineTypeName, "style")
+                colgrp[Str$(eCount)].Add(e.colour, "colour")
+                colgrp[Str$(eCount)].Add(e.LineWidth, "width")
+                colgrp[Str$(eCount)].Add(p, "p")
+                flxPoints.Add(e.P[0])                   ' X
+                flxPoints.Add(e.P[1])                   ' Y
+                flxPoints.Add(0)                        ' Z
+                colgrp[Str$(eCount)]["p"].Add(flxPoints, "p0")
+                flxPoints = New Float[]
+                flxPoints.Add(e.P[2])                   ' X
+                flxPoints.Add(e.P[3])                   ' Y
+                flxPoints.Add(0)                        ' Z
+                colgrp[Str$(eCount)]["p"].Add(flxPoints, "p1")
+
+        End Select
+        Inc eCount
+    Next
+
+    Return eCount
+
+End
+
 '' Importa la clave entidades de la coleccion y las coloca en el array de objetos
 
 Public Function ImportEntities2(colGrp As Collection, obxEntities As Entity[], Optional BlockName As String) As Integer
@@ -504,23 +589,22 @@ Public Function AddInsert(obxContainer As Entity[], Points As Float[], scaleX As
 
 End
 
-Public Function AddBlock(obxContainer As Entity[], Points As Float[], Optional Layer As String, Optional Block As String) As Boolean
+Public Function AddBlock(Points As Float[], Block As String) As Entity[]
 
-    Dim oEntity As New Entity
+    Dim newBlock As New ArrBlockSt
 
-    oEntity.ClassHandler = cadBlock
-    oEntity.Gender = oEntity.ClassHandler.gender
-    oEntity.P.insert(points)                    ' basepoint , , siempre es 0,0 los objetos agregados a este bloque se refieren a este punto
-    oEntity.layer = Layer
-    oEntity.Block = Block
-    obxContainer.Add(oEntity)
-    oEntity.ClassHandler.finish(oEntity, -1)
-    oEntity = Null                  ' free entity
+    newBlock.entities = New Entity[]
+    newBlock.name = block
+    newBlock.x = Points[0]
+    newBlock.y = Points[1]
+    APPMain.hFCAD.arrBlocks.Add(newBlock)
+
+    Return newBlock.entities
 
 End
-
 '' Aplica los cambios en los Layers a las entidades
 '' Si mode = 1, primero recontruye el layerID (para ser usado luego de abrir un archivo)
+
 Public Function ApplyLayerProperties(Optional mode As Integer = 0)
 
     Dim e As Entity, cLayer As Collection
@@ -548,6 +632,29 @@ Public Function ApplyLayerProperties(Optional mode As Integer = 0)
         If APPMain.hFCAD.cModel["Layers"][e.layerID]["show"] Then e.visible = True Else e.visible = False
 
     Next
+
+End
+
+'' Aplica los cambios en los Layers a las entidades
+'' Si mode = 1, primero recontruye el layerID (para ser usado luego de abrir un archivo)
+Public Function ApplyLayerPropertieToEntity(e As Entity)
+
+    Dim cLayer As Collection
+    Dim LayerName As String
+
+    ' reconstruyo el ID del layer en la entidad, para ello busco en la lista cual coincide con su nombre
+    For Each cLayer In APPMain.hFCAD.cModel["Layers"]
+        If e.layer = cLayer["name"] Then
+            e.layerID = cLayer["id"]
+            Break
+        Endif
+    Next
+
+    ' nombre, el que pudo haber cambiado (exepto el "0")
+    e.layer = APPMain.hFCAD.cModel["Layers"][e.layerID]["name"]
+
+    ' visibiliad
+    If APPMain.hFCAD.cModel["Layers"][e.layerID]["show"] Then e.visible = True Else e.visible = False
 
 End
 

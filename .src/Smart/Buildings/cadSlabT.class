@@ -117,7 +117,7 @@ Public Sub Finish(ParamsDone As Integer) As Boolean
     Me.DrawAble = True
     Me.Selected = False
     Me.Finished = True
-    Me.B.Resize(Me.P.Count)
+
     Me.psel.resize(Me.p.count / 2)
 
     If Me.p[0] = Me.p[4] Then ' this is a line, not a triangle

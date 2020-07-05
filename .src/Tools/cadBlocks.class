@@ -132,8 +132,6 @@ Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' called by FCAD->
     entInsert.fParam.Add(FBlock.degRotation)
     entInsert.ClassHandler.Finish(entInsert, -1)
 
-    clsEntities.BackUpPosition(entInsert)
-
     clsEntityBuilder.LastEntity = entInsert                                       ' save it to repeat on rigth click
 
     modCAD.clsJobPrevious = Me

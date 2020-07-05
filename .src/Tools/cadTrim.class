@@ -59,7 +59,7 @@ Public Function Start(Optional ElemToBuild As Variant, Optional _Mode As Integer
             If appmain.hFCAD.arrEntities[i].selected Then arrTijeras.Add(i)
         Next
 
-        'clsEntities.BackUp(True)
+        '
         clsDrawingAids.Helper.texto = clsDrawingAids.HelperTrabajo & (": entities to cut")
         'clsDrawingAids.HelperTrabajo = clsDrawingAids.HelperTrabajo & Str(Me.SelectionCount) & (" elements")
 

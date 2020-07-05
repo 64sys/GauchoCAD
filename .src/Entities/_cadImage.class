@@ -106,7 +106,7 @@ Public Sub Finish(oE As Entity, ParamsDone As Integer) As Boolean
     ' busco el tipo de linea, si hace falta
     If oE.LineTypeName = "Dashed" Then oE.LineType = 1
     ' tareas finales de armado del objeto
-    oE.b.resize(oE.P.count)
+
     oE.psel.resize(oE.p.count / 2)
     oE.ForDeletion = False
     oE.DrawAble = True

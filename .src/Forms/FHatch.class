@@ -6,7 +6,7 @@ Public Sub form_Open()
 
     Dim sFilename As String
 
-    For Each sFilename In Dir(Application.Path &/ "Patterns", "*.dxf")
+    For Each sFilename In Dir(Application.Path &/ "patterns", "*.dxf")
 
         ComboBox1.Add(Left$(sFilename, -4))
     Next
@@ -19,7 +19,7 @@ Public Sub ComboBox1_Click()
 
     cadDxf.arrToFill = entyHatch
 
-    cadDxf.LoadFile(Application.Path &/ "Patterns" &/ ComboBox1.Text & ".dxf")
+    cadDxf.LoadFile(Application.Path &/ "patterns" &/ ComboBox1.Text & ".dxf")
 
     DrawingArea1.Refresh
 

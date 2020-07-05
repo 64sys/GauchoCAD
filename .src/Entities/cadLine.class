@@ -41,45 +41,64 @@ Public Visible As Boolean = True            ' si esta entidad puede ser mostrada
 Public Finished As Boolean = False          ' colocar en true cuando se llegue a completar
 Public StepsDone As Integer                 ' esto lo cambia cls ElementBuilder durante la construccion
 
+Public Sub Translate(e As Entity, dX As Float, dY As Float)
+
+    puntos.Translate(e.p, dx, dy)
+
+End
+
+Public Sub Rotate(e As Entity, radians As Float)
+
+    puntos.Rotate(e.p, radians)
+
+End
+
+Public Sub Scale(e As Entity, sX As Float, sY As Float)
+
+    Dim i As Integer
+
+    For i = 0 To e.p.max Step 2
+
+        e.P[i] = e.P[i] * sX
+        e.P[i + 1] = e.P[i + 1] * sY
+
+    Next
+
+End
+
 Public Sub Draw(oE As Entity)
 
-    If Not oE.Visible Then Return
-
-    If oE.Selected And Not modCAD.ToolActive Then oE.ColorToPaint = modCAD.ColorForSelected Else oE.ColorToPaint = modCAD.GetGBColor(oE.colour, oE.Layerid)
+    oE.ColorToPaint = modCAD.GetGBColor(oE.colour, oE.Layerid)
 
     GLplus.Lines(oE.p, oE.ColorToPaint, oE.LineWidth, oE.LineType)
 
 End
 
 '' A fat version of the line
+Public Sub DrawSelected(oE As Entity)
+
+    Dim i As Integer
+
+    GLplus.Lines(oE.p, modCAD.WindowBackColor, oE.LineWidth, gcd.stiDashed)
+    GLplus.Lines(oE.p, modCAD.ColorForSelected, oE.LineWidth, oE.LineType)
+
+End
+'' A fat version of the line
+
 Public Sub DrawRemark(oE As Entity)
 
     If Not oE.Visible Then Return
-
-    If oE.Selected And Not modCAD.ToolActive Then oE.ColorToPaint = modCAD.ColorForSelected Else oE.ColorToPaint = modCAD.GetGBColor(oE.colour, oE.Layerid)
 
     GLplus.Lines(oE.p, modCAD.WindowBackColor, oE.LineWidth, gcd.stiDashed)
     GLplus.Lines(oE.p, oE.ColorToPaint, oE.LineWidth + 2, oE.LineType)
 
 End
 
-'' the selected version of the entity
-' Public Sub Draw(oE As Entity)
-'
-'     If Not oE.Visible Then Return
-'
-'     If oE.Selected And Not modCAD.ToolActive Then oE.ColorToPaint = modCAD.ColorForSelected Else oE.ColorToPaint = modCAD.GetGBColor(oE.colour, oE.Layerid)
-'
-'     GLplus.Lines(oE.p, oE.ColorToPaint, oE.LineWidth, oE.LineType)
-'
-' End
-
 '' The paint version of the entity
 Public Function Draw2(oE As Entity)
 
     If Not oE.Visible Then Return
 
-    If oE.Selected And Not modCAD.ToolActive Then oE.ColorToPaint = modCAD.ColorForSelected Else oE.ColorToPaint = modCAD.GetGBColor(oE.colour, oE.Layerid)
     paint.LineWidth = oE.LineWidth / appmain.hFcad.ScaleZoom / modCAD.ScaleLines
 
     paint.brush = Paint.Color(oE.ColorToPaint)
@@ -95,6 +114,9 @@ End
 Public Function BuildPOI(oE As Entity, Optional arrIndex As Integer = -1) As Integer
 
     If arrIndex < 0 Then arrIndex = appmain.hFCAD.arrEntities.Max       ' si este valor no es provisto , estos POI son de la ultima entidad
+
+    oe.PoiPoints.Clear
+    oe.PoiType.Clear
 
     ' points: end-mid-end
     oe.poiPoints.insert([oE.p[0], oE.p[1]])
@@ -126,7 +148,7 @@ Public Sub Finish(oE As Entity, ParamsDone As Integer) As Boolean
     ' busco el tipo de linea, si hace falta
     If oE.LineTypeName = "Dashed" Then oE.LineType = 1
     ' tareas finales de armado del objeto
-    oE.b.resize(oE.P.count)
+
     oE.psel.resize(oE.p.count / 2)
     oE.ForDeletion = False
     oE.DrawAble = True

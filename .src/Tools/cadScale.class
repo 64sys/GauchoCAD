@@ -26,6 +26,8 @@ Inherits ToolsBase
 Create Static
 Public Const Gender As String = "Scale"
 
+Public ScaleFactor As Float
+
 Public Function Start(Optional ElemToBuild As Variant, Optional _Mode As Integer = 0) As Boolean
     ' Llamada por FCAD al inicio de la aplicacion de esta herramienta
 
@@ -47,7 +49,6 @@ Public Function Start(Optional ElemToBuild As Variant, Optional _Mode As Integer
 
     Else                                                                    ' need the first point
 
-        clsEntities.BackUp(True)
         clsDrawingAids.Helper.texto = clsDrawingAids.HelperTrabajo & (": Base point")
         clsDrawingAids.HelperTrabajo = clsDrawingAids.HelperTrabajo & Str(Me.SelectionCount) & (" elements")
 
@@ -58,6 +59,8 @@ Public Function Start(Optional ElemToBuild As Variant, Optional _Mode As Integer
 End
 
 Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' called by FCAD-> DrawingArea_MouseUp
+
+    Dim i As Integer
 
     Inc Me.PointsDone
 
@@ -74,6 +77,19 @@ Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' called by FCAD->
         Me.SelStartX = mousex
         Me.SelStartY = mouseY
 
+        Me.glTranslate[0] = Me.SelStartXr
+        Me.glTranslate[1] = Me.SelStartYr
+        Me.glTranslate[2] = 0
+
+        gl.PushMatrix
+        gl.NewList(appmain.hFCAD.GlListSelectedEntities, gl.COMPILE)                      ' genero los graficos dentro de la lista
+        gl.Translatef(-Me.SelStartXr, -Me.SelStartYr, 0)
+        For i = 0 To appmain.hFCAD.arrEntities.Max 'Me.inxSelected.Max
+            If appmain.hFCAD.arrEntities[i].selected Then gl.CallList(APPMain.hFCAD.arrEntities[i].glDrwList)
+        Next
+        gl.EndList
+        gl.PopMatrix
+
         ' prevenir acciones tontas como hacer click en otro elemento antes de terminar con el actual
         ' TODO: reparar -> appmain.hFCAD.DesHabilitarBotones
     Else If Me.PointsDone = 2 Then ' acabo de marcar el punto destino
@@ -83,6 +99,12 @@ Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' called by FCAD->
         ' we have the point set from MouseMove
         Me.SelEndX = mousex
         Me.SelEndY = mouseY
+
+        clsEntities.Move(-Me.SelStartXr, -Me.SelStartYr, True)
+        clsEntities.Scale(ScaleFactor, ScaleFactor, 1, True)
+        clsEntities.Move(Me.SelStartXr, Me.SelStartYr, True)
+
+        clsEntities.Finish
 
         Me.Finish()
 
@@ -107,69 +129,13 @@ Public Function MouseMove(mouseX As Integer, mouseY As Integer) ' called by FCAD
         ' lets say is the distance from first click to the current position / 10
         '
 
-        ScaleFromOrigin((puntos.distancia(mousex, mouseY, Me.SelStartX, Me.SelStartY) - 50) / 50)
+        ScaleFactor = (puntos.distancia(mousex, mouseY, Me.SelStartX, Me.SelStartY) - 50) / 50
+
+        Me.glScale[0] = ScaleFactor
+        Me.glScale[1] = ScaleFactor
+        Me.glScale[2] = ScaleFactor
 
     End If
-
-End
-
-Public Sub Finish()
-
-    If Me.PointsDone = Me.PointsTotal Then
-
-        ' job finished correctly
-        ' we restore the point first
-        clsEntities.Restore(True)
-        ' and now we move
-
-        ScaleFromOrigin((puntos.distancia(Me.SelEndX, Me.SelEndY, Me.SelStartX, Me.SelStartY) - 50) / 50)
-
-        ' and bak them up
-        clsEntities.BackUp(True)
-        clsEntities.Finish
-
-    Else
-
-        ' user cancelled the operation
-        clsEntities.Restore(True)
-
-    Endif
-
-    modCAD.clsJobPrevious = Me
-    modCAD.clsJob = clsDefaultJob
-    clsDrawingAids.CleanTexts
-    clsEntities.DeSelection()
-    modCAD.DrawOriginals = False
-    appmain.hFCAD.Regen
-    Me.Active = False
-    modCAD.ToolActive = False
-
-End
-
-' in this case well do all stuff here, not using the Class Puntos
-
-Public Sub ScaleFromOrigin(ScaleFactor As Float)
-
-    ' crea un backup de todos los puntos
-    Dim e As Entity, i As Integer
-
-    ' X axis: Me.SelStartXrr           Now              Scale = 3             Final
-    '              ^
-    ' 0------------|-----------------X,Z --------------------------------Xscaled
-
-    ' Xscaled = (X - Me.SelStartX) * Scale + SelStarXr
-
-    For Each e In APPMain.hFCAD.arrEntities
-        If e.selected Then
-            For i = 0 To e.p.max Step 2
-
-                e.P[i] = e.B[i] + (e.B[i] - Me.SelStartXr) * ScaleFactor
-
-                e.P[i + 1] = e.B[i + 1] + (e.B[i + 1] - Me.SelStartYr) * ScaleFactor
-
-            Next
-        Endif
-
-    Next
+    gcd.Redraw
 
 End

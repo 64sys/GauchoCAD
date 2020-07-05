@@ -58,7 +58,6 @@ Public Function Start(Optional ElemToBuild As Variant, Optional _mode As Integer
 
     Else                                                                    ' need the first point
 
-        clsEntities.BackUp(True)
         clsDrawingAids.Helper.texto = clsDrawingAids.HelperTrabajo & (": Base point")
         clsDrawingAids.HelperTrabajo = clsDrawingAids.HelperTrabajo & Str(Me.SelectionCount) & (" elements")
 
@@ -163,13 +162,15 @@ Public Sub Finish()
                 For Each o In APPMain.hFCAD.arrEntities
                     If o.selected Then
                         newO = clsEntities.ClonEntity(o)               ' devuelve una entidad en exactamente la misma posicion
+
+                        newO.ClassHandler.traslate(newO, dx, dy)
                         APPMain.hFCAD.arrEntities.Add(newO)
-                        For i = 0 To newO.p.max Step 2
-                            newO.p[i] += dx * (rx - 1)
-                        Next
-                        For i = 1 To newO.p.max Step 2
-                            newO.p[i] += dy * (ry - 1)
-                        Next
+                        ' For i = 0 To newO.p.max Step 2
+                        '     newO.p[i] += dx * (rx - 1)
+                        ' Next
+                        ' For i = 1 To newO.p.max Step 2
+                        '     newO.p[i] += dy * (ry - 1)
+                        ' Next
 
                         newO = Null
                     Endif
@@ -191,15 +192,18 @@ Public Sub Finish()
             For Each o In APPMain.hFCAD.arrEntities
                 If o.selected Then
                     newO = clsEntities.ClonEntity(o)               ' devuelve una entidad en exactamente la misma posicion
+                    newO.classhandler.translate(newO, -Me.SelStartXr, -Me.SelStartYr)
+                    newO.ClassHandler.rotate(newO, dp * (ry - 1))
+                    newO.classhandler.translate(newO, Me.SelStartXr, Me.SelStartYr)
                     APPMain.hFCAD.arrEntities.Add(newO)
 
-                    For i = 0 To newO.p.max Step 2
-
-                        nuevos = puntos.RotateFromPointWithAngle(Me.SelStartXr, Me.SelStartYr, dp * (ry - 1), newO.p[i], newO.p[i + 1])
-                        newO.P[i] = nuevos[0]
-                        newO.P[i + 1] = nuevos[1]
-                        nuevos.Clear
-                    Next
+                    ' For i = 0 To newO.p.max Step 2
+                    '
+                    '     nuevos = puntos.RotateFromPointWithAngle(Me.SelStartXr, Me.SelStartYr, dp * (ry - 1), newO.p[i], newO.p[i + 1])
+                    '     newO.P[i] = nuevos[0]
+                    '     newO.P[i + 1] = nuevos[1]
+                    '     nuevos.Clear
+                    ' Next
 
                     newO = Null
                 Endif

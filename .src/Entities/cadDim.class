@@ -180,7 +180,19 @@ Public Function Start(Optional Mode As Integer = -1)
 
 End
 
-Public Sub Draw()
+Public Sub Translate(e As Entity, dX As Float, dY As Float)
+
+End
+
+Public Sub Rotate(e As Entity, radians As Float)
+
+End
+
+Public Sub Scale(e As Entity, sX As Float, sY As Float)
+
+End
+
+Public Sub Draw(elem As Entity)
 
     Dim l As Float, angulo As Float, hText As New PaintExtents, lText As String, lPix As Integer
     Dim e, fExtX, fExtY As Float
@@ -263,47 +275,52 @@ Public Sub DrawRemark(oE As Entity)
 
 End
 
+'' A fat version of the entity
+Public Sub DrawSelected(oE As Entity)
+
+End
+
 ' This function will return False if the element couldn't be created for some reason: bad or incomple user input
 ' True means all is good, False will instruct the clsEntityBuilder to delete it
 Public Sub Finish(oE As Entity, ParamsDone As Integer) As Boolean
 
     'Print "Finish en EntityBase"
     'CreatePolygon(oe)
-    BuildPOI(oe)
+    ' BuildPOI(oe)
+    '
+    ' ' busco el tipo de linea, si hace falta
+    ' If oe.LineTypeName = "Dashed" Then oe.LineType = 1
+    ' ' tareas finales de armado del objeto
 
-    ' busco el tipo de linea, si hace falta
-    If elem.LineTypeName = "Dashed" Then elem.LineType = 1
-    ' tareas finales de armado del objeto
-    elem.b.resize(elem.P.count)
-    elem.psel.resize(elem.p.count / 2)
-    elem.ForDeletion = False
-    elem.DrawAble = True
-    elem.Selected = False
-    elem.Finished = True
+    ' oe.psel.resize(oe.p.count / 2)
+    ' oe.ForDeletion = False
+    ' oe.DrawAble = True
+    ' oe.Selected = False
+    ' oe.Finished = True
+    '
+    ' If Not True Then
+    '
+    '     oe.ForDeletion = True
+    '     oe.DrawAble = False
+    '
+    ' End If
 
-    If Not True Then
-
-        elem.ForDeletion = True
-        elem.DrawAble = False
-
-    End If
-    clsEntities.BackUpPosition(elem)
-    APPMain.hFCAD.arrEntities.Add(elem)
-    'elem.ClassHandler.buildPOI(elem)
-    elem.ClassHandler.Finish(elem, elem.StepsDone)
-
-    LastEntity = elem                                       ' save it to repeat on rigth click
-
-    modCAD.clsJobPrevious = Me
-    modCAD.clsJob = clsDefaultJob
-    clsDrawingAids.CleanTexts
-
-    ' sort them
-    'APPMain.hFCAD.arrEntities.Sort()
-    clsMouseTracking.ReBuildPOIPoints
-    clsEntities.GLGenDrawList
-
-    appmain.hFCAD.redraw
+    ' APPMain.hFCAD.arrEntities.Add(oe)
+    ' 'oe.ClassHandler.buildPOI(oe)
+    ' oe.ClassHandler.Finish(oe, oe.StepsDone)
+    '
+    ' LastEntity = oe                                       ' save it to repeat on rigth click
+    '
+    ' modCAD.clsJobPrevious = Me
+    ' modCAD.clsJob = clsDefaultJob
+    ' clsDrawingAids.CleanTexts
+    '
+    ' ' sort them
+    ' 'APPMain.hFCAD.arrEntities.Sort()
+    ' clsMouseTracking.ReBuildPOIPoints
+    ' clsEntities.GLGenDrawList
+    '
+    ' appmain.hFCAD.redraw
 
 End
 

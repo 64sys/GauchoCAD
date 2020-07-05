@@ -42,10 +42,51 @@ Public start As Float
 Public recorrido As Float
 Public angle As Float
 
+Public Sub Translate(e As Entity, dX As Float, dY As Float)
+
+    puntos.Translate(e.p, dx, dy)
+
+End
+
+Public Sub Rotate(e As Entity, radians As Float)
+
+    puntos.Rotate(e.p, radians)
+
+End
+
+Public Sub Scale(e As Entity, sX As Float, sY As Float)
+
+    Dim i As Integer
+
+    For i = 0 To e.p.max Step 2
+
+        e.P[i] = e.P[i] * sX
+
+        e.P[i + 1] = e.P[i + 1] * sY
+
+    Next
+
+    ' start/end
+    If sx < 0 Then
+        E.fParam[1] = 360 - E.fParam[1]
+        E.fParam[2] = 360 - E.fParam[2]
+        Swap e.fParam[1], e.fParam[2]
+        If E.fParam[2] < E.fParam[1] Then E.fParam[2] += 360
+
+    Endif
+
+    If sy < 0 Then
+        E.fParam[1] = 360 - E.fParam[1]
+        E.fParam[2] = 360 - E.fParam[2]
+        Swap e.fParam[1], e.fParam[2]
+        If E.fParam[2] < E.fParam[1] Then E.fParam[2] += 360
+    Endif
+
+End
+
 Public Sub Draw(oE As Entity)
 
     If Not oE.Visible Then Return
-    If oE.Selected And Not modCAD.ToolActive Then oE.ColorToPaint = modCAD.ColorForSelected Else oE.ColorToPaint = modCAD.GetGBColor(oE.colour, oE.Layerid)
 
     Dim major, minor, la As Float
 
@@ -70,38 +111,40 @@ Public Sub Draw(oE As Entity)
     Dim x, y, theta, angle_increment As Float
     Dim i As Integer
 
-    Me.start = oE.fParam[1] * Pi / 180
-    Me.recorrido = oE.fParam[2] * Pi / 180 - Me.start
-    If Me.recorrido < 0 Then Me.recorrido = 2 * Pi + Me.recorrido
+    ' If oe.fParam[3] > 0 Then
+    '
+    '     If oE.fParam[2] < oE.fParam[1] Then oE.fParam[2] = 360 + oE.fParam[2]              ' grados
+    '
+    ' Else
+    '
+    '     If oE.fParam[2] > oE.fParam[1] Then oE.fParam[2] = oE.fParam[2] - 360              ' grados
+    '
+    ' Endif
 
     oE.PolyLine.Clear
     GL.Begin(gl.LINE_STRIP)
 
-    angle_increment = Pi * 2 / 360
-    For theta = 0 To Me.recorrido Step angle_increment
+    angle_increment = Pi * 2 / 360 '* oe.fParam[3]
+
+    For theta = oE.fParam[1] / 180 * Pi To oE.fParam[2] / 180 * Pi Step angle_increment
         ' el punto considerando 0,0 al centro
-        x = major * Cos(Me.start + theta) * Cos(angle) - minor * Sin(Me.start + theta) * Sin(angle)
-        y = major * Cos(Me.start + theta) * Sin(angle) + minor * Sin(Me.start + theta) * Cos(angle)
+        x = major * Cos(theta) * Cos(angle) - minor * Sin(theta) * Sin(angle)
+        y = major * Cos(theta) * Sin(angle) + minor * Sin(theta) * Cos(angle)
         oE.PolyLine.Add(x + oE.p[0])
         oE.PolyLine.Add(y + oE.p[1])
 
-        'GLplus.Vertex2D(radio * Cos(start_angle + theta), radio * Sin(start_angle + theta), colour)
     Next
-
-    ' ' aplico las trnasformaciones
-    ' puntos.Scale(oE.PolyLine, 1, minor / major)
-    ' puntos.Rotate(oE.PolyLine, angle)
-    'puntos.Translate(oE.PolyLine, oE.p[0], oE.p[1])
-    'For i = 0 To oE.PolyLine.max Step 2
-    '    GLplus.Vertex2D(oE.PolyLine[i], oE.PolyLine[i + 1], oE.ColorToPaint)
-    'Next
 
     GL.End
     GLplus.PolyLines(oE.PolyLine, oE.ColorToPaint, oe.LineWidth, oe.LineType)
 
-    ' For i = 0 To oE.PolyLine.max Step 2
-    '     GLplus.Vertex2D(oE.PolyLine[i], oE.PolyLine[i + 1], oE.ColorToPaint)
-    ' Next
+End
+
+'' A fat version of the entity
+Public Sub DrawSelected(oE As Entity)
+
+    GLplus.PolyLines(oE.PolyLine, modCAD.WindowBackColor, oE.LineWidth, gcd.stiDashed)
+    GLplus.PolyLines(oE.PolyLine, modCAD.ColorForSelected, oE.LineWidth, oE.LineType)
 
 End
 
@@ -116,8 +159,6 @@ End
 Public Function Draw2(oE As Entity)
 
     If Not oE.Visible Then Return
-
-    If oE.Selected And Not modCAD.ToolActive Then oE.ColorToPaint = modCAD.ColorForSelected Else oE.ColorToPaint = modCAD.GetGBColor(oE.colour, oE.Layerid)
 
     Dim major, minor, la As Float
 
@@ -163,12 +204,14 @@ Public Sub Finish(oE As Entity, ParamsDone As Integer) As Boolean
     'CreatePolygon
 
     ' tareas finales de armado del objeto
-    oE.b.resize(oE.P.count)
+
     oE.psel.resize(oE.p.count / 2)
     oE.ForDeletion = False
     oE.DrawAble = True
     oE.Selected = False
     oE.Finished = True
+
+    If oE.fParam[2] < oE.fParam[1] Then oE.fParam[2] += 360
 
     If Not True Then
 

@@ -46,3 +46,15 @@ Public Const dimAngular3point As Integer = 5
 Public Const dimOrdinate As Integer = 6
 Public Const dimHorizontal As Integer = 7
 Public Const dimVertical As Integer = 8
+
+Public Sub Redraw()
+
+    appmain.hFCAD.redraw
+
+End
+
+Public Function Metros(l As Integer) As Float
+
+    Return APPMain.hFCAD.Metros(l)
+
+End

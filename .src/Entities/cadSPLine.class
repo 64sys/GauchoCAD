@@ -27,11 +27,35 @@ Public drawingPoints As New Float[]
 
 Public numDrawingPoints As Integer = 100
 
+Public Sub Translate(e As Entity, dX As Float, dY As Float)
+
+    puntos.Translate(e.p, dx, dy)
+
+End
+
+Public Sub Rotate(e As Entity, radians As Float)
+
+    puntos.Rotate(e.P, radians)
+
+End
+
+Public Sub Scale(e As Entity, sX As Float, sY As Float)
+
+    Dim i As Integer
+
+    For i = 0 To e.p.max Step 2
+
+        e.P[i] = e.P[i] * sX
+        e.P[i + 1] = e.P[i + 1] * sY
+
+    Next
+
+End
+
 Public Sub Draw(oE As Entity)
 
     If Not oE.Visible Then Return
 
-    If oE.Selected And Not modCAD.ToolActive Then oE.ColorToPaint = modCAD.ColorForSelected Else oE.ColorToPaint = modCAD.GetGBColor(oE.colour, oE.Layerid)
     drawingPoints.Clear
 
     'oe.P.Clear
@@ -42,13 +66,20 @@ Public Sub Draw(oE As Entity)
 
 End
 
+'' A fat version of the entity
+Public Sub DrawSelected(oE As Entity)
+
+    GLplus.PolyLines(oE.PolyLine, modCAD.WindowBackColor, oE.LineWidth, gcd.stiDashed)
+    GLplus.PolyLines(oE.PolyLine, modCAD.ColorForSelected, oE.LineWidth, oE.LineType)
+
+End
+
 Public Sub Draw2(oE As Entity)
 
     ' FIXME: requiere reparacion -> OpenGL
     Return
 
     If Not oE.Visible Then Return
-    If oE.Selected And Not modCAD.ToolActive Then oE.ColorToPaint = modCAD.ColorForSelected Else oE.ColorToPaint = modCAD.GetGBColor(oE.colour, oE.Layerid)
 
     Dim i As Integer
 
@@ -91,6 +122,8 @@ End
 
 Public Function BuildPOI(oE As Entity, Optional arrIndex As Integer = -1) As Integer
 
+    cadPLine.BuildPOI(oe)
+
 End
 
 ' This function will return False if the element couldn't be created for some reason: bad or incomple user input
@@ -104,7 +137,7 @@ Public Sub Finish(oE As Entity, ParamsDone As Integer) As Boolean
     ' busco el tipo de linea, si hace falta
     If oE.LineTypeName = "Dashed" Then oE.LineType = 1
     ' tareas finales de armado del objeto
-    oE.b.resize(oE.P.count)
+
     oE.psel.resize(oE.p.count / 2)
     oE.ForDeletion = False
     oE.DrawAble = True

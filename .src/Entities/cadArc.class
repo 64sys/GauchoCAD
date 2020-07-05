@@ -42,6 +42,56 @@ Public StepsDone As Integer                 ' esto lo cambia cls ElementBuilder 
 Public start As Float
 Public recorrido As Float
 
+Public Sub Translate(e As Entity, dX As Float, dY As Float)
+
+    puntos.Translate(e.p, dx, dy)
+
+End
+
+Public Sub Rotate(e As Entity, radians As Float)
+
+    puntos.Rotate(e.p, radians)
+
+    ' el parametro lo tengo que pasar a grados porque la rutina que dibuja el texto usa eso
+    E.fParam[1] += radians * 180 / Pi
+    E.fParam[2] += radians * 180 / Pi
+
+    ' If E.fParam[1] < 0 Then E.fParam[1] = 360 + E.fParam[1]
+    ' If E.fParam[2] < 0 Then E.fParam[2] = 360 + E.fParam[2]              ' grados
+
+End
+
+Public Sub Scale(e As Entity, sX As Float, sY As Float)
+
+    Dim i As Integer
+
+    E.fParam[0] *= Abs(sX)
+
+    For i = 0 To e.p.max Step 2
+
+        e.P[i] = e.P[i] * sX
+
+        e.P[i + 1] = e.P[i + 1] * sY
+
+    Next
+
+    ' start/end
+    If sx < 0 Then
+        E.fParam[1] = 180 - E.fParam[1]
+        E.fParam[2] = 180 - E.fParam[2]
+        e.fParam[3] *= -1
+    Endif
+
+    If sy < 0 Then
+        E.fParam[1] = 360 - E.fParam[1]
+        E.fParam[2] = 360 - E.fParam[2]
+        e.fParam[3] *= -1
+    Endif
+
+    'If e.fParam[1] > e.fParam[2] Then Swap e.fParam[1], e.fParam[2]
+
+End
+
 Public Sub Draw(oE As Entity)
 
     Dim x, y, theta, angle_increment As Float
@@ -50,8 +100,6 @@ Public Sub Draw(oE As Entity)
     Dim major, minor, angle, la As Float
 
     If Not oE.Visible Then Return
-
-    If oE.Selected And Not modCAD.ToolActive Then oE.ColorToPaint = modCAD.ColorForSelected Else oE.ColorToPaint = modCAD.GetGBColor(oE.colour, oE.Layerid)
 
     If oE.StepsDone = 1 Then
 
@@ -86,29 +134,41 @@ Public Sub Draw(oE As Entity)
 
         clsDrawingAids.Helper.texto = Format$(oE.fParam[1], ("0.0 deg")) & (" to ") & Format$(oE.fParam[2], ("0.0 deg"))
     Else
-        If oE.fParam[1] < 0 Then oE.fParam[1] = 360 + oE.fParam[1]
-        If oE.fParam[2] < 0 Then oE.fParam[2] = 360 + oE.fParam[2]              ' grados
-        Me.start = oE.fParam[1] / 180 * Pi                                      ' rad
-        Me.recorrido = (oE.fParam[2] - oE.fParam[1]) / 180 * Pi                 ' rad
-        If Me.recorrido < 0 Then
+        ' If oE.fParam[1] < 0 Then oE.fParam[1] = 360 + oE.fParam[1]
+        'If oE.fParam[2] < oE.fParam[1] Then oE.fParam[2] = 360 + oE.fParam[2]              ' grados
+        'If oE.fParam[2] < 0 Then oE.fParam[1] = 360 + oE.fParam[1]
 
-            Me.recorrido += 2 * Pi
+        If oe.fParam[3] > 0 Then
+
+            If oE.fParam[2] < oE.fParam[1] Then oE.fParam[2] = 360 + oE.fParam[2]              ' grados
+
+        Else
+
+            If oE.fParam[2] > oE.fParam[1] Then oE.fParam[2] = oE.fParam[2] - 360              ' grados
 
         Endif
 
         oE.polyline.Clear
         GL.Begin(gl.LINE_STRIP)
-        angle_increment = Pi * 2 / 360
-        For theta = 0 To Me.recorrido Step angle_increment
+        angle_increment = Pi * 2 / 360 * oe.fParam[3]
+        'If Me.recorrido < 0 Then angle_increment *= -1
+        For theta = oE.fParam[1] / 180 * Pi To oE.fParam[2] / 180 * Pi Step angle_increment
             ' el punto considerando 0,0 al centro
-            x = oE.p[0] + oE.fParam[0] * Cos(Me.start + theta)
-            y = oE.p[1] + oE.fParam[0] * Sin(Me.start + theta)
+            x = oE.p[0] + oE.fParam[0] * Cos(theta)
+            y = oE.p[1] + oE.fParam[0] * Sin(theta)
             oE.polyline.Add(x)
             oE.polyline.Add(y)
             GLplus.Vertex2D(x, y, oE.ColorToPaint)
         Next
         gl.End
     End If
+
+End
+
+Public Sub DrawSelected(oE As Entity)
+
+    GLplus.PolyLines(oE.PolyLine, modCAD.WindowBackColor, oE.LineWidth, gcd.stiDashed)
+    GLplus.PolyLines(oE.PolyLine, modCAD.ColorForSelected, oE.LineWidth, oE.LineType)
 
 End
 
@@ -123,8 +183,6 @@ End
 Public Function Draw2(oE As Entity)
 
     If Not oE.Visible Then Return
-
-    If oE.Selected And Not modCAD.ToolActive Then oE.ColorToPaint = modCAD.ColorForSelected Else oE.ColorToPaint = modCAD.GetGBColor(oE.colour, oE.Layerid)
 
     paint.LineWidth = oE.LineWidth / appmain.hFcad.ScaleZoom / modCAD.ScaleLines
 
@@ -143,12 +201,13 @@ Public Sub Finish(oE As Entity, ParamsDone As Integer) As Boolean
     ' calculo el recorrido del arco como
 
     ' tareas finales de armado del objeto
-    oE.b.resize(oE.P.count)
+
     oE.psel.resize(oE.p.count / 2)
     oE.ForDeletion = False
     oE.DrawAble = True
     oE.Selected = False
     oE.Finished = True
+    oe.fParam.Add(1) ' sentido de giro
 
     If Not True Then
 

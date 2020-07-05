@@ -90,7 +90,6 @@ Public Sub Finish(ParamsDone As Integer) As Boolean
     Me.DrawAble = True
     Me.Selected = False
     Me.Finished = True
-    Me.B.Resize(Me.P.Count)
 
     If puntos.distancia(Me.p[0], Me.p[1], Me.p[2], Me.p[3]) = 0 Then ' this is too little
 

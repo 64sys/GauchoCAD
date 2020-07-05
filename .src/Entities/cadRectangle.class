@@ -45,8 +45,6 @@ Public Sub Draw(oE As Entity)
 
     If Not oE.Visible Then Return
 
-    If oE.Selected And Not modCAD.ToolActive Then oE.ColorToPaint = modCAD.ColorForSelected Else oE.ColorToPaint = modCAD.GetGBColor(oE.colour, oE.Layerid)
-
     GLplus.Rectangle2D(oE.p[0], oE.p[1], oE.p[2] - oE.p[0], oE.p[3] - oE.p[1],,,,, oE.ColorToPaint, oe.LineWidth, oe.LineType, 2)
 
     ' test
@@ -77,7 +75,7 @@ Public Sub Finish(oE As Entity, ParamsDone As Integer) As Boolean
     ' busco el tipo de linea, si hace falta
     If oE.LineTypeName = "Dashed" Then oE.LineType = 1
     ' tareas finales de armado del objeto
-    oE.b.resize(oE.P.count)
+
     oE.psel.resize(oE.p.count / 2)
     oE.ForDeletion = False
     oE.DrawAble = True

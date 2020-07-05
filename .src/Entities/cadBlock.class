@@ -40,6 +40,18 @@ Public Visible As Boolean = True            ' si esta entidad puede ser mostrada
 Public Finished As Boolean = False          ' colocar en true cuando se llegue a completar
 Public StepsDone As Integer                 ' esto lo cambia cls ElementBuilder durante la construccion
 
+Public Sub Translate(e As Entity, dX As Float, dY As Float)
+
+End
+
+Public Sub Rotate(e As Entity, radians As Float)
+
+End
+
+Public Sub Scale(e As Entity, sX As Float, sY As Float)
+
+End
+
 Public Sub Draw(oE As Entity)
 
     If oE.fParam.Count > 0 Then Return
@@ -63,6 +75,11 @@ Public Sub Draw(oE As Entity)
 End
 
 '' A fat version of the entity
+Public Sub DrawSelected(oE As Entity)
+
+End
+
+'' A fat version of the entity
 Public Sub DrawRemark(oE As Entity)
 
 End
@@ -82,7 +99,6 @@ Public Sub Finish(oE As Entity, ParamsDone As Integer) As Boolean
     iBlock = clsEntities.GetFreeBlockNumber()
     oE.fParam.add(iBlock)
     oE.Finished = True
-    oE.B.Resize(oE.P.Count)
 
     For Each e In APPMain.hFCAD.arrEntities
         If e.Selected Then                      ' parto of this
