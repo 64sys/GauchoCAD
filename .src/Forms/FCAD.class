@@ -113,26 +113,26 @@ Public Sub Form_Open()
 
 End
 
-Public Sub form_Close()
+Public Sub Form_Close()
 
     FInspector.Close
 
 End
 
-Public Sub form_Resize()
+Public Sub Form_Resize()
 
     Debug "resize " & Me.Title
     GLplus.Init(glarea1)
 
 End
 
-Public Sub form_Arrange()
+Public Sub Form_Arrange()
 
     Debug "arrange " & Me.Title
 
 End
 
-Public Sub form_Activate()
+Public Sub Form_Activate()
 
     Debug "activate " & Me.Title
     If FirstTime Then           ' esto ocurre cuando me llega un archivo cargado que tengo que mostrar por primera vez
@@ -144,6 +144,7 @@ Public Sub form_Activate()
         cadZoomE.Start()        ' puede mostrar hasta tener una GLArea conformada y a la vista
         FirstTime = False
         DrawingReady = True
+        GLplus.Init(glarea1)    ' Esto corrige el que no se van lo que se dibuja
     Endif
     If cImport.Count > 0 Then
 

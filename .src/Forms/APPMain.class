@@ -780,9 +780,9 @@ Public Sub Form_Open()
     Me.x = Screens[x].AvailableX
     Me.y = Screens[x].AvailableY
 
-    Me.Maximized = True
-
     gTask("new")
+
+    Me.Maximized = True
 
 End
 
@@ -1152,6 +1152,7 @@ Public Sub Workspace1_Activate()
 
         Print aWin.Tag
         CurrentFile = aWin.Tag
+
     Endif
 
 End
