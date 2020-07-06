@@ -99,6 +99,7 @@ Public Sub Main()
     'WindowBackColor = &1B2224
 
     Select Starter.flgWindowBackColor
+
         Case Color.Black
             'Case &1B2224
             Starter.flgWhiteAndBlack = Color.White

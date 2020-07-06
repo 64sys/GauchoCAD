@@ -12,7 +12,7 @@
 Public Sub Main()
 
     'Starter.Run()
-    Starter.Run() ''Lo pongo primero para que esten disponible slas variables
+    Starter.Run() ''Lo pongo primero para que esten disponibles las variables
 
     modCAD.Main
 

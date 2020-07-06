@@ -122,14 +122,19 @@ Public Sub XmlConfSave(sFile As String, ctn As Collection)
             If element.Name = "Variable" Then
                 If element.Attributes["Name"] = ctn.Key Then
                     If element.Attributes["Value"] <> var["Value"] Then
-                        Select TypeOf(var["Value"])
-                            Case gb.Boolean
+                        'Select TypeOf(var["Value"])
+                        Select var["Data"]
+                            Case "Boolean"
+                                'Case gb.Boolean
                                 Select var["Value"]
-                                    Case True
+                                    Case True, -1, "True", "TRUE", "true"
                                         element.Attributes["Value"] = "True"
-                                    Case False
+                                    Case Else
                                         element.Attributes["Value"] = "False"
                                 End Select
+                                'Case gb.String
+                            Case "String"
+                                element.Attributes["Value"] = var["Value"]
                             Case Else
                                 element.Attributes["Value"] = var["Value"]
                         End Select

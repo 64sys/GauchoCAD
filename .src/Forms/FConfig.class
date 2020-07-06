@@ -408,23 +408,30 @@ Public Sub xdata_click()
 
     obj = Last
 
-    If InStr(obj.Name, "fio") > 0 Then
-        tdr = File.Dir(obj.Text)
-        If Exist(tdr) Then
-            sfx = dsk.FileChooser(tdr, ["theme"])
-        Else
-            sfx = dsk.FileChooser(, ["theme"])
-        Endif
+    If ctn.Exist(obj.Tag) Then
+        Select Object.Type(obj)
+            Case "CheckBox"
+                ctn[obj.Tag]["Value"] = obj.Value
+            Case Else
+                If InStr(obj.Name, "fio") > 0 Then
+                    tdr = File.Dir(obj.Text)
+                    If Exist(tdr) Then
+                        sfx = dsk.FileChooser(tdr, ["theme"])
+                    Else
+                        sfx = dsk.FileChooser(, ["theme"])
+                    Endif
 
-        If sfx.count > 0 Then
-            s = sfx[0]
-            If Exist(s) Then
-                If Stat(s).Type = gb.File Then
-                    obj.Text = s
-                    'ctn[obj.Tag]["Value"] = s
+                    If sfx.count > 0 Then
+                        s = sfx[0]
+                        If Exist(s) Then
+                            If Stat(s).Type = gb.File Then
+                                obj.Text = s
+                                'ctn[obj.Tag]["Value"] = s
+                            Endif
+                        Endif
+                    Endif
                 Endif
-            Endif
-        Endif
+        End Select
     Endif
 
 End
@@ -442,6 +449,8 @@ Public Sub xdata_Change()
             Case "TextBox", "ComboBox", "MaskBox", "ButtonBox"
                 ctn[obj.Tag]["Value"] = obj.Text
             Case "ValueBox", "CheckBox", "DirBox"
+                ctn[obj.Tag]["Value"] = obj.Value
+            Case Else
                 ctn[obj.Tag]["Value"] = obj.Value
         End Select
     Endif

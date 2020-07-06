@@ -169,38 +169,40 @@ End
 
 Private Sub SetEnvironmentVars()
 
-    'Dim WindowMode As Integer
+    ' '' Vars for form interface
+    ' Select xmg.GetVar("Application.window-background-color", apc)
+    '         ''DEPRECATED: Cambiar en la proxima version de gambas para usar la propiedad .DarkTheme
+    '
+    '     Case "Light"
+    '         flgWindowBackColor = Color.White
+    '         flgWindowInfoColor = &HFFFF00
+    '         flgWindowTextColor = Color.Blue
+    '         flgWindowCursorColor = Color.Black
+    '     Case Else
+    '         flgWindowBackColor = Color.Black
+    '         flgWindowInfoColor = &HA0A000
+    '         flgWindowTextColor = Color.Yellow
+    '         flgWindowCursorColor = Color.White
+    ' End Select
 
-    Select xmg.GetVar("Application.window-background", apc)
-        Case "Light"
+    ''Vars for OpenGL window
+    Select xmg.GetVar("CAD.Background-Dark", apc)
+
+        Case True
             flgWindowBackColor = Color.White
             flgWindowInfoColor = &HFFFF00
             flgWindowTextColor = Color.Blue
             flgWindowCursorColor = Color.Black
             flgWhiteAndBlack = Color.Black
+
         Case Else
-            'WindowBackColor = &1B2224
             flgWindowBackColor = Color.Black
             flgWindowInfoColor = &HA0A000
-            'WindowTextColor = &C09209
-            'WindowCursorColor = &5F5FBF
             flgWindowTextColor = Color.Yellow
             flgWindowCursorColor = Color.White
             flgWhiteAndBlack = Color.White
 
     End Select
-
-    ' Select xmg.GetVar("CAD.GraphMode", CADConfig)
-    '     Case "1"
-    '         WindowMode = 1
-    '
-    '     Case "2"
-    '         WindowMode = 2
-    '
-    '     Case Else
-    '         WindowMode = 1
-    '
-    ' End Select
 
 End
 

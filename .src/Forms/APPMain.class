@@ -300,8 +300,6 @@ Public Sub AddLtypesPics()
     Dim dash As Float[]
     Dim img As Image
 
-    'lty = Starter.cLtypes
-
     For Each lt In Starter.cLtypes
 
         dash = lt[0]
@@ -318,11 +316,15 @@ Public Sub AddLtypesPics()
 
         End Select
 
-        Select Starter.flgWhiteAndBlack
-            Case 0
+        Select xmg.GetVar("Application.window-background-color", apc)
+            Case "Light"
                 Paint.Brush = Paint.Color(Color.Black)
-            Case Else
+
+            Case "Dark"
                 Paint.Brush = Paint.Color(Color.White)
+
+            Case Else
+                Paint.Brush = Paint.Color(Color.Orange)
         End Select
 
         Paint.LineWidth = 1
@@ -369,77 +371,6 @@ Public Sub AddColorsPics()
     Next
 
 End
-
-' Public Sub LoadLtypes()
-'
-'     Dim hMenu As Menu
-'     Dim mui As Menu
-'     Dim cCol As Collection
-'     Dim ix As Variant[]
-'     Dim isvg As String
-'     Dim img As Image
-'     Dim lty As New Collection
-'     Dim dash As Variant
-'     Dim lt As Integer
-'     Dim ctr As Menu
-'
-'     lty.Add([1], "Continous", "0") '1
-'     lty.Add([12, 2, 2, 2], "Center", "1") '1
-'     lty.Add([8, 4, 1, 4], "Dashdot", "2") '2
-'     lty.Add([8, 4], "Dashed", "3") '3
-'     lty.Add([4, 2, 1, 2, 1, 2], "Divide", "4") '4
-'     lty.Add([1, 2], "Dot", "5") '6
-'     lty.Add([4, 2], "Hidden", "6") '7
-'     lty.Add([2, 1], "Hidden2", "7") '8
-'     lty.Add([10, 2, 2, 2, 2, 2], "Phantom", "8") '9
-'     lty.Add([1], "ByBLock", "9") '1
-'     lty.Add([1], "ByLayer", "10") '1
-'
-'     mubLtypes.Menu = "Ltx"
-'
-'     ' Relleno el Menu del MenuButton
-'     hMenu = New Menu(Me) As "Ltx"
-'
-'     For Each dash In lty
-'
-'         mui = New Menu(hMenu) As "Ltx"
-'         img = New Image(128, 8, Color.White)
-'
-'         Paint.Begin(img)
-'         Paint.Dash = dash
-'
-'         Paint.NewPath
-'         Paint.Brush = Paint.Color(Color.Black)
-'         Paint.LineWidth = 1
-'         Paint.MoveTo(0, 4)
-'         Paint.LineTo(128, 4)
-'         Paint.Stroke
-'         Paint.End
-'
-'         mui.Picture = img.Stretch(218, 8).Picture
-'         mui.Text = lty.Key
-'         mui.Tag = lt
-'
-'         Inc lt
-'     Next
-'
-' End
-
-' Public Sub Ltx_Click()
-'
-'     Dim obj As Object
-'
-'     obj = Last
-'
-'     CurrentLineType = obj.Tag
-'     mubLtypes.Picture = obj.Picture
-'     mubLtypes.Text = obj.Text
-'     mubLtypes.Tooltip = obj.Text
-'
-'     txaDebug.Pos = 0
-'     txaDebug.Insert(obj.Text & " is the current linetype\n")
-'
-' End
 
 Public Sub LoadLocks()
 
