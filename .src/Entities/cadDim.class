@@ -180,7 +180,7 @@ Public Function Start(Optional Mode As Integer = -1)
 
 End
 
-Public Sub Translate(e As Entity, dX As Float, dY As Float)
+Public Sub Translate(e As Entity, dX As Float, dY As Float, Optional OnlySelected As Boolean = False)
 
 End
 

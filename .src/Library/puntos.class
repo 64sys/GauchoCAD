@@ -529,6 +529,7 @@ Public Function IsPoligonCrossingRect(poligon As Float[], x0 As Float, y0 As Flo
 
     Dim i As Integer
 
+    If poligon.Count = 0 Then Return False
     If IsPoligonCrossingLine(poligon, x0, y0, x1, y0, StartIndex, TotalElements) Then Return True
     If IsPoligonCrossingLine(poligon, x0, y1, x1, y1, StartIndex, TotalElements) Then Return True
     If IsPoligonCrossingLine(poligon, x0, y0, x0, y1, StartIndex, TotalElements) Then Return True

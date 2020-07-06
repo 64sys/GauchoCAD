@@ -42,9 +42,29 @@ Public StepsDone As Integer                 ' esto lo cambia cls ElementBuilder 
 Public start As Float
 Public recorrido As Float
 
-Public Sub Translate(e As Entity, dX As Float, dY As Float)
+Public Sub Stretch(e As Entity, dX As Float, dY As Float)
 
-    puntos.Translate(e.p, dx, dy)
+End
+
+Public Sub Translate(e As Entity, dX As Float, dY As Float, Optional OnlySelected As Boolean = False)
+
+    Dim i As Integer
+
+    If OnlySelected Then
+
+        For i = 0 To e.Psel.Max
+            If e.Psel[i] Then
+
+                e.P[i * 2] += dx
+                e.P[i * 2 + 1] += dy
+
+            Endif
+        Next
+
+    Else
+
+        puntos.Translate(e.p, dx, dy)
+    Endif
 
 End
 

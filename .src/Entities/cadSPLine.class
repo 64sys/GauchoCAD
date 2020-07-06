@@ -27,9 +27,25 @@ Public drawingPoints As New Float[]
 
 Public numDrawingPoints As Integer = 100
 
-Public Sub Translate(e As Entity, dX As Float, dY As Float)
+Public Sub Translate(e As Entity, dX As Float, dY As Float, Optional OnlySelected As Boolean = False)
 
-    puntos.Translate(e.p, dx, dy)
+    Dim i As Integer
+
+    If OnlySelected Then
+
+        For i = 0 To e.Psel.Max
+            If e.Psel[i] Then
+
+                e.P[i * 2] += dx
+                e.P[i * 2 + 1] += dy
+
+            Endif
+        Next
+
+    Else
+
+        puntos.Translate(e.p, dx, dy)
+    Endif
 
 End
 

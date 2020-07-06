@@ -25,6 +25,12 @@ Inherits ToolsBase
 Create Static
 Public Const Gender As String = "Stretch"
 
+Public dX As Float
+Public dY As Float
+
+' En esta tool no podemos usar OpenGL para acelerar, pero si podemos generar una lista ocn las entidades que solo se moveran, y dejar solo las que estan parcialmente seleccionadas para
+' estirarlas y dibujarlas individualemnte. Dificilmente haya muchas entidades a estirar.
+
 Public Function Start(Optional ElemToBuild As Variant, Optional _Mode As Integer = 0) As Boolean
     ' Llamada por FCAD al inicio de la aplicacion de esta herramienta
 
@@ -68,7 +74,8 @@ Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' called by FCAD->
         ' punto real base
         Me.SelStartXr = puntos.Near(appmain.hFcad.Xreal(mousex))
         Me.SelStartYr = puntos.Near(appmain.hFcad.Yreal(mouseY))
-
+        dX = Me.SelStartXr
+        dY = Me.SelStartYr
         ' prevenir acciones tontas como hacer click en otro elemento antes de terminar con el actual
         ' TODO: reparar -> appmain.hFCAD.DesHabilitarBotones
     Else If Me.PointsDone = 2 Then ' acabo de marcar el punto destino
@@ -108,10 +115,31 @@ Public Function MouseMove(mouseX As Integer, mouseY As Integer) ' called by FCAD
 
         End If
 
-        clsEntities.MoveFromBackUp(Me.SelEndXr - Me.SelStartXr, Me.SelEndyr - Me.SelStartYr, True, True)
+        clsEntities.Move(Me.SelEndXr - dX, Me.SelEndyr - dY, True, True)
+        dX = Me.SelEndXr
+        dY = Me.SelEndYr
 
     End If
     appmain.hFCAD.redraw
+
+End
+
+Public Sub Draw()               ' called by appmain.hFCAD.drwArea_Draw
+
+    Dim i As Integer
+
+    For i = 0 To appmain.hFCAD.arrSelecIndex.Max
+
+        appmain.hFCAD.arrEntities[appmain.hFCAD.arrSelecIndex[i]].ClassHandler.Draw(appmain.hFCAD.arrEntities[appmain.hFCAD.arrSelecIndex[i]])
+
+    Next
+
+    gl.PushMatrix
+    gl.Translatef(Me.glTranslate[0], Me.glTranslate[1], Me.glTranslate[2])
+    gl.Rotatef(Me.glAngle, Me.glRotate[0], Me.glRotate[1], Me.glRotate[2])
+    gl.Scalef(Me.glScale[0], Me.glScale[1], Me.glScale[2])
+    gl.CallList(appmain.hFCAD.GlListSelectedEntities)                      ' si GL no tiene contexto, la lista no se genera. Es necesario que la instancia de FCAD este cargada.
+    gl.PopMatrix
 
 End
 
@@ -122,7 +150,7 @@ Public Sub Finish()
         ' job finished correctly
 
         ' and now we move
-        clsEntities.Move(Me.SelEndXr - Me.SelStartXr, Me.SelEndyr - Me.SelStartYr, True, True)
+        'clsEntities.Move(Me.SelEndXr - Me.SelStartXr, Me.SelEndyr - Me.SelStartYr, True, True)
 
         clsEntities.Finish
 

@@ -41,40 +41,6 @@ Public Visible As Boolean = True            ' si esta entidad puede ser mostrada
 Public Finished As Boolean = False          ' colocar en true cuando se llegue a completar
 Public StepsDone As Integer                 ' esto lo cambia cls ElementBuilder durante la construccion
 
-' Public Sub Translate(e As Entity, dX As Float, dY As Float)
-'
-'     puntos.Translate(e.p, dx, dy)
-'     puntos.Translate(e.Polygon, dx, dy)
-'
-' End
-'
-' Public Sub Rotate(e As Entity, radians As Float)
-'
-'     puntos.Rotate(e.P, radians)
-'     puntos.Rotate(e.Polygon, radians)
-'
-' End
-'
-' Public Sub Scale(e As Entity, sX As Float, sY As Float)
-'
-'     Dim i As Integer
-'
-'     For i = 0 To e.Polygon.max Step 2
-'
-'         e.Polygon[i] = e.Polygon[i] * sX
-'         e.Polygon[i + 1] = e.Polygon[i + 1] * sY
-'
-'     Next
-'
-'     For i = 0 To e.p.max Step 2
-'
-'         e.P[i] = e.P[i] * sX
-'         e.P[i + 1] = e.P[i + 1] * sY
-'
-'     Next
-'
-' End
-
 Public Sub Draw(oE As Entity)
 
     If Not oE.Visible Then Return
@@ -82,7 +48,7 @@ Public Sub Draw(oE As Entity)
     Dim angle, xangle, x, y, z, r As Float
     Dim i As Integer
 
-    If oe.fParam[0] = 0 Then Return
+    If oe.fParam[0] < 3 Then Return
     r = oe.fParam[1]
     xangle = 3.1415927 / oe.fParam[0]
     oe.Polygon.Clear
