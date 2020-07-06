@@ -480,6 +480,7 @@ Public Sub config_Click()
                     '    EditData(XControl)
                     '  Endif
                     'Next
+
                     xmg.XmlConfSave(apc, ctn)
 
                     ctw.Clear

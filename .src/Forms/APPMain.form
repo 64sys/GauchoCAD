@@ -352,32 +352,33 @@
         MoveScaled(41,0,15,5)
       }
       { mubColors MenuButton
-        MoveScaled(57,0,15,5)
+        MoveScaled(59,0,6,5)
+        Visible = False
         Arrow = False
         MenuOnly = True
       }
       { cboLayers ComboBox dprop
         Name = "cboLayers"
-        MoveScaled(62,0,15,5)
+        MoveScaled(68,0,15,5)
         Tag = "layer"
         ToolTip = ("Layers")
         ReadOnly = True
       }
       { tobLayers ToolButton
-        MoveScaled(78,0,5,5)
+        MoveScaled(84,0,5,5)
         Picture = Picture["svg/layers/layers.svg"]
         Border = True
       }
       { cboWidths ComboBox dprop
         Name = "cboWidths"
-        MoveScaled(84,0,14,5)
+        MoveScaled(90,0,14,5)
         Tag = "weight"
         ToolTip = ("Line widths")
         ReadOnly = True
       }
       { cboDimSts ComboBox dprop
         Name = "cboDimSts"
-        MoveScaled(99,0,14,5)
+        MoveScaled(105,0,14,5)
         Tag = "style"
         ToolTip = ("Dimmension styles")
         ReadOnly = True
