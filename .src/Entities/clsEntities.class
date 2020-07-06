@@ -139,63 +139,53 @@ Public Sub FillEntity(o As Entity)
 
 End
 
-' '' Borra la lista anterior y genera una nueva
-'
-' Public Sub GLGenDrawList()
-'
-'     Dim idDrawing As Integer ' la instancia de dibujo en la que estamos
-'     Dim i As Integer
-'
-'     ' si esxite esta lista, la borro
-'     If Not gl.islist(APPMain.hFCAD.GlListAllEntities) Then APPMain.hFCAD.GlListAllEntities = gl.GenLists(1)
-'     modCAD.drwDrawingClass = modCAD.drwOpenGLClass
-'     gl.NewList(APPMain.hFCAD.GlListAllEntities, gl.COMPILE)
-'
-'     For i = 0 To APPMain.hFCAD.arrEntities.Max
-'
-'         APPMain.hFCAD.arrEntities[i].ClassHandler.Draw(APPMain.hFCAD.arrEntities[i])
-'
-'     Next
-'
-'     gl.EndList
-'
-' End
 '' Genera las listas GL de cada entidad individual, y la version seleccionada
 '' Borra la lista anterior y genera una nueva
-Public Sub glGenDrawList()
+Public Sub glGenDrawList(Optional iEntity As Integer = -1)
 
     Dim idDrawing As Integer ' la instancia de dibujo en la que estamos
     Dim i As Integer
 
-    ' si esxite esta lista, la borro
-    If Not gl.islist(APPMain.hFCAD.GlListAllEntities) Then APPMain.hFCAD.GlListAllEntities = gl.GenLists(1)
-    Dim t As Float = Timer
-    ' listas de entidades
-    For i = 0 To APPMain.hFCAD.arrEntities.Max
+    If iEntity >= 0 Then
 
-        If Not gl.islist(APPMain.hFCAD.arrEntities[i].glDrwList) Then APPMain.hFCAD.arrEntities[i].glDrwList = gl.GenLists(1)
-        gl.NewList(APPMain.hFCAD.arrEntities[i].glDrwList, gl.COMPILE)
-        APPMain.hFCAD.arrEntities[i].ClassHandler.Draw(APPMain.hFCAD.arrEntities[i])
+        If Not gl.islist(APPMain.hFCAD.arrEntities[iEntity].glDrwList) Then APPMain.hFCAD.arrEntities[iEntity].glDrwList = gl.GenLists(1)
+        gl.NewList(APPMain.hFCAD.arrEntities[iEntity].glDrwList, gl.COMPILE)
+        APPMain.hFCAD.arrEntities[iEntity].ClassHandler.Draw(APPMain.hFCAD.arrEntities[iEntity])
         gl.EndList
 
-    Next
-    Debug "GLlista de entidades generada en  ", Timer - t
-    ' lista de entidaes seleccionadas
-    For i = 0 To APPMain.hFCAD.arrEntities.Max
-        If Not gl.islist(APPMain.hFCAD.arrEntities[i].glDrwListSel) Then APPMain.hFCAD.arrEntities[i].glDrwListSel = gl.GenLists(1)
-        gl.NewList(APPMain.hFCAD.arrEntities[i].glDrwListSel, gl.COMPILE)
-
-        APPMain.hFCAD.arrEntities[i].ClassHandler.DrawSelected(APPMain.hFCAD.arrEntities[i])
-        'Me.DrawPoiSymbols(APPMain.hFCAD.arrEntities[i])
-
+        If Not gl.islist(APPMain.hFCAD.arrEntities[iEntity].glDrwListSel) Then APPMain.hFCAD.arrEntities[iEntity].glDrwListSel = gl.GenLists(1)
+        gl.NewList(APPMain.hFCAD.arrEntities[iEntity].glDrwListSel, gl.COMPILE)
+        APPMain.hFCAD.arrEntities[iEntity].ClassHandler.DrawSelected(APPMain.hFCAD.arrEntities[iEntity])
         gl.EndList
-    Next
 
-    ' lista de todas las entidades
-    t = Timer
-    GLGenDrawListAll
+    Else
+        ' si esxite esta lista, la borro
+        If Not gl.islist(APPMain.hFCAD.GlListAllEntities) Then APPMain.hFCAD.GlListAllEntities = gl.GenLists(1)
+        Dim t As Float = Timer
+        ' listas de entidades
+        For i = 0 To APPMain.hFCAD.arrEntities.Max
 
-    Debug "GLlista de todas generada en  ", Timer - t
+            If Not gl.islist(APPMain.hFCAD.arrEntities[i].glDrwList) Then APPMain.hFCAD.arrEntities[i].glDrwList = gl.GenLists(1)
+            gl.NewList(APPMain.hFCAD.arrEntities[i].glDrwList, gl.COMPILE)
+            APPMain.hFCAD.arrEntities[i].ClassHandler.Draw(APPMain.hFCAD.arrEntities[i])
+            gl.EndList
+
+        Next
+        Debug "GLlista de entidades generada en  ", Timer - t
+        ' lista de entidaes seleccionadas
+        For i = 0 To APPMain.hFCAD.arrEntities.Max
+            If Not gl.islist(APPMain.hFCAD.arrEntities[i].glDrwListSel) Then APPMain.hFCAD.arrEntities[i].glDrwListSel = gl.GenLists(1)
+            gl.NewList(APPMain.hFCAD.arrEntities[i].glDrwListSel, gl.COMPILE)
+            APPMain.hFCAD.arrEntities[i].ClassHandler.DrawSelected(APPMain.hFCAD.arrEntities[i])
+            gl.EndList
+        Next
+
+        ' lista de todas las entidades
+        t = Timer
+        GLGenDrawListAll
+
+        Debug "GLlista de todas generada en  ", Timer - t
+    End If
 
 End
 

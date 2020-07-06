@@ -27,6 +27,12 @@ Inherits ToolsBase
 Create Static
 Public Const Gender As String = "Default"
 
+Public EntityForEdit As Entity
+Public iEntityForEdit As Integer
+Public GripPoint As Integer = -1
+Public dX As Float
+Public dY As Float
+
 Public Function Start(Optional ElemToBuild As Variant, Optional _Mode As Integer = 0) As Boolean
     ' Modes:
     '       0 = Move, all points in the element must be selected, or click on it.
@@ -39,12 +45,51 @@ End
 
 Public Function MouseDown(mouseX As Integer, mouseY As Integer) ' esta rutina es llamada por FCAD en el evento DrawingArea_MouseDown
 
+    Dim i As Integer
+
+    GripPoint = -1
+    Me.SelStartX = mouseX
+    Me.SelStartY = mouseY
+    Me.SelStartXr = appmain.hFcad.Xreal(Me.SelStartX)
+    Me.SelStartYr = appmain.hFcad.Yreal(Me.SelStartY)
+
+    dX = Me.SelStartXr
+    dY = Me.SelStartYr
+
+    Me.SelEndX = Me.SelStartX
+    Me.SelEndy = Me.SelStartY
+
+    Me.SelEndXr = Me.SelStartXr
+    Me.SelEndyr = Me.SelStartYr
+
+    Me.PoiChecking = False
     If Mouse.Left Then
 
         If appmain.hFcad.iEntity[3] >= 0 Then                         ' 1.1.2 el mouse no esta enganchado, pero esta arriba de una entidad
 
             If appmain.hFcad.arrEntities[appmain.hFcad.iEntity[3]].selected Then
-                clsEntities.deSelectElem(appmain.hFcad.iEntity[3])               '   -> la deselecciono
+
+                ' veo si esta en un blip
+                For i = 0 To appmain.hFcad.arrEntities[appmain.hFcad.iEntity[3]].PoiType.Max
+                    If puntos.Around(Me.SelStartXr, Me.SelStartYr, appmain.hFcad.arrEntities[appmain.hFcad.iEntity[3]].PoiPoints[i * 2], appmain.hFcad.arrEntities[appmain.hFcad.iEntity[3]].PoiPoints[i * 2 + 1], appmain.hFCAD.Metros(8)) Then
+
+                        ' estoy editando la entidad desde un blip
+                        EntityForEdit = appmain.hFcad.arrEntities[appmain.hFcad.iEntity[3]]
+                        GripPoint = i
+                        iEntityForEdit = appmain.hFcad.iEntity[3]
+                        ' chequeo
+                        If EntityForEdit.PoiType[GripPoint] = gcd.poiQuadrant Then
+                            dx = EntityForEdit.P[0]
+                            dY = EntityForEdit.P[1]
+
+                        Endif
+
+                        Break
+
+                    Endif
+                Next
+
+                If GripPoint < 0 Then clsEntities.deSelectElem(appmain.hFcad.iEntity[3])               '   -> la deselecciono
             Else
                 clsEntities.SelectElem(appmain.hFcad.iEntity[3])                 '   -> la selecciono
             Endif
@@ -53,18 +98,6 @@ Public Function MouseDown(mouseX As Integer, mouseY As Integer) ' esta rutina es
 
         Else
 
-            Me.SelStartX = mouseX
-            Me.SelStartY = mouseY
-            Me.SelStartXr = appmain.hFcad.Xreal(Me.SelStartX)
-            Me.SelStartYr = appmain.hFcad.Yreal(Me.SelStartY)
-
-            Me.SelEndX = Me.SelStartX
-            Me.SelEndy = Me.SelStartY
-
-            Me.SelEndXr = Me.SelStartXr
-            Me.SelEndyr = Me.SelStartYr
-
-            Me.PoiChecking = False
             Me.Active = True
         End If
     End If
@@ -113,8 +146,12 @@ Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' esta rutina es l
 
         clsDrawingAids.HelperTrabajo = ("Selected ") & Str$(Me.selectionCount) & (" elements")
 
-    Else
-        ' fue un point selection
+    Else If GripPoint >= 0 Then
+
+        EntityForEdit.ClassHandler.buildpoi(EntityForEdit)
+        GripPoint = -1
+        clsEntities.glGenDrawList(iEntityForEdit)
+        'Me.Finish()
 
     End If
 
@@ -122,14 +159,44 @@ End
 
 Public Function MouseMove(mouseX As Integer, mouseY As Integer) ' esta rutina es llamada por FCAD en el evento DrawingArea_MouseMove
 
+    Me.SelEndX = mouseX
+    Me.SelEndy = mouseY
+    Me.SelEndXr = appmain.hFcad.Xreal(Me.SelEndX)
+    Me.SelEndyr = appmain.hFcad.Yreal(Me.SelEndy)
+
     If Me.Active Then
-        Me.SelEndX = mouseX
-        Me.SelEndy = mouseY
-        Me.SelEndXr = appmain.hFcad.Xreal(Me.SelEndX)
-        Me.SelEndyr = appmain.hFcad.Yreal(Me.SelEndy)
 
         appmain.hFCAD.redraw
     End If
+
+    If GripPoint >= 0 Then
+        Select Case EntityForEdit.PoiType[GripPoint]
+            Case gcd.poiBasePoint, gcd.poiCenter, gcd.poiMidPoint
+                EntityForEdit.ClassHandler.translate(EntityForEdit, Me.SelEndXr - dx, Me.SelEndYr - dY)
+                dX = Me.SelEndXr
+                dY = Me.SelEndYr
+            Case gcd.poiEndPoint
+                Select Case EntityForEdit.Gender
+                    Case "Line", "PLine", "SPline"
+                        If GripPoint > 0 Then ' tengo que descontar los midPoints o me dara error de desborde
+
+                            EntityForEdit.p[GripPoint] += Me.SelEndXr - dx
+                            EntityForEdit.p[GripPoint + 1] += Me.SelEndYr - dY
+                        Else
+                            EntityForEdit.p[0] += Me.SelEndXr - dx
+                            EntityForEdit.p[1] += Me.SelEndYr - dY
+
+                        Endif
+                        dX = Me.SelEndXr
+                        dY = Me.SelEndYr
+
+                End Select
+            Case gcd.poiQuadrant
+                EntityForEdit.fparam[0] = puntos.distancia(Me.SelEndXr, Me.SelEndYr, dx, dY)
+
+        End Select
+
+    Endif
 
 End
 
@@ -183,21 +250,27 @@ Public Sub Draw() ' esta rutina es llamada por FCAD en el evento DrawingArea_Dra
         End If
     Else
 
+        If GripPoint >= 0 Then
+
+            EntityForEdit.ClassHandler.Draw(EntityForEdit)
+
+        Endif
+
         gl.CallList(appmain.hFCAD.GlListSelectedEntities)
         clsEntities.DrawPoiSymbolsAll
 
     End If
 
 End
-
-Public Sub Finish()
-
-    ' modCAD.clsJobPrevious = Me  ' selection dont go to another job
-
-    modCAD.clsJob = modCAD.clsJobPrevious
-    modCAD.clsJobPrevious = Me
-    clsDrawingAids.CleanTexts
-    appmain.hFCAD.redraw
-    modCAD.clsJob.Start(modCAD.clsJobPreviousParam)
-
-End
+'
+' Public Sub Finish()
+'
+'     ' modCAD.clsJobPrevious = Me  ' selection dont go to another job
+'
+'     modCAD.clsJob = modCAD.clsJobPrevious
+'     modCAD.clsJobPrevious = Me
+'     clsDrawingAids.CleanTexts
+'     appmain.hFCAD.redraw
+'     modCAD.clsJob.Start(modCAD.clsJobPreviousParam)
+'
+' End
