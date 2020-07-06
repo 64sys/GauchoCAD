@@ -53,8 +53,8 @@ Public Function Start(Optional ElemToBuild As Variant, Optional _mode As Integer
 
         clsDrawingAids.Helper.texto = clsDrawingAids.HelperTrabajo & (": Selecct entities")
 
-        modCAD.clsJobPrevious = Me
-        modCAD.clsJob = clsDefaultJob
+        gcd.clsJobPrevious = Me
+        gcd.clsJob = clsDefaultJob
 
     Else                                                                    ' need the first point
 
@@ -64,7 +64,7 @@ Public Function Start(Optional ElemToBuild As Variant, Optional _mode As Integer
     Endif
 
     Me.Active = True
-    modCAD.ToolActive = True
+    gcd.ToolActive = True
 
 End
 
@@ -215,13 +215,13 @@ Public Sub Finish()
 
     End If
 
-    modCAD.clsJobPrevious = Me
-    modCAD.clsJob = clsDefaultJob
+    gcd.clsJobPrevious = Me
+    gcd.clsJob = clsDefaultJob
     clsDrawingAids.CleanTexts
     clsEntities.DeSelection()
-    modCAD.DrawOriginals = False
+    gcd.DrawOriginals = False
     appmain.hFCAD.Regen
     Me.Active = False
-    modCAD.ToolActive = False
+    gcd.ToolActive = False
 
 End

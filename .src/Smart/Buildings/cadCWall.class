@@ -65,7 +65,7 @@ Public Sub Draw()
 
     paint.Rotate(angulo)
     ' veo si esta seleccionada
-    If Me.selected And modCAD.DrawMarcados Then
+    If Me.selected And gcd.DrawMarcados Then
         paint.brush = Paint.Color(&HA0A063)
     Else
         paint.brush = Paint.Color(Color.Gray)

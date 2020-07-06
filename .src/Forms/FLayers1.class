@@ -112,7 +112,7 @@ Public Sub TableView1_Data(Row As Integer, Column As Integer)
     Dim pic As Picture
     '    Dim tog As ToggleButton
 
-    For Each v In cLayers 'draft 'modCAD.cLayers
+    For Each v In cLayers 'draft 'gcd.cLayers
         If i = row Then
             st = v[lbx[Column]]
             Select lbx[Column]
@@ -224,7 +224,7 @@ Public Sub LTask(lTask As String)
             TableView1.Rows.Count = 0
             TableView1.Rows.Count = cLayers.Count
 
-            'modCAD.cLayers.Add()
+            'gcd.cLayers.Add()
 
         Case "erase"
             If loading = False Then
@@ -249,7 +249,7 @@ Public Sub LTask(lTask As String)
             Dim t As Float = Timer                              ' IGNORAR: estos Timers y Debug son para monitorear el tiempo de actualizacion
 
             ' aplicamos los parametros de los layers a las entidades
-            modCAD.ApplyLayerProperties
+            gcd.ApplyLayerProperties
             'Debug "apply properties time ", Timer - t           ' IGNORAR: estos Timers y Debug son para monitorear el tiempo de actualizacion
             't = Timer                                           ' IGNORAR: estos Timers y Debug son para monitorear el tiempo de actualizacion
 

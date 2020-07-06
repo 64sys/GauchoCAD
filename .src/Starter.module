@@ -54,6 +54,14 @@ Public cLtypes As New Collection     '' Linetypes list
 ' Variables de un solo uso
 Private ldd As Boolean              '' Testigo de finalización de carga.
 
+Public Sub Main()
+
+    Run
+
+    gcd.Main
+
+End
+
 Public Sub Run()
 
     '    Dim sFile As String

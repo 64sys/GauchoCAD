@@ -22,6 +22,61 @@
 ' Boston, MA  02110-1301  USA
 ' Gambas class file
 
+' Credits
+' --------
+' Icon design por Trinh Ho ,Good Ware, freepik get them at https://www.flaticon.es
+' Based on an example called MuchosCirculos by JGuardon y MrShell
+' XML Load/Save by Tincho
+
+Public ScreenDensity As Float = 1080 / 29.5  ' pixele by cm wich gives a 1:100 scale in my monitor
+
+' Filtros del dibujo
+Public DrawOriginals As Boolean = False
+Public DrawMarcados As Boolean = True
+Public DrawSoloColumnas As Boolean = False
+Public DrawBounds As Boolean = False
+
+Public ScaleLines As Float = 1              ' la uso en Inserts para evitar lineas gordas
+Public FormatoCotas As String = "0.00"
+
+Public ColorForSelected As Integer = &H70E000
+Public ToolActive As Boolean
+
+Public HookSize As Integer = 16                       ' for use with poi
+Public Ortogonal As Boolean = False              ' idem Ortho F8 del CAD
+Public OrtogonalForzado As Boolean = False
+Public OrtogonalIgnorado As Boolean = False
+Public SnapMode As Integer                      ' Bitwise: -1 Off ; 0 = Nearest; 1 = Endpoint; 2 = midpoint
+
+Public clsJob As Object                             ' what I am doing now, thats either selecting or something else
+Public clsJobPrevious As Object                     ' what was doing before
+Public clsJobPreviousParam As Integer               ' a param to pass to clsJob.Start( param )
+
+Public Struct arrBlockSt
+    name As String
+    x As Float
+    y As Float
+    scaleX As Float
+    scaleY As Float
+    degRotation As Float
+    mirrored As Boolean
+    layer As String
+    entities As Entity[]
+End Struct
+
+'Public gColor As New Integer[]
+
+Public drwDrawingClass As Integer = 0 ' 0 = Paint, 1 = OpenGL
+Public Const drwPaintClass As Integer = 2
+Public Const drwOpenGLClass As Integer = 4
+
+Public LoadingFinished As Boolean = False
+Public FontList As New String[]                     ' esto deberia estar en otro lado
+Public TextureList As New String[]                     ' esto deberia estar en otro lado
+Public FileName As String                           ' current work filename
+
+Public ShowInspector As Boolean = False ' TODO: Tincho, agregar a la configuracion y a un Toggle button
+'---------------------------------------------------------------
 ' Point of Interest
 Public Const poiEndPoint As Integer = 1
 Public Const poiMidPoint As Integer = 2
@@ -56,5 +111,595 @@ End
 Public Function Metros(l As Integer) As Float
 
     Return APPMain.hFCAD.Metros(l)
+
+End
+
+Public Sub Main()
+
+    Select Starter.flgWindowBackColor
+        Case Color.Black
+            'Case &1B2224
+            Starter.flgWhiteAndBlack = Color.White
+
+        Case Else
+            Starter.flgWhiteAndBlack = Color.Black
+
+    End Select
+
+    'If WindowBackColor = 0 Then WhiteAndBlack = Color.White Else WhiteAndBlack = Color.Black
+    ' ' armo el array de colores
+    ' gcolor = DecodeColor()
+    '
+    ' ' corrijo los colores que no se ven contra el fondo
+    ' gcolor[0] = WhiteAndBlack
+    ' gcolor[7] = WhiteAndBlack
+    ' gcolor[255] = WhiteAndBlack
+
+    ' this is what we are doing now
+    clsJob = clsDefaultJob
+    clsJob.start()
+    clsJobPrevious = clsDefaultJob
+    clsJobPreviousParam = 0
+
+    'FileName = User.Home &/ "autosaveV5.xml"
+
+    'FontList = glPlus.LoadFonts(Application.Path &/ "Fonts/LFF")
+    FontList = glPlus.LoadFonts(Starter.sFonts)
+    glPlus.SelectFont("romanc")
+
+    'texturelist = glPlus.LoadTextures(Application.Path &/ "Textures")
+    texturelist = glPlus.LoadTextures(Starter.sTextures)
+
+End
+
+Public Function ExportBlocks(colData As Collection) ', obxEntities As Entity[]) As Integer
+
+    Dim i, iTE As Integer, colEnt, colBlk, colBlocks As New Collection, flxPoints As New Float[], P As Float[]
+
+    If Not colData.Exist("Blocks") Then
+        colData.Add(colBlocks, "Blocks")
+    Else
+        colData.Remove("Blocks")
+        colData.Add(colBlocks, "Blocks")
+    End If
+
+    For i = 0 To APPMain.hFCAD.arrBlocks.max
+        colBlk = New Collection
+        colData["Blocks"].Add(colBlk, APPMain.hFCAD.arrBlocks[i].name)
+
+        colData["Blocks"][APPMain.hFCAD.arrBlocks[i].name].Add("BLOCK", "entity")
+        colData["Blocks"][APPMain.hFCAD.arrBlocks[i].name].Add(APPMain.hFCAD.arrBlocks[i].name, "block")
+        colData["Blocks"][APPMain.hFCAD.arrBlocks[i].name].Add("BYLAYER", "style")
+        colEnt = New Collection
+        colData["Blocks"][APPMain.hFCAD.arrBlocks[i].name].Add(colEnt, "Entities")
+        For iTE = 0 To APPMain.hFCAD.arrBlocks[i].entities.Max
+            ExportEntities(colData["Blocks"]["Entities"], APPMain.hFCAD.arrBlocks[i].entities)
+        Next
+
+    Next
+
+End
+
+Public Function ImportBlocks(colData As Collection) ', obxEntities As Entity[]) As Integer
+
+    Dim iTotalEntities As Integer, colent, colBlk As Collection, flxPoints As New Float[], P As Float[]
+
+    If Not colData.Exist("Blocks") Then Return
+    For Each colBlk In colData["Blocks"]
+        Dim newBlock As New ArrBlockSt
+        newBlock.entities = New Entity[]
+        newBlock.name = colBlk["block"]
+        APPMain.hFCAD.arrBlocks.Add(newBlock)
+        ImportEntities2(colBlk["Entities"], newBlock.entities, newBlock.name)
+
+    Next
+
+End
+
+Public Function ExportModel(colData As Collection, obxEntities As Entity[], Optional BlockName As String) As Integer
+
+    Dim i, iTotalEntities As Integer
+    Dim colGrp As Collection
+
+    Dim flxPoints As New Float[]
+    Dim P As Float[]
+    Dim ratio As Float
+
+    For Each colGrp In colData
+
+        ImportEntities2(colGrp, obxEntities, BlockName)
+
+    Next
+
+End
+
+Public Function ImportModel(colData As Collection, obxEntities As Entity[], Optional BlockName As String) As Integer
+
+    Dim i, iTotalEntities As Integer
+    Dim colGrp As Collection
+
+    Dim flxPoints As New Float[]
+    Dim P As Float[]
+    Dim ratio As Float
+
+    For Each colGrp In colData
+
+        ImportEntities2(colGrp, obxEntities, BlockName)
+
+    Next
+
+End
+
+'' Pasa del arrEntities a la coleccion
+Public Function ExportEntities(colGrp As Collection, obxEntities As Entity[], Optional BlockName As String) As Integer
+
+    Dim i, eCount As Integer
+    Dim flxPoints As New Float[]
+    Dim P, Pn As New Collection
+    Dim ratio As Float
+    Dim colEnt As New Collection
+    Dim e As Entity
+
+    For Each e In obxEntities
+        flxPoints.Clear
+        colGrp.Add(colEnt, Str$(eCount))
+        Select Case e.Gender
+            Case "Line"
+                colgrp[Str$(eCount)].Add("LINE", "entity")
+                colgrp[Str$(eCount)].Add(e.Layer, "layer")
+                colgrp[Str$(eCount)].Add(e.LineTypeName, "style")
+                colgrp[Str$(eCount)].Add(e.colour, "colour")
+                colgrp[Str$(eCount)].Add(e.LineWidth, "width")
+                colgrp[Str$(eCount)].Add(p, "p")
+                flxPoints.Add(e.P[0])                   ' X
+                flxPoints.Add(e.P[1])                   ' Y
+                flxPoints.Add(0)                        ' Z
+                colgrp[Str$(eCount)]["p"].Add(flxPoints, "p0")
+                flxPoints = New Float[]
+                flxPoints.Add(e.P[2])                   ' X
+                flxPoints.Add(e.P[3])                   ' Y
+                flxPoints.Add(0)                        ' Z
+                colgrp[Str$(eCount)]["p"].Add(flxPoints, "p1")
+
+        End Select
+        Inc eCount
+    Next
+
+    Return eCount
+
+End
+
+'' Importa la clave entidades de la coleccion y las coloca en el array de objetos
+
+Public Function ImportEntities2(colGrp As Collection, obxEntities As Entity[], Optional BlockName As String) As Integer
+
+    Dim i, iTotalEntities As Integer
+    Dim flxPoints As New Float[]
+    Dim P As Float[]
+    Dim ratio As Float
+    Dim colEnt As Collection
+
+    For Each colEnt In colGrp
+        flxPoints.Clear
+        Select LCase$(colEnt["entity"]) 'colData.Key
+
+            Case "line"
+                GoSub GetPoints
+                AddLine(obxEntities, flxPoints, colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], BlockName)
+                Inc iTotalEntities
+
+            Case "lwpolyline", "polyline", "solid"
+                GoSub GetPoints
+                AddPolyLine(obxEntities, flxPoints, colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], BlockName)
+                Inc iTotalEntities
+
+            Case "ellipse"
+                GoSub GetPoints
+
+                AddEllipse(obxEntities, flxPoints, colEnt["ratio"], colEnt["start_angle"], colEnt["end_angle"], colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], BlockName)
+                Inc iTotalEntities
+
+            Case "circle"
+                GoSub GetPoints
+                AddCircle(obxEntities, flxPoints, colEnt["radius"], colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], BlockName)
+                Inc iTotalEntities
+
+            Case "arc"
+                GoSub GetPoints
+                AddArc(obxEntities, flxPoints, colEnt["radius"], colEnt["start_angle"], colEnt["end_angle"], colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], BlockName)
+                Inc iTotalEntities
+
+            Case "insert"
+                GoSub GetPoints
+                ' Insert viene con el punto de insercion XYZ, no puedo usar la rutina lectora de puntos
+                'flxPoints.Add(colEnt["p"]["p0"][0])
+                'flxPoints.Add(colEnt["p"]["p0"][1])
+                AddInsert(obxEntities, flxPoints, colEnt["scalex"], colEnt["scaley"], colEnt["angle"], colEnt["colour"], colEnt["style"], colEnt["layer"], colEnt["block"])
+                Inc iTotalEntities
+
+            Case "text"
+                GoSub GetPoints
+                'flxPoints.Add(colEnt["p"]["p0"][0])
+                'flxPoints.Add(colEnt["p"]["p0"][1])
+                AddText(obxEntities, flxPoints, colEnt["angle"], colEnt["text_height"], colEnt["text"], colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], BlockName)
+                Inc iTotalEntities
+
+            Case "mtext"
+                GoSub GetPoints
+                'flxPoints.Add(colEnt["p"]["p0"][0])
+                'flxPoints.Add(colEnt["p"]["p0"][1])
+                AddMText(obxEntities, flxPoints, colEnt["angle"], colEnt["text_height"], colEnt["text"], colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], BlockName)
+                Inc iTotalEntities
+
+            Case "dimmension"
+                GoSub GetPoints
+                AddDim(obxEntities, flxPoints, colEnt["angle"], colEnt["text_height"], colEnt["text"], colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], BlockName)
+                Inc iTotalEntities
+
+        End Select
+
+    Next
+
+    Return iTotalEntities
+
+GetPoints:              ' Leo los puntos que estan separados y los meto en un unico array de Float[]
+    flxPoints.Clear
+    For Each p In colEnt["p"]
+        For i = 0 To p.max Step 3
+            flxPoints.Add(p[i])                 'X
+            flxPoints.Add(p[i + 1])             'Y
+            'flxPoints.Add(p[i + 2])            'Z para uso futuro
+        Next
+    Next
+
+    Return
+
+End
+
+' importing
+
+Public Function AddLine(obxContainer As Entity[], Points As Float[], Optional colour As Integer = 0, Optional LineWidth As Float = 1, Optional Linetype As String, Optional Layer As String, Optional Block As String) As Boolean
+
+    ' points are in x,y,x,y,x,y....
+    Dim oEntity As New Entity
+
+    oEntity.ClassHandler = cadLine
+    oEntity.Gender = oEntity.ClassHandler.gender
+    oEntity.P.insert(points)                    ' recibimos los dos vertices de la linea x1,y1,x2,y2
+    oEntity.layer = Layer
+    oEntity.colour = colour
+    oEntity.LineWidth = 1 'LineWidth               ' datos CAD
+    oEntity.linetypename = linetype
+    oEntity.Block = Block
+    If oEntity.Block <> "" Then oEntity.visible = False
+    obxContainer.Add(oEntity)
+    oEntity.ClassHandler.finish(oEntity, -1)
+    'cadLine.finish(oEntity, -1)
+    oEntity = Null                  ' free entity
+
+End
+
+Public Function AddPolyLine(obxContainer As Entity[], Points As Float[], Optional colour As Integer = 0, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
+
+    ' points are in x,y,x,y,x,y....
+
+    Dim oEntity As New Entity
+
+    oEntity.ClassHandler = cadPLine
+    oEntity.Gender = oEntity.ClassHandler.gender
+    oEntity.P.insert(points)                    ' recibimos los dos vertices de la linea x1,y1,x2,y2
+
+    oEntity.layer = Layer
+    oEntity.colour = colour
+    oEntity.LineWidth = 1 ' LineWidth               ' datos CAD
+    oEntity.Block = Block
+    If oEntity.Block <> "" Then oEntity.visible = False
+    obxContainer.Add(oEntity)
+    oEntity.ClassHandler.finish(oEntity, -1)
+    oEntity = Null                  ' free entity
+
+End
+
+Public Function AddDim(obxContainer As Entity[], Points As Float[], bloque As String, medida As Float, texto As String, alineacion As Integer, angulo As Float, tipo As Integer, colour As Integer, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
+
+    Dim oEntity As New Entity
+
+    oEntity.ClassHandler = cadDim              ' create the new entity of proper class
+    oEntity.Gender = oEntity.ClassHandler.gender
+    oEntity.P.insert(points)                    ' recibimos los dos vertices de la linea x1,y1,x2,y2
+    oEntity.fParam.Add(tipo)
+    oEntity.fParam.Add(MEDIDA)
+    oEntity.fParam.Add(alineacion)
+    oEntity.fParam.Add(angulo)
+    oEntity.stringdata = texto
+    oEntity.stringdata2 = bloque
+    oEntity.layer = Layer
+    oEntity.colour = colour
+    oEntity.LineWidth = LineWidth               ' datos CAD
+    oEntity.Block = Block
+    If oEntity.Block <> "" Then oEntity.visible = False
+    obxContainer.Add(oEntity)
+    oEntity.ClassHandler.finish(oEntity, -1)
+    oEntity = Null                  ' free entity
+
+End
+
+Public Function AddSolid(obxContainer As Entity[], Points As Float[], Optional colour As Integer = 0, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
+
+    ' points are in x,y,x,y,x,y....
+    ' points are in x,y,x,y,x,y....
+    Dim oEntity As New Entity
+
+    oEntity.ClassHandler = cadSolid             ' create the new entity of proper class
+    oEntity.Gender = oEntity.ClassHandler.gender
+    oEntity.P.insert(points)                    ' recibimos los dos vertices de la linea x1,y1,x2,y2
+
+    oEntity.layer = Layer
+    oEntity.colour = colour
+    oEntity.LineWidth = LineWidth               ' datos CAD
+    oEntity.Block = Block
+    If oEntity.Block <> "" Then oEntity.visible = False
+    obxContainer.Add(oEntity)
+    oEntity.ClassHandler.finish(oEntity, -1)
+    oEntity = Null                  ' free entity
+
+End
+
+Public Function AddSPLine(obxContainer As Entity[], Points As Float[], Optional colour As Integer = 0, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
+
+    ' points are in x,y,x,y,x,y....
+    Dim oEntity As New Entity
+
+    oEntity.ClassHandler = cadSPLine
+    oEntity.Gender = oEntity.ClassHandler.gender
+    oEntity.P.insert(points)                    ' recibimos los dos vertices de la linea x1,y1,x2,y2
+
+    oEntity.layer = Layer
+    oEntity.colour = colour
+    oEntity.LineWidth = LineWidth               ' datos CAD
+    oEntity.Block = Block
+    If oEntity.Block <> "" Then oEntity.visible = False
+    obxContainer.Add(oEntity)
+    oEntity.ClassHandler.finish(oEntity, -1)
+    oEntity = Null                  ' free entity
+
+End
+
+Public Function AddCircle(obxContainer As Entity[], Points As Float[], radious As Float, Optional colour As Integer = 0, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
+
+    ' points are in x,y,x,y,x,y....
+    Dim oEntity As New Entity
+
+    oEntity.ClassHandler = cadCircle
+    oEntity.Gender = oEntity.ClassHandler.gender
+    oEntity.P.insert(points)                    ' centro x1,y1
+    oEntity.fParam.Add(radious)                 ' radio
+    oEntity.layer = Layer
+    oEntity.colour = colour
+    oEntity.LineWidth = LineWidth               ' datos CAD
+    oEntity.Block = Block
+    If oEntity.Block <> "" Then oEntity.visible = False
+    obxContainer.Add(oEntity)
+    oEntity.ClassHandler.finish(oEntity, -1)
+    oEntity = Null                  ' free entity
+
+End
+
+Public Function AddArc(obxContainer As Entity[], Points As Float[], r As Float, angle1 As Float, angle2 As Float, Optional colour As Integer = 0, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
+
+    ' points are in x,y,x,y,x,y....
+    Dim oEntity As New Entity
+
+    oEntity.ClassHandler = cadArc
+    oEntity.Gender = oEntity.ClassHandler.gender
+    oEntity.P.insert(points)                    ' centro x1,y1
+    oEntity.fParam.Add(r)                      ' radio
+    oEntity.fParam.Add(angle1)                   ' angulo
+    oEntity.fParam.Add(angle2)                   ' angulo
+    oEntity.layer = Layer
+    oEntity.colour = colour
+    oEntity.LineWidth = LineWidth               ' datos CAD
+    oEntity.Block = Block
+    If oEntity.Block <> "" Then oEntity.visible = False
+    obxContainer.Add(oEntity)
+    oEntity.ClassHandler.finish(oEntity, -1)
+    oEntity = Null                  ' free entity
+
+End
+
+Public Function AddEllipse(obxContainer As Entity[], Points As Float[], r As Float, angle1 As Float, angle2 As Float, Optional colour As Integer = 0, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
+
+    ' points are in x,y,x,y,x,y....
+    Dim oEntity As New Entity
+
+    oEntity.ClassHandler = cadEllipse
+    oEntity.Gender = oEntity.ClassHandler.gender
+    oEntity.P.insert(points)                    ' centro x1,y1
+    oEntity.p[2] += oEntity.p[0]                ' un pequeño truco porque gaucho usa los puntos de manera diferente a DXF
+    oEntity.p[3] += oEntity.p[1]
+    oEntity.fParam.Add(r)                      ' ratio minor/major
+    oEntity.fParam.Add(angle1 * 180 / Pi)     ' start angle
+    oEntity.fParam.Add(angle2 * 180 / Pi)      ' end angle
+    oEntity.layer = Layer
+    oEntity.colour = colour
+    oEntity.LineWidth = LineWidth               ' datos CAD
+    oEntity.Block = Block
+    If oEntity.Block <> "" Then oEntity.visible = False
+    obxContainer.Add(oEntity)
+    oEntity.ClassHandler.finish(oEntity, -1)
+    oEntity = Null                  ' free entity
+
+End
+
+Public Function AddText(obxContainer As Entity[], Points As Float[], angle As Float, height As Float, _Text As String, Optional colour As Integer = Color.Blue, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
+
+    Dim oEntity As New Entity
+
+    oEntity.ClassHandler = cadText
+    oEntity.Gender = oEntity.ClassHandler.gender
+    oEntity.P.insert(points)                    ' recibimos position x1,y1
+    oEntity.fParam.Add(angle)                   ' grados
+    oEntity.fParam.Add(height)                  ' alto letras
+    oEntity.stringdata = _text                  ' el texto
+    oEntity.layer = Layer
+    oEntity.colour = colour
+    oEntity.LineWidth = LineWidth               ' datos CAD
+    oEntity.Block = Block
+    If oEntity.Block <> "" Then oEntity.visible = False
+    obxContainer.Add(oEntity)
+    oEntity.ClassHandler.finish(oEntity, -1)
+    oEntity = Null                  ' free entity
+
+End
+
+Public Function AddMText(obxContainer As Entity[], Points As Float[], angle As Float, height As Float, _Text As String, Optional colour As Integer = Color.Blue, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
+
+    Dim oEntity As New Entity
+
+    oEntity.ClassHandler = cadMText
+    oEntity.Gender = oEntity.ClassHandler.gender
+    oEntity.P.insert(points)                    ' recibimos position x1,y1
+    oEntity.fParam.Add(angle)                  ' GRADOS
+    oEntity.fParam.Add(height)                  ' alto letras
+    oEntity.stringdata = _text                  ' el texto
+    oEntity.layer = Layer
+    oEntity.colour = colour
+    oEntity.LineWidth = LineWidth               ' datos CAD
+    oEntity.Block = Block
+    If oEntity.Block <> "" Then oEntity.visible = False
+    obxContainer.Add(oEntity)
+    oEntity.ClassHandler.finish(oEntity, -1)
+    oEntity = Null                  ' free entity
+
+End
+
+Public Function AddCurve(obxContainer As Entity[], Points As Float[], Optional colour As Integer = 0, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
+
+    ' points are in x,y,x,y,x,y....
+    Dim oEntity As New Entity
+
+    oEntity.Gender = oEntity.ClassHandler.gender
+
+End
+
+Public Function AddInsert(obxContainer As Entity[], Points As Float[], scaleX As Float, scaleY As Float, angulo As Float, Optional colour As Integer = Color.Blue, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
+
+    Dim oEntity As New Entity
+
+    oEntity.ClassHandler = cadInsert
+    oEntity.Gender = oEntity.ClassHandler.gender
+    oEntity.P.insert(points)                    ' recibimos position x1,y1
+    oEntity.fParam.Add(scaleX)
+    oEntity.fParam.Add(scaleY)
+    oEntity.fParam.Add(angulo)                  ' GRADOS
+    oEntity.layer = Layer
+    oEntity.colour = colour
+    oEntity.Block = Block
+    obxContainer.Add(oEntity)
+    oEntity.ClassHandler.finish(oEntity, -1)
+
+    oEntity = Null                  ' free entity
+
+End
+
+Public Function AddBlock(Points As Float[], Block As String) As Entity[]
+
+    Dim newBlock As New ArrBlockSt
+
+    newBlock.entities = New Entity[]
+    newBlock.name = block
+    newBlock.x = Points[0]
+    newBlock.y = Points[1]
+    APPMain.hFCAD.arrBlocks.Add(newBlock)
+
+    Return newBlock.entities
+
+End
+'' Aplica los cambios en los Layers a las entidades
+'' Si mode = 1, primero recontruye el layerID (para ser usado luego de abrir un archivo)
+
+Public Function ApplyLayerProperties(Optional mode As Integer = 0)
+
+    Dim e As Entity, cLayer As Collection
+    Dim LayerName As String
+
+    Print "Aplicando propiedades del Layers"
+
+    For Each e In APPMain.hFCAD.arrEntities
+
+        If mode = 1 Then
+            ' reconstruyo el ID del layer en la entidad, para ello busco en la lista cual coincide con su nombre
+            For Each cLayer In APPMain.hFCAD.cModel["Layers"]
+                If e.layer = cLayer["name"] Then
+                    e.layerID = cLayer["id"]
+                    Break
+                Endif
+            Next
+
+        Endif
+
+        ' nombre, el que pudo haber cambiado (exepto el "0")
+        e.layer = APPMain.hFCAD.cModel["Layers"][e.layerID]["name"]
+
+        ' visibiliad
+        If APPMain.hFCAD.cModel["Layers"][e.layerID]["show"] Then e.visible = True Else e.visible = False
+
+    Next
+
+End
+
+'' Aplica los cambios en los Layers a las entidades
+'' Si mode = 1, primero recontruye el layerID (para ser usado luego de abrir un archivo)
+Public Function ApplyLayerPropertieToEntity(e As Entity)
+
+    Dim cLayer As Collection
+    Dim LayerName As String
+
+    ' reconstruyo el ID del layer en la entidad, para ello busco en la lista cual coincide con su nombre
+    For Each cLayer In APPMain.hFCAD.cModel["Layers"]
+        If e.layer = cLayer["name"] Then
+            e.layerID = cLayer["id"]
+            Break
+        Endif
+    Next
+
+    ' nombre, el que pudo haber cambiado (exepto el "0")
+    e.layer = APPMain.hFCAD.cModel["Layers"][e.layerID]["name"]
+
+    ' visibiliad
+    If APPMain.hFCAD.cModel["Layers"][e.layerID]["show"] Then e.visible = True Else e.visible = False
+
+End
+
+Public Function GetLayerID(LayerName As String) As String
+
+    Dim cLayer As Collection
+
+    For Each cLayer In APPMain.hFCAD.cModel["Layers"]
+        If cLayer["name"] = LayerName Then Return cLayer["id"]
+    Next
+
+End
+
+Public Function GetGBColor(CADcolor As Integer, layerID As String) As Integer
+
+    ' color
+    If CADcolor = 256 Then          ' buscar color del layer
+
+        Return Starter.gColor[APPMain.hFCAD.cModel["Layers"][layerID]["colour"]]
+
+    Else If CADcolor = 257 Then     ' buscar color del objeto
+
+        Return Starter.gColor[APPMain.hFCAD.cModel["Layers"][layerID]["colour"]]     ' FIXME: cambiar esto
+
+    Else If CADcolor = 0 Then       ' buscar color del bloque
+
+        Return Starter.gColor[APPMain.hFCAD.cModel["Layers"][layerID]["colour"]]     ' FIXME: cambiar esto
+
+    Else
+
+        Return Starter.gColor[CADcolor]
+
+    Endif
 
 End

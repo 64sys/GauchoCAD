@@ -190,7 +190,7 @@ Public Sub Init(drwContext As Object) ' only glArea for now
     gl.Enable(gl.TEXTURE_2D)
 
     ' con este color limpiamos la pantalla
-    If modCAD.WindowBackColor = 0 Then
+    If Starter.flgWindowBackColor = 0 Then
         gl.ClearColor(0, 0, 0, 1)
     Else
         gl.ClearColor(1, 1, 1, 1)

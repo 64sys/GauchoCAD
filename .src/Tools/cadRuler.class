@@ -40,7 +40,7 @@ Public Function Start(Optional ElemToBuild As Variant, Optional _Mode As Integer
     Poli.Add(0)
 
     Me.Active = True
-    modCAD.ToolActive = True
+    gcd.ToolActive = True
 
 End
 
@@ -109,11 +109,11 @@ Public Sub Finish()
 
     Endif
 
-    modCAD.clsJobPrevious = Me
-    modCAD.clsJob = clsDefaultJob
+    gcd.clsJobPrevious = Me
+    gcd.clsJob = clsDefaultJob
     clsEntities.DeSelection()
     appmain.hFCAD.Regen
     Me.Active = False
-    modCAD.ToolActive = False
+    gcd.ToolActive = False
 
 End

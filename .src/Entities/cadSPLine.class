@@ -85,8 +85,8 @@ End
 '' A fat version of the entity
 Public Sub DrawSelected(oE As Entity)
 
-    GLplus.PolyLines(oE.PolyLine, modCAD.WindowBackColor, oE.LineWidth, gcd.stiDashed)
-    GLplus.PolyLines(oE.PolyLine, modCAD.ColorForSelected, oE.LineWidth, oE.LineType)
+    GLplus.PolyLines(oE.PolyLine, Starter.flgWindowBackColor, oE.LineWidth, gcd.stiDashed)
+    GLplus.PolyLines(oE.PolyLine, gcd.ColorForSelected, oE.LineWidth, oE.LineType)
 
 End
 
@@ -99,10 +99,10 @@ Public Sub Draw2(oE As Entity)
 
     Dim i As Integer
 
-    paint.LineWidth = oE.LineWidth / appmain.hFcad.ScaleZoom / modCAD.ScaleLines
+    paint.LineWidth = oE.LineWidth / appmain.hFcad.ScaleZoom / gcd.ScaleLines
 
-    If oE.Selected And Not modCAD.ToolActive Then
-        paint.brush = Paint.Color(modCAD.ColorForSelected)
+    If oE.Selected And Not gcd.ToolActive Then
+        paint.brush = Paint.Color(gcd.ColorForSelected)
     Else
         paint.brush = Paint.Color(oE.ColorToPaint)
     Endif

@@ -96,21 +96,21 @@ Public Sub Finish()
 
     appmain.hFCAD.iEntity.Clear
     appmain.hFCAD.iEntity.Insert([0, 0, -1, -1])
-    modCAD.clsJobPrevious = Me
-    modCAD.clsJob = clsDefaultJob
+    gcd.clsJobPrevious = Me
+    gcd.clsJob = clsDefaultJob
     clsDrawingAids.CleanTexts
     clsEntities.DeSelection()
-    modCAD.DrawOriginals = False
+    gcd.DrawOriginals = False
     appmain.hFCAD.Regen
     Me.Active = False
-    modCAD.ToolActive = False
+    gcd.ToolActive = False
 
 End
 
 Public Sub Cancel()
 
-    modCAD.clsJobPrevious = Me
-    modCAD.clsJob = clsDefaultJob
+    gcd.clsJobPrevious = Me
+    gcd.clsJob = clsDefaultJob
     clsDrawingAids.CleanTexts
     appmain.hFCAD.redraw
 

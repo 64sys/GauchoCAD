@@ -118,15 +118,15 @@ End
 '' A fat version of the entity
 Public Sub DrawSelected(oE As Entity)
 
-    GLplus.Polygon(oE.p, modCAD.WindowBackColor, oE.LineWidth, gcd.stiDashed)
-    GLplus.Polygon(oE.p, modCAD.ColorForSelected, oE.LineWidth, oE.LineType)
+    GLplus.Polygon(oE.p, Starter.flgWindowBackColor, oE.LineWidth, gcd.stiDashed)
+    GLplus.Polygon(oE.p, gcd.ColorForSelected, oE.LineWidth, oE.LineType)
 
 End
 
 '' A fat version of the line
 Public Sub DrawRemark(oE As Entity)
 
-    GLplus.Polygon(oE.p, modCAD.WindowBackColor, oE.LineWidth, gcd.stiDashed)
+    GLplus.Polygon(oE.p, Starter.flgWindowBackColor, oE.LineWidth, gcd.stiDashed)
     GLplus.Polygon(oE.p, oE.ColorToPaint, oE.LineWidth + 2, oE.LineType)
 
 End
@@ -137,8 +137,8 @@ Public Function Draw2(oE As Entity)
 
     Dim i As Integer
 
-    If oE.Selected And Not modCAD.ToolActive Then
-        paint.brush = Paint.Color(modCAD.ColorForSelected)
+    If oE.Selected And Not gcd.ToolActive Then
+        paint.brush = Paint.Color(gcd.ColorForSelected)
     Else
         paint.brush = Paint.Color(oE.ColorToPaint)
     Endif

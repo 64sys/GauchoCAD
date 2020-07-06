@@ -172,13 +172,13 @@ Public Function XmlDwg(xf As String, Optional ctn As Collection, Optional strCom
     writer.EndElement ' dc:format
     writer.EndElement ' metadata
 
-    ' For Each v In modCAD.cLayers
-    '     If modCAD.cLayers["label"] = "tesla" Then
-    '         myColor = modCAD.cLayers["color"]
+    ' For Each v In gcd.cLayers
+    '     If gcd.cLayers["label"] = "tesla" Then
+    '         myColor = gcd.cLayers["color"]
     '     Endif
     ' Next
 
-    For Each var In ctn 'modCAD.cLayers
+    For Each var In ctn 'gcd.cLayers
         Select ctn.Key
             Case "layers", "colors", "styles", "weights"
                 For Each att In var

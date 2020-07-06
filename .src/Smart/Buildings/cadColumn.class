@@ -47,7 +47,7 @@ Public Sub Draw()
     paint.Rectangle(Me.p[0] - 0.1, Me.p[1] + 0.1, Me.fParam[0], Me.fParam[1])
 
     ' veo si esta seleccionada
-    If Me.selected And modCAD.DrawMarcados Then
+    If Me.selected And gcd.DrawMarcados Then
         paint.brush = Paint.Color(&HA0A063)
     Else
         paint.brush = Paint.Color(Color.Black)

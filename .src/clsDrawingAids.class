@@ -112,7 +112,7 @@ Public Sub DibujaHelper()
     Texting(trabajoYteclado, 10 - appmain.hFcad.glarea1.w / 2, 10 - appmain.hFcad.glarea1.h / 2, Starter.flgWindowInfoColor) ' Tincho - toma color de la configuración
 
     HelperDibujo = ""
-    If modCAD.Ortogonal Then HelperDibujo = "F8-Ortho"
+    If gcd.Ortogonal Then HelperDibujo = "F8-Ortho"
     If puntos.Gridactive Then HelperDibujo = HelperDibujo & "  F7-Grid = " & Format$(puntos.GridSpacing, "0.00 m")
     ' and so on...
 
@@ -226,16 +226,16 @@ Public Sub DrawPolygons() ' and other debugging stuff
 
     Dim e As Entity, i As Integer, p0, p1 As Float
 
-    HelperTrabajo2 = "modCAD.clsJob: " & Str(modCAD.clsJob) & "->" & Str(clsEntityBuilder.elem)
+    HelperTrabajo2 = "gcd.clsJob: " & Str(gcd.clsJob) & "->" & Str(clsEntityBuilder.elem)
     '
     Texting(HelperTrabajo2, 300, appmain.hFcad.glarea1.h - 20, Color.Blue)
     '
-    HelperTrabajo2 = "modCAD.clsJobPrevious: " & Str(modCAD.clsJobPrevious)
+    HelperTrabajo2 = "gcd.clsJobPrevious: " & Str(gcd.clsJobPrevious)
     '
 
     Texting(HelperTrabajo2, 300, appmain.hFcad.glarea1.h - 40, Color.Blue)
 
-    If modCAD.clsJob.gender = "Builder" Then Return
+    If gcd.clsJob.gender = "Builder" Then Return
 
     For Each e In APPMain.hFCAD.arrEntities
 

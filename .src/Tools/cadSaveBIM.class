@@ -25,7 +25,7 @@ Public Const Gender As String = "SaveBIN"
 
 Public Function Start(Optional ElemToBuild As Variant, Optional _mode As Integer = 0) As Boolean
 
-    SaveToFileBIN(modCAD.FileName)
+    SaveToFileBIN(gcd.FileName)
     Me.Finish
 
 End
@@ -42,14 +42,14 @@ Public Function SaveToFileBIN(nName As String) As Boolean
     Dim enty As New Collection  'Tincho
 
     'tm.Clear              ' Tincho
-    'For Each lay In modCAD.cLayers
+    'For Each lay In gcd.cLayers
     ct.Add(APPMain.hFCAD.cModel, "layers")
     'ct.Add(APPMain.hFCAD.cModel, "colors")
     'ct.Add(APPMain.hFCAD.cModel, "styles")
     'ct.Add(APPMain.hFCAD.cModel, "weights")
     'Next
     enty.Clear
-    If nNAme = "" Then nName = modCAD.FileName
+    If nNAme = "" Then nName = gcd.FileName
 
     For Each obj In APPMain.hFCAD.arrEntities
         tm.Clear              ' Tincho

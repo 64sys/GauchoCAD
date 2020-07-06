@@ -84,7 +84,7 @@ End
 
 Public Sub Draw(oE As Entity)
 
-    oE.ColorToPaint = modCAD.GetGBColor(oE.colour, oE.Layerid)
+    oE.ColorToPaint = gcd.GetGBColor(oE.colour, oE.Layerid)
 
     GLplus.Lines(oE.p, oE.ColorToPaint, oE.LineWidth, oE.LineType)
 
@@ -95,8 +95,8 @@ Public Sub DrawSelected(oE As Entity)
 
     Dim i As Integer
 
-    GLplus.Lines(oE.p, modCAD.WindowBackColor, oE.LineWidth, gcd.stiDashed)
-    GLplus.Lines(oE.p, modCAD.ColorForSelected, oE.LineWidth, oE.LineType)
+    GLplus.Lines(oE.p, Starter.flgWindowBackColor, oE.LineWidth, gcd.stiDashed)
+    GLplus.Lines(oE.p, gcd.ColorForSelected, oE.LineWidth, oE.LineType)
 
 End
 '' A fat version of the line
@@ -105,7 +105,7 @@ Public Sub DrawRemark(oE As Entity)
 
     If Not oE.Visible Then Return
 
-    GLplus.Lines(oE.p, modCAD.WindowBackColor, oE.LineWidth, gcd.stiDashed)
+    GLplus.Lines(oE.p, Starter.flgWindowBackColor, oE.LineWidth, gcd.stiDashed)
     GLplus.Lines(oE.p, oE.ColorToPaint, oE.LineWidth + 2, oE.LineType)
 
 End
@@ -115,7 +115,7 @@ Public Function Draw2(oE As Entity)
 
     If Not oE.Visible Then Return
 
-    paint.LineWidth = oE.LineWidth / appmain.hFcad.ScaleZoom / modCAD.ScaleLines
+    paint.LineWidth = oE.LineWidth / appmain.hFcad.ScaleZoom / gcd.ScaleLines
 
     paint.brush = Paint.Color(oE.ColorToPaint)
     paint.MoveTo(oE.p[0], oE.p[1])

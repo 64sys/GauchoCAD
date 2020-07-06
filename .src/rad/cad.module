@@ -298,7 +298,7 @@ Public Function LoadGaucho(sFile As String) As Collection
         '-----
 
         ' aca hay un problema: si gcad guarda los puntos p0="1:2"  p1="1:1" etc, entoces cModel queda igual que como cuando lees cImport
-        ' pero si los guardas seguido, no podes usar la rutina modCAD.ImportEntities pq vienen distinto
+        ' pero si los guardas seguido, no podes usar la rutina gcd.ImportEntities pq vienen distinto
 
         ' una solucion es cuando importas DXF guardas todos los p seguidos o en gaucho los guardas separados , lo que para polilineas largas no se que comportamiento tendra
         ' https://stackoverflow.com/questions/56035887/what-is-the-one-line-max-length-limit-in-xml-files

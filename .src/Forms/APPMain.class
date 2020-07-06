@@ -735,7 +735,7 @@ Public Sub entity_Click()
 
     If Workspace1.ActiveWindow Then
         txoCom.Text = obj.Tag & "\n"
-        'modCAD.clsJob.KeyText(String.UCaseFirst(obj.Tag))
+        'gcd.clsJob.KeyText(String.UCaseFirst(obj.Tag))
 
     Endif
 
@@ -749,7 +749,7 @@ Public Sub tool_Click()
 
     If Workspace1.ActiveWindow Then
         'txoCom.Text = obj.Tag & Key.Enter
-        modCAD.clsJob.KeyText(String.UCaseFirst(obj.Tag))
+        gcd.clsJob.KeyText(String.UCaseFirst(obj.Tag))
     Endif
 
 End
@@ -771,7 +771,7 @@ Public Sub view_Click()
     obj = Last
 
     If Workspace1.ActiveWindow Then
-        modCAD.clsJob.KeyText(String.UCaseFirst(obj.Tag))
+        gcd.clsJob.KeyText(String.UCaseFirst(obj.Tag))
     Endif
 
 End
@@ -1147,7 +1147,7 @@ End
 '         Case Key.Enter, Key.Return, Key.Space
 '             sCom = txoCom.Text
 '             If Workspace1.ActiveWindow Then
-'                 obj = modCAD.clsJob
+'                 obj = gcd.clsJob
 '                 Select Object.Type(obj)
 '                     Case "clsEntityBuilder"
 '                         enty = obj.elem
@@ -1191,9 +1191,9 @@ End
 '                                 HistoCom.Push(sCom)
 '                                 Print sCom
 '                                 If Workspace1.ActiveWindow Then
-'                                     modCAD.clsJob.KeyText(sCom)
+'                                     gcd.clsJob.KeyText(sCom)
 '
-'                                     obj = modCAD.clsJob
+'                                     obj = gcd.clsJob
 '                                     Select Object.Type(obj)
 '                                         Case "clsEntityBuilder"
 '                                             txoCom.Text = ""
@@ -1227,7 +1227,7 @@ Public Sub txoCom_Change()
                 'Case Key.Enter, Key.Return, Key.Space
                 sCom = String.Mid(txoCom.Text, 1, String.Len(txoCom.Text) - 1)
                 If Workspace1.ActiveWindow Then
-                    obj = modCAD.clsJob
+                    obj = gcd.clsJob
                     Select Object.Type(obj)
                         Case "clsEntityBuilder"
                             'KillJob()
@@ -1275,9 +1275,9 @@ Public Sub txoCom_Change()
                                     Print sCom
                                     If Workspace1.ActiveWindow Then
                                         'KillJob()
-                                        modCAD.clsJob.KeyText(sCom)
+                                        gcd.clsJob.KeyText(sCom)
 
-                                        obj = modCAD.clsJob
+                                        obj = gcd.clsJob
                                         Select Object.Type(obj)
                                             Case "clsEntityBuilder"
                                                 enty = obj.elem
@@ -1304,9 +1304,9 @@ End
 Public Sub KillJob() ' no funciona bien
     ''TODO: Mejorar esta sub o hacer una nueva para CANCELAR el comando actual
 
-    modCAD.clsJob.Finish()
-    modCAD.clsJobPrevious = modCAD.clsJob
-    modCAD.clsJob = clsDefaultJob
+    gcd.clsJob.Finish()
+    gcd.clsJobPrevious = gcd.clsJob
+    gcd.clsJob = clsDefaultJob
     'redraw
     'Return
 
@@ -1538,7 +1538,7 @@ Public Sub Form_KeyPress()
     If Workspace1.ActiveWindow Then
         Select Key.Code
             Case Key.Del
-                modCAD.clsJob.KeyText("Erase")
+                gcd.clsJob.KeyText("Erase")
 
         End Select
 

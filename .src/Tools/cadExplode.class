@@ -37,13 +37,13 @@ Public Function Start(Optional ElemToBuild As Variant, Optional _Mode As Integer
 
         clsDrawingAids.Helper.texto = clsDrawingAids.HelperTrabajo & (": Selecct blocks")
 
-        modCAD.clsJobPrevious = Me
-        modCAD.clsJob = clsDefaultJob
+        gcd.clsJobPrevious = Me
+        gcd.clsJob = clsDefaultJob
 
     Else                                                                    ' EXPLOTA !!!
 
     Endif
 
-    modCAD.ToolActive = True
+    gcd.ToolActive = True
 
 End

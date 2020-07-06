@@ -47,9 +47,9 @@ Public Function Start(Optional ElemToBuild As Variant, Optional _Mode As Integer
 
         clsDrawingAids.Helper.texto = clsDrawingAids.HelperTrabajo & (": Selecct entities")
 
-        modCAD.clsJobPrevious = Me
-        modCAD.clsJob = clsDefaultJob
-        modCAD.clsJob.Start(1) ' Stretch mode
+        gcd.clsJobPrevious = Me
+        gcd.clsJob = clsDefaultJob
+        gcd.clsJob.Start(1) ' Stretch mode
 
     Else                                                                    ' need the first point
 
@@ -58,7 +58,7 @@ Public Function Start(Optional ElemToBuild As Variant, Optional _Mode As Integer
 
     Endif
     Me.Active = True
-    modCAD.ToolActive = True
+    gcd.ToolActive = True
 
 End
 
@@ -101,7 +101,7 @@ Public Function MouseMove(mouseX As Integer, mouseY As Integer) ' called by FCAD
         Me.SelEndXr = puntos.Near(appmain.hFcad.Xreal(mouseX))
         Me.SelEndyr = puntos.Near(appmain.hFcad.Yreal(mouseY))
 
-        If modCAD.Ortogonal Then
+        If gcd.Ortogonal Then
 
             If Abs(Me.SelEndXr - Me.SelStartXr) > Abs(Me.SelEndyr - Me.SelStartYr) Then ' X prevails
 
@@ -156,13 +156,13 @@ Public Sub Finish()
 
     Endif
 
-    modCAD.clsJobPrevious = Me
-    modCAD.clsJob = clsDefaultJob
+    gcd.clsJobPrevious = Me
+    gcd.clsJob = clsDefaultJob
     clsDrawingAids.CleanTexts
     clsEntities.DeSelection()
-    modCAD.DrawOriginals = False
+    gcd.DrawOriginals = False
     appmain.hFCAD.Regen
     Me.Active = False
-    modCAD.ToolActive = False
+    gcd.ToolActive = False
 
 End

@@ -134,8 +134,8 @@ Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' called by FCAD->
 
     clsEntityBuilder.LastEntity = entInsert                                       ' save it to repeat on rigth click
 
-    modCAD.clsJobPrevious = Me
-    modCAD.clsJob = clsDefaultJob
+    gcd.clsJobPrevious = Me
+    gcd.clsJob = clsDefaultJob
     clsDrawingAids.CleanTexts
 
     appmain.hFCAD.Regen

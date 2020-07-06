@@ -207,19 +207,19 @@ Public Function KeyText(EnteredText As String)
 
     If EnteredText = "" Then Return                                ' no BS here
 
-    modCAD.clsJobPrevious = modCAD.clsJob
+    gcd.clsJobPrevious = gcd.clsJob
 
     o = Object.New("cad" & EnteredText)
 
     ' check if the class needs to be run trough other
     If o.usewith = "" Then                        ' its a tool
-        modCAD.clsJob = o
-        modCAD.clsJob.start
+        gcd.clsJob = o
+        gcd.clsJob.start
 
     Else                                                    ' its propably an eentity
 
-        modCAD.clsJob = Object.New(o.usewith)
-        modCAD.clsJob.start(o)
+        gcd.clsJob = Object.New(o.usewith)
+        gcd.clsJob.start(o)
 
     End If
 
@@ -265,12 +265,12 @@ End
 '
 ' Public Sub Finish()
 '
-'     ' modCAD.clsJobPrevious = Me  ' selection dont go to another job
+'     ' gcd.clsJobPrevious = Me  ' selection dont go to another job
 '
-'     modCAD.clsJob = modCAD.clsJobPrevious
-'     modCAD.clsJobPrevious = Me
+'     gcd.clsJob = gcd.clsJobPrevious
+'     gcd.clsJobPrevious = Me
 '     clsDrawingAids.CleanTexts
 '     appmain.hFCAD.redraw
-'     modCAD.clsJob.Start(modCAD.clsJobPreviousParam)
+'     gcd.clsJob.Start(gcd.clsJobPreviousParam)
 '
 ' End

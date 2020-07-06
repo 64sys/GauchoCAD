@@ -69,7 +69,7 @@ Public Sub Draw()
     paint.LineTo(Me.p[4], Me.p[5])
     paint.ClosePath
     ' veo si esta seleccionada
-    If Me.selected And modCAD.DrawMarcados Then
+    If Me.selected And gcd.DrawMarcados Then
         paint.brush = Paint.Color(&HA0A063)
     Else
         paint.brush = Paint.Color(&HEBEBEB)

@@ -46,20 +46,20 @@ Public Sub Run(cMod As Collection)
         cLayers = cMod["Layers"]
     Endif
 
-    'For i = 0 To modCAD.cStyles.Count - 1
+    'For i = 0 To gcd.cStyles.Count - 1
     '    xStyles.Add(CStr(i))
     'Next
 
-    'For i = 0 To modCAD.cWeights.Count - 1
+    'For i = 0 To gcd.cWeights.Count - 1
     '    xWeights.Add(CStr(i))
     'Next
 
-    'For i = 0 To modCAD.cColors.Count - 1
+    'For i = 0 To gcd.cColors.Count - 1
     '    xColors.Add(CStr(i))
     'Next
 
     ' Made a copy for job
-    'draft = modCAD.cLayers.Copy()
+    'draft = gcd.cLayers.Copy()
 
     stx = [("id"), ("Name"), ("Show"), ("Frozen"), ("Lock"), ("Color"), ("Style"), ("Width"), ("Print")]
     lbx = ["id", "name", "show", "frozen", "locked", "colour", "style", "width", "print"]
@@ -89,7 +89,7 @@ Public Sub Run(cMod As Collection)
     Next
 
     TableView1.Rows.Count = 0
-    'TableView1.Rows.Count = draft.Count 'modCAD.cLayers.Count '+ 1
+    'TableView1.Rows.Count = draft.Count 'gcd.cLayers.Count '+ 1
     TableView1.Rows.Count = cLayers.Count
     Me.Title = ("Layers")
 
@@ -105,7 +105,7 @@ Public Sub TableView1_Data(Row As Integer, Column As Integer)
     Dim pic As Picture
     '    Dim tog As ToggleButton
 
-    For Each v In cLayers 'draft 'modCAD.cLayers
+    For Each v In cLayers 'draft 'gcd.cLayers
         If i = row Then
             st = v[lbx[Column]]
             Select lbx[Column]
@@ -191,7 +191,7 @@ Public Sub LMenu_Click()
     Dim drf As Variant
     Dim n As Variant
 
-    'If modCAD.FileName <> "" Then
+    'If gcd.FileName <> "" Then
 
     obj = Last
 
@@ -212,7 +212,7 @@ Public Sub LMenu_Click()
             TableView1.Rows.Count = 0
             TableView1.Rows.Count = cLayers.Count
 
-            'modCAD.cLayers.Add()
+            'gcd.cLayers.Add()
 
         Case "erase"
             If loading = False Then
@@ -237,7 +237,7 @@ Public Sub LMenu_Click()
             Dim t As Float = Timer                              ' IGNORAR: estos Timers y Debug son para monitorear el tiempo de actualizacion
 
             ' aplicamos los parametros de los layers a las entidades
-            modCAD.ApplyLayerProperties
+            gcd.ApplyLayerProperties
             Debug "apply properties time ", Timer - t           ' IGNORAR: estos Timers y Debug son para monitorear el tiempo de actualizacion
             t = Timer                                           ' IGNORAR: estos Timers y Debug son para monitorear el tiempo de actualizacion
 

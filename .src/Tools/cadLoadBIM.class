@@ -83,7 +83,7 @@ Public Sub LoadFromFile(Optional FilePath As String)
 
     x.Open(FilePath)
 
-    modCAD.FileName = FilePath
+    gcd.FileName = FilePath
 
     For Each ent In x.GetElementsByTagName("header")
         Select ent.Attributes["type"]
@@ -100,7 +100,7 @@ Public Sub LoadFromFile(Optional FilePath As String)
                 c["style"] = CInt(ent.Attributes["style"])
                 c["weight"] = CInt(ent.Attributes["weight"])
                 c["print"] = CBool(ent.Attributes["print"])
-                modCAD.cLayers.Add(c.Copy(), ent.Attributes["id"])
+                gcd.cLayers.Add(c.Copy(), ent.Attributes["id"])
                 'Inc ilayer
 
                 ' Case "color"
@@ -110,7 +110,7 @@ Public Sub LoadFromFile(Optional FilePath As String)
                 '     c["type"] = ent.Attributes["type"]
                 '     'c["label"] = ent.Attributes["label"]
                 '     c["value"] = ent.Attributes["value"]
-                '     modCAD.cColors.Add(c.Copy(), ent.Attributes["id"])
+                '     gcd.cColors.Add(c.Copy(), ent.Attributes["id"])
                 '     'Inc icolor
                 '
                 ' Case "style"
@@ -120,7 +120,7 @@ Public Sub LoadFromFile(Optional FilePath As String)
                 '     c["type"] = ent.Attributes["type"]
                 '     'c["label"] = ent.Attributes["value"]
                 '     c["value"] = ent.Attributes["value"]
-                '     modCAD.cStyles.Add(c.Copy(), ent.Attributes["id"])
+                '     gcd.cStyles.Add(c.Copy(), ent.Attributes["id"])
                 '     'Inc istyle
                 '
                 ' Case "weight"
@@ -130,7 +130,7 @@ Public Sub LoadFromFile(Optional FilePath As String)
                 '     c["type"] = ent.Attributes["type"]
                 '     'c["label"] = ent.Attributes["label"]
                 '     c["value"] = ent.Attributes["value"]
-                '     modCAD.cWeights.Add(c.Copy(), ent.Attributes["id"])
+                '     gcd.cWeights.Add(c.Copy(), ent.Attributes["id"])
                 '     'Inc iweight
 
         End Select
@@ -186,8 +186,8 @@ End
 
 Public Sub Finish()     ' en este caso no podemos usar la rutina de la clase padre
 
-    modCAD.clsJobPrevious = Me
-    modCAD.clsJob = clsDefaultJob
+    gcd.clsJobPrevious = Me
+    gcd.clsJob = clsDefaultJob
     clsDrawingAids.CleanTexts
 
 End

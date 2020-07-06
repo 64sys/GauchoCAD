@@ -99,7 +99,7 @@ End
 '' A fat version of the line
 Public Sub DrawSelected(oE As Entity)
 
-    GLplus.Polygon(oE.Polygon, modCAD.ColorForSelected, oE.LineWidth, gcd.stiDashed)
+    GLplus.Polygon(oE.Polygon, gcd.ColorForSelected, oE.LineWidth, gcd.stiDashed)
 
 End
 

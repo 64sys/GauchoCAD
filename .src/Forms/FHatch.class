@@ -39,6 +39,6 @@ End
 
 Public Sub btnCAncel_Click()
 
-    modCAD.clsJob.finish
+    gcd.clsJob.finish
 
 End

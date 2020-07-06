@@ -162,11 +162,11 @@ Public Function Draw2(oE As Entity)
     paint.Translate(appmain.hFcad.pixels(oE.p[0]) / appmain.hFcad.ScaleZoom, appmain.hFcad.pixels(oE.p[1]) / appmain.hFcad.ScaleZoom)
     paint.Scale(oE.fParam[0], oE.fParam[1])
     paint.Rotate(oE.fParam[2])
-    modCAD.ScaleLines = (Abs(oE.fParam[0]) + Abs(oE.fParam[1])) / 2
+    gcd.ScaleLines = (Abs(oE.fParam[0]) + Abs(oE.fParam[1])) / 2
     For Each ET In appmain.hFCAD.arrBlocks[i].entities
         et.Draw
     Next
-    modCAD.ScaleLines = 1
+    gcd.ScaleLines = 1
     paint.Restore
 
 End
