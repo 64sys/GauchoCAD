@@ -245,7 +245,7 @@ Public Function ExportEntities(colGrp As Collection, obxEntities As Entity[], Op
         colGrp.Add(colEnt, Str$(eCount))
         Select Case e.Gender
             Case "Line"
-                colgrp[Str$(eCount)].Add("LINE", "entity")
+                colgrp[Str$(eCount)].Add("line", "entity")
                 colgrp[Str$(eCount)].Add(e.Layer, "layer")
                 colgrp[Str$(eCount)].Add(e.LineTypeName, "style")
                 colgrp[Str$(eCount)].Add(e.colour, "colour")
@@ -260,7 +260,21 @@ Public Function ExportEntities(colGrp As Collection, obxEntities As Entity[], Op
                 flxPoints.Add(e.P[3])                   ' Y
                 flxPoints.Add(0)                        ' Z
                 colgrp[Str$(eCount)]["p"].Add(flxPoints, "p1")
-
+            Case "PLine"
+                colgrp[Str$(eCount)].Add("lwpolyline", "entity")
+                colgrp[Str$(eCount)].Add(e.Layer, "layer")
+                colgrp[Str$(eCount)].Add(e.LineTypeName, "style")
+                colgrp[Str$(eCount)].Add(e.colour, "colour")
+                colgrp[Str$(eCount)].Add(e.LineWidth, "width")
+                colgrp[Str$(eCount)].Add(p, "p")
+                For i = 0 To e.P.Max Step 2
+                    flxPoints = New Float[]
+                    flxPoints.Add(e.P[i])                   ' X
+                    flxPoints.Add(e.P[i + 1])               ' Y
+                    flxPoints.Add(0)                        ' Z
+                    colgrp[Str$(eCount)]["p"].Add(flxPoints, "p" & Trim(Str(i / 2)))
+                Next
+                Stop
         End Select
         Inc eCount
     Next
