@@ -349,7 +349,7 @@
         MoveScaled(24,0,15,5)
       }
       { btnColors Button
-        MoveScaled(41,0,15,5)
+        MoveScaled(41,0,5,5)
       }
       { mubColors MenuButton
         MoveScaled(59,0,6,5)

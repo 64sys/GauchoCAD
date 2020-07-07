@@ -20,40 +20,119 @@
 ' Foundation, Inc., 51 Franklin St, Fifth Floor,
 ' Boston, MA  02110-1301  USA
 '
-Private ltypes As Collection
 Private Coords As Integer[]
 Private wmax As Integer
+Private iCurrentColor As Integer
 
-Public Sub _new(lty As Collection, cor As Integer[])
+Public Sub _new(cor As Integer[])
 
-    ltypes = lty
     Coords = cor
 
 End
 
 Public Sub Run() As Boolean
 
-    ' Dim vrx As Variant
-    ' Dim wtmp As Integer
-    '
-    ' For Each vrx In ltypes
-    '     wtmp = dsk.TextWidth(vrx[1], Me.Font.Name, Me.Font.Size) + 8 + vrx[2].Picture.Width
-    '     If wtmp > wmax Then
-    '         wmax = wtmp
-    '     Endif
-    ' Next
-    '
-    ' GridView1.Columns.Count = 2
-    ' GridView1.Columns[0].Expand = False
-    ' GridView1.Columns[0].Width = 0
-    ' GridView1.Columns[1].Expand = True
-    '
-    ' GridView1.Rows.Count = 0
-    ' GridView1.Rows.Count = ltypes.Count
-    '
-    ' Me.Width = wmax
+    Dim i As Integer
+    Dim btn As ToolButton
+    Dim crs As New String[]
+    Dim img As Image
+    Dim cr As Color
+    Dim s As Integer
+    Dim r As Integer
+    Dim g As Integer
+    Dim b As Integer
+    Dim j As Integer
+    Dim xPanel As Panel
+
+    s = 20
+    crs = cad.RGBColors()
+    Me.W = ((s + 2) * 23) + 4
+    Me.h = (s + 2) * 10 + pnlPrimary.H + pnlGray.H + Panel5.H
+    'pnlColors.Arrangement = Arrange.None
+
+    For i = 1 To 9
+        r = CInt(Split(crs[i], ",")[0])
+        g = CInt(Split(crs[i], ",")[1])
+        b = CInt(Split(crs[i], ",")[2])
+        img = New Image(s, s, Color.RGB(r, g, b), 0)
+
+        btn = New ToolButton(pnlPrimary) As "Colour"
+        With btn
+            .H = pnlPrimary.H
+            .W = pnlPrimary.H
+            .Tooltip = CStr(i)
+            .Tag = i
+            .Name = "pic" & CStr(i)
+            .Picture = img.Stretch(pnlPrimary.H - 4, pnlPrimary.H - 4).Picture
+        End With
+    Next
+    For i = 250 To 255
+        r = CInt(Split(crs[i], ",")[0])
+        g = CInt(Split(crs[i], ",")[1])
+        b = CInt(Split(crs[i], ",")[2])
+        img = New Image(s, s, Color.RGB(r, g, b), 0)
+        btn = New ToolButton(pnlGray) As "Colour"
+        With btn
+            .H = pnlGray.H
+            .W = pnlGray.H
+            .Tooltip = CStr(i)
+            .Tag = i
+            .Name = "pic" & CStr(i)
+            .Picture = img.Stretch(pnlGray.H - 4, pnlGray.H - 4).Picture
+        End With
+    Next
+
+    For j = 0 To 9
+        xPanel = Me.Controls["pnlC" & CStr(j + 1)]
+
+        For i = 10 To 240 Step 10
+            r = CInt(Split(crs[i + j], ",")[0])
+            g = CInt(Split(crs[i + j], ",")[1])
+            b = CInt(Split(crs[i + j], ",")[2])
+            img = New Image(s, s, Color.RGB(r, g, b), 0)
+            btn = New ToolButton(xPanel) As "Colour"
+            With btn
+                .H = xPanel.H
+                .W = xPanel.H
+                .Tooltip = CStr(i + j)
+                .Tag = i + j
+                .Name = "pic" & CStr(i + j)
+                .Picture = img.Stretch(xPanel.H - 4, xPanel.H - 4).Picture
+            End With
+        Next
+
+    Next
 
     Me.Show
+
+End
+
+Public Sub Colour_Click()
+
+    Dim obj As Object
+
+    obj = Last
+
+    iCurrentColor = obj.Tag
+
+    APPMain.SelectedColour = True
+    APPMain.CurrentColor = iCurrentColor
+
+    Me.Close
+
+End
+
+Public Sub Colour_GotFocus()
+
+    Dim obj As Object
+
+    obj = Last
+
+    iCurrentColor = obj.Tag
+    TextBox1.Text = obj.Tag
+
+    'APPMain.SelectedColour = iCurrentColor
+    'Me.Close
 
 End
 
@@ -63,46 +142,9 @@ Public Sub Form_Open()
 
 End
 
-' Public Sub GridView1_Data(Row As Integer, Column As Integer)
-'
-'     Dim img As Image
-'     Dim dash As Float[]
-'
-'     Select Column
-'         Case 0
-'             GridView1[Row, Column].Text = CStr(Row)
-'
-'         Case 1
-'
-'             If ltypes[CStr(Row)][2] Then
-'                 img = ltypes[CStr(Row)][2]
-'                 GridView1[Row, Column].Picture = img.Picture
-'             Else
-'                 img.Clear
-'             Endif
-'
-'             GridView1[Row, Column].Text = ltypes[CStr(Row)][1]
-'
-'     End Select
-'
-' End
+Public Sub pnlColors_LostFocus()
 
-' Public Sub GridView1_MouseDown()
-'
-'     If GridView1.Row <> -1 Then
-'         APPMain.CurrentLtype = GridView1.Row
-'         APPMain.SelectedLtype = True
-'     Endif
-'     Print GridView1[GridView1.Row, 0].Text
-'     Print GridView1[GridView1.Row, 1].Text
-'
-'     Me.Close(True)
-'
-' End
-'
-' Public Sub GridView1_LostFocus()
-'
-'     APPMain.SelectedLtype = True
-'     Me.Close
-'
-' End
+    APPMain.SelectedColour = iCurrentColor
+    Me.Close
+
+End

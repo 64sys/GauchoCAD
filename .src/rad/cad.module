@@ -1902,6 +1902,7 @@ Public Function EntityCodes(Optional ent As String) As Collection
 End
 
 'Dim d As New Collection
+'' Return a String[] with the form r,g,b where each index is the dxf color number
 
 Public Function RGBColors() As String[]
 

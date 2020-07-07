@@ -1,10 +1,101 @@
 # Gambas Form File 3.0
 
 { Form Form
-  MoveScaled(0,0,38,36)
-  Border = False
+  MoveScaled(0,0,81,80)
   Arrangement = Arrange.Vertical
   { Panel1 Panel
-    MoveScaled(2,5,33,28)
+    MoveScaled(0,1,79,11)
+    Arrangement = Arrange.Column
+    { Panel2 Panel
+      MoveScaled(0,0,52,11)
+      Arrangement = Arrange.Vertical
+      Spacing = True
+      { pnlPrimary Panel
+        MoveScaled(0,0,35,5)
+        Expand = True
+        Arrangement = Arrange.Horizontal
+      }
+      { Panel3 Panel
+        MoveScaled(0,5,52,5)
+        Arrangement = Arrange.Horizontal
+        { pnlGray Panel
+          MoveScaled(1,0,35,5)
+          Expand = True
+          Arrangement = Arrange.Horizontal
+        }
+        { TextBox1 TextBox
+          MoveScaled(37,0,14,5)
+          Alignment = Align.Center
+        }
+      }
+    }
+    { Panel4 Panel
+      MoveScaled(53,0,25,11)
+      Arrangement = Arrange.Column
+      Spacing = True
+      Margin = True
+      { tobByBlock ToolButton Colour
+        Name = "tobByBlock"
+        MoveScaled(1,0,9,9)
+        #Translate = False
+        Tag = "256"
+        Text = "ByBlock"
+      }
+      { tobByLayer ToolButton Colour
+        Name = "tobByLayer"
+        MoveScaled(15,1,9,9)
+        #Translate = False
+        Tag = "257"
+        Text = "ByLayer"
+      }
+    }
+  }
+  { pnlColors Panel
+    MoveScaled(1,13,78,58)
+    Expand = True
+    Arrangement = Arrange.Vertical
+    { pnlC9 Panel
+      MoveScaled(7,1,60,3)
+      Arrangement = Arrange.Horizontal
+    }
+    { pnlC7 Panel
+      MoveScaled(7,5,60,3)
+      Arrangement = Arrange.Horizontal
+    }
+    { pnlC5 Panel
+      MoveScaled(7,9,60,3)
+      Arrangement = Arrange.Horizontal
+    }
+    { pnlC3 Panel
+      MoveScaled(7,13,60,3)
+      Arrangement = Arrange.Horizontal
+    }
+    { pnlC1 Panel
+      MoveScaled(7,17,60,3)
+      Arrangement = Arrange.Horizontal
+    }
+    { Panel5 Panel
+      MoveScaled(4,20,65,2)
+    }
+    { pnlC2 Panel
+      MoveScaled(2,23,60,3)
+      Arrangement = Arrange.Horizontal
+    }
+    { pnlC4 Panel
+      MoveScaled(2,27,60,3)
+      Arrangement = Arrange.Horizontal
+    }
+    { pnlC6 Panel
+      MoveScaled(2,31,60,3)
+      Arrangement = Arrange.Horizontal
+    }
+    { pnlC8 Panel
+      MoveScaled(2,35,60,3)
+      Arrangement = Arrange.Horizontal
+    }
+    { pnlC10 Panel
+      MoveScaled(2,39,60,3)
+      Arrangement = Arrange.Horizontal
+    }
   }
 }

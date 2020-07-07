@@ -37,13 +37,17 @@ Private lgg As Logger               '' Registro de eventos de la aplicación.
 Public hFCAD As FCAD                    '' CAD Editor
 Public CurrentForm As Form
 Public CurrentFile As String
+
+Public SelectedColour As Boolean
 Public CurrentColor As Integer
-Public CurrentLayer As String
-Public CurrentLtype As Integer
+Public imgColor As Image
 
 Public SelectedLayer As Boolean
+Public CurrentLayer As String
+
 Public SelectedLtype As Boolean
-Public SelectedColour As Boolean
+Public CurrentLtype As Integer
+
 Public SelectedWidth As Boolean
 
 'variables de ambiente
@@ -67,6 +71,9 @@ Public Sub Run(cin As Collection)
     Dim iSet As String
     Dim z As Integer
     Dim ctr As Object
+    Dim r As Integer
+    Dim g As Integer
+    Dim b As Integer
 
     'CurrentColor = Color.Green
 
@@ -147,13 +154,6 @@ Public Sub Run(cin As Collection)
                         Case "grpSmart", "grpEntities", "grpView", "grpTools"
                             tob.Picture = obj.Picture.Image.Stretch(z - 8, z - 8).Picture
                             .Border = True
-
-                            ' Case "grpHelp"
-                            '     'Skip
-                            '
-                            ' Case Else
-                            '     tob.Picture = obj.Picture
-                            '     .Border = True
                     End Select
 
                 End With
@@ -168,9 +168,10 @@ Public Sub Run(cin As Collection)
 
     'For Each ctr In Panel2.Children
     'If Object.Type(ctr) <> "Panel" Then
-    btnLayers.Reparent(pnlFile)
+    btnColors.Reparent(pnlFile)
     btnLtypes.Reparent(pnlFile)
-    mubColors.Reparent(pnlFile)
+    btnLayers.Reparent(pnlFile)
+    'mubColors.Reparent(pnlFile)
     cboLayers.Reparent(pnlFile)
     tobLayers.Reparent(pnlFile)
     'cboStyles.Reparent(pnlFile)
@@ -181,7 +182,7 @@ Public Sub Run(cin As Collection)
 
     'Loading menu colors
     'LoadColors()
-    AddColorsPics()
+    ' AddColorsPics()
 
     AddLtypesPics()
     btnLtypes.Picture = Starter.cLtypes["0"][2].Picture
@@ -189,6 +190,18 @@ Public Sub Run(cin As Collection)
 
     ' 'LoadLtypes()
     'LoadLocks()
+
+    If CurrentColor = 0 Then
+        CurrentColor = 3
+    Endif
+
+    r = CInt(Split(Starter.ColorsRGB[CurrentColor], ",")[0])
+    g = CInt(Split(Starter.ColorsRGB[CurrentColor], ",")[1])
+    b = CInt(Split(Starter.ColorsRGB[CurrentColor], ",")[2])
+
+    imgColor = New Image(btnColors.H - 2, btnColors.H - 2, Color.RGB(r, g, b), 0)
+    btnColors.Picture = imgColor.Picture
+    btnColors.Tooltip = ("Color") & ": " & CStr(CurrentColor)
 
     Me.Show()
 
@@ -1346,6 +1359,47 @@ Public Sub btnLtypes_MouseDown()
 
 End
 
+Public Sub btnColors_MouseDown()
+
+    Dim FClr As FColors
+    Dim r As Integer
+    Dim g As Integer
+    Dim b As Integer
+
+    FClr = New FColors([btnColors.ScreenX, btnColors.ScreenY + btnColors.Parent.H])
+    FClr.Border = False
+
+    If SelectedColour = False Then
+        FClr.Run()
+        Do
+            If SelectedColour = True Then
+
+                r = CInt(Split(Starter.ColorsRGB[CurrentColor], ",")[0])
+                g = CInt(Split(Starter.ColorsRGB[CurrentColor], ",")[1])
+                b = CInt(Split(Starter.ColorsRGB[CurrentColor], ",")[2])
+
+                imgColor = New Image(btnColors.H - 2, btnColors.H - 2, Color.RGB(r, g, b), 0)
+
+                btnColors.Picture = imgColor.Picture
+                Select CurrentColor
+                    Case 256
+                        btnColors.Tooltip = ("Color") & ": " & "ByBlock"
+                    Case 257
+                        btnColors.Tooltip = ("Color") & ": " & "ByLayer"
+                    Case Else
+                        btnColors.Tooltip = ("Color") & ": " & CStr(CurrentColor)
+                End Select
+
+                SelectedColour = False
+                Break
+            Else
+                Wait 0.01
+            Endif
+        Loop
+    Endif
+
+End
+
 Public Sub btnLayers_MouseDown()
 
     Dim FLay As FLayers1
@@ -1355,18 +1409,6 @@ Public Sub btnLayers_MouseDown()
     FLay.Border = False
 
     FLay.Run(hFCAD.cModel)
-
-End
-
-Public Sub btnColors_MouseDown()
-
-    Dim FClr As FColors
-
-    FClr = New FColors([Workspace1.ScreenX, Workspace1.ScreenY])
-
-    FClr.Border = False
-
-    FClr.Run()
 
 End
 

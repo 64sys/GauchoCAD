@@ -49,6 +49,7 @@ Public flgWindowInfoColor As Integer           ' habria que agrupar todas las va
 '----------------------
 Public cCommands As New Collection   '' Commands list
 Public cColors As New Collection     '' Colors list
+Public ColorsRGB As New String[]     '' Colors lists each item as r,g,b string
 Public cLtypes As New Collection     '' Linetypes list
 
 ' Variables de un solo uso
@@ -152,6 +153,7 @@ Public Sub Run()
 
     '' Load the colors list
     cColors = LoadColors()
+    ColorsRGB = cad.RGBColors()
 
     '' Load the linetypes list
     cLtypes = LoadLtypes()
