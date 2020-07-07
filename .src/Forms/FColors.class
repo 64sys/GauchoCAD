@@ -20,17 +20,18 @@
 ' Foundation, Inc., 51 Franklin St, Fifth Floor,
 ' Boston, MA  02110-1301  USA
 '
-Private Coords As Integer[]
+'Private Coords As Integer[]
 Private wmax As Integer
 Private iCurrentColor As Integer
 
-Public Sub _new(cor As Integer[])
+'Public Sub _new(cor As Integer[])
+'
+'    Coords = cor
+'
+'End
 
-    Coords = cor
-
-End
-
-Public Sub Run() As Boolean
+'Public Sub Run() As Boolean
+Public Sub Form_Open()
 
     Dim i As Integer
     Dim btn As ToolButton
@@ -63,7 +64,7 @@ Public Sub Run() As Boolean
             .Tooltip = CStr(i)
             .Tag = i
             .Name = "pic" & CStr(i)
-            .Picture = img.Stretch(pnlPrimary.H - 4, pnlPrimary.H - 4).Picture
+            .Picture = img.Stretch(pnlPrimary.H - 8, pnlPrimary.H - 8).Picture
         End With
     Next
     For i = 250 To 255
@@ -71,6 +72,7 @@ Public Sub Run() As Boolean
         g = CInt(Split(crs[i], ",")[1])
         b = CInt(Split(crs[i], ",")[2])
         img = New Image(s, s, Color.RGB(r, g, b), 0)
+
         btn = New ToolButton(pnlGray) As "Colour"
         With btn
             .H = pnlGray.H
@@ -78,7 +80,7 @@ Public Sub Run() As Boolean
             .Tooltip = CStr(i)
             .Tag = i
             .Name = "pic" & CStr(i)
-            .Picture = img.Stretch(pnlGray.H - 4, pnlGray.H - 4).Picture
+            .Picture = img.Stretch(pnlGray.H - 8, pnlGray.H - 8).Picture
         End With
     Next
 
@@ -90,6 +92,7 @@ Public Sub Run() As Boolean
             g = CInt(Split(crs[i + j], ",")[1])
             b = CInt(Split(crs[i + j], ",")[2])
             img = New Image(s, s, Color.RGB(r, g, b), 0)
+
             btn = New ToolButton(xPanel) As "Colour"
             With btn
                 .H = xPanel.H
@@ -97,13 +100,11 @@ Public Sub Run() As Boolean
                 .Tooltip = CStr(i + j)
                 .Tag = i + j
                 .Name = "pic" & CStr(i + j)
-                .Picture = img.Stretch(xPanel.H - 4, xPanel.H - 4).Picture
+                .Picture = img.Stretch(xPanel.H - 8, xPanel.H - 8).Picture
             End With
         Next
 
     Next
-
-    Me.Show
 
 End
 
@@ -130,21 +131,5 @@ Public Sub Colour_GotFocus()
 
     iCurrentColor = obj.Tag
     TextBox1.Text = obj.Tag
-
-    'APPMain.SelectedColour = iCurrentColor
-    'Me.Close
-
-End
-
-Public Sub Form_Open()
-
-    Me.Move(Coords[0], Coords[1])
-
-End
-
-Public Sub pnlColors_LostFocus()
-
-    APPMain.SelectedColour = iCurrentColor
-    Me.Close
 
 End

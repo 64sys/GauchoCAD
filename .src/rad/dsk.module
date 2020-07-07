@@ -67,6 +67,34 @@ Public Function MimeAppPicture(strApp As String, intSize As Integer) As Picture 
 
 End
 
+'' Return the same image but with a frame
+
+Public Function ImageFrame(img As Image) As Image
+
+    Dim lt As Variant
+    'Dim img As Image
+
+    For Each lt In Starter.cColors
+
+        Paint.Begin(img)
+        Paint.NewPath
+        Paint.Brush = Paint.Color(Color.Black)
+
+        Paint.LineWidth = 3
+        Paint.MoveTo(2, 2)
+
+        Paint.LineTo(img.W - 2, 2)
+        Paint.LineTo(img.W - 2, img.H - 2)
+        Paint.LineTo(2, img.H - 2)
+        Paint.LineTo(2, 2)
+
+        Paint.Stroke
+        Paint.End
+    Next
+    Return img
+
+End
+
 Public Function FileChooser(Optional strInputPath As String, Optional stxExt As String[]) As String[] ''Selecciona la ruta completa de un archivo, con el nombre y las extensiones. Como opcional se puede pasar un directorio que es a donde se dirigira el filechooser cuando se abra. También como opcional se pued epasar un filtro de tipos de archivos separados por :, por ejemolo "txt:csv"
 
     Dim strExt As String

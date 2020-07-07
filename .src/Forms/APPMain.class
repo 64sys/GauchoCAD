@@ -74,6 +74,7 @@ Public Sub Run(cin As Collection)
     Dim r As Integer
     Dim g As Integer
     Dim b As Integer
+    Dim img As Image
 
     'CurrentColor = Color.Green
 
@@ -200,7 +201,10 @@ Public Sub Run(cin As Collection)
     b = CInt(Split(Starter.ColorsRGB[CurrentColor], ",")[2])
 
     imgColor = New Image(btnColors.H - 2, btnColors.H - 2, Color.RGB(r, g, b), 0)
-    btnColors.Picture = imgColor.Picture
+    img = dsk.ImageFrame(imgColor.Stretch(btnColors.W - 4, btnColors.H - 4))
+
+    btnColors.Picture = img.Picture
+
     btnColors.Tooltip = ("Color") & ": " & CStr(CurrentColor)
 
     Me.Show()
@@ -1361,42 +1365,30 @@ End
 
 Public Sub btnColors_MouseDown()
 
-    Dim FClr As FColors
     Dim r As Integer
     Dim g As Integer
     Dim b As Integer
+    Dim img As Image
 
-    FClr = New FColors([btnColors.ScreenX, btnColors.ScreenY + btnColors.Parent.H])
-    FClr.Border = False
+    FColors.ShowModal()
 
-    If SelectedColour = False Then
-        FClr.Run()
-        Do
-            If SelectedColour = True Then
+    r = CInt(Split(Starter.ColorsRGB[CurrentColor], ",")[0])
+    g = CInt(Split(Starter.ColorsRGB[CurrentColor], ",")[1])
+    b = CInt(Split(Starter.ColorsRGB[CurrentColor], ",")[2])
 
-                r = CInt(Split(Starter.ColorsRGB[CurrentColor], ",")[0])
-                g = CInt(Split(Starter.ColorsRGB[CurrentColor], ",")[1])
-                b = CInt(Split(Starter.ColorsRGB[CurrentColor], ",")[2])
+    imgColor = New Image(btnColors.H - 2, btnColors.H - 2, Color.RGB(r, g, b), 0)
 
-                imgColor = New Image(btnColors.H - 2, btnColors.H - 2, Color.RGB(r, g, b), 0)
+    img = dsk.ImageFrame(imgColor)
 
-                btnColors.Picture = imgColor.Picture
-                Select CurrentColor
-                    Case 256
-                        btnColors.Tooltip = ("Color") & ": " & "ByBlock"
-                    Case 257
-                        btnColors.Tooltip = ("Color") & ": " & "ByLayer"
-                    Case Else
-                        btnColors.Tooltip = ("Color") & ": " & CStr(CurrentColor)
-                End Select
-
-                SelectedColour = False
-                Break
-            Else
-                Wait 0.01
-            Endif
-        Loop
-    Endif
+    btnColors.Picture = img.Picture
+    Select CurrentColor
+        Case 256
+            btnColors.Tooltip = ("Color") & ": " & "ByBlock"
+        Case 257
+            btnColors.Tooltip = ("Color") & ": " & "ByLayer"
+        Case Else
+            btnColors.Tooltip = ("Color") & ": " & CStr(CurrentColor)
+    End Select
 
 End
 
@@ -1585,5 +1577,9 @@ Public Sub Form_KeyPress()
         End Select
 
     Endif
+
+End
+
+Public Sub btnColors_Click()
 
 End

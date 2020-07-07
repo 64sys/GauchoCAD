@@ -347,9 +347,11 @@
       }
       { btnLayers Button
         MoveScaled(24,0,15,5)
+        Background = Color.Yellow
       }
       { btnColors Button
         MoveScaled(41,0,5,5)
+        Background = Color.Yellow
       }
       { mubColors MenuButton
         MoveScaled(59,0,6,5)

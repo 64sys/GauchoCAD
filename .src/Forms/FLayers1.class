@@ -341,41 +341,25 @@ Public Sub TableView1_Click()
             TableView1.Edit
 
         Case "colour"
-            'tx = Mouse.X
-            'ty = Mouse.y
-            'tx = TableView1[TableView1.Row, TableView1.Column].ClientX ' + TableView1.ClientX
-            'ty = TableView1[TableView1.Row, TableView1.Column].ClientY ' + TableView1.ClientY
 
-            FClr = New FColors([tx, ty])
-            FClr.Border = False
+            FColors.ShowModal()
 
-            If SelectedColour = False Then
-                FClr.Run()
-                Do
-                    If SelectedColour = True Then
+            r = CInt(Split(Starter.ColorsRGB[CurrentColor], ",")[0])
+            g = CInt(Split(Starter.ColorsRGB[CurrentColor], ",")[1])
+            b = CInt(Split(Starter.ColorsRGB[CurrentColor], ",")[2])
 
-                        r = CInt(Split(Starter.ColorsRGB[CurrentColor], ",")[0])
-                        g = CInt(Split(Starter.ColorsRGB[CurrentColor], ",")[1])
-                        b = CInt(Split(Starter.ColorsRGB[CurrentColor], ",")[2])
+            TableView1[TableView1.Row, TableView1.Column].Background = CurrentColor
 
-                        TableView1[TableView1.Row, TableView1.Column].Background = CurrentColor
+            Select CurrentColor
+                Case 256
+                    TableView1[TableView1.Row, TableView1.Column].Text = "ByBlock"
+                Case 257
+                    TableView1[TableView1.Row, TableView1.Column].Text = "ByLayer"
+                Case Else
+                    TableView1[TableView1.Row, TableView1.Column].Text = CStr(CurrentColor)
+            End Select
 
-                        Select CurrentColor
-                            Case 256
-                                TableView1[TableView1.Row, TableView1.Column].Text = "ByBlock"
-                            Case 257
-                                TableView1[TableView1.Row, TableView1.Column].Text = "ByLayer"
-                            Case Else
-                                TableView1[TableView1.Row, TableView1.Column].Text = CStr(CurrentColor)
-                        End Select
-
-                        SelectedColour = False
-                        Break
-                    Else
-                        Wait 0.01
-                    Endif
-                Loop
-            Endif
+            'Endif
 
             'TableView1.Edit(xColors, True)
         Case "style"
