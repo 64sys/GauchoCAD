@@ -45,6 +45,9 @@ Public Function SaveGaucho(sFile As String, cMdl As Collection)
     Dim a As String
     Dim pq As Integer
     Dim pc As Integer
+    Dim myMdl As Collection
+
+    myMdl = cMdl
 
     stx = ["entity", "handle", "layer", "style", "width", "colour", "p", "radius", "ratio", "start_angle", "end_angle", "angle", "scale", "block", "text", "height", "font", "oblique", "just_h", "just_v", "wfactor", "paper", "blkid"]
 
@@ -64,45 +67,48 @@ Public Function SaveGaucho(sFile As String, cMdl As Collection)
     writer.EndElement
     writer.EndElement
 
-    For Each var In cMdl
-        Print cMdl.Key
-        Select cMdl.Key
-                ' Case "File"
-                '
-                ' Case "Version"
+    For Each var In myMdl 'cMdl
 
-            Case "Layers", "Colors", "Styles", "Weights", "DimSts", "Fonts"
-                For Each att In var
-                    writer.StartElement("header")
-                    For Each v In att
-                        writer.Attribute(att.Key, v)
-                    Next
-                    writer.EndElement
-                Next
+        If TypeOf(var) = 16 Then
 
-            Case "Entities"
-                For Each ety In var
-                    For Each att In ety
-                        writer.StartElement("entity")
+            Print myMdl.Key 'cMdl.Key
+            Select myMdl.Key
+                    ' Case "File"
+                    '
+                    ' Case "Version"
+
+                Case "Layers", "Styles", "Widths", "DimSts", "Fonts"
+                    For Each att In var
+                        writer.StartElement("header")
                         For Each v In att
-                            If stx.Exist(att.Key) Then
-                                Print att.Key & ": " & ety.Key
+                            writer.Attribute(att.Key, v)
+                        Next
+                        writer.EndElement
+                    Next
+
+                Case "Entities"
+                    For Each ety In var
+                        'For Each att In ety
+                        writer.StartElement("entity")
+                        For Each v In ety ' att
+                            If stx.Exist(ety.Key) Then
+                                'Print ety.Key & ": " & ety.Key
                                 Select TypeOf(v)
 
                                     Case gb.Null
-                                        atr.Add(v, att.Key)
+                                        atr.Add(v, ety.Key)
                                     Case gb.Boolean
-                                        atr.Add(v, att.Key)
+                                        atr.Add(v, ety.Key)
                                     Case gb.Byte, gb.Short, gb.Integer, gb.Long, gb.Single
-                                        atr.Add(v, att.Key)
+                                        atr.Add(v, ety.Key)
                                     Case gb.Float
-                                        atr.Add(v, att.Key)
+                                        atr.Add(v, ety.Key)
                                     Case gb.Date
-                                        atr.Add(Format(v, "yyyymmddhhnnss"), att.Key)
+                                        atr.Add(Format(v, "yyyymmddhhnnss"), ety.Key)
                                     Case gb.String
-                                        atr.Add(v, att.Key)
+                                        atr.Add(v, ety.Key)
                                     Case gb.Variant
-                                        atr.Add(v, att.Key)
+                                        atr.Add(v, ety.Key)
                                     Case gb.Object
                                         Select Object.Type(v)
                                             Case "Collection"
@@ -111,13 +117,13 @@ Public Function SaveGaucho(sFile As String, cMdl As Collection)
                                                 Next
                                                 Select ptx.Count
                                                     Case 0
-                                                        atr.Add("", att.Key)
+                                                        atr.Add("", ety.Key)
                                                     Case 1
-                                                        atr.Add(ptx[0], att.Key)
+                                                        atr.Add(ptx[0], ety.Key)
                                                         ptx.Clear
 
                                                     Case Else
-                                                        atr.Add(ptx.Join(";"), att.Key)
+                                                        atr.Add(ptx.Join(";"), ety.Key)
                                                         ptx.Clear
 
                                                 End Select
@@ -128,13 +134,13 @@ Public Function SaveGaucho(sFile As String, cMdl As Collection)
                                                 Next
                                                 Select ptx.Count
                                                     Case 0
-                                                        atr.Add("", att.Key)
+                                                        atr.Add("", ety.Key)
                                                     Case 1
-                                                        atr.Add(ptx[0], att.Key)
+                                                        atr.Add(ptx[0], ety.Key)
                                                         ptx.Clear
 
                                                     Case Else
-                                                        atr.Add(ptx.Join(":"), att.Key)
+                                                        atr.Add(ptx.Join(":"), ety.Key)
                                                         ptx.Clear
 
                                                 End Select
@@ -179,9 +185,10 @@ Public Function SaveGaucho(sFile As String, cMdl As Collection)
                             Endif
                         Next
                         writer.EndElement
+                        'Next
                     Next
-                Next
-        End Select
+            End Select
+        Endif
     Next
     If sErr <> "" Then
         File.Save(sEfl, sErr)
@@ -289,7 +296,7 @@ Public Function LoadGaucho(sFile As String) As Collection
             c["handle"] = sog.UUIDHandle(6)
         Endif
         '-----
-        c["entity"] = ent.Attributes["type"]
+        c["entity"] = ent.Attributes["entity"]
         '-----
         c["layer"] = ent.Attributes["layer"]
         c["style"] = ent.Attributes["style"]
@@ -302,9 +309,9 @@ Public Function LoadGaucho(sFile As String) As Collection
 
         ' una solucion es cuando importas DXF guardas todos los p seguidos o en gaucho los guardas separados , lo que para polilineas largas no se que comportamiento tendra
         ' https://stackoverflow.com/questions/56035887/what-is-the-one-line-max-length-limit-in-xml-files
-        Select ent.Attributes["type"]
+        Select ent.Attributes["entity"]
 
-            Case "line", "polyline"
+            Case "line", "polyline", "lwpolyline"
                 c["p"] = EncodePoint(ent.Attributes["p"], "p")
 
             Case "circle"
