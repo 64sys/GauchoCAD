@@ -234,7 +234,7 @@ End
 Public Function ExportEntities(colGrp As Collection, obxEntities As Entity[], Optional BlockName As String) As Integer
 
     Dim i, eCount As Integer
-    Dim flxPoints As Float[]
+    Dim flxPoints As New Float[]
     Dim P, Pn As New Collection
     Dim ratio As Float
     Dim colEnt As New Collection
@@ -243,7 +243,8 @@ Public Function ExportEntities(colGrp As Collection, obxEntities As Entity[], Op
 
     For Each e In obxEntities
         flxPoints = New Float[]
-
+        colEnt = New Collection
+        p = New Collection
         Select Case e.Gender
             Case "Line"
                 If Not colgrp.Exist("line") Then colgrp.Add(colLines, "line")
