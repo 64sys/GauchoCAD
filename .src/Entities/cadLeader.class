@@ -93,10 +93,10 @@ Public Sub Draw(oE As Entity)
 
     Dim tRect As New Float[], poli As New Float[]
 
-    tRect = glPlus.TextExtends(oE.StringData, oE.fParam[0])
+    tRect = glPlus.TextExtends(oE.stringdata[0], oE.fParam[0])
 
     angle = Ang((oE.p[oE.p.max - 1] - oE.p[oE.p.max - 3]), (oE.p[oE.p.max] - oE.p[oE.p.max - 2]))
-    glPlus.DrawText(oE.StringData, (oE.p[oE.p.max - 1] + oE.p[oE.p.max - 3]) / 2 - tRect[0] / 2, (oE.p[oE.p.Max] + oE.p[oE.p.max - 2]) / 2 + tRect[1] / 2, Angle, oe.fParam[0], oE.ColorToPaint)
+    glPlus.DrawText(oE.stringdata[0], (oE.p[oE.p.max - 1] + oE.p[oE.p.max - 3]) / 2 - tRect[0] / 2, (oE.p[oE.p.Max] + oE.p[oE.p.max - 2]) / 2 + tRect[1] / 2, Angle, oe.fParam[0], oE.ColorToPaint)
     ' TODO: arrow head cuando tengamos los parametros de Dim , como ser tamaño de la flecha, etc
     GLplus.PolyLines(oE.p, oE.ColorToPaint, oE.LineWidth, oe.linetype)
 
@@ -165,7 +165,7 @@ Public Function BuildPOI(oE As Entity, Optional arrIndex As Integer = -1) As Int
 
     Dim tRect As New Float[], poli As New Float[]
 
-    tRect = glPlus.TextExtends(oE.StringData, oE.fParam[0])
+    tRect = glPlus.TextExtends(oE.stringdata[0], oE.fParam[0])
     poli.Insert([0, 0, tRect[0], 0, tRect[0], tRect[1], 0, tRect[1]]) ' armo el poligono , que ya tiene la escala
     puntos.Rotate(Poli, oE.fParam[0] * Pi / 180)
     puntos.Translate(Poli, oE.P[0], oE.P[1])

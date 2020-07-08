@@ -86,7 +86,7 @@ Public Sub Draw(oE As Entity)
 
     If Not oE.Visible Then Return
 
-    If oE.StepsDone < 1 Then
+    If Me.StepsDone < 1 Then
 
         oE.P[2] = oE.P[0]
         oE.P[3] = oE.P[1]
@@ -95,14 +95,14 @@ Public Sub Draw(oE As Entity)
 
     End If
 
-    If oE.StepsDone < 2 Then
+    If Me.StepsDone < 2 Then
 
         oE.P[4] = oE.P[2]
         oE.P[5] = oE.P[3]
 
     End If
 
-    If oE.StepsDone < 3 Then
+    If Me.StepsDone < 3 Then
 
         oE.P[6] = oE.P[4]
         oE.P[7] = oE.P[5]
@@ -110,7 +110,7 @@ Public Sub Draw(oE As Entity)
     Endif
 
     oE.Polygon = oE.P
-    If oE.StepsDone < 2 Then Return
+    If Me.StepsDone < 2 Then Return
     GLplus.PolygonFilled(oE.p, oE.ColorToPaint, oE.ColorToPaint, oE.LineWidth, oe.LineType)
 
 End

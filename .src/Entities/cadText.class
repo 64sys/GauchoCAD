@@ -90,7 +90,7 @@ Public Sub Draw(oE As Entity)
 
     If Not oE.Visible Then Return
 
-    glPlus.DrawText(oE.StringData, oE.p[0], oE.p[1], oE.fParam[0], oE.fParam[1], oE.ColorToPaint)
+    glPlus.DrawText(oE.stringdata[0], oE.p[0], oE.p[1], oE.fParam[0], oE.fParam[1], oE.ColorToPaint)
 
 End
 
@@ -133,13 +133,13 @@ Public Function Draw2(oE As Entity)
 
     End If
 
-    If oE.StringData = "" Then
+    If oE.stringdata[0] = "" Then
 
         ltext = "ABCdef123"
 
     Else
 
-        ltext = oE.StringData
+        ltext = oE.stringdata[0]
 
     End If
 
@@ -196,7 +196,7 @@ Public Function BuildPOI(oE As Entity, Optional arrIndex As Integer = -1) As Int
 
     Dim tRect As New Float[], poli As New Float[]
 
-    tRect = glPlus.TextExtends(oE.StringData, oE.fParam[1])
+    tRect = glPlus.TextExtends(oE.stringdata[0], oE.fParam[1])
     poli.Insert([0, 0, tRect[0], 0, tRect[0], tRect[1], 0, tRect[1]]) ' armo el poligono , que ya tiene la escala
     puntos.Rotate(Poli, oE.fParam[0] * Pi / 180)
     puntos.Translate(Poli, oE.P[0], oE.P[1])

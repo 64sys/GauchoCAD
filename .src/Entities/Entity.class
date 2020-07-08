@@ -20,35 +20,24 @@
 ' Foundation, Inc., 51 Franklin St, Fifth Floor,
 ' Boston, MA  02110-1301  USA
 
-Public Const GAUCHOENTITY As String = "Entity"
-Public Gender As String = "Arc"
-Public USEWITH As String = "clsEntityBuilder"
-Public Const DrawingOrder As Integer = 0        '' 1 = draws first
-Public Const PointsToDraw As Integer = 1             '' minimal point requered for drawing something usefull
-Public Const OrtogonalIgnorado As Boolean = False
-Public Const OrtogonalForzado As Boolean = False
-Public Const ParamDefault As String = " "
-Public Const StretchAble As Boolean = True           '' Si lo puedo deformar
-
 ' SAVE from this vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 ' IMPORTANT: ALL CHANGES HERE MUST BE TRANSLATED TO cadLoad/Save and clsEntities.CopyElementData()                                                                                    |
+Public Gender As String = ""
 Public P As New Float[]                     '' X,Y pairs
 Public Level As New Float[]                 '' The future Z or elevation
-Public StringData As String                 '' Split with "|" separator if neccesary, that's is Entity specific.
-Public StringData2 As String                '' Split with "|" separator if neccesary, that's is Entity specific.
-Public StringData3 As String                '' Split with "|" separator if neccesary, that's is Entity specific.
+Public StringData As New String[]               '' Split with "|" separator if neccesary, that's is Entity specific.
 Public fParam As New Float[]                '' Array of floats
 Public Layer As String = "0"                '' Capa o Layer que se guarda en el archivo
-Public Block As String                      '' Para tener la posibilidade de juntar cosas en un block
 Public colour As Integer                    '' 0=by layer, 1=by block, 10+=16 bit color code  ;  ths is not the color to be draw, ColorToPaint is, set in Finish()
 Public LineTypeName As String               '' Continuous, dashed , etc
 Public LineWidth As Integer = 1             '' This is it
-Public RefPointX As Float                   '' New
-Public RefPointY As Float
 ' SAVE to here  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 ' NOT SAVED
 ' construction and usage vars
+Public Block As String                      '' Para tener la posibilidade de juntar cosas en un block
+Public RefPointX As Float                   '' New
+Public RefPointY As Float
 Public ClassHandler As Object               '' The class used for drawing, creating and other stuff any particular entity
 Public LineType As Integer                  '' 0=continuous, 1=dashed from flxDash
 Public LayerId As String = "00"             '' Esta variable es la Key en la coleccion de layers
@@ -60,18 +49,12 @@ Public ForDeletion As Boolean = True        '' This must be falsed in Finish
 Public DrawAble As Boolean = False          '' True si durante la construccion ya tiene suficientes elementos para poder hacer una representacion digna
 Public Visible As Boolean = True            '' Si esta entidad puede ser mostrada independientmente
 Public Finished As Boolean = False          '' Colocar en true cuando se llegue a completar
-Public StepsDone As Integer                 '' DEPRECADO
 Public Group As Integer = 0                 '' Pertenecemos a un grupo?
 Public Psel As New Boolean[]                '' Selected points
-Public BackUpP As New Float[]               '' X,Y pairs            for Stretch
-Public BackUpfParam As New Float[]          '' Array of floats      for Stretch
 Public Polygon As New Float[]               '' This is a poligon built at element's contruction that defines a poligon used for detecting points inside me
 Public PolyLine As New Float[]              '' This is a poliline built at element's contruction that defines a poligon used for detecting points inside me
 Public PoiPoints As New Float[]             '' Point of interest
 Public PoiType As New Integer[]
-
-Public Stage As Integer                     '' DEPRECADO
-
 Public glDrwList As Integer                 '' drawing list
 Public glDrwListSel As Integer              '' drawing list for selected item
 Public glDrwListPOI As Integer              '' drawing list for POI

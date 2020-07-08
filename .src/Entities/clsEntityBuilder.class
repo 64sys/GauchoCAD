@@ -38,7 +38,7 @@ Public SelEndXr As Float            ' aca Y es Z
 Public SelEndZr As Float
 
 ' indicadores
-'Public elem.StepsDone As Integer = 0          ' La cantidad de puntos que marco para el trabajo actual--->Gurdado en la entidad
+'Public elem.ClassHandler.StepsDone As Integer = 0          ' La cantidad de puntos que marco para el trabajo actual--->Gurdado en la entidad
 Public StepsTotal As Integer = 0          ' Tomado de la lista de tipo de paramtros
 Public PointsTotal As Integer = 0          ' Tomado de la lista de tipo de paramtros
 Public NextParamType As String          ' What kind of input the element expects P=point, F=float, C=color, S=string, M=mixed either Point, or Float that is taken from Max(Px-Px', Pz-Pz')
@@ -103,7 +103,7 @@ Public Function Start(ElemToBuild As Variant, Optional Mode As Integer = 0)
 
     clsEntities.FillEntity(elem)
     ' reset from previous element
-    elem.StepsDone = 0
+    elem.ClassHandler.StepsDone = 0
 
     'elem.gbcolor = appmain.CurrentColor
 
@@ -118,12 +118,12 @@ Public Function Start(ElemToBuild As Variant, Optional Mode As Integer = 0)
     Try Paramhelperlist = Split(elem.ClassHandler.ParamHelper, ";")                      ' optional
     Try Paramdefault = Split(elem.ClassHandler.ParamDefault, ";")                        ' optional
 
-    NextParamType = UCase(Mid(elem.ClassHandler.ParamType, elem.StepsDone + 1, 1))
+    NextParamType = UCase(Mid(elem.ClassHandler.ParamType, elem.ClassHandler.StepsDone + 1, 1))
     clsDrawingAids.HelperTrabajoNext = ParamHelperList[0]
 
     ' instructions to FCAD
-    gcd.OrtogonalIgnorado = elem.OrtogonalIgnorado
-    gcd.OrtogonalForzado = elem.OrtogonalForzado
+    gcd.OrtogonalIgnorado = elem.ClassHandler.OrtogonalIgnorado
+    gcd.OrtogonalForzado = elem.ClassHandler.OrtogonalForzado
 
     elem.layer = appmain.CurrentLayer
     elem.layerid = gcd.GetLayerID(appmain.CurrentLayer)
@@ -205,15 +205,15 @@ Public Function KeyText(EnteredText As String) ' esta rutina es llamada por FCAD
             ' its a valid input?
             If EnteredText = "" Then
 
-                'elem.stringdata = EnteredText
-                elem.stringdata &= ParamDefault[elem.StepsDone]
-            Else If elem.stringdata <> "" Then                      ' we have a previous entry
+                'elem.stringdata[0] = EnteredText
+                elem.stringdata[0] &= ParamDefault[elem.ClassHandler.StepsDone]
+            Else If elem.stringdata[0] <> "" Then                      ' we have a previous entry
 
-                elem.stringdata &= "|" & EnteredText  ' split if necessary
+                elem.stringdata[0] &= "|" & EnteredText  ' split if necessary
 
             Else
 
-                elem.stringdata &= EnteredText                      ' first entry
+                elem.stringdata[0] &= EnteredText                      ' first entry
 
             End If
 
@@ -224,7 +224,7 @@ Public Function KeyText(EnteredText As String) ' esta rutina es llamada por FCAD
 
             If EnteredText = "" Then
 
-                Try elem.fParam[iFloat] = ParamDefault[elem.StepsDone]
+                Try elem.fParam[iFloat] = ParamDefault[elem.ClassHandler.StepsDone]
 
             Else
 
@@ -259,28 +259,28 @@ End
 
 Public Sub AdvanceStep()
 
-    Inc elem.StepsDone
-    If elem.StepsDone = StepsTotal Then
+    Inc elem.ClassHandler.StepsDone
+    If elem.ClassHandler.StepsDone = StepsTotal Then
 
         Me.Finish
     Else
 
         ' prepare next stuff
         '
-        NextParamType = UCase(Mid(elem.ClassHandler.ParamType, elem.StepsDone + 1, 1))
+        NextParamType = UCase(Mid(elem.ClassHandler.ParamType, elem.ClassHandler.StepsDone + 1, 1))
         If NextParamType = "+" Then ' add another point
             elem.p.add(0)
             elem.p.add(0)
             elem.level.add(0)
 
             elem.Psel.add(0)
-            Dec elem.StepsDone
+            Dec elem.ClassHandler.StepsDone
         Endif
 
-        Try clsDrawingAids.HelperTrabajoNext = ParamHelperList[elem.StepsDone]          ' try in case of lack of desciption or keep last
-        If ParamDefault.Count > elem.StepsDone Then                            ' not null
-            ParamDefault[elem.StepsDone] = Trim$(ParamDefault[elem.StepsDone])
-            If ParamDefault[elem.StepsDone] <> "" Then clsDrawingAids.HelperTrabajoNext &= "[" & ParamDefault[elem.StepsDone] & "]"           ' try in case of lack of desciption or keep last
+        Try clsDrawingAids.HelperTrabajoNext = ParamHelperList[elem.ClassHandler.StepsDone]          ' try in case of lack of desciption or keep last
+        If ParamDefault.Count > elem.ClassHandler.StepsDone Then                            ' not null
+            ParamDefault[elem.ClassHandler.StepsDone] = Trim$(ParamDefault[elem.ClassHandler.StepsDone])
+            If ParamDefault[elem.ClassHandler.StepsDone] <> "" Then clsDrawingAids.HelperTrabajoNext &= "[" & ParamDefault[elem.ClassHandler.StepsDone] & "]"           ' try in case of lack of desciption or keep last
         End If
 
         ' last point
@@ -336,7 +336,7 @@ Public Function MouseMove(mouseX As Integer, mouseY As Integer) ' esta rutina es
 
         ' aca tengo que verificar el ortogonal
 
-    Else If elem.StepsDone > 0 Then                                                                          ' puedo hacer ortogonal
+    Else If elem.ClassHandler.StepsDone > 0 Then                                                                          ' puedo hacer ortogonal
         If gcd.OrtogonalForzado Or (Not gcd.OrtogonalIgnorado And gcd.Ortogonal) Then          ' hablame de operadores logicos
 
             If Abs(elem.p[iPoints * 2] - elem.P[(iPoints - 1) * 2]) > Abs(elem.p[iPoints * 2 + 1] - elem.P[(iPoints - 1) * 2 + 1]) Then ' prevalece X
@@ -397,7 +397,7 @@ Public Function MouseDown(mouseX As Integer, mouseY As Integer) ' esta rutina es
 
         ' aca tengo que verificar el ortogonal
 
-    Else If elem.StepsDone > 0 Then                                                                          ' puedo hacer ortogonal
+    Else If elem.ClassHandler.StepsDone > 0 Then                                                                          ' puedo hacer ortogonal
         If gcd.OrtogonalForzado Or (Not gcd.OrtogonalIgnorado And gcd.Ortogonal) Then          ' hablame de operadores logicos
 
             If Abs(elem.p[iPoints * 2] - elem.P[(iPoints - 1) * 2]) > Abs(elem.p[iPoints * 2 + 1] - elem.P[(iPoints - 1) * 2 + 1]) Then ' prevalece X
@@ -437,7 +437,7 @@ Public Sub Finish()
 
     APPMain.hFCAD.arrEntities.Add(elem)
     'elem.ClassHandler.buildPOI(elem)
-    elem.ClassHandler.Finish(elem, elem.StepsDone)
+    elem.ClassHandler.Finish(elem, elem.ClassHandler.StepsDone)
 
     LastEntity = elem                                       ' save it to repeat on rigth click
 

@@ -86,7 +86,7 @@ Public Function SaveToFileBIN(nName As String) As Boolean
         tm.Add(p, "p")            '       +---------------------+
         tm.Add(fpar, "fparam")     '  <----+   Estos son arrays  |
         tm.Add(lev, "level")       '       +---------------------+
-        tm.Add(obj.StringData, "string")                           ' Martin nuevo
+        tm.Add(obj.stringdata[0], "string")                           ' Martin nuevo
         tm.Add(obj.Layer, "layer")
         tm.Add(obj.block, "block")
         tm.Add(obj.colour, "color") ' <------------------------ Este parametro esta inventado, ojo. ( ya no )

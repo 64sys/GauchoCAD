@@ -48,7 +48,7 @@ Public Sub Draw(oE As Entity)
         Dialog.Filter = ["*.*"]
         f = Dialog.Path
         If Exist(f) Then
-            Me.StringData = f
+            Me.stringdata[0] = f
             imagen = Image.Load(f)
             hBrush = paint.Image(Imagen)
 

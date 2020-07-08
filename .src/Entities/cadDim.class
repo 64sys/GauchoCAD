@@ -307,7 +307,7 @@ Public Sub Finish(oE As Entity, ParamsDone As Integer) As Boolean
 
     ' APPMain.hFCAD.arrEntities.Add(oe)
     ' 'oe.ClassHandler.buildPOI(oe)
-    ' oe.ClassHandler.Finish(oe, oe.StepsDone)
+    ' oe.ClassHandler.Finish(oe,mE.StepsDone)
     '
     ' LastEntity = oe                                       ' save it to repeat on rigth click
     '

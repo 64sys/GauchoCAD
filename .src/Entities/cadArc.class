@@ -121,11 +121,11 @@ Public Sub Draw(oE As Entity)
 
     If Not oE.Visible Then Return
 
-    If oE.StepsDone = 1 Then
+    If Me.StepsDone = 1 Then
 
         oE.fParam[2] = 360
 
-    Else If oE.StepsDone = 2 Then
+    Else If Me.StepsDone = 2 Then
 
         If oE.fParam[1] < 0 Then oE.fParam[1] = 360 + oE.fParam[1]
         difang = (oE.fParam[2] - oE.fParam[1])
@@ -133,7 +133,7 @@ Public Sub Draw(oE As Entity)
         GLplus.Lines([oE.p[0], oE.p[1], oE.p[0] + oE.fParam[0] * Cos(oE.fParam[1] / 180 * Pi), oE.p[1] + oE.fParam[0] * Sin(oE.fParam[1] / 180 * Pi)], oE.ColorToPaint)
         clsDrawingAids.Helper.texto = Format$(oE.fParam[1], ("0.0 deg"))
 
-    Else If oE.StepsDone = 3 Then
+    Else If Me.StepsDone = 3 Then
 
         If oE.fParam[1] < 0 Then oE.fParam[1] = 360 + oE.fParam[1]
         If oE.fParam[2] < 0 Then oE.fParam[2] = 360 + oE.fParam[2]              ' grados

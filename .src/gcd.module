@@ -239,6 +239,153 @@ Public Function ExportEntities(colGrp As Collection, obxEntities As Entity[], Op
     Dim ratio As Float
     Dim colEnt As New Collection
     Dim e As Entity
+    Dim colLines, colCircles, colPolylines, colArcs, colEllipses, colText, colMtext, colInserts As New Collection
+
+    For Each e In obxEntities
+        flxPoints = New Float[]
+
+        Select Case e.Gender
+            Case "Line"
+                If Not colgrp.Exist("line") Then colgrp.Add(colLines, "line")
+                colLines.Add(colEnt, Str$(eCount))
+                colEnt.Add("LINE", "entity")
+                GoSub Common
+                colEnt.Add(p, "p")
+                flxPoints.Add(e.P[0])                   ' X
+                flxPoints.Add(e.P[1])                   ' Y
+                flxPoints.Add(0)                        ' Z
+                colEnt["p"].Add(flxPoints, "p0")
+                flxPoints = New Float[]
+                flxPoints.Add(e.P[2])                   ' X
+                flxPoints.Add(e.P[3])                   ' Y
+                flxPoints.Add(0)                        ' Z
+                colEnt["p"].Add(flxPoints, "p1")
+            Case "PLine"
+                If Not colgrp.Exist("lwpolyline") Then colgrp.Add(colPolylines, "lwpolyline")
+                colPolylines.Add(colEnt, Str$(eCount))
+                colEnt.Add("lwpolyline", "entity")
+                GoSub Common
+                colEnt.Add(p, "p")
+                For i = 0 To e.P.Max Step 2
+                    flxPoints = New Float[]
+                    flxPoints.Add(e.P[i])                   ' X
+                    flxPoints.Add(e.P[i + 1])               ' Y
+                    flxPoints.Add(0)                        ' Z
+                    colEnt["p"].Add(flxPoints, "p" & Trim(Str(i / 2)))
+                Next
+            Case "Ellipse"
+                If Not colgrp.Exist("ellipse") Then colgrp.Add(colEllipses, "ellipse")
+                colEllipses.Add(colEnt, Str$(eCount))
+                colEnt.Add("ellipse", "entity")
+                GoSub Common
+                colEnt.Add(p, "p")
+                flxPoints.Add(e.P[0])                   ' X
+                flxPoints.Add(e.P[1])                   ' Y
+                flxPoints.Add(0)                        ' Z
+                colEnt["p"].Add(flxPoints, "p0")
+                flxPoints = New Float[]
+                flxPoints.Add(e.P[2])                   ' X
+                flxPoints.Add(e.P[3])                   ' Y
+                flxPoints.Add(0)                        ' Z
+                colEnt["p"].Add(flxPoints, "p1")
+                colEnt.Add(e.fParam[0], "ratio")
+                colEnt.Add(e.fParam[1], "start_angle")
+                colEnt.Add(e.fParam[2], "end_angle")
+            Case "Arc"
+                If Not colgrp.Exist("arc") Then colgrp.Add(colArcs, "arc")
+                colArcs.Add(colEnt, Str$(eCount))
+                colEnt.Add("arc", "entity")
+                GoSub Common
+                colEnt.Add(p, "p")
+                flxPoints.Add(e.P[0])                   ' X
+                flxPoints.Add(e.P[1])                   ' Y
+                flxPoints.Add(0)                        ' Z
+                colEnt["p"].Add(flxPoints, "p0")
+                colEnt.Add(e.fParam[0], "radius")
+                colEnt.Add(e.fParam[1], "start_angle")
+                colEnt.Add(e.fParam[2], "end_angle")
+            Case "Circle"
+                If Not colgrp.Exist("circle") Then colgrp.Add(colcircles, "circle")
+                colcircles.Add(colEnt, Str$(eCount))
+                colEnt.Add("circle", "entity")
+                GoSub Common
+                colEnt.Add(p, "p")
+                flxPoints.Add(e.P[0])                   ' X
+                flxPoints.Add(e.P[1])                   ' Y
+                flxPoints.Add(0)                        ' Z
+                colEnt["p"].Add(flxPoints, "p0")
+                colEnt.Add(e.fParam[0], "radius")
+            Case "Insert"
+                If Not colgrp.Exist("insert") Then colgrp.Add(colInserts, "insert")
+                colInserts.Add(colEnt, Str$(eCount))
+
+                colEnt.Add("insert", "entity")
+                GoSub Common
+                colEnt.Add(p, "p")
+                flxPoints.Add(e.P[0])                   ' X
+                flxPoints.Add(e.P[1])                   ' Y
+                flxPoints.Add(0)                        ' Z
+                colEnt["p"].Add(flxPoints, "p0")
+                colEnt.Add(e.fParam[0], "scalex")
+                colEnt.Add(e.fParam[1], "scalex")
+                colEnt.Add(1, "scalez")
+                colEnt.Add(e.fParam[2], "angle")
+                colEnt.Add(e.Block, "block")
+
+            Case "Text"
+                If Not colgrp.Exist("text") Then colgrp.Add(colText, "text")
+                colText.Add(colEnt, Str$(eCount))
+
+                colEnt.Add("text", "entity")
+                GoSub Common
+                colEnt.Add(p, "p")
+                flxPoints.Add(e.P[0])                   ' X
+                flxPoints.Add(e.P[1])                   ' Y
+                flxPoints.Add(0)                        ' Z
+                colEnt["p"].Add(flxPoints, "p0")
+                colEnt.Add(e.stringdata[0], "text")
+                colEnt.Add(e.fParam[0], "angle")
+                colEnt.Add(e.fParam[1], "text_height")
+            Case "MText"
+                If Not colgrp.Exist("mtext") Then colgrp.Add(colMtext, "ellipse")
+                colMtext.Add(colEnt, Str$(eCount))
+
+                colEnt.Add("mtext", "entity")
+                GoSub Common
+                colEnt.Add(p, "p")
+                flxPoints.Add(e.P[0])                   ' X
+                flxPoints.Add(e.P[1])                   ' Y
+                flxPoints.Add(0)                        ' Z
+                colEnt["p"].Add(flxPoints, "p0")
+                colEnt.Add(e.stringdata[0], "text")
+                colEnt.Add(e.fParam[0], "angle")
+                colEnt.Add(e.fParam[1], "text_height")
+
+        End Select
+        Inc eCount
+    Next
+
+    Return eCount
+
+Common:
+    colEnt.Add(e.Layer, "layer")
+    colEnt.Add(e.LineTypeName, "style")
+    colEnt.Add(e.colour, "colour")
+    colEnt.Add(e.LineWidth, "width")
+    Return
+
+End
+'' Pasa del arrEntities a la coleccion cModel
+
+Public Function ExportEntities2(colGrp As Collection, obxEntities As Entity[], Optional BlockName As String) As Integer
+
+    Dim i, eCount As Integer
+    Dim flxPoints As Float[]
+    Dim P, Pn As New Collection
+    Dim ratio As Float
+    Dim colEnt As New Collection
+    Dim e As Entity
+    Dim colLines, conCircles, colPolylines, colArcs, colEllipses As New Collection
 
     For Each e In obxEntities
         flxPoints = New Float[]
@@ -326,7 +473,7 @@ Public Function ExportEntities(colGrp As Collection, obxEntities As Entity[], Op
                 flxPoints.Add(e.P[1])                   ' Y
                 flxPoints.Add(0)                        ' Z
                 colgrp[Str$(eCount)]["p"].Add(flxPoints, "p0")
-                colgrp[Str$(eCount)].Add(e.StringData, "text")
+                colgrp[Str$(eCount)].Add(e.stringdata[0], "text")
                 colgrp[Str$(eCount)].Add(e.fParam[0], "angle")
                 colgrp[Str$(eCount)].Add(e.fParam[1], "text_height")
             Case "MText"
@@ -337,7 +484,7 @@ Public Function ExportEntities(colGrp As Collection, obxEntities As Entity[], Op
                 flxPoints.Add(e.P[1])                   ' Y
                 flxPoints.Add(0)                        ' Z
                 colgrp[Str$(eCount)]["p"].Add(flxPoints, "p0")
-                colgrp[Str$(eCount)].Add(e.StringData, "text")
+                colgrp[Str$(eCount)].Add(e.stringdata[0], "text")
                 colgrp[Str$(eCount)].Add(e.fParam[0], "angle")
                 colgrp[Str$(eCount)].Add(e.fParam[1], "text_height")
 
@@ -501,8 +648,8 @@ Public Function AddDim(obxContainer As Entity[], Points As Float[], bloque As St
     oEntity.fParam.Add(MEDIDA)
     oEntity.fParam.Add(alineacion)
     oEntity.fParam.Add(angulo)
-    oEntity.stringdata = texto
-    oEntity.stringdata2 = bloque
+    oEntity.stringdata.Add(texto)
+    oEntity.stringdata.Add(bloque)
     oEntity.layer = Layer
     oEntity.colour = colour
     oEntity.LineWidth = LineWidth               ' datos CAD
@@ -630,7 +777,7 @@ Public Function AddText(obxContainer As Entity[], Points As Float[], angle As Fl
     oEntity.P.insert(points)                    ' recibimos position x1,y1
     oEntity.fParam.Add(angle)                   ' grados
     oEntity.fParam.Add(height)                  ' alto letras
-    oEntity.stringdata = _text                  ' el texto
+    oEntity.stringdata[0] = _text                  ' el texto
     oEntity.layer = Layer
     oEntity.colour = colour
     oEntity.LineWidth = LineWidth               ' datos CAD
@@ -651,7 +798,7 @@ Public Function AddMText(obxContainer As Entity[], Points As Float[], angle As F
     oEntity.P.insert(points)                    ' recibimos position x1,y1
     oEntity.fParam.Add(angle)                  ' GRADOS
     oEntity.fParam.Add(height)                  ' alto letras
-    oEntity.stringdata = _text                  ' el texto
+    oEntity.stringdata[0] = _text                  ' el texto
     oEntity.layer = Layer
     oEntity.colour = colour
     oEntity.LineWidth = LineWidth               ' datos CAD

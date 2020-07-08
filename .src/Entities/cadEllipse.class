@@ -62,7 +62,6 @@ Public Sub Translate(e As Entity, dX As Float, dY As Float, Optional OnlySelecte
         puntos.Translate(e.p, dx, dy)
     Endif
 
-
 End
 
 Public Sub Rotate(e As Entity, radians As Float)
@@ -110,12 +109,12 @@ Public Sub Draw(oE As Entity)
     major = Sqr((oE.p[2] - oE.p[0]) ^ 2 + (oE.p[3] - oE.p[1]) ^ 2)
     angle = Ang(oE.p[2] - oE.p[0], oE.p[3] - oE.p[1])          ' Los coordenadas del eje mayor son relativas al centro
     If Not oE.Finished Then
-        If oE.stepsdone < 2 Then
+        If Me.StepsDone < 2 Then
             oE.fParam[0] = 0.5
             Me.start = 0
             Me.recorrido = 2 * Pi
             Minor = major * oE.fParam[0]
-        Else If oE.stepsdone < 3 Then
+        Else If Me.StepsDone < 3 Then
             Minor = major * oE.fParam[0]
             'If oE.fParam[0] > major Then oE.fParam[0] = major
             'Minor = oE.fParam[0]
@@ -182,12 +181,12 @@ Public Function Draw2(oE As Entity)
     major = Sqr((oE.p[2] - oE.p[0]) ^ 2 + (oE.p[3] - oE.p[1]) ^ 2)
     angle = Ang(oE.p[2] - oE.p[0], oE.p[3] - oE.p[1])          ' Los coordenadas del eje mayor son relativas al centro
     If Not oE.Finished Then
-        If oE.stepsdone < 2 Then
+        If Me.StepsDone < 2 Then
             oE.fParam[0] = 0.5
             Me.start = 0
             Me.recorrido = 2 * Pi
             Minor = major * oE.fParam[0]
-        Else If oE.stepsdone < 3 Then
+        Else If Me.StepsDone < 3 Then
             Minor = major * oE.fParam[0]
             'If oE.fParam[0] > major Then oE.fParam[0] = major
             'Minor = oE.fParam[0]

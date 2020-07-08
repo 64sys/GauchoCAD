@@ -90,9 +90,9 @@ Public Sub Draw(oE As Entity)
 
     If Not oE.Visible Then Return
 
-    glPlus.DrawMultilineText(oE.StringData, oE.p[0], oE.p[1], oE.fParam[0], oE.fParam[1], oE.ColorToPaint)
+    glPlus.DrawMultilineText(oE.stringdata[0][0], oE.p[0], oE.p[1], oE.fParam[0], oE.fParam[1], oE.ColorToPaint)
 
-    If oE.StringData <> "" Then CreatePolygon(oe)
+    If oE.stringdata[0] <> "" Then CreatePolygon(oe)
 
 End
 
@@ -137,13 +137,13 @@ Public Function Draw2(oE As Entity)
 
     End If
 
-    If oE.StringData = "" Then
+    If oE.stringdata[0] = "" Then
 
         ltext = "ABCdef123"
 
     Else
 
-        ltext = oE.StringData
+        ltext = oE.stringdata[0]
 
     End If
 
@@ -185,7 +185,7 @@ Public Sub CreatePolygon(oE As Entity)
 
     oE.Polygon.Clear
 
-    tRect = glPlus.MTextExtends(oE.StringData, oE.p[0], oE.p[1], oE.fParam[1])
+    tRect = glPlus.MTextExtends(oE.stringdata[0], oE.p[0], oE.p[1], oE.fParam[1])
 
     ' armo el poligono , que ya tiene la escala
 

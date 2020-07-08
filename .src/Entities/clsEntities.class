@@ -130,6 +130,7 @@ Public Sub FillEntity(o As Entity)
                 o.fParam.Add(0)
 
             Case "T"
+                o.StringData.Add("")
 
             Case "C"
 
@@ -576,7 +577,7 @@ Public Sub CopyElemData(origen As Entity, destino As Entity)
     destino.fparam.resize(origen.fparam.count)
     destino.level.resize(origen.level.count)
     destino.psel.resize(origen.psel.count)
-
+    destino.StringData.resize(origen.StringData.count)
     For i = 0 To origen.p.Max
         destino.P[i] = origen.P[i]
     Next
@@ -586,12 +587,14 @@ Public Sub CopyElemData(origen As Entity, destino As Entity)
     For i = 0 To origen.fparam.Max
         destino.fparam[i] = origen.fparam[i]
     Next
+    For i = 0 To origen.StringData.Max
+        destino.StringData[i] = origen.StringData[i]
+    Next
     destino.Gender = origen.Gender
     destino.ClassHandler = origen.ClassHandler
     destino.layerID = origen.LayerID
     destino.RefPointX = origen.refpointX
     destino.RefPointY = origen.refpointY
-    destino.stringdata = origen.Stringdata
     destino.Block = origen.Block
     destino.Layer = origen.Layer
     destino.Group = origen.Group

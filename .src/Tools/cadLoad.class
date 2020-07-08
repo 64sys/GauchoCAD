@@ -171,7 +171,7 @@ Public Sub LoadFromFile(Optional FilePath As String)
 
         ' vars CAD de futura implementacion
         ' TODO: implementar para el resto
-        newObj.StringData = ent.Attributes["string"]
+        newObj.stringdata[0] = ent.Attributes["string"]
         newObj.colour = CInt(ent.Attributes["color"])
         newObj.Block = ent.Attributes["block"]
         newObj.layer = ent.Attributes["layer"]   ' <------------- tincho uso layer en vez de nivel

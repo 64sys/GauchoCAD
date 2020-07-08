@@ -3787,9 +3787,9 @@ Private Function dxfSave5Entities() As Integer
             Case "Ellipse"
                 dxfSaveEllipse(e.p, e.fParam[0], e.fParam[1], e.fParam[2], e.Layer, e.colour,, e.LineWidth)
             Case "Text"
-                dxfSaveText(e.StringData, e.p, e.fParam[1], e.fParam[0], e.Layer, e.colour,, e.LineWidth)
+                dxfSaveText(e.stringdata[0], e.p, e.fParam[1], e.fParam[0], e.Layer, e.colour,, e.LineWidth)
             Case "MText"
-                dxfSaveMText(e.StringData, e.p, e.fParam[1], e.fParam[0], e.Layer, e.colour,, e.LineWidth)
+                dxfSaveMText(e.stringdata[0], e.p, e.fParam[1], e.fParam[0], e.Layer, e.colour,, e.LineWidth)
 
         End Select
     Next

@@ -107,16 +107,16 @@ Public Sub Draw2(oE As Entity)
         paint.brush = Paint.Color(oE.ColorToPaint)
     Endif
 
-    If oE.StepsDone = 1 Then
+    If Me.StepsDone = 1 Then
         paint.moveto(oE.p[0], oE.p[1])
         paint.lineto(oE.p[2], oE.p[3])
 
-    Else If oE.StepsDone = 2 Then
+    Else If Me.StepsDone = 2 Then
         paint.moveto(oE.p[0], oE.p[1])
         paint.lineto(oE.p[2], oE.p[3])
         paint.lineto(oE.p[4], oE.p[5])
 
-    Else If oE.StepsDone >= 3 Then 'If oE.P.Count / 2 < 5 Then
+    Else If Me.StepsDone >= 3 Then 'If oE.P.Count / 2 < 5 Then
         paint.moveto(oE.p[0], oE.p[1])
         paint.curveto(oE.p[2], oE.p[3], oE.p[4], oE.p[5], oE.p[6], oE.p[7])
         '
