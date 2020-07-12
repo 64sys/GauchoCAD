@@ -25,7 +25,7 @@
 Public Gender As String = ""
 Public P As New Float[]                     '' X,Y pairs
 Public Level As New Float[]                 '' The future Z or elevation
-Public StringData As New String[]               '' Split with "|" separator if neccesary, that's is Entity specific.
+Public StringData As New String[]           '' Split with "|" separator if neccesary, that's is Entity specific.
 Public fParam As New Float[]                '' Array of floats
 Public Layer As String = "0"                '' Capa o Layer que se guarda en el archivo
 Public colour As Integer                    '' 0=by layer, 1=by block, 10+=16 bit color code  ;  ths is not the color to be draw, ColorToPaint is, set in Finish()

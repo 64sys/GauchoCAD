@@ -232,7 +232,7 @@ Public Function CheckAboveEntity(xr As Float, Yr As Float, tolerance As Float) A
 
         End Select
 
-        modUtils.DoEvents(0.100)
+        modUtils.DoEvents(0.00100)
 
     Next
 

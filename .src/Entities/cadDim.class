@@ -21,6 +21,18 @@
 ' Boston, MA  02110-1301  USA
 Create Static
 
+Public Struct arrBlockSt
+    name As String
+    x As Float
+    y As Float
+    scaleX As Float
+    scaleY As Float
+    degRotation As Float
+    mirrored As Boolean
+    layer As String
+    entities As Entity[]
+End Struct
+
 Public Const Gender As String = "Dimension"
 Public Const DrawingOrder As Integer = 100 ' 1 a 32.724 esto debe Drawse primero y ser sobreescrito por el resto
 Public Const PointsToDraw As Integer = 1             ' minimal point requered for drawing something usefull
@@ -38,6 +50,8 @@ Public DrawAble As Boolean = False          ' True si durante la construccion ya
 Public Visible As Boolean = True            ' si esta entidad puede ser mostrada independientmente
 Public Finished As Boolean = False          ' colocar en true cuando se llegue a completar
 Public StepsDone As Integer                 ' esto lo cambia cls ElementBuilder durante la construccion
+
+Public TotalDimensions As Integer           ' the total dimensions present in this drawing
 
 ' dimstyle: Todas las variables numericas Float estaran multiplicadas por DimScale
 Public DimType As Integer = 0            ' = fParam[0] and &X1111
@@ -129,14 +143,16 @@ Public extension As Float
 ' 2 = DimScale
 
 '' Mode = DimType ver gcd.DimXXXX constants
-Public Function Start(Optional Mode As Integer = -1)
+Public Function Start(Optional Mode As Integer = gcd.DimAligned)
+
+    Dim newBlock As New ArrBlockSt, eParte As Entity
 
     elem = New Entity
 
     Me.DimType = Mode
 
     elem.Gender = Me.Gender
-    elem.ClassHandler = Me
+    elem.ClassHandler = cadDim
     elem.p.Resize(24)
     elem.fParam.Resize(6)
     elem.Visible = False
@@ -150,6 +166,25 @@ Public Function Start(Optional Mode As Integer = -1)
         Case gcd.DimAligned
             Me.StepsTotal = 3 ' 1-punto 2-punto 3-ubicacion del texto
             NextParamType = "P"
+            ' ahora creo el bloque asociado
+            newBlock.entities = New Entity[]
+            newBlock.name = "*D" & Str$(Me.TotalDimensions)
+            APPMain.hFCAD.arrBlocks.Add(newBlock)
+            ' linea principal
+            gcd.AddLine(newBlock.entities, [0, 0, 0, 0], elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
+
+            ' lineas de demarcacion
+            gcd.AddLine(newBlock.entities, [0, Me.DimExtension, 0, -Me.DimExtension], elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
+            gcd.AddLine(newBlock.entities, [0, Me.DimExtension, 0, -Me.DimExtension], elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
+
+            ' flechas
+            gcd.Addsolid(newBlock.entities, [0, 0, Me.DimArrowWidth, Me.DimArrowSize, Me.DimArrowWidth, -Me.DimArrowSize, 0, 0], elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
+            gcd.Addsolid(newBlock.entities, [0, 0, -Me.DimArrowWidth, Me.DimArrowSize, -Me.DimArrowWidth, -Me.DimArrowSize, 0, 0], elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
+
+            ' texto
+            gcd.AddMText(newBlock.entities, [0, 0, 0, 0], 0, Me.DimTextHeight, "0.00", elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
+
+            ' y ahora e
 
         Case gcd.dimAngular
             Me.StepsTotal = 3 ' 1-centro 2-punto 3-punto 4-ubicacion del texto
@@ -158,6 +193,7 @@ Public Function Start(Optional Mode As Integer = -1)
     End Select
 
     'elem.gbcolor = appmain.CurrentColor
+    elem.Block = newBlock.name
 
     iPoints = 0
     iFloat = 0
@@ -170,8 +206,8 @@ Public Function Start(Optional Mode As Integer = -1)
     ' clsDrawingAids.HelperTrabajoNext = ParamHelperList[0]
 
     ' instructions to FCAD
-    gcd.OrtogonalIgnorado = elem.OrtogonalIgnorado
-    gcd.OrtogonalForzado = elem.OrtogonalForzado
+    gcd.OrtogonalIgnorado = Me.OrtogonalIgnorado
+    gcd.OrtogonalForzado = Me.OrtogonalForzado
 
     elem.layer = appmain.CurrentLayer
     elem.layerid = gcd.GetLayerID(appmain.CurrentLayer)
@@ -182,101 +218,117 @@ End
 
 Public Sub Translate(e As Entity, dX As Float, dY As Float, Optional OnlySelected As Boolean = False)
 
+    cadInsert.Translate(e, dx, dy, OnlySelected)
+
 End
 
 Public Sub Rotate(e As Entity, radians As Float)
+
+    cadInsert.Rotate(e, radians)
 
 End
 
 Public Sub Scale(e As Entity, sX As Float, sY As Float)
 
-End
-
-Public Sub Draw(elem As Entity)
-
-    Dim l As Float, angulo As Float, hText As New PaintExtents, lText As String, lPix As Integer
-    Dim e, fExtX, fExtY As Float
-    Dim ET As Entity, i As Integer
-    Dim fArrow, fExt, txtRect As Float[]
-
-    If Not elem.Visible Then Return
-
-    If elem.Selected And Not gcd.ToolActive Then elem.ColorToPaint = gcd.ColorForSelected Else elem.ColorToPaint = gcd.GetGBColor(elem.colour, elem.Layerid)
-
-    Select Case DimType
-        Case gcd.DimAligned
-            angulo = Ang(elem.P[4] - elem.P[0], elem.P[5] - elem.P[1])
-
-            ' lineas de extension
-            fExt = puntos.RotateFromPointWithAngle(0, 0, angulo, 0, -extension)
-            txtRect = glPlus.TextExtends(Format$(puntos.distancia(elem.P[0], elem.P[1], elem.P[4], elem.P[5]), DimFormat), DimTextHeight)
-            puntos.Rotate(txtRect, angulo)
-            ' raya horizontal
-            glPlus.Lines([elem.P[0] + fExt[0], elem.P[1] + fExt[1], elem.P[4] + fExt[0], elem.P[5] + fExt[1]], elem.ColorToPaint, elem.LineWidth, elem.LineType)
-
-            ' texto
-            elem.P[2] = (elem.P[4] + elem.P[0]) / 2 + fExt[0] + txtRect[0] * 0.25
-            elem.P[3] = (elem.P[5] + elem.P[1]) / 2 + fExt[1] + txtRect[1] * 0.25
-
-            glPlus.DrawText(Format$(puntos.distancia(elem.P[0], elem.P[1], elem.P[4], elem.P[5]), DimFormat), elem.P[2], elem.P[3], Angulo * 180 / Pi, DimTextHeight, elem.ColorToPaint)
-
-            ' flechas
-            fArrow = [0, 0, DimArrowSize, DimArrowWidth / 2, DimArrowSize, -DimArrowWidth / 2]
-            puntos.Rotate(farrow, angulo)
-            puntos.Translate(fArrow, elem.P[0] + fExt[0], elem.P[1] + fExt[1])
-            glPlus.PolygonFilled(fArrow, elem.ColorToPaint, elem.ColorToPaint)
-
-            fArrow = [0, 0, -DimArrowSize, DimArrowWidth / 2, -DimArrowSize, -DimArrowWidth / 2]
-            puntos.Rotate(farrow, angulo)
-            puntos.Translate(fArrow, elem.P[4] + fExt[0], elem.P[5] + fExt[1])
-            glPlus.PolygonFilled(fArrow, elem.ColorToPaint, elem.ColorToPaint)
-
-        Case gcd.dimAngular
-
-        Case gcd.dimRadius
-            ' P0=centro P1=texto P5=flecha
-
-        Case gcd.dimDiameter
-            ' P0=flecha P1=texto P5=flecha
-
-            angulo = Ang(elem.P[4] - elem.P[0], elem.P[5] - elem.P[1])
-
-            ' lineas de extension
-            fExt = puntos.RotateFromPointWithAngle(0, 0, angulo, 0, -extension)
-            txtRect = glPlus.TextExtends(Format$(puntos.distancia(elem.P[0], elem.P[1], elem.P[4], elem.P[5]), DimFormat), DimTextHeight)
-            puntos.Rotate(txtRect, angulo)
-
-            ' raya horizontal
-            glPlus.Lines([elem.P[0], elem.P[1], elem.P[4], elem.P[5]], elem.ColorToPaint, elem.LineWidth, elem.LineType)
-
-            ' texto
-            elem.P[2] = (elem.P[4] + elem.P[0]) / 2 + fExt[0] + txtRect[0] * 0.25
-            elem.P[3] = (elem.P[5] + elem.P[1]) / 2 + fExt[1] + txtRect[1] * 0.25
-
-            glPlus.DrawText(Format$(puntos.distancia(elem.P[0], elem.P[1], elem.P[4], elem.P[5]), DimFormat), elem.P[2], elem.P[3], Angulo * 180 / Pi, DimTextHeight, elem.ColorToPaint)
-
-            ' flechas
-            fArrow = [0, 0, DimArrowSize, DimArrowWidth / 2, DimArrowSize, -DimArrowWidth / 2]
-            puntos.Rotate(farrow, angulo)
-            puntos.Translate(fArrow, elem.P[0], elem.P[1])
-            glPlus.PolygonFilled(fArrow, elem.ColorToPaint, elem.ColorToPaint)
-
-            fArrow = [0, 0, -DimArrowSize, DimArrowWidth / 2, -DimArrowSize, -DimArrowWidth / 2]
-            puntos.Rotate(farrow, angulo)
-            puntos.Translate(fArrow, elem.P[4], elem.P[5])
-            glPlus.PolygonFilled(fArrow, elem.ColorToPaint, elem.ColorToPaint)
-
-    End Select
+    cadInsert.Scale(e, sx, sy)
 
 End
+
+Public Sub Draw(Optional e As Entity)
+
+    cadInsert.Draw(elem)
+
+End
+
+' Public Sub Draw(elem As Entity)
+'
+'     Dim l As Float, angulo As Float, hText As New PaintExtents, lText As String, lPix As Integer
+'     Dim e, fExtX, fExtY As Float
+'     Dim ET As Entity, i As Integer
+'     Dim fArrow, fExt, txtRect As Float[]
+'
+'     If Not elem.Visible Then Return
+'
+'     If elem.Selected And Not gcd.ToolActive Then elem.ColorToPaint = gcd.ColorForSelected Else elem.ColorToPaint = gcd.GetGBColor(elem.colour, elem.Layerid)
+'
+'     Select Case DimType
+'         Case gcd.DimAligned
+'             angulo = Ang(elem.P[4] - elem.P[0], elem.P[5] - elem.P[1])
+'
+'             ' lineas de extension
+'             fExt = puntos.RotateFromPointWithAngle(0, 0, angulo, 0, -extension)
+'             txtRect = glPlus.TextExtends(Format$(puntos.distancia(elem.P[0], elem.P[1], elem.P[4], elem.P[5]), DimFormat), DimTextHeight)
+'             puntos.Rotate(txtRect, angulo)
+'             ' raya horizontal
+'             glPlus.Lines([elem.P[0] + fExt[0], elem.P[1] + fExt[1], elem.P[4] + fExt[0], elem.P[5] + fExt[1]], elem.ColorToPaint, elem.LineWidth, elem.LineType)
+'
+'             ' texto
+'             elem.P[2] = (elem.P[4] + elem.P[0]) / 2 + fExt[0] + txtRect[0] * 0.25
+'             elem.P[3] = (elem.P[5] + elem.P[1]) / 2 + fExt[1] + txtRect[1] * 0.25
+'
+'             glPlus.DrawText(Format$(puntos.distancia(elem.P[0], elem.P[1], elem.P[4], elem.P[5]), DimFormat), elem.P[2], elem.P[3], Angulo * 180 / Pi, DimTextHeight, elem.ColorToPaint)
+'
+'             ' flechas
+'             fArrow = [0, 0, DimArrowSize, DimArrowWidth / 2, DimArrowSize, -DimArrowWidth / 2]
+'             puntos.Rotate(farrow, angulo)
+'             puntos.Translate(fArrow, elem.P[0] + fExt[0], elem.P[1] + fExt[1])
+'             glPlus.PolygonFilled(fArrow, elem.ColorToPaint, elem.ColorToPaint)
+'
+'             fArrow = [0, 0, -DimArrowSize, DimArrowWidth / 2, -DimArrowSize, -DimArrowWidth / 2]
+'             puntos.Rotate(farrow, angulo)
+'             puntos.Translate(fArrow, elem.P[4] + fExt[0], elem.P[5] + fExt[1])
+'             glPlus.PolygonFilled(fArrow, elem.ColorToPaint, elem.ColorToPaint)
+'
+'         Case gcd.dimAngular
+'
+'         Case gcd.dimRadius
+'             ' P0=centro P1=texto P5=flecha
+'
+'         Case gcd.dimDiameter
+'             ' P0=flecha P1=texto P5=flecha
+'
+'             angulo = Ang(elem.P[4] - elem.P[0], elem.P[5] - elem.P[1])
+'
+'             ' lineas de extension
+'             fExt = puntos.RotateFromPointWithAngle(0, 0, angulo, 0, -extension)
+'             txtRect = glPlus.TextExtends(Format$(puntos.distancia(elem.P[0], elem.P[1], elem.P[4], elem.P[5]), DimFormat), DimTextHeight)
+'             puntos.Rotate(txtRect, angulo)
+'
+'             ' raya horizontal
+'             glPlus.Lines([elem.P[0], elem.P[1], elem.P[4], elem.P[5]], elem.ColorToPaint, elem.LineWidth, elem.LineType)
+'
+'             ' texto
+'             elem.P[2] = (elem.P[4] + elem.P[0]) / 2 + fExt[0] + txtRect[0] * 0.25
+'             elem.P[3] = (elem.P[5] + elem.P[1]) / 2 + fExt[1] + txtRect[1] * 0.25
+'
+'             glPlus.DrawText(Format$(puntos.distancia(elem.P[0], elem.P[1], elem.P[4], elem.P[5]), DimFormat), elem.P[2], elem.P[3], Angulo * 180 / Pi, DimTextHeight, elem.ColorToPaint)
+'
+'             ' flechas
+'             fArrow = [0, 0, DimArrowSize, DimArrowWidth / 2, DimArrowSize, -DimArrowWidth / 2]
+'             puntos.Rotate(farrow, angulo)
+'             puntos.Translate(fArrow, elem.P[0], elem.P[1])
+'             glPlus.PolygonFilled(fArrow, elem.ColorToPaint, elem.ColorToPaint)
+'
+'             fArrow = [0, 0, -DimArrowSize, DimArrowWidth / 2, -DimArrowSize, -DimArrowWidth / 2]
+'             puntos.Rotate(farrow, angulo)
+'             puntos.Translate(fArrow, elem.P[4], elem.P[5])
+'             glPlus.PolygonFilled(fArrow, elem.ColorToPaint, elem.ColorToPaint)
+'
+'     End Select
+'
+' End
 
 '' A fat version of the entity
 Public Sub DrawRemark(oE As Entity)
+
+    cadInsert.DrawRemark(oe)
 
 End
 
 '' A fat version of the entity
 Public Sub DrawSelected(oE As Entity)
+
+    cadInsert.DrawSelected(oe)
 
 End
 
@@ -429,6 +481,9 @@ End
 
 Public Sub AdvanceStep()
 
+    Dim iBloque As Integer
+    Dim d As Float
+
     Select Case DimType
         Case -1 'clsDrawingAids.HelperTrabajo = "DimType? Horizontal;Vertical;Aligned;aNgular;rOtated,Radial;Diameter"
             Select Case UCase(TextEntry)
@@ -454,12 +509,62 @@ Public Sub AdvanceStep()
 
         Case gcd.DimAligned
             If iPoints = 1 Then ' marco el primer punto
-                elem.P[0] = ClickXr
+                elem.P[0] = ClickXr     ' posicion base del inserto
                 elem.P[1] = ClickYr
+
+                elem.fParam[0] = 1      ' ScaleX del inserto
+                elem.fParam[1] = 1      ' ScaleY del inserto
+                elem.fParam[2] = 0      ' degAngle del inserto
+
                 elem.Visible = True
-            Else If iPoints = 2 Then ' marco el segundo punto
-                elem.P[4] = ClickXr ' 2 y 3  son la posicion del texto
-                elem.P[5] = ClickYr
+            Else If iPoints = 2 Then ' marco el segundo punto, lo que modifica los parametros del bloque
+                ' -> el bloque
+                iBloque = clsEntities.FIndBlockID(elem.Block)
+
+                ' el largo de la linea principal viene dado por la distancia entre ambos puntos
+                d = puntos.distancia(elem.P[0], elem.P[1], ClickXr, ClickYr)
+
+                ' la primer entidad del bloque es la linea principal
+                appmain.hFCAD.arrBlocks[iBloque].entities[0].P[0] = 0           ' X0
+                appmain.hFCAD.arrBlocks[iBloque].entities[0].P[1] = 0           ' Y0
+
+                appmain.hFCAD.arrBlocks[iBloque].entities[0].P[2] = d           ' X1
+                appmain.hFCAD.arrBlocks[iBloque].entities[0].P[3] = 0           ' Y1
+
+                ' la segunda es la primer linea de demarcacion (sin cambios)
+                'appmain.hFCAD.arrBlocks[iBloque].entities[1].P[0] = 0           ' X0
+                'appmain.hFCAD.arrBlocks[iBloque].entities[1].P[1] = 0           ' Y0
+
+                'appmain.hFCAD.arrBlocks[iBloque].entities[1].P[2] = d           ' X1
+                'appmain.hFCAD.arrBlocks[iBloque].entities[1].P[3] = 0           ' Y1
+
+                ' la tercera es la segunda linea de demarcacion
+                appmain.hFCAD.arrBlocks[iBloque].entities[2].P[0] = d           ' X0
+                'appmain.hFCAD.arrBlocks[iBloque].entities[2].P[1] = 0           ' Y0
+
+                appmain.hFCAD.arrBlocks[iBloque].entities[2].P[2] = d           ' X1
+                'appmain.hFCAD.arrBlocks[iBloque].entities[2].P[3] = 0           ' Y1
+
+                ' la cuarta y quinta son las flechas , tengo que verificar si entran
+                If Me.DimArrowWidth * Me.DimScale > d / 2 Then ' entra
+
+                    appmain.hFCAD.arrBlocks[iBloque].entities[4].P[0] = d           ' X0
+                    appmain.hFCAD.arrBlocks[iBloque].entities[4].P[2] = d           ' X0
+                    appmain.hFCAD.arrBlocks[iBloque].entities[4].P[4] = d           ' X0
+                    appmain.hFCAD.arrBlocks[iBloque].entities[4].P[6] = d           ' X0
+                Else
+                    appmain.hFCAD.arrBlocks[iBloque].entities[3].P[0] = d           ' X0
+                    appmain.hFCAD.arrBlocks[iBloque].entities[3].P[2] = d           ' X0
+                    appmain.hFCAD.arrBlocks[iBloque].entities[3].P[4] = d           ' X0
+                    appmain.hFCAD.arrBlocks[iBloque].entities[3].P[6] = d           ' X0
+
+                End If
+
+                ' la sexta es el texto
+
+                appmain.hFCAD.arrBlocks[iBloque].entities[5].P[0] = d / 2          ' X0
+                appmain.hFCAD.arrBlocks[iBloque].entities[5].P[1] = 0              ' Y0
+
             Else If iPoints = 3 Then ' marco la extension
 
                 extension = puntos.PointToLineDistance([ClickXr, ClickYr], [elem.P[0], elem.P[1], elem.P[4], elem.P[5]])
@@ -485,7 +590,7 @@ Public Sub AdvanceStep()
             End If
 
     End Select
-    Inc elem.StepsDone
+    Inc Me.StepsDone
 
     appmain.hFCAD.redraw
 
@@ -526,7 +631,7 @@ Public Function MouseMove(mouseX As Integer, mouseY As Integer) ' esta rutina es
         ClickYr = appmain.hFcad.iEntity[1]
 
         ' aca tengo que verificar el ortogonal
-    Else If elem.StepsDone > 0 Then                                                                          ' puedo hacer ortogonal
+    Else If Me.StepsDone > 0 Then                                                                          ' puedo hacer ortogonal
         If gcd.OrtogonalForzado Or (Not gcd.OrtogonalIgnorado And gcd.Ortogonal) Then          ' hablame de operadores logicos
 
             If Abs(ClickXr - ClickPrevXr) > Abs(ClickYr - ClickPrevYr) Then ' prevalece X
@@ -604,7 +709,7 @@ Public Function MouseDown(mouseX As Integer, mouseY As Integer) ' esta rutina es
 
         ' aca tengo que verificar el ortogonal
 
-    Else If elem.StepsDone > 0 Then                                                                          ' puedo hacer ortogonal
+    Else If Me.StepsDone > 0 Then                                                                          ' puedo hacer ortogonal
         If gcd.OrtogonalForzado Or (Not gcd.OrtogonalIgnorado And gcd.Ortogonal) Then          ' hablame de operadores logicos
 
             If Abs(ClickXr - ClickPrevXr) > Abs(ClickYr - ClickPrevYr) Then ' prevalece X
@@ -631,104 +736,13 @@ End
 
 Public Function Draw2(oE As Entity)
 
-    Dim l As Float, angulo As Float, hText As New PaintExtents, lText As String, lPix As Integer
-    Dim e As Float
-    Dim ET As Entity, i As Integer
-
-    If Not elem.Visible Then Return
-
-    If elem.Selected And Not gcd.ToolActive Then elem.ColorToPaint = gcd.ColorForSelected Else elem.ColorToPaint = gcd.GetGBColor(elem.colour, elem.Layerid)
-
-    paint.Save
-
-    paint.LineWidth = elem.LineWidth / appmain.hFcad.ScaleZoom / gcd.ScaleLines
-
-    If elem.Selected And Not gcd.ToolActive Then
-        paint.brush = Paint.Color(gcd.ColorForSelected)
-    Else
-        paint.brush = Paint.Color(elem.ColorToPaint)
-    Endif
-    ' La cota puede estar inclinada, entonces debo rotarla
-    l = puntos.distancia(elem.p[0], elem.p[1], elem.p[2], elem.p[3])
-    lPix = appmain.hFcad.pixels(l)
-    ltext = Format(l, gcd.FormatoCotas)
-    angulo = -Ang(elem.p[2] - elem.p[0], elem.p[1] - elem.p[3])
-    paint.Translate(elem.p[0], elem.p[1])
-    paint.Rotate(-angulo)
-    htext = paint.TextExtents(ltext)
-    ' e1 = puntos.distanciap(elem.p[0], elem.p[2])        ' lo que se separa la cota de los puntos marcados para acotar
-    ' e2 = puntos.distanciap(elem.p[1], elem.p[2])        ' lo que se separa la cota de los puntos marcados para acotar
-    ' If e1 > e2 Then e = e2 Else e = e1      ' tomo el menor, en metros
-    ' e = appmain.hFcad.pixels(e)                     ' paso a pixels
-    e = 0 ' TODO:  arregla esto
-    'paint.brush = Paint.Color(Color.White)
-
-    paint.relLineTo(lPix, 0) ' linea horizontal
-    paint.relmoveto(0, -10)
-    paint.relLineTo(0, 20) ' linea vertical 1
-    paint.relmoveto(-lPix, 0)
-    paint.relLineTo(0, -20) ' linea vertical 2
-    paint.relmoveto(5, 5)
-    paint.relLineTo(-10, 10) ' linea vertical 2
-    paint.relmoveto(lPix, 0)
-    paint.relLineTo(10, -10) ' linea vertical 2
-    paint.Stroke
-    If hText.Width * 0.8 < lPix Then
-        paint.MoveTo(lPix / 2 - htext.Width / 2, htext.Height / 2 - 10 - e)
-        Paint.Scale(1, -1)
-        paint.Text(ltext)
-    Endif
-
-    paint.Stroke
-    paint.Restore
+    cadInsert.Draw2(oe)
 
 End
 
 Public Sub CreatePolygon(oE As Entity)
 
-    ' checkk Viga / Beam to see how its done
-
-    elem.Polygon.Clear
-
-    Dim BpX, BpZ, l As Float, Rotated As Float[]
-    l = puntos.distancia(elem.p[0], elem.p[1], elem.p[2], elem.p[3])
-
-    ' From an unrotated point of view, our bouding points look like
-    ' 1
-    BpX = elem.p[0]
-    BpZ = elem.p[1] - elem.fParam[0] / 2  ' thats wall thickness
-
-    ' and, the rotated are
-
-    rotated = puntos.RotateFromPointWithSinCos(elem.p[0], elem.p[1], (elem.p[3] - elem.p[1]) / l, (elem.p[2] - elem.p[0]) / l, BpX, Bpz)
-    elem.Polygon.Insert(rotated)     ' pair
-
-    ' 2
-    BpX = elem.p[0] + l
-    BpZ = elem.p[1] - elem.fParam[0] / 2
-
-    ' and, the rotated are
-
-    rotated = puntos.RotateFromPointWithSinCos(elem.p[0], elem.p[1], (elem.p[3] - elem.p[1]) / l, (elem.p[2] - elem.p[0]) / l, BpX, Bpz)
-    elem.Polygon.Insert(rotated)     ' pair
-
-    ' 3
-    BpX = elem.p[0] + l
-    BpZ = elem.p[1] + elem.fParam[0] / 2
-
-    ' and, the rotated are
-
-    rotated = puntos.RotateFromPointWithSinCos(elem.p[0], elem.p[1], (elem.p[3] - elem.p[1]) / l, (elem.p[2] - elem.p[0]) / l, BpX, Bpz)
-    elem.Polygon.Insert(rotated)     ' pair
-
-    ' 4
-    BpX = elem.p[0]
-    BpZ = elem.p[1] + elem.fParam[0] / 2
-
-    ' and, the rotated are
-
-    rotated = puntos.RotateFromPointWithSinCos(elem.p[0], elem.p[1], (elem.p[3] - elem.p[1]) / l, (elem.p[2] - elem.p[0]) / l, BpX, Bpz)
-    elem.Polygon.Insert(rotated)     ' pair
+    cadInsert.CreatePolygon(oe)
 
 End
 

@@ -2922,42 +2922,60 @@ Private Function dxfSave2Tables() As Integer
     Print #hFIle, "0"
     Print #hFIle, "0"
     Print #hFIle, "ENDTAB"
-    Print #hFIle, "0"
+
+    ' ======================================================================================
+    ' LAYERS
+    Print #hFIle, "0"                       ' OBJECT TYPE
     Print #hFIle, "TABLE"
-    Print #hFIle, "2"
+    Print #hFIle, "2"                       ' TABLE NAME
     Print #hFIle, "LAYER"
-    Print #hFIle, "5"
+    Print #hFIle, "5"                       ' HANDLE
     Print #hFIle, "2"
     Print #hFIle, "330"
     Print #hFIle, "0"
     Print #hFIle, "100"
     Print #hFIle, "AcDbSymbolTable"
-    Print #hFIle, "70"
-    Print #hFIle, "1"
-    Print #hFIle, "0"
-    Print #hFIle, "LAYER"
-    Print #hFIle, "5"
-    Print #hFIle, "10"
-    Print #hFIle, "330"
-    Print #hFIle, "2"
-    Print #hFIle, "100"
-    Print #hFIle, "AcDbSymbolTableRecord"
-    Print #hFIle, "100"
-    Print #hFIle, "AcDbLayerTableRecord"
-    Print #hFIle, "2"
-    Print #hFIle, "0"
-    Print #hFIle, "70"
-    Print #hFIle, "0"
-    Print #hFIle, "62"
-    Print #hFIle, "7"
-    Print #hFIle, "6"
-    Print #hFIle, "CONTINUOUS"
-    Print #hFIle, "370"
-    Print #hFIle, "0"
-    Print #hFIle, "390"
-    Print #hFIle, "F"
+    Print #hFIle, "70"                      ' ENTRIES IN TABLE
+    Print #hFIle, APPMain.hFCAD.cModel["Layers"].Count
+    Dim i As Integer, lay As Collection
+    ' individual layers
+    For Each lay In APPMain.hFCAD.cModel["Layers"]
+        Print #hFIle, "0"
+        Print #hFIle, "LAYER"
+        Print #hFIle, "5"                   ' handle
+        Print #hFIle, Str(i)                ' "10"
+        Print #hFIle, "330"
+        Print #hFIle, "2"
+        Print #hFIle, "100"
+        Print #hFIle, "AcDbSymbolTableRecord"
+        Print #hFIle, "100"
+        Print #hFIle, "AcDbLayerTableRecord"
+        Print #hFIle, "2"                   ' name
+        Print #hFIle, lay["name"]
+        Print #hFIle, "70"                  '
+        ' Standard flags(bit - coded values):
+        ' 1 = Layer Is Frozen; otherwise layer Is Thawed
+        ' 2 = Layer Is Frozen by Default In New Viewports
+        ' 4 = Layer Is Locked
+        ' 16 = If set, table entry Is Externally dependent On an xref
+        ' 32 = If both this bit And bit 16 are set, the externally dependent xref has been successfully resolved
+        ' 64 = If set, the table entry was referenced by at least one entity In the drawing the Last Time the drawing was edited.(This flag Is For the benefit Of AutoCAD commands.It can be ignored by most programs that Read DXF files And need Not be set by programs that Write DXF files)
+        Print #hFIle, "0"
+        Print #hFIle, "62"                  ' color (neg = layer off)
+        Print #hFIle, lay["colour"]
+        Print #hFIle, "6"                                               ' linetype
+        Print #hFIle, lay["style"]        '"CONTINUOUS"
+        Print #hFIle, "370"
+        Print #hFIle, "0"
+        Print #hFIle, "390"
+        Print #hFIle, "F"
+
+    Next
     Print #hFIle, "0"
     Print #hFIle, "ENDTAB"
+
+    ' =====================================================================================================
+    ' STYLES
     Print #hFIle, "0"
     Print #hFIle, "TABLE"
     Print #hFIle, "2"
@@ -3255,6 +3273,8 @@ End
 
 Private Function dxfSave3BlockRecord() As Integer
 
+    Dim i As Integer
+
     Print #hFIle, "0"
     Print #hFIle, "TABLE"
     Print #hFIle, "2"
@@ -3304,25 +3324,27 @@ Private Function dxfSave3BlockRecord() As Integer
     Print #hFIle, "281"
     Print #hFIle, "0"
     ' block record
+    For i = 0 To APPMain.hFCAD.arrBlocks.Max
+        Print #hFIle, "0"
+        Print #hFIle, "BLOCK_RECORD"
+        Print #hFIle, "5"                   ' handle
+        Print #hFIle, Str$(i)               ' "4E"
+        Print #hFIle, "330"
+        Print #hFIle, "1"
+        Print #hFIle, "100"
+        Print #hFIle, "AcDbSymbolTableRecord"
+        Print #hFIle, "100"
+        Print #hFIle, "AcDbBlockTableRecord"
+        Print #hFIle, "2"                                   ' block name
+        Print #hFIle, APPMain.hFCAD.arrBlocks[i].name       ' "*D1"
+        Print #hFIle, "70"                                  ' insertion units
+        Print #hFIle, "0"                                   ' 0 = unitless
+        Print #hFIle, "280"                                 ' explotability
+        Print #hFIle, "1"                                   ' 0 = false ; 1 = true????
+        Print #hFIle, "281"                                 ' scalability
+        Print #hFIle, "1"
 
-    ' Print #hFIle, "0"
-    ' Print #hFIle, "BLOCK_RECORD"
-    ' Print #hFIle, "5"
-    ' Print #hFIle, "4E"
-    ' Print #hFIle, "330"
-    ' Print #hFIle, "1"
-    ' Print #hFIle, "100"
-    ' Print #hFIle, "AcDbSymbolTableRecord"
-    ' Print #hFIle, "100"
-    ' Print #hFIle, "AcDbBlockTableRecord"
-    ' Print #hFIle, "2"
-    ' Print #hFIle, "*D1"
-    ' Print #hFIle, "70"
-    ' Print #hFIle, "0"
-    ' Print #hFIle, "280"
-    ' Print #hFIle, "1"
-    ' Print #hFIle, "281"
-    ' Print #hFIle, "0"
+    Next
 
     ' fin del block record
     Print #hFIle, "0"
@@ -3333,6 +3355,9 @@ Private Function dxfSave3BlockRecord() As Integer
 End
 
 Private Function dxfSave4Blocks() As Integer
+
+    Dim i As Integer
+    Dim iii As Integer
 
     Print #hFIle, "0"
     Print #hFIle, "SECTION"
@@ -3418,343 +3443,64 @@ Private Function dxfSave4Blocks() As Integer
     Print #hFIle, "AcDbBlockEnd"
     ' a partir de aca van los bloques
     '===========================================================================================================
-    ' Print #hFIle, "0"
-    ' Print #hFIle, "BLOCK"
-    ' Print #hFIle, "5"
-    ' Print #hFIle, "52"
-    ' Print #hFIle, "330"
-    ' Print #hFIle, "51"
-    ' Print #hFIle, "100"
-    ' Print #hFIle, "AcDbEntity"
-    ' Print #hFIle, "8"
-    ' Print #hFIle, "0"
-    ' Print #hFIle, "100"
-    ' Print #hFIle, "AcDbBlockBegin"
-    ' Print #hFIle, "2"
-    ' Print #hFIle, "*D2"
-    ' Print #hFIle, "70"
-    ' Print #hFIle, "1"
-    ' Print #hFIle, "10"
-    ' Print #hFIle, "0"
-    ' Print #hFIle, "20"
-    ' Print #hFIle, "0"
-    ' Print #hFIle, "3"
-    ' Print #hFIle, "*D2"
-    ' Print #hFIle, "1"
-    ' Print #hFIle, ""
-    ' Print #hFIle, "0"
-    ' Print #hFIle, "LINE"
-    ' Print #hFIle, "5"
-    ' Print #hFIle, "5D"
-    ' Print #hFIle, "100"
-    ' Print #hFIle, "AcDbEntity"
-    ' Print #hFIle, "8"
-    ' Print #hFIle, "0"
-    ' Print #hFIle, "6"
-    ' Print #hFIle, "ByBlock"
-    ' Print #hFIle, "62"
-    ' Print #hFIle, "0"
-    ' Print #hFIle, "370"
-    ' Print #hFIle, "-2"
-    ' Print #hFIle, "100"
-    ' Print #hFIle, "AcDbLine"
-    ' Print #hFIle, "10"
-    ' Print #hFIle, "43.99432756510384"
-    ' Print #hFIle, "20"
-    ' Print #hFIle, "90.35288354215538"
-    ' Print #hFIle, "11"
-    ' Print #hFIle, "40.57704609229131"
-    ' Print #hFIle, "21"
-    ' Print #hFIle, "93.8164386966949"
-    ' Print #hFIle, "0"
-    ' Print #hFIle, "LINE"
-    ' Print #hFIle, "5"
-    ' Print #hFIle, "5E"
-    ' Print #hFIle, "100"
-    ' Print #hFIle, "AcDbEntity"
-    ' Print #hFIle, "8"
-    ' Print #hFIle, "0"
-    ' Print #hFIle, "6"
-    ' Print #hFIle, "ByBlock"
-    ' Print #hFIle, "62"
-    ' Print #hFIle, "0"
-    ' Print #hFIle, "370"
-    ' Print #hFIle, "-2"
-    ' Print #hFIle, "100"
-    ' Print #hFIle, "AcDbLine"
-    ' Print #hFIle, "10"
-    ' Print #hFIle, "69.25948473366495"
-    ' Print #hFIle, "20"
-    ' Print #hFIle, "115.2804939446232"
-    ' Print #hFIle, "11"
-    ' Print #hFIle, "65.84220326085241"
-    ' Print #hFIle, "21"
-    ' Print #hFIle, "118.7440490991627"
-    ' Print #hFIle, "0"
-    ' Print #hFIle, "LINE"
-    ' Print #hFIle, "5"
-    ' Print #hFIle, "5F"
-    ' Print #hFIle, "100"
-    ' Print #hFIle, "AcDbEntity"
-    ' Print #hFIle, "8"
-    ' Print #hFIle, "0"
-    ' Print #hFIle, "6"
-    ' Print #hFIle, "ByBlock"
-    ' Print #hFIle, "62"
-    ' Print #hFIle, "0"
-    ' Print #hFIle, "370"
-    ' Print #hFIle, "-2"
-    ' Print #hFIle, "100"
-    ' Print #hFIle, "AcDbLine"
-    ' Print #hFIle, "10"
-    ' Print #hFIle, "41.45496559322551"
-    ' Print #hFIle, "20"
-    ' Print #hFIle, "92.92663121758527"
-    ' Print #hFIle, "11"
-    ' Print #hFIle, "66.72012276178661"
-    ' Print #hFIle, "21"
-    ' Print #hFIle, "117.8542416200531"
-    ' Print #hFIle, "0"
-    ' Print #hFIle, "SOLID"
-    ' Print #hFIle, "5"
-    ' Print #hFIle, "60"
-    ' Print #hFIle, "100"
-    ' Print #hFIle, "AcDbEntity"
-    ' Print #hFIle, "8"
-    ' Print #hFIle, "0"
-    ' Print #hFIle, "6"
-    ' Print #hFIle, "ByBlock"
-    ' Print #hFIle, "62"
-    ' Print #hFIle, "0"
-    ' Print #hFIle, "370"
-    ' Print #hFIle, "-2"
-    ' Print #hFIle, "100"
-    ' Print #hFIle, "AcDbTrace"
-    ' Print #hFIle, "10"
-    ' Print #hFIle, "41.45496559322551"
-    ' Print #hFIle, "20"
-    ' Print #hFIle, "92.92663121758527"
-    ' Print #hFIle, "30"
-    ' Print #hFIle, "0"
-    ' Print #hFIle, "11"
-    ' Print #hFIle, "42.942209016246"
-    ' Print #hFIle, "21"
-    ' Print #hFIle, "94.97880078099355"
-    ' Print #hFIle, "31"
-    ' Print #hFIle, "0"
-    ' Print #hFIle, "12"
-    ' Print #hFIle, "43.52695208664359"
-    ' Print #hFIle, "22"
-    ' Print #hFIle, "94.38613965791376"
-    ' Print #hFIle, "32"
-    ' Print #hFIle, "0"
-    ' Print #hFIle, "13"
-    ' Print #hFIle, "43.52695208664359"
-    ' Print #hFIle, "23"
-    ' Print #hFIle, "94.38613965791376"
-    ' Print #hFIle, "33"
-    ' Print #hFIle, "0"
-    ' Print #hFIle, "0"
-    ' Print #hFIle, "SOLID"
-    ' Print #hFIle, "5"
-    ' Print #hFIle, "61"
-    ' Print #hFIle, "100"
-    ' Print #hFIle, "AcDbEntity"
-    ' Print #hFIle, "8"
-    ' Print #hFIle, "0"
-    ' Print #hFIle, "6"
-    ' Print #hFIle, "ByBlock"
-    ' Print #hFIle, "62"
-    ' Print #hFIle, "0"
-    ' Print #hFIle, "370"
-    ' Print #hFIle, "-2"
-    ' Print #hFIle, "100"
-    ' Print #hFIle, "AcDbTrace"
-    ' Print #hFIle, "10"
-    ' Print #hFIle, "66.72012276178661"
-    ' Print #hFIle, "20"
-    ' Print #hFIle, "117.8542416200531"
-    ' Print #hFIle, "30"
-    ' Print #hFIle, "0"
-    ' Print #hFIle, "11"
-    ' Print #hFIle, "65.23287933876612"
-    ' Print #hFIle, "21"
-    ' Print #hFIle, "115.8020720566448"
-    ' Print #hFIle, "31"
-    ' Print #hFIle, "0"
-    ' Print #hFIle, "12"
-    ' Print #hFIle, "64.64813626836853"
-    ' Print #hFIle, "22"
-    ' Print #hFIle, "116.3947331797246"
-    ' Print #hFIle, "32"
-    ' Print #hFIle, "0"
-    ' Print #hFIle, "13"
-    ' Print #hFIle, "64.64813626836853"
-    ' Print #hFIle, "23"
-    ' Print #hFIle, "116.3947331797246"
-    ' Print #hFIle, "33"
-    ' Print #hFIle, "0"
-    ' Print #hFIle, "0"
-    ' Print #hFIle, "MTEXT"
-    ' Print #hFIle, "5"
-    ' Print #hFIle, "62"
-    ' Print #hFIle, "100"
-    ' Print #hFIle, "AcDbEntity"
-    ' Print #hFIle, "8"
-    ' Print #hFIle, "0"
-    ' Print #hFIle, "6"
-    ' Print #hFIle, "CONTINUOUS"
-    ' Print #hFIle, "62"
-    ' Print #hFIle, "0"
-    ' Print #hFIle, "370"
-    ' Print #hFIle, "-2"
-    ' Print #hFIle, "100"
-    ' Print #hFIle, "AcDbMText"
-    ' Print #hFIle, "10"
-    ' Print #hFIle, "52.77066492610479"
-    ' Print #hFIle, "20"
-    ' Print #hFIle, "106.7251476374836"
-    ' Print #hFIle, "30"
-    ' Print #hFIle, "0"
-    ' Print #hFIle, "40"
-    ' Print #hFIle, "2.5"
-    ' Print #hFIle, "41"
-    ' Print #hFIle, "8.194444444444756"
-    ' Print #hFIle, "71"
-    ' Print #hFIle, "5"
-    ' Print #hFIle, "72"
-    ' Print #hFIle, "1"
-    ' Print #hFIle, "1"
-    ' Print #hFIle, "35,49"
-    ' Print #hFIle, "7"
-    ' Print #hFIle, "STANDARD"
-    ' Print #hFIle, "210"
-    ' Print #hFIle, "0"
-    ' Print #hFIle, "220"
-    ' Print #hFIle, "0"
-    ' Print #hFIle, "230"
-    ' Print #hFIle, "1"
-    ' Print #hFIle, "50"
-    ' Print #hFIle, "44.61469122995314"
-    ' Print #hFIle, "73"
-    ' Print #hFIle, "2"
-    ' Print #hFIle, "44"
-    ' Print #hFIle, "1"
-    ' Print #hFIle, "0"
-    ' Print #hFIle, "ENDBLK"
-    ' Print #hFIle, "5"
-    ' Print #hFIle, "53"
-    ' Print #hFIle, "330"
-    ' Print #hFIle, "51"
-    ' Print #hFIle, "100"
-    ' Print #hFIle, "AcDbEntity"
-    ' Print #hFIle, "8"
-    ' Print #hFIle, "0"
-    ' Print #hFIle, "100"
-    ' Print #hFIle, "AcDbBlockEnd"
-    '===========================================================================================================
-    ' Print #hFIle, "0"
-    ' Print #hFIle, "BLOCK"
-    ' Print #hFIle, "5"
-    ' Print #hFIle, "55"
-    ' Print #hFIle, "330"
-    ' Print #hFIle, "54"
-    ' Print #hFIle, "100"
-    ' Print #hFIle, "AcDbEntity"
-    ' Print #hFIle, "8"
-    ' Print #hFIle, "0"
-    ' Print #hFIle, "100"
-    ' Print #hFIle, "AcDbBlockBegin"
-    ' Print #hFIle, "2"
-    ' Print #hFIle, "3 circulos"
-    ' Print #hFIle, "70"
-    ' Print #hFIle, "0"
-    ' Print #hFIle, "10"
-    ' Print #hFIle, "0"
-    ' Print #hFIle, "20"
-    ' Print #hFIle, "0"
-    ' Print #hFIle, "3"
-    ' Print #hFIle, "3 circulos"
-    ' Print #hFIle, "1"
-    ' Print #hFIle, ""  '-------------------------------hasta aca el el block header, luego siguen las entidades
-    ' Print #hFIle, "0"
-    ' Print #hFIle, "CIRCLE"
-    ' Print #hFIle, "5"
-    ' Print #hFIle, "63"
-    ' Print #hFIle, "100"
-    ' Print #hFIle, "AcDbEntity"
-    ' Print #hFIle, "8"
-    ' Print #hFIle, "0"
-    ' Print #hFIle, "6"
-    ' Print #hFIle, "ByLayer"
-    ' Print #hFIle, "62"
-    ' Print #hFIle, "256"
-    ' Print #hFIle, "370"
-    ' Print #hFIle, "-1"
-    ' Print #hFIle, "100"
-    ' Print #hFIle, "AcDbCircle"
-    ' Print #hFIle, "10"
-    ' Print #hFIle, "42.5286139424684"
-    ' Print #hFIle, "20"
-    ' Print #hFIle, "26.88675741840227"
-    ' Print #hFIle, "40"
-    ' Print #hFIle, "33.5"
-    ' Print #hFIle, "0"
-    ' Print #hFIle, "CIRCLE"
-    ' Print #hFIle, "5"
-    ' Print #hFIle, "64"
-    ' Print #hFIle, "100"
-    ' Print #hFIle, "AcDbEntity"
-    ' Print #hFIle, "8"
-    ' Print #hFIle, "0"
-    ' Print #hFIle, "6"
-    ' Print #hFIle, "ByLayer"
-    ' Print #hFIle, "62"
-    ' Print #hFIle, "256"
-    ' Print #hFIle, "370"
-    ' Print #hFIle, "-1"
-    ' Print #hFIle, "100"
-    ' Print #hFIle, "AcDbCircle"
-    ' Print #hFIle, "10"
-    ' Print #hFIle, "42.52861394246841"
-    ' Print #hFIle, "20"
-    ' Print #hFIle, "26.88675741840225"
-    ' Print #hFIle, "40"
-    ' Print #hFIle, "36"
-    ' Print #hFIle, "0"
-    ' Print #hFIle, "CIRCLE"
-    ' Print #hFIle, "5"
-    ' Print #hFIle, "65"
-    ' Print #hFIle, "100"
-    ' Print #hFIle, "AcDbEntity"
-    ' Print #hFIle, "8"
-    ' Print #hFIle, "0"
-    ' Print #hFIle, "6"
-    ' Print #hFIle, "ByLayer"
-    ' Print #hFIle, "62"
-    ' Print #hFIle, "256"
-    ' Print #hFIle, "370"
-    ' Print #hFIle, "-1"
-    ' Print #hFIle, "100"
-    ' Print #hFIle, "AcDbCircle"
-    ' Print #hFIle, "10"
-    ' Print #hFIle, "42.52861394246841"
-    ' Print #hFIle, "20"
-    ' Print #hFIle, "26.88675741840225"
-    ' Print #hFIle, "40"
-    ' Print #hFIle, "35"
-    ' Print #hFIle, "0"     '-----------------------------------------------de aqui al final es el block end
-    ' Print #hFIle, "ENDBLK"
-    ' Print #hFIle, "5"
-    ' Print #hFIle, "56"
-    ' Print #hFIle, "330"
-    ' Print #hFIle, "54"
-    ' Print #hFIle, "100"
-    ' Print #hFIle, "AcDbEntity"
-    ' Print #hFIle, "8"
-    ' Print #hFIle, "0"
-    ' Print #hFIle, "100"
-    ' Print #hFIle, "AcDbBlockEnd"
+    For i = 0 To APPMain.hFCAD.arrBlocks.Max
+        Print #hFIle, "0"
+        Print #hFIle, "BLOCK"
+        Print #hFIle, "5"                           ' handle
+        Print #hFIle, Str$(i)
+        Print #hFIle, "330"
+        Print #hFIle, "51"
+        Print #hFIle, "100"
+        Print #hFIle, "AcDbEntity"
+        Print #hFIle, "8"                           ' layer
+        Print #hFIle, APPMain.hFCAD.arrBlocks[i].layer
+        Print #hFIle, "100"
+        Print #hFIle, "AcDbBlockBegin"
+        Print #hFIle, "2"
+        Print #hFIle, APPMain.hFCAD.arrBlocks[i].name
+        Print #hFIle, "70"
+        ' Block - type flags(bit - coded values, may be combined):
+        ' 0 = Indicates none Of the following flags apply
+        ' 1 = This Is An anonymous block generated by hatching, associative dimensioning, other internal operations, Or an application
+        ' 2 = This block has non - constant attribute definitions(this bit Is Not set If the block has any attribute definitions that are constant, Or has no attribute definitions at all)
+        ' 4 = This block Is An external reference(xref)
+        ' 8 = This block Is An xref overlay
+        ' 16 = This block Is Externally dependent
+        ' 32 = This Is A resolved external reference, Or dependent Of an external reference(ignored On Input )
+        ' 64 = This definition Is A referenced external reference(ignored On Input )
+        Print #hFIle, "1"
+        Print #hFIle, "10"                          ' Base point X
+        Print #hFIle, APPMain.hFCAD.arrBlocks[i].x
+        Print #hFIle, "20"
+        Print #hFIle, APPMain.hFCAD.arrBlocks[i].y
+        Print #hFIle, "30"
+        Print #hFIle, "0"
+        Print #hFIle, "3"                           ' name
+        Print #hFIle, APPMain.hFCAD.arrBlocks[i].name
+        Print #hFIle, "1"                     ' Xref path name
+        Print #hFIle, ""
+        Print #hFIle, "4"                     ' description (optional)
+        Print #hFIle, ""
+
+        ' entiades del block
+        For iii = 0 To APPMain.hFCAD.arrBlocks[i].entities.Max
+            dxfSave51Entity(APPMain.hFCAD.arrBlocks[i].entities[iii])
+        Next
+        Print #hFIle, "0"
+        Print #hFIle, "ENDBLK"
+        Print #hFIle, "5"
+        Print #hFIle, APPMain.hFCAD.arrBlocks[i].layer
+        Print #hFIle, "330"
+        Print #hFIle, "51"
+        Print #hFIle, "100"
+        Print #hFIle, "AcDbEntity"
+        Print #hFIle, "8"
+        Print #hFIle, APPMain.hFCAD.arrBlocks[i].layer
+        Print #hFIle, "100"
+        Print #hFIle, "AcDbBlockEnd"
+
+    Next
+
     '===========================================================================================================
     ' fin de los bloques
     Print #hFIle, "0"
@@ -3773,30 +3519,36 @@ Private Function dxfSave5Entities() As Integer
 
     ' here go all entities
     For Each e In APPMain.hFCAD.arrEntities
-        Select Case e.Gender
-            Case "Line"
-                dxfSaveLine(e.p, e.Layer, e.colour,, e.LineWidth)
-            Case "PLine"
-                dxfSavePLine(e.p, e.Layer, e.colour,, e.LineWidth)
-            Case "SPLine"
-                dxfSaveSPLine(e.p, e.Layer, e.colour,, e.LineWidth)
-            Case "Circle"
-                dxfSaveCircle(e.p, e.fParam[0], e.Layer, e.colour,, e.LineWidth)
-            Case "Arc"
-                dxfSaveArc(e.p, e.fParam[0], e.fParam[1], e.fParam[2], e.Layer, e.colour,, e.LineWidth)
-            Case "Ellipse"
-                dxfSaveEllipse(e.p, e.fParam[0], e.fParam[1], e.fParam[2], e.Layer, e.colour,, e.LineWidth)
-            Case "Text"
-                dxfSaveText(e.stringdata[0], e.p, e.fParam[1], e.fParam[0], e.Layer, e.colour,, e.LineWidth)
-            Case "MText"
-                dxfSaveMText(e.stringdata[0], e.p, e.fParam[1], e.fParam[0], e.Layer, e.colour,, e.LineWidth)
-
-        End Select
+        dxfSave51Entity(e)
     Next
 
     ' end section code
     Print #hFIle, "0"
     Print #hFIle, "ENDSEC"
+
+End
+
+Private Function dxfSave51Entity(e As Entity)
+
+    Select Case e.Gender
+        Case "Line"
+            dxfSaveLine(e.p, e.Layer, e.colour,, e.LineWidth)
+        Case "PLine"
+            dxfSavePLine(e.p, e.Layer, e.colour,, e.LineWidth)
+        Case "SPLine"
+            dxfSaveSPLine(e.p, e.Layer, e.colour,, e.LineWidth)
+        Case "Circle"
+            dxfSaveCircle(e.p, e.fParam[0], e.Layer, e.colour,, e.LineWidth)
+        Case "Arc"
+            dxfSaveArc(e.p, e.fParam[0], e.fParam[1], e.fParam[2], e.Layer, e.colour,, e.LineWidth)
+        Case "Ellipse"
+            dxfSaveEllipse(e.p, e.fParam[0], e.fParam[1], e.fParam[2], e.Layer, e.colour,, e.LineWidth)
+        Case "Text"
+            dxfSaveText(e.stringdata[0], e.p, e.fParam[1], e.fParam[0], e.Layer, e.colour,, e.LineWidth)
+        Case "MText"
+            dxfSaveMText(e.stringdata[0], e.p, e.fParam[1], e.fParam[0], e.Layer, e.colour,, e.LineWidth)
+
+    End Select
 
 End
 
@@ -4054,9 +3806,9 @@ Public Function dxfSaveArc(fCentro As Float[], radious As Float, fStart As Float
     Print #hFIle, "40"                      ' radious
     Print #hFIle, radious
     Print #hFIle, "50"                      ' start angle
-    Print #hFIle, fStart
+    Print #hFIle, fStart / 180 * Pi
     Print #hFIle, "51"                      ' end angle
-    Print #hFIle, fEnd
+    Print #hFIle, fEnd / 180 * Pi
 
 End
 
@@ -4087,11 +3839,11 @@ Public Function dxfSaveEllipse(fCentro As Float[], ratio As Float, fStart As Flo
     Print #hFIle, "21"                      ' Y1 eje major
     Print #hFIle, fCentro[3]
     Print #hFIle, "40"                      ' ratio
-    Print #hFIle, ratio
+    Print #hFIle, ratio / 180 * Pi
     Print #hFIle, "41"                      ' start angle
     Print #hFIle, fStart
     Print #hFIle, "42"                      ' end angle
-    Print #hFIle, fEnd
+    Print #hFIle, fEnd / 180 * Pi
 
 End
 

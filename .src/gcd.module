@@ -778,7 +778,7 @@ Public Function AddText(obxContainer As Entity[], Points As Float[], angle As Fl
     oEntity.P.insert(points)                    ' recibimos position x1,y1
     oEntity.fParam.Add(angle)                   ' grados
     oEntity.fParam.Add(height)                  ' alto letras
-    oEntity.stringdata[0] = _text                  ' el texto
+    oEntity.stringdata.Add(_text)                  ' el texto
     oEntity.layer = Layer
     oEntity.colour = colour
     oEntity.LineWidth = LineWidth               ' datos CAD
@@ -796,10 +796,10 @@ Public Function AddMText(obxContainer As Entity[], Points As Float[], angle As F
 
     oEntity.ClassHandler = cadMText
     oEntity.Gender = oEntity.ClassHandler.gender
-    oEntity.P.insert(points)                    ' recibimos position x1,y1
+    oEntity.P.insert(points)                    ' recibimos position x1,y1 pero tal vez venga un recuadro
     oEntity.fParam.Add(angle)                  ' GRADOS
     oEntity.fParam.Add(height)                  ' alto letras
-    oEntity.stringdata[0] = _text                  ' el texto
+    oEntity.stringdata.add(_text)                  ' el texto
     oEntity.layer = Layer
     oEntity.colour = colour
     oEntity.LineWidth = LineWidth               ' datos CAD

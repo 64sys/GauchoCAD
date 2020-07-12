@@ -920,6 +920,16 @@ Public Sub gTask(sTask As String)
         Catch
             Message.Info(Error.Text)
 
+        Case "export"
+
+            Dialog.Filter = ["*.dxf", "DXF 2007 files"]
+            If Dialog.SaveFile() Then Return
+            FilePath = Dialog.Path
+            If File.Ext(FilePath) <> "xml" Then
+                FilePath = FilePath & ".xml"
+            Endif
+            cadDxf.Start(, 1)
+
         Case "import"
             stx = dsk.FileChooser(User.Home, ["dxf", "dwg"])
             If stx.count > 0 Then
