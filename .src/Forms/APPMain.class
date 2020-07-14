@@ -1111,16 +1111,18 @@ Public Sub Workspace1_Activate()
 
     Dim aWin As Window
 
-    aWin = Workspace1.ActiveWindow
+    If Workspace1.ActiveWindow Then
+        aWin = Workspace1.ActiveWindow
 
-    If aWin.Name = "FCAD" Then
+        If aWin.Name = "FCAD" Then
 
-        hFCAD = aWin
-        LoadComboboxes(hFCAD.cModel)
+            hFCAD = aWin
+            LoadComboboxes(hFCAD.cModel)
 
-        Print aWin.Tag
-        CurrentFile = aWin.Tag
+            Print aWin.Tag
+            CurrentFile = aWin.Tag
 
+        Endif
     Endif
 
 End
