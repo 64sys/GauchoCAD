@@ -217,6 +217,7 @@ Public Sub Finish(oE As Entity, ParamsDone As Integer) As Boolean
         appmain.hFCAD.arrEntities.Add(clsEntities.ClonEntity(et))
         appmain.hFCAD.arrEntities.Last.Block = oe.block
         appmain.hFCAD.arrEntities.Last.iInsert = iInsert
+        appmain.hFCAD.arrEntities.Last.ClassHandler.finish(appmain.hFCAD.arrEntities.Last, -1)
         appmain.hFCAD.arrEntities.Last.ClassHandler.Scale(appmain.hFCAD.arrEntities.Last, oe.fParam[0], oE.fParam[1])
         appmain.hFCAD.arrEntities.Last.ClassHandler.Rotate(appmain.hFCAD.arrEntities.Last, oE.fParam[2] * Pi / 180)
         appmain.hFCAD.arrEntities.Last.ClassHandler.Translate(appmain.hFCAD.arrEntities.Last, oE.p[0], oE.p[1])

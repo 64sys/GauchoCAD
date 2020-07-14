@@ -114,6 +114,7 @@ Public LastEntity As Entity
 Public XYreal As Float[]
 
 Public extension As Float
+Public iBloque As Integer
 
 ' Para mejor generalidad y para compatibilidad futura usaremos los P[] asi con los CODE del DXF
 ' P[] = DXF CODE
@@ -143,9 +144,12 @@ Public extension As Float
 ' 2 = DimScale
 
 '' Mode = DimType ver gcd.DimXXXX constants
-Public Function Start(Optional Mode As Integer = gcd.DimAligned)
+Public Function Start(Optional Mode As Integer = gcd.dimAngular)
 
     Dim newBlock As New ArrBlockSt, eParte As Entity
+    Dim f1, f2 As New Float[]
+
+    Inc TotalDimensions
 
     elem = New Entity
 
@@ -156,6 +160,14 @@ Public Function Start(Optional Mode As Integer = gcd.DimAligned)
     elem.p.Resize(24)
     elem.fParam.Resize(6)
     elem.Visible = False
+
+    ' como esto sera tratado como un inserto
+    elem.fParam[0] = 1  ' scaleX
+    elem.fParam[1] = 1  ' scaleY
+    elem.fParam[2] = 0  ' rotate
+
+    StepsDone = 0
+    iPoints = 0
 
     ' init arrays
     Select Case DimType
@@ -168,7 +180,7 @@ Public Function Start(Optional Mode As Integer = gcd.DimAligned)
             NextParamType = "P"
             ' ahora creo el bloque asociado
             newBlock.entities = New Entity[]
-            newBlock.name = "*D" & Str$(Me.TotalDimensions)
+            newBlock.name = "*D" & Str$(APPMain.hFCAD.arrBlocks.Count)
             APPMain.hFCAD.arrBlocks.Add(newBlock)
             ' linea principal
             gcd.AddLine(newBlock.entities, [0, 0, 0, 0], elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
@@ -178,8 +190,12 @@ Public Function Start(Optional Mode As Integer = gcd.DimAligned)
             gcd.AddLine(newBlock.entities, [0, Me.DimExtension, 0, -Me.DimExtension], elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
 
             ' flechas
-            gcd.Addsolid(newBlock.entities, [0, 0, Me.DimArrowWidth, Me.DimArrowSize, Me.DimArrowWidth, -Me.DimArrowSize, 0, 0], elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
-            gcd.Addsolid(newBlock.entities, [0, 0, -Me.DimArrowWidth, Me.DimArrowSize, -Me.DimArrowWidth, -Me.DimArrowSize, 0, 0], elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
+
+            f1.Insert([0, 0, Me.DimArrowSize, Me.DimArrowWidth, Me.DimArrowSize, -Me.DimArrowWidth, 0, 0])
+            f2.Insert([0, 0, -Me.DimArrowSize, Me.DimArrowWidth, -Me.DimArrowSize, -Me.DimArrowWidth, 0, 0])
+
+            gcd.Addsolid(newBlock.entities, f1, elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
+            gcd.Addsolid(newBlock.entities, f2, elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
 
             ' texto
             gcd.AddMText(newBlock.entities, [0, 0, 0, 0], 0, Me.DimTextHeight, "0.00", elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
@@ -187,8 +203,31 @@ Public Function Start(Optional Mode As Integer = gcd.DimAligned)
             ' y ahora e
 
         Case gcd.dimAngular
-            Me.StepsTotal = 3 ' 1-centro 2-punto 3-punto 4-ubicacion del texto
+
+            Me.StepsTotal = 4 ' 1-centro 2-punto 3-punto 4-ubicacion del texto
             NextParamType = "P"
+
+            ' ahora creo el bloque asociado
+            newBlock.entities = New Entity[]
+            newBlock.name = "*D" & Str$(APPMain.hFCAD.arrBlocks.Count)
+            APPMain.hFCAD.arrBlocks.Add(newBlock)
+            ' la linea principal ahora es un arco
+            gcd.Addarc(newBlock.entities, [0, 0], 0, 0, 0, elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
+
+            ' lineas de demarcacion
+            gcd.AddLine(newBlock.entities, [0, Me.DimExtension, 0, -Me.DimExtension], elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
+            gcd.AddLine(newBlock.entities, [0, Me.DimExtension, 0, -Me.DimExtension], elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
+
+            ' flechas
+
+            'f1.Insert()
+            'f2.Insert([0, 0, -Me.DimArrowSize, Me.DimArrowWidth, -Me.DimArrowSize, -Me.DimArrowWidth, 0, 0])
+
+            gcd.Addsolid(newBlock.entities, [0, 0, Me.DimArrowSize, Me.DimArrowWidth, Me.DimArrowSize, -Me.DimArrowWidth, 0, 0], elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
+            gcd.Addsolid(newBlock.entities, [0, 0, -Me.DimArrowSize, Me.DimArrowWidth, -Me.DimArrowSize, -Me.DimArrowWidth, 0, 0], elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
+
+            ' texto
+            gcd.AddMText(newBlock.entities, [0, 0, 0, 0], 0, Me.DimTextHeight, "0.00", elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
 
     End Select
 
@@ -236,87 +275,14 @@ End
 
 Public Sub Draw(Optional e As Entity)
 
-    cadInsert.Draw(elem)
+    If e Then
+        cadInsert.Draw(e)
+    Else
+
+        cadInsert.Draw(elem)
+    End If
 
 End
-
-' Public Sub Draw(elem As Entity)
-'
-'     Dim l As Float, angulo As Float, hText As New PaintExtents, lText As String, lPix As Integer
-'     Dim e, fExtX, fExtY As Float
-'     Dim ET As Entity, i As Integer
-'     Dim fArrow, fExt, txtRect As Float[]
-'
-'     If Not elem.Visible Then Return
-'
-'     If elem.Selected And Not gcd.ToolActive Then elem.ColorToPaint = gcd.ColorForSelected Else elem.ColorToPaint = gcd.GetGBColor(elem.colour, elem.Layerid)
-'
-'     Select Case DimType
-'         Case gcd.DimAligned
-'             angulo = Ang(elem.P[4] - elem.P[0], elem.P[5] - elem.P[1])
-'
-'             ' lineas de extension
-'             fExt = puntos.RotateFromPointWithAngle(0, 0, angulo, 0, -extension)
-'             txtRect = glPlus.TextExtends(Format$(puntos.distancia(elem.P[0], elem.P[1], elem.P[4], elem.P[5]), DimFormat), DimTextHeight)
-'             puntos.Rotate(txtRect, angulo)
-'             ' raya horizontal
-'             glPlus.Lines([elem.P[0] + fExt[0], elem.P[1] + fExt[1], elem.P[4] + fExt[0], elem.P[5] + fExt[1]], elem.ColorToPaint, elem.LineWidth, elem.LineType)
-'
-'             ' texto
-'             elem.P[2] = (elem.P[4] + elem.P[0]) / 2 + fExt[0] + txtRect[0] * 0.25
-'             elem.P[3] = (elem.P[5] + elem.P[1]) / 2 + fExt[1] + txtRect[1] * 0.25
-'
-'             glPlus.DrawText(Format$(puntos.distancia(elem.P[0], elem.P[1], elem.P[4], elem.P[5]), DimFormat), elem.P[2], elem.P[3], Angulo * 180 / Pi, DimTextHeight, elem.ColorToPaint)
-'
-'             ' flechas
-'             fArrow = [0, 0, DimArrowSize, DimArrowWidth / 2, DimArrowSize, -DimArrowWidth / 2]
-'             puntos.Rotate(farrow, angulo)
-'             puntos.Translate(fArrow, elem.P[0] + fExt[0], elem.P[1] + fExt[1])
-'             glPlus.PolygonFilled(fArrow, elem.ColorToPaint, elem.ColorToPaint)
-'
-'             fArrow = [0, 0, -DimArrowSize, DimArrowWidth / 2, -DimArrowSize, -DimArrowWidth / 2]
-'             puntos.Rotate(farrow, angulo)
-'             puntos.Translate(fArrow, elem.P[4] + fExt[0], elem.P[5] + fExt[1])
-'             glPlus.PolygonFilled(fArrow, elem.ColorToPaint, elem.ColorToPaint)
-'
-'         Case gcd.dimAngular
-'
-'         Case gcd.dimRadius
-'             ' P0=centro P1=texto P5=flecha
-'
-'         Case gcd.dimDiameter
-'             ' P0=flecha P1=texto P5=flecha
-'
-'             angulo = Ang(elem.P[4] - elem.P[0], elem.P[5] - elem.P[1])
-'
-'             ' lineas de extension
-'             fExt = puntos.RotateFromPointWithAngle(0, 0, angulo, 0, -extension)
-'             txtRect = glPlus.TextExtends(Format$(puntos.distancia(elem.P[0], elem.P[1], elem.P[4], elem.P[5]), DimFormat), DimTextHeight)
-'             puntos.Rotate(txtRect, angulo)
-'
-'             ' raya horizontal
-'             glPlus.Lines([elem.P[0], elem.P[1], elem.P[4], elem.P[5]], elem.ColorToPaint, elem.LineWidth, elem.LineType)
-'
-'             ' texto
-'             elem.P[2] = (elem.P[4] + elem.P[0]) / 2 + fExt[0] + txtRect[0] * 0.25
-'             elem.P[3] = (elem.P[5] + elem.P[1]) / 2 + fExt[1] + txtRect[1] * 0.25
-'
-'             glPlus.DrawText(Format$(puntos.distancia(elem.P[0], elem.P[1], elem.P[4], elem.P[5]), DimFormat), elem.P[2], elem.P[3], Angulo * 180 / Pi, DimTextHeight, elem.ColorToPaint)
-'
-'             ' flechas
-'             fArrow = [0, 0, DimArrowSize, DimArrowWidth / 2, DimArrowSize, -DimArrowWidth / 2]
-'             puntos.Rotate(farrow, angulo)
-'             puntos.Translate(fArrow, elem.P[0], elem.P[1])
-'             glPlus.PolygonFilled(fArrow, elem.ColorToPaint, elem.ColorToPaint)
-'
-'             fArrow = [0, 0, -DimArrowSize, DimArrowWidth / 2, -DimArrowSize, -DimArrowWidth / 2]
-'             puntos.Rotate(farrow, angulo)
-'             puntos.Translate(fArrow, elem.P[4], elem.P[5])
-'             glPlus.PolygonFilled(fArrow, elem.ColorToPaint, elem.ColorToPaint)
-'
-'     End Select
-'
-' End
 
 '' A fat version of the entity
 Public Sub DrawRemark(oE As Entity)
@@ -329,50 +295,6 @@ End
 Public Sub DrawSelected(oE As Entity)
 
     cadInsert.DrawSelected(oe)
-
-End
-
-' This function will return False if the element couldn't be created for some reason: bad or incomple user input
-' True means all is good, False will instruct the clsEntityBuilder to delete it
-Public Sub Finish(oE As Entity, ParamsDone As Integer) As Boolean
-
-    'Print "Finish en EntityBase"
-    'CreatePolygon(oe)
-    ' BuildPOI(oe)
-    '
-    ' ' busco el tipo de linea, si hace falta
-    ' If oe.LineTypeName = "Dashed" Then oe.LineType = 1
-    ' ' tareas finales de armado del objeto
-
-    ' oe.psel.resize(oe.p.count / 2)
-    ' oe.ForDeletion = False
-    ' oe.DrawAble = True
-    ' oe.Selected = False
-    ' oe.Finished = True
-    '
-    ' If Not True Then
-    '
-    '     oe.ForDeletion = True
-    '     oe.DrawAble = False
-    '
-    ' End If
-
-    ' APPMain.hFCAD.arrEntities.Add(oe)
-    ' 'oe.ClassHandler.buildPOI(oe)
-    ' oe.ClassHandler.Finish(oe,mE.StepsDone)
-    '
-    ' LastEntity = oe                                       ' save it to repeat on rigth click
-    '
-    ' gcd.clsJobPrevious = Me
-    ' gcd.clsJob = clsDefaultJob
-    ' clsDrawingAids.CleanTexts
-    '
-    ' ' sort them
-    ' 'APPMain.hFCAD.arrEntities.Sort()
-    ' clsMouseTracking.ReBuildPOIPoints
-    ' clsEntities.GLGenDrawList
-    '
-    ' appmain.hFCAD.redraw
 
 End
 
@@ -479,10 +401,13 @@ Catch
 
 End
 
-Public Sub AdvanceStep()
+Public Sub ReBuildBlock()
 
-    Dim iBloque As Integer
-    Dim d As Float
+    Dim d As Float, flxTextExt As Float[]
+    Dim fRotXY As Float[]
+
+    ' -> el bloque
+    iBloque = clsEntities.FIndBlockID(elem.Block)
 
     Select Case DimType
         Case -1 'clsDrawingAids.HelperTrabajo = "DimType? Horizontal;Vertical;Aligned;aNgular;rOtated,Radial;Diameter"
@@ -508,7 +433,7 @@ Public Sub AdvanceStep()
             ' good input
 
         Case gcd.DimAligned
-            If iPoints = 1 Then ' marco el primer punto
+            If iPoints = 0 Then     ' marco el primer punto
                 elem.P[0] = ClickXr     ' posicion base del inserto
                 elem.P[1] = ClickYr
 
@@ -516,13 +441,16 @@ Public Sub AdvanceStep()
                 elem.fParam[1] = 1      ' ScaleY del inserto
                 elem.fParam[2] = 0      ' degAngle del inserto
 
+            Else If iPoints = 1 Then ' marco el segundo punto, lo que modifica los parametros del bloque
                 elem.Visible = True
-            Else If iPoints = 2 Then ' marco el segundo punto, lo que modifica los parametros del bloque
-                ' -> el bloque
-                iBloque = clsEntities.FIndBlockID(elem.Block)
+                elem.P[2] = ClickXr     ' posicion base del inserto
+                elem.P[3] = ClickYr
 
                 ' el largo de la linea principal viene dado por la distancia entre ambos puntos
                 d = puntos.distancia(elem.P[0], elem.P[1], ClickXr, ClickYr)
+
+                ' con este click calculo el angulo
+                elem.fParam[2] = Ang(ClickXr - elem.P[0], ClickYr - elem.P[1]) * 180 / Pi
 
                 ' la primer entidad del bloque es la linea principal
                 appmain.hFCAD.arrBlocks[iBloque].entities[0].P[0] = 0           ' X0
@@ -545,31 +473,75 @@ Public Sub AdvanceStep()
                 appmain.hFCAD.arrBlocks[iBloque].entities[2].P[2] = d           ' X1
                 'appmain.hFCAD.arrBlocks[iBloque].entities[2].P[3] = 0           ' Y1
 
-                ' la cuarta y quinta son las flechas , tengo que verificar si entran
-                If Me.DimArrowWidth * Me.DimScale > d / 2 Then ' entra
+                ' la sexta es el texto
+                appmain.hFCAD.arrBlocks[iBloque].entities[5].StringData[0] = Format(d, Me.DimFormat)
+
+                flxTextExt = glPlus.MTextExtends(appmain.hFCAD.arrBlocks[iBloque].entities[5].StringData[0], 0, 0, appmain.hFCAD.arrBlocks[iBloque].entities[5].fParam[1])
+
+                ' la cuarta y quinta son las flechas , tengo que verificar si entran, o el texto
+                If flxTextExt[2] * 1.1 > d Then                      ' no entra
+
+                    appmain.hFCAD.arrBlocks[iBloque].entities[3].P[0] = d           ' X0
+                    appmain.hFCAD.arrBlocks[iBloque].entities[3].P[2] = Me.DimArrowSize + d           ' X0
+                    appmain.hFCAD.arrBlocks[iBloque].entities[3].P[4] = Me.DimArrowSize + d           ' X0
+                    appmain.hFCAD.arrBlocks[iBloque].entities[3].P[6] = d           ' X0
+
+                    appmain.hFCAD.arrBlocks[iBloque].entities[4].P[0] = 0           ' X0
+                    appmain.hFCAD.arrBlocks[iBloque].entities[4].P[2] = -Me.DimArrowSize
+                    appmain.hFCAD.arrBlocks[iBloque].entities[4].P[4] = -Me.DimArrowSize
+                    appmain.hFCAD.arrBlocks[iBloque].entities[4].P[6] = 0           ' X0
+
+                    ' el texto va afuera
+                    appmain.hFCAD.arrBlocks[iBloque].entities[5].P[0] = d + Me.DimArrowSize / 2
+                    appmain.hFCAD.arrBlocks[iBloque].entities[5].P[1] = Me.DimArrowWidth
+
+                Else                                                                ' entra
+                    appmain.hFCAD.arrBlocks[iBloque].entities[3].P[0] = 0           ' X0
+                    appmain.hFCAD.arrBlocks[iBloque].entities[3].P[2] = Me.DimArrowSize
+                    appmain.hFCAD.arrBlocks[iBloque].entities[3].P[4] = Me.DimArrowSize
+                    appmain.hFCAD.arrBlocks[iBloque].entities[3].P[6] = 0           ' X0
 
                     appmain.hFCAD.arrBlocks[iBloque].entities[4].P[0] = d           ' X0
-                    appmain.hFCAD.arrBlocks[iBloque].entities[4].P[2] = d           ' X0
-                    appmain.hFCAD.arrBlocks[iBloque].entities[4].P[4] = d           ' X0
+                    appmain.hFCAD.arrBlocks[iBloque].entities[4].P[2] = -Me.DimArrowSize + d           ' X0
+                    appmain.hFCAD.arrBlocks[iBloque].entities[4].P[4] = -Me.DimArrowSize + d           ' X0
                     appmain.hFCAD.arrBlocks[iBloque].entities[4].P[6] = d           ' X0
-                Else
-                    appmain.hFCAD.arrBlocks[iBloque].entities[3].P[0] = d           ' X0
-                    appmain.hFCAD.arrBlocks[iBloque].entities[3].P[2] = d           ' X0
-                    appmain.hFCAD.arrBlocks[iBloque].entities[3].P[4] = d           ' X0
-                    appmain.hFCAD.arrBlocks[iBloque].entities[3].P[6] = d           ' X0
+
+                    ' el texto va adentro
+                    appmain.hFCAD.arrBlocks[iBloque].entities[5].P[0] = d / 2 - flxTextExt[2] / 2
+                    appmain.hFCAD.arrBlocks[iBloque].entities[5].P[1] = Me.DimArrowWidth
 
                 End If
 
-                ' la sexta es el texto
+            Else If iPoints = 2 Then ' marco la extension
 
-                appmain.hFCAD.arrBlocks[iBloque].entities[5].P[0] = d / 2          ' X0
-                appmain.hFCAD.arrBlocks[iBloque].entities[5].P[1] = 0              ' Y0
+                extension = -puntos.PointToLineDistance([ClickXr, ClickYr], [elem.P[0], elem.P[1], elem.P[2], elem.P[3]])
+                'Debug extension
 
-            Else If iPoints = 3 Then ' marco la extension
+                ' linea principal
+                appmain.hFCAD.arrBlocks[iBloque].entities[0].P[1] = extension           ' Y0
+                appmain.hFCAD.arrBlocks[iBloque].entities[0].P[3] = extension           ' Y1
 
-                extension = puntos.PointToLineDistance([ClickXr, ClickYr], [elem.P[0], elem.P[1], elem.P[4], elem.P[5]])
-                'elem.P[2] = ClickXr
-                'elem.P[3] = ClickYr
+                ' linea de demarcacion
+                appmain.hFCAD.arrBlocks[iBloque].entities[1].P[1] = Me.DimExtension + extension           ' Y0
+                appmain.hFCAD.arrBlocks[iBloque].entities[1].P[3] = -Me.DimExtension + extension           ' Y1
+
+                ' segunda linea de demarcacion
+                appmain.hFCAD.arrBlocks[iBloque].entities[2].P[1] = Me.DimExtension + extension           ' Y0
+                appmain.hFCAD.arrBlocks[iBloque].entities[2].P[3] = -Me.DimExtension + extension           ' Y1
+
+                ' texto
+                appmain.hFCAD.arrBlocks[iBloque].entities[5].P[1] = Me.DimArrowWidth + extension
+
+                ' flechas
+                appmain.hFCAD.arrBlocks[iBloque].entities[3].P[1] = extension           ' X0
+                appmain.hFCAD.arrBlocks[iBloque].entities[3].P[3] = extension + Me.DimArrowWidth
+                appmain.hFCAD.arrBlocks[iBloque].entities[3].P[5] = extension - Me.DimArrowWidth
+                appmain.hFCAD.arrBlocks[iBloque].entities[3].P[7] = extension           ' X0
+
+                appmain.hFCAD.arrBlocks[iBloque].entities[4].P[1] = extension           ' X0
+                appmain.hFCAD.arrBlocks[iBloque].entities[4].P[3] = extension + Me.DimArrowWidth
+                appmain.hFCAD.arrBlocks[iBloque].entities[4].P[5] = extension - Me.DimArrowWidth
+                appmain.hFCAD.arrBlocks[iBloque].entities[4].P[7] = extension           ' X0
 
             End If
 
@@ -589,8 +561,163 @@ Public Sub AdvanceStep()
 
             End If
 
+        Case gcd.dimAngular
+            If iPoints = 0 Then     ' marco el primer punto
+                elem.P[0] = ClickXr     ' posicion base del inserto
+                elem.P[1] = ClickYr
+
+                elem.fParam[0] = 1      ' ScaleX del inserto
+                elem.fParam[1] = 1      ' ScaleY del inserto
+                elem.fParam[2] = 0      ' degAngle del inserto
+
+            Else If iPoints = 1 Then ' marco el segundo punto, lo que modifica los parametros del bloque
+
+                elem.P[2] = ClickXr     ' con esto puedo definir el radio del arco
+                elem.P[3] = ClickYr
+                d = puntos.distancia(elem.P[0], elem.P[1], ClickXr, ClickYr)
+
+                ' con este click calculo el angulo
+                'elem.fParam[2] = Ang(ClickXr - elem.P[0], ClickYr - elem.P[1]) * 180 / Pi
+
+                ' la primer entidad del bloque es el arco
+                appmain.hFCAD.arrBlocks[iBloque].entities[0].P[0] = 0 'elem.P[0]
+                appmain.hFCAD.arrBlocks[iBloque].entities[0].P[1] = 0 'elem.P[1]
+
+                appmain.hFCAD.arrBlocks[iBloque].entities[0].fParam[0] = d          ' radio
+                appmain.hFCAD.arrBlocks[iBloque].entities[0].fParam[1] = Ang(ClickXr - elem.P[0], ClickYr - elem.P[1]) * 180 / Pi
+                appmain.hFCAD.arrBlocks[iBloque].entities[0].fParam[2] = 0
+
+                ' las lineas de extension (las hago HORIZONTALES y las roto)
+                appmain.hFCAD.arrBlocks[iBloque].entities[1].P.Clear
+                appmain.hFCAD.arrBlocks[iBloque].entities[1].P.Insert([-Me.DimExtension, 0, Me.DimExtension, 0])
+                appmain.hFCAD.arrBlocks[iBloque].entities[2].P.Clear
+                appmain.hFCAD.arrBlocks[iBloque].entities[2].P.Insert([-Me.DimExtension, 0, Me.DimExtension, 0])
+
+                ' flechas
+                appmain.hFCAD.arrBlocks[iBloque].entities[3].P.Clear
+                appmain.hFCAD.arrBlocks[iBloque].entities[3].P.Insert([0, 0, -Me.DimArrowWidth, Me.DimArrowSize, Me.DimArrowWidth, Me.DimArrowSize, 0, 0])
+
+                appmain.hFCAD.arrBlocks[iBloque].entities[4].P.Clear
+                appmain.hFCAD.arrBlocks[iBloque].entities[4].P.Insert([0, 0, -Me.DimArrowWidth, -Me.DimArrowSize, Me.DimArrowWidth, -Me.DimArrowSize, 0, 0])
+
+                ' roto
+                appmain.hFCAD.arrBlocks[iBloque].entities[1].ClassHandler.Rotate(appmain.hFCAD.arrBlocks[iBloque].entities[1], appmain.hFCAD.arrBlocks[iBloque].entities[0].fParam[1] / 180 * Pi)
+                appmain.hFCAD.arrBlocks[iBloque].entities[2].ClassHandler.Rotate(appmain.hFCAD.arrBlocks[iBloque].entities[2], appmain.hFCAD.arrBlocks[iBloque].entities[0].fParam[1] / 180 * Pi)
+                appmain.hFCAD.arrBlocks[iBloque].entities[3].ClassHandler.Rotate(appmain.hFCAD.arrBlocks[iBloque].entities[3], appmain.hFCAD.arrBlocks[iBloque].entities[0].fParam[1] / 180 * Pi)
+                appmain.hFCAD.arrBlocks[iBloque].entities[4].ClassHandler.Rotate(appmain.hFCAD.arrBlocks[iBloque].entities[4], appmain.hFCAD.arrBlocks[iBloque].entities[0].fParam[1] / 180 * Pi)
+
+                ' traslado
+                appmain.hFCAD.arrBlocks[iBloque].entities[1].ClassHandler.Translate(appmain.hFCAD.arrBlocks[iBloque].entities[1], elem.P[2] - elem.P[0], elem.P[3] - elem.P[1])
+                appmain.hFCAD.arrBlocks[iBloque].entities[2].ClassHandler.Translate(appmain.hFCAD.arrBlocks[iBloque].entities[2], elem.P[2] - elem.P[0], elem.P[3] - elem.P[1])
+                appmain.hFCAD.arrBlocks[iBloque].entities[3].ClassHandler.Translate(appmain.hFCAD.arrBlocks[iBloque].entities[3], elem.P[2] - elem.P[0], elem.P[3] - elem.P[1])
+                appmain.hFCAD.arrBlocks[iBloque].entities[4].ClassHandler.Translate(appmain.hFCAD.arrBlocks[iBloque].entities[4], elem.P[2] - elem.P[0], elem.P[3] - elem.P[1])
+
+                ' la sexta es el texto
+                appmain.hFCAD.arrBlocks[iBloque].entities[5].StringData[0] = Format(0, Me.DimFormatAng)
+                flxTextExt = glPlus.MTextExtends(appmain.hFCAD.arrBlocks[iBloque].entities[5].StringData[0], 0, 0, appmain.hFCAD.arrBlocks[iBloque].entities[5].fParam[1])
+
+                appmain.hFCAD.arrBlocks[iBloque].entities[5].P[0] = elem.P[2] - elem.P[0]
+                appmain.hFCAD.arrBlocks[iBloque].entities[5].P[1] = elem.P[3] - elem.P[1]
+
+            Else If iPoints = 2 Then ' marco el segundo punto, lo que modifica los parametros del bloque
+                elem.Visible = True
+                elem.P[4] = ClickXr
+                elem.P[5] = ClickYr
+
+                'appmain.hFCAD.arrBlocks[iBloque].entities[0].fParam[1] = Ang(ClickXr - elem.P[0], ClickYr - elem.P[1]) * 180 / Pi
+                appmain.hFCAD.arrBlocks[iBloque].entities[0].fParam[2] = Ang(ClickXr - elem.P[0], ClickYr - elem.P[1]) * 180 / Pi
+
+                ' las lineas de extension (las hago HORIZONTALES y las roto)
+                'appmain.hFCAD.arrBlocks[iBloque].entities[1].P.Clear
+                'appmain.hFCAD.arrBlocks[iBloque].entities[1].P.Insert([-Me.DimExtension, 0, Me.DimExtension, 0])
+                appmain.hFCAD.arrBlocks[iBloque].entities[2].P.Clear
+                appmain.hFCAD.arrBlocks[iBloque].entities[2].P.Insert([-Me.DimExtension, 0, Me.DimExtension, 0])
+
+                ' flechas
+                'appmain.hFCAD.arrBlocks[iBloque].entities[3].P.Clear
+                'appmain.hFCAD.arrBlocks[iBloque].entities[3].P.Insert([0, 0, -Me.DimArrowWidth, Me.DimArrowSize, Me.DimArrowWidth, Me.DimArrowSize, 0, 0])
+
+                appmain.hFCAD.arrBlocks[iBloque].entities[4].P.Clear
+                appmain.hFCAD.arrBlocks[iBloque].entities[4].P.Insert([0, 0, -Me.DimArrowWidth, -Me.DimArrowSize, Me.DimArrowWidth, -Me.DimArrowSize, 0, 0])
+
+                ' roto
+
+                'appmain.hFCAD.arrBlocks[iBloque].entities[1].ClassHandler.Rotate(appmain.hFCAD.arrBlocks[iBloque].entities[1], appmain.hFCAD.arrBlocks[iBloque].entities[0].fParam[1] / 180 * Pi)
+                appmain.hFCAD.arrBlocks[iBloque].entities[2].ClassHandler.Rotate(appmain.hFCAD.arrBlocks[iBloque].entities[2], appmain.hFCAD.arrBlocks[iBloque].entities[0].fParam[2] / 180 * Pi)
+                'appmain.hFCAD.arrBlocks[iBloque].entities[3].ClassHandler.Rotate(appmain.hFCAD.arrBlocks[iBloque].entities[3], appmain.hFCAD.arrBlocks[iBloque].entities[0].fParam[1] / 180 * Pi)
+                appmain.hFCAD.arrBlocks[iBloque].entities[4].ClassHandler.Rotate(appmain.hFCAD.arrBlocks[iBloque].entities[4], appmain.hFCAD.arrBlocks[iBloque].entities[0].fParam[2] / 180 * Pi)
+
+                ' muevo
+                fRotXY = puntos.RotateFromPointWithAngle(elem.P[0], elem.P[1], (appmain.hFCAD.arrBlocks[iBloque].entities[0].fParam[2] - appmain.hFCAD.arrBlocks[iBloque].entities[0].fParam[1]) / 180 * Pi, elem.P[2], elem.P[3])
+
+                'appmain.hFCAD.arrBlocks[iBloque].entities[2].ClassHandler.Translate(appmain.hFCAD.arrBlocks[iBloque].entities[2], elem.P[4] - elem.P[0], elem.P[5] - elem.P[1])
+                'appmain.hFCAD.arrBlocks[iBloque].entities[4].ClassHandler.Translate(appmain.hFCAD.arrBlocks[iBloque].entities[4], elem.P[4] - elem.P[0], elem.P[5] - elem.P[1])
+                appmain.hFCAD.arrBlocks[iBloque].entities[2].ClassHandler.Translate(appmain.hFCAD.arrBlocks[iBloque].entities[2], fRotXY[0] - elem.P[0], fRotXY[1] - elem.P[1])
+                appmain.hFCAD.arrBlocks[iBloque].entities[4].ClassHandler.Translate(appmain.hFCAD.arrBlocks[iBloque].entities[4], fRotXY[0] - elem.P[0], fRotXY[1] - elem.P[1])
+
+                ' la sexta es el texto
+                If (appmain.hFCAD.arrBlocks[iBloque].entities[0].fParam[2] - appmain.hFCAD.arrBlocks[iBloque].entities[0].fParam[1]) < 0 Then appmain.hFCAD.arrBlocks[iBloque].entities[0].fParam[2] += 360
+                appmain.hFCAD.arrBlocks[iBloque].entities[5].StringData[0] = Format((appmain.hFCAD.arrBlocks[iBloque].entities[0].fParam[2] - appmain.hFCAD.arrBlocks[iBloque].entities[0].fParam[1]), Me.DimFormatAng)
+                fRotXY = puntos.RotateFromPointWithAngle(elem.P[0], elem.P[1], (appmain.hFCAD.arrBlocks[iBloque].entities[0].fParam[2] - appmain.hFCAD.arrBlocks[iBloque].entities[0].fParam[1]) / 180 * Pi / 2, elem.P[2], elem.P[3])
+
+                flxTextExt = glPlus.MTextExtends(appmain.hFCAD.arrBlocks[iBloque].entities[5].StringData[0], 0, 0, appmain.hFCAD.arrBlocks[iBloque].entities[5].fParam[1])
+
+                appmain.hFCAD.arrBlocks[iBloque].entities[5].P[0] = fRotXY[0] - elem.P[0]
+                appmain.hFCAD.arrBlocks[iBloque].entities[5].P[1] = fRotXY[1] - elem.P[1]
+                appmain.hFCAD.arrBlocks[iBloque].entities[5].fParam[0] = (appmain.hFCAD.arrBlocks[iBloque].entities[0].fParam[2] + appmain.hFCAD.arrBlocks[iBloque].entities[0].fParam[1]) / 2 - 90
+
+            Else If iPoints = 3 Then ' aca marco la extension, que es todo lo anterior, pero con otro radio
+
+                elem.P[6] = ClickXr
+                elem.P[7] = ClickYr
+
+                ' nuevo radio
+                d = puntos.distancia(elem.P[0], elem.P[1], ClickXr, ClickYr)
+                appmain.hFCAD.arrBlocks[iBloque].entities[0].fParam[0] = d          ' radio del arco
+
+                ' regenero
+
+                ' las lineas de extension (las hago HORIZONTALES y las roto)
+                appmain.hFCAD.arrBlocks[iBloque].entities[1].P.Clear
+                appmain.hFCAD.arrBlocks[iBloque].entities[1].P.Insert([-Me.DimExtension, 0, Me.DimExtension, 0])
+                appmain.hFCAD.arrBlocks[iBloque].entities[2].P.Clear
+                appmain.hFCAD.arrBlocks[iBloque].entities[2].P.Insert([-Me.DimExtension, 0, Me.DimExtension, 0])
+
+                ' flechas
+                appmain.hFCAD.arrBlocks[iBloque].entities[3].P.Clear
+                appmain.hFCAD.arrBlocks[iBloque].entities[3].P.Insert([0, 0, -Me.DimArrowWidth, Me.DimArrowSize, Me.DimArrowWidth, Me.DimArrowSize, 0, 0])
+
+                appmain.hFCAD.arrBlocks[iBloque].entities[4].P.Clear
+                appmain.hFCAD.arrBlocks[iBloque].entities[4].P.Insert([0, 0, -Me.DimArrowWidth, -Me.DimArrowSize, Me.DimArrowWidth, -Me.DimArrowSize, 0, 0])
+
+                ' roto
+                appmain.hFCAD.arrBlocks[iBloque].entities[1].ClassHandler.Rotate(appmain.hFCAD.arrBlocks[iBloque].entities[1], appmain.hFCAD.arrBlocks[iBloque].entities[0].fParam[1] / 180 * Pi)
+                appmain.hFCAD.arrBlocks[iBloque].entities[2].ClassHandler.Rotate(appmain.hFCAD.arrBlocks[iBloque].entities[2], appmain.hFCAD.arrBlocks[iBloque].entities[0].fParam[2] / 180 * Pi)
+                appmain.hFCAD.arrBlocks[iBloque].entities[3].ClassHandler.Rotate(appmain.hFCAD.arrBlocks[iBloque].entities[3], appmain.hFCAD.arrBlocks[iBloque].entities[0].fParam[1] / 180 * Pi)
+                appmain.hFCAD.arrBlocks[iBloque].entities[4].ClassHandler.Rotate(appmain.hFCAD.arrBlocks[iBloque].entities[4], appmain.hFCAD.arrBlocks[iBloque].entities[0].fParam[2] / 180 * Pi)
+
+                ' muevo
+                fRotXY = puntos.RotateFromPointWithAngle(elem.P[0], elem.P[1], appmain.hFCAD.arrBlocks[iBloque].entities[0].fParam[1] / 180 * Pi, d + elem.P[0], elem.P[1])
+                ' traslado una flecha y una linea de extension
+                appmain.hFCAD.arrBlocks[iBloque].entities[1].ClassHandler.Translate(appmain.hFCAD.arrBlocks[iBloque].entities[1], fRotXY[0] - elem.P[0], fRotXY[1] - elem.P[1])
+                appmain.hFCAD.arrBlocks[iBloque].entities[3].ClassHandler.Translate(appmain.hFCAD.arrBlocks[iBloque].entities[3], fRotXY[0] - elem.P[0], fRotXY[1] - elem.P[1])
+
+                ' muevo
+                fRotXY = puntos.RotateFromPointWithAngle(elem.P[0], elem.P[1], appmain.hFCAD.arrBlocks[iBloque].entities[0].fParam[2] / 180 * Pi, d + elem.P[0], elem.P[1])
+                ' traslado las otras
+                appmain.hFCAD.arrBlocks[iBloque].entities[2].ClassHandler.Translate(appmain.hFCAD.arrBlocks[iBloque].entities[2], fRotXY[0] - elem.P[0], fRotXY[1] - elem.P[1])
+                appmain.hFCAD.arrBlocks[iBloque].entities[4].ClassHandler.Translate(appmain.hFCAD.arrBlocks[iBloque].entities[4], fRotXY[0] - elem.P[0], fRotXY[1] - elem.P[1])
+
+                ' la sexta es el texto
+
+                fRotXY = puntos.RotateFromPointWithAngle(elem.P[0], elem.P[1], (appmain.hFCAD.arrBlocks[iBloque].entities[0].fParam[2] + appmain.hFCAD.arrBlocks[iBloque].entities[0].fParam[1]) / 180 * Pi / 2, d + elem.P[0], elem.P[1])
+
+                appmain.hFCAD.arrBlocks[iBloque].entities[5].P[0] = fRotXY[0] - elem.P[0]
+                appmain.hFCAD.arrBlocks[iBloque].entities[5].P[1] = fRotXY[1] - elem.P[1]
+
+            End If
+
     End Select
-    Inc Me.StepsDone
 
     appmain.hFCAD.redraw
 
@@ -644,24 +771,7 @@ Public Function MouseMove(mouseX As Integer, mouseY As Integer) ' esta rutina es
 
     End If
 
-    Select Case DimType
-        Case gcd.DimAligned
-            If iPoints = 1 Then ' marco el primer punto
-                elem.P[0] = ClickXr
-                elem.P[1] = ClickYr
-            Else If iPoints = 2 Then ' marco el segundo punto
-                elem.P[4] = ClickXr
-                elem.P[5] = ClickYr
-                ' ' 2 y 3  son la posicion del texto
-                ' elem.P[2] = (elem.P[4] + elem.P[0]) / 2
-                ' elem.P[3] = (elem.P[5] + elem.P[1]) / 2
-            Else If iPoints = 3 Then ' marco el segundo punto
-                extension = puntos.PointToLineDistance([ClickXr, ClickYr], [elem.P[0], elem.P[1], elem.P[4], elem.P[5]])
-                'elem.P[2] = ClickXr ' 2 y 3  son la posicion del texto
-                'elem.P[3] = ClickYr
-
-            End If
-    End Select
+    RebuildBlock
 
     appmain.hFCAD.redraw
 
@@ -734,6 +844,18 @@ Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' esta rutina es l
 
 End
 
+Public Sub AdvanceStep()
+
+    Inc StepsDone
+    If Me.StepsDone = Me.StepsTotal Then
+        clsEntityBuilder.elem = elem
+        clsEntityBuilder.Finish
+        elem = Null
+
+    End If
+
+End
+
 Public Function Draw2(oE As Entity)
 
     cadInsert.Draw2(oe)
@@ -748,6 +870,8 @@ End
 
 Public Function BuildPOI(oE As Entity, Optional arrIndex As Integer = -1) As Integer
 
+    cadInsert.BuildPOI(oe, arrIndex)
+
 End
 
 Public Sub Cancel()
@@ -757,5 +881,15 @@ Public Sub Cancel()
     gcd.clsJob = clsDefaultJob
     clsDrawingAids.CleanTexts
     appmain.hFCAD.redraw
+
+End
+
+' This function will return False if the element couldn't be created for some reason: bad or incomple user input
+' True means all is good, False will instruct the clsEntityBuilder to delete it
+Public Sub Finish(oE As Entity, ParamsDone As Integer) As Boolean
+
+    ' primero agregamos la entidad al array
+
+    cadInsert.Finish(oe, ParamsDone)
 
 End

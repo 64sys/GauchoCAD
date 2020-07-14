@@ -86,31 +86,35 @@ Public Sub Draw(oE As Entity)
 
     If Not oE.Visible Then Return
 
-    If Me.StepsDone < 1 Then
+    oE.ColorToPaint = gcd.GetGBColor(oE.colour, oE.Layerid)
 
-        oE.P[2] = oE.P[0]
-        oE.P[3] = oE.P[1]
+    If Not oe.Finished Then
+        If Me.StepsDone < 1 Then
 
-        glPlus.Lines(oE.p, oE.ColorToPaint, oE.LineWidth)
+            oE.P[2] = oE.P[0]
+            oE.P[3] = oE.P[1]
+
+            glPlus.Lines(oE.p, oE.ColorToPaint, oE.LineWidth)
+
+        End If
+
+        If Me.StepsDone < 2 Then
+
+            oE.P[4] = oE.P[2]
+            oE.P[5] = oE.P[3]
+
+        End If
+
+        If Me.StepsDone < 3 Then
+
+            oE.P[6] = oE.P[4]
+            oE.P[7] = oE.P[5]
+
+        Endif
 
     End If
 
-    If Me.StepsDone < 2 Then
-
-        oE.P[4] = oE.P[2]
-        oE.P[5] = oE.P[3]
-
-    End If
-
-    If Me.StepsDone < 3 Then
-
-        oE.P[6] = oE.P[4]
-        oE.P[7] = oE.P[5]
-
-    Endif
-
-    oE.Polygon = oE.P
-    If Me.StepsDone < 2 Then Return
+    If oe.P.Count < 2 Then Return
     GLplus.PolygonFilled(oE.p, oE.ColorToPaint, oE.ColorToPaint, oE.LineWidth, oe.LineType)
 
 End
@@ -165,6 +169,7 @@ Public Sub Finish(oE As Entity, ParamsDone As Integer) As Boolean
     'Print "Finish en EntityBase"
     'CreatePolygon(oe)
     BuildPOI(oe)
+    oE.Polygon = oE.P
 
     ' busco el tipo de linea, si hace falta
     If oE.LineTypeName = "Dashed" Then oE.LineType = 1

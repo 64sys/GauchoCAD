@@ -61,6 +61,9 @@ Public Sub Translate(e As Entity, dX As Float, dY As Float, Optional OnlySelecte
         puntos.Translate(e.p, dx, dy)
     Endif
 
+    'CreatePolygon(e)
+    BuildPOI(e)
+
 End
 
 Public Sub Rotate(e As Entity, radians As Float)
@@ -69,6 +72,9 @@ Public Sub Rotate(e As Entity, radians As Float)
 
     ' el parametro lo tengo que pasar a grados porque la rutina que dibuja el texto usa eso
     E.fParam[0] += radians * 180 / Pi
+
+    'CreatePolygon(e)
+    BuildPOI(e)
 
 End
 
@@ -83,6 +89,9 @@ Public Sub Scale(e As Entity, sX As Float, sY As Float)
         e.P[i + 1] = e.P[i + 1] * sY
 
     Next
+
+    'CreatePolygon(e)
+    BuildPOI(e)
 
 End
 

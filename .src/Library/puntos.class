@@ -31,7 +31,7 @@
 
 Create Static
 Create Private
-Fast Unsafe
+'Fast Unsafe
 Public HookSize As Integer = 16                       ' for use with poi
 Public NumericTolerance As Float = 1e-7
 Public GridSpacing As Float = 0.5
@@ -395,19 +395,22 @@ Public Function PointToLineDistance(fPoint As Float[], fLine As Float[]) As Floa
     ' veo los casos mas simples
 
     If fLine[0] = fLine[2] Then ' la linea es vertical
-        Return fPoint[0] - fLine[0]
+        Return fLine[0] - fPoint[0]
 
     Else If fLine[1] = fLine[3] Then ' la linea es horizontal
-        Return fPoint[1] - fLine[1]
+        Return fLine[1] - fPoint[1]
 
     Endif
 
-    e = lineLineIntersection(fPoint, [1e10, fPoint[1]], [fLine[0], fLine[1]], [fLine[2], fLine[3]])
+    e = lineLineIntersection(fPoint, [10e10, fPoint[1]], [fLine[0], fLine[1]], [fLine[2], fLine[3]])
 
     CE = fPoint[0] - e[0]
 
-    angE = ATan2(fLine[2] - fLine[0], fLine[3] - fLine[1])
+    angE = ATan2(fLine[3] - fLine[1], fLine[2] - fLine[0])
 
+    ' Debug "Radio", ce
+    ' Debug "angulo", angE
+    ' Debug "distancia", CE * Sin(angE)
     Return CE * Sin(angE)
 
 End

@@ -436,7 +436,7 @@ End
 Public Sub Finish()
 
     APPMain.hFCAD.arrEntities.Add(elem)
-    'elem.ClassHandler.buildPOI(elem)
+
     elem.ClassHandler.Finish(elem, elem.ClassHandler.StepsDone)
 
     LastEntity = elem                                       ' save it to repeat on rigth click

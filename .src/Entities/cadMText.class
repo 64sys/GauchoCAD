@@ -61,6 +61,9 @@ Public Sub Translate(e As Entity, dX As Float, dY As Float, Optional OnlySelecte
         puntos.Translate(e.p, dx, dy)
     Endif
 
+    CreatePolygon(e)
+    BuildPOI(e)
+
 End
 
 Public Sub Rotate(e As Entity, radians As Float)
@@ -69,6 +72,9 @@ Public Sub Rotate(e As Entity, radians As Float)
 
     ' el parametro lo tengo que pasar a grados porque la rutina que dibuja el texto usa eso
     E.fParam[0] += radians * 180 / Pi
+
+    CreatePolygon(e)
+    BuildPOI(e)
 
 End
 
@@ -84,13 +90,17 @@ Public Sub Scale(e As Entity, sX As Float, sY As Float)
 
     Next
 
+    CreatePolygon(e)
+    BuildPOI(e)
+
 End
 
 Public Sub Draw(oE As Entity)
 
     If Not oE.Visible Then Return
+    oE.ColorToPaint = gcd.GetGBColor(oE.colour, oE.Layerid)
 
-    glPlus.DrawMultilineText(oE.stringdata[0][0], oE.p[0], oE.p[1], oE.fParam[0], oE.fParam[1], oE.ColorToPaint)
+    glPlus.DrawMultilineText(oE.stringdata[0], oE.p[0], oE.p[1], oE.fParam[0], oE.fParam[1], oE.ColorToPaint)
 
     If oE.stringdata[0] <> "" Then CreatePolygon(oe)
 
