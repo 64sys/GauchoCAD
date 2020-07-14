@@ -45,9 +45,6 @@ Public Function SaveGaucho(sFile As String, cMdl As Collection)
     Dim a As String
     Dim pq As Integer
     Dim pc As Integer
-    Dim myMdl As Collection
-
-    myMdl = cMdl
 
     stx = ["entity", "handle", "layer", "style", "width", "colour", "p", "radius", "ratio", "start_angle", "end_angle", "angle", "scale", "block", "text", "height", "font", "oblique", "just_h", "just_v", "wfactor", "paper", "blkid"]
 
@@ -67,48 +64,45 @@ Public Function SaveGaucho(sFile As String, cMdl As Collection)
     writer.EndElement
     writer.EndElement
 
-    For Each var In myMdl 'cMdl
+    For Each var In cMdl
+        Print cMdl.Key
+        Select cMdl.Key
+                ' Case "File"
+                '
+                ' Case "Version"
 
-        If TypeOf(var) = 16 Then
-
-            Print myMdl.Key 'cMdl.Key
-            Select myMdl.Key
-                    ' Case "File"
-                    '
-                    ' Case "Version"
-
-                Case "Layers", "Styles", "Widths", "DimSts", "Fonts"
-                    For Each att In var
-                        writer.StartElement("header")
-                        For Each v In att
-                            writer.Attribute(att.Key, v)
-                        Next
-                        writer.EndElement
+            Case "Layers", "Colors", "Styles", "Weights", "DimSts", "Fonts"
+                For Each att In var
+                    writer.StartElement("header")
+                    For Each v In att
+                        writer.Attribute(att.Key, v)
                     Next
+                    writer.EndElement
+                Next
 
-                Case "Entities"
-                    For Each ety In var
-                        'For Each att In ety
+            Case "Entities"
+                For Each ety In var
+                    For Each att In ety
                         writer.StartElement("entity")
-                        For Each v In ety ' att
-                            If stx.Exist(ety.Key) Then
-                                'Print ety.Key & ": " & ety.Key
+                        For Each v In att
+                            If stx.Exist(att.Key) Then
+                                Print att.Key & ": " & ety.Key
                                 Select TypeOf(v)
 
                                     Case gb.Null
-                                        atr.Add(v, ety.Key)
+                                        atr.Add(v, att.Key)
                                     Case gb.Boolean
-                                        atr.Add(v, ety.Key)
+                                        atr.Add(v, att.Key)
                                     Case gb.Byte, gb.Short, gb.Integer, gb.Long, gb.Single
-                                        atr.Add(v, ety.Key)
+                                        atr.Add(v, att.Key)
                                     Case gb.Float
-                                        atr.Add(v, ety.Key)
+                                        atr.Add(v, att.Key)
                                     Case gb.Date
-                                        atr.Add(Format(v, "yyyymmddhhnnss"), ety.Key)
+                                        atr.Add(Format(v, "yyyymmddhhnnss"), att.Key)
                                     Case gb.String
-                                        atr.Add(v, ety.Key)
+                                        atr.Add(v, att.Key)
                                     Case gb.Variant
-                                        atr.Add(v, ety.Key)
+                                        atr.Add(v, att.Key)
                                     Case gb.Object
                                         Select Object.Type(v)
                                             Case "Collection"
@@ -117,13 +111,13 @@ Public Function SaveGaucho(sFile As String, cMdl As Collection)
                                                 Next
                                                 Select ptx.Count
                                                     Case 0
-                                                        atr.Add("", ety.Key)
+                                                        atr.Add("", att.Key)
                                                     Case 1
-                                                        atr.Add(ptx[0], ety.Key)
+                                                        atr.Add(ptx[0], att.Key)
                                                         ptx.Clear
 
                                                     Case Else
-                                                        atr.Add(ptx.Join(";"), ety.Key)
+                                                        atr.Add(ptx.Join(";"), att.Key)
                                                         ptx.Clear
 
                                                 End Select
@@ -134,13 +128,13 @@ Public Function SaveGaucho(sFile As String, cMdl As Collection)
                                                 Next
                                                 Select ptx.Count
                                                     Case 0
-                                                        atr.Add("", ety.Key)
+                                                        atr.Add("", att.Key)
                                                     Case 1
-                                                        atr.Add(ptx[0], ety.Key)
+                                                        atr.Add(ptx[0], att.Key)
                                                         ptx.Clear
 
                                                     Case Else
-                                                        atr.Add(ptx.Join(":"), ety.Key)
+                                                        atr.Add(ptx.Join(":"), att.Key)
                                                         ptx.Clear
 
                                                 End Select
@@ -151,44 +145,46 @@ Public Function SaveGaucho(sFile As String, cMdl As Collection)
                                         'Case gb.Function
                                         'Case gb.Class
 
-                                        For Each a In stx
-                                            If atr.Exist(a) Then
-                                                writer.Attribute(a, atr[a])
-
-                                                If a = "p" Then
-                                                    pq = String2.Count(atr[a], ";")
-                                                    pc = String2.Count(atr[a], ":")
-
-                                                    Select pq
-                                                        Case 0
-                                                            If String2.Count(atr[a], ":") <> 2 Then
-                                                                sErr &= atr["entity"] & "\t" & atr["handle"] & "\t" & atr["p"] & "\n"
-                                                            Endif
-                                                        Case Else
-                                                            If pc / (pq + 1) <> 2 Then
-                                                                sErr &= atr["entity"] & "\t" & atr["handle"] & "\t" & atr["p"] & "\n"
-                                                            Endif
-
-                                                    End Select
-                                                Endif
-
-                                            Endif
-                                        Next
-                                        atr.Clear
-
                                 End Select
+
+                                For Each a In stx
+                                    If atr.Exist(a) Then
+                                        writer.Attribute(a, atr[a])
+
+                                        ' If a = "p" Then
+                                        '     pq = String2.Count(atr[a], ";")
+                                        '     pc = String2.Count(atr[a], ":")
+                                        '
+                                        '     Select pq
+                                        '         Case 0
+                                        '             If String2.Count(atr[a], ":") <> 2 Then
+                                        '                 sErr &= atr["entity"] & "\t" & atr["handle"] & "\t" & atr["p"] & "\n"
+                                        '             Endif
+                                        '         Case Else
+                                        '             If pc / (pq + 1) <> 2 Then
+                                        '                 sErr &= atr["entity"] & "\t" & atr["handle"] & "\t" & atr["p"] & "\n"
+                                        '             Endif
+                                        '
+                                        '     End Select
+                                        ' Endif
+
+                                    Endif
+                                Next
+                                'atr.Clear
+
+                                'End Select
 
                             Else
 
                                 'sErr &= att.Key & ": " & ety.Key & "\n"
                                 'Print att.Key & ": " & ety.Key
                             Endif
+                            atr.Clear
                         Next
                         writer.EndElement
-                        'Next
                     Next
-            End Select
-        Endif
+                Next
+        End Select
     Next
     If sErr <> "" Then
         File.Save(sEfl, sErr)
@@ -2576,6 +2572,7 @@ Private Function EntitiesSort(c As Collection) As Collection
     For Each eName In stx
         For Each ety In c
             If eName = String.LCase(ety["entity"]) Then
+                Print ety["handle"]
                 tmp.Add(ety, ety["handle"])
             Endif
         Next

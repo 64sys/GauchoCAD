@@ -626,79 +626,79 @@ Public Sub BlocksTransfer()
 End
 
 '' This transfer layers from imported file, one collection actually, to the model collection
-
-Public Sub EntitiesTransfer()
-
-    Dim tEnt As New Collection
-    Dim iEt As Variant
-    Dim prop As String
-    Dim iEnt As Collection
-    Dim mEnt As Collection
-    Dim iBk As Collection
-    Dim iB As Variant
-    Dim iGt As Variant
-
-    If cImport.Count > 0 Then
-        If cImport.Exist("Entities") Then
-            iEnt = cImport["Entities"]
-            If cModel.Exist("Entities") Then
-                mEnt = cModel["Entities"]
-
-                For Each iGt In iEnt
-
-                    For Each iEt In iGt
-                        For Each prop In ["entity", "handle", "layer", "style", "width", "colour", "blkid", "visible", "paper", "elev", "thick", "p"]
-                            tEnt.Add(iEt[prop], prop)
-                        Next
-                        Select iEt["entity"]
-                            Case "LINE", "LWPOLYLINE"
-                                tEnt.Add(iEt["p"], "p")
-
-                            Case "CIRCLE"
-                                tEnt.Add(iEt["p"], "p")
-                                tEnt.Add(iEt["r"], "r")
-
-                            Case "ARC"
-                                tEnt.Add(iEt["p"], "p")
-                                tEnt.Add(iEt["r"], "r")
-                                tEnt.Add(iEt["a"], "a")
-
-                            Case "ELLIPSE"
-                                tEnt.Add(iEt["p"], "p")
-                                tEnt.Add(iEt["r"], "r")
-                                tEnt.Add(iEt["a"], "a")
-
-                            Case "INSERT"
-                                tEnt.Add(iEt["b"], "ba")
-                                tEnt.Add(iEt["p"], "p")
-                                tEnt.Add(iEt["s"], "s")
-                                tEnt.Add(iEt["a"], "a")
-                                tEnt.Add(iEt["co"], "co")
-                                tEnt.Add(iEt["ro"], "ro")
-                                tEnt.Add(iEt["cs"], "cs")
-                                tEnt.Add(iEt["rs"], "rs")
-
-                            Case "TEXT"
-                                tEnt.Add(iEt["p"], "p")
-                                tEnt.Add(iEt["a"], "a")
-                                tEnt.Add(iEt["h"], "h")
-                                tEnt.Add(iEt["f"], "f")
-                                tEnt.Add(iEt["text"], "text")
-
-                            Case "DIMMENSION"
-                                tEnt.Add(iEt["p"], "p")
-
-                        End Select
-                        mEnt.Add(tEnt.copy(), iEt["handle"])
-                        tEnt.Clear
-
-                    Next
-                Next
-            Endif
-        Endif
-    Endif
-
-End
+'
+' Public Sub EntitiesTransfer()
+'
+'     Dim tEnt As New Collection
+'     Dim iEt As Variant
+'     Dim prop As String
+'     Dim iEnt As Collection
+'     Dim mEnt As Collection
+'     Dim iBk As Collection
+'     Dim iB As Variant
+'     Dim iGt As Variant
+'
+'     If cImport.Count > 0 Then
+'         If cImport.Exist("Entities") Then
+'             iEnt = cImport["Entities"]
+'             If cModel.Exist("Entities") Then
+'                 mEnt = cModel["Entities"]
+'
+'                 For Each iGt In iEnt
+'
+'                     For Each iEt In iGt
+'                         For Each prop In ["entity", "handle", "layer", "style", "width", "colour", "blkid", "visible", "paper", "elev", "thick", "p"]
+'                             tEnt.Add(iEt[prop], prop)
+'                         Next
+'                         Select iEt["entity"]
+'                             Case "LINE", "LWPOLYLINE"
+'                                 tEnt.Add(iEt["p"], "p")
+'
+'                             Case "CIRCLE"
+'                                 tEnt.Add(iEt["p"], "p")
+'                                 tEnt.Add(iEt["r"], "r")
+'
+'                             Case "ARC"
+'                                 tEnt.Add(iEt["p"], "p")
+'                                 tEnt.Add(iEt["r"], "r")
+'                                 tEnt.Add(iEt["a"], "a")
+'
+'                             Case "ELLIPSE"
+'                                 tEnt.Add(iEt["p"], "p")
+'                                 tEnt.Add(iEt["r"], "r")
+'                                 tEnt.Add(iEt["a"], "a")
+'
+'                             Case "INSERT"
+'                                 tEnt.Add(iEt["b"], "ba")
+'                                 tEnt.Add(iEt["p"], "p")
+'                                 tEnt.Add(iEt["s"], "s")
+'                                 tEnt.Add(iEt["a"], "a")
+'                                 tEnt.Add(iEt["co"], "co")
+'                                 tEnt.Add(iEt["ro"], "ro")
+'                                 tEnt.Add(iEt["cs"], "cs")
+'                                 tEnt.Add(iEt["rs"], "rs")
+'
+'                             Case "TEXT"
+'                                 tEnt.Add(iEt["p"], "p")
+'                                 tEnt.Add(iEt["a"], "a")
+'                                 tEnt.Add(iEt["h"], "h")
+'                                 tEnt.Add(iEt["f"], "f")
+'                                 tEnt.Add(iEt["text"], "text")
+'
+'                             Case "DIMMENSION"
+'                                 tEnt.Add(iEt["p"], "p")
+'
+'                         End Select
+'                         mEnt.Add(tEnt.copy(), iEt["handle"])
+'                         tEnt.Clear
+'
+'                     Next
+'                 Next
+'             Endif
+'         Endif
+'     Endif
+'
+' End
 
 '' This transfer layers from imported file, one collection actually, to the model collection
 

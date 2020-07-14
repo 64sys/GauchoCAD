@@ -910,13 +910,21 @@ Public Sub gTask(sTask As String)
 
         Case "saveas"
 
-            Dialog.Filter = ["*.xml", "GauchoCAD"]
+            Dialog.Filter = ["*.gcad", "GauchoCAD"]
             If Dialog.SaveFile() Then Return
             FilePath = Dialog.Path
-            If File.Ext(FilePath) <> "xml" Then
-                FilePath = FilePath & ".xml"
+            If File.Ext(FilePath) <> "gcad" Then
+                FilePath = FilePath & ".gcad"
             Endif
+
+            '' Transfer data from arrEntitites to cModel
+            gcd.ExportBlocks(hFCAD.cModel)
+            gcd.ExportEntities(hFCAD.cModel["Entities"], hFCAD.arrEntities)
+            hFCAD.cModel["File"] = FilePath
             cad.SaveGaucho(FilePath, hFCAD.cModel)
+            hFCAD.Text = File.Name(FilePath)
+            'Print hFCAD.CurrentFile
+
         Catch
             Message.Info(Error.Text)
 
@@ -926,7 +934,7 @@ Public Sub gTask(sTask As String)
             If Dialog.SaveFile() Then Return
             FilePath = Dialog.Path
             If File.Ext(FilePath) <> "xml" Then
-                FilePath = FilePath & ".xml"
+                FilePath = FilePath & ".gcad"
             Endif
             cadDxf.Start(, 1)
 
@@ -962,13 +970,14 @@ Public Sub gTask(sTask As String)
 
         Case "open"
 
-            Dialog.Filter = ["*.xml", "GauchoCAD"]
+            Dialog.Title = ("Open file")
+            Dialog.Filter = ["*.gcad", "GauchoCAD"]
             Dialog.OpenFile(False)
             FilePath = Dialog.Path
 
             If Exist(FilePath) Then
                 Select String.LCase(File.Ext(FilePath))
-                    Case "xml"
+                    Case "gcad"
                         'cModel = FileLoad(FilePath)
                         cModel = cad.LoadGaucho(FilePath)
                         LoadComboboxes(cModel)
@@ -991,19 +1000,19 @@ Public Sub gTask(sTask As String)
             Endif
         Case "new"
 
-            FileDef = adi &/ "default.xml"
+            FileDef = adi &/ "default.gcad"
             If Exist(FileDef) = False Then
-                Copy "./def.xml" To FileDef
+                Copy "./def.gcad" To FileDef
             Endif
 
             For i = 1 To 99
-                FilePath = User.Home &/ "drawing" & CStr(i) & ".xml"
+                FilePath = User.Home &/ "drawing" & CStr(i) & ".gcad"
                 If ExistWin(FilePath, Workspace1) = False Then
                     Break
                 Endif
             Next
 
-            FileDef = adi &/ "default.xml"
+            FileDef = adi &/ "default.gcad"
             If Exist(FileDef) Then
                 If Exist(FilePath) = False Then
                     Copy FileDef To FilePath
@@ -1078,7 +1087,7 @@ Public Sub gTask(sTask As String)
                 Next
             Endif
 
-        Case "quit"
+        Case "quit", "exit"
             Me.Close
 
     End Select
