@@ -61,7 +61,7 @@
       Name = "mnuExit"
       Text = ("Quit")
       Picture = Picture["icon:/22/quit"]
-      Tag = "exit"
+      Tag = "quit"
     }
   }
   { grpOptions Menu
