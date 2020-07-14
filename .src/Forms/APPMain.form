@@ -134,7 +134,6 @@
       Name = "mnuDim"
       Text = ("Dimmension")
       Picture = Picture["svg/entities/dim.svg"]
-      Enabled = False
       Tag = "dim"
     }
     { mnuLeader Menu entity
