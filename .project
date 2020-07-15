@@ -2,7 +2,7 @@
 Title=GauchoCAD
 Startup=Starter
 Icon=logo.png
-Version=0.0.74
+Version=0.0.78
 Component=gb.image
 Component=gb.cairo
 Component=gb.gui
