@@ -456,16 +456,21 @@
           Visible = False
           Expand = True
           Arrangement = Arrange.Vertical
-          { Button1 Button
+          { btnRefresh Button
             MoveScaled(1,2,16,4)
+            Text = ("Refresh")
           }
           { ComboBox1 ComboBox
             MoveScaled(1,7,16,4)
             ReadOnly = True
           }
           { TableView1 TableView
-            MoveScaled(2,13,14,35)
+            MoveScaled(2,13,14,24)
             Border = False
+          }
+          { btnSave Button
+            MoveScaled(0,45,16,4)
+            Text = ("Save")
           }
         }
       }

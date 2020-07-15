@@ -905,6 +905,9 @@ Public Sub gTask(sTask As String)
             If template = True Then
                 gTask("saveas")
             Else
+                '' Transfer data from arrEntitites to cModel
+                gcd.ExportBlocks(hFCAD.cModel)
+                gcd.ExportEntities(hFCAD.cModel["Entities"], hFCAD.arrEntities)
                 cad.SaveGaucho(CurrentFile, hFCAD.cModel)
             Endif
 
@@ -1425,7 +1428,7 @@ Public Sub btnLayers_MouseDown()
 
 End
 
-Public Sub Button1_Click()
+Public Sub btnRefresh_Click()
     ''TODO: Poner esta accion en otro evento, por ejemplo despues de seleccionar entidades.
 
     Dim e As Entity
@@ -1470,6 +1473,43 @@ Public Sub Button1_Click()
 
 End
 
+Public Sub btnSave_Click()
+
+    Dim i As Integer
+    Dim r As Integer
+    Dim e As Entity
+    Dim lay As Collection
+    Dim ly As Collection
+
+    lay = APPMain.hFCAD.cModel["Layers"]
+
+    For i = 0 To APPMain.hFCAD.arrEntities.Max
+        e = APPMain.hFCAD.arrEntities[i]
+
+        If e.Selected Then
+            For r = 0 To TableView1.Rows.Count - 1
+                Select TableView1[r, 0].Text
+                    Case "Layer"
+                        cProp["Layer"] = TableView1[r, 1].Text
+                        e.Layer = cProp["Layer"]
+                        For Each ly In lay
+                            If ly["name"] = cProp["Layer"] Then
+                                e.LayerId = ly["id"]
+                                Break
+                            Endif
+                        Next
+
+                    Case "Color"
+                        cProp["Color"] = TableView1[r, 1].Text
+                        e.colour = cProp["Color"]
+                        e.ColorToPaint = cProp["Color"]
+                End Select
+            Next
+        Endif
+    Next
+
+End
+
 Public Sub ComboBox1_Click()
 
     'Print ComboBox1.Text
@@ -1508,6 +1548,15 @@ Public Sub LoadPropertiesList(eFilter As String)
                 Endif
             Endif
 
+            'LineType
+            If cProp.Exist("LType") = False Then
+                cProp.Add([e.LineType], "LType")
+            Else
+                If cProp["LType"].Exist(e.LineType) = False Then
+                    cProp["LType"].Add(e.LineType)
+                Endif
+            Endif
+
         Endif
     Next
 
@@ -1529,7 +1578,7 @@ Public Sub TableView1_Data(Row As Integer, Column As Integer)
                     TableView1[Row, Column].Text = cProp.Key
                 Case 1
                     Select Object.Type(prop)
-                        Case "String[]"
+                        Case "String[]", "Integer[]"
                             Select prop.count
                                 Case 0
                                     'TableView1[Row, Column].Text = 0
@@ -1566,6 +1615,8 @@ Public Sub TableView1_Click()
     Select TableView1[TableView1.Row, 0].Text
         Case "Layer"
             TableView1.Edit(lrx, True)
+        Case "Color"
+            TableView1.Edit()
     End Select
 
 End
@@ -1598,9 +1649,5 @@ Public Sub Form_KeyPress()
         End Select
 
     Endif
-
-End
-
-Public Sub btnColors_Click()
 
 End
