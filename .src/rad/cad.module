@@ -333,7 +333,7 @@ Public Function LoadGaucho(sFile As String) As Collection
             Case "text"
                 c["p"] = EncodePoint(ent.Attributes["p"], "p")
                 c["angle"] = CFloat(ent.Attributes["angle"])        ' grados
-                c["text"] = ent.Attributes["t"]
+                c["text"] = ent.Attributes["text"]
                 c["height"] = ent.Attributes["height"]
                 c["font"] = ent.Attributes["font"]
 
