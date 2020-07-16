@@ -48,7 +48,7 @@ Public HelperTrabajo4 As String     '   sin usar
 Public ErrorMessage As String
 Public ErrorTimer As Integer = 0
 Public HelperDibujo As String       ' Se escribe abajo "Grid  Ortho" , etc
-
+Public trabajoYteclado As String
 Public PromtSlash As String = "|"
 
 Public Function CleanTexts()
@@ -92,41 +92,35 @@ End
 
 Public Sub DibujaHelper()
 
-    Dim hExt As PaintExtents, trabajoYteclado As String, sNext As String
+    Dim hExt As PaintExtents, sNext As String
 
-    If ErrorMessage <> "" Then
-
-        texting(ErrorMessage, 10 - appmain.hFcad.glarea1.w / 2, 30 - appmain.hFcad.glarea1.h / 2, Color.Red)
-
-        If ErrorTimer = 15 Then ErrorMessage = ""
-    Else
-        ErrorTimer = 0
-
-    End If
+    ' If ErrorMessage <> "" Then
+    '
+    '     texting(ErrorMessage, 10 - appmain.hFcad.glarea1.w / 2, 30 - appmain.hFcad.glarea1.h / 2, Color.Red)
+    '
+    '     If ErrorTimer = 15 Then ErrorMessage = ""
+    ' Else
+    '     ErrorTimer = 0
+    '
+    ' End If
 
     If HelperTrabajoNext <> "" Then snext = HelperTrabajoNext & " : "
 
-    trabajoYteclado = HelperTrabajo & " > " & sNext & appmain.hFCAD.KeysAccumulator & PromtSlash
+    trabajoYteclado = HelperTrabajo & " > " & sNext & appmain.KeysAccumulator & PromtSlash
 
-    'Texting(trabajoYteclado, 10 - appmain.hFcad.glarea1.w / 2, 10 - appmain.hFcad.glarea1.h / 2, color.blue)
-    Texting(trabajoYteclado, 10 - appmain.hFcad.glarea1.w / 2, 10 - appmain.hFcad.glarea1.h / 2, Starter.flgWindowInfoColor) ' Tincho - toma color de la configuración
+    'Texting(trabajoYteclado, 10 - appmain.hFcad.glarea1.w / 2, 10 - appmain.hFcad.glarea1.h / 2, Starter.flgWindowInfoColor) ' Tincho - toma color de la configuración
 
     HelperDibujo = ""
     If gcd.Ortogonal Then HelperDibujo = "F8-Ortho"
     If puntos.Gridactive Then HelperDibujo = HelperDibujo & "  F7-Grid = " & Format$(puntos.GridSpacing, "0.00 m")
     ' and so on...
 
-    'texting(HelperDibujo, 40, 10 - appmain.hFcad.glarea1.h / 2, color.blue)
     texting(HelperDibujo, 40, 10 - appmain.hFcad.glarea1.h / 2, Starter.flgWindowInfoColor) ' Tincho - toma color de la configuración
 
     ' helper del mouse
     If Len(Helper.Texto) = 0 Then Return
 
-    ' paint.MoveTo(puntos.cursorX + helper.dX, puntos.cursorY + Helper.dY)
-
     Texting(Helper.Texto, appmain.hFcad.CursorX - appmain.hFcad.glarea1.w / 2, -appmain.hFcad.CursorY + appmain.hFcad.glarea1.h / 2, Color.DarkGreen, 10)
-
-    ' paint.Stroke
 
 End Sub
 

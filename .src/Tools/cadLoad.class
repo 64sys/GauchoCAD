@@ -80,6 +80,7 @@ Public Sub LoadFromFile(Optional FilePath As String)
     Dim icolor As Integer
     Dim iweight As Integer
     Dim istyle As Integer
+    Dim iStrings As Integer
 
     x.Open(FilePath)
 
@@ -141,12 +142,7 @@ Public Sub LoadFromFile(Optional FilePath As String)
         ' tengo que crear un objeto de este tipo
         ' TODO: verificar si esta entidad la conozco, esto dara soporte para abrir versiones futuras
 
-        newObj = Object.New(ent.Attributes["type"])   ' los elementos no tiene argumentos en _New para serializar este proceso
-
-        ' aqui voy a tener creados puntos minimos, pero voy a recrear los arrays mas abajo, asi que los borro por ahora
-        newObj.P.Clear
-        newObj.fParam.Clear
-        newObj.Level.clear
+        newObj = New Entity
 
         ' agrego el objeto ya mismo
         APPMain.hFCAD.arrEntities.Add(newObj)
@@ -169,15 +165,23 @@ Public Sub LoadFromFile(Optional FilePath As String)
             newObj.fParam.Add(CFloat(mistr))
         Next
 
+        ' idem StringData
+        Do
+            Inc iStrings
+            If ent.IsAttributeSet["string" & Str(iStrings)] Then
+                newObj.stringdata.Add(ent.Attributes["string" & Str(iStrings)])
+            Else
+                iStrings = 0
+                Break
+            End If
+        Loop
+
         ' vars CAD de futura implementacion
         ' TODO: implementar para el resto
-        newObj.stringdata[0] = ent.Attributes["string"]
         newObj.colour = CInt(ent.Attributes["color"])
         newObj.Block = ent.Attributes["block"]
-        newObj.layer = ent.Attributes["layer"]   ' <------------- tincho uso layer en vez de nivel
-        newObj.RefPointX = CFloat(ent.Attributes["refx"])   ' nuevos
-        newObj.RefPointY = CFloat(ent.Attributes["refy"])   ' nuevos
-
+        newObj.layer = ent.Attributes["layer"]
+        newObj.Gender = ent.Attributes["gender"]
         newObj.Finish(-1)
 
     Next

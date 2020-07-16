@@ -32,7 +32,7 @@ End
 
 Public Function SaveToFile(nName As String) As Boolean
 
-    Dim obj As Object
+    Dim obj As Entity
     Dim tm As New Collection
     Dim ct As New Collection
     Dim hdr As String
@@ -42,12 +42,12 @@ Public Function SaveToFile(nName As String) As Boolean
     Dim enty As New Collection  'Tincho
 
     'tm.Clear              ' Tincho
-    'For Each lay In gcd.cLayers
-    ct.Add(APPMain.hFCAD.cModel, "layers")
-    ct.Add(APPMain.hFCAD.cModel, "colors")
-    ct.Add(APPMain.hFCAD.cModel, "styles")
-    ct.Add(APPMain.hFCAD.cModel, "weights")
-    'Next
+
+    ct.Add(APPMain.hFCAD.cModel["layers"], "layers")
+    'ct.Add(APPMain.hFCAD.cModel["colors"], "colors")
+    ct.Add(APPMain.hFCAD.cModel["styles"], "styles")
+    'ct.Add(APPMain.hFCAD.cModel, "weights")
+
     enty.Clear
     If nNAme = "" Then nName = gcd.FileName
 
@@ -59,7 +59,7 @@ Public Function SaveToFile(nName As String) As Boolean
         fPar = ""
 
         hdr = sog.UUIDHandle(4)
-        tm.Add(Object.Type(obj), "type")
+        tm.Add(obj.Gender, "type")
         tm.Add(hdr, "handle")
 
         ' Todos los arrays de cada entidad tienen la misma longitud (pero difieren entre si), luego armo las variables a insertar
@@ -70,28 +70,27 @@ Public Function SaveToFile(nName As String) As Boolean
             '                                       |
         Next
 
-        For i = 0 To obj.level.max  '  fParam puede ser distinto
+        For i = 0 To obj.level.max
             lev &= obj.level[i] & ":"
         Next                                    '                                       |
 
-        For i = 0 To obj.fParam.max  '  fParam puede ser distinto
+        For i = 0 To obj.fParam.max
             fPar &= obj.fParam[i] & ":"
         Next                                    '                                       |
 
-        ' extraigo el ultimo ":"                                                        v
         p = Left$(p, -1)
         lev = Left$(lev, -1)
         fPar = Left$(fpar, -1)
 
-        tm.Add(p, "p")            '       +---------------------+
+        tm.Add(p, "p")             '       +---------------------+
         tm.Add(fpar, "fparam")     '  <----+   Estos son arrays  |
         tm.Add(lev, "level")       '       +---------------------+
-        tm.Add(obj.stringdata[0], "string")                           ' Martin nuevo
+        For i = 0 To obj.stringdata.max
+            tm.Add(obj.stringdata[i], "string" & Str(i))                           ' Martin nuevo
+        Next
         tm.Add(obj.Layer, "layer")
         tm.Add(obj.block, "block")
         tm.Add(obj.colour, "color") ' <------------------------ Este parametro esta inventado, ojo. ( ya no )
-        tm.Add(obj.RefPointX, "refx")                    ' nuevos
-        tm.Add(obj.RefPointY, "refy")
         enty.Add(tm.Copy(), hdr)
 
     Next

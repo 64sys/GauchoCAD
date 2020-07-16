@@ -61,6 +61,8 @@ Public Sub Main()
 
     gcd.Main
 
+    APPMain.Workspace1.ActiveWindow.SetFocus
+
 End
 
 Public Sub Run()

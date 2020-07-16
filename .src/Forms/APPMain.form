@@ -420,8 +420,9 @@
           }
         }
       }
-      { Workspace1 Workspace
+      { !Workspace1 Workspace
         MoveScaled(28,4,75,49)
+        #Public = True
         Background = Color.TextBackground
         Expand = True
         Border = False
@@ -478,13 +479,18 @@
     { Panel4 Panel
       MoveScaled(3,66,129,5)
       Arrangement = Arrange.Horizontal
-      { lblCommand Label
-        MoveScaled(1,0,12,4)
+      { !lblCommand Label
+        MoveScaled(1,0,85,4)
+        #Public = True
         Font = Font["Bold,+1"]
+        Background = Color.LightGray
+        Foreground = Color.Black
         Text = ("Command")
+        Border = Border.Raised
       }
       { txoCom TextBox
-        MoveScaled(13,0,43,4)
+        MoveScaled(87,0,4,4)
+        Enabled = False
         Font = Font["Bold,+1"]
         Background = Color.TextBackground
       }
@@ -524,6 +530,11 @@
           MoveScaled(28,1,2,3)
         }
       }
+    }
+    { tmr500 #Timer
+      #MoveScaled(138,66)
+      Enabled = True
+      Delay = 500
     }
   }
 }

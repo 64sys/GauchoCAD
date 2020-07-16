@@ -38,6 +38,9 @@ Public hFCAD As FCAD                    '' CAD Editor
 Public CurrentForm As Form
 Public CurrentFile As String
 
+Public KeysAccumulator As String
+Public TmrTicks As Integer
+
 Public SelectedColour As Boolean
 Public CurrentColor As Integer
 Public imgColor As Image
@@ -1640,13 +1643,91 @@ End
 Public Sub Form_KeyPress()
 
     Print Key.Code
+    Dim t As Float = Timer
 
-    If Workspace1.ActiveWindow Then
-        Select Key.Code
-            Case Key.Del
-                gcd.clsJob.KeyText("Erase")
+    'If Workspace1.ActiveWindow Then
+    Select Key.Code
+        Case Key.Enter, Key.Return
+            Debug KeysAccumulator
+            gcd.clsJob.KeyText(KeysAccumulator)
+            KeysAccumulator = ""
 
-        End Select
+        Case Key.f6
+            gcd.DrawBounds = Not gcd.DrawBounds
+            ' Dim i As Integer
+            '
+            ' For i = 0 To 50000
+            '     '
+            '     gcd.AddLine(arrEntities, [Rnd(-20, 20), Rnd(-20, 20), Rnd(-20, 20), Rnd(-20, 20)], 0, 1, 0, "0")
+            '     '     'arrEntities.Last.gbcolor = Color.RGB(Rnd(0, 255), Rnd(0, 255), Rnd(0, 255))
+            ' Next
+            ' Debug "Entidades creadas en  ", Timer - t
+            '        gcd.AddEllipse([10, 10, 150, 150], 0.5, 0, Pi)
+
+            'gcd.AddMText([0, 0], 20, 30, "Primera linea" & gb.Cr & "Segunda linea", 3, 1, 1, "0", "")
+
+            'gcd.AddText([0, -400], 20, 30, "Unica linea", 3, 1, 1, "0", "")
+            'gcd.ApplyLayerProperties
+            'gcd.AddLine([0, -200, 400, 0], 2, 1, "Dashed", "0", "")
+            ' gcd.Benchmarks
+            '
+
+        Case Key.BackSpace
+
+            KeysAccumulator = Left(KeysAccumulator, -1)
+
+        Case Key.f8
+
+            Debug "Entidades transferidas en  ", Timer - t
+            gcd.Ortogonal = Not gcd.Ortogonal
+
+        Case Key.f7
+
+            puntos.Gridactive = Not puntos.Gridactive
+
+        Case Key.Esc
+
+            gcd.clsJob.Finish()  ' Now!
+            ' we cancel everything
+            gcd.clsJobPrevious = gcd.clsJob
+            gcd.clsJob = clsDefaultJob
+
+        Case Key.Space
+            Stop Event
+
+        Case Key.Del
+            gcd.clsJob.KeyText("Erase")
+
+        Case Else
+            ' A GOOD KEY
+            KeysAccumulator &= Key.Text
+            clsDrawingAids.ErrorMessage = ""
+
+    End Select
+    tmr500_timer
+    ' Endif
+
+End
+
+Public Sub tmr500_Timer()
+
+    If clsDrawingAids.PromtSlash = "|" Then clsDrawingAids.PromtSlash = "" Else clsDrawingAids.PromtSlash = "|"
+    'Debug "Tick"
+    clsDrawingAids.DibujaHelper
+    If clsDrawingAids.ErrorMessage <> "" Then
+
+        lblCommand.Text = clsDrawingAids.ErrorMessage
+        lblCommand.Foreground = Color.Red
+        Inc TmrTicks
+
+        If TmrTicks = 10 Then
+            clsDrawingAids.ErrorMessage = ""
+            TmrTicks = 0
+        End If
+
+    Else
+        lblCommand.Foreground = Color.Black
+        lblCommand.Text = clsDrawingAids.trabajoYteclado
 
     Endif
 
