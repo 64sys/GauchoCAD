@@ -1476,6 +1476,49 @@ Public Sub btnRefresh_Click()
 
 End
 
+Public Sub SelectionRefresh()
+
+    Dim e As Entity
+    Dim etype As New String[]
+    Dim i As Integer
+    Dim j As Integer
+    'Dim inx As New Integer[]
+
+    ComboBox1.Clear
+    ComboBox1.Text = ""
+    cProp.Clear
+    TableView1.Clear
+
+    For i = 0 To APPMain.hFCAD.arrEntities.Max
+        e = APPMain.hFCAD.arrEntities[i]
+
+        If e.Selected Then
+            If etype.Exist(e.Gender) = False Then
+                etype.Add(e.Gender)
+            Endif
+        Endif
+    Next
+
+    Select etype.Count
+        Case 0
+            'Aca se puede poner en off el panel de seleccion ya que no hay entidades seleccionadas
+            'skip
+
+        Case 1
+            ComboBox1.Add(etype[0])
+            ComboBox1.Text = etype[0]
+            LoadPropertiesList(etype[0])
+        Case Else
+            ComboBox1.Add(("All"))
+            For j = 0 To etype.Max
+                ComboBox1.Add(etype[j])
+            Next
+            ComboBox1.Text = ("All")
+            LoadPropertiesList("varies")
+    End Select
+
+End
+
 Public Sub btnSave_Click()
 
     Dim i As Integer
