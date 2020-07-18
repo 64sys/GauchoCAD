@@ -92,6 +92,7 @@ Public Function MouseDown(mouseX As Integer, mouseY As Integer) ' esta rutina es
                 If GripPoint < 0 Then clsEntities.deSelectElem(appmain.hFcad.iEntity[3])               '   -> la deselecciono
             Else
                 clsEntities.SelectElem(appmain.hFcad.iEntity[3])                 '   -> la selecciono
+                AppMain.SelectionRefresh()
             Endif
             Me.Active = False
             clsEntities.GLGenDrawListSel(0)
@@ -141,6 +142,7 @@ Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' esta rutina es l
             Debug "Select parsing time ", Timer - t
 
             clsEntities.GLGenDrawListSel(0)
+            AppMain.SelectionRefresh()
 
         End If
 
