@@ -304,6 +304,13 @@ Public Sub GLArea1_MouseMove()
                     iEntity[3] = -1                 ' Hooked entity
 
                 End If
+
+            End If
+
+            If gcd.clsJob.EntityChecking Then
+                If Not clsMouseTracking.flgSearchingEntity Then
+                    iEntity[3] = clsMouseTracking.CheckAboveEntity(Xreal(mouse.x), Yreal(mouse.Y), Metros(16))
+                End If
             End If
 
             flgShowPOIinfo = True
@@ -411,6 +418,8 @@ Public Sub GLArea1_MouseWheel()
 End
 
 Public Sub form_KeyPress()
+
+    Return
 
     Dim t As Float = Timer
 

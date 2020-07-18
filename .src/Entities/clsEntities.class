@@ -160,7 +160,7 @@ Public Sub glGenDrawList(Optional iEntity As Integer = -1)
         gl.EndList
 
     Else
-        ' si esxite esta lista, la borro
+
         If Not gl.islist(APPMain.hFCAD.GlListAllEntities) Then APPMain.hFCAD.GlListAllEntities = gl.GenLists(1)
         Dim t As Float = Timer
         ' listas de entidades

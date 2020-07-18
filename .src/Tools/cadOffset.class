@@ -21,3 +21,216 @@
 ' Boston, MA  02110-1301  USA
 
 Inherits ToolsBase
+Create Static
+Public Const Gender As String = "Offset"
+
+Public Offset As Float
+Public iEntitySelected As Integer
+' Workflow
+'   1 Enter offset distance
+'   2 Select entity
+'   3 If entity is valid to offset, select side to offset
+'   4 Goto 2
+
+Public Function Start(Optional ElemToBuild As Variant, Optional _Mode As Integer = 0) As Boolean
+    ' Llamada por FCAD al inicio de la aplicacion de esta herramienta
+
+    ' Aprovechamos para establecer los helpers (comentarios de ayuda en pantalla)
+    Me.PointsDone = 0
+    Me.PointsTotal = 2
+
+    Me.PoiChecking = False
+    Me.EntityChecking = True
+
+    clsDrawingAids.HelperTrabajo = ("Offset, enter distance [0.10]:")
+    Me.NextParamType = "F"
+    Me.NextParamDefault = 0.1
+    ' para esta herramienta necesito desdeleciconar todo
+    clsEntities.DeSelection()
+
+    Me.Active = True
+    gcd.ToolActive = True
+
+End
+
+Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' called by FCAD-> DrawingArea_MouseUp
+
+    Dim d, dx, dy, m1, m2, angle As Float
+    Dim e As Entity
+
+    If Me.PointsDone = 1 Then ' estoy intentando seleccionar una entidad
+
+        If appmain.hFcad.iEntity[3] >= 0 Then
+            Select Case APPMain.hFCAD.arrEntities[appmain.hFcad.iEntity[3]].Gender
+                Case "Line", "Pline", "Circle", "Arc", "Ellipse", "Spline"
+                    Me.iEntitySelected = appmain.hFcad.iEntity[3]
+                    clsEntities.SelectElem(Me.iEntitySelected)
+                    clsDrawingAids.Helper.texto = ("Side to offset")
+                    Me.PointsDone = 2
+                Case Else
+                    Me.iEntitySelected = -1
+                    clsDrawingAids.ErrorMessage = "Can't offset that entity"
+            End Select
+
+            ' punto real base
+            Me.SelStartXr = puntos.Near(appmain.hFcad.Xreal(mousex))
+            Me.SelStartYr = puntos.Near(appmain.hFcad.Yreal(mouseY))
+        End If
+
+    Else If Me.PointsDone = 2 Then ' acabo de marcar el punto destino
+
+        e = APPMain.hFCAD.arrEntities[Me.iEntitySelected]
+        ' creo una nueva entidad en el mismo lugar
+        APPMain.hFCAD.arrEntities.Add(clsEntities.ClonEntity(e))
+        e = APPMain.hFCAD.arrEntities.Last
+        e.ClassHandler.Finish(e, -1)
+
+        Select Case e.Gender
+            Case "Line"
+                ' calculo la distancia del nuevo punto a la line
+                d = puntos.PointToLineDistance([Me.SelEndXr, Me.SelEndyr], e.p)
+                If d >= 0 Then d = 1 Else d = -1
+                ' la pendiente de la recta donde esta la linea es
+                m1 = (e.P[3] - e.P[1]) / (e.P[2] - e.P[0])
+
+                ' la pendiente de la perpendicular es
+                If m1 <> 0 Then
+                    m2 = -1 / m1
+                    angle = ATan(m2)
+                    dx = Offset * Cos(Angle) * d
+                    dy = Offset * Sin(angle) * d
+                Else
+                    dx = Offset * d
+                    dy = 0
+                End If
+
+                e.ClassHandler.translate(e, dx, dy)
+
+                clsEntities.glGenDrawList()
+                clsEntities.glGenDrawListAll
+                gcd.Redraw
+                clsDrawingAids.HelperTrabajo = ("Offset: select an entity or <Esc>")
+
+        End Select
+
+        Me.PointsDone = 1
+
+    End If
+
+End
+
+Public Sub KeyText(EnteredText As String)
+
+    ' this could be many things, but lets concentrate in what to expect and check if its correct
+    ' The element provides a constant called ParamType wich is a string like "PPFCTB"
+    ' P = point in X,Y format with decimal point as dot "."
+    '     it can also be @X,Y wich means that the coordinates are relative to the last point
+    ' F = float, thats any number
+    ' T = a text or a single character too
+    ' C = color input
+    ' B = boolean, Yes/Si or No
+
+    ' Lets see what are we expecting
+    Dim Xt, Zt As Float, ErrTxt As String, Relative As Boolean
+
+    Select Case Me.NextParamType
+
+        Case "P", "+"
+            ' errtxt = ", expected a valid point like 12.4,9.5  or @12.34,10.5"
+            ' ' lets filter
+            ' EnteredText = Trim$(UCase$(EnteredText))
+            ' ' So we expect a position x,y , but in some cases it can be
+            ' ' C = close
+            ' ' U = undo, delete last segment
+            ' ' and others
+            '
+            ' If Left(EnteredText, 1) = "C" Then          ' close the element
+            '     ' got othe first point and exit
+            '     elem.P[iPoints * 2] = elem.P[0]
+            '     elem.P[iPoints * 2 + 1] = elem.P[1]
+            '     Me.Finish
+            '
+            ' Else If Left(EnteredText, 1) = "U" Then     ' undo last command and go
+            '
+            '     elem.P.remove(elem.P.max)
+            '     elem.P.remove(elem.P.max)
+            '     Me.Finish
+            ' Else                                        ' an X,Y or @X,Y
+            '
+            '     If InStr(EnteredText, "@") > 0 Then    ' may be a point
+            '         Relative = True
+            '         EnteredText = Replace(EnteredText, "@", "")
+            '     Endif
+            '     Xt = CFloat(Split(EnteredText, ",")[0])
+            '     Zt = CFloat(Split(EnteredText, ",")[1])
+            '
+            '     ' if we are stll here, input was good
+            '     elem.P[iPoints * 2] = Xt
+            '     elem.P[iPoints * 2 + 1] = Zt
+            '
+            '     If Relative And (elem.P.count > 2) Then
+            '         elem.P[iPoints * 2] += elem.P[(iPoints - 1) * 2]
+            '         elem.P[iPoints * 2 + 1] += elem.P[(iPoints - 1) * 2 + 1]
+            '
+            '     Endif
+            '     Inc iPoints
+            '     AdvanceStep
+            '
+            ' End If
+
+        Case "T"
+            ' errtxt = ", expected text, not a point"
+            ' ' its a valid input?
+            ' If EnteredText = "" Then
+            '
+            '     'elem.stringdata[0] = EnteredText
+            '     elem.stringdata[0] &= ParamDefault[elem.ClassHandler.StepsDone]
+            ' Else If elem.stringdata[0] <> "" Then                      ' we have a previous entry
+            '
+            '     elem.stringdata[0] &= "|" & EnteredText  ' split if necessary
+            '
+            ' Else
+            '
+            '     elem.stringdata[0] &= EnteredText                      ' first entry
+            '
+            ' End If
+            '
+            ' AdvanceStep
+
+        Case "F", "M", "A", "L"                 ' Float, Mixed, Angle, Longitud
+            errtxt = "enter a valid text size"
+
+            If EnteredText = "" Then
+
+                Offset = Me.NextParamDefault
+
+            Else
+
+                Offset = CFloat(EnteredText)
+
+            Endif
+            clsDrawingAids.HelperTrabajo = ("Offset: select an entity")
+
+            Inc Me.PointsDone
+
+        Case "C"                                ' color
+            ' If Dialog.SelectColor() Then
+            '     elem.fParam[iFloat] = CFloat(Dialog.Color)
+            '     Inc iFloat
+            '     AdvanceStep
+            '
+            ' Endif
+            ' Key.Cod
+
+    End Select
+
+Finally
+
+    Return
+
+Catch
+
+    ' unexpected input
+    clsDrawingAids.ErrorMessage = ("Bad input" & ErrTxt)
+
+End
