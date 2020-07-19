@@ -28,6 +28,9 @@ Public Function Start(Optional ElemToBuild As Variant, Optional _Mode As Integer
 
     ' Aprovechamos para establecer los helpers (comentarios de ayuda en pantalla)
 
+    Dim i As Integer
+    Dim e As Entity
+
     clsDrawingAids.HelperTrabajo = ("Explode ")
 
     ' chequeamos si hubo seleccion previa
@@ -41,6 +44,26 @@ Public Function Start(Optional ElemToBuild As Variant, Optional _Mode As Integer
         gcd.clsJob = clsDefaultJob
 
     Else                                                                    ' EXPLOTA !!!
+
+        For i = APPMain.hFCAD.arrEntities.Max To 0 Step -1
+
+            e = APPMain.hFCAD.arrEntities[i]
+            If e.Selected Then
+                Select Case e.Gender
+                    Case "Insert", "Dimension"
+                        e.ForDeletion = True
+                    Case Else
+                        ' le saco la referencia a un bloque
+
+                        e.Block = ""
+                        e.BlockNumber = -1
+
+                End Select
+            End If
+        Next
+        clsEntities.DeleteSelected(True)
+
+        Me.Finish
 
     Endif
 

@@ -56,7 +56,9 @@ End
 Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' called by FCAD-> DrawingArea_MouseUp
 
     Dim d, dx, dy, m1, m2, angle As Float
+    Dim flxIntersec As Float[]
     Dim e As Entity
+    Dim flxItersec As Float[]
 
     If Me.PointsDone = 1 Then ' estoy intentando seleccionar una entidad
 
@@ -73,11 +75,13 @@ Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' called by FCAD->
             End Select
 
             ' punto real base
-            Me.SelStartXr = puntos.Near(appmain.hFcad.Xreal(mousex))
-            Me.SelStartYr = puntos.Near(appmain.hFcad.Yreal(mouseY))
+            Me.SelStartXr = appmain.hFcad.Xreal(mousex)
+            Me.SelStartYr = appmain.hFcad.Yreal(mouseY)
         End If
 
     Else If Me.PointsDone = 2 Then ' acabo de marcar el punto destino
+        Me.SelEndXr = appmain.hFcad.Xreal(mousex)
+        Me.SelEndYr = appmain.hFcad.Yreal(mouseY)
 
         e = APPMain.hFCAD.arrEntities[Me.iEntitySelected]
         ' creo una nueva entidad en el mismo lugar
@@ -86,32 +90,63 @@ Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' called by FCAD->
         e.ClassHandler.Finish(e, -1)
 
         Select Case e.Gender
-            Case "Line"
-                ' calculo la distancia del nuevo punto a la line
-                d = puntos.PointToLineDistance([Me.SelEndXr, Me.SelEndyr], e.p)
-                If d >= 0 Then d = 1 Else d = -1
-                ' la pendiente de la recta donde esta la linea es
-                m1 = (e.P[3] - e.P[1]) / (e.P[2] - e.P[0])
-
-                ' la pendiente de la perpendicular es
-                If m1 <> 0 Then
-                    m2 = -1 / m1
-                    angle = ATan(m2)
-                    dx = Offset * Cos(Angle) * d
-                    dy = Offset * Sin(angle) * d
+            Case "Spline", "Pline"
+                ' voy a aplicar una logica basica: veo cual es mayor dx, dy diferencia de clicks
+                If (Me.SelEndXr - Me.SelStartXr) > (Me.SelEndYr - Me.SelStartYr) Then ' X prevalece
+                    If (Me.SelEndXr > Me.SelStartXr) Then dx = offset Else dx = -offset
                 Else
-                    dx = Offset * d
-                    dy = 0
+                    If (Me.SelEndYr > Me.SelStartYr) Then dy = offset Else dy = -offset
                 End If
+                e.ClassHandler.translate(e, dx, dy)
+
+            Case "Circle", "Arc"
+                d = puntos.distancia(Me.SelEndXr, Me.SelEndyr, e.P[0], e.p[1])
+                If d < e.fParam[0] Then e.fParam[0] -= offset Else e.fParam[0] += offset
+
+            Case "Ellipse"
+                d = puntos.distancia(Me.SelEndXr, Me.SelEndyr, e.P[0], e.p[1])
+                m1 = puntos.distancia(e.P[0], e.p[1], e.P[2], e.p[3])
+
+                If d < m1 Then ' contraigo la ellipse
+                    e.P[2] -= (e.P[2] - e.p[0]) / m1 * offset
+                    e.P[3] -= (e.P[3] - e.p[1]) / m1 * offset
+                Else
+                    e.P[2] += (e.P[2] - e.p[0]) / m1 * offset
+                    e.P[3] += (e.P[3] - e.p[1]) / m1 * offset
+                End If
+
+            Case "Line"
+
+                If (e.P[2] - e.P[0]) <> 0 Then
+                    ' la pendiente de la recta donde esta la linea es
+                    m1 = (e.P[3] - e.P[1]) / (e.P[2] - e.P[0])
+                    If m1 <> 0 Then
+                        m2 = -1 / m1
+                        angle = ATan(m2)
+                        dx = Offset * Cos(Angle)
+                        dy = Offset * Sin(angle)
+
+                        ' necesito saber de que lado estamos
+                        flxIntersec = puntos.lineLineIntersection([Me.SelEndXr, Me.SelEndyr], [10e6, Me.SelEndyr], [e.P[0], e.p[1]], [e.P[2], e.p[3]])
+                        If flxIntersec[0] > Me.SelEndXr Then            ' estamos a la izquierda
+                            dx *= -1
+                            dy *= -1
+                        Endif
+                    Else
+                        If Me.SelEndYr > e.P[1] Then dy = Offset Else dy = -Offset
+                    End If
+                Else
+                    If Me.SelEndXr > e.P[0] Then dx = Offset Else dx = -Offset
+
+                Endif
 
                 e.ClassHandler.translate(e, dx, dy)
 
-                clsEntities.glGenDrawList()
-                clsEntities.glGenDrawListAll
-                gcd.Redraw
-                clsDrawingAids.HelperTrabajo = ("Offset: select an entity or <Esc>")
-
         End Select
+        clsEntities.glGenDrawList()
+        clsEntities.glGenDrawListAll
+        gcd.Redraw
+        clsDrawingAids.HelperTrabajo = ("Offset: select an entity or <Esc>")
 
         Me.PointsDone = 1
 

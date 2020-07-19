@@ -424,9 +424,17 @@ Public Function DeleteSelected(Optional Purge As Boolean = True) As Integer
     '  Purgue will also delete those with .ForDeletion = true
 
     For i = APPMain.hFCAD.arrEntities.Max To 0 Step -1
-        If APPMain.hFCAD.arrEntities[i].ForDeletion Or APPMain.hFCAD.arrEntities[i].Selected Then
-            APPMain.hFCAD.arrEntities.Remove(i)
-            Inc c
+        If Purge Then
+            If APPMain.hFCAD.arrEntities[i].ForDeletion Then
+                APPMain.hFCAD.arrEntities.Remove(i)
+                Inc c
+            End If
+        Else
+
+            If APPMain.hFCAD.arrEntities[i].ForDeletion Or APPMain.hFCAD.arrEntities[i].Selected Then
+                APPMain.hFCAD.arrEntities.Remove(i)
+                Inc c
+            End If
         End If
     Next
 
