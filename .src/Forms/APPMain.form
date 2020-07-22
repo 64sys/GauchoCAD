@@ -214,14 +214,12 @@
       Name = "mnuFillet"
       Text = ("Fillet")
       Picture = Picture["svg/tools/fillet.svg"]
-      Enabled = False
       Tag = "fillet"
     }
     { mnuChamfer Menu tool
       Name = "mnuChamfer"
       Text = ("Chamfer")
       Picture = Picture["svg/tools/chamfer.svg"]
-      Enabled = False
       Tag = "chamfer"
     }
     { mnuArray Menu tool
@@ -240,14 +238,12 @@
       Name = "mnuOffset"
       Text = ("Offset")
       Picture = Picture["svg/tools/offset.svg"]
-      Visible = False
       Tag = "offset"
     }
     { mnuDivide Menu tool
       Name = "mnuDivide"
       Text = ("Divide")
       Picture = Picture["svg/tools/divide.svg"]
-      Enabled = False
       Tag = "divide"
     }
     { mnuDelete Menu tool
