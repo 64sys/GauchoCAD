@@ -53,11 +53,16 @@ Public CurrentLtype As Integer
 
 Public SelectedWidth As Boolean
 
+Private PropertiesFlag As Boolean = False
+Private LayersFlag As Boolean = False
+Private BlocksFlag As Boolean = False
+'Private xxxFlag As Boolean = False ' Future expansion for mode panels to show
+
 'variables de ambiente
 Public flgShowInspector As Boolean = True
 Public HistoCom As New String[]     '' Commands history
-Public ListCom As New String[]      '' Commands list
-Public AliasCom As New String[]     '' Commands alias
+'Public ListCom As New String[]      '' Commands list
+'Public AliasCom As New String[]     '' Commands alias
 Private p As Integer
 
 Public cMod As New Collection       '' All drawings common collection
@@ -431,19 +436,27 @@ Public Sub locks_Click()
     obj = Last
 
     Select obj.Tag
+        Case "bounds"
+            gcd.DrawBounds = Not gcd.DrawBounds
 
-        Case "off"
-            pnlDebug.Visible = False
-            pnlProperties.Visible = False
+        Case "grid"
+            puntos.Gridactive = Not puntos.Gridactive
 
-        Case "properties"
-            pnlDebug.Visible = False
-            pnlProperties.Visible = True
+        Case "ortho"
+            gcd.Ortogonal = Not gcd.Ortogonal
 
-        Case "debug"
-
-            pnlProperties.Visible = False
-            pnlDebug.Visible = True
+            ' Case "off"
+            '     pnlDebug.Visible = False
+            '     pnlProperties.Visible = False
+            '
+            ' Case "properties"
+            '     pnlDebug.Visible = False
+            '     pnlProperties.Visible = True
+            '
+            ' Case "debug"
+            '
+            '     pnlProperties.Visible = False
+            '     pnlDebug.Visible = True
 
             'If pnlDebug.Visible = False Then
             '    pnlDebug.Visible = True
@@ -754,9 +767,7 @@ Public Sub entity_Click()
     obj = Last
 
     If Workspace1.ActiveWindow Then
-        txoCom.Text = obj.Tag & "\n"
-        'gcd.clsJob.KeyText(String.UCaseFirst(obj.Tag))
-
+        gcd.clsJob.KeyText(obj.Tag)
     Endif
 
 End
@@ -769,7 +780,8 @@ Public Sub tool_Click()
 
     If Workspace1.ActiveWindow Then
         'txoCom.Text = obj.Tag & Key.Enter
-        gcd.clsJob.KeyText(String.UCaseFirst(obj.Tag))
+        gcd.clsJob.KeyText(obj.Tag)
+        'gcd.clsJob.KeyText(String.UCaseFirst(obj.Tag))
     Endif
 
 End
@@ -791,7 +803,8 @@ Public Sub view_Click()
     obj = Last
 
     If Workspace1.ActiveWindow Then
-        gcd.clsJob.KeyText(String.UCaseFirst(obj.Tag))
+        gcd.clsJob.KeyText(obj.Tag)
+        'gcd.clsJob.KeyText(String.UCaseFirst(obj.Tag))
     Endif
 
 End
@@ -1254,96 +1267,96 @@ End
 '     End Select
 '
 ' End
-Public Sub txoCom_Change()
-
-    Dim sCom As String
-    Dim i As Integer
-    Dim obj As Object
-    Dim enty As Entity
-
-    Dim x As Float
-    Dim y As Float
-
-    If String.Len(txoCom.Text) > 0 Then
-        Select String.Right(txoCom.Text)
-            Case " ", "\n"
-                'Select Key.Code
-                'Case Key.Enter, Key.Return, Key.Space
-                sCom = String.Mid(txoCom.Text, 1, String.Len(txoCom.Text) - 1)
-                If Workspace1.ActiveWindow Then
-                    obj = gcd.clsJob
-                    Select Object.Type(obj)
-                        Case "clsEntityBuilder"
-                            'KillJob()
-                            enty = obj.elem
-                            ' txaDebug.Pos = 0
-                            ' txaDebug.Insert(enty.Gender & " command\n")
-                            ' txaDebug.Refresh
-                            Select enty.Gender
-
-                                Case "Line"
-                                    If InStr(sCom, ",") > 0 Then
-
-                                        x = Split(sCom, ",")[0]
-                                        y = Split(sCom, ",")[1]
-
-                                        Select p ' P es una variable global tipo Private
-                                            Case 0
-                                                enty.P[0] = x
-                                                enty.P[1] = y
-                                                p = p + 2
-                                                lblCommand.Text = obj.ParamHelperList[1]
-                                                txoCom.Text = ""
-                                            Case -1
-                                                txoCom.Text = ""
-                                                lblCommand.Text = "Command"
-
-                                            Case Else
-
-                                                enty.P[0 + p] = x
-                                                enty.P[1 + p] = y
-                                                enty.Finished = True
-                                                'p = -1
-                                                txoCom.Text = ""
-
-                                        End Select
-
-                                    Endif
-
-                            End Select
-                        Case Else
-                            If sCom <> "" Then
-                                If Starter.cCommands.Exist(sCom) Then
-                                    HistoCom.Push(sCom)
-
-                                    Print sCom
-                                    If Workspace1.ActiveWindow Then
-                                        'KillJob()
-                                        gcd.clsJob.KeyText(sCom)
-
-                                        obj = gcd.clsJob
-                                        Select Object.Type(obj)
-                                            Case "clsEntityBuilder"
-                                                enty = obj.elem
-
-                                                txaDebug.Pos = 0
-                                                txaDebug.Insert(enty.Gender & " command\n")
-                                                txaDebug.Refresh
-                                                txoCom.Text = ""
-                                                lblCommand.Text = obj.ParamHelperList[0]
-
-                                            Case Else
-                                                p = 0
-                                        End Select
-                                    Endif
-                                Endif
-                            Endif
-                    End Select
-                Endif
-        End Select
-    Endif
-
-End
+' Public Sub txoCom_Change()
+'
+'     Dim sCom As String
+'     Dim i As Integer
+'     Dim obj As Object
+'     Dim enty As Entity
+'
+'     Dim x As Float
+'     Dim y As Float
+'
+'     If String.Len(txoCom.Text) > 0 Then
+'         Select String.Right(txoCom.Text)
+'             Case " ", "\n"
+'                 'Select Key.Code
+'                 'Case Key.Enter, Key.Return, Key.Space
+'                 sCom = String.Mid(txoCom.Text, 1, String.Len(txoCom.Text) - 1)
+'                 If Workspace1.ActiveWindow Then
+'                     obj = gcd.clsJob
+'                     Select Object.Type(obj)
+'                         Case "clsEntityBuilder"
+'                             'KillJob()
+'                             enty = obj.elem
+'                             ' txaDebug.Pos = 0
+'                             ' txaDebug.Insert(enty.Gender & " command\n")
+'                             ' txaDebug.Refresh
+'                             Select enty.Gender
+'
+'                                 Case "Line"
+'                                     If InStr(sCom, ",") > 0 Then
+'
+'                                         x = Split(sCom, ",")[0]
+'                                         y = Split(sCom, ",")[1]
+'
+'                                         Select p ' P es una variable global tipo Private
+'                                             Case 0
+'                                                 enty.P[0] = x
+'                                                 enty.P[1] = y
+'                                                 p = p + 2
+'                                                 lblCommand.Text = obj.ParamHelperList[1]
+'                                                 txoCom.Text = ""
+'                                             Case -1
+'                                                 txoCom.Text = ""
+'                                                 lblCommand.Text = "Command"
+'
+'                                             Case Else
+'
+'                                                 enty.P[0 + p] = x
+'                                                 enty.P[1 + p] = y
+'                                                 enty.Finished = True
+'                                                 'p = -1
+'                                                 txoCom.Text = ""
+'
+'                                         End Select
+'
+'                                     Endif
+'
+'                             End Select
+'                         Case Else
+'                             If sCom <> "" Then
+'                                 If Starter.cCommands.Exist(sCom) Then
+'                                     HistoCom.Push(sCom)
+'
+'                                     Print sCom
+'                                     If Workspace1.ActiveWindow Then
+'                                         'KillJob()
+'                                         gcd.clsJob.KeyText(sCom)
+'
+'                                         obj = gcd.clsJob
+'                                         Select Object.Type(obj)
+'                                             Case "clsEntityBuilder"
+'                                                 enty = obj.elem
+'
+'                                                 txaDebug.Pos = 0
+'                                                 txaDebug.Insert(enty.Gender & " command\n")
+'                                                 txaDebug.Refresh
+'                                                 txoCom.Text = ""
+'                                                 lblCommand.Text = obj.ParamHelperList[0]
+'
+'                                             Case Else
+'                                                 p = 0
+'                                         End Select
+'                                     Endif
+'                                 Endif
+'                             Endif
+'                     End Select
+'                 Endif
+'         End Select
+'     Endif
+'
+' End
 
 Public Sub KillJob() ' no funciona bien
     ''TODO: Mejorar esta sub o hacer una nueva para CANCELAR el comando actual
@@ -1682,16 +1695,39 @@ Public Sub TableView1_Save(Row As Integer, Column As Integer, Value As String)
     End Select
 
 End
+'
+' Public Sub Form_KeyRelease()
+'
+'     Select Key.Code
+'         Case Key.Control
+'             Print "command"
+'
+'     End Select
+'
+' End
 
 Public Sub Form_KeyPress()
+
+    Dim iAlias As Integer
+    Dim com As Variant
 
     Print Key.Code
     Dim t As Float = Timer
 
     'If Workspace1.ActiveWindow Then
     Select Key.Code
+
         Case Key.Enter, Key.Return
             Debug KeysAccumulator
+
+            For Each com In Starter.cCommands
+                If com.count = 2 Then
+                    If com[1] = KeysAccumulator Then
+                        KeysAccumulator = com[0]
+                    Endif
+                Endif
+            Next
+
             gcd.clsJob.KeyText(KeysAccumulator)
             KeysAccumulator = ""
 
@@ -1735,16 +1771,48 @@ Public Sub Form_KeyPress()
             gcd.clsJobPrevious = gcd.clsJob
             gcd.clsJob = clsDefaultJob
 
+            SelectionRefresh()
+
         Case Key.Space
             Stop Event
 
         Case Key.Del
             gcd.clsJob.KeyText("Erase")
 
+        Case Key.ControlKey
+            KeysAccumulator = "Function"
+
         Case Else
             ' A GOOD KEY
-            KeysAccumulator &= Key.Text
-            clsDrawingAids.ErrorMessage = ""
+            If InStr(KeysAccumulator, "Function") > 0 Then
+                KeysAccumulator = ""
+                Select Key.Code
+                    Case Asc("1") ' Properties
+                        If PropertiesFlag = False Then
+                            pnlProperties.Visible = True
+                            PropertiesFlag = True
+
+                        Else
+                            pnlProperties.Visible = False
+                            PropertiesFlag = False
+                        Endif
+
+                        'Case Asc("2") ' Layers
+
+                        'Case Asc("3") ' Blocks
+
+                        'Case Asc("4...") ' More...
+                        'KeysAccumulator &= "-" & Key.Text
+                        'Case Else
+                        '    KeysAccumulator = ""
+                        'pnlProperties.Visible = False
+                        'pnlDebug.Visible = False
+                End Select
+                'Print KeysAccumulator
+            Else
+                KeysAccumulator &= Key.Text
+                clsDrawingAids.ErrorMessage = ""
+            Endif
 
     End Select
     tmr500_timer

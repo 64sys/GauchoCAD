@@ -329,7 +329,7 @@
     }
   }
   { Panel1 Panel
-    MoveScaled(1,1,156,72)
+    MoveScaled(1,0,156,72)
     Expand = True
     Arrangement = Arrange.Vertical
     { Panel2 Panel
@@ -427,52 +427,46 @@
         Expand = True
         Border = False
       }
-      { SidePanel1 SidePanel
-        MoveScaled(110,2,37,53)
-        Arrangement = Arrange.Horizontal
-        Orientation = Align.Left
-        { pnlDebug Panel
-          MoveScaled(0,2,19,48)
-          Visible = False
-          Arrangement = Arrange.Vertical
-          { pnlSmart Panel
-            MoveScaled(1,1,21,17)
-            Expand = True
-            Arrangement = Arrange.Row
-            { lblSmart Label
-              MoveScaled(0,1,20,3)
-              Visible = False
-              Text = (" Smart entities")
-              Alignment = Align.Center
-            }
-          }
-          { txaDebug TextArea
-            MoveScaled(2,24,16,16)
-            Font = Font["Noto Mono"]
-            Expand = True
+      { pnlDebug Panel
+        MoveScaled(106,3,19,48)
+        Visible = False
+        Arrangement = Arrange.Vertical
+        { pnlSmart Panel
+          MoveScaled(1,1,21,17)
+          Expand = True
+          Arrangement = Arrange.Row
+          { lblSmart Label
+            MoveScaled(0,1,20,3)
+            Visible = False
+            Text = (" Smart entities")
+            Alignment = Align.Center
           }
         }
-        { pnlProperties Panel
-          MoveScaled(21,0,18,50)
-          Visible = False
+        { txaDebug TextArea
+          MoveScaled(2,24,16,16)
+          Font = Font["Noto Mono"]
           Expand = True
-          Arrangement = Arrange.Vertical
-          { btnRefresh Button
-            MoveScaled(1,2,16,4)
-            Text = ("Refresh")
-          }
-          { ComboBox1 ComboBox
-            MoveScaled(1,7,16,4)
-            ReadOnly = True
-          }
-          { TableView1 TableView
-            MoveScaled(2,13,14,24)
-            Border = False
-          }
-          { btnSave Button
-            MoveScaled(0,45,16,4)
-            Text = ("Save")
-          }
+        }
+      }
+      { pnlProperties Panel
+        MoveScaled(126,1,24,50)
+        Visible = False
+        Arrangement = Arrange.Vertical
+        { btnRefresh Button
+          MoveScaled(1,2,16,4)
+          Text = ("Refresh")
+        }
+        { ComboBox1 ComboBox
+          MoveScaled(1,7,16,4)
+          ReadOnly = True
+        }
+        { TableView1 TableView
+          MoveScaled(2,13,14,24)
+          Border = False
+        }
+        { btnSave Button
+          MoveScaled(0,45,16,4)
+          Text = ("Save")
         }
       }
     }
@@ -490,6 +484,7 @@
       }
       { txoCom TextBox
         MoveScaled(87,0,4,4)
+        Visible = False
         Enabled = False
         Font = Font["Bold,+1"]
         Background = Color.TextBackground
@@ -500,30 +495,34 @@
         Arrangement = Arrange.Horizontal
         Spacing = True
         { Spring1 Spring
-          MoveScaled(2,1,6,3)
+          MoveScaled(1,1,3,3)
         }
         { ToolButton1 ToolButton locks
           Name = "ToolButton1"
-          MoveScaled(10,0,5,5)
-          Tag = "debug"
+          MoveScaled(3,0,9,5)
+          #Translate = False
+          Tag = "bounds"
+          ToolTip = "F6"
+          Text = "BOUNDS"
           Border = True
-          Radio = True
           Toggle = True
         }
         { ToolButton2 ToolButton locks
           Name = "ToolButton2"
-          MoveScaled(16,0,5,5)
-          Tag = "properties"
+          MoveScaled(8,0,9,5)
+          Tag = "grid"
+          ToolTip = ("F8")
+          Text = ("GRID")
           Border = True
-          Radio = True
           Toggle = True
         }
         { ToolButton3 ToolButton locks
           Name = "ToolButton3"
-          MoveScaled(22,0,5,5)
-          Tag = "off"
+          MoveScaled(15,0,9,5)
+          Tag = "ortho"
+          ToolTip = ("F8")
+          Text = ("ORTHO")
           Border = True
-          Radio = True
           Toggle = True
         }
         { Panel5 Panel
@@ -532,7 +531,7 @@
       }
     }
     { tmr500 #Timer
-      #MoveScaled(138,66)
+      #MoveScaled(138,65)
       Enabled = True
       Delay = 500
     }
