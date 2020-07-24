@@ -334,7 +334,13 @@ Public Sub GLArea1_MouseUp()
     ' los rigth clicks se manejan en FCAD , ni las herramientas ni las entidades los necesitan
     If Mouse.Right Then                ' rigth clicks means finish what you're doing rigth now and go back to the previous Job
         ' the Finish() sub will do this in a good manner
-        gcd.clsJob.Finish
+        If gcd.clsJob.gender <> "Default" Then
+            gcd.clsJob.Finish
+
+        Else
+            gcd.clsJob = gcd.clsJobPrevious
+            gcd.clsJob.Start()
+        Endif
 
     Else ' Left Click
 

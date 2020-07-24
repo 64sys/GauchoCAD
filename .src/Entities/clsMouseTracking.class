@@ -270,6 +270,7 @@ Public Sub CheckPOI(xr As Float, Yr As Float) As Float[]
     Dim DistQuad As Float = 1e6
     Dim DistCenter As Float = 1e6
     Dim DistInter As Float = 1e6
+    Dim DistNearest As Float = 1e6
     Dim Dist As Float = 1e5  ' el menor
 
     ' If Me.flgSearchingPOI Then Return   ' no nesting this
@@ -573,5 +574,45 @@ Public Sub CheckPOI(xr As Float, Yr As Float) As Float[]
     ' Debug "pois checked"
     Me.flgSearchingPOI = False
     Return rData
+
+End
+
+'' Devuelve el punto en la entidad que esta mas cercano al provisto
+Public Sub GetNearestPoint(e As Entity, xr As Float, Yr As Float) As Float[]
+
+    Dim x2, y2, c, d, dx, dy, m1, m2, angle As Float
+    Dim flxIntersec As Float[]
+
+    Select Case e.Gender
+        Case "Line"
+            If (e.P[2] - e.P[0]) <> 0 Then
+                ' la pendiente de la recta donde esta la linea es
+                m1 = (e.P[3] - e.P[1]) / (e.P[2] - e.P[0])
+                If m1 <> 0 Then
+                    m2 = -1 / m1
+
+                    ' la ecuacion de la recta que pasa por Xr,Yr con pendiente m2 es:
+                    ' Y = m X + c
+                    c = yr - m2 * xr
+                    ' si
+                    x2 = 1e10
+                    y2 = m2 * x2 + c
+
+                    ' obtenemos el punto interseccion
+                    flxIntersec = puntos.lineLineIntersection([xr, yr], [x2, y2], [e.P[0], e.P[1]], [e.P[2], e.P[3]])
+
+                    ' y salimos
+
+                    Return flxIntersec
+
+                Else                                                            ' la perpendicular es verical
+                    Return [xr, e.P[1]]
+                End If
+            Else                                                                ' la perpendicular es horizontal
+                Return [e.P[0], yr]
+
+            Endif
+
+    End Select
 
 End

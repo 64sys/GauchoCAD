@@ -89,7 +89,7 @@ Public Sub Draw2(oE As Entity)
 
 End
 
-Public Sub Finish(oE As Entity, ParamsDone As Integer) As Boolean
+Public Sub Finish(oE As Entity, Optional ParamsDone As Integer = -1) As Boolean
 
     ' we set the block property of all entities selected
 
