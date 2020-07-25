@@ -56,7 +56,7 @@ Public Function Start(Optional ElemToBuild As Variant, Optional _Mode As Integer
         Select Case APPMain.hFCAD.arrEntities[Me.iEntitySelected].Gender
             Case "Line", "Pline", "Circle", "Arc", "Ellipse", "Spline"
                 clsEntities.SelectElem(Me.iEntitySelected)
-                clsDrawingAids.Helper.texto = ("Breackpoint of entity")
+                clsDrawingAids.Helper.texto = ("Breakpoint of entity")
                 Me.PointsDone = 1
             Case Else
                 Me.iEntitySelected = -1
@@ -72,7 +72,6 @@ Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' called by FCAD->
     Dim d, dx, dy, m1, m2, angle As Float
     Dim flxIntersec As Float[]
     Dim e, e2 As Entity
-    Dim flxItersec As Float[]
 
     Me.SelStartXr = appmain.hFcad.Xreal(mousex)
     Me.SelStartYr = appmain.hFcad.Yreal(mouseY)
