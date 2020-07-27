@@ -264,15 +264,4 @@ Public Sub Draw() ' esta rutina es llamada por FCAD en el evento DrawingArea_Dra
     End If
 
 End
-'
-' Public Sub Finish()
-'
-'     ' gcd.clsJobPrevious = Me  ' selection dont go to another job
-'
-'     gcd.clsJob = gcd.clsJobPrevious
-'     gcd.clsJobPrevious = Me
-'     clsDrawingAids.CleanTexts
-'     appmain.hFCAD.redraw
-'     gcd.clsJob.Start(gcd.clsJobPreviousParam)
-'
-' End
+
