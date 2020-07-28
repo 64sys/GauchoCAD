@@ -246,6 +246,12 @@
       Picture = Picture["svg/tools/divide.svg"]
       Tag = "divide"
     }
+    { mnuBreak Menu tool
+      Name = "mnuBreak"
+      Text = ("Break")
+      Picture = Picture["svg/tools/break.svg"]
+      Tag = "break"
+    }
     { mnuDelete Menu tool
       Name = "mnuDelete"
       Text = ("Delete")
@@ -417,14 +423,14 @@
         }
       }
       { !Workspace1 Workspace
-        MoveScaled(28,4,75,49)
+        MoveScaled(28,4,21,49)
         #Public = True
         Background = Color.TextBackground
         Expand = True
         Border = False
       }
       { pnlDebug Panel
-        MoveScaled(106,3,19,48)
+        MoveScaled(51,3,22,50)
         Visible = False
         Arrangement = Arrange.Vertical
         { pnlSmart Panel
@@ -445,7 +451,7 @@
         }
       }
       { pnlProperties Panel
-        MoveScaled(126,1,24,50)
+        MoveScaled(75,3,24,50)
         Visible = False
         Arrangement = Arrange.Vertical
         { btnRefresh Button
@@ -464,6 +470,9 @@
           MoveScaled(0,45,16,4)
           Text = ("Save")
         }
+      }
+      { pnlBlock Panel
+        MoveScaled(100,3,23,50)
       }
     }
     { Panel4 Panel

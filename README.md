@@ -37,6 +37,7 @@ GauchoCAD is currently under development and the status is as follows:
 # Tools
 | Icon | Alias | Name | Description |
 |------|:-----:|:----:|------------:|
+| <img src="./svg/tools/break.svg" width="48" height="48"> | bg | Break | Brak a entity in two parts |
 | <img src="./svg/tools/chamfer.svg" width="48" height="48"> | cd | Chamfer | Create a chamfer from two lines |
 | <img src="./svg/tools/copy.svg" width="48" height="48"> | c | Copy | Copy an entity |
 | <img src="./svg/tools/divide.svg" width="48" height="48"> | dx | Divide | Divide an entity |
