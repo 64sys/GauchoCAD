@@ -59,7 +59,7 @@ Public Function KeyText(EnteredText As String) ' esta rutina es llamada por FCAD
         If Me.Radious = 0 Then
             clsDrawingAids.ErrorMessage = "Bad input"
         Else
-            clsDrawingAids.HelperTrabajo = ("Select first line]")
+            clsDrawingAids.HelperTrabajo = ("Select first line")
             Me.PointsDone = 1
         End If
     End If
@@ -160,8 +160,6 @@ Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' esta rutina es l
             AppMain.SelectionRefresh()
 
         End If
-
-        clsDrawingAids.HelperTrabajo = ("Selected ") & Str$(Me.selectionCount) & (" elements")
 
     End If
 
