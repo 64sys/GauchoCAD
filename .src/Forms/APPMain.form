@@ -522,7 +522,7 @@
           Name = "btnGrid"
           MoveScaled(8,0,9,5)
           Tag = "grid"
-          ToolTip = ("F8")
+          ToolTip = ("F7")
           Text = ("GRID")
           Border = True
           Toggle = True

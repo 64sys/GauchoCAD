@@ -437,10 +437,23 @@ Public Sub locks_Click()
 
     Select obj.Tag
         Case "bounds"
-            gcd.DrawBounds = Not gcd.DrawBounds
+            Select obj.Value
+                Case True
+                    gcd.DrawBounds = True
+                Case Else
+                    gcd.DrawBounds = False
+            End Select
+            'gcd.DrawBounds = Not gcd.DrawBounds
 
         Case "grid"
-            puntos.Gridactive = Not puntos.Gridactive
+            Select obj.Value
+                Case True
+                    puntos.Gridactive = True
+                Case Else
+                    puntos.Gridactive = False
+            End Select
+
+            'puntos.Gridactive = Not puntos.Gridactive
 
         Case "ortho"
             Select obj.Value
@@ -1776,7 +1789,6 @@ Public Sub Form_KeyPress()
 
             If btnOrtho.Value = False Then
                 gcd.Ortogonal = True
-
             Else
                 gcd.Ortogonal = False
             Endif
@@ -1786,8 +1798,12 @@ Public Sub Form_KeyPress()
             'gcd.Ortogonal = Not gcd.Ortogonal
 
         Case Key.f7
-
-            puntos.Gridactive = Not puntos.Gridactive
+            If btnGrid.Value = False Then
+                puntos.Gridactive = True
+            Else
+                puntos.Gridactive = False
+            Endif
+            btnGrid.Value = puntos.Gridactive
 
         Case Key.Esc
 
