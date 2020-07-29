@@ -559,19 +559,19 @@ Public Function ImportEntities2(colGrp As Collection, obxEntities As Entity[], O
                 GoSub GetPoints
                 'flxPoints.Add(colEnt["p"]["p0"][0])
                 'flxPoints.Add(colEnt["p"]["p0"][1])
-                AddText(obxEntities, flxPoints, colEnt["angle"], colEnt["height"], colEnt["text"], colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], BlockName)
+                AddText(obxEntities, flxPoints, colEnt["angle"], colEnt["text_height"], colEnt["text"], colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], BlockName)
                 Inc iTotalEntities
 
             Case "mtext"
                 GoSub GetPoints
                 'flxPoints.Add(colEnt["p"]["p0"][0])
                 'flxPoints.Add(colEnt["p"]["p0"][1])
-                AddMText(obxEntities, flxPoints, colEnt["angle"], colEnt["height"], colEnt["text"], colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], BlockName)
+                AddMText(obxEntities, flxPoints, colEnt["angle"], colEnt["text_height"], colEnt["text"], colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], BlockName)
                 Inc iTotalEntities
 
             Case "dimmension"
                 GoSub GetPoints
-                AddDim(obxEntities, flxPoints, colEnt["angle"], colEnt["height"], colEnt["text"], colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], BlockName)
+                AddDim(obxEntities, flxPoints, colEnt["angle"], colEnt["text_height"], colEnt["text"], colEnt["colour"], colEnt["width"], colEnt["style"], colEnt["layer"], BlockName)
                 Inc iTotalEntities
 
         End Select

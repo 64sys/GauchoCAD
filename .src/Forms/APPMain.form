@@ -473,6 +473,12 @@
       }
       { pnlBlock Panel
         MoveScaled(100,3,23,50)
+        Visible = False
+        { TableView2 TableView
+          MoveScaled(5,10,14,24)
+          Expand = True
+          Border = False
+        }
       }
     }
     { Panel4 Panel
