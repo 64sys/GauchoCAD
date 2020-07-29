@@ -508,8 +508,8 @@
         { Spring1 Spring
           MoveScaled(1,1,3,3)
         }
-        { ToolButton1 ToolButton locks
-          Name = "ToolButton1"
+        { btnBounds ToolButton locks
+          Name = "btnBounds"
           MoveScaled(3,0,9,5)
           #Translate = False
           Tag = "bounds"
@@ -518,8 +518,8 @@
           Border = True
           Toggle = True
         }
-        { ToolButton2 ToolButton locks
-          Name = "ToolButton2"
+        { btnGrid ToolButton locks
+          Name = "btnGrid"
           MoveScaled(8,0,9,5)
           Tag = "grid"
           ToolTip = ("F8")
@@ -527,8 +527,8 @@
           Border = True
           Toggle = True
         }
-        { ToolButton3 ToolButton locks
-          Name = "ToolButton3"
+        { btnOrtho ToolButton locks
+          Name = "btnOrtho"
           MoveScaled(15,0,9,5)
           Tag = "ortho"
           ToolTip = ("F8")

@@ -443,7 +443,12 @@ Public Sub locks_Click()
             puntos.Gridactive = Not puntos.Gridactive
 
         Case "ortho"
-            gcd.Ortogonal = Not gcd.Ortogonal
+            Select obj.Value
+                Case True
+                    gcd.Ortogonal = True
+                Case Else
+                    gcd.Ortogonal = False
+            End Select
 
             ' Case "off"
             '     pnlDebug.Visible = False
@@ -1445,47 +1450,49 @@ Public Sub btnLayers_MouseDown()
 End
 
 Public Sub btnRefresh_Click()
-    ''TODO: Poner esta accion en otro evento, por ejemplo despues de seleccionar entidades.
+    ''FIXED: Poner esta accion en otro evento, por ejemplo despues de seleccionar entidades.
 
-    Dim e As Entity
-    Dim etype As New String[]
-    Dim i As Integer
-    Dim j As Integer
-    'Dim inx As New Integer[]
+    ' Dim e As Entity
+    ' Dim etype As New String[]
+    ' Dim i As Integer
+    ' Dim j As Integer
+    ' 'Dim inx As New Integer[]
+    '
+    ' ComboBox1.Clear
+    ' ComboBox1.Text = ""
+    ' cProp.Clear
+    ' TableView1.Clear
+    '
+    ' For i = 0 To APPMain.hFCAD.arrEntities.Max
+    '     e = APPMain.hFCAD.arrEntities[i]
+    '
+    '     If e.Selected Then
+    '         'inx.Add(i)
+    '         If etype.Exist(e.Gender) = False Then
+    '             etype.Add(e.Gender)
+    '         Endif
+    '     Endif
+    ' Next
+    '
+    ' Select etype.Count
+    '     Case 0
+    '         'Aca se puede poner en off el panel de seleccion ya que no hay entidades seleccionadas
+    '         'skip
+    '
+    '     Case 1
+    '         ComboBox1.Add(etype[0])
+    '         ComboBox1.Text = etype[0]
+    '         LoadPropertiesList(etype[0])
+    '     Case Else
+    '         ComboBox1.Add(("All"))
+    '         For j = 0 To etype.Max
+    '             ComboBox1.Add(etype[j])
+    '         Next
+    '         ComboBox1.Text = ("All")
+    '         LoadPropertiesList("varies")
+    ' End Select
 
-    ComboBox1.Clear
-    ComboBox1.Text = ""
-    cProp.Clear
-    TableView1.Clear
-
-    For i = 0 To APPMain.hFCAD.arrEntities.Max
-        e = APPMain.hFCAD.arrEntities[i]
-
-        If e.Selected Then
-            'inx.Add(i)
-            If etype.Exist(e.Gender) = False Then
-                etype.Add(e.Gender)
-            Endif
-        Endif
-    Next
-
-    Select etype.Count
-        Case 0
-            'Aca se puede poner en off el panel de seleccion ya que no hay entidades seleccionadas
-            'skip
-
-        Case 1
-            ComboBox1.Add(etype[0])
-            ComboBox1.Text = etype[0]
-            LoadPropertiesList(etype[0])
-        Case Else
-            ComboBox1.Add(("All"))
-            For j = 0 To etype.Max
-                ComboBox1.Add(etype[j])
-            Next
-            ComboBox1.Text = ("All")
-            LoadPropertiesList("varies")
-    End Select
+    SelectionRefresh()
 
 End
 
@@ -1521,6 +1528,7 @@ Public Sub SelectionRefresh()
             ComboBox1.Add(etype[0])
             ComboBox1.Text = etype[0]
             LoadPropertiesList(etype[0])
+
         Case Else
             ComboBox1.Add(("All"))
             For j = 0 To etype.Max
@@ -1732,7 +1740,14 @@ Public Sub Form_KeyPress()
             KeysAccumulator = ""
 
         Case Key.f6
-            gcd.DrawBounds = Not gcd.DrawBounds
+
+            If btnBounds.Value = True Then
+                gcd.DrawBounds = False
+            Else
+                gcd.DrawBounds = True
+            Endif
+            btnBounds.Value = gcd.DrawBounds
+
             ' Dim i As Integer
             '
             ' For i = 0 To 50000
@@ -1758,7 +1773,17 @@ Public Sub Form_KeyPress()
         Case Key.f8
 
             Debug "Entidades transferidas en  ", Timer - t
-            gcd.Ortogonal = Not gcd.Ortogonal
+
+            If btnOrtho.Value = False Then
+                gcd.Ortogonal = True
+
+            Else
+                gcd.Ortogonal = False
+            Endif
+
+            btnOrtho.Value = gcd.Ortogonal
+
+            'gcd.Ortogonal = Not gcd.Ortogonal
 
         Case Key.f7
 
@@ -1791,7 +1816,6 @@ Public Sub Form_KeyPress()
                         If PropertiesFlag = False Then
                             pnlProperties.Visible = True
                             PropertiesFlag = True
-
                         Else
                             pnlProperties.Visible = False
                             PropertiesFlag = False
