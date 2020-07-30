@@ -29,13 +29,13 @@
 ' XML Load/Save by Tincho
 ' GUI by Postpase/Tincho
 
-Public tmr33Hz As Integer                   '  +1  every 33Hz so it goes from 0 to 1E32
+Public tmr33Hz As Integer                   ''  +1  every 33Hz so it goes from 0 to 1E32
 
 Public KeysAccumulator As String
 Public FirstTime As Boolean = True
 Public DrawingReady As Boolean = False
-Public DrawNeedsUpdate As Boolean                   ' true on mouse, key or tool events
-Public TimerTic As Integer = 0                      ' this reaches 1024 and then zeroes, at 33Hz
+Public DrawNeedsUpdate As Boolean                   '' true on mouse, key or tool events
+Public TimerTic As Integer = 0                      '' this reaches 1024 and then zeroes, at 33Hz
 Public nDraws As Integer
 Public nDrawsRequired As Integer
 Public idDrawing As Integer
@@ -44,8 +44,8 @@ Public idDrawing As Integer
 
 Public CursorX As Integer
 Public CursorY As Integer
-Public PanX As Integer = 0              ' trnaslation of th 0,0 from the corner of the drawing area
-Public PanY As Integer = 0              ' in pixels
+Public PanX As Integer = 0              '' trnaslation of th 0,0 from the corner of the drawing area
+Public PanY As Integer = 0              '' in pixels
 Public ScaleZoom As Float
 Public Propiedadtest As String
 '-----------------------------------
@@ -65,8 +65,11 @@ Public Struct arrBlockSt
 End Struct
 
 Public arrBlocks As New ArrBlockSt[]
-Public arrEntities As New Entity[]             ' were al elements live
-Public arrSelecIndex As New Integer[]          ' indice en el array de entidades
+Public arrEntities As New Entity[]             '' were al elements live
+Public arrTmp As New Entity[]             '' Temporal array to put a copy of an entity before change something in it
+Public arrUndo As New Entity[]             '' An array to put an unmodified copy of an entity before modifying it and then restoring it to the previous version.
+
+Public arrSelecIndex As New Integer[]          '' indice en el array de entidades
 
 Public Xmenor As Float = 1E100
 Public Xmayor As Float = -1E100
@@ -74,21 +77,21 @@ Public Ymenor As Float = 1E100
 Public Ymayor As Float = -1E100
 
 ' point of interests, lines, areas and entities: all this is generated n the entity creation
-Public poiPoints As New Float[]                 ' xy pairs of points
-Public poiType As New Integer[]                 ' tipe of poi: End, Mid, Quadrant, Tangent
-Public poiEntities As New Integer[]             ' related entity
+Public poiPoints As New Float[]                 '' xy pairs of points
+Public poiType As New Integer[]                 '' tipe of poi: End, Mid, Quadrant, Tangent
+Public poiEntities As New Integer[]             '' related entity
 
-Public poiLines As New Float[]                  ' x0y0x1y1 points
-Public poiLinesEntities As New Integer[]        ' related entity
+Public poiLines As New Float[]                  '' x0y0x1y1 points
+Public poiLinesEntities As New Integer[]        '' related entity
 
-Public poiPoligons As New Float[]               ' this define multiple poligons to search for proximity
+Public poiPoligons As New Float[]               '' this define multiple poligons to search for proximity
 Public poiPoligonStartIndex As New Integer[]
 Public poiPoligonElements As New Integer[]
-Public poiPoligonEntities As New Integer[]      ' related entity
+Public poiPoligonEntities As New Integer[]      '' related entity
 
 ' interaccion del mouse en pantalla
-Public LastPoint As New Float[]                ' ultimo punto marcado o null si no existe
-Public iEntity As New Single[]             ' las coordenadas del punto encontrado y el tipo de punto
+Public LastPoint As New Float[]                '' ultimo punto marcado o null si no existe
+Public iEntity As New Single[]             '' las coordenadas del punto encontrado y el tipo de punto
 Public flgShowPOIinfo As Boolean = True
 
 ' OpenGl stuff

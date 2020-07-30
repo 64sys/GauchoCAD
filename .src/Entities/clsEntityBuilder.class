@@ -131,6 +131,7 @@ Public Function Start(Optional ElemToBuild As Variant, Optional Mode As Integer 
 
     elem.colour = appmain.CurrentColor
     elem.ColorToPaint = Starter.gColor[elem.colour]
+    elem.Handle = sog.UUIDHandle(4)
 
     clsDrawingAids.HelperTrabajo = elem.ClassHandler.HelperTrabajo
 

@@ -1560,32 +1560,60 @@ Public Sub btnSave_Click()
     Dim e As Entity
     Dim lay As Collection
     Dim ly As Collection
+    Dim Changed As Boolean
+    Dim te As Entity
+    Dim obj As Entity
 
     lay = APPMain.hFCAD.cModel["Layers"]
 
     For i = 0 To APPMain.hFCAD.arrEntities.Max
+        Changed = False
         e = APPMain.hFCAD.arrEntities[i]
+        APPMain.hFCAD.arrTmp.Clear
 
         If e.Selected Then
+            'Copio la entidad en una lista temportal
+            e = APPMain.hFCAD.arrEntities[i]
+
+            te = clsEntities.ClonEntity(e)
+            te.Handle = e.Handle
+
+            APPMain.hFCAD.arrTmp.Add(te)
+
             For r = 0 To TableView1.Rows.Count - 1
                 Select TableView1[r, 0].Text
                     Case "Layer"
                         cProp["Layer"] = TableView1[r, 1].Text
-                        e.Layer = cProp["Layer"]
-                        For Each ly In lay
-                            If ly["name"] = cProp["Layer"] Then
-                                e.LayerId = ly["id"]
-                                Break
-                            Endif
-                        Next
+                        If e.Layer <> cProp["Layer"] Then
+                            Changed = True
+                            e.Layer = cProp["Layer"]
+                            For Each ly In lay
+                                If ly["name"] = cProp["Layer"] Then
+                                    e.LayerId = ly["id"]
+                                    Break
+                                Endif
+                            Next
+                        Endif
 
                     Case "Color"
                         cProp["Color"] = TableView1[r, 1].Text
-                        e.colour = cProp["Color"]
-                        e.ColorToPaint = cProp["Color"]
+                        If e.colour <> cProp["Color"] Then
+                            Changed = True
+                            e.colour = cProp["Color"]
+                            e.ColorToPaint = cProp["Color"]
+                        Endif
+
                 End Select
             Next
+
         Endif
+
+        If Changed = True Then
+            APPMain.hFCAD.arrUndo.Add(te)
+            APPMain.hFCAD.Regen
+            'gcd.Redraw
+        Endif
+
     Next
 
 End
@@ -1731,6 +1759,10 @@ Public Sub Form_KeyPress()
 
     Dim iAlias As Integer
     Dim com As Variant
+    Dim umx As Integer     '' Index in undo array
+    Dim uEnty As Entity    '' Undo entity
+    Dim aEnty As Entity    '' Actual entity
+    Dim imx As Integer     '' Index in Entities array
 
     Print Key.Code
     Dim t As Float = Timer
@@ -1837,7 +1869,7 @@ Public Sub Form_KeyPress()
                             PropertiesFlag = False
                         Endif
 
-                        'Case Asc("2") ' Layers
+                    Case Asc("2") ' Layers
 
                         'Case Asc("3") ' Blocks
 
@@ -1847,6 +1879,27 @@ Public Sub Form_KeyPress()
                         '    KeysAccumulator = ""
                         'pnlProperties.Visible = False
                         'pnlDebug.Visible = False
+
+                    Case Asc("z"), Asc("Z") ' Undo
+
+                        If APPMain.hFCAD.arrUndo.Count > 0 Then
+                            umx = APPMain.hFCAD.arrUndo.Max
+
+                            uEnty = APPMain.hFCAD.arrUndo[umx]
+                            For Each aEnty In APPMain.hFCAD.arrEntities
+                                If aEnty.Handle = uEnty.Handle Then
+                                    APPMain.hFCAD.arrEntities.Remove(imx, 1)
+                                    APPMain.hFCAD.arrEntities.Add(uEnty, imx)
+                                    APPMain.hFCAD.arrUndo.Remove(umx, 1)
+                                    APPMain.hFCAD.Regen
+                                    'gcd.Redraw
+                                    Break
+                                Endif
+                                Inc imx
+                            Next
+
+                        Endif
+
                 End Select
                 'Print KeysAccumulator
             Else
