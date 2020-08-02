@@ -521,18 +521,20 @@
         { btnGrid ToolButton locks
           Name = "btnGrid"
           MoveScaled(8,0,9,5)
+          #Translate = False
           Tag = "grid"
-          ToolTip = ("F7")
-          Text = ("GRID")
+          ToolTip = "F7"
+          Text = "GRID"
           Border = True
           Toggle = True
         }
         { btnOrtho ToolButton locks
           Name = "btnOrtho"
           MoveScaled(15,0,9,5)
+          #Translate = False
           Tag = "ortho"
-          ToolTip = ("F8")
-          Text = ("ORTHO")
+          ToolTip = "F8"
+          Text = "ORTHO"
           Border = True
           Toggle = True
         }
