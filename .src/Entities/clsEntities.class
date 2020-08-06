@@ -417,7 +417,7 @@ Public Function GetSelectionCount() As Integer
 
 End Function
 
-Public Function DeleteSelected(Optional Purge As Boolean = True) As Integer
+Public Function DeleteSelected(Optional Purge As Boolean = False) As Integer
 
     Dim i As Integer, c As Integer
 

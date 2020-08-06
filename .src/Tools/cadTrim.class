@@ -25,15 +25,10 @@ Create Static
 Public Const Gender As String = "Trim"
 
 Public arrTijeras As New Integer[]
+Public eRecortar As Entity
 
 Public Function Start(Optional ElemToBuild As Variant, Optional _Mode As Integer = 0) As Boolean
     ' Llamada por FCAD al inicio de la aplicacion de esta herramienta
-
-    ' TODO: remover al seguir con esta herramienta
-
-    Me.Finish
-
-    Return
 
     Dim i As Integer
     ' Aprovechamos para establecer los helpers (comentarios de ayuda en pantalla)
@@ -41,13 +36,14 @@ Public Function Start(Optional ElemToBuild As Variant, Optional _Mode As Integer
     Me.PointsTotal = 2
 
     clsDrawingAids.HelperTrabajo = ("Trim ")
+    gcd.clsJob.EntityChecking = True
 
     ' chequeamos si hubo seleccion previa
     Me.SelectionCount = clsEntities.GetSelectionCount()
 
     If Me.SelectionCount = 0 Then                                     ' we have no elements in the selection
         arrTijeras.Clear
-        clsDrawingAids.Helper.texto = clsDrawingAids.HelperTrabajo & (": Selecct cutting edges")
+        clsDrawingAids.Helper.texto = clsDrawingAids.HelperTrabajo & (": Select cutting edges")
 
         gcd.clsJobPrevious = Me
         gcd.clsJob = clsDefaultJob
@@ -71,56 +67,51 @@ End
 
 Public Function MouseDown(mouseX As Integer, mouseY As Integer)
 
-    Dim i As Integer, oTijera As Entity, v1, v2, flxIntersec As New Float[]
+    Dim i As Integer, eTijera As Entity, v1, v2, flxIntersec As New Float[]
 
+    Me.SelEndXr = appmain.hFcad.Xreal(mouseX)
+    Me.SelEndyr = appmain.hFcad.Yreal(mouseY)
     If Mouse.Left Then
 
-        If appmain.hFcad.iEntity[2] >= 0 Then                               ' hay una entidad para recortar
+        If appmain.hFcad.iEntity[3] >= 0 Then
 
-            Select Case appmain.hFcad.oEntity.Gender                  ' tengo que ver cada caso particular
+            Me.eRecortar = appmain.hFCAD.arrEntities[appmain.hFcad.iEntity[3]]
+            Select Case eRecortar.Gender
                 Case "Line"
-                    ' busco las tijeras
-                    For i = 0 To arrTijeras.Max
-                        'oTijera = appmain.hFCAD.arrEntities[arrTijeras[i]]
-                        recortar(appmain.hFCAD.oEntity, appmain.hFcad.iEntity[0], appmain.hFcad.iEntity[1], appmain.hFCAD.arrEntities[arrTijeras[i]])
-
-                    Next
+                    DoTrimLine
+                Case "Pline"
+                    DoTrimPline
             End Select
 
-            If appmain.hFcad.oEntity.selected Then
-                clsEntities.deSelectElem(appmain.hFcad.oEntity)             '   -> la deselecciono
-            Else
-                clsEntities.SelectElem(appmain.hFcad.oEntity)               '   -> la selecciono
-            Endif
             Me.Active = False
-            appmain.hFcad.regen
 
         Else
 
-            Me.SelStartX = mouseX
-            Me.SelStartY = mouseY
-            Me.SelStartXr = appmain.hFcad.Xreal(Me.SelStartX)
-            Me.SelStartYr = appmain.hFcad.Yreal(Me.SelStartY)
-
-            Me.SelEndX = Me.SelStartX
-            Me.SelEndy = Me.SelStartY
-
             Me.Active = True
         End If
-
     End If
 
 End
 
-Public Function MouseMove(mouseX As Integer, mouseY As Integer) ' esta rutina es llamada por FCAD en el evento DrawingArea_MouseMove
+Public Sub Draw() ' esta rutina es llamada por FCAD en el evento DrawingArea_Draw
+    ' por ultimo, y para que se vea arriba, la seleccion
 
     If Me.Active Then
-        Me.SelEndX = mouseX
-        Me.SelEndy = mouseY
-        Me.SelEndXr = appmain.hFcad.Xreal(Me.SelEndX)
-        Me.SelEndyr = appmain.hFcad.Yreal(Me.SelEndy)
 
-        appmain.hFCAD.redraw
+        If Me.SelStartX > Me.SelEndX Then                               ' Seleccion crossing, o sea que si cualquier arista del rectangulo cruza el bounding poligon, queda seleccionado
+
+            GLplus.Rectangle2D(Me.SelStartXr, Me.SelStartYr, Me.SelEndXr - Me.SelStartXr, Me.SelEndyr - Me.SelStartYr, Color.RGB(224, 220, 207, 215),,,, Color.red, 1, 1, 2)
+
+        Else                                                            ' seleccion full, todos los puntos deben estar adentro
+
+            GLplus.Rectangle2D(Me.SelStartXr, Me.SelStartYr, Me.SelEndXr - Me.SelStartXr, Me.SelEndyr - Me.SelStartYr, Color.RGB(224, 220, 207, 215),,,, Color.Green, 1, 1, 2)
+
+        End If
+    Else
+
+        ' gl.CallList(appmain.hFCAD.GlListSelectedEntities)
+        ' clsEntities.DrawPoiSymbolsAll
+
     End If
 
 End
@@ -144,11 +135,6 @@ Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' called by FCAD->
             End If
             If Me.SelStartY < Me.SelEndy Then Swap Me.SelStartY, Me.SelEndy                     ' this is FLIPPED
 
-            Dim tipo As String
-            tipo = "nueva"
-            If Mouse.Shift Then tipo = "resta" ' estos elementos de la seleccion anterior
-            If Mouse.Control Then tipo = "suma" ' elementos a la seleccion anterior
-
             ' Paso a coordenadas reales
             Me.SelStartXr = appmain.hFcad.Xreal(Me.SelStartX)
             Me.SelStartYr = appmain.hFcad.Yreal(Me.SelStartY)
@@ -158,7 +144,7 @@ Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' called by FCAD->
             ' veo si el rectangulo es suficientemente grande como para representar una seleccion por rectangulo
             If (Me.SelEndX - Me.SelStartX + (-Me.SelEndy + Me.SelStartY)) > 10 Then
 
-                Me.selectionCount = clsEntities.SelectionSquare(Me.SelStartXr, Me.SelStartYr, Me.SelEndXr, Me.SelEndyr, tipo, crossing)
+                Me.selectionCount = clsEntities.SelectionSquare(Me.SelStartXr, Me.SelStartYr, Me.SelEndXr, Me.SelEndyr,, crossing)
                 Appmain.hFCAD.regen
 
             End If
@@ -188,157 +174,828 @@ Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' called by FCAD->
 
 End
 
-'' Esta sub recorta una cosa con otra cosa
-Public Sub Recortar(oRecortar As Entity, Xcorte As Float, Ycorte As Float, oTijera As Entity)
+'' Esta sub recorta una cosa con otras cosas
+Public Sub DoTrimLine()
 
     Dim i, iii As Integer, v1, v2, flxIntersecMin, flxIntersec As New Float[], dIntersect, dIntersectMin As Float = 1e20
     Dim flxObjeto, flxTijera As Float[]
     Dim s1 As Integer
+    Dim Xcorte As Float
+    Dim eTijera, eNewPart As Entity
 
-    Select Case oTijera.Gender
-        Case "Line"             ' recorto linea con linea
-            If puntos.doIntersect(oRecortar.p[0], oRecortar.p[1], oRecortar.p[2], oRecortar.p[3], oTijera.p[0], oTijera.p[1], oTijera.p[2], oTijera.p[3]) Then
+    Dim C1x, C1y, C2x, C2y As Float ' candidatos al recorte, C1 es el que esta mas cerca de P01 y C2 de P23
+    Dim Ycorte As Float
 
-                ' obtengo el punto de interseccion
-                flxIntersec = puntos.lineLineIntersection([oRecortar.p[0], oRecortar.p[1]], [oRecortar.p[2], oRecortar.p[3]], [oTijera.p[0], oTijera.p[1]], [oTijera.p[2], oTijera.p[3]])
+    Xcorte = Me.SelEndXr
+    Ycorte = Me.SelEndyr
 
-                ' ahora veo cual es el lado a recortar
-                ' necesito encontrar los vectores, si van en direccion contraria, es el punto a recortar
-                '       P1------X--------------|----------------P2
-                '            click           tijera
+    ' debo encontrar los puntos de corte mas cercanos a cada lado del punto que esta sobre la entidad a recortar
+    C1x = eRecortar.p[0]
+    C1y = eRecortar.p[1]        ' inicialmente estan en los limites
+    C2x = eRecortar.p[2]
+    C2y = eRecortar.p[3]
 
-                v1.Add(oRecortar.p[0] - Xcorte)
-                v1.Add(oRecortar.p[1] - Ycorte)       ' click - P1
-
-                v2.Add(flxIntersec[0] - Xcorte)       ' cick - Tijera
-                v2.Add(flxIntersec[1] - Ycorte)
-
-                If Sgn(v1[0]) <> Sgn(v2[0]) Or Sgn(v1[1]) <> Sgn(v2[1]) Then ' van en sentido contrario
-
-                    ' intercambio P1 con Tijera
-                    oRecortar.p[0] = flxIntersec[0]
-                    oRecortar.p[1] = flxIntersec[1]
-
-                Else
-                    ' intercambio P2 con Tijera
-                    oRecortar.p[2] = flxIntersec[0]
-                    oRecortar.p[3] = flxIntersec[1]
-
-                End If
-
-            Endif
-        Case "PLine"
-            ' verifico cual punto de interseccion es el mas cercano
-            For i = 0 To oTijera.p.count - 4 Step 2         ' para todos los puntos de la polilinea
-                If puntos.doIntersect(oRecortar.p[0], oRecortar.p[1], oRecortar.p[2], oRecortar.p[3], oTijera.p[i + 0], oTijera.p[i + 1], oTijera.p[i + 2], oTijera.p[i + 3]) Then
+    For iii = 0 To Me.arrTijeras.Max
+        eTijera = appmain.hFCAD.arrEntities[iii]
+        Select Case eTijera.Gender
+            Case "Line"
+                If puntos.doIntersect(eRecortar.p[0], eRecortar.p[1], eRecortar.p[2], eRecortar.p[3], eTijera.p[0], eTijera.p[1], eTijera.p[2], eTijera.p[3]) Then
 
                     ' obtengo el punto de interseccion
-                    flxIntersec = puntos.lineLineIntersection([oRecortar.p[0], oRecortar.p[1]], [oRecortar.p[2], oRecortar.p[3]], [oTijera.p[i + 0], oTijera.p[i + 1]], [oTijera.p[i + 2], oTijera.p[i + 3]])
+                    flxIntersec = puntos.lineLineIntersection([eRecortar.p[0], eRecortar.p[1]], [eRecortar.p[2], eRecortar.p[3]], [eTijera.p[0], eTijera.p[1]], [eTijera.p[2], eTijera.p[3]])
 
-                    ' mido la distancia
+                    ' ahora veo cual es el lado a recortar
+                    ' necesito encontrar los vectores, si van en direccion contraria, es el punto a recortar
+                    '       P1------X--------------|----------------P2
+                    '            click           tijera
 
-                    dIntersect = puntos.distancia(Xcorte, Ycorte, flxIntersec[0], flxIntersec[1])
-                    If dIntersect < dIntersectMin Then
-                        dIntersectMin = dIntersect
-                        flxIntersecMin.Clear
-                        flxIntersecMin.Insert(flxIntersec)
+                    If puntos.distancia(eRecortar.p[0], eRecortar.p[1], Xcorte, Ycorte) > puntos.distancia(eRecortar.p[0], eRecortar.p[1], flxIntersec[0], flxIntersec[1]) Then
 
-                    Endif
-                End If
-            Next
-
-            If dIntersectMin < 1e19 Then ' enconte un punto y es el mas cercano al click
-
-                ' ahora veo cual es el lado a recortar
-                ' necesito encontrar los vectores, si van en direccion contraria, es el punto a recortar
-                '       P1------X--------------|----------------P2
-                '            click           tijera
-
-                v1.Add(oRecortar.p[0] - Xcorte)
-                v1.Add(oRecortar.p[1] - Ycorte)       ' click - P1
-
-                v2.Add(flxIntersecMin[0] - Xcorte)       ' cick - Tijera
-                v2.Add(flxIntersecMin[1] - Ycorte)
-
-                If Sgn(v1[0]) <> Sgn(v2[0]) Or Sgn(v1[1]) <> Sgn(v2[1]) Then ' van en sentido contrario
-
-                    ' intercambio P1 con Tijera
-                    oRecortar.p[0] = flxIntersecMin[0]
-                    oRecortar.p[1] = flxIntersecMin[1]
-
-                Else
-                    ' intercambio P2 con Tijera
-                    oRecortar.p[2] = flxIntersecMin[0]
-                    oRecortar.p[3] = flxIntersecMin[1]
-
-                End If
-            End If
-
-        Case "Arc", "Ellipse", "Text", "MText", "Circle"
-
-            ' en el caso general, la tijera es un poligono y la entidad a recortar, otro
-            ' yo tengo que encontrar , para cada cruce de la tijera y la entidad , la distancia (o mejor dicho recorrido)
-            ' entre el cruce y el click del usuario porque eso determina la parte a recortar
-
-            flxTijera = oTijera.Polygon
-            flxObjeto = oRecortar.Polygon
-
-            ' Paso 1: encontrar el cruce que esta mas cerca del click del user sobre la entidad a recortar
-            Do
-                ' arranco del segmento donde hice el click, el que busco de nuevo
-
-                s1 = puntos.inPolySegment(flxObjeto, Xcorte, Ycorte)
-
-                For i = 0 To flxObjeto.max Step 2
-                    If puntos.IsPoligonCrossingLine.doIntersect(flxObjeto[i], flxObjeto[i])
-
-                        ' For i = 0 To flxTijera.count - 4 Step 2
-                        '     If puntos.doIntersect(oRecortar.p[0], oRecortar.p[1], oRecortar.p[2], oRecortar.p[3], flxTijera[i + 0], flxTijera[i + 1], flxTijera[i + 2], flxTijera[i + 3]) Then
-                        '
-                        '         ' recorto la linea con otra linea
-                        '         ' obtengo el punto de interseccion
-                        '         flxIntersec = puntos.lineLineIntersection([oRecortar.p[0], oRecortar.p[1]], [oRecortar.p[2], oRecortar.p[3]], [flxTijera[i + 0], flxTijera[i + 1]], [flxTijera[i + 2], flxTijera[i + 3]])
-                        '
-                        '         ' ahora veo cual es el lado a recortar
-                        '         ' necesito encontrar los vectores, si van en direccion contraria, es el punto a recortar
-                        '         '       P1------X--------------|----------------P2
-                        '         '            click           tijera
-                        '
-                        '         v1.Add(oRecortar.p[0] - Xcorte)
-                        '         v1.Add(oRecortar.p[1] - Ycorte)       ' click - P1
-                        '
-                        '         v2.Add(flxIntersec[0] - Xcorte)       ' cick - Tijera
-                        '         v2.Add(flxIntersec[1] - Ycorte)
-                        '
-                        '         If Sgn(v1[0]) <> Sgn(v2[0]) Or Sgn(v1[1]) <> Sgn(v2[1]) Then ' van en sentido contrario
-                        '
-                        '             ' intercambio P1 con Tijera
-                        '             oRecortar.p[0] = flxIntersec[0]
-                        '             oRecortar.p[1] = flxIntersec[1]
-                        '
-                        '         Else
-                        '             ' intercambio P2 con Tijera
-                        '             oRecortar.p[2] = flxIntersec[0]
-                        '             oRecortar.p[3] = flxIntersec[1]
-                        '
-                        '         End If
+                        ' el punto encontrado esta a la izq del click, entonces lo asignamos a C1, pero solo si es mas cercano
+                        If puntos.distancia(Xcorte, Ycorte, flxIntersec[0], flxIntersec[1]) < puntos.distancia(C1x, C1y, Xcorte, Ycorte) Then
+                            C1x = flxIntersec[0]
+                            C1y = flxIntersec[1]
+                        End If
 
                     Endif
+
+                    ' lo mismo para P23
+                    If puntos.distancia(eRecortar.p[2], eRecortar.p[3], Xcorte, Ycorte) > puntos.distancia(eRecortar.p[2], eRecortar.p[3], flxIntersec[0], flxIntersec[1]) Then
+
+                        ' el punto encontrado esta a la derecha del click, entonces lo asignamos a C2, pero solo si es mas cercano
+                        If puntos.distancia(Xcorte, Ycorte, flxIntersec[0], flxIntersec[1]) < puntos.distancia(C2x, C2y, Xcorte, Ycorte) Then
+                            C2x = flxIntersec[0]
+                            C2y = flxIntersec[1]
+                        End If
+
+                    Endif
+
+                Endif
+            Case "PLine"
+
+                For i = 0 To eTijera.p.count - 4 Step 2         ' Idem linea, pero  para todos los tramos de la polilinea
+
+                    If puntos.doIntersect(eRecortar.p[0], eRecortar.p[1], eRecortar.p[2], eRecortar.p[3], eTijera.p[i + 0], eTijera.p[i + 1], eTijera.p[i + 2], eTijera.p[i + 3]) Then
+
+                        ' obtengo el punto de interseccion
+                        flxIntersec = puntos.lineLineIntersection([eRecortar.p[0], eRecortar.p[1]], [eRecortar.p[2], eRecortar.p[3]], [eTijera.p[i + 0], eTijera.p[i + 1]], [eTijera.p[i + 2], eTijera.p[i + 3]])
+
+                        If puntos.distancia(eRecortar.p[0], eRecortar.p[1], Xcorte, Ycorte) > puntos.distancia(eRecortar.p[0], eRecortar.p[1], flxIntersec[0], flxIntersec[1]) Then
+
+                            ' el punto encontrado esta a la izq del click, entonces lo asignamos a C1, pero solo si es mas cercano
+                            If puntos.distancia(Xcorte, Ycorte, flxIntersec[0], flxIntersec[1]) < puntos.distancia(C1x, C1y, Xcorte, Ycorte) Then
+                                C1x = flxIntersec[0]
+                                C1y = flxIntersec[1]
+                            End If
+
+                        Endif
+
+                        ' lo mismo para P23
+                        If puntos.distancia(eRecortar.p[2], eRecortar.p[3], Xcorte, Ycorte) > puntos.distancia(eRecortar.p[2], eRecortar.p[3], flxIntersec[0], flxIntersec[1]) Then
+
+                            ' el punto encontrado esta a la derecha del click, entonces lo asignamos a C2, pero solo si es mas cercano
+                            If puntos.distancia(Xcorte, Ycorte, flxIntersec[0], flxIntersec[1]) < puntos.distancia(C2x, C2y, Xcorte, Ycorte) Then
+                                C2x = flxIntersec[0]
+                                C2y = flxIntersec[1]
+                            End If
+
+                        Endif
+
+                    Endif
+
                 Next
 
-            Loop
-    End Select
+            Case "Text", "MText"
+
+                For i = 0 To eTijera.Polygon.count - 4 Step 2         ' Idem linea, pero  para todos los tramos de la polilinea
+
+                    If puntos.doIntersect(eRecortar.p[0], eRecortar.p[1], eRecortar.p[2], eRecortar.p[3], eTijera.polygon[i + 0], eTijera.polygon[i + 1], eTijera.polygon[i + 2], eTijera.polygon[i + 3]) Then
+
+                        ' obtengo el punto de interseccion
+                        flxIntersec = puntos.lineLineIntersection([eRecortar.p[0], eRecortar.p[1]], [eRecortar.p[2], eRecortar.p[3]], [eTijera.polygon[i + 0], eTijera.polygon[i + 1]], [eTijera.polygon[i + 2], eTijera.polygon[i + 3]])
+
+                        If puntos.distancia(eRecortar.p[0], eRecortar.p[1], Xcorte, Ycorte) > puntos.distancia(eRecortar.p[0], eRecortar.p[1], flxIntersec[0], flxIntersec[1]) Then
+
+                            ' el punto encontrado esta a la izq del click, entonces lo asignamos a C1, pero solo si es mas cercano
+                            If puntos.distancia(Xcorte, Ycorte, flxIntersec[0], flxIntersec[1]) < puntos.distancia(C1x, C1y, Xcorte, Ycorte) Then
+                                C1x = flxIntersec[0]
+                                C1y = flxIntersec[1]
+                            End If
+
+                        Endif
+
+                        ' lo mismo para P23
+                        If puntos.distancia(eRecortar.p[2], eRecortar.p[3], Xcorte, Ycorte) > puntos.distancia(eRecortar.p[2], eRecortar.p[3], flxIntersec[0], flxIntersec[1]) Then
+
+                            ' el punto encontrado esta a la derecha del click, entonces lo asignamos a C2, pero solo si es mas cercano
+                            If puntos.distancia(Xcorte, Ycorte, flxIntersec[0], flxIntersec[1]) < puntos.distancia(C2x, C2y, Xcorte, Ycorte) Then
+                                C2x = flxIntersec[0]
+                                C2y = flxIntersec[1]
+                            End If
+
+                        Endif
+
+                    Endif
+
+                Next
+            Case "Arc", "Ellipse", "Circle"
+
+                For i = 0 To eTijera.polyline.count - 4 Step 2         ' Idem linea, pero  para todos los tramos de la polilinea
+
+                    If puntos.doIntersect(eRecortar.p[0], eRecortar.p[1], eRecortar.p[2], eRecortar.p[3], eTijera.polyline[i + 0], eTijera.polyline[i + 1], eTijera.polyline[i + 2], eTijera.polyline[i + 3]) Then
+
+                        ' obtengo el punto de interseccion
+                        flxIntersec = puntos.lineLineIntersection([eRecortar.p[0], eRecortar.p[1]], [eRecortar.p[2], eRecortar.p[3]], [eTijera.polyline[i + 0], eTijera.polyline[i + 1]], [eTijera.polyline[i + 2], eTijera.polyline[i + 3]])
+
+                        If puntos.distancia(eRecortar.p[0], eRecortar.p[1], Xcorte, Ycorte) > puntos.distancia(eRecortar.p[0], eRecortar.p[1], flxIntersec[0], flxIntersec[1]) Then
+
+                            ' el punto encontrado esta a la izq del click, entonces lo asignamos a C1, pero solo si es mas cercano
+                            If puntos.distancia(Xcorte, Ycorte, flxIntersec[0], flxIntersec[1]) < puntos.distancia(C1x, C1y, Xcorte, Ycorte) Then
+                                C1x = flxIntersec[0]
+                                C1y = flxIntersec[1]
+                            End If
+
+                        Endif
+
+                        ' lo mismo para P23
+                        If puntos.distancia(eRecortar.p[2], eRecortar.p[3], Xcorte, Ycorte) > puntos.distancia(eRecortar.p[2], eRecortar.p[3], flxIntersec[0], flxIntersec[1]) Then
+
+                            ' el punto encontrado esta a la derecha del click, entonces lo asignamos a C2, pero solo si es mas cercano
+                            If puntos.distancia(Xcorte, Ycorte, flxIntersec[0], flxIntersec[1]) < puntos.distancia(C2x, C2y, Xcorte, Ycorte) Then
+                                C2x = flxIntersec[0]
+                                C2y = flxIntersec[1]
+                            End If
+
+                        Endif
+
+                    Endif
+
+                Next
+        End Select
+    Next
+    ' termine la busqueda de puntos de recorte
+    'ahora recorto la entidad
+    ' primer o determino si debo partir la entidad o si solo se recorta
+    If (eRecortar.p[0] = C1x) And (eRecortar.p[1] = C1y) And (eRecortar.p[2] = C2x) And (eRecortar.p[3] = C2y) Then
+        ' este entidad no sera recortada
+
+    Else If (eRecortar.p[0] = C1x) And (eRecortar.p[1] = C1y) Then ' elimino el tramo P01 - C2
+
+        eRecortar.p[0] = C2x
+        eRecortar.p[1] = C2y
+
+    Else If (eRecortar.p[2] = C2x) And (eRecortar.p[3] = C2y) Then ' elimino el tramo p23 - C1
+
+        eRecortar.p[2] = C1x
+        eRecortar.p[3] = C1y
+
+    Else ' se parte en dos la entidad
+
+        eNewPart = clsEntities.ClonEntity(eRecortar)          ' primero la clono
+        eNewPart.p[0] = C2x
+        eNewPart.p[1] = C2y
+
+        ' tareas finales en las entidades
+        eNewPart.ClassHandler.finish(eNewPart)
+        appmain.hFCAD.arrEntities.Add(eNewPart)                ' la agrego al dibujo
+
+        eRecortar.p[2] = C1x
+        eRecortar.p[3] = C1y
+        eRecortar.ClassHandler.finish(eRecortar)                ' para regenerar los POI
+
+        ' regenro las listas openGL de ambas entidades
+        'clsEntities.glGenDrawList(appmain.hFcad.iEntity[3])
+        'clsEntities.glGenDrawList(appmain.hFCAD.arrEntities.max)
+        'clsEntities.glGenDrawListAll
+        gcd.Regen
+    End If
 
 End
 
-Public Sub Finish()
+'' Esta sub recorta una cosa con otras cosas
+Public Sub DoTrimPline()
 
-    gcd.clsJobPrevious = Me
-    gcd.clsJob = clsDefaultJob
-    clsDrawingAids.CleanTexts
-    clsEntities.DeSelection()
-    appmain.hFCAD.Regen
-    Me.Active = False
-    gcd.ToolActive = False
+    Dim i, iii As Integer, v1, v2, flxIntersecMin, flxIntersec As New Float[], dIntersect, dIntersectMin As Float = 1e20
+    Dim flxObjeto, flxTijera As Float[]
+    Dim s1 As Integer
+    Dim Xcorte As Float
+    Dim eTijera, eNewPart As Entity
+
+    Dim C1x, C1y, C2x, C2y As Float ' candidatos al recorte, C1 es el que esta mas cerca de P01 y C2 de P23
+    Dim TramoC1, TramoC2 As Integer ' tramos donde estan los puntos para recortar
+    Dim T1x, T1y, T2x, T2y As Float ' puntos del tramo en cuestion
+    Dim Ycorte As Float
+    Dim TramoCorte, t, tramo As Integer
+
+    Xcorte = Me.SelEndXr
+    Ycorte = Me.SelEndyr
+
+    ' necesito encontrar el tramo donde esta el punto
+    TramoCorte = puntos.inPolySegment(eRecortar.p, Xcorte, Ycorte)
+
+    ' debo encontrar los puntos de corte mas cercanos a cada lado del punto que esta sobre la entidad a recortar
+    C1x = eRecortar.p[0]
+    C1y = eRecortar.p[1]        ' inicialmente estan en los limites
+    C2x = eRecortar.p[eRecortar.p.Max - 1]
+    C2y = eRecortar.p[eRecortar.p.Max]
+
+    TramoC1 = 0                         ' y los tramos en el primero y el ultimo
+    TramoC2 = eRecortar.p.Count / 2
+
+    For t = 0 To eRecortar.p.count - 4 Step 2         ' Idem linea, pero  para todos los tramos de la polilinea
+        Tramo = t / 2
+        T1x = eRecortar.p[t + 0]
+        T1y = eRecortar.p[t + 1]
+        T2x = eRecortar.p[t + 2]
+        T2y = eRecortar.p[t + 3]
+
+        For iii = 0 To Me.arrTijeras.Max
+            eTijera = appmain.hFCAD.arrEntities[iii]
+            Select Case eTijera.Gender
+                Case "Line"
+                    If puntos.doIntersect(T1x, T1y, T2x, T2y, eTijera.p[0], eTijera.p[1], eTijera.p[2], eTijera.p[3]) Then
+
+                        ' obtengo el punto de interseccion
+                        flxIntersec = puntos.lineLineIntersection([T1x, T1y], [T2x, T2y], [eTijera.p[0], eTijera.p[1]], [eTijera.p[2], eTijera.p[3]])
+
+                        ' ahora veo cual es el lado a recortar
+                        ' necesito encontrar los vectores, si van en direccion contraria, es el punto a recortar
+                        '       P1------X--------------|----------------P2
+                        '            click           tijera
+
+                        If puntos.distancia(T1x, T1y, Xcorte, Ycorte) > puntos.distancia(T1x, T1y, flxIntersec[0], flxIntersec[1]) Then
+
+                            ' el punto encontrado esta a la izq del click, entonces lo asignamos a C1, pero solo si es mas cercano
+                            If puntos.distancia(Xcorte, Ycorte, flxIntersec[0], flxIntersec[1]) < puntos.distancia(C1x, C1y, Xcorte, Ycorte) Then
+                                C1x = flxIntersec[0]
+                                C1y = flxIntersec[1]
+                            End If
+
+                        Endif
+
+                        ' lo mismo para P23
+                        If puntos.distancia(T2x, T2y, Xcorte, Ycorte) > puntos.distancia(T2x, T2y, flxIntersec[0], flxIntersec[1]) Then
+
+                            ' el punto encontrado esta a la derecha del click, entonces lo asignamos a C2, pero solo si es mas cercano
+                            If puntos.distancia(Xcorte, Ycorte, flxIntersec[0], flxIntersec[1]) < puntos.distancia(C2x, C2y, Xcorte, Ycorte) Then
+                                C2x = flxIntersec[0]
+                                C2y = flxIntersec[1]
+                            End If
+
+                        Endif
+
+                    Endif
+                Case "PLine"
+
+                    For i = 0 To eTijera.p.count - 4 Step 2         ' Idem linea, pero  para todos los tramos de la polilinea
+
+                        If puntos.doIntersect(T1x, T1y, T2x, T2y, eTijera.p[i + 0], eTijera.p[i + 1], eTijera.p[i + 2], eTijera.p[i + 3]) Then
+
+                            ' obtengo el punto de interseccion
+                            flxIntersec = puntos.lineLineIntersection([T1x, T1y], [T2x, T2y], [eTijera.p[i + 0], eTijera.p[i + 1]], [eTijera.p[i + 2], eTijera.p[i + 3]])
+
+                            If puntos.distancia(T1x, T1y, Xcorte, Ycorte) > puntos.distancia(T1x, T1y, flxIntersec[0], flxIntersec[1]) Then
+
+                                ' el punto encontrado esta a la izq del click, entonces lo asignamos a C1, pero solo si es mas cercano
+                                If puntos.distancia(Xcorte, Ycorte, flxIntersec[0], flxIntersec[1]) < puntos.distancia(C1x, C1y, Xcorte, Ycorte) Then
+                                    C1x = flxIntersec[0]
+                                    C1y = flxIntersec[1]
+                                End If
+
+                            Endif
+
+                            ' lo mismo para P23
+                            If puntos.distancia(T2x, T2y, Xcorte, Ycorte) > puntos.distancia(T2x, T2y, flxIntersec[0], flxIntersec[1]) Then
+
+                                ' el punto encontrado esta a la derecha del click, entonces lo asignamos a C2, pero solo si es mas cercano
+                                If puntos.distancia(Xcorte, Ycorte, flxIntersec[0], flxIntersec[1]) < puntos.distancia(C2x, C2y, Xcorte, Ycorte) Then
+                                    C2x = flxIntersec[0]
+                                    C2y = flxIntersec[1]
+                                End If
+
+                            Endif
+
+                        Endif
+
+                    Next
+
+                Case "Text", "MText"
+
+                    For i = 0 To eTijera.Polygon.count - 4 Step 2         ' Idem linea, pero  para todos los tramos de la polilinea
+
+                        If puntos.doIntersect(T1x, T1y, T2x, T2y, eTijera.polygon[i + 0], eTijera.polygon[i + 1], eTijera.polygon[i + 2], eTijera.polygon[i + 3]) Then
+
+                            ' obtengo el punto de interseccion
+                            flxIntersec = puntos.lineLineIntersection([T1x, T1y], [T2x, T2y], [eTijera.polygon[i + 0], eTijera.polygon[i + 1]], [eTijera.polygon[i + 2], eTijera.polygon[i + 3]])
+
+                            If puntos.distancia(T1x, T1y, Xcorte, Ycorte) > puntos.distancia(T1x, T1y, flxIntersec[0], flxIntersec[1]) Then
+
+                                ' el punto encontrado esta a la izq del click, entonces lo asignamos a C1, pero solo si es mas cercano
+                                If puntos.distancia(Xcorte, Ycorte, flxIntersec[0], flxIntersec[1]) < puntos.distancia(C1x, C1y, Xcorte, Ycorte) Then
+                                    C1x = flxIntersec[0]
+                                    C1y = flxIntersec[1]
+                                End If
+
+                            Endif
+
+                            ' lo mismo para P23
+                            If puntos.distancia(T2x, T2y, Xcorte, Ycorte) > puntos.distancia(T2x, T2y, flxIntersec[0], flxIntersec[1]) Then
+
+                                ' el punto encontrado esta a la derecha del click, entonces lo asignamos a C2, pero solo si es mas cercano
+                                If puntos.distancia(Xcorte, Ycorte, flxIntersec[0], flxIntersec[1]) < puntos.distancia(C2x, C2y, Xcorte, Ycorte) Then
+                                    C2x = flxIntersec[0]
+                                    C2y = flxIntersec[1]
+                                End If
+
+                            Endif
+
+                        Endif
+
+                    Next
+                Case "Arc", "Ellipse", "Circle"
+
+                    For i = 0 To eTijera.polyline.count - 4 Step 2         ' Idem linea, pero  para todos los tramos de la polilinea
+
+                        If puntos.doIntersect(T1x, T1y, T2x, T2y, eTijera.polyline[i + 0], eTijera.polyline[i + 1], eTijera.polyline[i + 2], eTijera.polyline[i + 3]) Then
+
+                            ' obtengo el punto de interseccion
+                            flxIntersec = puntos.lineLineIntersection([T1x, T1y], [T2x, T2y], [eTijera.polyline[i + 0], eTijera.polyline[i + 1]], [eTijera.polyline[i + 2], eTijera.polyline[i + 3]])
+
+                            If puntos.distancia(T1x, T1y, Xcorte, Ycorte) > puntos.distancia(T1x, T1y, flxIntersec[0], flxIntersec[1]) Then
+
+                                ' el punto encontrado esta a la izq del click, entonces lo asignamos a C1, pero solo si es mas cercano
+                                If puntos.distancia(Xcorte, Ycorte, flxIntersec[0], flxIntersec[1]) < puntos.distancia(C1x, C1y, Xcorte, Ycorte) Then
+                                    C1x = flxIntersec[0]
+                                    C1y = flxIntersec[1]
+                                End If
+
+                            Endif
+
+                            ' lo mismo para P23
+                            If puntos.distancia(T2x, T2y, Xcorte, Ycorte) > puntos.distancia(T2x, T2y, flxIntersec[0], flxIntersec[1]) Then
+
+                                ' el punto encontrado esta a la derecha del click, entonces lo asignamos a C2, pero solo si es mas cercano
+                                If puntos.distancia(Xcorte, Ycorte, flxIntersec[0], flxIntersec[1]) < puntos.distancia(C2x, C2y, Xcorte, Ycorte) Then
+                                    C2x = flxIntersec[0]
+                                    C2y = flxIntersec[1]
+                                End If
+
+                            Endif
+
+                        Endif
+
+                    Next
+            End Select
+        Next
+        ' termine la busqueda de puntos de recorte
+        'ahora recorto la entidad
+        ' primer o determino si debo partir la entidad o si solo se recorta
+        If (T1x = C1x) And (T1y = C1y) And (T2x = C2x) And (T2y = C2y) Then
+            ' este entidad no sera recortada
+
+        Else If (T1x = C1x) And (T1y = C1y) Then ' elimino el tramo P01 - C2
+
+            T1x = C2x
+            T1y = C2y
+
+        Else If (T2x = C2x) And (T2y = C2y) Then ' elimino el tramo p23 - C1
+
+            T2x = C1x
+            T2y = C1y
+
+        Else ' se parte en dos la entidad
+
+            eNewPart = clsEntities.ClonEntity(eRecortar)          ' primero la clono
+            eNewPart.p[0] = C2x
+            eNewPart.p[1] = C2y
+
+            ' tareas finales en las entidades
+            eNewPart.ClassHandler.finish(eNewPart)
+            appmain.hFCAD.arrEntities.Add(eNewPart)                ' la agrego al dibujo
+
+            T2x = C1x
+            T2y = C1y
+            eRecortar.ClassHandler.finish(eRecortar)                ' para regenerar los POI
+
+            ' regenro las listas openGL de ambas entidades
+            'clsEntities.glGenDrawList(appmain.hFcad.iEntity[3])
+            'clsEntities.glGenDrawList(appmain.hFCAD.arrEntities.max)
+            'clsEntities.glGenDrawListAll
+            gcd.Regen
+        End If
+    Next
+
+End
+
+'' Esta sub recorta una cosa con otras cosas
+Public Sub DoTrimCircle()
+
+    Dim i, iii As Integer, v1, v2, flxIntersecMin, flxIntersec As New Float[], dIntersect, dIntersectMin As Float = 1e20
+    Dim flxObjeto, flxTijera As Float[]
+    Dim s1 As Integer
+    Dim Xcorte As Float
+    Dim eTijera, eNewPart As Entity
+
+    Dim C1x, C1y, C2x, C2y As Float ' candidatos al recorte, C1 es el que esta mas cerca de P01 y C2 de P23
+    Dim TramoC1, TramoC2 As Integer ' tramos donde estan los puntos para recortar
+    Dim T1x, T1y, T2x, T2y As Float ' puntos del tramo en cuestion
+    Dim Ycorte As Float
+    Dim TramoCorte, t, tramo As Integer
+
+    Xcorte = Me.SelEndXr
+    Ycorte = Me.SelEndyr
+
+    ' necesito encontrar el tramo donde esta el punto
+    TramoCorte = puntos.inPolySegment(eRecortar.p, Xcorte, Ycorte)
+
+    ' debo encontrar los puntos de corte mas cercanos a cada lado del punto que esta sobre la entidad a recortar
+    C1x = eRecortar.p[0]
+    C1y = eRecortar.p[1]        ' inicialmente estan en los limites
+    C2x = eRecortar.p[eRecortar.p.Max - 1]
+    C2y = eRecortar.p[eRecortar.p.Max]
+
+    TramoC1 = 0                         ' y los tramos en el primero y el ultimo
+    TramoC2 = eRecortar.p.Count / 2
+
+    For t = 0 To eRecortar.p.count - 4 Step 2         ' Idem linea, pero  para todos los tramos de la polilinea
+        Tramo = t / 2
+        T1x = eRecortar.p[t + 0]
+        T1y = eRecortar.p[t + 1]
+        T2x = eRecortar.p[t + 2]
+        T2y = eRecortar.p[t + 3]
+
+        For iii = 0 To Me.arrTijeras.Max
+            eTijera = appmain.hFCAD.arrEntities[iii]
+            Select Case eTijera.Gender
+                Case "Line"
+                    If puntos.doIntersect(T1x, T1y, T2x, T2y, eTijera.p[0], eTijera.p[1], eTijera.p[2], eTijera.p[3]) Then
+
+                        ' obtengo el punto de interseccion
+                        flxIntersec = puntos.lineLineIntersection([T1x, T1y], [T2x, T2y], [eTijera.p[0], eTijera.p[1]], [eTijera.p[2], eTijera.p[3]])
+
+                        ' ahora veo cual es el lado a recortar
+                        ' necesito encontrar los vectores, si van en direccion contraria, es el punto a recortar
+                        '       P1------X--------------|----------------P2
+                        '            click           tijera
+
+                        If puntos.distancia(T1x, T1y, Xcorte, Ycorte) > puntos.distancia(T1x, T1y, flxIntersec[0], flxIntersec[1]) Then
+
+                            ' el punto encontrado esta a la izq del click, entonces lo asignamos a C1, pero solo si es mas cercano
+                            If puntos.distancia(Xcorte, Ycorte, flxIntersec[0], flxIntersec[1]) < puntos.distancia(C1x, C1y, Xcorte, Ycorte) Then
+                                C1x = flxIntersec[0]
+                                C1y = flxIntersec[1]
+                            End If
+
+                        Endif
+
+                        ' lo mismo para P23
+                        If puntos.distancia(T2x, T2y, Xcorte, Ycorte) > puntos.distancia(T2x, T2y, flxIntersec[0], flxIntersec[1]) Then
+
+                            ' el punto encontrado esta a la derecha del click, entonces lo asignamos a C2, pero solo si es mas cercano
+                            If puntos.distancia(Xcorte, Ycorte, flxIntersec[0], flxIntersec[1]) < puntos.distancia(C2x, C2y, Xcorte, Ycorte) Then
+                                C2x = flxIntersec[0]
+                                C2y = flxIntersec[1]
+                            End If
+
+                        Endif
+
+                    Endif
+                Case "PLine"
+
+                    For i = 0 To eTijera.p.count - 4 Step 2         ' Idem linea, pero  para todos los tramos de la polilinea
+
+                        If puntos.doIntersect(T1x, T1y, T2x, T2y, eTijera.p[i + 0], eTijera.p[i + 1], eTijera.p[i + 2], eTijera.p[i + 3]) Then
+
+                            ' obtengo el punto de interseccion
+                            flxIntersec = puntos.lineLineIntersection([T1x, T1y], [T2x, T2y], [eTijera.p[i + 0], eTijera.p[i + 1]], [eTijera.p[i + 2], eTijera.p[i + 3]])
+
+                            If puntos.distancia(T1x, T1y, Xcorte, Ycorte) > puntos.distancia(T1x, T1y, flxIntersec[0], flxIntersec[1]) Then
+
+                                ' el punto encontrado esta a la izq del click, entonces lo asignamos a C1, pero solo si es mas cercano
+                                If puntos.distancia(Xcorte, Ycorte, flxIntersec[0], flxIntersec[1]) < puntos.distancia(C1x, C1y, Xcorte, Ycorte) Then
+                                    C1x = flxIntersec[0]
+                                    C1y = flxIntersec[1]
+                                End If
+
+                            Endif
+
+                            ' lo mismo para P23
+                            If puntos.distancia(T2x, T2y, Xcorte, Ycorte) > puntos.distancia(T2x, T2y, flxIntersec[0], flxIntersec[1]) Then
+
+                                ' el punto encontrado esta a la derecha del click, entonces lo asignamos a C2, pero solo si es mas cercano
+                                If puntos.distancia(Xcorte, Ycorte, flxIntersec[0], flxIntersec[1]) < puntos.distancia(C2x, C2y, Xcorte, Ycorte) Then
+                                    C2x = flxIntersec[0]
+                                    C2y = flxIntersec[1]
+                                End If
+
+                            Endif
+
+                        Endif
+
+                    Next
+
+                Case "Text", "MText"
+
+                    For i = 0 To eTijera.Polygon.count - 4 Step 2         ' Idem linea, pero  para todos los tramos de la polilinea
+
+                        If puntos.doIntersect(T1x, T1y, T2x, T2y, eTijera.polygon[i + 0], eTijera.polygon[i + 1], eTijera.polygon[i + 2], eTijera.polygon[i + 3]) Then
+
+                            ' obtengo el punto de interseccion
+                            flxIntersec = puntos.lineLineIntersection([T1x, T1y], [T2x, T2y], [eTijera.polygon[i + 0], eTijera.polygon[i + 1]], [eTijera.polygon[i + 2], eTijera.polygon[i + 3]])
+
+                            If puntos.distancia(T1x, T1y, Xcorte, Ycorte) > puntos.distancia(T1x, T1y, flxIntersec[0], flxIntersec[1]) Then
+
+                                ' el punto encontrado esta a la izq del click, entonces lo asignamos a C1, pero solo si es mas cercano
+                                If puntos.distancia(Xcorte, Ycorte, flxIntersec[0], flxIntersec[1]) < puntos.distancia(C1x, C1y, Xcorte, Ycorte) Then
+                                    C1x = flxIntersec[0]
+                                    C1y = flxIntersec[1]
+                                End If
+
+                            Endif
+
+                            ' lo mismo para P23
+                            If puntos.distancia(T2x, T2y, Xcorte, Ycorte) > puntos.distancia(T2x, T2y, flxIntersec[0], flxIntersec[1]) Then
+
+                                ' el punto encontrado esta a la derecha del click, entonces lo asignamos a C2, pero solo si es mas cercano
+                                If puntos.distancia(Xcorte, Ycorte, flxIntersec[0], flxIntersec[1]) < puntos.distancia(C2x, C2y, Xcorte, Ycorte) Then
+                                    C2x = flxIntersec[0]
+                                    C2y = flxIntersec[1]
+                                End If
+
+                            Endif
+
+                        Endif
+
+                    Next
+                Case "Arc", "Ellipse", "Circle"
+
+                    For i = 0 To eTijera.polyline.count - 4 Step 2         ' Idem linea, pero  para todos los tramos de la polilinea
+
+                        If puntos.doIntersect(T1x, T1y, T2x, T2y, eTijera.polyline[i + 0], eTijera.polyline[i + 1], eTijera.polyline[i + 2], eTijera.polyline[i + 3]) Then
+
+                            ' obtengo el punto de interseccion
+                            flxIntersec = puntos.lineLineIntersection([T1x, T1y], [T2x, T2y], [eTijera.polyline[i + 0], eTijera.polyline[i + 1]], [eTijera.polyline[i + 2], eTijera.polyline[i + 3]])
+
+                            If puntos.distancia(T1x, T1y, Xcorte, Ycorte) > puntos.distancia(T1x, T1y, flxIntersec[0], flxIntersec[1]) Then
+
+                                ' el punto encontrado esta a la izq del click, entonces lo asignamos a C1, pero solo si es mas cercano
+                                If puntos.distancia(Xcorte, Ycorte, flxIntersec[0], flxIntersec[1]) < puntos.distancia(C1x, C1y, Xcorte, Ycorte) Then
+                                    C1x = flxIntersec[0]
+                                    C1y = flxIntersec[1]
+                                End If
+
+                            Endif
+
+                            ' lo mismo para P23
+                            If puntos.distancia(T2x, T2y, Xcorte, Ycorte) > puntos.distancia(T2x, T2y, flxIntersec[0], flxIntersec[1]) Then
+
+                                ' el punto encontrado esta a la derecha del click, entonces lo asignamos a C2, pero solo si es mas cercano
+                                If puntos.distancia(Xcorte, Ycorte, flxIntersec[0], flxIntersec[1]) < puntos.distancia(C2x, C2y, Xcorte, Ycorte) Then
+                                    C2x = flxIntersec[0]
+                                    C2y = flxIntersec[1]
+                                End If
+
+                            Endif
+
+                        Endif
+
+                    Next
+            End Select
+        Next
+        ' termine la busqueda de puntos de recorte
+        'ahora recorto la entidad
+        ' primer o determino si debo partir la entidad o si solo se recorta
+        If (T1x = C1x) And (T1y = C1y) And (T2x = C2x) And (T2y = C2y) Then
+            ' este entidad no sera recortada
+
+        Else If (T1x = C1x) And (T1y = C1y) Then ' elimino el tramo P01 - C2
+
+            T1x = C2x
+            T1y = C2y
+
+        Else If (T2x = C2x) And (T2y = C2y) Then ' elimino el tramo p23 - C1
+
+            T2x = C1x
+            T2y = C1y
+
+        Else ' se parte en dos la entidad
+
+            eNewPart = clsEntities.ClonEntity(eRecortar)          ' primero la clono
+            eNewPart.p[0] = C2x
+            eNewPart.p[1] = C2y
+
+            ' tareas finales en las entidades
+            eNewPart.ClassHandler.finish(eNewPart)
+            appmain.hFCAD.arrEntities.Add(eNewPart)                ' la agrego al dibujo
+
+            T2x = C1x
+            T2y = C1y
+            eRecortar.ClassHandler.finish(eRecortar)                ' para regenerar los POI
+
+            ' regenro las listas openGL de ambas entidades
+            'clsEntities.glGenDrawList(appmain.hFcad.iEntity[3])
+            'clsEntities.glGenDrawList(appmain.hFCAD.arrEntities.max)
+            'clsEntities.glGenDrawListAll
+            gcd.Regen
+        End If
+    Next
+
+End
+
+'' Esta sub recorta una cosa con otras cosas
+Public Sub DoTrimArc()
+
+    Dim i, iii As Integer, v1, v2, flxIntersecMin, flxIntersec As New Float[], dIntersect, dIntersectMin As Float = 1e20
+    Dim flxObjeto, flxTijera As Float[]
+    Dim s1 As Integer
+    Dim Xcorte As Float
+    Dim eTijera, eNewPart As Entity
+
+    Dim C1x, C1y, C2x, C2y As Float ' candidatos al recorte, C1 es el que esta mas cerca de P01 y C2 de P23
+    Dim Ycorte As Float
+
+    Xcorte = Me.SelEndXr
+    Ycorte = Me.SelEndyr
+
+    ' debo encontrar los puntos de corte mas cercanos a cada lado del punto que esta sobre la entidad a recortar
+    C1x = eRecortar.p[0]
+    C1y = eRecortar.p[1]        ' inicialmente estan en los limites
+    C2x = eRecortar.p[2]
+    C2y = eRecortar.p[3]
+
+    For iii = 0 To Me.arrTijeras.Max
+        eTijera = appmain.hFCAD.arrEntities[iii]
+        Select Case eTijera.Gender
+            Case "Line"
+                If puntos.doIntersect(eRecortar.p[0], eRecortar.p[1], eRecortar.p[2], eRecortar.p[3], eTijera.p[0], eTijera.p[1], eTijera.p[2], eTijera.p[3]) Then
+
+                    ' obtengo el punto de interseccion
+                    flxIntersec = puntos.lineLineIntersection([eRecortar.p[0], eRecortar.p[1]], [eRecortar.p[2], eRecortar.p[3]], [eTijera.p[0], eTijera.p[1]], [eTijera.p[2], eTijera.p[3]])
+
+                    ' ahora veo cual es el lado a recortar
+                    ' necesito encontrar los vectores, si van en direccion contraria, es el punto a recortar
+                    '       P1------X--------------|----------------P2
+                    '            click           tijera
+
+                    If puntos.distancia(eRecortar.p[0], eRecortar.p[1], Xcorte, Ycorte) > puntos.distancia(eRecortar.p[0], eRecortar.p[1], flxIntersec[0], flxIntersec[1]) Then
+
+                        ' el punto encontrado esta a la izq del click, entonces lo asignamos a C1, pero solo si es mas cercano
+                        If puntos.distancia(Xcorte, Ycorte, flxIntersec[0], flxIntersec[1]) < puntos.distancia(C1x, C1y, Xcorte, Ycorte) Then
+                            C1x = flxIntersec[0]
+                            C1y = flxIntersec[1]
+                        End If
+
+                    Endif
+
+                    ' lo mismo para P23
+                    If puntos.distancia(eRecortar.p[2], eRecortar.p[3], Xcorte, Ycorte) > puntos.distancia(eRecortar.p[2], eRecortar.p[3], flxIntersec[0], flxIntersec[1]) Then
+
+                        ' el punto encontrado esta a la derecha del click, entonces lo asignamos a C2, pero solo si es mas cercano
+                        If puntos.distancia(Xcorte, Ycorte, flxIntersec[0], flxIntersec[1]) < puntos.distancia(C2x, C2y, Xcorte, Ycorte) Then
+                            C2x = flxIntersec[0]
+                            C2y = flxIntersec[1]
+                        End If
+
+                    Endif
+
+                Endif
+            Case "PLine"
+
+                For i = 0 To eTijera.p.count - 4 Step 2         ' Idem linea, pero  para todos los tramos de la polilinea
+
+                    If puntos.doIntersect(eRecortar.p[0], eRecortar.p[1], eRecortar.p[2], eRecortar.p[3], eTijera.p[i + 0], eTijera.p[i + 1], eTijera.p[i + 2], eTijera.p[i + 3]) Then
+
+                        ' obtengo el punto de interseccion
+                        flxIntersec = puntos.lineLineIntersection([eRecortar.p[0], eRecortar.p[1]], [eRecortar.p[2], eRecortar.p[3]], [eTijera.p[i + 0], eTijera.p[i + 1]], [eTijera.p[i + 2], eTijera.p[i + 3]])
+
+                        If puntos.distancia(eRecortar.p[0], eRecortar.p[1], Xcorte, Ycorte) > puntos.distancia(eRecortar.p[0], eRecortar.p[1], flxIntersec[0], flxIntersec[1]) Then
+
+                            ' el punto encontrado esta a la izq del click, entonces lo asignamos a C1, pero solo si es mas cercano
+                            If puntos.distancia(Xcorte, Ycorte, flxIntersec[0], flxIntersec[1]) < puntos.distancia(C1x, C1y, Xcorte, Ycorte) Then
+                                C1x = flxIntersec[0]
+                                C1y = flxIntersec[1]
+                            End If
+
+                        Endif
+
+                        ' lo mismo para P23
+                        If puntos.distancia(eRecortar.p[2], eRecortar.p[3], Xcorte, Ycorte) > puntos.distancia(eRecortar.p[2], eRecortar.p[3], flxIntersec[0], flxIntersec[1]) Then
+
+                            ' el punto encontrado esta a la derecha del click, entonces lo asignamos a C2, pero solo si es mas cercano
+                            If puntos.distancia(Xcorte, Ycorte, flxIntersec[0], flxIntersec[1]) < puntos.distancia(C2x, C2y, Xcorte, Ycorte) Then
+                                C2x = flxIntersec[0]
+                                C2y = flxIntersec[1]
+                            End If
+
+                        Endif
+
+                    Endif
+
+                Next
+
+            Case "Text", "MText"
+
+                For i = 0 To eTijera.Polygon.count - 4 Step 2         ' Idem linea, pero  para todos los tramos de la polilinea
+
+                    If puntos.doIntersect(eRecortar.p[0], eRecortar.p[1], eRecortar.p[2], eRecortar.p[3], eTijera.polygon[i + 0], eTijera.polygon[i + 1], eTijera.polygon[i + 2], eTijera.polygon[i + 3]) Then
+
+                        ' obtengo el punto de interseccion
+                        flxIntersec = puntos.lineLineIntersection([eRecortar.p[0], eRecortar.p[1]], [eRecortar.p[2], eRecortar.p[3]], [eTijera.polygon[i + 0], eTijera.polygon[i + 1]], [eTijera.polygon[i + 2], eTijera.polygon[i + 3]])
+
+                        If puntos.distancia(eRecortar.p[0], eRecortar.p[1], Xcorte, Ycorte) > puntos.distancia(eRecortar.p[0], eRecortar.p[1], flxIntersec[0], flxIntersec[1]) Then
+
+                            ' el punto encontrado esta a la izq del click, entonces lo asignamos a C1, pero solo si es mas cercano
+                            If puntos.distancia(Xcorte, Ycorte, flxIntersec[0], flxIntersec[1]) < puntos.distancia(C1x, C1y, Xcorte, Ycorte) Then
+                                C1x = flxIntersec[0]
+                                C1y = flxIntersec[1]
+                            End If
+
+                        Endif
+
+                        ' lo mismo para P23
+                        If puntos.distancia(eRecortar.p[2], eRecortar.p[3], Xcorte, Ycorte) > puntos.distancia(eRecortar.p[2], eRecortar.p[3], flxIntersec[0], flxIntersec[1]) Then
+
+                            ' el punto encontrado esta a la derecha del click, entonces lo asignamos a C2, pero solo si es mas cercano
+                            If puntos.distancia(Xcorte, Ycorte, flxIntersec[0], flxIntersec[1]) < puntos.distancia(C2x, C2y, Xcorte, Ycorte) Then
+                                C2x = flxIntersec[0]
+                                C2y = flxIntersec[1]
+                            End If
+
+                        Endif
+
+                    Endif
+
+                Next
+            Case "Arc", "Ellipse", "Circle"
+
+                For i = 0 To eTijera.polyline.count - 4 Step 2         ' Idem linea, pero  para todos los tramos de la polilinea
+
+                    If puntos.doIntersect(eRecortar.p[0], eRecortar.p[1], eRecortar.p[2], eRecortar.p[3], eTijera.polyline[i + 0], eTijera.polyline[i + 1], eTijera.polyline[i + 2], eTijera.polyline[i + 3]) Then
+
+                        ' obtengo el punto de interseccion
+                        flxIntersec = puntos.lineLineIntersection([eRecortar.p[0], eRecortar.p[1]], [eRecortar.p[2], eRecortar.p[3]], [eTijera.polyline[i + 0], eTijera.polyline[i + 1]], [eTijera.polyline[i + 2], eTijera.polyline[i + 3]])
+
+                        If puntos.distancia(eRecortar.p[0], eRecortar.p[1], Xcorte, Ycorte) > puntos.distancia(eRecortar.p[0], eRecortar.p[1], flxIntersec[0], flxIntersec[1]) Then
+
+                            ' el punto encontrado esta a la izq del click, entonces lo asignamos a C1, pero solo si es mas cercano
+                            If puntos.distancia(Xcorte, Ycorte, flxIntersec[0], flxIntersec[1]) < puntos.distancia(C1x, C1y, Xcorte, Ycorte) Then
+                                C1x = flxIntersec[0]
+                                C1y = flxIntersec[1]
+                            End If
+
+                        Endif
+
+                        ' lo mismo para P23
+                        If puntos.distancia(eRecortar.p[2], eRecortar.p[3], Xcorte, Ycorte) > puntos.distancia(eRecortar.p[2], eRecortar.p[3], flxIntersec[0], flxIntersec[1]) Then
+
+                            ' el punto encontrado esta a la derecha del click, entonces lo asignamos a C2, pero solo si es mas cercano
+                            If puntos.distancia(Xcorte, Ycorte, flxIntersec[0], flxIntersec[1]) < puntos.distancia(C2x, C2y, Xcorte, Ycorte) Then
+                                C2x = flxIntersec[0]
+                                C2y = flxIntersec[1]
+                            End If
+
+                        Endif
+
+                    Endif
+
+                Next
+        End Select
+    Next
+    ' termine la busqueda de puntos de recorte
+    'ahora recorto la entidad
+    ' primer o determino si debo partir la entidad o si solo se recorta
+    If (eRecortar.p[0] = C1x) And (eRecortar.p[1] = C1y) And (eRecortar.p[2] = C2x) And (eRecortar.p[3] = C2y) Then
+        ' este entidad no sera recortada
+
+    Else If (eRecortar.p[0] = C1x) And (eRecortar.p[1] = C1y) Then ' elimino el tramo P01 - C2
+
+        eRecortar.p[0] = C2x
+        eRecortar.p[1] = C2y
+
+    Else If (eRecortar.p[2] = C2x) And (eRecortar.p[3] = C2y) Then ' elimino el tramo p23 - C1
+
+        eRecortar.p[2] = C1x
+        eRecortar.p[3] = C1y
+
+    Else ' se parte en dos la entidad
+
+        eNewPart = clsEntities.ClonEntity(eRecortar)          ' primero la clono
+        eNewPart.p[0] = C2x
+        eNewPart.p[1] = C2y
+
+        ' tareas finales en las entidades
+        eNewPart.ClassHandler.finish(eNewPart)
+        appmain.hFCAD.arrEntities.Add(eNewPart)                ' la agrego al dibujo
+
+        eRecortar.p[2] = C1x
+        eRecortar.p[3] = C1y
+        eRecortar.ClassHandler.finish(eRecortar)                ' para regenerar los POI
+
+        ' regenro las listas openGL de ambas entidades
+        'clsEntities.glGenDrawList(appmain.hFcad.iEntity[3])
+        'clsEntities.glGenDrawList(appmain.hFCAD.arrEntities.max)
+        'clsEntities.glGenDrawListAll
+        gcd.Regen
+    End If
 
 End

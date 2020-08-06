@@ -131,7 +131,6 @@ Public Function Start(Optional ElemToBuild As Variant, Optional Mode As Integer 
 
     elem.colour = appmain.CurrentColor
     elem.ColorToPaint = Starter.gColor[elem.colour]
-    elem.Handle = sog.UUIDHandle(4)
 
     clsDrawingAids.HelperTrabajo = elem.ClassHandler.HelperTrabajo
 
@@ -338,7 +337,7 @@ Public Function MouseMove(mouseX As Integer, mouseY As Integer) ' esta rutina es
 
         ' aca tengo que verificar el ortogonal
 
-    Else If elem.ClassHandler.StepsDone > 0 Then                                                                          ' puedo hacer ortogonal
+    Else If Me.iPoints > 0 Then                                                                          ' puedo hacer ortogonal
         If gcd.OrtogonalForzado Or (Not gcd.OrtogonalIgnorado And gcd.Ortogonal) Then          ' hablame de operadores logicos
 
             If Abs(elem.p[iPoints * 2] - elem.P[(iPoints - 1) * 2]) > Abs(elem.p[iPoints * 2 + 1] - elem.P[(iPoints - 1) * 2 + 1]) Then ' prevalece X
@@ -399,7 +398,7 @@ Public Function MouseDown(mouseX As Integer, mouseY As Integer) ' esta rutina es
 
         ' aca tengo que verificar el ortogonal
 
-    Else If elem.ClassHandler.StepsDone > 0 Then                                                                          ' puedo hacer ortogonal
+    Else If Me.iPoints > 0 Then                                                                          ' puedo hacer ortogonal
         If gcd.OrtogonalForzado Or (Not gcd.OrtogonalIgnorado And gcd.Ortogonal) Then          ' hablame de operadores logicos
 
             If Abs(elem.p[iPoints * 2] - elem.P[(iPoints - 1) * 2]) > Abs(elem.p[iPoints * 2 + 1] - elem.P[(iPoints - 1) * 2 + 1]) Then ' prevalece X

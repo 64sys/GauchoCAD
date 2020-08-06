@@ -108,6 +108,14 @@ Public Sub Redraw()
 
 End
 
+Public Sub Regen()
+
+    clsEntities.GLGenDrawList
+    clsEntities.glGenDrawListSel
+    redraw
+
+End
+
 Public Function Metros(l As Integer) As Float
 
     Return APPMain.hFCAD.Metros(l)

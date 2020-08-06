@@ -272,12 +272,17 @@ Public Sub CheckPOI(xr As Float, Yr As Float) As Float[]
     Dim DistInter As Float = 1e6
     Dim DistNearest As Float = 1e6
     Dim Dist As Float = 1e5  ' el menor
+    Dim DistEnd1B As Float
+    Dim DistEnd2B As Float
+    Dim DistMidB As Float
+    Dim tolerance As Float
 
     ' If Me.flgSearchingPOI Then Return   ' no nesting this
     Me.flgSearchingPOI = True
 
     Dim t As Float = Timer
 
+    tolerance = APPMain.hFCAD.Metros(16)
     'Debug "Checking POI"
 
     iPoligon = -1
@@ -299,7 +304,7 @@ Public Sub CheckPOI(xr As Float, Yr As Float) As Float[]
     ' Return rdata
     'Debug "total poi check time ", Timer - t, APPMain.hFCAD.poiPoligons.Count + APPMain.hFCAD.poiLines.Count + APPMain.hFCAD.poiPoints.Count, " points parsed"
 
-    indexEntity = CheckAboveEntity(xr, yr, APPMain.hFCAD.Metros(16))
+    indexEntity = CheckAboveEntity(xr, yr, tolerance)
 
     ' If iLine > 0 Then e = appmain.hFCAD.arrEntities[appmain.hFCAD.poiLinesEntities[iLine]]
     ' If iPoligon > 0 Then e = appmain.hFCAD.arrEntities[iPoligon]
@@ -465,6 +470,7 @@ Public Sub CheckPOI(xr As Float, Yr As Float) As Float[]
                 DistEnd2 = puntos.distancia(e.P[2], e.P[3], xr, yr)
 
                 DistMid = puntos.distancia((e.P[2] + e.P[0]) / 2, (e.P[3] + e.P[1]) / 2, xr, yr)
+                i = 0
 
             Case "Text", "MText"
 
@@ -473,6 +479,26 @@ Public Sub CheckPOI(xr As Float, Yr As Float) As Float[]
             Case "Circle", "Ellipse", "Arc"
 
                 DistCenter = puntos.distancia(e.P[0], e.P[1], xr, yr)
+
+            Case "PLine"
+                ' tengo que ver cual es el mas cercano
+
+                For i = 0 To e.P.count - 4 Step 2
+
+                    ' busco en que tramo estoy
+                    If puntos.doIntersect(xr - tolerance, Yr, Xr + tolerance, Yr, e.P[i + 0], e.P[i + 1], e.P[i + 2], e.P[i + 3]) Or puntos.doIntersect(xr, Yr - tolerance, Xr, Yr + tolerance, e.P[i + 0], e.P[i + 1], e.P[i + 2], e.P[i + 3]) Then
+
+                        DistEnd1 = puntos.distancia(e.P[i + 0], e.P[i + 1], xr, yr)
+                        'If DistEnd1 > DistEnd1B Then DistEnd1 = DistEnd1B
+
+                        DistEnd2 = puntos.distancia(e.P[i + 2], e.P[i + 3], xr, yr)
+                        'If DistEnd2 > DistEnd2B Then DistEnd2 = DistEnd2B
+
+                        DistMid = puntos.distancia((e.P[i + 2] + e.P[i + 0]) / 2, (e.P[i + 3] + e.P[i + 1]) / 2, xr, yr)
+                        'If DistMid > DistMidB Then DistMid = DistMidB
+                        Break
+                    End If
+                Next
 
         End Select
 
@@ -492,24 +518,24 @@ Public Sub CheckPOI(xr As Float, Yr As Float) As Float[]
 
         ' ofrezco ese punto
         If dist = DistEnd1 Then
-            rData[0] = e.P[0]
-            rData[1] = e.P[1]
+            rData[0] = e.P[i + 0]
+            rData[1] = e.P[i + 1]
             rData[2] = gcd.poiEndPoint
             clsDrawingAids.Helper.texto = "EndPoint"
         End If
 
         ' ofrezco ese punto
         If dist = DistEnd2 Then
-            rData[0] = e.P[2]
-            rData[1] = e.P[3]
+            rData[0] = e.P[i + 2]
+            rData[1] = e.P[i + 3]
             rData[2] = gcd.poiEndPoint
             clsDrawingAids.Helper.texto = "EndPoint"
         End If
 
         ' ofrezco ese punto
         If dist = DistMid Then
-            rData[0] = (e.P[2] + e.P[0]) / 2
-            rData[1] = (e.P[3] + e.P[1]) / 2
+            rData[0] = (e.P[i + 2] + e.P[i + 0]) / 2
+            rData[1] = (e.P[i + 3] + e.P[i + 1]) / 2
             rData[2] = gcd.poiMidPoint
             clsDrawingAids.Helper.texto = "MidPoint"
         End If
