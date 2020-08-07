@@ -45,7 +45,7 @@ Public ToolActive As Boolean
 Public HookSize As Integer = 16                       '' for use with poi
 Public Orthogonal As Boolean = False              '' idem Ortho F8 del CAD
 Public OrthogonalForced As Boolean = False
-Public OrthogonalNoteless As Boolean = False
+Public OrthogonalIgnored As Boolean = False
 Public SnapMode As Integer                      '' Bitwise: -1 Off ; 0 = Nearest; 1 = Endpoint; 2 = midpoint
 
 Public clsJob As Object                             '' what I am doing now, thats either selecting or something else

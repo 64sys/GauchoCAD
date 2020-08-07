@@ -123,7 +123,7 @@ Public Function Start(Optional ElemToBuild As Variant, Optional Mode As Integer 
     clsDrawingAids.HelperTrabajoNext = ParamHelperList[0]
 
     ' instructions to FCAD
-    gcd.OrthogonalNoteless = elem.ClassHandler.OrthogonalNoteless
+    gcd.OrthogonalIgnored = elem.ClassHandler.OrthogonalIgnored
     gcd.OrthogonalForced = elem.ClassHandler.OrthogonalForced
 
     elem.layer = appmain.CurrentLayer
@@ -338,7 +338,7 @@ Public Function MouseMove(mouseX As Integer, mouseY As Integer) ' esta rutina es
         ' aca tengo que verificar el ortogonal
 
     Else If Me.iPoints > 0 Then                                                                          ' puedo hacer ortogonal
-        If gcd.OrthogonalForced Or (Not gcd.OrthogonalNoteless And gcd.Orthogonal) Then          ' hablame de operadores logicos
+        If gcd.OrthogonalForced Or (Not gcd.OrthogonalIgnored And gcd.Orthogonal) Then          ' hablame de operadores logicos
 
             If Abs(elem.p[iPoints * 2] - elem.P[(iPoints - 1) * 2]) > Abs(elem.p[iPoints * 2 + 1] - elem.P[(iPoints - 1) * 2 + 1]) Then ' prevalece X
                 elem.p[iPoints * 2 + 1] = elem.P[(iPoints - 1) * 2 + 1]
@@ -399,7 +399,7 @@ Public Function MouseDown(mouseX As Integer, mouseY As Integer) ' esta rutina es
         ' aca tengo que verificar el ortogonal
 
     Else If Me.iPoints > 0 Then                                                                          ' puedo hacer ortogonal
-        If gcd.OrthogonalForced Or (Not gcd.OrthogonalNoteless And gcd.Orthogonal) Then          ' hablame de operadores logicos
+        If gcd.OrthogonalForced Or (Not gcd.OrthogonalIgnored And gcd.Orthogonal) Then          ' hablame de operadores logicos
 
             If Abs(elem.p[iPoints * 2] - elem.P[(iPoints - 1) * 2]) > Abs(elem.p[iPoints * 2 + 1] - elem.P[(iPoints - 1) * 2 + 1]) Then ' prevalece X
                 elem.p[iPoints * 2 + 1] = elem.P[(iPoints - 1) * 2 + 1]

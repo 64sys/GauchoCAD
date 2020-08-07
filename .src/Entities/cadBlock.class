@@ -30,7 +30,7 @@ Public Const GAMBASCADENTITY As String = "EntityBase"
 Public Const USEWITH As String = "clsEntityBuilder"
 Public Const DrawingOrder As Integer = 0        ' 1 = draws first
 Public Const PointsToDraw As Integer = 1             ' minimal point requered for drawing something usefull
-Public Const OrthogonalNoteless As Boolean = False
+Public Const OrthogonalIgnored As Boolean = False
 Public Const OrthogonalForced As Boolean = False
 Public Const StretchAble As Boolean = True           ' Si lo puedo deformar
 Public Selected As Boolean

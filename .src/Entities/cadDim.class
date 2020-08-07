@@ -40,7 +40,7 @@ Public Const HelperTrabajo As String = ("Insert an acotation")
 Public ParamType As String = "TPP"                             ' that is Point, Point, Float; could be Color Text, etc
 Public ParamHelper As String = "Start point;End point"
 Public Const USEWITH As String = ""
-Public Const OrthogonalNoteless As Boolean = False
+Public Const OrthogonalIgnored As Boolean = False
 Public Const OrthogonalForced As Boolean = False
 Public Const ParamDefault As String = " "
 Public Const StretchAble As Boolean = True           ' Si lo puedo deformar
@@ -289,7 +289,7 @@ Public Function Start(Optional Mode As Integer = gcd.dimRadius)
     ' clsDrawingAids.HelperTrabajoNext = ParamHelperList[0]
 
     ' instructions to FCAD
-    gcd.OrthogonalNoteless = Me.OrthogonalNoteless
+    gcd.OrthogonalIgnored = Me.OrthogonalIgnored
     gcd.OrthogonalForced = Me.OrthogonalForced
 
     elem.layer = appmain.CurrentLayer
@@ -888,7 +888,7 @@ Public Function MouseMove(mouseX As Integer, mouseY As Integer) ' esta rutina es
 
         ' aca tengo que verificar el ortogonal
     Else If Me.StepsDone > 0 Then                                                                          ' puedo hacer ortogonal
-        If gcd.OrthogonalForced Or (Not gcd.OrthogonalNoteless And gcd.Orthogonal) Then          ' hablame de operadores logicos
+        If gcd.OrthogonalForced Or (Not gcd.OrthogonalIgnored And gcd.Orthogonal) Then          ' hablame de operadores logicos
 
             If Abs(ClickXr - ClickPrevXr) > Abs(ClickYr - ClickPrevYr) Then ' prevalece X
                 ClickYr = ClickPrevYr
@@ -949,7 +949,7 @@ Public Function MouseDown(mouseX As Integer, mouseY As Integer) ' esta rutina es
         ' aca tengo que verificar el ortogonal
 
     Else If Me.StepsDone > 0 Then                                                                          ' puedo hacer ortogonal
-        If gcd.OrthogonalForced Or (Not gcd.OrthogonalNoteless And gcd.Orthogonal) Then          ' hablame de operadores logicos
+        If gcd.OrthogonalForced Or (Not gcd.OrthogonalIgnored And gcd.Orthogonal) Then          ' hablame de operadores logicos
 
             If Abs(ClickXr - ClickPrevXr) > Abs(ClickYr - ClickPrevYr) Then ' prevalece X
                 ClickYr = ClickPrevYr

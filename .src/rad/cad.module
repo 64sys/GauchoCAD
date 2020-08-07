@@ -2352,7 +2352,7 @@ Public Function CADConfig() As Collection
     str = ctnTmp["Name"]
     ctnOut.Add(ctnTmp.Copy(), str)
 
-    ctnTmp.Add("CAD.OrthogonalNoteless", "Name")
+    ctnTmp.Add("CAD.OrthogonalIgnored", "Name")
     ctnTmp.Add("CAD", "Group")
     ctnTmp.Add(False, "Value")
     ctnTmp.Add("Boolean", "Data")
