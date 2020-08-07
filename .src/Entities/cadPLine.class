@@ -28,11 +28,11 @@ Public Const HelperTrabajo As String = ("Polyline")
 Public Const ParamType As String = "P+"                             ' that is Point, Point, Float; could be Color Text, etc
 Public Const ParamHelper As String = ("Next Point")      ' a little text that is shown at the prompt waiting for user input during build
 Public Const ParamDefault As String = "Close/Undo"
-Public Const GAMBASCADENTITY As String = ("EntityBase")
+Public Const GAMBASCADENTITY As String = "EntityBase"
 Public Const USEWITH As String = "clsEntityBuilder"
 Public Const DrawingOrder As Integer = 0        ' 1 = draws first
-Public Const OrtogonalIgnorado As Boolean = False
-Public Const OrtogonalForzado As Boolean = False
+Public Const OrthogonalNoteless As Boolean = False
+Public Const OrthogonalForced As Boolean = False
 Public Const StretchAble As Boolean = True           ' Si lo puedo deformar
 Public Selected As Boolean
 Public ForDeletion As Boolean = True        ' this must be falsed in Finish

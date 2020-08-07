@@ -24,44 +24,9 @@
 
 Export
 
-' Public Sub DataExport(con As Connection, ctn As Collection) As String ''<p>Exportacion de datos en formato CSV. Como parametro de entrada requiere una conecxión a una base de datos y una colección con tres parametros <b>Query</b>, <b>Separator</b> y <b>File</b> de donde el primero es la consulta, el segundo el separador de listas y el tercero el archivo de salida.</p>
-'
-'     Dim res As Result
-'     Dim fld As ResultField
-'     Dim stxFields As New String[]
-'     Dim stxOut As New String[]
-'     Dim stxReg As New String[]
-'     Dim int As Integer
-'
-'     res = con.Exec(ctn["Query"])
-'
-'     For Each fld In res.Fields
-'         stxFields.Add(fld.Name)
-'     Next
-'     stxOut.Add(stxFields.Join(ctn["Separator"]))
-'
-'     While res.Available
-'         stxReg.Clear
-'         For int = 0 To stxFields.Max
-'             stxReg.Add(res[stxFields[int]])
-'         Next
-'         stxOut.Add(stxReg.Join(ctn["Separator"]))
-'         res.MoveNext
-'     Wend
-'
-'     If stxOut.Count > 0 Then
-'         File.Save(ctn["File"], stxOut.Join("\n"))
-'         Wait 0.01
-'         If Exist(ctn["File"]) Then
-'             Return ctn["File"]
-'         Else
-'             Return ""
-'         Endif
-'     Endif
-'
-' End
+'' Returns the parent directory of another one that is passed as a parameter.
 
-Public Function DirParent(strPath As String) As String  ''Devuelve el directorio padre de otro que se pasa como parámetro.
+Public Function DirParent(strPath As String) As String
 
     Dim strParent As String
     Dim intLast As Integer
@@ -89,7 +54,9 @@ Public Function DirParent(strPath As String) As String  ''Devuelve el directorio
 
 End
 
-Public Function DirBase(strPath As String) As String  ''Devuelve el directorio sin la ruta hasta el mismo, es decir devuelve el nombre del directorio. si se pasa "/home/usuario/musica" devolvera "musica"
+'' Returns the directory without the path to it, that is, returns the name of the directory. if you give "/home/user/music" it will return "music"
+
+Public Function DirBase(strPath As String) As String
 
     Dim strBase As String
     Dim stx As New String[]
@@ -103,7 +70,9 @@ Public Function DirBase(strPath As String) As String  ''Devuelve el directorio s
 
 End
 
-Public Function CodeStructure() As String[] ''Crea una matriz con las estructuras del lenguaje gambas que, por ejemplo, puede servir para iterpretar el código.
+''Create an array with the gambas language structures that, for example, can be used to interpret the code.
+
+Public Function CodeStructure() As String[]
 
     Dim stxStructure As New String[]
     ' "X#Function #As " X es el primer caracter de comienzo de la línea de código
@@ -166,7 +135,8 @@ Public Function CodeStructure() As String[] ''Crea una matriz con las estructura
 
 End
 
-'' Función que devuelve el tipo de contenedor de acuerdo a la variable que se le pasa como parametro
+'' Function that returns the type of container according to the variable that is passed as a parameter
+
 Public Function ConType(vrt As Variant) As String
 
     Dim obj As Object
@@ -192,7 +162,9 @@ Public Function ConType(vrt As Variant) As String
 
 End
 
-Public Function CodeTag(str As String) As String ''Analiza de una cadena de texto que se le pasa como parámetro y en el contexto de un fragmento de código, devuelve que es esa frase.
+'' It parses a text string that is passed as a parameter and, in the context of a code snippet, returns what that phrase is.
+
+Public Function CodeTag(str As String) As String
 
     Dim stxStruc As New String[]
     Dim stxSTmp As New String[]
@@ -402,7 +374,9 @@ Public Function CodeMthod(stxPart As String[]) As String[]
 
 End
 
-Public Function RelationProj(stxClass As String[], stxMet As String[], stxCod As String[]) As String[] ''Lee las matrices de métodos y código del proyecto para luego analizar las relaciones entre estos generando una matrix con estas relaciones.
+'' Read the method and code matrices of the project and then analyze the relationships between them generating a matrix with these relationships.
+
+Public Function RelationProj(stxClass As String[], stxMet As String[], stxCod As String[]) As String[]
 
     Dim stxReltn As New String[] ' Lista de métodos
     Dim intCod As Integer
@@ -437,7 +411,9 @@ Public Function RelationProj(stxClass As String[], stxMet As String[], stxCod As
 
 End
 
-Public Function DokuProj(strPath As String) As String[] ''Lee todas las clases y los módulos de un proyecto gambas, recaba informacion del mismo de forma orenada y lo plasma en una matriz de texto.
+'' Read all the classes and modules of a gambas project, collect information from it in an open way and translate it into a text matrix.
+
+Public Function DokuProj(strPath As String) As String[]
 
     Dim stxFiles As New String[]
     Dim strFile As String
@@ -458,8 +434,7 @@ Public Function DokuProj(strPath As String) As String[] ''Lee todas las clases y
     Dim strTypeCode As String
     Dim intInit As Integer
 
-    ' strPath Es el direcotrio raíz que se le pasa a la funcion, y a partir de allí
-    ' esta buscara los archivos .project
+    '' strPath It is the root directory that is passed to the function, and from there it will look for the .project files
     stxFiles = ScanDir(strPath)
     stxFiles.Sort
 
@@ -469,7 +444,6 @@ Public Function DokuProj(strPath As String) As String[] ''Lee todas las clases y
             strFileBase = File.BaseName(strFile)
             Select strFileExt
                 Case "module", "class"
-                    'Print strFileBase
                     stxText = fil.FileLoadRaw(strFile)
 
                     For int = 0 To stxText.Max
@@ -516,7 +490,7 @@ Public Function DokuProj(strPath As String) As String[] ''Lee todas las clases y
 
                             Endif
 
-                            ' Aca esta el método completo
+                            '' Here is the complete method
 
                             stxProj.Add(strFile & "\t" & strFileBase & "\t" & stxMethod.Join("\n") & "\t" & stxCode.Join("\n") & "\t" & stxVars.Join("\n") & "\t" & CStr(intInit) & "\t" & CStr(intEnd))
 
@@ -530,7 +504,9 @@ Public Function DokuProj(strPath As String) As String[] ''Lee todas las clases y
 
 End
 
-Public Function DokuHtml(strPath As String) As String ''Devuelve un html con las funciones de un módulo y todos los datos de estas, comoparametro de entrada requiere el directorio raiz a partir del cual buscar los módulos.
+'' It returns an html with the functions of a module and all the data of these, as an input parameter it requires the root directory from which to search the modules.
+
+Public Function DokuHtml(strPath As String) As String
 
     Dim stxFiles As String[]
     Dim strHtml As String
@@ -543,8 +519,8 @@ Public Function DokuHtml(strPath As String) As String ''Devuelve un html con las
     Dim strFunDesc As String
     Dim stxFunky As New String[]
     Dim intPrm As Integer
-    Dim intModule As Integer ' Cantidad de módulos
-    Dim intQty As Integer ' Cantidad de métodos
+    Dim intModule As Integer        '' Number of modules
+    Dim intQty As Integer           '' Number of methods
 
     Dim strKey As String
     Dim strAttr As String
@@ -573,13 +549,13 @@ Public Function DokuHtml(strPath As String) As String ''Devuelve un html con las
     strHtml &= "</div>"
 
     strHtml &= "<h1>" & Application.Name & "</h1>"
-    strHtml &= "<p>" & ("Autor") & ": <b>" & stxInfo[2] & "</b></p>"
-    strHtml &= "<p>" & ("Proveedor") & ": <b>" & stxInfo[3] & "</b></p>"
-    strHtml &= "<p>" & ("Versión") & ": <b>" & stxInfo[4] & "</b></p>"
-    strHtml &= "<p>" & ("Fecha de este documento") & ": <b>" & Format(Now(), "yyyy.mm.dd hh:nn:ss") & "</b></p>"
-    strHtml &= "<p>" & ("Componentes") & ": <b>" & Replace(stxInfo[5], ":", ", ") & "</b></p>"
+    strHtml &= "<p>" & ("Author") & ": <b>" & stxInfo[2] & "</b></p>"
+    strHtml &= "<p>" & ("Vendor") & ": <b>" & stxInfo[3] & "</b></p>"
+    strHtml &= "<p>" & ("Version") & ": <b>" & stxInfo[4] & "</b></p>"
+    strHtml &= "<p>" & ("Date of this document") & ": <b>" & Format(Now(), "yyyy.mm.dd hh:nn:ss") & "</b></p>"
+    strHtml &= "<p>" & ("Components") & ": <b>" & Replace(stxInfo[5], ":", ", ") & "</b></p>"
 
-    strHtml &= "<p>" & Application.Name & " " & ("esta formado por") & " <b>MMMOOODDDUUULLLOOOSSS</b> " & ("módulos") & " y <b>FFUUNNCCIIOONNEESS</b> " & ("métodos") & "</p>"
+    strHtml &= "<p>" & Application.Name & " " & ("It is made up") & " <b>MMMOOODDDUUULLLOOOSSS</b> " & ("modules") & " y <b>FFUUNNCCIIOONNEESS</b> " & ("methods") & "</p>"
 
     If stxFiles.Count > 0 Then
         For Each strFile In stxFiles
@@ -587,7 +563,6 @@ Public Function DokuHtml(strPath As String) As String ''Devuelve un html con las
                 strHtml &= "<h2>" & File.Name(strFile) & "</h2>"
                 Inc intModule
 
-                'Print "<h2> " & File.BaseName(strFile) & " </h2>"
                 For Each strLine In fil.FileLoad(strFile)
                     If String.Left(strLine, intPub) = strKey Then
                         Inc intQty
@@ -676,7 +651,9 @@ Public Function DokuHtml(strPath As String) As String ''Devuelve un html con las
 
 End
 
-Public Function Dokuwiki(strPath As String) As String ''Devuelve un wiki con las funciones de un módulo y todos los datos de estas, comoparametro de entrada requiere el directorio raiz a partir del cual buscar los módulos.
+'' Returns a wiki with the functions of a module and all their data, as an input parameter it requires the root directory from which to look for the modules.
+
+Public Function Dokuwiki(strPath As String) As String
 
     Dim stxFiles As String[]
     Dim strWiki As String
@@ -779,7 +756,9 @@ Public Function Dokuwiki(strPath As String) As String ''Devuelve un wiki con las
 
 End
 
-Public Function ArrangePath(strPathRaw As String) As String ''Devuelve una ruta sin los saltos del línea ni caracteres problemáticos
+'' Returns a path without line breaks or problematic characters
+
+Public Function ArrangePath(strPathRaw As String) As String
 
     Dim strPath As String
 
@@ -792,13 +771,17 @@ Public Function ArrangePath(strPathRaw As String) As String ''Devuelve una ruta 
 
 End
 
-Public Function Timestamp(datTime As Date) As String ''Retorna una cadena de texto con el tiempo en formato "yyyymmddhhnnss". Desde años a segundos.
+'' Returns a text string over time in "yyyymmddhhnnss" format. From years to seconds.
+
+Public Function Timestamp(datTime As Date) As String
 
     Return Format(datTime, "yyyymmddhhnnss")
 
 End
 
-Public Function TimeYear(str As String) As String ''Retorna el año a partir de una cadena de texto que se le pasa como parámetro.
+'' Returns the year from a text string that is passed as a parameter.
+
+Public Function TimeYear(str As String) As String
 
     Dim strOut As String
 
@@ -810,13 +793,17 @@ Public Function TimeYear(str As String) As String ''Retorna el año a partir de 
 
 End
 
-Public Function Timestampu(datTime As Date) As String ''Retorna una cadena de texto con el tiempo en formato "yyyymmddhhnnssuu". Desde años a milisegundos con tres digitos.
+'' Returns a text string over time in "yyyymmddhhnnssuu" format. From years to milliseconds with three digits.
+
+Public Function Timestampu(datTime As Date) As String
 
     Return Format(datTime, "yyyymmddhhnnssuu")
 
 End
 
-Public Function TypeVar(intType As Integer) As String ''Función que devuelve el tipo de variable como una palabra. Como parametro de entrada requiere un numero entero.
+'' Function that returns the type of variable as a word. As input parameter requires an integer number.
+
+Public Function TypeVar(intType As Integer) As String
 
     Dim vrxType As String[]
 

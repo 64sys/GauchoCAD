@@ -27,10 +27,10 @@ Inherits BIMEntityBase
 Public Const Gender As String = "WallColumn"
 Public Const DrawingOrder As Integer = 20 ' 1 a 100 esto debe Drawse primero y ser sobreescrito por el resto
 Public Const PointsToDraw As Integer = 1             ' minimal point requered for drawing something usefull
-Public Const HelperTrabajo As String = ("Insert a Wall Column")
+Public Const HelperTrabajo As String = ("Insert a wall column")
 Public Const ParamType As String = "PPF"                             ' that is Point, Point, Float; could be Color Text, etc
-Public Const ParamHelper As String = ("Start point;End point;Thickness")      ' a little text that is shown at the prompt waiting for user input during build
-Public Const ParamDefault As String = (" ;  ; 0.12")
+Public Const ParamHelper As String = "Start point;End point;Thickness"      ' a little text that is shown at the prompt waiting for user input during build
+Public Const ParamDefault As String = " ;  ; 0.12"
 '                                                                                                      |
 '
 

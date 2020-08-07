@@ -452,18 +452,18 @@ Public Function OnlyText(strInput As String) As String ''Validación de solo tex
 
     If stxSpaces.Find("ini") > -1 Then
         If stxSpaces.Find("end") > -1 Then
-            strError &= "[" & ("Espacios al inicio y al final") & "]"
+            strError &= "[" & ("Spaces at the beginning and at the end") & "]"
         Else
-            strError &= "[" & ("Espacio al inicio") & "]"
+            strError &= "[" & ("Space at the start") & "]"
         Endif
     Else
         If stxSpaces.Find("end") > -1 Then
-            strError &= "[" & ("Espacio al final") & "]"
+            strError &= "[" & ("Space at the end") & "]"
         Endif
     Endif
 
     If stxRepated.Count > 0 Then
-        strError &= "[" & ("Repetidos") & ": " & stxRepated.Join(",") & "]"
+        strError &= "[" & ("Repeated") & ": " & stxRepated.Join(",") & "]"
     Endif
 
     If stxExcluded.Count > 0 Then
@@ -490,11 +490,11 @@ Public Function OnlyText(strInput As String) As String ''Validación de solo tex
                     stxExcluded.Add(stxEx[int] & "#" & CStr(inxExN[int]))
             End Select
         Next
-        strError &= "[" & ("Excluidos") & ": " & stxExcluded.Join(",") & "]"
+        strError &= "[" & ("Excluded") & ": " & stxExcluded.Join(",") & "]"
     Endif
 
     If intM > 1 Then
-        strError &= "[" & ("Mas de una letra mayúscula") & "]"
+        strError &= "[" & ("More than one capital letter") & "]"
     Endif
 
     If strError = "" Then
@@ -594,18 +594,18 @@ Public Function OnlyTextCyrilic(strInput As String) As String ''Validación de s
 
     If stxSpaces.Find("ini") > -1 Then
         If stxSpaces.Find("end") > -1 Then
-            strError &= "[" & ("Espacios al inicio y al final") & "]"
+            strError &= "[" & ("Spaces at the beginning and at the end") & "]"
         Else
-            strError &= "[" & ("Espacio al inicio") & "]"
+            strError &= "[" & ("Space at the start") & "]"
         Endif
     Else
         If stxSpaces.Find("end") > -1 Then
-            strError &= "[" & ("Espacio al final") & "]"
+            strError &= "[" & ("Space at the end") & "]"
         Endif
     Endif
 
     If stxRepated.Count > 0 Then
-        strError &= "[" & ("Repetidos") & ": " & stxRepated.Join(",") & "]"
+        strError &= "[" & ("Repeated") & ": " & stxRepated.Join(",") & "]"
     Endif
 
     If stxExcluded.Count > 0 Then
@@ -632,11 +632,11 @@ Public Function OnlyTextCyrilic(strInput As String) As String ''Validación de s
                     stxExcluded.Add(stxEx[int] & "#" & CStr(inxExN[int]))
             End Select
         Next
-        strError &= "[" & ("Excluidos") & ": " & stxExcluded.Join(",") & "]"
+        strError &= "[" & ("Excluded") & ": " & stxExcluded.Join(",") & "]"
     Endif
 
     If intM > 1 Then
-        strError &= "[" & ("Mas de una letra mayúscula") & "]"
+        strError &= "[" & ("More than one capital letter") & "]"
     Endif
 
     If strError = "" Then

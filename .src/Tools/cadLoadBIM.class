@@ -21,7 +21,7 @@
 ' Boston, MA  02110-1301  USA
 
 Inherits ToolsBase
-Public Const Gender As String = "LoadBIN"
+Public Const Gender As String = "LoadBIM"
 
 Public Function Start(Optional filename As Variant, Optional _mode As Integer = 0) As Boolean
 
@@ -29,7 +29,7 @@ Public Function Start(Optional filename As Variant, Optional _mode As Integer = 
     Dim f As String
 
     If filename = "" Then
-        Dialog.Filter = ["*.xml-bin", ("Archivos BIN de GambasCAD")]
+        Dialog.Filter = ["*.xml-bin", ("Files") & " BIN GambasCAD"]
         Dialog.OpenFile(False)
 
         f = Dialog.Path

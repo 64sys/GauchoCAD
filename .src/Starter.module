@@ -270,8 +270,8 @@ Private Function LoadColors() As Collection
 
     Dim cColor As New Collection
 
-    cColor.Add([("ByBlock"), 0], "0")
-    cColor.Add([("ByLayer"), 256], "256")
+    cColor.Add(["ByBlock", 0], "0")
+    cColor.Add(["ByLayer", 256], "256")
     cColor.Add([("Red"), 1], "1")
     cColor.Add([("Yellow"), 2], "2")
     cColor.Add([("Green"), 3], "3")

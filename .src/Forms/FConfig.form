@@ -5,7 +5,7 @@
   Icon = Picture["logo.png"]
   Arrangement = Arrange.Vertical
   { mnuConfig Menu
-    Text = ("Configuración")
+    Text = ("Preferences")
     { mnuNewconfig Menu config
       Name = "mnuNewconfig"
       Text = ("New preferences")

@@ -472,7 +472,7 @@ Public Sub form_KeyPress()
     If Key.Code = Key.f8 Then
 
         Debug "Entidades transferidas en  ", Timer - t
-        gcd.Ortogonal = Not gcd.Ortogonal
+        gcd.Orthogonal = Not gcd.Orthogonal
         redraw
     Endif
     If Key.Code = Key.f7 Then

@@ -40,15 +40,15 @@ Public Function Start(Optional ElemToBuild As Variant, Optional _Mode As Integer
 
     If Me.SelectionCount = 0 Then                                     ' we have no elements in the selection
 
-        clsDrawingAids.Helper.texto = clsDrawingAids.HelperTrabajo & (": Selecct entities")
+        clsDrawingAids.Helper.texto = clsDrawingAids.HelperTrabajo & ": " & ("Select entities")
 
         gcd.clsJobPrevious = Me
         gcd.clsJob = clsDefaultJob
 
     Else                                                                    ' need the first point
 
-        clsDrawingAids.Helper.texto = clsDrawingAids.HelperTrabajo & (": Base point")
-        clsDrawingAids.HelperTrabajo = clsDrawingAids.HelperTrabajo & Str(Me.SelectionCount) & (" elements")
+        clsDrawingAids.Helper.texto = clsDrawingAids.HelperTrabajo & ": " & ("Base point")
+        clsDrawingAids.HelperTrabajo = clsDrawingAids.HelperTrabajo & Str(Me.SelectionCount) & " " & ("elements")
 
         ' genero drawing lists
 
@@ -105,7 +105,7 @@ Public Function MouseMove(mouseX As Integer, mouseY As Integer) ' called by FCAD
         Me.SelEndXr = puntos.Near(appmain.hFcad.Xreal(mouseX))
         Me.SelEndyr = puntos.Near(appmain.hFcad.Yreal(mouseY))
 
-        If gcd.Ortogonal Then
+        If gcd.Orthogonal Then
 
             If Abs(Me.SelEndXr - Me.SelStartXr) > Abs(Me.SelEndyr - Me.SelStartYr) Then ' X prevails
 

@@ -300,27 +300,27 @@ Public Function QueryXML(strFile As String, ctn As Collection) As Collection '' 
 
 End
 
-'' <p>Devuelve el valor de una variable (un nodo del xml) para "consultar" esta
-''  información de debe hacer de la forma general:</p>
-'' <code> myvar = xmg.GetVar("NodeName/AttName/AttReturn")</code>
-'' <p>El caso particular para variables que en el xml son nodos llamados "Variable" es:</p>
-'' <code> myvar = xmg.GetVar("AtributeName")</code>
-'' <p>Nota: Tambien podria usarse el caso general de esta manera:</p>
-'' <code> myvar = xmg.GetVar("Variable/Name/Value")</code>
-'' <p>Ejemplo de obtension de datos de una tabla</p>
-'' <code> myvar = xmg.GetVar("Table/products/title")</code>
-'' <p>Se devolverar el titulo alias de una tabla llamada "products"</p>
-'' <p>Ejemplo de obtension de datos de un campo</p>
-'' <code> myvar = xmg.GetVar("Field/Productname/Type")</code>
-'' <p>Se devolverar el tipo de campo para uno llamado "productname"</p>
+'' <p> Returns the value of a variable (a node of the xml) to "consult" this
+'' information should be done in the general form: </p>
+'' <code> myvar = xmg.GetVar ("NodeName / AttName / AttReturn") </code>
+'' <p> The particular case for variables that in the xml are nodes called "Variable" is: </p>
+'' <code> myvar = xmg.GetVar ("AttributeName") </code>
+'' <p> Note: The general case could also be used like this: </p>
+'' <code> myvar = xmg.GetVar ("Variable / Name / Value") </code>
+'' <p> Example of obtaining data from a table </p>
+'' <code> myvar = xmg.GetVar ("Table / products / title") </code>
+'' <p> The alias title of a table called "products" will be returned </p>
+'' <p> Example of obtaining data from a field </p>
+'' <code> myvar = xmg.GetVar ("Field / Productname / Type") </code>
+'' <p> The field type will be returned for one named "productname" </p>
 
 Public Function GetVar(sVar As String, f As String) As Variant
 
     Dim ctn As New Collection
     Dim cto As New Collection
     Dim xNode As String
-    Dim xAtt As String                '' Atributo de verificación, por ejemplo el nombre de una tabla, campo o variable
-    Dim rAtt As String                '' Atributo del cual se devolvera el valor el valor.
+    Dim xAtt As String                '' Verification attribute, for example the name of a table, field or variable
+    Dim rAtt As String                '' Attribute from which the value will be returned.
     Dim xks As New String[]
 
     Select InStr(sVar, "/")
@@ -370,7 +370,9 @@ Public Sub SetVar(sVar As String, sVal As String, f As String)
 
 End
 
-Public Function XMLTagAtt(strFile As String, ctn As Collection) As Collection '' Consulta un atributo de en un archivo xml y extrae un atributo de este
+'' Query an attribute of in an xml file and extract an attribute from it
+
+Public Function XMLTagAtt(strFile As String, ctn As Collection) As Collection
 
     Dim document As New XmlDocument
     Dim dad As XmlNode
@@ -706,7 +708,7 @@ Public Function XmlIni() As Collection ''Crea una coleccion con las variables y 
     ctnTmp.Add(str, "Value")
     ctnTmp.Add("String", "Data")
     ctnTmp.Add("txo", "Ctrl")
-    ctnTmp.Add(("Editor de texto simple por defecto"), "Desc")
+    ctnTmp.Add(("Simple text editor by default"), "Desc")
     str = ctnTmp["Name"]
     ctnOut.Add(ctnTmp.Copy(), str)
 
@@ -716,7 +718,7 @@ Public Function XmlIni() As Collection ''Crea una coleccion con las variables y 
     ctnTmp.Add("/usr/share/icons/Numix/32", "Value")
     ctnTmp.Add("String", "Data")
     ctnTmp.Add("dio", "Ctrl")
-    ctnTmp.Add(("Íconos del programa"), "Desc")
+    ctnTmp.Add(("Program icons"), "Desc")
     str = ctnTmp["Name"]
     ctnOut.Add(ctnTmp.Copy(), str)
 

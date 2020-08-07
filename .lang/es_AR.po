@@ -2,8 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: GauchoCAD 3.15.0\n"
-"POT-Creation-Date: 2020-08-02 22:40 UTC\n"
-"PO-Revision-Date: 2020-08-02 22:55 UTC\n"
+"PO-Revision-Date: 2020-08-07 16:30 UTC\n"
 "Last-Translator: bmk <bmk@gaucho>\n"
 "Language: es_AR\n"
 "MIME-Version: 1.0\n"
@@ -18,100 +17,99 @@ msgstr "GauchoCAD"
 msgid "A little CAD made in Gambas"
 msgstr "Un pequeño CAD hecho en Gambas"
 
-#: APPMain.class:216 FLayers.class:64 FLayers1.class:69 dbs.module:1763
+#: APPMain.class:192 FLayers.class:64 FLayers1.class:69 dbs.module:1735
 msgid "Color"
 msgstr "Color"
 
-#: APPMain.class:991
+#: APPMain.class:645
 msgid "Not implemented yet"
 msgstr "Aún sin implementar"
 
-#: APPMain.class:1010
+#: APPMain.class:656
 msgid "Open file"
 msgstr "Abrir un archivo"
 
-#: APPMain.class:1114
+#: APPMain.class:758
 msgid "Configuration"
 msgstr "Configuración"
 
-#: APPMain.class:1546
+#: APPMain.class:971
 msgid "All"
 msgstr "Todas"
 
-#: APPMain.class:1697
+#: APPMain.class:1120
 msgid "varies"
 msgstr "varios"
 
-#: APPMain.form:108 FCAD.form:69
+#: APPMain.form:108 FCAD.class:955
 msgid "File"
 msgstr "Archivo"
 
-#: APPMain.form:112 FCAD.form:74
+#: APPMain.form:112
 msgid "New"
 msgstr "Nuevo"
 
-#: APPMain.form:119 FCAD.form:82
+#: APPMain.form:119
 msgid "Open"
 msgstr "Abierto"
 
-#: APPMain.form:126 FAlias.form:62 FCAD.form:90 FLayers.form:60
-#: FLayers1.form:60
+#: APPMain.form:126 FAlias.form:62 FLayers.form:60 FLayers1.form:60
 msgid "Save"
 msgstr "Salvar"
 
-#: APPMain.form:133 FCAD.form:98
+#: APPMain.form:133
 msgid "Save as"
 msgstr "Guardar como"
 
-#: APPMain.form:140 FCAD.form:106
+#: APPMain.form:140
 msgid "Import"
 msgstr "Importar"
 
-#: APPMain.form:147 FCAD.form:114
+#: APPMain.form:147
 msgid "Export"
 msgstr "Exportar"
 
-#: APPMain.form:154 FCAD.form:122
+#: APPMain.form:154
 msgid "Plot"
-msgstr "Trama"
+msgstr "Trazar"
 
-#: APPMain.form:161 FCAD.form:130
+#: APPMain.form:161
 msgid "Close"
-msgstr "Cerca"
+msgstr "Cerrar"
 
-#: APPMain.form:170 FCAD.form:138 FConfig.form:66
+#: APPMain.form:170 FConfig.form:66
 msgid "Quit"
 msgstr "Salir"
 
-#: APPMain.form:177 FCAD.form:146
+#: APPMain.form:177
 msgid "Options"
 msgstr "Opciones"
 
-#: APPMain.form:181 FCAD.form:151
+#: APPMain.form:181 FConfig.form:28
 msgid "Preferences"
 msgstr "Preferencias"
 
-#: APPMain.form:188 FCAD.form:159
+#: APPMain.form:188
 msgid "Entities"
 msgstr "Entidades"
 
-#: APPMain.form:193 FCAD.form:165
+#: APPMain.form:193
 msgid "Line"
 msgstr "Línea"
 
-#: APPMain.form:200 FCAD.form:172 cadPLine.class:27
+#: APPMain.form:200 cadPLine.class:27
 msgid "Polyline"
 msgstr "Polilínea"
 
-#: APPMain.form:207 FCAD.form:179
+#: APPMain.form:207
 msgid "Circle"
 msgstr "Circulo"
 
-#: APPMain.form:214 FCAD.form:193
+#: APPMain.form:214
 msgid "Arc"
 msgstr "Arco"
 
-#: APPMain.form:221 FCAD.form:186
+#: APPMain.form:221
 msgid "Ellipse"
 msgstr "Elipse"
 
@@ -119,35 +117,35 @@ msgstr "Elipse"
 msgid "Solid"
 msgstr "Sólido"
 
-#: APPMain.form:235 FCAD.form:207
+#: APPMain.form:235
 msgid "Text"
 msgstr "Texto"
 
-#: APPMain.form:242 FCAD.form:214
+#: APPMain.form:242
 msgid "Multi Text"
 msgstr "Texto múltiple"
 
-#: APPMain.form:249 FBlock.form:128 FCAD.form:229 cadBlock.class:25
+#: APPMain.form:249 FBlock.form:129 cadBlock.class:25
 msgid "Block"
-msgstr "Bloquear"
+msgstr "Bloque"
 
-#: APPMain.form:256 FCAD.form:222
+#: APPMain.form:256
 msgid "Dimmension"
-msgstr "Dimmension"
+msgstr "Cotas"
 
 #: APPMain.form:263
 msgid "Ledader"
-msgstr "Ledader"
+msgstr "Flecha"
 
 #: APPMain.form:270
 msgid "Spline"
-msgstr "Ranura"
+msgstr "Spline"
 
-#: APPMain.form:277 FCAD.form:237 cadHatch.class:27
+#: APPMain.form:277 cadHatch.class:27
 msgid "Hatch"
-msgstr "Escotilla"
+msgstr "Rayados"
 
-#: APPMain.form:284 FCAD.form:200
+#: APPMain.form:284
 msgid "Rectangle"
 msgstr "Rectángulo"
 
@@ -155,67 +153,67 @@ msgstr "Rectángulo"
 msgid "Polygon"
 msgstr "Polígono"
 
-#: APPMain.form:297 FCAD.form:245
+#: APPMain.form:297
 msgid "Point"
 msgstr "Punto"
 
-#: APPMain.form:304 FCAD.form:252
+#: APPMain.form:304
 msgid "Tools"
 msgstr "Herramientas"
 
-#: APPMain.form:308 FCAD.form:257
+#: APPMain.form:308
 msgid "Move"
-msgstr "Moverse"
+msgstr "Mover"
 
-#: APPMain.form:315 FCAD.form:264
+#: APPMain.form:315 cadCopy.class:36
 msgid "Copy"
 msgstr "Copiar"
 
-#: APPMain.form:322 FBlock.form:45 FCAD.form:271 FHatch.form:39
+#: APPMain.form:322 FBlock.form:45 FHatch.form:39 cadScale.class:38
 msgid "Scale"
 msgstr "Escala"
 
-#: APPMain.form:329 FCAD.form:285
+#: APPMain.form:329 cadRotate.class:40
 msgid "Rotate"
 msgstr "Girar"
 
-#: APPMain.form:336
+#: APPMain.form:336 cadMirror.class:40
 msgid "Mirror"
-msgstr "Espejo"
+msgstr "Espejar"
 
-#: APPMain.form:343
+#: APPMain.form:343 cadTrim.class:38
 msgid "Trim"
-msgstr "Podar"
+msgstr "Cortar"
 
-#: APPMain.form:350 FCAD.form:306
+#: APPMain.form:350
 msgid "Fillet"
-msgstr "Filete"
+msgstr "Filetear"
 
 #: APPMain.form:357
 msgid "Chamfer"
 msgstr "Chaflán"
 
-#: APPMain.form:364 FCAD.form:278
+#: APPMain.form:364 cadArray.class:47
 msgid "Array"
-msgstr "Formación"
+msgstr "Matriz"
 
-#: APPMain.form:371 FCAD.form:292
+#: APPMain.form:371
 msgid "Stretch"
-msgstr "Tramo"
+msgstr "Estirar"
 
-#: APPMain.form:378 FCAD.form:299
+#: APPMain.form:378
 msgid "Offset"
-msgstr "Compensar"
+msgstr "Paralelas"
 
-#: APPMain.form:385
+#: APPMain.form:385 cadDivide.class:41
 msgid "Divide"
 msgstr "Dividir"
 
 #: APPMain.form:392
 msgid "Break"
-msgstr "Rotura"
+msgstr "Interrumpir"
 
-#: APPMain.form:399 FCAD.form:313
+#: APPMain.form:399 cadErase.class:35
 msgid "Delete"
 msgstr "Eliminar"
 
@@ -237,21 +235,21 @@ msgstr "Columna"
 
 #: APPMain.form:432
 msgid "Beam"
-msgstr "Haz"
+msgstr "Viga"
 
 #: APPMain.form:439
 msgid "Wall column"
 msgstr "Columna de pared"
 
-#: APPMain.form:447 FCAD.form:321
+#: APPMain.form:447
 msgid "View"
-msgstr "Ver"
+msgstr "Vista"
 
-#: APPMain.form:451 FCAD.form:326
+#: APPMain.form:451
 msgid "Zoom window"
 msgstr "Ventana de zoom"
 
-#: APPMain.form:458 FCAD.form:333
+#: APPMain.form:458
 msgid "Pan view"
 msgstr "Vista panorámica"
 
@@ -259,11 +257,7 @@ msgstr "Vista panorámica"
 msgid "Zoom extents"
 msgstr "Extensiones de zoom"
 
-#: APPMain.form:472 FCAD.form:348
-msgid "?"
-msgstr "?"
-
-#: APPMain.form:476 FCAD.form:352
+#: APPMain.form:476 FAbout.class:187
 msgid "About"
 msgstr "Acerca de"
 
@@ -277,11 +271,11 @@ msgstr "Capas"
 
 #: APPMain.form:544
 msgid "Line widths"
-msgstr "Anchos de línea"
+msgstr "Espesores de línea"
 
 #: APPMain.form:552
 msgid "Dimmension styles"
-msgstr "Estilos de dimmension"
+msgstr "Estilos de cotas"
 
 #: APPMain.form:618
 msgid " Smart entities"
@@ -293,42 +287,33 @@ msgstr "Actualizar"
 
 #: APPMain.form:677 FAlias.class:42
 msgid "Command"
-msgstr "Mando"
+msgstr "Orden"
 
-#: BIMEntityBase.class:27
-msgid "BINEntityBase"
-msgstr "BINEntityBase"
-
-#: FAbout.class:136
-msgid "Código fuente"
+#: FAbout.class:128
+msgid "Source code"
 msgstr "Código fuente"
 
-#: FAbout.class:145
-msgid "Contacto"
+#: FAbout.class:137
+msgid "Contact"
 msgstr "Contacto"
 
-#: FAbout.class:163
-msgid "Licencia del programa"
-msgstr "Licencia del programa"
+#: FAbout.class:155
+msgid "Program license"
+msgstr "Licencia dle programa"
 
-#: FAbout.class:173
-msgid "El icono no existe"
+#: FAbout.class:165
+msgid "The icon does not exist"
 msgstr "El icono no existe"
 
-#: FAbout.class:195
-msgid "Acerca de"
-msgstr "Acerca de"
-
-#: FAbout.class:215
-msgid "Hola desarrolladores de"
+#: FAbout.class:207
+msgid "Hello developers of"
 msgstr "Hola desarrolladores de"
 
 #: FAlias.class:42 cadAlias.class:62
 msgid "Alias"
 msgstr "Alias"
 
-#: FAlias.form:69 FBlock.form:73 FHatch.form:67 FLayers.form:68
-#: FLayers1.form:68 Form1.form:33
+#: FAlias.form:69 FBlock.form:73 FHatch.form:67 FLayers.form:68 FLayers1.form:68 Form1.form:33
 msgid "Cancel"
 msgstr "Cancelar"
 
@@ -340,14 +325,6 @@ msgstr "Inserción de bloque"
 msgid "Preview"
 msgstr "Avance"
 
-#: FBlock.form:50 FHatch.form:44
-msgid "1"
-msgstr "1"
-
-#: FBlock.form:56 FHatch.form:50
-msgid "0"
-msgstr "0 0"
-
 #: FBlock.form:63 FHatch.form:57
 msgid "Rotation"
 msgstr "Rotación"
@@ -356,85 +333,41 @@ msgstr "Rotación"
 msgid "Insert"
 msgstr "Insertar"
 
-#: FBlock.form:78 FHatch.form:82
-msgid "deg"
-msgstr "deg"
-
-#: FBlock.form:89
-msgid "X"
-msgstr "X"
-
-#: FBlock.form:101
-msgid "Y"
-msgstr "Y"
-
-#: FBlock.form:106
-msgid "M"
-msgstr "METRO"
-
-#: FBlock.form:121
+#: FBlock.form:122
 msgid "Folder"
 msgstr "Carpeta"
 
-#: FBlock.form:135
+#: FBlock.form:136
 msgid "Parameters"
 msgstr "Parámetros"
 
-#: FBlock.form:149
-msgid "270*"
-msgstr "270 *"
-
-#: FBlock.form:154
-msgid "180*"
-msgstr "180 *"
-
-#: FBlock.form:159
-msgid "0*"
-msgstr "0 *"
-
-#: FBlock.form:165
-msgid "90*"
-msgstr "90 *"
-
-#: FCAD.class:959
+#: FCAD.class:959 uty.module:554
 msgid "Version"
 msgstr "Versión"
 
-#: FCAD.form:340
-msgid "Zoom extends"
-msgstr "Zoom se extiende"
-
-#: FCAD.form:445
-msgid "Coordenadas"
+#: FCAD.form:113
+msgid "Coords"
 msgstr "Coordenadas"
 
 #: FConfig.class:93
 msgid "Configuration file does not exist"
 msgstr "El archivo de configuración no existe"
 
-#: FConfig.class:487
-msgid "Program configuration"
-msgstr "Configuración del programa"
-
-#: FConfig.class:488
+#: FConfig.class:492
 msgid "The changes was saved"
 msgstr "Los cambios fueron guardados"
 
-#: FConfig.class:508
+#: FConfig.class:512
 msgid "A new copy was created"
 msgstr "Se creó una nueva copia."
 
-#: FConfig.class:521
+#: FConfig.class:525
 msgid "A copy was successfully archived"
 msgstr "Una copia fue archivada exitosamente"
 
-#: FConfig.class:530
+#: FConfig.class:534
 msgid "Restored configuration"
 msgstr "Configuración restaurada"
-
-#: FConfig.form:28
-msgid "Configuración"
-msgstr "Configuración"
 
 #: FConfig.form:32
 msgid "New preferences"
@@ -465,8 +398,8 @@ msgid "Directories"
 msgstr "Directorios"
 
 #: FHatch.form:34
-msgid "Pattern:"
-msgstr "Patrón:"
+msgid "Pattern"
+msgstr "Patrón"
 
 #: FHatch.form:62 Form1.form:27
 msgid "OK"
@@ -492,18 +425,6 @@ msgstr "Radiante"
 msgid "Layer"
 msgstr "Capa"
 
-#: FInspector.form:42
-msgid "LblProp2"
-msgstr "LblProp2"
-
-#: FInspector.form:60
-msgid "LblProp1"
-msgstr "LblProp1"
-
-#: FInspector.form:66
-msgid "LblProp3"
-msgstr "LblProp3"
-
 #: FLayers.class:64 FLayers1.class:69
 msgid "Frozen"
 msgstr "Congelado"
@@ -512,7 +433,7 @@ msgstr "Congelado"
 msgid "Lock"
 msgstr "Bloquear"
 
-#: FLayers.class:64 FLayers1.class:69 dbs.module:1744
+#: FLayers.class:64 FLayers1.class:69 dbs.module:1716
 msgid "Name"
 msgstr "Nombre"
 
@@ -535,14 +456,6 @@ msgstr "Anchura"
 #: FLayers.class:64 FLayers1.class:69
 msgid "id"
 msgstr "carné de identidad"
-
-#: Starter.module:273
-msgid "ByBlock"
-msgstr "ByBlock"
-
-#: Starter.module:274
-msgid "ByLayer"
-msgstr "Por capa"
 
 #: Starter.module:275
 msgid "Red"
@@ -576,37 +489,29 @@ msgstr "Blanco"
 msgid "Inserts an image"
 msgstr "Inserta una imagen"
 
-#: _cadImage.class:28
-msgid "Position;Rotation; Scale"
-msgstr "Posición, rotación; Escala"
-
-#: cad.module:2220 xmg.module:679
+#: cad.module:2220 xmg.module:681
 msgid "Program"
 msgstr "Programa"
 
-#: cad.module:2224 xmg.module:683
+#: cad.module:2224 xmg.module:685
 msgid "Application directory"
 msgstr "Directorio de aplicaciones"
 
-#: cad.module:2234 xmg.module:693
+#: cad.module:2234 xmg.module:695
 msgid "Window background color"
 msgstr "Color de fondo de la ventana"
 
-#: cad.module:2246 xmg.module:705
+#: cad.module:2246 xmg.module:707
 msgid "Desktop"
 msgstr "Escritorio"
 
-#: cad.module:2250 xmg.module:709
-msgid "Editor de texto simple por defecto"
+#: cad.module:2250 xmg.module:711
+msgid "Simple text editor by default"
 msgstr "Editor de texto simple por defecto"
 
-#: cad.module:2260 xmg.module:719
-msgid "Íconos del programa"
-msgstr "Íconos del programa"
-
-#: cad.module:2266
-msgid "CAD"
-msgstr "CANALLA"
+#: cad.module:2260 xmg.module:721
+msgid "Program icons"
+msgstr "Iconos de programa"
 
 #: cad.module:2270
 msgid "Drawing window dark mode"
@@ -641,15 +546,15 @@ msgid "Tool active"
 msgstr "Herramienta activa"
 
 #: cad.module:2342
-msgid "Ortogonal"
+msgid "Orthogonal"
 msgstr "Ortogonal"
 
 #: cad.module:2351
-msgid "Oorthogonal forced"
+msgid "Orthogonal forced"
 msgstr "Ortogonal forzado"
 
 #: cad.module:2360
-msgid "Oorthogonal ignored"
+msgid "Orthogonal ignored"
 msgstr "Ortogonal ignorado"
 
 #: cad.module:2369
@@ -660,104 +565,65 @@ msgstr "Mostrar inspector"
 msgid "Draws an arc"
 msgstr "Dibuja un arco"
 
-#: cadArc.class:28
-msgid "Center;Radious;Start;End"
-msgstr "Centro; Radiante; Inicio; Fin"
-
-#: cadArc.class:134
-msgid "0.0 deg"
-msgstr "0.0 grados"
-
 #: cadArc.class:155
 msgid " to "
 msgstr " a"
 
 #: cadArea.class:38
-msgid "Area : mark points"
-msgstr "Área: marcar puntos"
+msgid "Area"
+msgstr "Área"
 
-#: cadArea.class:99 cadArray.class:102 cadDim.class:474 cadMirror.class:172
-#: cadProtractor.class:110 cadRotate.class:174 cadRuler.class:98
+#: cadArea.class:38 cadRuler.class:38
+msgid "mark points"
+msgstr "marcar puntos"
+
+#: cadArea.class:99 cadArray.class:102 cadChamfer.class:60 cadDim.class:474 cadFillet.class:60 cadMirror.class:172 cadOffset.class:269 cadProtractor.class:110 cadRotate.class:174 cadRuler.class:98
 msgid "Bad input"
 msgstr "Mala entrada"
 
 #: cadArea.class:109
-msgid " - Perimeter = "
-msgstr " - Perímetro ="
+msgid "Perimeter"
+msgstr "Perímetro"
 
-#: cadArea.class:109
-msgid "Area = "
-msgstr "Área ="
+#: cadArray.class:54 cadCopy.class:43 cadErase.class:42 cadMirror.class:47 cadMove.class:43 cadRotate.class:47 cadScale.class:45 cadStretch.class:48
+msgid "Select entities"
+msgstr "Seleccionar entidades"
 
-#: cadArray.class:47
-msgid "Array "
-msgstr "Formación"
+#: cadArray.class:61 cadCopy.class:50 cadMirror.class:55 cadMove.class:50 cadRotate.class:54 cadScale.class:52 cadStretch.class:56
+msgid "Base point"
+msgstr "Punto base"
 
-#: cadArray.class:54 cadCopy.class:43 cadMirror.class:47 cadMove.class:43
-#: cadRotate.class:47 cadScale.class:45 cadStretch.class:48
-msgid ": Selecct entities"
-msgstr ": Seleccionar entidades"
-
-#: cadArray.class:61 cadCopy.class:50 cadMirror.class:55 cadMove.class:50
-#: cadRotate.class:54 cadScale.class:52 cadStretch.class:56
-msgid ": Base point"
-msgstr ": Punto base"
-
-#: cadArray.class:62 cadCopy.class:51 cadMirror.class:56 cadMove.class:51
-#: cadRotate.class:55 cadScale.class:53 cadStretch.class:57 cadTrim.class:166
-#: clsDefaultJob.class:149
-msgid " elements"
-msgstr " elementos"
+#: cadArray.class:62 cadCopy.class:51 cadMirror.class:56 cadMove.class:51 cadRotate.class:55 cadScale.class:53 cadStretch.class:57 cadTrim.class:152 clsDefaultJob.class:149
+msgid "elements"
+msgstr "elementos"
 
 #: cadArray.class:81
-msgid ": Ortog or Polar [O]?"
-msgstr ": Ortog o Polar [O]?"
+msgid "Orthogonal or polar"
+msgstr "Ortogonal o polar"
 
 #: cadArray.class:95
-msgid ": Columns [1]?"
-msgstr ": Columnas [1]?"
+msgid "Columns"
+msgstr "Columnas"
 
 #: cadArray.class:99
-msgid ": Repetitions [1]?"
-msgstr ": ¿Repeticiones [1]?"
+msgid "Repetitions"
+msgstr "Repeticiones"
 
 #: cadArray.class:110
-msgid ": X distance [0]?"
-msgstr ": X distancia [0]?"
+msgid "Distance"
+msgstr "Distancia"
 
-#: cadArray.class:114
-msgid ": Angle  [45]?"
-msgstr ": Ángulo [45]?"
+#: cadArray.class:114 cadMirror.class:83 cadProtractor.class:85 cadRotate.class:82
+msgid "Angle"
+msgstr "Ángulo"
 
 #: cadArray.class:122
-msgid ": Rows [1]?"
-msgstr ": ¿Filas [1]?"
-
-#: cadArray.class:133
-msgid ": Y distance [0]?"
-msgstr ": ¿Distancia Y [0]?"
+msgid "Rows"
+msgstr "Filas"
 
 #: cadBeam.class:30
-msgid "Insert a Beam"
+msgid "Insert a beam"
 msgstr "Insertar una viga"
-
-#: cadBeam.class:32
-msgid "Start point;End point;Width;Height"
-msgstr "Punto de inicio; Punto final; Ancho; Altura"
-
-#: cadBeam.class:33
-msgid " ;  ; 0.20 ; 0.40"
-msgstr " ; ; 0,20; 0,40"
-
-#: cadBlock.class:27
-msgid "Name; Origin"
-msgstr "Nombre; Origen"
-
-#: cadBlock.class:29 cadCircle.class:31 cadInsert.class:29 cadLeader.class:31
-#: cadLine.class:30 cadMText.class:32 cadPLine.class:31 cadPolygon.class:30
-#: cadRectangle.class:30 cadSPLine.class:14 cadSolid.class:31 cadText.class:33
-msgid "EntityBase"
-msgstr "EntityBase"
 
 #: cadBlock.class:65
 msgid "Select two or mores entities first"
@@ -768,34 +634,38 @@ msgid "Break "
 msgstr "Rotura"
 
 #: cadBreak.class:48 cadDivide.class:48
-msgid ": Select only one entity"
-msgstr ": Seleccione solo una entidad"
+msgid "Select only one entity"
+msgstr "Seleccione solo una entidad"
 
 #: cadBreak.class:59
 msgid "Breakpoint of entity"
 msgstr "Punto de corte de la entidad"
 
+#: cadBreak.class:63 cadDivide.class:63
+msgid "Can't break that entity"
+msgstr "No puedo romper esa entidad"
+
+#: cadBreak.class:85 cadDivide.class:85
+msgid "Invalid breakpoint"
+msgstr "Punto de interrupción no válido"
+
+#: cadBreak.class:119 cadDivide.class:99 cadOffset.class:74
+msgid "Can't offset that entity"
+msgstr "No puedo compensar esa entidad"
+
 #: cadCWall.class:30
-msgid "Insert a Wall Column"
+msgid "Insert a wall column"
 msgstr "Insertar una columna de pared"
 
-#: cadCWall.class:32 cadSlab.class:33
-msgid "Start point;End point;Thickness"
-msgstr "Punto de inicio; Punto final; Espesor"
-
-#: cadCWall.class:33
-msgid " ;  ; 0.12"
-msgstr " ; ; 0,12"
-
 #: cadChamfer.class:47
-msgid "Chamfer: enter size ["
-msgstr "Chaflán: ingrese el tamaño ["
+msgid "enter size"
+msgstr "ingrese un tamaño"
 
-#: cadChamfer.class:62
-msgid "Select first line]"
-msgstr "Seleccionar primera línea]"
+#: cadChamfer.class:62 cadFillet.class:62
+msgid "Select first line"
+msgstr "Seleccionar primera línea"
 
-#: cadChamfer.class:98
+#: cadChamfer.class:98 cadFillet.class:98
 msgid "Select second line"
 msgstr "Seleccionar segunda línea"
 
@@ -803,25 +673,9 @@ msgstr "Seleccionar segunda línea"
 msgid "Draw a circle"
 msgstr "Dibuja un circulo"
 
-#: cadCircle.class:29
-msgid "Start point;Radious"
-msgstr "Punto de inicio; Radious"
-
 #: cadColumn.class:31
-msgid "Insert a Column"
+msgid "Insert a column"
 msgstr "Insertar una columna"
-
-#: cadColumn.class:33
-msgid "Position;Side X;Side Z"
-msgstr "Posición; Lado X; Lado Z"
-
-#: cadColumn.class:34
-msgid " ;0.20;0.20"
-msgstr " ; 0.20; 0.20"
-
-#: cadCopy.class:36
-msgid "Copy "
-msgstr "Copiar"
 
 #: cadCopy.class:68 cadMove.class:72 cadScale.class:70 cadStretch.class:72
 msgid "Final point"
@@ -829,11 +683,7 @@ msgstr "Punto final"
 
 #: cadDim.class:39
 msgid "Insert an acotation"
-msgstr "Insertar una cita"
-
-#: cadDivide.class:41
-msgid "Divide "
-msgstr "Dividir"
+msgstr "Insertar una acotación"
 
 #: cadDivide.class:59
 msgid "First breakpoint of entity"
@@ -847,109 +697,61 @@ msgstr "Segundo punto de quiebre de la entidad"
 msgid "Draw an ellipse"
 msgstr "Dibujar una elipse"
 
-#: cadEllipse.class:29
-msgid "Start point;Major Radious;Minor/Major;Start;End"
-msgstr "Punto de inicio; Radiante mayor; Menor/mayor; Inicio; Fin"
-
-#: cadErase.class:35
-msgid "Delete "
-msgstr "Eliminar"
-
-#: cadErase.class:42
-msgid ": Select entities"
-msgstr ": Seleccionar entidades"
-
 #: cadExplode.class:34
-msgid "Explode "
+msgid "Explode"
 msgstr "Explotar"
 
 #: cadExplode.class:41
-msgid ": Selecct blocks"
-msgstr ": Seleccionar bloques"
+msgid "Select blocks"
+msgstr "Seleccionar bloques"
 
 #: cadFillet.class:47
-msgid "Fillet: enter radious ["
-msgstr "Filete: enter radious ["
-
-#: cadFillet.class:62
-msgid "Select first line"
-msgstr "Seleccionar primera línea"
-
-#: cadFillet.class:98
-msgid "Select second line]"
-msgstr "Seleccionar segunda línea]"
-
-#: cadHatch.class:29
-msgid "Point;Texture;Scale"
-msgstr "Punto; Textura; Escala"
+msgid "enter radious"
+msgstr "ingrese un radio"
 
 #: cadInsert.class:25
 msgid "Inserts a block"
 msgstr "Inserta un bloque"
 
-#: cadInsert.class:27
-msgid "BlockName; Position ; X scale ; Y scale ; Rotation"
-msgstr "BlockName; Posición ; Escala X; Escala Y; Rotación"
-
 #: cadLeader.class:27
 msgid "Leader"
 msgstr "Líder"
-
-#: cadLeader.class:29
-msgid "Text; Height; Next Point"
-msgstr "Texto; Altura; Siguiente punto"
 
 #: cadLine.class:27 cadRectangle.class:27
 msgid "a line"
 msgstr "una linea"
 
-#: cadLoad.class:32
-msgid "Archivos de GauchoCAD"
-msgstr "Archivos de GauchoCAD"
-
-#: cadLoadBIM.class:32
-msgid "Archivos BIN de GambasCAD"
-msgstr "Archivos BIN de GambasCAD"
+#: cadLoad.class:32 cadLoadBIM.class:32
+msgid "Files"
+msgstr "Archivos"
 
 #: cadMText.class:28
 msgid "Inserts a multiline text"
 msgstr "Inserta un texto multilínea"
 
-#: cadMText.class:30 cadText.class:30
-msgid "Start point;Angle;Heigth;"
-msgstr "Punto de inicio; ángulo; altura;"
-
-#: cadMirror.class:40
-msgid "Mirror "
-msgstr "Espejo"
-
-#: cadMirror.class:83 cadRotate.class:82
-msgid ": Angle [90]?"
-msgstr ": Ángulo [90]?"
-
 #: cadMirror.class:109
-msgid ": Keep originals (Y/N)? [Y]"
-msgstr ": ¿Conservar originales (S/N)? [Y]"
+msgid "Keep originals"
+msgstr "Mantener originales"
 
 #: cadMove.class:35
 msgid "Move "
 msgstr "Moverse"
 
 #: cadOffset.class:45
-msgid "Offset, enter distance [0.10]:"
-msgstr "Offset, ingrese la distancia [0.10]:"
+msgid "enter distance"
+msgstr "ingrese una distancia"
 
 #: cadOffset.class:70
 msgid "Side to offset"
 msgstr "Lado para compensar"
 
 #: cadOffset.class:149
-msgid "Offset: select an entity or <Esc>"
-msgstr "Desplazamiento: seleccione una entidad o <Esc>"
+msgid "select an entity"
+msgstr "seleccione una entidad"
 
-#: cadOffset.class:247
-msgid "Offset: select an entity"
-msgstr "Desplazamiento: seleccione una entidad"
+#: cadOffset.class:236
+msgid "enter a valid text size"
+msgstr "Ingrese un tamaño de texto válido"
 
 #: cadPLine.class:29 cadSPLine.class:12
 msgid "Next Point"
@@ -960,64 +762,28 @@ msgid "Panning"
 msgstr "Paneo"
 
 #: cadPolygon.class:27
-msgid "a polgon"
+msgid "a polygon"
 msgstr "un polígono"
 
 #: cadProtractor.class:38
-msgid "Protractor : mark first point"
-msgstr "Transportador: marca el primer punto"
+msgid "mark first point"
+msgstr "marcar el primer punto"
 
 #: cadProtractor.class:60
-msgid "Protractor : mark center"
-msgstr "Transportador: marca centro"
-
-#: cadProtractor.class:85
-msgid "Angle = "
-msgstr "Ángulo ="
-
-#: cadRotate.class:40
-msgid "Rotate "
-msgstr "Girar"
-
-#: cadRuler.class:38
-msgid "Ruler : mark points"
-msgstr "Regla: marcar puntos"
+msgid "mark center"
+msgstr "marque el centro"
 
 #: cadRuler.class:73
-msgid "Total length = "
-msgstr "Longitud total ="
-
-#: cadSPLine.class:10
-msgid "SPLine"
-msgstr "Ranura"
-
-#: cadScale.class:38
-msgid "Scale "
-msgstr "Escala"
+msgid "Total length"
+msgstr "Largo total"
 
 #: cadSlab.class:31
-msgid "Insert a Slab"
+msgid "Insert a slab"
 msgstr "Insertar una losa"
 
-#: cadSlab.class:34
-msgid " ;  ; 0.08 "
-msgstr " ; ; 0,08"
-
 #: cadSlabT.class:32
-msgid "Insert a Triangular Slab"
+msgid "Insert a triangular slab"
 msgstr "Insertar una losa triangular"
-
-#: cadSlabT.class:34
-msgid "Start point;First side;Second side;Thickness"
-msgstr "Punto de inicio; Primer lado; Segundo lado; Espesor"
-
-#: cadSlabT.class:35
-msgid " ;  ;  ; 0.08"
-msgstr " ; ; ; 0,08"
-
-#: cadSolid.class:29
-msgid "First Point;Next Point;Next Point;Last Point"
-msgstr "Primer punto; Siguiente punto; Siguiente punto; Último punto"
 
 #: cadStretch.class:41
 msgid "Stretch "
@@ -1027,20 +793,16 @@ msgstr "Tramo"
 msgid "Inserts a text"
 msgstr "Inserta un texto"
 
-#: cadTrim.class:43
-msgid "Trim "
-msgstr "Podar"
+#: cadTrim.class:46
+msgid "Select cutting edges"
+msgstr "Seleccionar líneas de corte"
 
-#: cadTrim.class:50
-msgid ": Selecct cutting edges"
-msgstr ": Seleccionar filos de corte"
+#: cadTrim.class:59
+msgid "entities to cut"
+msgstr "entidades a cortar"
 
-#: cadTrim.class:63
-msgid ": entities to cut"
-msgstr ": entidades para cortar"
-
-#: cadTrim.class:166 clsDefaultJob.class:149
-msgid "Selected "
+#: cadTrim.class:152 clsDefaultJob.class:149
+msgid "Selected"
 msgstr "Seleccionado"
 
 #: cadZoomW.class:75
@@ -1055,178 +817,171 @@ msgstr "Cargando bloques"
 msgid "Can create entity"
 msgstr "Puede crear entidad"
 
-#: dbs.module:1406
-msgid "Extrayendo datos de"
+#: dbs.module:1378
+msgid "Extracting data from"
 msgstr "Extrayendo datos de"
 
-#: dbs.module:1406
-msgid "Sistema"
+#: dbs.module:1378
+msgid "System"
 msgstr "Sistema"
 
-#: dbs.module:1413
-msgid "Formateando datos de"
-msgstr "Formateando datos de"
+#: dbs.module:1385
+msgid "Formatting data from"
+msgstr "Formateando datos desde"
 
-#: dbs.module:1421
-msgid "Base de datos completada"
+#: dbs.module:1393
+msgid "Database completed"
 msgstr "Base de datos completada"
 
-#: dbs.module:1500
-msgid "Títulos de los campos de tablas y vistas"
-msgstr "Títulos de los campos de tablas y vistas"
+#: dbs.module:1472
+msgid "Table and view field titles"
+msgstr "Títulos de campo de tablas y vistas"
 
-#: dbs.module:1502
-msgid "Títulos de las vistas"
+#: dbs.module:1474
+msgid "View titles"
 msgstr "Títulos de las vistas"
 
-#: dbs.module:1582
-msgid "Títulos de los campos de las vistas"
-msgstr "Títulos de los campos de las vistas"
+#: dbs.module:1554
+msgid "View field titles"
+msgstr "Títulos de campo de la vista"
 
-#: dbs.module:1742
+#: dbs.module:1714
 msgid "Date"
 msgstr "Fecha"
 
-#: dbs.module:1745
+#: dbs.module:1717
 msgid "Email"
 msgstr "Email"
 
-#: dbs.module:1746
+#: dbs.module:1718
 msgid "Mobile"
 msgstr "Móvil"
 
-#: dbs.module:1747
+#: dbs.module:1719
 msgid "Phone"
 msgstr "Teléfono"
 
-#: dbs.module:1750
+#: dbs.module:1722
 msgid "Quantity"
 msgstr "Cantidad"
 
-#: dbs.module:1751
+#: dbs.module:1723
 msgid "Price"
 msgstr "Precio"
 
-#: dbs.module:1752
+#: dbs.module:1724
 msgid "Trademark"
 msgstr "Marca comercial"
 
-#: dbs.module:1753
+#: dbs.module:1725
 msgid "Description"
 msgstr "Descripción"
 
-#: dbs.module:1754
+#: dbs.module:1726
 msgid "Address"
 msgstr "Habla a"
 
-#: dbs.module:1755
+#: dbs.module:1727 uty.module:553
 msgid "Vendor"
 msgstr "Vendedor"
 
-#: dbs.module:1756
+#: dbs.module:1728
 msgid "Class"
 msgstr "Clase"
 
-#: dbs.module:1757
+#: dbs.module:1729
 msgid "Code"
 msgstr "Código"
 
-#: dbs.module:1758
+#: dbs.module:1730
 msgid "City"
 msgstr "Ciudad"
 
-#: dbs.module:1759
-msgid "Simbol"
-msgstr "Simbol"
+#: dbs.module:1731
+msgid "Symbol"
+msgstr "Simbolo"
 
-#: dbs.module:1760
+#: dbs.module:1732
 msgid "Job"
 msgstr "Trabajo"
 
-#: dbs.module:1761
+#: dbs.module:1733
 msgid "Client"
 msgstr "Cliente"
 
-#: dbs.module:1762
-msgid "Tipy"
-msgstr "Tipy"
+#: dbs.module:1734
+msgid "Type"
+msgstr "Tipo"
 
 #: dsk.module:110
-msgid "Seleccionar archivo"
+msgid "Select File"
 msgstr "Seleccionar archivo"
 
 #: dsk.module:119
-msgid "Filtro"
-msgstr "Filtro"
+msgid "Filter"
+msgstr "Filtrar"
 
 #: dsk.module:141
-msgid "Seleccionar directorio"
+msgid "Select directory"
 msgstr "Seleccionar directorio"
 
 #: dsk.module:196
-msgid "Hola"
+msgid "Hi"
 msgstr "Hola"
 
 #: modUtils.module:256
 msgid "Can't determine array type"
 msgstr "No se puede determinar el tipo de matriz"
 
-#: sog.module:577
-msgid "Desconocido"
+#: sog.module:102
+msgid "Unknown"
 msgstr "Desconocido"
 
-#: uty.module:576
-msgid "Autor"
+#: uty.module:552
+msgid "Author"
 msgstr "Autor"
 
-#: uty.module:577
-msgid "Proveedor"
-msgstr "Proveedor"
-
-#: uty.module:578
-msgid "Versión"
-msgstr "Versión"
-
-#: uty.module:579
-msgid "Fecha de este documento"
+#: uty.module:555
+msgid "Date of this document"
 msgstr "Fecha de este documento"
 
-#: uty.module:580
-msgid "Componentes"
+#: uty.module:556
+msgid "Components"
 msgstr "Componentes"
 
-#: uty.module:582
-msgid "esta formado por"
-msgstr "esta formado por"
+#: uty.module:558
+msgid "It is made up"
+msgstr "Esta hecho"
 
-#: uty.module:582
-msgid "métodos"
+#: uty.module:558
+msgid "methods"
 msgstr "métodos"
 
-#: uty.module:582
-msgid "módulos"
+#: uty.module:558
+msgid "modules"
 msgstr "módulos"
 
 #: vag.module:455
-msgid "Espacios al inicio y al final"
-msgstr "Espacios al inicio y al final"
+msgid "Spaces at the beginning and at the end"
+msgstr "Espacios al principio y al final"
 
 #: vag.module:457
-msgid "Espacio al inicio"
-msgstr "Espacio al inicio"
+msgid "Space at the start"
+msgstr "Espacio al principio"
 
 #: vag.module:461
-msgid "Espacio al final"
+msgid "Space at the end"
 msgstr "Espacio al final"
 
 #: vag.module:466
-msgid "Repetidos"
+msgid "Repeated"
 msgstr "Repetidos"
 
 #: vag.module:493
-msgid "Excluidos"
-msgstr "Excluidos"
+msgid "Excluded"
+msgstr "Excluido"
 
 #: vag.module:497
-msgid "Mas de una letra mayúscula"
-msgstr "Mas de una letra mayúscula"
+msgid "More than one capital letter"
+msgstr "Más de una letra mayúscula"
+

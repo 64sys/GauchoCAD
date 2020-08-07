@@ -146,7 +146,7 @@ Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' esta rutina es l
 
         End If
 
-        clsDrawingAids.HelperTrabajo = ("Selected ") & Str$(Me.selectionCount) & (" elements")
+        clsDrawingAids.HelperTrabajo = ("Selected") & " " & Str$(Me.selectionCount) & " " & ("elements")
 
     Else If GripPoint >= 0 Then
 
@@ -264,4 +264,3 @@ Public Sub Draw() ' esta rutina es llamada por FCAD en el evento DrawingArea_Dra
     End If
 
 End
-

@@ -107,7 +107,7 @@ Public Function FileChooser(Optional strInputPath As String, Optional stxExt As 
         strInputPath = User.Home
     Endif
 
-    Dialog.Title = ("Seleccionar archivo")
+    Dialog.Title = ("Select File")
     Dialog.Filter = Null
 
     If stxExt Then
@@ -116,7 +116,7 @@ Public Function FileChooser(Optional strInputPath As String, Optional stxExt As 
                 stxFilter.Add("*." & String.LCase(strExt) & ";" & "*." & String.UCase(strExt))
             Next
             strFilterA = stxFilter.Join(";")
-            strFilterB = ("Filtro") & ": " & stxExt.Join(",")
+            strFilterB = ("Filter") & ": " & stxExt.Join(",")
             Dialog.Filter = [strFilterA, strFilterB]
         Endif
     Endif
@@ -138,7 +138,7 @@ Public Function DirChooser(Optional stInputPath As String) As String  ''Seleccio
         Dialog.Path = stInputPath
     Endif
 
-    Dialog.Title = ("Seleccionar directorio")
+    Dialog.Title = ("Select directory")
     Dialog.Filter = Null
     Dialog.SelectDirectory
 
@@ -193,7 +193,7 @@ Public Sub SendEmail(stxAddreses As String[], stxNames As String[], Optional str
     Endif
 
     If strBody = "" Then
-        strBody = ("Hola") & " " & strNames & "."
+        strBody = ("Hi") & " " & strNames & "."
     Endif
 
     Desktop.SendMail(stxAddreses,,, strSubject, strBody)

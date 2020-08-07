@@ -24,8 +24,8 @@
 
 Export
 
-Private Observer As Observer        ''Observador usaod para avisar si hay cambios sin aplicar
-Private cfg As New Collection       '' Coleccion de propiedades del proyecto
+Private Observer As Observer        '' Observer used to notify if there are changes not applied
+Private cfg As New Collection       '' Project property collection
 
 Public Sub _new(cin As Collection)
 
@@ -40,14 +40,6 @@ Public Function Run(cin As Collection) As Boolean
     Dim v As Variant
     Dim val As String
     Dim s As String
-
-    '' Estableciendo la conexion a la base de datos
-    'con = cin["Connection"]       ' Conexión a la base de datos
-    'adi = cin["AppDir"]           ' Directorio del programa
-    'apc = cin["AppCfg"]           ' Archivo de configuracion del programa
-    'dbc = cin["DbsCfg"]           ' Archivo de configuracion de la base de datos
-    'etx = cin["AppEdi"]           ' Editor de texto plano por defecto
-    'lgg = cin["AppLog"]           ' Registro de eventos de la aplicación.
 
     cfg = cin
 
@@ -133,7 +125,7 @@ Public Sub CControls()
     tob.Width = 35
     tob.Height = 35
     tob.Border = False
-    tob.Tooltip = ("Código fuente")
+    tob.Tooltip = ("Source code")
 
     tob = New ToolButton(pnlLinks) As "Url"
     tob.Name = "tob-" & "Email"
@@ -142,7 +134,7 @@ Public Sub CControls()
     tob.Width = 35
     tob.Height = 35
     tob.Border = False
-    tob.Tooltip = ("Contacto")
+    tob.Tooltip = ("Contact")
 
     If Exist("./artist.txt") Then
         strArtisData = File.Load("./artist.txt")
@@ -160,7 +152,7 @@ Public Sub CControls()
         tob.Width = 35
         tob.Height = 35
         tob.Border = False
-        tob.Tooltip = ("Licencia del programa")
+        tob.Tooltip = ("Program license")
 
         tob = New ToolButton(pnlLinks) As "Url"
         tob.Name = "tob-" & "Artist"
@@ -170,7 +162,7 @@ Public Sub CControls()
         If Exist(Application.Path &/ cfg["Icon"]) Then
             tob.Picture = Image.Load(Application.Path &/ cfg["Icon"]).Stretch(32, 32).Picture
         Else
-            Message.Warning(("El icono no existe") & gb.NewLine & Application.Path &/ cfg["Icon"])
+            Message.Warning(("The icon does not exist") & gb.NewLine & Application.Path &/ cfg["Icon"])
         Endif
 
         For int = 0 To stxTag.Max
@@ -179,7 +171,7 @@ Public Sub CControls()
                     If Exist(Application.Path &/ cfg["Icon"]) Then
                         tob.Picture = Image.Load(Application.Path &/ cfg["Icon"]).Stretch(32, 32).Picture
                     Else
-                        Message.Warning(("El icono no existe") & gb.NewLine & Application.Path &/ cfg["Icon"])
+                        Message.Warning(("The icon does not exist") & gb.NewLine & Application.Path &/ cfg["Icon"])
                     Endif
                 Case "website"
                     tob.Tooltip = stxVal[int]
@@ -192,7 +184,7 @@ Public Sub CControls()
 
     Endif
 
-    Me.Caption = ("Acerca de") & " " & String.UCaseFirst(Application.Name)
+    Me.Caption = ("About") & " " & String.UCaseFirst(Application.Name)
 
 End
 
@@ -212,7 +204,7 @@ Public Sub Url_Click()
         strType = "email"
         stxAddress.Add(strUrl)
 
-        strSubject = ("Hola desarrolladores de") & " " & Application.Name & " [" & uty.Timestamp(Now()) & "]"
+        strSubject = ("Hello developers of") & " " & Application.Name & " [" & uty.Timestamp(Now()) & "]"
 
     Else
         If InStr(strUrl, "http") > 0 Then

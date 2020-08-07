@@ -1,7 +1,7 @@
 # Gambas Form File 3.0
 
 { Form Form
-  MoveScaled(0,0,158,78)
+  MoveScaled(0,0,158,77)
   Background = Color.TextBackground
   Icon = Picture["logo.svg"]
   Arrangement = Arrange.Vertical
@@ -316,7 +316,8 @@
     }
   }
   { grpHelp Menu
-    Text = ("?")
+    #Translate = False
+    Text = "?"
     { mnuInfo Menu menuapp
       Name = "mnuInfo"
       Text = ("About")

@@ -26,7 +26,9 @@
 
 Export
 
-Public Sub DataExport(con As Connection, ctn As Collection) As String ''<p>Exportación de datos de un result en formato CSV. Los parametros de entrada son los siguientes.</p><ol start="0"><li>con - Conexión abierta a la base de datos</li><li>ctn - Colección con varios itemes</li></ol><li></li><p>La coleccíon debe tener los siguientes itemes</p><ul><li>File	La ruta completa del archivo que se desea exportar</li><li>Query	La consulta que se usara para listar los datos de la base de datos</li><li>Separator	El caracter separador de listas que se utilizara en el archivo de exportación</li></ul>
+'' <p> Data export of a result in CSV format. The input parameters are as follows. </p> <ol start = "0"> <li> con - Open connection to the database </li> <li> ctn - Collection with several items </li> < / ol> <li> </li> <p> The collection must have the following items </p> <ul> <li> File The full path of the file to be exported </li> <li> Query The query that will be used to list the database data </li> <li> Separator The list separator character that will be used in the export file </li> </ul>
+
+Public Sub DataExport(con As Connection, ctn As Collection) As String
 
     Dim res As Result
     Dim fld As ResultField
@@ -63,7 +65,9 @@ Public Sub DataExport(con As Connection, ctn As Collection) As String ''<p>Expor
 
 End
 
-Public Function DBTemplate(stxDB As String[]) As String ''Crea una plantilla de la base de datos que se le pasa como parametros.
+'' Create a database template that is passed to it as parameters.
+
+Public Function DBTemplate(stxDB As String[]) As String
 
     Dim conCreate As New Connection
     Dim strTemplate As String
@@ -114,7 +118,9 @@ Public Function FileSqlLoad(str As String) As String[]
 
 End
 
-Public Function DBConf(con As Connection, sXML As String, rp As Collection) As String ''Escribe el archivo XML del modelo de la base de datos
+'' Write the XML file of the database model
+
+Public Function DBConf(con As Connection, sXML As String, rp As Collection) As String
 
     Dim writer As New XmlWriter
     Dim ctn As New Collection
@@ -123,10 +129,7 @@ Public Function DBConf(con As Connection, sXML As String, rp As Collection) As S
     Dim tck As Date
     Dim fdata As Variant
     Dim hlpr As String
-    'Dim rn As New Collection          ''Lista de nombres para reemplazar
-    'Dim rf As New Collection          ''Lista de formatos
-    'Dim rg As New Collection          ''Lista de grupos
-    Dim rt As New Collection          ''Lista pivote
+    Dim rt As New Collection
     Dim tx As String
 
     hlpr = ""
@@ -149,14 +152,13 @@ Public Function DBConf(con As Connection, sXML As String, rp As Collection) As S
         For Each tbl In con.Tables
             If tbl.System = False Then
                 hlpr &= "rp.Add((\"" & tbl.Name & "\"), \"" & tbl.Name & "\")\n"
-                writer.StartElement("Table") 'de la tabla
-                writer.Attribute("Name", tbl.Name) 'de la tabla
+                writer.StartElement("Table")
+                writer.Attribute("Name", tbl.Name)
                 For Each tx In ["Title", "Group"]
                     If rp.Exist(tx) Then
                         rt = rp[tx]
                         If rt.Exist(tbl.Name) Then
                             writer.Attribute(tx, rt[tbl.Name])
-                            'Print ctn.Key & ":" & rt[tbl.Name]
                         Else
                             writer.Attribute(tx, "")
                         Endif
@@ -165,22 +167,7 @@ Public Function DBConf(con As Connection, sXML As String, rp As Collection) As S
                     Endif
                 Next
 
-                ' If rp.Exist(tbl.Name) Then
-                '   writer.Attribute("Title", rp[tbl.Name]) 'de la tabla
-                ' Else
-                '   writer.Attribute("Title", tbl.Name) 'de la tabla
-                ' Endif
-
-                ' If rp.Exist("groups") Then
-                '   rg = rp["groups"]
-                '   If rg.Exist(tbl.Name & "." & fld.Name) Then
-                '     writer.Attribute("Group", rg[tbl.Name & "." & fld.Name])
-                '   Else
-                '     writer.Attribute("Group", "")
-                '   Endif
-                ' Else
-                writer.Attribute("Group", "") 'de la tabla
-                ' Endif
+                writer.Attribute("Group", "")
 
                 For Each fld In tbl.Fields
                     hlpr &= "rp.Add((\"" & fld.Name & "\"), \"" & tbl.Name & "." & fld.Name & "\")\n"
@@ -191,11 +178,8 @@ Public Function DBConf(con As Connection, sXML As String, rp As Collection) As S
 
                     For Each fdata In ctn
                         Print ctn.Key & ": " & fdata
-                        'Select ctn.Key
-                        'Case "Title"
 
                         If rp.Exist(ctn.Key) Then
-                            'rt.Clear ' Hacer un clear a la colecion en este punto es una cagada grande como una casa.
                             rt = rp[ctn.Key]
                             If rt.Exist(tbl.Name & "." & fld.Name) Then
                                 writer.Attribute(ctn.Key, rt[tbl.Name & "." & fld.Name])
@@ -206,25 +190,7 @@ Public Function DBConf(con As Connection, sXML As String, rp As Collection) As S
                         Else
                             writer.Attribute(ctn.Key, fdata)
                         Endif
-
-                        ' If rp.Exist(tbl.Name & "." & fld.Name) Then
-                        '   writer.Attribute(ctn.Key, rp[tbl.Name & "." & fld.Name])
-                        ' Else
-                        '   writer.Attribute(ctn.Key, fdata)
-                        ' Endif
-
-                        ' Case Else
-                        '    writer.Attribute(ctn.Key, fdata)
-                        'End Select
-
                     Next
-
-                    ' If rp.Exist(tbl.Name) Then
-                    '   writer.Attribute("Title", rp[tbl.Name])
-                    ' Else
-                    '   writer.Attribute("Title", tbl.Name)
-                    ' Endif
-
                     writer.Attribute("OrderType", "")
                     writer.Attribute("OrderPosition", "")
                     writer.Attribute("Width", "75")
@@ -262,12 +228,12 @@ Public Function DBOpen(stxDB As String[]) As Connection ''Inicia una base de dat
     Dim tbl As Table
     Dim fld As Field
 
-    Dim strTbN As String  ' Nombre de tabla
-    Dim strFdN As String  ' Nombre de campo
-    Dim strFdT As String  ' Tipo de campo
-    Dim strTbR As String  ' Tabla de referencia
-    Dim strFdRi As String ' Campo clave de referencia
-    Dim strFdRs As String ' Campo a mostrar de la tabla dereferencia
+    Dim strTbN As String  ' Table name
+    Dim strFdN As String  ' Field name
+    Dim strFdT As String  ' Field type
+    Dim strTbR As String  ' Reference table
+    Dim strFdRi As String ' Reference key field
+    Dim strFdRs As String ' Field to show from the reference table
 
     con.Type = stxDB[0]
     con.Host = stxDB[1]
@@ -279,7 +245,7 @@ Public Function DBOpen(stxDB As String[]) As Connection ''Inicia una base de dat
     Select con.Type
 
         Case "sqlite3"
-            'Averiguar si la base de datos existe, que en el caso de sqlite3 es un archivo.sqlite
+            ''Find out if the database exists, which in the case of sqlite3 is a .sqlite file
             If Exist(con.Host &/ con.Name) Then
                 con.Open
                 For Each tbl In con.Tables
@@ -290,7 +256,7 @@ Public Function DBOpen(stxDB As String[]) As Connection ''Inicia una base de dat
                         strFdN = fld.Name
 
                         If tbl.PrimaryKey.Find(fld.Name) <> -1 Then
-                            ' ¿El campo es clave primaria de la tabla?
+                            ' Is the field the primary key of the table?
                             strFdT = DataType(-1)
                         Else
                             strFdT = DataType(fld.Type)
@@ -302,7 +268,7 @@ Public Function DBOpen(stxDB As String[]) As Connection ''Inicia una base de dat
                     Next
                 Next
             Else
-                ' No existe el archivo
+                '' File does not exist
 
                 Copy con.Name To con.Host &/ con.Name
                 Wait 0.1
@@ -327,7 +293,9 @@ Public Function DBOpen(stxDB As String[]) As Connection ''Inicia una base de dat
 
 End
 
-Public Function DBSqlite(stxDB As String[], Optional strMod As String) As Connection ''Inicia una base de datos o la crea y la inicia. Devuelve una conexion y como parametro de entrada requiere una matriz con los parametros de la base. Si la base de datos no existe, entonces crea una y la inicia.   ' Si la base de datos si existe, entonces puede hacer dos cosas, iniciarla o crear una copia de respaldo y crear una base nueva. stxDB contiene los paramentros de la base. 0 - DBHost. 1 - DBName. 2 - DBPath
+'' Starts a database or creates and starts it. Returns a connection and as an input parameter requires an array with the base parameters. If the database does not exist, then create one and start it. 'If the database does exist then you can do two things, start it or create a backup and create a new database. stxDB contains the base parameters. 0 - DBHost. 1 - DBName. 2 - DBPath
+
+Public Function DBSqlite(stxDB As String[], Optional strMod As String) As Connection
 
     Dim conCreate As New Connection
     Dim strTimeStamp As String
@@ -385,7 +353,9 @@ Public Function DBSqlite(stxDB As String[], Optional strMod As String) As Connec
 
 End
 
-Public Function RecordPrimaryKey(con As Connection, tab As String) As String ''Devuelve el nombre del campo clave de la tabla. GEFStarter.conProgram As Connection es laq conxión a la base de  datos. tab As String es el nombre de la tabla sobre la que intenta saber que tipo de campo es. strFieldCheck As String Es el campo a verificar. strValueCheck As String Es el valor del registro para el campo a verificar. GEFStarter.stxTableFields As String[] Es la lista de todos los campos de la base de datos.
+'' Returns the name of the key field in the table. GEFStarter.conProgram As Connection is the connection to the database. tab As String is the name of the table on which you try to know what type of field it is. strFieldCheck As String It is the field to verify. strValueCheck As String Is the value of the record for the field to verify. GEFStarter.stxTableFields As String [] It is the list of all the fields in the database.
+
+Public Function RecordPrimaryKey(con As Connection, tab As String) As String
 
     Dim tbl As Table
     Dim stx As New String[]
@@ -397,7 +367,9 @@ Public Function RecordPrimaryKey(con As Connection, tab As String) As String ''D
 
 End
 
-Public Function RecordValue(con As Connection, tab As String, strField As String, strFKey As String, intKey As Integer) As String ''Devuelve el valor para un campo dado y una clave.
+'' Returns the value for a given field and a key.
+
+Public Function RecordValue(con As Connection, tab As String, strField As String, strFKey As String, intKey As Integer) As String
 
     Dim intQty As Integer
     Dim str As String
@@ -1403,14 +1375,14 @@ Public Sub MDBtoSQL(strFilePath As String) As String[] ''Estadisticas de bases d
         strFileSQL = strJobPath &/ strStatTable & "-data.sql"
 
         prsB = Shell "mdb-export -D %Y%m%d%H%M%S -H -b strip -R '::rrr::' -d '::ccc::' " & strFilePath & " " & strStatTable & " > " & strFileExt
-        Exec ["notify-send", "-t", "2000", ("Sistema"), ("Extrayendo datos de") & " " & strStatTable]
+        Exec ["notify-send", "-t", "2000", ("System"), ("Extracting data from") & " " & strStatTable]
         While prsB.State = prsB.Running
 
             Wait 0.1
         Wend
 
         prsC = Shell "tr -cd '[:print:]' < " & strFileExt & " | tr -s ' ' | sed 's/\\d96//g' | sed 's/\\d39//g' | sed 's/,/~/g' | sed 's/\\d34/\\d39/g'  | sed 's/::ccc::::ccc::/::ccc::\\d39\\d39::ccc::/g' | sed 's/::ccc::::ccc::/::ccc::\\d39\\d39::ccc::/g' | sed 's/::ccc::::ccc::/::ccc::\\d39\\d39::ccc::/g' | sed 's/::rrr::/\\n/g' | sed '/^$/d' | sed -e 's/^/INSERT INTO `" & strStatTable & "` VALUES (/' | sed 's/.*/&);/' | sed 's/::ccc::\\d41;/::ccc::\\d39\\d39\\d41;/g' | sed 's/::ccc::/,/g' > " & strFileSQL
-        Exec ["notify-send", "-t", "2000", ("Sistema"), ("Formateando datos de") & " " & strStatTable]
+        Exec ["notify-send", "-t", "2000", ("System"), ("Formatting data from") & " " & strStatTable]
         While prsC.State = prsC.Running
 
             Wait 0.1
@@ -1418,7 +1390,7 @@ Public Sub MDBtoSQL(strFilePath As String) As String[] ''Estadisticas de bases d
 
     Next
 
-    Exec ["notify-send", "-t", "2000", ("Sistema"), ("Base de datos completada")]
+    Exec ["notify-send", "-t", "2000", ("System"), ("Database completed")]
 
     ' Extraccion de los archivos csv de las tablas
     File.Save(strJobPath &/ "tables.txt", stxStatTables.Join("\n"))
@@ -1497,9 +1469,9 @@ Public Function MakeDBProfile(stx As String[]) As String[] ''Esta función crea 
     stxRWords = RWords()
     stxUsual = UsualFieldsNames()
 
-    stxOut.Add("'// " & ("Títulos de los campos de tablas y vistas"))
+    stxOut.Add("'// " & ("Table and view field titles"))
 
-    stxViewTitles.Add("'// " & ("Títulos de las vistas"))
+    stxViewTitles.Add("'// " & ("View titles"))
     strViewCurrent = ""
 
     If stx.Count > 0 Then
@@ -1579,9 +1551,9 @@ Public Function MakeDBProfile(stx As String[]) As String[] ''Esta función crea 
             Endif
         Next
     Endif
-    stxOut.Add("'// " & ("Títulos de los campos de las vistas"))
+    stxOut.Add("'// " & ("View field titles"))
     stxOut.Insert(stxFViews)
-    stxOut.Add("'// " & ("Títulos de las vistas"))
+    stxOut.Add("'// " & ("View titles"))
     stxOut.Insert(stxViewTitles)
 
     Return stxOut
@@ -1756,10 +1728,10 @@ Public Function UsualFieldsNames() As String[][]
     stx.Add(["class", ("Class")])
     stx.Add(["cod", ("Code")])
     stx.Add(["city", ("City")])
-    stx.Add(["symbol", ("Simbol")])
+    stx.Add(["symbol", ("Symbol")])
     stx.Add(["job", ("Job")])
     stx.Add(["client", ("Client")])
-    stx.Add(["type", ("Tipy")])
+    stx.Add(["type", ("Type")])
     stx.Add(["color", ("Color")])
 
     Return stx

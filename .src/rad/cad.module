@@ -2247,7 +2247,7 @@ Public Function CADConfig() As Collection
     ctnTmp.Add(str, "Value")
     ctnTmp.Add("String", "Data")
     ctnTmp.Add("txo", "Ctrl")
-    ctnTmp.Add(("Editor de texto simple por defecto"), "Desc")
+    ctnTmp.Add(("Simple text editor by default"), "Desc")
     str = ctnTmp["Name"]
     ctnOut.Add(ctnTmp.Copy(), str)
 
@@ -2257,13 +2257,13 @@ Public Function CADConfig() As Collection
     ctnTmp.Add("/usr/share/icons/Numix/32", "Value")
     ctnTmp.Add("String", "Data")
     ctnTmp.Add("dio", "Ctrl")
-    ctnTmp.Add(("Íconos del programa"), "Desc")
+    ctnTmp.Add(("Program icons"), "Desc")
     str = ctnTmp["Name"]
     ctnOut.Add(ctnTmp.Copy(), str)
 
     ' CAD
     ctnTmp.Add("CAD.Background-Dark", "Name")
-    ctnTmp.Add(("CAD"), "Group")
+    ctnTmp.Add("CAD", "Group")
     ctnTmp.Add(False, "Value")
     ctnTmp.Add("Boolean", "Data")
     ctnTmp.Add("cko", "Ctrl")
@@ -2272,7 +2272,7 @@ Public Function CADConfig() As Collection
     ctnOut.Add(ctnTmp.Copy(), str)
 
     ctnTmp.Add("CAD.DrawOriginals", "Name")
-    ctnTmp.Add(("CAD"), "Group")
+    ctnTmp.Add("CAD", "Group")
     ctnTmp.Add(False, "Value")
     ctnTmp.Add("Boolean", "Data")
     ctnTmp.Add("cko", "Ctrl")
@@ -2281,7 +2281,7 @@ Public Function CADConfig() As Collection
     ctnOut.Add(ctnTmp.Copy(), str)
 
     ctnTmp.Add("CAD.DrawMarcados", "Name")
-    ctnTmp.Add(("CAD"), "Group")
+    ctnTmp.Add("CAD", "Group")
     ctnTmp.Add(True, "Value")
     ctnTmp.Add("Boolean", "Data")
     ctnTmp.Add("cko", "Ctrl")
@@ -2290,7 +2290,7 @@ Public Function CADConfig() As Collection
     ctnOut.Add(ctnTmp.Copy(), str)
 
     ctnTmp.Add("CAD.DrawSoloColumnas", "Name")
-    ctnTmp.Add(("CAD"), "Group")
+    ctnTmp.Add("CAD", "Group")
     ctnTmp.Add(False, "Value")
     ctnTmp.Add("Boolean", "Data")
     ctnTmp.Add("cko", "Ctrl")
@@ -2299,7 +2299,7 @@ Public Function CADConfig() As Collection
     ctnOut.Add(ctnTmp.Copy(), str)
 
     ctnTmp.Add("CAD.DrawBounds", "Name")
-    ctnTmp.Add(("CAD"), "Group")
+    ctnTmp.Add("CAD", "Group")
     ctnTmp.Add(False, "Value")
     ctnTmp.Add("Boolean", "Data")
     ctnTmp.Add("cko", "Ctrl")
@@ -2308,7 +2308,7 @@ Public Function CADConfig() As Collection
     ctnOut.Add(ctnTmp.Copy(), str)
 
     ctnTmp.Add("CAD.FormatoCotas", "Name")
-    ctnTmp.Add(("CAD"), "Group")
+    ctnTmp.Add("CAD", "Group")
     ctnTmp.Add("0.00", "Value")
     ctnTmp.Add("String", "Data")
     ctnTmp.Add("txo", "Ctrl")
@@ -2317,7 +2317,7 @@ Public Function CADConfig() As Collection
     ctnOut.Add(ctnTmp.Copy(), str)
 
     ctnTmp.Add("CAD.ColorForSelected", "Name")
-    ctnTmp.Add(("CAD"), "Group")
+    ctnTmp.Add("CAD", "Group")
     ctnTmp.Add(&H70E000, "Value")
     ctnTmp.Add("String", "Data")
     ctnTmp.Add("txo", "Ctrl")
@@ -2326,7 +2326,7 @@ Public Function CADConfig() As Collection
     ctnOut.Add(ctnTmp.Copy(), str)
 
     ctnTmp.Add("CAD.ToolActive", "Name")
-    ctnTmp.Add(("CAD"), "Group")
+    ctnTmp.Add("CAD", "Group")
     ctnTmp.Add(True, "Value")
     ctnTmp.Add("Boolean", "Data")
     ctnTmp.Add("cko", "Ctrl")
@@ -2334,35 +2334,35 @@ Public Function CADConfig() As Collection
     str = ctnTmp["Name"]
     ctnOut.Add(ctnTmp.Copy(), str)
 
-    ctnTmp.Add("CAD.Ortogonal", "Name")
-    ctnTmp.Add(("CAD"), "Group")
+    ctnTmp.Add("CAD.Orthogonal", "Name")
+    ctnTmp.Add("CAD", "Group")
     ctnTmp.Add(False, "Value")
     ctnTmp.Add("Boolean", "Data")
     ctnTmp.Add("cko", "Ctrl")
-    ctnTmp.Add(("Ortogonal"), "Desc")
+    ctnTmp.Add(("Orthogonal"), "Desc")
     str = ctnTmp["Name"]
     ctnOut.Add(ctnTmp.Copy(), str)
 
-    ctnTmp.Add("CAD.OrtogonalForzado", "Name")
-    ctnTmp.Add(("CAD"), "Group")
+    ctnTmp.Add("CAD.OrthogonalForced", "Name")
+    ctnTmp.Add("CAD", "Group")
     ctnTmp.Add(False, "Value")
     ctnTmp.Add("Boolean", "Data")
     ctnTmp.Add("cko", "Ctrl")
-    ctnTmp.Add(("Oorthogonal forced"), "Desc")
+    ctnTmp.Add(("Orthogonal forced"), "Desc")
     str = ctnTmp["Name"]
     ctnOut.Add(ctnTmp.Copy(), str)
 
-    ctnTmp.Add("CAD.OrtogonalIgnorado", "Name")
-    ctnTmp.Add(("CAD"), "Group")
+    ctnTmp.Add("CAD.OrthogonalNoteless", "Name")
+    ctnTmp.Add("CAD", "Group")
     ctnTmp.Add(False, "Value")
     ctnTmp.Add("Boolean", "Data")
     ctnTmp.Add("cko", "Ctrl")
-    ctnTmp.Add(("Oorthogonal ignored"), "Desc")
+    ctnTmp.Add(("Orthogonal ignored"), "Desc")
     str = ctnTmp["Name"]
     ctnOut.Add(ctnTmp.Copy(), str)
 
     ctnTmp.Add("CAD.flgShowInspector", "Name")
-    ctnTmp.Add(("CAD"), "Group")
+    ctnTmp.Add("CAD", "Group")
     ctnTmp.Add(False, "Value")
     ctnTmp.Add("Boolean", "Data")
     ctnTmp.Add("cko", "Ctrl")

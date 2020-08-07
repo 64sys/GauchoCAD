@@ -42,7 +42,7 @@ Public Function Start(Optional ElemToBuild As Variant, Optional _Mode As Integer
     Me.PoiChecking = False
     Me.EntityChecking = True
 
-    clsDrawingAids.HelperTrabajo = ("Offset, enter distance [0.10]:")
+    clsDrawingAids.HelperTrabajo = "Offset, " & ("enter distance") & " [0.10]"
     Me.NextParamType = "F"
     Me.NextParamDefault = 0.1
     ' para esta herramienta necesito desdeleciconar todo
@@ -71,7 +71,7 @@ Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' called by FCAD->
                     Me.PointsDone = 2
                 Case Else
                     Me.iEntitySelected = -1
-                    clsDrawingAids.ErrorMessage = "Can't offset that entity"
+                    clsDrawingAids.ErrorMessage = ("Can't offset that entity")
             End Select
 
             ' punto real base
@@ -146,7 +146,7 @@ Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' called by FCAD->
         clsEntities.glGenDrawList()
         clsEntities.glGenDrawListAll
         gcd.Redraw
-        clsDrawingAids.HelperTrabajo = ("Offset: select an entity or <Esc>")
+        clsDrawingAids.HelperTrabajo = "Offset: " & ("select an entity") & "/<Esc>"
 
         Me.PointsDone = 1
 
@@ -233,7 +233,7 @@ Public Sub KeyText(EnteredText As String)
             ' AdvanceStep
 
         Case "F", "M", "A", "L"                 ' Float, Mixed, Angle, Longitud
-            errtxt = "enter a valid text size"
+            ErrTxt = ("enter a valid text size")
 
             If EnteredText = "" Then
 
@@ -244,7 +244,7 @@ Public Sub KeyText(EnteredText As String)
                 Offset = CFloat(EnteredText)
 
             Endif
-            clsDrawingAids.HelperTrabajo = ("Offset: select an entity")
+            clsDrawingAids.HelperTrabajo = "Offset: " & ("select an entity")
 
             Inc Me.PointsDone
 
@@ -266,6 +266,6 @@ Finally
 Catch
 
     ' unexpected input
-    clsDrawingAids.ErrorMessage = ("Bad input" & ErrTxt)
+    clsDrawingAids.ErrorMessage = ("Bad input") & " " & ErrTxt
 
 End

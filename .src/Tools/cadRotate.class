@@ -37,22 +37,22 @@ Public Function Start(Optional ElemToBuild As Variant, Optional _Mode As Integer
     Me.PointsDone = 0
     Me.PointsTotal = 2
 
-    clsDrawingAids.HelperTrabajo = ("Rotate ")
+    clsDrawingAids.HelperTrabajo = ("Rotate") & " "
 
     ' chequeamos si hubo seleccion previa
     Me.SelectionCount = clsEntities.GetSelectionCount()
 
     If Me.SelectionCount = 0 Then                                     ' we have no elements in the selection
 
-        clsDrawingAids.Helper.texto = clsDrawingAids.HelperTrabajo & (": Selecct entities")
+        clsDrawingAids.Helper.texto = clsDrawingAids.HelperTrabajo & ": " & ("Select entities")
 
         gcd.clsJobPrevious = Me
         gcd.clsJob = clsDefaultJob
 
     Else                                                                    ' need the first point
 
-        clsDrawingAids.Helper.texto = clsDrawingAids.HelperTrabajo & (": Base point")
-        clsDrawingAids.HelperTrabajo = clsDrawingAids.HelperTrabajo & Str(Me.SelectionCount) & (" elements")
+        clsDrawingAids.Helper.texto = clsDrawingAids.HelperTrabajo & ": " & ("Base point")
+        clsDrawingAids.HelperTrabajo = clsDrawingAids.HelperTrabajo & Str(Me.SelectionCount) & " " & ("elements")
         Me.inxSelected.Clear
         For i = 0 To appmain.hFCAD.arrEntities.Max                  ' recolecto las entidades a modificar
             If appmain.hFCAD.arrEntities[i].selected Then Me.inxSelected.Add(i)                               ' y las meto en un  array
@@ -79,7 +79,7 @@ Public Function MouseUp(mouseX As Integer, mouseY As Integer)
     If Me.PointsDone = 1 Then ' acabo de marcar el punto base
 
         ' ya tengo cosas seleccionadas
-        clsDrawingAids.Helper.texto = clsDrawingAids.HelperTrabajo & (": Angle [90]?")
+        clsDrawingAids.Helper.texto = clsDrawingAids.HelperTrabajo & ": " & ("Angle") & " [90]"
 
         ' punto real base
         Me.SelStartXr = puntos.Near(appmain.hFcad.Xreal(mousex))
@@ -143,7 +143,7 @@ Public Function MouseMove(mouseX As Integer, mouseY As Integer) ' called by FCAD
 
         Me.glAngle = Radianes * 180 / Pi
 
-        clsDrawingAids.Helper.texto = clsDrawingAids.HelperTrabajo & (": Angle [90]?") & Format$(Me.glAngle, "0.0")
+        clsDrawingAids.Helper.texto = clsDrawingAids.HelperTrabajo & ": " & ("Angle") & " [90]" & Format$(Me.glAngle, "0.0")
 
     End If
 

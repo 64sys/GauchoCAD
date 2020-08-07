@@ -26,12 +26,12 @@ Public Const Gender As String = "Ellipse"
 Public Const PointsToDraw As Integer = 1             ' minimal point requered for drawing something usefull
 Public Const HelperTrabajo As String = ("Draw an ellipse")
 Public Const ParamType As String = "PPFFF"
-Public Const ParamHelper As String = ("Start point;Major Radious;Minor/Major;Start;End")      ' a little text that is shown at the prompt waiting for user input during build
+Public Const ParamHelper As String = "Start point;Major Radious;Minor/Major;Start;End"      ' a little text that is shown at the prompt waiting for user input during build
 Public Const ParamDefault As String = " ;  ;0.5;0;360"
 Public Const USEWITH As String = "clsEntityBuilder"
 Public Const DrawingOrder As Integer = 0        ' 1 = draws first
-Public Const OrtogonalIgnorado As Boolean = False
-Public Const OrtogonalForzado As Boolean = False
+Public Const OrthogonalNoteless As Boolean = False
+Public Const OrthogonalForced As Boolean = False
 Public Const StretchAble As Boolean = True           ' Si lo puedo deformar
 Public DrawAble As Boolean = False          ' True si durante la construccion ya tiene suficientes elementos para poder hacer una representacion digna
 Public Finished As Boolean = False          ' colocar en true cuando se llegue a completar

@@ -29,7 +29,7 @@ Public Function Start(Optional filename As Variant, Optional _mode As Integer = 
     Dim f As String
 
     If filename = "" Then
-        Dialog.Filter = ["*.gcad", ("Archivos de GauchoCAD")]
+        Dialog.Filter = ["*.gcad", ("Files") & " GauchoCAD"]
         Dialog.OpenFile(False)
 
         f = Dialog.Path

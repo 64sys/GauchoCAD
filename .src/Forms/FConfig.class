@@ -22,18 +22,18 @@
 ' Boston, MA  02110-1301  USA
 '
 
-' Esta clase sirve para editar un archivo XML de configuración.
+' This class is for editing a configuration XML file.
 
 Export
 
-Public Observer As Observer        ''Observador usaod para avisar si hay cambios sin aplicar
+Public Observer As Observer        '' Observer used to notify if there are changes not applied
 '------------------------------------------------------------------------------
 ' Variables que se pasaron desde el módulo de inicio
-Private apc As String               '' Archivo de configuracion del programa
-Private lgg As Logger               '' Registro de eventos de la aplicación.
+Private apc As String               '' Program configuration file
+Private lgg As Logger               '' Application event log.
 '------------------------------------------------------------------------------
-Private ctn As New Collection       '' Colección de variables del programa que reflejan los cambios de configuración.
-Private cfg As New Collection       '' Coleccion de propiedades del proyecto
+Private ctn As New Collection       '' Collection of program variables that reflect configuration changes.
+Private cfg As New Collection       '' Project property collection
 
 Public Sub _new(cin As Collection)
 
@@ -48,7 +48,7 @@ Public Sub Run(cin As Collection) As Boolean
     Dim ictn As New Collection
     Dim iSet As String
 
-    '' Estableciendo la conexion a la base de datos
+    '' Establishing the connection to the database
     'con = cin["Connex"]       ' Conexión a la base de datos
     'adi = cin["AppDir"]           ' Directorio del programa
     apc = cin["AppCfg"]           ' Archivo de configuracion del programa
@@ -95,13 +95,17 @@ Public Sub Run(cin As Collection) As Boolean
 
 End
 
-Public Sub Observer_Close() '' Utilización de un observador para guardar los cambios antesde cerar el formulario si es que los hay.
+'' Using an observer to save changes before closing the form if any.
+
+Public Sub Observer_Close()
 
     Me.Close
 
 End
 
-Private Sub ConfLoad() '' Crea los controles y carga los datos en estos desde la coleccion de configuración, que a su vez esta es rellenada con los datos del archivo conf.xml
+'' Create the controls and load the data into them from the configuration collection, which in turn is filled with the data from the conf.xml file
+
+Private Sub ConfLoad()
 
     Dim var As Variant                ''Valor de la varialbe
     Dim sType As String               ''Tipo de control a crear
@@ -484,7 +488,7 @@ Public Sub config_Click()
                     xmg.XmlConfSave(apc, ctn)
 
                     ctw.Clear
-                    ctw.Add(("Program configuration"), "Title")
+                    ctw.Add(("Preferences"), "Title")
                     ctw.Add(("The changes was saved"), "Body")
                     ctw.Add(LogLevel.Info, "Level")
                     Tweet(ctw)
@@ -504,7 +508,7 @@ Public Sub config_Click()
                         Me.Close
                     Endif
                     ctw.Clear
-                    ctw.Add(("Program configuration"), "Title")
+                    ctw.Add(("Preferences"), "Title")
                     ctw.Add(("A new copy was created"), "Body")
                     ctw.Add(LogLevel.Info, "Level")
                     Tweet(ctw)
@@ -517,7 +521,7 @@ Public Sub config_Click()
                     Shell "mv " & gz & " " & rgz Wait
                     If Exist(rgz) Then
                         ctw.Clear
-                        ctw.Add(("Program configuration"), "Title")
+                        ctw.Add(("Preferences"), "Title")
                         ctw.Add(("A copy was successfully archived"), "Body")
                         ctw.Add(LogLevel.Info, "Level")
                         Tweet(ctw)

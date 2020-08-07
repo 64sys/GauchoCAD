@@ -37,14 +37,14 @@ Public Function Start(Optional ElemToBuild As Variant, Optional _Mode As Integer
     Me.PointsDone = 0
     Me.PointsTotal = 3
 
-    clsDrawingAids.HelperTrabajo = ("Mirror ")
+    clsDrawingAids.HelperTrabajo = ("Mirror") & " "
 
     ' chequeamos si hubo seleccion previa
     Me.SelectionCount = clsEntities.GetSelectionCount()
 
     If Me.SelectionCount = 0 Then                                     ' we have no elements in the selection
 
-        clsDrawingAids.Helper.texto = clsDrawingAids.HelperTrabajo & (": Selecct entities")
+        clsDrawingAids.Helper.texto = clsDrawingAids.HelperTrabajo & ": " & ("Select entities")
 
         gcd.clsJobPrevious = Me
         gcd.clsJob = clsDefaultJob
@@ -52,8 +52,8 @@ Public Function Start(Optional ElemToBuild As Variant, Optional _Mode As Integer
     Else                                                                    ' need the first point
 
         Me.inxSelected.Clear
-        clsDrawingAids.Helper.texto = clsDrawingAids.HelperTrabajo & (": Base point")
-        clsDrawingAids.HelperTrabajo = clsDrawingAids.HelperTrabajo & Str(Me.SelectionCount) & (" elements")
+        clsDrawingAids.Helper.texto = clsDrawingAids.HelperTrabajo & ": " & ("Base point")
+        clsDrawingAids.HelperTrabajo = clsDrawingAids.HelperTrabajo & Str(Me.SelectionCount) & " " & ("elements")
 
         For i = 0 To appmain.hFCAD.arrEntities.Max                  ' recolecto las entidades a modificar
             If appmain.hFCAD.arrEntities[i].selected Then Me.inxSelected.Add(i)                               ' y las meto en un  array
@@ -80,7 +80,7 @@ Public Function MouseUp(mouseX As Integer, mouseY As Integer)
     If Me.PointsDone = 1 Then ' acabo de marcar el punto base
 
         ' ya tengo cosas seleccionadas
-        clsDrawingAids.Helper.texto = clsDrawingAids.HelperTrabajo & (": Angle [90]?")
+        clsDrawingAids.Helper.texto = clsDrawingAids.HelperTrabajo & ": " & ("Angle") & " [90]"
 
         ' punto real base
         Me.SelStartXr = puntos.Near(appmain.hFcad.Xreal(mousex))
@@ -106,7 +106,7 @@ Public Function MouseUp(mouseX As Integer, mouseY As Integer)
         '     ' TODO: reparar -> appmain.hFCAD.HabilitarBotones
         'Me.SelEndXr = puntos.Near(appmain.hFcad.Xreal(mousex)
         'Me.SelEndyr = puntos.Near(appmain.hFcad.Yreal(mouseY))
-        clsDrawingAids.Helper.texto = clsDrawingAids.HelperTrabajo & (": Keep originals (Y/N)? [Y]")
+        clsDrawingAids.Helper.texto = clsDrawingAids.HelperTrabajo & ": " & ("Keep originals") & " (Y/N)[Y]"
         'Radianes = Ang(Me.SelEndXr - Me.SelStartXr, Me.SelEndYr - Me.SelStartYr)
         '
         'Me.Finish()
@@ -146,12 +146,12 @@ Public Function KeyText(EnteredText As String) ' esta rutina es llamada por FCAD
             Radianes = 90 / 180 * Pi
             Inc Me.PointsDone
 
-            clsDrawingAids.Helper.texto = clsDrawingAids.HelperTrabajo & (": Keep originals (Y/N)? [Y]")
+            clsDrawingAids.Helper.texto = clsDrawingAids.HelperTrabajo & ": " & ("Keep originals") & " (Y/N)[Y]"
 
         Else
             Radianes = CFloat(EnteredText) / 180 * Pi
             Inc Me.PointsDone
-            clsDrawingAids.Helper.texto = clsDrawingAids.HelperTrabajo & (": Keep originals (Y/N)? [Y]")
+            clsDrawingAids.Helper.texto = clsDrawingAids.HelperTrabajo & ": " & ("Keep originals") & " (Y/N)[Y]"
         End If
 
     Else If Me.PointsDone = 2 Then

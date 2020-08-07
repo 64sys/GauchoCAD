@@ -99,7 +99,7 @@ Public Function Distro() As String
 
     stxDistro = Split(strDistro, " ")
 
-    strDistroShort = "Desconocida"
+    strDistroShort = ("Unknown")
 
     For intN = 0 To stxDistro.Max
 
@@ -574,7 +574,7 @@ Public Function LastUpgrade() As String ''Devuelve la Fecha de la ultima vez que
             strLastUpgrade = RTrim(Replace(strLastUpgrade, "\n", " "))
 
         Case Else
-            strLastUpgrade = ("Desconocido")
+            strLastUpgrade = ("Unknown")
     End Select
 
     Return strLastUpgrade
