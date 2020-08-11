@@ -54,8 +54,8 @@ Public CurrentLtype As Integer
 Public SelectedWidth As Boolean
 
 Private PropertiesFlag As Boolean = False
-Private LayersFlag As Boolean = False
-Private BlocksFlag As Boolean = False
+'Private LayersFlag As Boolean = False
+'Private BlocksFlag As Boolean = False
 'Private xxxFlag As Boolean = False ' Future expansion for mode panels to show
 
 'variables de ambiente
@@ -63,7 +63,7 @@ Public flgShowInspector As Boolean = True
 Public HistoCom As New String[]     '' Commands history
 'Public ListCom As New String[]      '' Commands list
 'Public AliasCom As New String[]     '' Commands alias
-Private p As Integer
+'Private p As Integer
 
 Public cMod As New Collection       '' All drawings common collection
 Public cProp As New Collection      '' Properties list
@@ -78,7 +78,7 @@ Public Sub Run(cin As Collection)
     Dim i As Integer
     Dim iSet As String
     Dim z As Integer
-    Dim ctr As Object
+    'Dim ctr As Object
     Dim r As Integer
     Dim g As Integer
     Dim b As Integer
@@ -241,7 +241,7 @@ Public Sub LoadColors()
     Dim mui As Menu
     Dim cCol As Collection
     Dim ix As Variant[]
-    Dim isvg As String
+    'Dim isvg As String
     Dim imgColorCircle As Image
 
     cCol = Starter.cColors
@@ -513,7 +513,7 @@ End
 Public Sub LoadComboboxes(cMdl As Collection)
 
     Dim aLayer As Variant
-    Dim aStyle As Variant
+    'Dim aStyle As Variant
     Dim aWidth As Variant
     Dim aDimSt As Variant
 
@@ -856,7 +856,7 @@ End
 Public Sub btnLtypes_MouseDown()
 
     Dim lst As FLtypes
-    Dim lty As New Collection
+    'Dim lty As New Collection
     Dim vrx As Variant[]
     Dim img2 As Image
 
@@ -987,7 +987,7 @@ Public Sub btnSave_Click()
     Dim ly As Collection
     Dim Changed As Boolean
     Dim te As Entity
-    Dim obj As Entity
+    'Dim obj As Entity
 
     lay = APPMain.hFCAD.cModel["Layers"]
 
@@ -1170,7 +1170,7 @@ End
 
 Public Sub Form_KeyPress()
 
-    Dim iAlias As Integer
+    'Dim iAlias As Integer
     Dim com As Variant
     Dim umx As Integer     '' Index in undo array
     Dim uEnty As Entity    '' Undo entity

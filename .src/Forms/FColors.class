@@ -21,7 +21,7 @@
 ' Boston, MA  02110-1301  USA
 '
 'Private Coords As Integer[]
-Private wmax As Integer
+'Private wmax As Integer
 Private iCurrentColor As Integer
 
 'Public Sub _new(cor As Integer[])
@@ -37,7 +37,7 @@ Public Sub Form_Open()
     Dim btn As ToolButton
     Dim crs As New String[]
     Dim img As Image
-    Dim cr As Color
+    '    Dim cr As Color
     Dim s As Integer
     Dim r As Integer
     Dim g As Integer

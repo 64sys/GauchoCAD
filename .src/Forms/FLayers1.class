@@ -26,7 +26,7 @@ Private lbx As New String[]
 
 Private xStyles As New String[]
 Private xWeights As New String[]
-Private xColors As New String[]
+'Private xColors As New String[]
 
 Private draft As New Collection
 
@@ -196,8 +196,8 @@ End
 Public Sub LMenu_Click()
 
     Dim obj As Object
-    Dim drf As Variant
-    Dim n As Variant
+    '    Dim drf As Variant
+    'Dim n As Variant
 
     obj = Last
 
@@ -249,7 +249,7 @@ Public Sub LTask(lTask As String)
             ' aplicamos los cambios de la tabla copiada a la tabla real del dibujo
             APPMain.hFCAD.cModel["Layers"] = cLayers.Copy()
 
-            Dim t As Float = Timer                              ' IGNORAR: estos Timers y Debug son para monitorear el tiempo de actualizacion
+            'Dim t As Float = Timer                              ' IGNORAR: estos Timers y Debug son para monitorear el tiempo de actualizacion
 
             ' aplicamos los parametros de los layers a las entidades
             gcd.ApplyLayerProperties
@@ -279,13 +279,13 @@ Public Sub TableView1_Click()
     Dim v As Variant
     Dim pval As Variant
 
-    Dim FClr As FColors
+    'Dim FClr As FColors
     Dim r As Integer
     Dim g As Integer
     Dim b As Integer
-    Dim tx As Integer
-    Dim ty As Integer
-    Dim imgColor As Image
+    'Dim tx As Integer
+    'Dim ty As Integer
+    'Dim imgColor As Image
 
     Select lbx[TableView1.Column]
 

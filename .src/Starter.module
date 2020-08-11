@@ -27,8 +27,8 @@ Private apc As String               '' Archivo de configuracion del programa
 Private CADConfig As String         '' CAD config file
 Private etx As String               '' Editor de texto plano por defecto
 Private lgf As String               '' Archivo de registro de incidencias
-Private dbn As String               '' Nombre de la base de datos
-Private sql As String               '' Sentencia SQL de creacion de la base de datos varia segun el tipo de base de datos.
+'Private dbn As String               '' Nombre de la base de datos
+'Private sql As String               '' Sentencia SQL de creacion de la base de datos varia segun el tipo de base de datos.
 Private lgg As Logger               '' Registro de eventos de la aplicación.
 
 ' Global vars
@@ -121,7 +121,7 @@ Public Sub Run()
     Endif
 
     '' Estableciendo las variables de entorno especiales con un archivo XML
-    ' CADConfig = adi &/ "cad.xml"
+    CADConfig = adi &/ "cad.xml"
     ' If Exist(File.Dir(CADConfig)) = False Then
     '     Mkdir File.Dir(CADConfig)
     ' Endif

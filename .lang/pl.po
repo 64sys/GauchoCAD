@@ -1,11 +1,11 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: GauchoCAD 3.15.0\n"
+"Project-Id-Version: GauchoCAD 0.0.78\n"
 "POT-Creation-Date: 2020-08-07 14:44 UTC\n"
-"PO-Revision-Date: 2020-08-10 17:53 UTC\n"
-"Last-Translator: bmk <bmk@gaucho>\n"
-"Language: es_AR\n"
+"PO-Revision-Date: 2020-08-10 22:31+CEST\n"
+"Last-Translator: trkSoft bmk@gaucho\n"
+"Language: pl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -16,299 +16,299 @@ msgstr "GauchoCAD"
 
 #: .project:2
 msgid "A little CAD made in Gambas"
-msgstr "Un pequeño CAD hecho en Gambas"
+msgstr "Mały CAD wykonany w Gambas"
 
 #: APPMain.class:192 FLayers.class:64 FLayers1.class:69 dbs.module:1735
 msgid "Color"
-msgstr "Color"
+msgstr "Kolor"
 
 #: APPMain.class:645
 msgid "Not implemented yet"
-msgstr "Aún sin implementar"
+msgstr "Jeszcze niezaimplementowane"
 
 #: APPMain.class:656
 msgid "Open file"
-msgstr "Abrir un archivo"
+msgstr "Otwórz plik"
 
 #: APPMain.class:758
 msgid "Configuration"
-msgstr "Configuración"
+msgstr "Konfiguracja"
 
 #: APPMain.class:971
 msgid "All"
-msgstr "Todas"
+msgstr "Wszystko"
 
 #: APPMain.class:1120
 msgid "varies"
-msgstr "varios"
+msgstr "różna"
 
 #: APPMain.form:108 FCAD.class:955
 msgid "File"
-msgstr "Archivo"
+msgstr "Plik"
 
 #: APPMain.form:112
 msgid "New"
-msgstr "Nuevo"
+msgstr "Nowy"
 
 #: APPMain.form:119
 msgid "Open"
-msgstr "Abierto"
+msgstr "otwarty"
 
 #: APPMain.form:126 FAlias.form:62 FLayers.form:60 FLayers1.form:60
 msgid "Save"
-msgstr "Salvar"
+msgstr "Zapisać"
 
 #: APPMain.form:133
 msgid "Save as"
-msgstr "Guardar como"
+msgstr "Zapisz jako"
 
 #: APPMain.form:140
 msgid "Import"
-msgstr "Importar"
+msgstr "Import"
 
 #: APPMain.form:147
 msgid "Export"
-msgstr "Exportar"
+msgstr "Eksport"
 
 #: APPMain.form:154
 msgid "Plot"
-msgstr "Trazar"
+msgstr "Wątek"
 
 #: APPMain.form:161
 msgid "Close"
-msgstr "Cerrar"
+msgstr "Blisko"
 
 #: APPMain.form:170 FConfig.form:66
 msgid "Quit"
-msgstr "Salir"
+msgstr "Porzucić"
 
 #: APPMain.form:177
 msgid "Options"
-msgstr "Opciones"
+msgstr "Opcje"
 
 #: APPMain.form:181 FConfig.form:28
 msgid "Preferences"
-msgstr "Preferencias"
+msgstr "Preferencje"
 
 #: APPMain.form:188
 msgid "Entities"
-msgstr "Entidades"
+msgstr "Podmioty"
 
 #: APPMain.form:193
 msgid "Line"
-msgstr "Línea"
+msgstr "Linia"
 
 #: APPMain.form:200 cadPLine.class:27
 msgid "Polyline"
-msgstr "Polilínea"
+msgstr "Polilinia"
 
 #: APPMain.form:207
 msgid "Circle"
-msgstr "Circulo"
+msgstr "okrąg"
 
 #: APPMain.form:214
 msgid "Arc"
-msgstr "Arco"
+msgstr "Łuk"
 
 #: APPMain.form:221
 msgid "Ellipse"
-msgstr "Elipse"
+msgstr "Elipsa"
 
 #: APPMain.form:228 cadSolid.class:27
 msgid "Solid"
-msgstr "Sólido"
+msgstr "Solidny"
 
 #: APPMain.form:235
 msgid "Text"
-msgstr "Texto"
+msgstr "Tekst"
 
 #: APPMain.form:242
 msgid "Multi Text"
-msgstr "Texto múltiple"
+msgstr "Multi Text"
 
 #: APPMain.form:249 FBlock.form:129 cadBlock.class:25
 msgid "Block"
-msgstr "Bloque"
+msgstr "Blok"
 
 #: APPMain.form:256
 msgid "Dimmension"
-msgstr "Cotas"
+msgstr "Wymiar"
 
 #: APPMain.form:263
 msgid "Ledader"
-msgstr "Flecha"
+msgstr "Ledader"
 
 #: APPMain.form:270
 msgid "Spline"
-msgstr "Spline"
+msgstr "Klin"
 
 #: APPMain.form:277 cadHatch.class:27
 msgid "Hatch"
-msgstr "Rayados"
+msgstr "Właz"
 
 #: APPMain.form:284
 msgid "Rectangle"
-msgstr "Rectángulo"
+msgstr "Prostokąt"
 
 #: APPMain.form:290
 msgid "Polygon"
-msgstr "Polígono"
+msgstr "Wielokąt"
 
 #: APPMain.form:297
 msgid "Point"
-msgstr "Punto"
+msgstr "Punkt"
 
 #: APPMain.form:304
 msgid "Tools"
-msgstr "Herramientas"
+msgstr "Przybory"
 
 #: APPMain.form:308
 msgid "Move"
-msgstr "Mover"
+msgstr "Ruszaj się"
 
 #: APPMain.form:315 cadCopy.class:36
 msgid "Copy"
-msgstr "Copiar"
+msgstr "Kopiuj"
 
 #: APPMain.form:322 FBlock.form:45 FHatch.form:39 cadScale.class:38
 msgid "Scale"
-msgstr "Escala"
+msgstr "Skala"
 
 #: APPMain.form:329 cadRotate.class:40
 msgid "Rotate"
-msgstr "Girar"
+msgstr "Obracać się"
 
 #: APPMain.form:336 cadMirror.class:40
 msgid "Mirror"
-msgstr "Espejar"
+msgstr "Lustro"
 
 #: APPMain.form:343 cadTrim.class:38
 msgid "Trim"
-msgstr "Cortar"
+msgstr "Trym"
 
 #: APPMain.form:350
 msgid "Fillet"
-msgstr "Filetear"
+msgstr "Filet"
 
 #: APPMain.form:357
 msgid "Chamfer"
-msgstr "Chaflán"
+msgstr "Ścięcie"
 
 #: APPMain.form:364 cadArray.class:47
 msgid "Array"
-msgstr "Matriz"
+msgstr "Szyk"
 
 #: APPMain.form:371
 msgid "Stretch"
-msgstr "Estirar"
+msgstr "Rozciągać"
 
 #: APPMain.form:378
 msgid "Offset"
-msgstr "Paralelas"
+msgstr "Offsetowy"
 
 #: APPMain.form:385 cadDivide.class:41
 msgid "Divide"
-msgstr "Dividir"
+msgstr "Podzielić"
 
 #: APPMain.form:392 cadBreak.class:41
 msgid "Break"
-msgstr "Partir"
+msgstr "Przerwa"
 
 #: APPMain.form:399 cadErase.class:35
 msgid "Delete"
-msgstr "Eliminar"
+msgstr "Usunąć"
 
 #: APPMain.form:406
 msgid "Structures"
-msgstr "Estructuras"
+msgstr "Struktury"
 
 #: APPMain.form:410
 msgid "Slab 4 sided"
-msgstr "Losa de 4 lados"
+msgstr "Płyta 4-stronna"
 
 #: APPMain.form:418
 msgid "Slab 3 sided"
-msgstr "Losa de 3 lados"
+msgstr "Płyta 3-stronna"
 
 #: APPMain.form:425
 msgid "Column"
-msgstr "Columna"
+msgstr "Kolumna"
 
 #: APPMain.form:432
 msgid "Beam"
-msgstr "Viga"
+msgstr "Belka"
 
 #: APPMain.form:439
 msgid "Wall column"
-msgstr "Columna de pared"
+msgstr "Kolumna ścienna"
 
 #: APPMain.form:447
 msgid "View"
-msgstr "Vista"
+msgstr "Widok"
 
 #: APPMain.form:451
 msgid "Zoom window"
-msgstr "Ventana de zoom"
+msgstr "Okno powiększenia"
 
 #: APPMain.form:458
 msgid "Pan view"
-msgstr "Vista panorámica"
+msgstr "Widok panoramiczny"
 
 #: APPMain.form:465
 msgid "Zoom extents"
-msgstr "Extensiones de zoom"
+msgstr "Powiększ zakres"
 
 #: APPMain.form:476 FAbout.class:187
 msgid "About"
-msgstr "Acerca de"
+msgstr "O"
 
 #: APPMain.form:483
 msgid "Help"
-msgstr "Ayuda"
+msgstr "Wsparcie"
 
 #: APPMain.form:530 FLayers.class:94 FLayers1.class:97 cadLayers.class:36
 msgid "Layers"
-msgstr "Capas"
+msgstr "Warstwy"
 
 #: APPMain.form:544
 msgid "Line widths"
-msgstr "Espesores de línea"
+msgstr "Szerokości linii"
 
 #: APPMain.form:552
 msgid "Dimmension styles"
-msgstr "Estilos de cotas"
+msgstr "Style wymiarowania"
 
 #: APPMain.form:618
 msgid " Smart entities"
-msgstr " Entidades inteligentes"
+msgstr " Inteligentne podmioty"
 
 #: APPMain.form:637
 msgid "Refresh"
-msgstr "Actualizar"
+msgstr "Odświeżać"
 
 #: APPMain.form:677 FAlias.class:42
 msgid "Command"
-msgstr "Orden"
+msgstr "Komenda"
 
 #: FAbout.class:128
 msgid "Source code"
-msgstr "Código fuente"
+msgstr "Kod źródłowy"
 
 #: FAbout.class:137
 msgid "Contact"
-msgstr "Contacto"
+msgstr "Kontakt"
 
 #: FAbout.class:155
 msgid "Program license"
-msgstr "Licencia dle programa"
+msgstr "Licencja programu"
 
 #: FAbout.class:165
 msgid "The icon does not exist"
-msgstr "El icono no existe"
+msgstr "Ikona nie istnieje"
 
 #: FAbout.class:207
 msgid "Hello developers of"
-msgstr "Hola desarrolladores de"
+msgstr "Witajcie programiści"
 
 #: FAlias.class:42 cadAlias.class:62
 msgid "Alias"
@@ -317,167 +317,167 @@ msgstr "Alias"
 #: FAlias.form:69 FBlock.form:73 FHatch.form:67 FLayers.form:68
 #: FLayers1.form:68 Form1.form:33
 msgid "Cancel"
-msgstr "Cancelar"
+msgstr "Anuluj"
 
 #: FBlock.form:31
 msgid "Block insertion"
-msgstr "Inserción de bloque"
+msgstr "Zablokuj wstawianie"
 
 #: FBlock.form:39
 msgid "Preview"
-msgstr "Avance"
+msgstr "Zapowiedź"
 
 #: FBlock.form:63 FHatch.form:57
 msgid "Rotation"
-msgstr "Rotación"
+msgstr "Obrót"
 
 #: FBlock.form:68
 msgid "Insert"
-msgstr "Insertar"
+msgstr "Wstawić"
 
 #: FBlock.form:122
 msgid "Folder"
-msgstr "Carpeta"
+msgstr "Teczka"
 
 #: FBlock.form:136
 msgid "Parameters"
-msgstr "Parámetros"
+msgstr "Parametry"
 
 #: FCAD.class:959 uty.module:554
 msgid "Version"
-msgstr "Versión"
+msgstr "Wersja"
 
 #: FCAD.form:113
 msgid "Coords"
-msgstr "Coordenadas"
+msgstr "Coords"
 
 #: FConfig.class:93
 msgid "Configuration file does not exist"
-msgstr "El archivo de configuración no existe"
+msgstr "Plik konfiguracyjny nie istnieje"
 
 #: FConfig.class:492
 msgid "The changes was saved"
-msgstr "Los cambios fueron guardados"
+msgstr "Zmiany zostały zapisane"
 
 #: FConfig.class:512
 msgid "A new copy was created"
-msgstr "Se creó una nueva copia."
+msgstr "Utworzono nową kopię"
 
 #: FConfig.class:525
 msgid "A copy was successfully archived"
-msgstr "Una copia fue archivada exitosamente"
+msgstr "Kopia została pomyślnie zarchiwizowana"
 
 #: FConfig.class:534
 msgid "Restored configuration"
-msgstr "Configuración restaurada"
+msgstr "Przywrócona konfiguracja"
 
 #: FConfig.form:32
 msgid "New preferences"
-msgstr "Nuevas preferencias"
+msgstr "Nowe preferencje"
 
 #: FConfig.form:39
 msgid "Apply preferences changes"
-msgstr "Aplicar los cambios de preferencias"
+msgstr "Zastosuj zmiany preferencji"
 
 #: FConfig.form:46
 msgid "Restore preferences"
-msgstr "Restaurar preferencias"
+msgstr "Przywróć preferencje"
 
 #: FConfig.form:53
 msgid "Archive preferences"
-msgstr "Archivar preferecias"
+msgstr "Archiwizuj preferencje"
 
 #: FConfig.form:59
 msgid "Open log file"
-msgstr "Abrir archivo de registro"
+msgstr "Otwórz plik dziennika"
 
 #: FConfig.form:113
 msgid "Open application directory"
-msgstr "Abrir el directorio del programa"
+msgstr "Otwórz katalog aplikacji"
 
 #: FConfig.form:143
 msgid "Directories"
-msgstr "Directorios"
+msgstr "Katalogi"
 
 #: FHatch.form:34
 msgid "Pattern"
-msgstr "Patrón"
+msgstr "Wzór"
 
 #: FHatch.form:62 Form1.form:27
 msgid "OK"
-msgstr "Okay"
+msgstr "dobrze"
 
 #: FHatch.form:72
 msgid "Add areas"
-msgstr "Agregar áreas"
+msgstr "Dodaj obszary"
 
 #: FHatch.form:77
 msgid "Remove areas"
-msgstr "Eliminar áreas"
+msgstr "Usuń obszary"
 
 #: FInspector.class:18
 msgid "Length"
-msgstr "Longitud"
+msgstr "Długość"
 
 #: FInspector.class:29
 msgid "Radious"
-msgstr "Radiante"
+msgstr "Radosny"
 
 #: FInspector.form:23
 msgid "Layer"
-msgstr "Capa"
+msgstr "Warstwa"
 
 #: FLayers.class:64 FLayers1.class:69
 msgid "Frozen"
-msgstr "Congelado"
+msgstr "Mrożony"
 
 #: FLayers.class:64 FLayers1.class:69
 msgid "Lock"
-msgstr "Bloquear"
+msgstr "Zamek"
 
 #: FLayers.class:64 FLayers1.class:69 dbs.module:1716
 msgid "Name"
-msgstr "Nombre"
+msgstr "Imię"
 
 #: FLayers.class:64 FLayers1.class:69
 msgid "Print"
-msgstr "Impresión"
+msgstr "Wydrukować"
 
 #: FLayers.class:64 FLayers1.class:69
 msgid "Show"
-msgstr "mostrar"
+msgstr "Pokazać"
 
 #: FLayers.class:64 FLayers1.class:69
 msgid "Style"
-msgstr "Estilo"
+msgstr "Styl"
 
 #: FLayers.class:64 FLayers1.class:69
 msgid "Width"
-msgstr "Anchura"
+msgstr "Szerokość"
 
 #: FLayers.class:64 FLayers1.class:69
 msgid "id"
-msgstr "carné de identidad"
+msgstr "ID"
 
 #: Starter.module:275
 msgid "Red"
-msgstr "rojo"
+msgstr "Czerwony"
 
 #: Starter.module:276
 msgid "Yellow"
-msgstr "Amarillo"
+msgstr "Żółty"
 
 #: Starter.module:277
 msgid "Green"
-msgstr "Verde"
+msgstr "Zielony"
 
 #: Starter.module:278
 msgid "Cyan"
-msgstr "Cian"
+msgstr "Cyjan"
 
 #: Starter.module:279
 msgid "Blue"
-msgstr "Azul"
+msgstr "niebieski"
 
 #: Starter.module:280
 msgid "Magenta"
@@ -485,462 +485,462 @@ msgstr "Magenta"
 
 #: Starter.module:281
 msgid "White"
-msgstr "Blanco"
+msgstr "Biały"
 
 #: _cadImage.class:26
 msgid "Inserts an image"
-msgstr "Inserta una imagen"
+msgstr "Wstawia obraz"
 
 #: cad.module:2220 xmg.module:681
 msgid "Program"
-msgstr "Programa"
+msgstr "Program"
 
 #: cad.module:2224 xmg.module:685
 msgid "Application directory"
-msgstr "Directorio de aplicaciones"
+msgstr "Katalog aplikacji"
 
 #: cad.module:2234 xmg.module:695
 msgid "Window background color"
-msgstr "Color de fondo de la ventana"
+msgstr "Kolor tła okna"
 
 #: cad.module:2246 xmg.module:707
 msgid "Desktop"
-msgstr "Escritorio"
+msgstr "Pulpit"
 
 #: cad.module:2250 xmg.module:711
 msgid "Simple text editor by default"
-msgstr "Editor de texto simple por defecto"
+msgstr "Prosty edytor tekstu domyślnie"
 
 #: cad.module:2260 xmg.module:721
 msgid "Program icons"
-msgstr "Iconos de programa"
+msgstr "Ikony programu"
 
 #: cad.module:2270
 msgid "Drawing window dark mode"
-msgstr "Ventana de dibujo en modo oscuro"
+msgstr "Tryb ciemny okna rysunku"
 
 #: cad.module:2279
 msgid "Draw originals"
-msgstr "Dibujar originales"
+msgstr "Narysuj oryginały"
 
 #: cad.module:2288
 msgid "Draw marked"
-msgstr "Sorteo marcado"
+msgstr "Remis zaznaczony"
 
 #: cad.module:2297
 msgid "Draw only columns"
-msgstr "Dibuja solo columnas"
+msgstr "Rysuj tylko kolumny"
 
 #: cad.module:2306
 msgid "Draw bounds"
-msgstr "Dibujar límites"
+msgstr "Narysuj granice"
 
 #: cad.module:2315
 msgid "Dimensions format"
-msgstr "Formato de dimensiones"
+msgstr "Format wymiarów"
 
 #: cad.module:2324
 msgid "Color sellection"
-msgstr "Selección de color"
+msgstr "Wyprzedaż kolorów"
 
 #: cad.module:2333
 msgid "Tool active"
-msgstr "Herramienta activa"
+msgstr "Narzędzie aktywne"
 
 #: cad.module:2342
 msgid "Orthogonal"
-msgstr "Ortogonal"
+msgstr "Prostokątny"
 
 #: cad.module:2351
 msgid "Orthogonal forced"
-msgstr "Ortogonal forzado"
+msgstr "Wymuszony ortogonalnie"
 
 #: cad.module:2360
 msgid "Orthogonal ignored"
-msgstr "Ortogonal ignorado"
+msgstr "Zignorowano ortogonalność"
 
 #: cad.module:2369
 msgid "Show inspector"
-msgstr "Mostrar inspector"
+msgstr "Pokaż inspektora"
 
 #: cadArc.class:26
 msgid "Draws an arc"
-msgstr "Dibuja un arco"
+msgstr "Rysuje łuk"
 
 #: cadArc.class:155
 msgid " to "
-msgstr " a"
+msgstr " do"
 
 #: cadArea.class:38
 msgid "Area"
-msgstr "Área"
+msgstr "Powierzchnia"
 
 #: cadArea.class:38 cadRuler.class:38
 msgid "mark points"
-msgstr "marcar puntos"
+msgstr "zaznacz punkty"
 
 #: cadArea.class:99 cadArray.class:102 cadChamfer.class:60 cadDim.class:474
 #: cadFillet.class:60 cadMirror.class:172 cadOffset.class:269
 #: cadProtractor.class:110 cadRotate.class:174 cadRuler.class:98
 msgid "Bad input"
-msgstr "Mala entrada"
+msgstr "Złe dane wejściowe"
 
 #: cadArea.class:109
 msgid "Perimeter"
-msgstr "Perímetro"
+msgstr "Obwód"
 
 #: cadArray.class:54 cadCopy.class:43 cadErase.class:42 cadMirror.class:47
 #: cadMove.class:43 cadRotate.class:47 cadScale.class:45 cadStretch.class:48
 msgid "Select entities"
-msgstr "Seleccionar entidades"
+msgstr "Wybierz podmioty"
 
 #: cadArray.class:61 cadCopy.class:50 cadMirror.class:55 cadMove.class:50
 #: cadRotate.class:54 cadScale.class:52 cadStretch.class:56
 msgid "Base point"
-msgstr "Punto base"
+msgstr "Punkt bazowy"
 
 #: cadArray.class:62 cadCopy.class:51 cadMirror.class:56 cadMove.class:51
 #: cadRotate.class:55 cadScale.class:53 cadStretch.class:57 cadTrim.class:152
 #: clsDefaultJob.class:149
 msgid "elements"
-msgstr "elementos"
+msgstr "elementy"
 
 #: cadArray.class:81
 msgid "Orthogonal or polar"
-msgstr "Ortogonal o polar"
+msgstr "Ortogonalny lub biegunowy"
 
 #: cadArray.class:95
 msgid "Columns"
-msgstr "Columnas"
+msgstr "Kolumny"
 
 #: cadArray.class:99
 msgid "Repetitions"
-msgstr "Repeticiones"
+msgstr "Powtórzenia"
 
 #: cadArray.class:110
 msgid "Distance"
-msgstr "Distancia"
+msgstr "Dystans"
 
 #: cadArray.class:114 cadMirror.class:83 cadProtractor.class:85
 #: cadRotate.class:82
 msgid "Angle"
-msgstr "Ángulo"
+msgstr "Kąt"
 
 #: cadArray.class:122
 msgid "Rows"
-msgstr "Filas"
+msgstr "Wydziwianie"
 
 #: cadBeam.class:30
 msgid "Insert a beam"
-msgstr "Insertar una viga"
+msgstr "Wstaw belkę"
 
 #: cadBlock.class:65
 msgid "Select two or mores entities first"
-msgstr "Seleccione dos o más entidades primero"
+msgstr "Najpierw wybierz dwa lub więcej obiektów"
 
 #: cadBreak.class:48 cadDivide.class:48
 msgid "Select only one entity"
-msgstr "Seleccione solo una entidad"
+msgstr "Wybierz tylko jedną jednostkę"
 
 #: cadBreak.class:59
 msgid "Breakpoint of entity"
-msgstr "Punto de corte de la entidad"
+msgstr "Punkt przerwania bytu"
 
 #: cadBreak.class:63 cadDivide.class:63
 msgid "Can't break that entity"
-msgstr "No puedo romper esa entidad"
+msgstr "Nie mogę złamać tej istoty"
 
 #: cadBreak.class:85 cadDivide.class:85
 msgid "Invalid breakpoint"
-msgstr "Punto de interrupción no válido"
+msgstr "Nieprawidłowy punkt przerwania"
 
 #: cadBreak.class:119 cadDivide.class:99 cadOffset.class:74
 msgid "Can't offset that entity"
-msgstr "No puedo compensar esa entidad"
+msgstr "Nie można zrównoważyć tego elementu"
 
 #: cadCWall.class:30
 msgid "Insert a wall column"
-msgstr "Insertar una columna de pared"
+msgstr "Wstaw słup ścienny"
 
 #: cadChamfer.class:47
 msgid "enter size"
-msgstr "ingrese un tamaño"
+msgstr "wprowadź rozmiar"
 
 #: cadChamfer.class:62 cadFillet.class:62
 msgid "Select first line"
-msgstr "Seleccionar primera línea"
+msgstr "Wybierz pierwszą linię"
 
 #: cadChamfer.class:98 cadFillet.class:98
 msgid "Select second line"
-msgstr "Seleccionar segunda línea"
+msgstr "Wybierz drugą linię"
 
 #: cadCircle.class:27
 msgid "Draw a circle"
-msgstr "Dibuja un circulo"
+msgstr "Narysuj okrąg"
 
 #: cadColumn.class:31
 msgid "Insert a column"
-msgstr "Insertar una columna"
+msgstr "Wstaw kolumnę"
 
 #: cadCopy.class:68 cadMove.class:72 cadScale.class:70 cadStretch.class:72
 msgid "Final point"
-msgstr "Punto final"
+msgstr "Punkt końcowy"
 
 #: cadDim.class:39
 msgid "Insert an acotation"
-msgstr "Insertar una acotación"
+msgstr "Wstaw akcję"
 
 #: cadDivide.class:59
 msgid "First breakpoint of entity"
-msgstr "Primer punto de quiebre de la entidad"
+msgstr "Pierwszy punkt przerwania encji"
 
 #: cadDivide.class:94
 msgid "Second breakpoint of entity"
-msgstr "Segundo punto de quiebre de la entidad"
+msgstr "Drugi punkt przerwania encji"
 
 #: cadEllipse.class:27
 msgid "Draw an ellipse"
-msgstr "Dibujar una elipse"
+msgstr "Narysuj elipsę"
 
 #: cadExplode.class:34
 msgid "Explode"
-msgstr "Explotar"
+msgstr "Eksplodować"
 
 #: cadExplode.class:41
 msgid "Select blocks"
-msgstr "Seleccionar bloques"
+msgstr "Wybierz bloki"
 
 #: cadFillet.class:47
 msgid "enter radious"
-msgstr "ingrese un radio"
+msgstr "wprowadź radious"
 
 #: cadInsert.class:25
 msgid "Inserts a block"
-msgstr "Inserta un bloque"
+msgstr "Wstawia blok"
 
 #: cadLeader.class:27
 msgid "Leader"
-msgstr "Líder"
+msgstr "Lider"
 
 #: cadLine.class:27 cadRectangle.class:27
 msgid "a line"
-msgstr "una linea"
+msgstr "linia"
 
 #: cadLoad.class:32 cadLoadBIM.class:32
 msgid "Files"
-msgstr "Archivos"
+msgstr "Pliki"
 
 #: cadMText.class:28
 msgid "Inserts a multiline text"
-msgstr "Inserta un texto multilínea"
+msgstr "Wstawia tekst wielowierszowy"
 
 #: cadMirror.class:109
 msgid "Keep originals"
-msgstr "Mantener originales"
+msgstr "Zachowaj oryginały"
 
 #: cadMove.class:35
 msgid "Move "
-msgstr "Moverse"
+msgstr "Ruszaj się"
 
 #: cadOffset.class:45
 msgid "enter distance"
-msgstr "ingrese una distancia"
+msgstr "wprowadź odległość"
 
 #: cadOffset.class:70
 msgid "Side to offset"
-msgstr "Lado para compensar"
+msgstr "Strona przesunięta"
 
 #: cadOffset.class:149
 msgid "select an entity"
-msgstr "seleccione una entidad"
+msgstr "wybierz jednostkę"
 
 #: cadOffset.class:236
 msgid "enter a valid text size"
-msgstr "Ingrese un tamaño de texto válido"
+msgstr "wprowadź prawidłowy rozmiar tekstu"
 
 #: cadPLine.class:29 cadSPLine.class:12
 msgid "Next Point"
-msgstr "Siguiente punto"
+msgstr "Następny punkt"
 
 #: cadPan.class:30
 msgid "Panning"
-msgstr "Paneo"
+msgstr "Panoramowanie"
 
 #: cadPolygon.class:27
 msgid "a polygon"
-msgstr "un polígono"
+msgstr "wielokąt"
 
 #: cadProtractor.class:38
 msgid "mark first point"
-msgstr "marcar el primer punto"
+msgstr "zaznacz pierwszy punkt"
 
 #: cadProtractor.class:60
 msgid "mark center"
-msgstr "marque el centro"
+msgstr "zaznacz środek"
 
 #: cadRuler.class:73
 msgid "Total length"
-msgstr "Largo total"
+msgstr "Długość całkowita"
 
 #: cadSlab.class:31
 msgid "Insert a slab"
-msgstr "Insertar una losa"
+msgstr "Włóż płytę"
 
 #: cadSlabT.class:32
 msgid "Insert a triangular slab"
-msgstr "Insertar una losa triangular"
+msgstr "Wstaw trójkątną płytę"
 
 #: cadStretch.class:41
 msgid "Stretch "
-msgstr "Tramo"
+msgstr "Rozciągać"
 
 #: cadText.class:28
 msgid "Inserts a text"
-msgstr "Inserta un texto"
+msgstr "Wstawia tekst"
 
 #: cadTrim.class:46
 msgid "Select cutting edges"
-msgstr "Seleccionar líneas de corte"
+msgstr "Wybierz krawędzie tnące"
 
 #: cadTrim.class:59
 msgid "entities to cut"
-msgstr "entidades a cortar"
+msgstr "byty do wycięcia"
 
 #: cadTrim.class:152 clsDefaultJob.class:149
 msgid "Selected"
-msgstr "Seleccionado"
+msgstr "Wybrany"
 
 #: cadZoomW.class:75
 msgid "Window is too small"
-msgstr "La ventana es muy pequeña."
+msgstr "Okno jest za małe"
 
 #: clsEntities.class:59
 msgid "Loading blocks "
-msgstr "Cargando bloques"
+msgstr "Ładowanie bloków"
 
 #: clsEntityBuilder.class:91
 msgid "Can create entity"
-msgstr "Puede crear entidad"
+msgstr "Może tworzyć byty"
 
 #: dbs.module:1378
 msgid "Extracting data from"
-msgstr "Extrayendo datos de"
+msgstr "Wyodrębnianie danych z"
 
 #: dbs.module:1378
 msgid "System"
-msgstr "Sistema"
+msgstr "System"
 
 #: dbs.module:1385
 msgid "Formatting data from"
-msgstr "Formateando datos desde"
+msgstr "Formatowanie danych z"
 
 #: dbs.module:1393
 msgid "Database completed"
-msgstr "Base de datos completada"
+msgstr "Baza danych ukończona"
 
 #: dbs.module:1472
 msgid "Table and view field titles"
-msgstr "Títulos de campo de tablas y vistas"
+msgstr "Tytuły tabel i pól widoków"
 
 #: dbs.module:1474
 msgid "View titles"
-msgstr "Títulos de las vistas"
+msgstr "Zobacz tytuły"
 
 #: dbs.module:1554
 msgid "View field titles"
-msgstr "Títulos de campo de la vista"
+msgstr "Zobacz tytuły pól"
 
 #: dbs.module:1714
 msgid "Date"
-msgstr "Fecha"
+msgstr "Data"
 
 #: dbs.module:1717
 msgid "Email"
-msgstr "Email"
+msgstr "E-mail"
 
 #: dbs.module:1718
 msgid "Mobile"
-msgstr "Móvil"
+msgstr "mobilny"
 
 #: dbs.module:1719
 msgid "Phone"
-msgstr "Teléfono"
+msgstr "Telefon"
 
 #: dbs.module:1722
 msgid "Quantity"
-msgstr "Cantidad"
+msgstr "Ilość"
 
 #: dbs.module:1723
 msgid "Price"
-msgstr "Precio"
+msgstr "Cena £"
 
 #: dbs.module:1724
 msgid "Trademark"
-msgstr "Marca comercial"
+msgstr "Znak towarowy"
 
 #: dbs.module:1725
 msgid "Description"
-msgstr "Descripción"
+msgstr "Opis"
 
 #: dbs.module:1726
 msgid "Address"
-msgstr "Habla a"
+msgstr "Adres"
 
 #: dbs.module:1727 uty.module:553
 msgid "Vendor"
-msgstr "Vendedor"
+msgstr "Sprzedawca"
 
 #: dbs.module:1728
 msgid "Class"
-msgstr "Clase"
+msgstr "Klasa"
 
 #: dbs.module:1729
 msgid "Code"
-msgstr "Código"
+msgstr "Kod"
 
 #: dbs.module:1730
 msgid "City"
-msgstr "Ciudad"
+msgstr "Miasto"
 
 #: dbs.module:1731
 msgid "Symbol"
-msgstr "Simbolo"
+msgstr "Symbol"
 
 #: dbs.module:1732
 msgid "Job"
-msgstr "Trabajo"
+msgstr "Praca"
 
 #: dbs.module:1733
 msgid "Client"
-msgstr "Cliente"
+msgstr "Klient"
 
 #: dbs.module:1734
 msgid "Type"
-msgstr "Tipo"
+msgstr "Rodzaj"
 
 #: dsk.module:110
 msgid "Select File"
-msgstr "Seleccionar archivo"
+msgstr "Wybierz plik"
 
 #: dsk.module:119
 msgid "Filter"
-msgstr "Filtrar"
+msgstr "Filtr"
 
 #: dsk.module:141
 msgid "Select directory"
-msgstr "Seleccionar directorio"
+msgstr "Wybierz katalog"
 
 #: dsk.module:196
 msgid "Hi"
-msgstr "Hola"
+msgstr "cześć"
 
 #: modUtils.module:256
 msgid "Can't determine array type"
-msgstr "No se puede determinar el tipo de matriz"
+msgstr "Nie można określić typu tablicy"
 
 #: sog.module:102
 msgid "Unknown"
-msgstr "Desconocido"
+msgstr "Nieznany"
 
 #: uty.module:552
 msgid "Author"
@@ -948,44 +948,44 @@ msgstr "Autor"
 
 #: uty.module:555
 msgid "Date of this document"
-msgstr "Fecha de este documento"
+msgstr "Data tego dokumentu"
 
 #: uty.module:556
 msgid "Components"
-msgstr "Componentes"
+msgstr "składniki"
 
 #: uty.module:558
 msgid "It is made up"
-msgstr "Esta hecho"
+msgstr "To jest wymyślone"
 
 #: uty.module:558
 msgid "methods"
-msgstr "métodos"
+msgstr "metody"
 
 #: uty.module:558
 msgid "modules"
-msgstr "módulos"
+msgstr "moduły"
 
 #: vag.module:455
 msgid "Spaces at the beginning and at the end"
-msgstr "Espacios al principio y al final"
+msgstr "Spacje na początku i na końcu"
 
 #: vag.module:457
 msgid "Space at the start"
-msgstr "Espacio al principio"
+msgstr "Przestrzeń na początku"
 
 #: vag.module:461
 msgid "Space at the end"
-msgstr "Espacio al final"
+msgstr "Przestrzeń na końcu"
 
 #: vag.module:466
 msgid "Repeated"
-msgstr "Repetidos"
+msgstr "Powtarzający się"
 
 #: vag.module:493
 msgid "Excluded"
-msgstr "Excluido"
+msgstr "Wyłączony"
 
 #: vag.module:497
 msgid "More than one capital letter"
-msgstr "Más de una letra mayúscula"
+msgstr "Więcej niż jedna duża litera"
