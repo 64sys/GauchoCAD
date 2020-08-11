@@ -2,8 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: GauchoCAD 3.15.0\n"
-"POT-Creation-Date: 2020-08-07 14:44 UTC\n"
-"PO-Revision-Date: 2020-08-10 17:53 UTC\n"
+"PO-Revision-Date: 2020-08-11 12:51 UTC\n"
 "Last-Translator: bmk <bmk@gaucho>\n"
 "Language: es_AR\n"
 "MIME-Version: 1.0\n"
@@ -314,8 +313,7 @@ msgstr "Hola desarrolladores de"
 msgid "Alias"
 msgstr "Alias"
 
-#: FAlias.form:69 FBlock.form:73 FHatch.form:67 FLayers.form:68
-#: FLayers1.form:68 Form1.form:33
+#: FAlias.form:69 FBlock.form:73 FHatch.form:67 FLayers.form:68 FLayers1.form:68 Form1.form:33
 msgid "Cancel"
 msgstr "Cancelar"
 
@@ -579,9 +577,7 @@ msgstr "Área"
 msgid "mark points"
 msgstr "marcar puntos"
 
-#: cadArea.class:99 cadArray.class:102 cadChamfer.class:60 cadDim.class:474
-#: cadFillet.class:60 cadMirror.class:172 cadOffset.class:269
-#: cadProtractor.class:110 cadRotate.class:174 cadRuler.class:98
+#: cadArea.class:99 cadArray.class:102 cadChamfer.class:60 cadDim.class:474 cadFillet.class:60 cadMirror.class:172 cadOffset.class:269 cadProtractor.class:110 cadRotate.class:174 cadRuler.class:98
 msgid "Bad input"
 msgstr "Mala entrada"
 
@@ -589,19 +585,15 @@ msgstr "Mala entrada"
 msgid "Perimeter"
 msgstr "Perímetro"
 
-#: cadArray.class:54 cadCopy.class:43 cadErase.class:42 cadMirror.class:47
-#: cadMove.class:43 cadRotate.class:47 cadScale.class:45 cadStretch.class:48
+#: cadArray.class:54 cadCopy.class:43 cadErase.class:42 cadMirror.class:47 cadMove.class:43 cadRotate.class:47 cadScale.class:45 cadStretch.class:48
 msgid "Select entities"
 msgstr "Seleccionar entidades"
 
-#: cadArray.class:61 cadCopy.class:50 cadMirror.class:55 cadMove.class:50
-#: cadRotate.class:54 cadScale.class:52 cadStretch.class:56
+#: cadArray.class:61 cadCopy.class:50 cadMirror.class:55 cadMove.class:50 cadRotate.class:54 cadScale.class:52 cadStretch.class:56
 msgid "Base point"
 msgstr "Punto base"
 
-#: cadArray.class:62 cadCopy.class:51 cadMirror.class:56 cadMove.class:51
-#: cadRotate.class:55 cadScale.class:53 cadStretch.class:57 cadTrim.class:152
-#: clsDefaultJob.class:149
+#: cadArray.class:62 cadCopy.class:51 cadMirror.class:56 cadMove.class:51 cadRotate.class:55 cadScale.class:53 cadStretch.class:57 cadTrim.class:152 clsDefaultJob.class:149
 msgid "elements"
 msgstr "elementos"
 
@@ -621,8 +613,7 @@ msgstr "Repeticiones"
 msgid "Distance"
 msgstr "Distancia"
 
-#: cadArray.class:114 cadMirror.class:83 cadProtractor.class:85
-#: cadRotate.class:82
+#: cadArray.class:114 cadMirror.class:83 cadProtractor.class:85 cadRotate.class:82
 msgid "Angle"
 msgstr "Ángulo"
 
@@ -989,3 +980,4 @@ msgstr "Excluido"
 #: vag.module:497
 msgid "More than one capital letter"
 msgstr "Más de una letra mayúscula"
+

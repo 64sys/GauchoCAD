@@ -1,103 +1,13 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: $(PACKAGE) $(VERSION)\n"
-"POT-Creation-Date: 2020-08-07 14:44 UTC\n"
+"Project-Id-Version: GauchoCAD 3.15.0\n"
+"PO-Revision-Date: 2020-08-11 12:51 UTC\n"
+"Last-Translator: bmk <bmk@gaucho>\n"
+"Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"#-#-#-#-#  APPMain.pot ($(PACKAGE) $(VERSION))  #-#-#-#-#\n"
-"#-#-#-#-#  BIMEntityBase.pot ($(PACKAGE) $(VERSION))  #-#-#-#-#\n"
-"#-#-#-#-#  cadAlias.pot ($(PACKAGE) $(VERSION))  #-#-#-#-#\n"
-"#-#-#-#-#  cadArc.pot ($(PACKAGE) $(VERSION))  #-#-#-#-#\n"
-"#-#-#-#-#  cadArea.pot ($(PACKAGE) $(VERSION))  #-#-#-#-#\n"
-"#-#-#-#-#  cadArray.pot ($(PACKAGE) $(VERSION))  #-#-#-#-#\n"
-"#-#-#-#-#  cadBeam.pot ($(PACKAGE) $(VERSION))  #-#-#-#-#\n"
-"#-#-#-#-#  cadBlock.pot ($(PACKAGE) $(VERSION))  #-#-#-#-#\n"
-"#-#-#-#-#  cadBlocks.pot ($(PACKAGE) $(VERSION))  #-#-#-#-#\n"
-"#-#-#-#-#  cadBreak.pot ($(PACKAGE) $(VERSION))  #-#-#-#-#\n"
-"#-#-#-#-#  cadChamfer.pot ($(PACKAGE) $(VERSION))  #-#-#-#-#\n"
-"#-#-#-#-#  cadCircle.pot ($(PACKAGE) $(VERSION))  #-#-#-#-#\n"
-"#-#-#-#-#  cadColumn.pot ($(PACKAGE) $(VERSION))  #-#-#-#-#\n"
-"#-#-#-#-#  cadCopy.pot ($(PACKAGE) $(VERSION))  #-#-#-#-#\n"
-"#-#-#-#-#  cadCWall.pot ($(PACKAGE) $(VERSION))  #-#-#-#-#\n"
-"#-#-#-#-#  cadDim.pot ($(PACKAGE) $(VERSION))  #-#-#-#-#\n"
-"#-#-#-#-#  cadDivide.pot ($(PACKAGE) $(VERSION))  #-#-#-#-#\n"
-"#-#-#-#-#  cadDxf.pot ($(PACKAGE) $(VERSION))  #-#-#-#-#\n"
-"#-#-#-#-#  cadEdit.pot ($(PACKAGE) $(VERSION))  #-#-#-#-#\n"
-"#-#-#-#-#  cadEllipse.pot ($(PACKAGE) $(VERSION))  #-#-#-#-#\n"
-"#-#-#-#-#  cadErase.pot ($(PACKAGE) $(VERSION))  #-#-#-#-#\n"
-"#-#-#-#-#  cadExplode.pot ($(PACKAGE) $(VERSION))  #-#-#-#-#\n"
-"#-#-#-#-#  cadFillet.pot ($(PACKAGE) $(VERSION))  #-#-#-#-#\n"
-"#-#-#-#-#  cadHatch.pot ($(PACKAGE) $(VERSION))  #-#-#-#-#\n"
-"#-#-#-#-#  _cadImage.pot ($(PACKAGE) $(VERSION))  #-#-#-#-#\n"
-"#-#-#-#-#  cadInsert.pot ($(PACKAGE) $(VERSION))  #-#-#-#-#\n"
-"#-#-#-#-#  cadLayers.pot ($(PACKAGE) $(VERSION))  #-#-#-#-#\n"
-"#-#-#-#-#  cadLeader.pot ($(PACKAGE) $(VERSION))  #-#-#-#-#\n"
-"#-#-#-#-#  cadLine.pot ($(PACKAGE) $(VERSION))  #-#-#-#-#\n"
-"#-#-#-#-#  cadLoadBIM.pot ($(PACKAGE) $(VERSION))  #-#-#-#-#\n"
-"#-#-#-#-#  cadLoad.pot ($(PACKAGE) $(VERSION))  #-#-#-#-#\n"
-"#-#-#-#-#  cadMirror.pot ($(PACKAGE) $(VERSION))  #-#-#-#-#\n"
-"#-#-#-#-#  cadMove.pot ($(PACKAGE) $(VERSION))  #-#-#-#-#\n"
-"#-#-#-#-#  cadMText.pot ($(PACKAGE) $(VERSION))  #-#-#-#-#\n"
-"#-#-#-#-#  cadOffset.pot ($(PACKAGE) $(VERSION))  #-#-#-#-#\n"
-"#-#-#-#-#  cadPan.pot ($(PACKAGE) $(VERSION))  #-#-#-#-#\n"
-"#-#-#-#-#  cadPLine.pot ($(PACKAGE) $(VERSION))  #-#-#-#-#\n"
-"#-#-#-#-#  cadPolygon.pot ($(PACKAGE) $(VERSION))  #-#-#-#-#\n"
-"#-#-#-#-#  cad.pot ($(PACKAGE) $(VERSION))  #-#-#-#-#\n"
-"#-#-#-#-#  cadProtractor.pot ($(PACKAGE) $(VERSION))  #-#-#-#-#\n"
-"#-#-#-#-#  cadRectangle.pot ($(PACKAGE) $(VERSION))  #-#-#-#-#\n"
-"#-#-#-#-#  cadRotate.pot ($(PACKAGE) $(VERSION))  #-#-#-#-#\n"
-"#-#-#-#-#  cadRuler.pot ($(PACKAGE) $(VERSION))  #-#-#-#-#\n"
-"#-#-#-#-#  cadSaveAsBIM.pot ($(PACKAGE) $(VERSION))  #-#-#-#-#\n"
-"#-#-#-#-#  cadSaveAs.pot ($(PACKAGE) $(VERSION))  #-#-#-#-#\n"
-"#-#-#-#-#  cadSaveBIM.pot ($(PACKAGE) $(VERSION))  #-#-#-#-#\n"
-"#-#-#-#-#  cadSave.pot ($(PACKAGE) $(VERSION))  #-#-#-#-#\n"
-"#-#-#-#-#  cadScale.pot ($(PACKAGE) $(VERSION))  #-#-#-#-#\n"
-"#-#-#-#-#  cadSlab.pot ($(PACKAGE) $(VERSION))  #-#-#-#-#\n"
-"#-#-#-#-#  cadSlabT.pot ($(PACKAGE) $(VERSION))  #-#-#-#-#\n"
-"#-#-#-#-#  cadSolid.pot ($(PACKAGE) $(VERSION))  #-#-#-#-#\n"
-"#-#-#-#-#  cadSPLine.pot ($(PACKAGE) $(VERSION))  #-#-#-#-#\n"
-"#-#-#-#-#  cadStretch.pot ($(PACKAGE) $(VERSION))  #-#-#-#-#\n"
-"#-#-#-#-#  cadText.pot ($(PACKAGE) $(VERSION))  #-#-#-#-#\n"
-"#-#-#-#-#  cadTrim.pot ($(PACKAGE) $(VERSION))  #-#-#-#-#\n"
-"#-#-#-#-#  cadZoomE.pot ($(PACKAGE) $(VERSION))  #-#-#-#-#\n"
-"#-#-#-#-#  cadZoomW.pot ($(PACKAGE) $(VERSION))  #-#-#-#-#\n"
-"#-#-#-#-#  clsDefaultJob.pot ($(PACKAGE) $(VERSION))  #-#-#-#-#\n"
-"#-#-#-#-#  clsDrawingAids.pot ($(PACKAGE) $(VERSION))  #-#-#-#-#\n"
-"#-#-#-#-#  clsDummy.pot ($(PACKAGE) $(VERSION))  #-#-#-#-#\n"
-"#-#-#-#-#  clsEntities.pot ($(PACKAGE) $(VERSION))  #-#-#-#-#\n"
-"#-#-#-#-#  clsEntityBuilder.pot ($(PACKAGE) $(VERSION))  #-#-#-#-#\n"
-"#-#-#-#-#  clsMouseTracking.pot ($(PACKAGE) $(VERSION))  #-#-#-#-#\n"
-"#-#-#-#-#  dbs.pot ($(PACKAGE) $(VERSION))  #-#-#-#-#\n"
-"#-#-#-#-#  dsk.pot ($(PACKAGE) $(VERSION))  #-#-#-#-#\n"
-"#-#-#-#-#  Entity.pot ($(PACKAGE) $(VERSION))  #-#-#-#-#\n"
-"#-#-#-#-#  FAbout.pot ($(PACKAGE) $(VERSION))  #-#-#-#-#\n"
-"#-#-#-#-#  FAlias.pot ($(PACKAGE) $(VERSION))  #-#-#-#-#\n"
-"#-#-#-#-#  FBlock.pot ($(PACKAGE) $(VERSION))  #-#-#-#-#\n"
-"#-#-#-#-#  FCAD.pot ($(PACKAGE) $(VERSION))  #-#-#-#-#\n"
-"#-#-#-#-#  FColors.pot ($(PACKAGE) $(VERSION))  #-#-#-#-#\n"
-"#-#-#-#-#  FConfig.pot ($(PACKAGE) $(VERSION))  #-#-#-#-#\n"
-"#-#-#-#-#  FHatch.pot ($(PACKAGE) $(VERSION))  #-#-#-#-#\n"
-"#-#-#-#-#  fil.pot ($(PACKAGE) $(VERSION))  #-#-#-#-#\n"
-"#-#-#-#-#  FInspector.pot ($(PACKAGE) $(VERSION))  #-#-#-#-#\n"
-"#-#-#-#-#  FLayers1.pot ($(PACKAGE) $(VERSION))  #-#-#-#-#\n"
-"#-#-#-#-#  FLayers.pot ($(PACKAGE) $(VERSION))  #-#-#-#-#\n"
-"#-#-#-#-#  FLtypes.pot ($(PACKAGE) $(VERSION))  #-#-#-#-#\n"
-"#-#-#-#-#  Form1.pot ($(PACKAGE) $(VERSION))  #-#-#-#-#\n"
-"#-#-#-#-#  FPrint.pot ($(PACKAGE) $(VERSION))  #-#-#-#-#\n"
-"#-#-#-#-#  gcd.pot ($(PACKAGE) $(VERSION))  #-#-#-#-#\n"
-"#-#-#-#-#  glPlus.pot ($(PACKAGE) $(VERSION))  #-#-#-#-#\n"
-"#-#-#-#-#  modUtils.pot ($(PACKAGE) $(VERSION))  #-#-#-#-#\n"
-"#-#-#-#-#  #project.pot (GauchoCAD 3.15.0)  #-#-#-#-#\n"
-"#-#-#-#-#  puntos.pot ($(PACKAGE) $(VERSION))  #-#-#-#-#\n"
-"#-#-#-#-#  sog.pot ($(PACKAGE) $(VERSION))  #-#-#-#-#\n"
-"#-#-#-#-#  Starter.pot ($(PACKAGE) $(VERSION))  #-#-#-#-#\n"
-"#-#-#-#-#  String2.pot ($(PACKAGE) $(VERSION))  #-#-#-#-#\n"
-"#-#-#-#-#  ToolsBase.pot ($(PACKAGE) $(VERSION))  #-#-#-#-#\n"
-"#-#-#-#-#  uty.pot ($(PACKAGE) $(VERSION))  #-#-#-#-#\n"
-"#-#-#-#-#  vag.pot ($(PACKAGE) $(VERSION))  #-#-#-#-#\n"
-"#-#-#-#-#  xmg.pot ($(PACKAGE) $(VERSION))  #-#-#-#-#\n"
 
 #: .project:1
 msgid "GauchoCAD"
@@ -403,8 +313,7 @@ msgstr "Hallo Entwickler von"
 msgid "Alias"
 msgstr "Alias"
 
-#: FAlias.form:69 FBlock.form:73 FHatch.form:67 FLayers.form:68
-#: FLayers1.form:68 Form1.form:33
+#: FAlias.form:69 FBlock.form:73 FHatch.form:67 FLayers.form:68 FLayers1.form:68 Form1.form:33
 msgid "Cancel"
 msgstr "Stornieren"
 
@@ -668,9 +577,7 @@ msgstr "Bereich"
 msgid "mark points"
 msgstr "Punkte markieren"
 
-#: cadArea.class:99 cadArray.class:102 cadChamfer.class:60 cadDim.class:474
-#: cadFillet.class:60 cadMirror.class:172 cadOffset.class:269
-#: cadProtractor.class:110 cadRotate.class:174 cadRuler.class:98
+#: cadArea.class:99 cadArray.class:102 cadChamfer.class:60 cadDim.class:474 cadFillet.class:60 cadMirror.class:172 cadOffset.class:269 cadProtractor.class:110 cadRotate.class:174 cadRuler.class:98
 msgid "Bad input"
 msgstr "Schlechte Eingabe"
 
@@ -678,19 +585,15 @@ msgstr "Schlechte Eingabe"
 msgid "Perimeter"
 msgstr "Umfang"
 
-#: cadArray.class:54 cadCopy.class:43 cadErase.class:42 cadMirror.class:47
-#: cadMove.class:43 cadRotate.class:47 cadScale.class:45 cadStretch.class:48
+#: cadArray.class:54 cadCopy.class:43 cadErase.class:42 cadMirror.class:47 cadMove.class:43 cadRotate.class:47 cadScale.class:45 cadStretch.class:48
 msgid "Select entities"
 msgstr "Wählen Sie Entitäten aus"
 
-#: cadArray.class:61 cadCopy.class:50 cadMirror.class:55 cadMove.class:50
-#: cadRotate.class:54 cadScale.class:52 cadStretch.class:56
+#: cadArray.class:61 cadCopy.class:50 cadMirror.class:55 cadMove.class:50 cadRotate.class:54 cadScale.class:52 cadStretch.class:56
 msgid "Base point"
 msgstr "Basispunkt"
 
-#: cadArray.class:62 cadCopy.class:51 cadMirror.class:56 cadMove.class:51
-#: cadRotate.class:55 cadScale.class:53 cadStretch.class:57 cadTrim.class:152
-#: clsDefaultJob.class:149
+#: cadArray.class:62 cadCopy.class:51 cadMirror.class:56 cadMove.class:51 cadRotate.class:55 cadScale.class:53 cadStretch.class:57 cadTrim.class:152 clsDefaultJob.class:149
 msgid "elements"
 msgstr "Elemente"
 
@@ -710,8 +613,7 @@ msgstr "Wiederholungen"
 msgid "Distance"
 msgstr "Entfernung"
 
-#: cadArray.class:114 cadMirror.class:83 cadProtractor.class:85
-#: cadRotate.class:82
+#: cadArray.class:114 cadMirror.class:83 cadProtractor.class:85 cadRotate.class:82
 msgid "Angle"
 msgstr "Winkel"
 
@@ -1078,3 +980,4 @@ msgstr "Ausgeschlossen"
 #: vag.module:497
 msgid "More than one capital letter"
 msgstr "Mehr als ein Großbuchstabe"
+
