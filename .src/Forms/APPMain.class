@@ -71,707 +71,707 @@ Private iTheme As Integer           '' Theme luminance (determine if Dark or Lig
 
 Public Sub Run(cin As Collection)
 
-    Dim obj As Object
-    Dim ictn As New Collection
-    Dim mnu As Menu
-    Dim tob As ToolButton
-    Dim i As Integer
-    Dim iSet As String
-    Dim z As Integer
-    'Dim ctr As Object
-    Dim r As Integer
-    Dim g As Integer
-    Dim b As Integer
-    Dim img As Image
-    '------------------------------------------------------------------------------
-    '' Setting connection variables and more
-    cex = cin
-    con = cin["Connex"]           '' Connection to the database.
-    adi = cin["AppDir"]           '' Program Directory.
-    apc = cin["AppCfg"]           '' Program configuration file.
-    dbc = cin["DbsCfg"]           '' Database configuration file.
-    etx = cin["AppEdi"]           '' Default plain text editor.
-    lgg = cin["AppLog"]           '' Application event log.
-    '------------------------------------------------------------------------------
-    iSet = xmg.GetVar("Desktop.Icons", apc)
-    ictn = dsk.GNumix(iSet & "/")
-    '------------------------------------------------------------------------------
-    For Each mnu In Me.Menus
-        For Each obj In mnu.Children
-            ''Adding menu item in the alternative menu
-            If obj.Visible = True Then
-                Select mnu.Name
-                    Case "grpEntities"
-                        tob = New ToolButton(pnlEntities) As "entity"
-                        z = 48
-                    Case "grpTools"
-                        tob = New ToolButton(pnlEntities) As "tool"
-                        z = 48
-                    Case "grpSmart"
-                        tob = New ToolButton(pnlSmart) As "tool"
-                        z = 48
+  Dim obj As Object
+  Dim ictn As New Collection
+  Dim mnu As Menu
+  Dim tob As ToolButton
+  Dim i As Integer
+  Dim iSet As String
+  Dim z As Integer
+  'Dim ctr As Object
+  Dim r As Integer
+  Dim g As Integer
+  Dim b As Integer
+  Dim img As Image
+  '------------------------------------------------------------------------------
+  '' Setting connection variables and more
+  cex = cin
+  con = cin["Connex"]           '' Connection to the database.
+  adi = cin["AppDir"]           '' Program Directory.
+  apc = cin["AppCfg"]           '' Program configuration file.
+  dbc = cin["DbsCfg"]           '' Database configuration file.
+  etx = cin["AppEdi"]           '' Default plain text editor.
+  lgg = cin["AppLog"]           '' Application event log.
+  '------------------------------------------------------------------------------
+  iSet = xmg.GetVar("Desktop.Icons", apc)
+  ictn = dsk.GNumix(iSet & "/")
+  '------------------------------------------------------------------------------
+  For Each mnu In Me.Menus
+    For Each obj In mnu.Children
+      ''Adding menu item in the alternative menu
+      If obj.Visible = True Then
+        Select mnu.Name
+          Case "grpEntities"
+            tob = New ToolButton(pnlEntities) As "entity"
+            z = 48
+          Case "grpTools"
+            tob = New ToolButton(pnlEntities) As "tool"
+            z = 48
+          Case "grpSmart"
+            tob = New ToolButton(pnlSmart) As "tool"
+            z = 48
 
-                    Case "grpFile", "grpHelp"
-                        tob = New ToolButton(pnlFile) As "menuapp"
-                        z = 32
+          Case "grpFile", "grpHelp"
+            tob = New ToolButton(pnlFile) As "menuapp"
+            z = 32
 
-                    Case "grpOptions"
-                        tob = New ToolButton(pnlFile) As "menuapp"
-                        z = 32
+          Case "grpOptions"
+            tob = New ToolButton(pnlFile) As "menuapp"
+            z = 32
 
-                    Case "grpView"
-                        'tob = New ToolButton(pnlToolsH) As "tool"
-                        tob = New ToolButton(pnlFile) As "tool"
-                        z = 32
+          Case "grpView"
+            'tob = New ToolButton(pnlToolsH) As "tool"
+            tob = New ToolButton(pnlFile) As "tool"
+            z = 32
 
-                End Select
+        End Select
 
-                With tob
-                    .Name = "tob" & obj.Tag & CStr(i)
-                    .Tag = obj.Tag
-                    .Tooltip = obj.Text
-                    .Enabled = obj.Enabled
+        With tob
+          .Name = "tob" & obj.Tag & CStr(i)
+          .Tag = obj.Tag
+          .Tooltip = obj.Text
+          .Enabled = obj.Enabled
 
-                    .W = z
-                    .H = z
+          .W = z
+          .H = z
 
-                    Select mnu.Name
-                        Case "grpFile", "grpOptions", "grpHelp" ', "grpView" ', "grpSmart", "grpEntities"
-                            If Exist(ictn[obj.Tag]) Then
-                                If Stat(ictn[obj.Tag]).Type = gb.File Or Stat(ictn[obj.Tag]).Type = gb.Link Then
-                                    tob.Picture = Image.Load(ictn[obj.Tag]).Stretch(z - 8, z - 8).Picture
-                                Else
-                                    tob.Picture = obj.Picture
-                                    .Border = True
-                                Endif
-                            Else
-                                tob.Picture = obj.Picture
-                                .Border = True
-                            Endif
+          Select mnu.Name
+            Case "grpFile", "grpOptions", "grpHelp" ', "grpView" ', "grpSmart", "grpEntities"
+              If Exist(ictn[obj.Tag]) Then
+                If Stat(ictn[obj.Tag]).Type = gb.File Or Stat(ictn[obj.Tag]).Type = gb.Link Then
+                  tob.Picture = Image.Load(ictn[obj.Tag]).Stretch(z - 8, z - 8).Picture
+                Else
+                  tob.Picture = obj.Picture
+                  .Border = True
+                Endif
+              Else
+                tob.Picture = obj.Picture
+                .Border = True
+              Endif
 
-                        Case "grpSmart", "grpEntities", "grpView", "grpTools"
-                            tob.Picture = obj.Picture.Image.Stretch(z - 8, z - 8).Picture
-                            .Border = True
-                    End Select
+            Case "grpSmart", "grpEntities", "grpView", "grpTools"
+              tob.Picture = obj.Picture.Image.Stretch(z - 8, z - 8).Picture
+              .Border = True
+          End Select
 
-                End With
+        End With
 
-                obj.Picture = obj.Picture.Image.Stretch(22, 22).Picture
+        obj.Picture = obj.Picture.Image.Stretch(22, 22).Picture
 
-            Endif
-            Inc i
+      Endif
+      Inc i
 
-        Next
     Next
+  Next
 
-    btnColors.Reparent(pnlFile)
-    btnLtypes.Reparent(pnlFile)
-    btnLayers.Reparent(pnlFile)
-    cboLayers.Reparent(pnlFile)
-    tobLayers.Reparent(pnlFile)
-    cboWidths.Reparent(pnlFile)
-    cboDimSts.Reparent(pnlFile)
+  btnColors.Reparent(pnlFile)
+  btnLtypes.Reparent(pnlFile)
+  btnLayers.Reparent(pnlFile)
+  cboLayers.Reparent(pnlFile)
+  tobLayers.Reparent(pnlFile)
+  cboWidths.Reparent(pnlFile)
+  cboDimSts.Reparent(pnlFile)
 
-    AddLtypesPics()
-    btnLtypes.Picture = Starter.cLtypes["0"][2].Picture
-    btnLtypes.Tooltip = Starter.cLtypes["0"][1]
+  AddLtypesPics()
+  btnLtypes.Picture = Starter.cLtypes["0"][2].Picture
+  btnLtypes.Tooltip = Starter.cLtypes["0"][1]
 
-    If CurrentColor = 0 Then
-        CurrentColor = 3
-    Endif
+  If CurrentColor = 0 Then
+    CurrentColor = 3
+  Endif
 
-    r = CInt(Split(Starter.ColorsRGB[CurrentColor], ",")[0])
-    g = CInt(Split(Starter.ColorsRGB[CurrentColor], ",")[1])
-    b = CInt(Split(Starter.ColorsRGB[CurrentColor], ",")[2])
+  r = CInt(Split(Starter.ColorsRGB[CurrentColor], ",")[0])
+  g = CInt(Split(Starter.ColorsRGB[CurrentColor], ",")[1])
+  b = CInt(Split(Starter.ColorsRGB[CurrentColor], ",")[2])
 
-    imgColor = New Image(btnColors.H - 2, btnColors.H - 2, Color.RGB(r, g, b), 0)
-    img = dsk.ImageFrame(imgColor.Stretch(btnColors.W - 4, btnColors.H - 4))
+  imgColor = New Image(btnColors.H - 2, btnColors.H - 2, Color.RGB(r, g, b), 0)
+  img = dsk.ImageFrame(imgColor.Stretch(btnColors.W - 4, btnColors.H - 4))
 
-    btnColors.Picture = img.Picture
+  btnColors.Picture = img.Picture
 
-    btnColors.Tooltip = ("Color") & ": " & CStr(CurrentColor)
+  btnColors.Tooltip = ("Color") & ": " & CStr(CurrentColor)
 
-    Me.Show()
+  Me.Show()
 
 End
 
 Public Sub LoadColorsOriginalDeTincho()
 
-    Dim hMenu As Menu
-    Dim mui As Menu
-    Dim cCol As Collection
-    Dim ix As Variant[]
-    Dim isvg As String
+  Dim hMenu As Menu
+  Dim mui As Menu
+  Dim cCol As Collection
+  Dim ix As Variant[]
+  Dim isvg As String
 
-    cCol = Starter.cColors
+  cCol = Starter.cColors
 
-    mubColors.Menu = "Clx"
+  mubColors.Menu = "Clx"
 
-    '' Filling the MenuButton menu
-    hMenu = New Menu(Me) As "Clx" '' Create the initial menu
+  '' Filling the MenuButton menu
+  hMenu = New Menu(Me) As "Clx" '' Create the initial menu
 
-    For Each ix In cCol
-        mui = New Menu(hMenu) As "Clx"
-        mui.Text = ix[0]
-        mui.Tag = ix[1]
-        Select ix[1]
-            Case 255, 256, 0
-                isvg = "./svg/colors/" & "7" & ".svg"
-            Case 1, 2, 3, 4, 5, 6, 7
-                isvg = "./svg/colors/" & cCol.Key & ".svg"
-        End Select
+  For Each ix In cCol
+    mui = New Menu(hMenu) As "Clx"
+    mui.Text = ix[0]
+    mui.Tag = ix[1]
+    Select ix[1]
+      Case 255, 256, 0
+        isvg = "./svg/colors/" & "7" & ".svg"
+      Case 1, 2, 3, 4, 5, 6, 7
+        isvg = "./svg/colors/" & cCol.Key & ".svg"
+    End Select
 
-        If Exist(isvg) Then
-            mui.Picture = Image.Load(isvg).Stretch(16, 16).Picture
-        Endif
+    If Exist(isvg) Then
+      mui.Picture = Image.Load(isvg).Stretch(16, 16).Picture
+    Endif
 
-        If cCol.Key = "7" Then
-            mubColors.Picture = Image.Load(isvg).Stretch(16, 16).Picture
-            mubColors.Tooltip = ix[0]
-            mubColors.Text = ix[0]
-        Endif
+    If cCol.Key = "7" Then
+      mubColors.Picture = Image.Load(isvg).Stretch(16, 16).Picture
+      mubColors.Tooltip = ix[0]
+      mubColors.Text = ix[0]
+    Endif
 
-    Next
+  Next
 
 End
 
 Public Sub LoadColors()
 
-    Dim hMenu As Menu
-    Dim mui As Menu
-    Dim cCol As Collection
-    Dim ix As Variant[]
-    'Dim isvg As String
-    Dim imgColorCircle As Image
+  Dim hMenu As Menu
+  Dim mui As Menu
+  Dim cCol As Collection
+  Dim ix As Variant[]
+  'Dim isvg As String
+  Dim imgColorCircle As Image
 
-    cCol = Starter.cColors
+  cCol = Starter.cColors
 
-    mubColors.Menu = "Clx"
+  mubColors.Menu = "Clx"
 
-    ' Fill the MenuButton menu
-    hMenu = New Menu(Me) As "Clx" '' Crea el menu inicial
+  ' Fill the MenuButton menu
+  hMenu = New Menu(Me) As "Clx" '' Crea el menu inicial
 
-    For Each ix In cCol
-        mui = New Menu(hMenu) As "Clx"
-        mui.Text = ix[0]
-        mui.Tag = ix[1]
+  For Each ix In cCol
+    mui = New Menu(hMenu) As "Clx"
+    mui.Text = ix[0]
+    mui.Tag = ix[1]
 
-        imgColorCircle = New Image(16, 16, mubColors.Background)    '' I dynamically create the image 16x16 size, but it can be any
+    imgColorCircle = New Image(16, 16, mubColors.Background)    '' I dynamically create the image 16x16 size, but it can be any
 
-        Paint.Begin(imgColorCircle)                                 '' I am going to draw over the image I just created
-        Paint.Arc(8, 8, 7, 0, 2 * Pi)                               '' I add a circle, but it could be any shape
-        Paint.Brush = Paint.Color(Starter.gColor[Val(cCol.Key)])    '' the color was taken directly from the CAD color chart
-        Paint.Fill(True)                                            '' filling
-        Paint.Brush = Paint.Color(Color.Black)                      '' optionally I draw the outline that makes the best contrast with the menubutton
-        Paint.Stroke()                                              '' outline
-        Paint.End                                                   '' end of the Paint cycle on this image
+    Paint.Begin(imgColorCircle)                                 '' I am going to draw over the image I just created
+    Paint.Arc(8, 8, 7, 0, 2 * Pi)                               '' I add a circle, but it could be any shape
+    Paint.Brush = Paint.Color(Starter.gColor[Val(cCol.Key)])    '' the color was taken directly from the CAD color chart
+    Paint.Fill(True)                                            '' filling
+    Paint.Brush = Paint.Color(Color.Black)                      '' optionally I draw the outline that makes the best contrast with the menubutton
+    Paint.Stroke()                                              '' outline
+    Paint.End                                                   '' end of the Paint cycle on this image
 
-        mui.Picture = imgColorCircle.Picture                        '' I insert it in the Button
+    mui.Picture = imgColorCircle.Picture                        '' I insert it in the Button
 
-        If cCol.Key = "7" Then                                      '' if it's 7, I choose it as default
-            mubColors.Picture = imgColorCircle.Picture
-            mubColors.Tooltip = ix[0]
-            mubColors.Text = ix[0]
-        Endif
+    If cCol.Key = "7" Then                                      '' if it's 7, I choose it as default
+      mubColors.Picture = imgColorCircle.Picture
+      mubColors.Tooltip = ix[0]
+      mubColors.Text = ix[0]
+    Endif
 
-    Next
+  Next
 
 End
 
 Public Sub Clx_Click()
 
-    Dim obj As Object
+  Dim obj As Object
 
-    obj = Last
+  obj = Last
 
-    CurrentColor = obj.Tag
-    mubColors.Picture = obj.Picture
-    mubColors.Text = obj.Text
-    mubColors.Tooltip = obj.Text
+  CurrentColor = obj.Tag
+  mubColors.Picture = obj.Picture
+  mubColors.Text = obj.Text
+  mubColors.Tooltip = obj.Text
 
-    txaDebug.Pos = 0
-    txaDebug.Insert(obj.Text & " is the current color\n")
+  txaDebug.Pos = 0
+  txaDebug.Insert(obj.Text & " is the current color\n")
 
 End
 
 Public Sub AddLtypesPics()
 
-    Dim lt As Variant
-    Dim dash As Float[]
-    Dim img As Image
-    Dim hColor As ColorInfo
-    'Dim iTheme As Integer
+  Dim lt As Variant
+  Dim dash As Float[]
+  Dim img As Image
+  Dim hColor As ColorInfo
+  'Dim iTheme As Integer
 
-    hColor = Color[Color.ButtonBackground]
+  hColor = Color[Color.ButtonBackground]
 
-    If iTheme <> hColor.Luminance Then
-        iTheme = hColor.Luminance
+  If iTheme <> hColor.Luminance Then
+    iTheme = hColor.Luminance
 
-        For Each lt In Starter.cLtypes
+    For Each lt In Starter.cLtypes
 
-            dash = lt[0]
+      dash = lt[0]
 
-            img = New Image(btnLtypes.Width, 8, btnLtypes.Background)
+      img = New Image(btnLtypes.Width, 8, btnLtypes.Background)
 
-            Paint.Begin(img)
-            Paint.NewPath
-            Select dash.Count
-                Case 0, 1
+      Paint.Begin(img)
+      Paint.NewPath
+      Select dash.Count
+        Case 0, 1
 
-                Case Else
-                    Paint.Dash = dash
+        Case Else
+          Paint.Dash = dash
 
-            End Select
+      End Select
 
-            hColor = Color[Color.ButtonBackground]
+      hColor = Color[Color.ButtonBackground]
 
-            If hColor.Luminance > 160 Then
-                Paint.Brush = Paint.Color(Color.Black)
-            Else
-                Paint.Brush = Paint.Color(Color.White)
-            Endif
+      If hColor.Luminance > 160 Then
+        Paint.Brush = Paint.Color(Color.Black)
+      Else
+        Paint.Brush = Paint.Color(Color.White)
+      Endif
 
-            Paint.LineWidth = 1
-            Paint.MoveTo(4, 4)
-            Paint.LineTo(btnLtypes.Width - 4, 4)
-            Paint.Stroke
-            Paint.End
+      Paint.LineWidth = 1
+      Paint.MoveTo(4, 4)
+      Paint.LineTo(btnLtypes.Width - 4, 4)
+      Paint.Stroke
+      Paint.End
 
-            If Starter.cLtypes[Starter.cLtypes.Key].Count = 3 Then
-                Starter.cLtypes[Starter.cLtypes.Key][2] = img
-            Else
-                Starter.cLtypes[Starter.cLtypes.Key].Add(img)
-            Endif
+      If Starter.cLtypes[Starter.cLtypes.Key].Count = 3 Then
+        Starter.cLtypes[Starter.cLtypes.Key][2] = img
+      Else
+        Starter.cLtypes[Starter.cLtypes.Key].Add(img)
+      Endif
 
-        Next
+    Next
 
-    Endif
+  Endif
 
 End
 
 Public Sub AddColorsPics()
 
-    Dim lt As Variant
-    Dim img As Image
+  Dim lt As Variant
+  Dim img As Image
 
-    For Each lt In Starter.cColors
+  For Each lt In Starter.cColors
 
-        img = New Image(16, 16, btnLtypes.Background)
+    img = New Image(16, 16, btnLtypes.Background)
 
-        Paint.Begin(img)
-        Paint.NewPath
+    Paint.Begin(img)
+    Paint.NewPath
 
-        Select Starter.flgWhiteAndBlack
-            Case 0
-                Paint.Brush = Paint.Color(Color.Black)
-            Case Else
-                Paint.Brush = Paint.Color(Color.White)
-        End Select
-
-        Paint.Begin(img)
-        Paint.Arc(8, 8, 7, 0, 2 * Pi)
-        Paint.Brush = Paint.Color(Val(Starter.cColors.Key))
-        Paint.Fill(True)
+    Select Starter.flgWhiteAndBlack
+      Case 0
         Paint.Brush = Paint.Color(Color.Black)
-        Paint.Stroke()
-        Paint.End
+      Case Else
+        Paint.Brush = Paint.Color(Color.White)
+    End Select
 
-        Starter.cColors[Starter.cColors.Key].Add(img)
+    Paint.Begin(img)
+    Paint.Arc(8, 8, 7, 0, 2 * Pi)
+    Paint.Brush = Paint.Color(Val(Starter.cColors.Key))
+    Paint.Fill(True)
+    Paint.Brush = Paint.Color(Color.Black)
+    Paint.Stroke()
+    Paint.End
 
-    Next
+    Starter.cColors[Starter.cColors.Key].Add(img)
+
+  Next
 
 End
 
 Public Sub LoadLocks()
 
-    Dim obj As Object
+  Dim obj As Object
 
-    For Each obj In pnlLocks.Children
-        Select Object.Type(obj)
-            Case "ToolButton"
-                Select obj.Tag
-                    Case "grid"
-                        obj.Picture = Image.Load("./svg/locks/grid.svg").Stretch(22, 22).Picture
+  For Each obj In pnlLocks.Children
+    Select Object.Type(obj)
+      Case "ToolButton"
+        Select obj.Tag
+          Case "grid"
+            obj.Picture = Image.Load("./svg/locks/grid.svg").Stretch(22, 22).Picture
 
-                    Case "debug"
-                        obj.Picture = Image.Load("./svg/locks/debug.svg").Stretch(22, 22).Picture
-
-                End Select
+          Case "debug"
+            obj.Picture = Image.Load("./svg/locks/debug.svg").Stretch(22, 22).Picture
 
         End Select
 
-    Next
+    End Select
+
+  Next
 
 End
 
 Public Sub locks_Click()
 
-    Dim obj As Object
+  Dim obj As Object
 
-    obj = Last
+  obj = Last
 
-    Select obj.Tag
-        Case "bounds"
-            Select obj.Value
-                Case True
-                    gcd.DrawBounds = True
-                Case Else
-                    gcd.DrawBounds = False
-            End Select
-            'gcd.DrawBounds = Not gcd.DrawBounds
+  Select obj.Tag
+    Case "bounds"
+      Select obj.Value
+        Case True
+          gcd.DrawBounds = True
+        Case Else
+          gcd.DrawBounds = False
+      End Select
+      'gcd.DrawBounds = Not gcd.DrawBounds
 
-        Case "grid"
-            Select obj.Value
-                Case True
-                    puntos.Gridactive = True
-                Case Else
-                    puntos.Gridactive = False
-            End Select
+    Case "grid"
+      Select obj.Value
+        Case True
+          puntos.Gridactive = True
+        Case Else
+          puntos.Gridactive = False
+      End Select
 
-            'puntos.Gridactive = Not puntos.Gridactive
+      'puntos.Gridactive = Not puntos.Gridactive
 
-        Case "ortho"
-            Select obj.Value
-                Case True
-                    gcd.Orthogonal = True
-                Case Else
-                    gcd.Orthogonal = False
-            End Select
+    Case "ortho"
+      Select obj.Value
+        Case True
+          gcd.Orthogonal = True
+        Case Else
+          gcd.Orthogonal = False
+      End Select
 
-    End Select
+  End Select
 
 End
 
 Public Sub Form_Open()
 
-    Dim n As Integer
-    Dim b As Integer
-    Dim x As Integer
+  Dim n As Integer
+  Dim b As Integer
+  Dim x As Integer
 
-    For n = 0 To Screens.Count - 1
-        If Screens[n].AvailableWidth > b Then
-            b = Screens[n].AvailableWidth
-            x = n
-        Endif
-    Next
+  For n = 0 To Screens.Count - 1
+    If Screens[n].AvailableWidth > b Then
+      b = Screens[n].AvailableWidth
+      x = n
+    Endif
+  Next
 
-    Me.x = Screens[x].AvailableX
-    Me.y = Screens[x].AvailableY
+  Me.x = Screens[x].AvailableX
+  Me.y = Screens[x].AvailableY
 
-    gTask("new")
+  gTask("new")
 
-    Me.Maximized = True
+  Me.Maximized = True
 
 End
 
 Public Sub entity_Click()
 
-    Dim obj As Object
+  Dim obj As Object
 
-    obj = Last
+  obj = Last
 
-    If Workspace1.ActiveWindow Then
-        gcd.clsJob.KeyText(obj.Tag)
-    Endif
+  If Workspace1.ActiveWindow Then
+    gcd.clsJob.KeyText(obj.Tag)
+  Endif
 
 End
 
 Public Sub tool_Click()
 
-    Dim obj As Object
+  Dim obj As Object
 
-    obj = Last
+  obj = Last
 
-    If Workspace1.ActiveWindow Then
-        gcd.clsJob.KeyText(obj.Tag)
-    Endif
+  If Workspace1.ActiveWindow Then
+    gcd.clsJob.KeyText(obj.Tag)
+  Endif
 
 End
 
 Public Sub menuapp_Click()
 
-    Dim obj As Object
+  Dim obj As Object
 
-    obj = Last
+  obj = Last
 
-    gTask(obj.Tag)
+  gTask(obj.Tag)
 
 End
 
 Public Sub view_Click()
 
-    Dim obj As Object
+  Dim obj As Object
 
-    obj = Last
+  obj = Last
 
-    If Workspace1.ActiveWindow Then
-        gcd.clsJob.KeyText(obj.Tag)
-    Endif
+  If Workspace1.ActiveWindow Then
+    gcd.clsJob.KeyText(obj.Tag)
+  Endif
 
 End
 
 Public Sub LoadComboboxes(cMdl As Collection)
 
-    Dim aLayer As Variant
-    'Dim aStyle As Variant
-    Dim aWidth As Variant
-    Dim aDimSt As Variant
+  Dim aLayer As Variant
+  'Dim aStyle As Variant
+  Dim aWidth As Variant
+  Dim aDimSt As Variant
 
-    cMod = cMdl
+  cMod = cMdl
 
-    cboLayers.Clear
-    cboWidths.Clear
-    cboDimSts.Clear
+  cboLayers.Clear
+  cboWidths.Clear
+  cboDimSts.Clear
 
-    If cMdl.Count > 0 Then
-        If cMdl.Exist("Layers") Then
-            For Each aLayer In cMdl["Layers"]
-                cboLayers.Add(aLayer["name"])
-            Next
-            For Each aLayer In cMdl["Layers"]
-                cboLayers.Text = aLayer["name"]
-                Break
-            Next
-        Endif
-
-        If cMdl.Exist("Widths") Then
-            For Each aWidth In cMdl["Widths"]
-                cboWidths.Add(aWidth["value"])
-            Next
-            For Each aWidth In cMdl["Widths"]
-                cboWidths.Text = aWidth["value"]
-                Break
-            Next
-        Endif
-
-        If cMdl.Exist("DimSts") Then
-            For Each aDimSt In cMdl["DimSts"]
-                cboDimSts.Add(aDimSt["name"])
-            Next
-            For Each aDimSt In cMdl["DimSts"]
-                cboDimSts.Text = aDimSt["name"]
-                Break
-            Next
-        Endif
-
+  If cMdl.Count > 0 Then
+    If cMdl.Exist("Layers") Then
+      For Each aLayer In cMdl["Layers"]
+        cboLayers.Add(aLayer["name"])
+      Next
+      For Each aLayer In cMdl["Layers"]
+        cboLayers.Text = aLayer["name"]
+        Break
+      Next
     Endif
+
+    If cMdl.Exist("Widths") Then
+      For Each aWidth In cMdl["Widths"]
+        cboWidths.Add(aWidth["value"])
+      Next
+      For Each aWidth In cMdl["Widths"]
+        cboWidths.Text = aWidth["value"]
+        Break
+      Next
+    Endif
+
+    If cMdl.Exist("DimSts") Then
+      For Each aDimSt In cMdl["DimSts"]
+        cboDimSts.Add(aDimSt["name"])
+      Next
+      For Each aDimSt In cMdl["DimSts"]
+        cboDimSts.Text = aDimSt["name"]
+        Break
+      Next
+    Endif
+
+  Endif
 
 End
 
 Public Sub gTask(sTask As String)
 
-    Dim s As String
-    Dim cModel As New Collection
-    Dim ctn As New Collection
-    Dim cfg As New Collection
+  Dim s As String
+  Dim cModel As New Collection
+  Dim ctn As New Collection
+  Dim cfg As New Collection
 
-    Dim hFConfig As FConfig                 '' Edit program configuration
-    Dim hFAbout As FAbout                  '' Formulario que muestra informacin del programa
-    'Dim hFImport As FImport                 '' Impor from others formats
-    Dim w As Window
-    Dim wtag As String
+  Dim hFConfig As FConfig                 '' Edit program configuration
+  Dim hFAbout As FAbout                  '' Formulario que muestra informacin del programa
+  'Dim hFImport As FImport                 '' Impor from others formats
+  Dim w As Window
+  Dim wtag As String
 
-    Dim stx As New String[]
-    Dim FilePath As String            ''Nombre del archivo que se abrira
-    Dim FileDef As String
-    Dim i As Integer
-    Dim mdl As New Collection
-    Dim template As Boolean
+  Dim stx As New String[]
+  Dim FilePath As String            ''Nombre del archivo que se abrira
+  Dim FileDef As String
+  Dim i As Integer
+  Dim mdl As New Collection
+  Dim template As Boolean
 
-    '' if the drawing is drawingX.xml, drawingX.gcad where X is a integer number then the Ssave is changed to Save As
+  '' if the drawing is drawingX.xml, drawingX.gcad where X is a integer number then the Ssave is changed to Save As
 
-    Select sTask
+  Select sTask
 
-        Case "save"
-            For i = 1 To 99
-                If File.Name(CurrentFile) = "drawing" & CStr(i) & "." & File.Ext(CurrentFile) Then
-                    template = True
-                    Break
-                Endif
-            Next
+    Case "save"
+      For i = 1 To 99
+        If File.Name(CurrentFile) = "drawing" & CStr(i) & "." & File.Ext(CurrentFile) Then
+          template = True
+          Break
+        Endif
+      Next
 
-            If template = True Then
-                gTask("saveas")
-            Else
-                '' Transfer data from arrEntitites to cModel
-                gcd.ExportBlocks(hFCAD.cModel)
-                gcd.ExportEntities(hFCAD.cModel["Entities"], hFCAD.arrEntities)
-                cad.SaveGaucho(CurrentFile, hFCAD.cModel)
+      If template = True Then
+        gTask("saveas")
+      Else
+        '' Transfer data from arrEntitites to cModel
+        gcd.ExportBlocks(hFCAD.cModel)
+        gcd.ExportEntities(hFCAD.cModel["Entities"], hFCAD.arrEntities)
+        cad.SaveGaucho(CurrentFile, hFCAD.cModel)
+      Endif
+
+    Case "saveas"
+
+      Dialog.Filter = ["*.gcad", "GauchoCAD"]
+      If Dialog.SaveFile() Then Return
+      FilePath = Dialog.Path
+      If File.Ext(FilePath) <> "gcad" Then
+        FilePath = FilePath & ".gcad"
+      Endif
+
+      '' Transfer data from arrEntitites to cModel
+      gcd.ExportBlocks(hFCAD.cModel)
+      gcd.ExportEntities(hFCAD.cModel["Entities"], hFCAD.arrEntities)
+      hFCAD.cModel["File"] = FilePath
+      cad.SaveGaucho(FilePath, hFCAD.cModel)
+      hFCAD.Text = File.Name(FilePath)
+      'Print hFCAD.CurrentFile
+
+    Catch
+      Message.Info(Error.Text)
+
+    Case "export"
+
+      Dialog.Filter = ["*.dxf", "DXF 2007 files"]
+      If Dialog.SaveFile() Then Return
+      FilePath = Dialog.Path
+      If File.Ext(FilePath) <> "xml" Then
+        FilePath = FilePath & ".gcad"
+      Endif
+      cadDxf.Start(, 1)
+
+    Case "import"
+      stx = dsk.FileChooser(User.Home, ["dxf", "dwg"])
+      If stx.count > 0 Then
+        FilePath = stx[0]
+
+        Select String.LCase(File.Ext(FilePath))
+          Case "dxf"
+            mdl = cad.ImportDxf(FilePath)
+            If mdl.Count > 0 Then
+              hFCAD.cImport = mdl
             Endif
 
-        Case "saveas"
+          Case "dwg"
+            Message.Info(("Not implemented yet"))
+            ' mdl = cad.ImportDwg(FilePath)
+            ' If mdl.Count > 0 Then
+            '     hFCAD.cImport = mdl
+            ' Endif
+        End Select
 
-            Dialog.Filter = ["*.gcad", "GauchoCAD"]
-            If Dialog.SaveFile() Then Return
-            FilePath = Dialog.Path
-            If File.Ext(FilePath) <> "gcad" Then
-                FilePath = FilePath & ".gcad"
-            Endif
+      Endif
 
-            '' Transfer data from arrEntitites to cModel
-            gcd.ExportBlocks(hFCAD.cModel)
-            gcd.ExportEntities(hFCAD.cModel["Entities"], hFCAD.arrEntities)
-            hFCAD.cModel["File"] = FilePath
-            cad.SaveGaucho(FilePath, hFCAD.cModel)
-            hFCAD.Text = File.Name(FilePath)
-            'Print hFCAD.CurrentFile
+    Case "open"
 
-        Catch
-            Message.Info(Error.Text)
+      Dialog.Title = ("Open file")
+      Dialog.Filter = ["*.gcad", "GauchoCAD"]
+      Dialog.OpenFile(False)
+      FilePath = Dialog.Path
 
-        Case "export"
-
-            Dialog.Filter = ["*.dxf", "DXF 2007 files"]
-            If Dialog.SaveFile() Then Return
-            FilePath = Dialog.Path
-            If File.Ext(FilePath) <> "xml" Then
-                FilePath = FilePath & ".gcad"
-            Endif
-            cadDxf.Start(, 1)
-
-        Case "import"
-            stx = dsk.FileChooser(User.Home, ["dxf", "dwg"])
-            If stx.count > 0 Then
-                FilePath = stx[0]
-
-                Select String.LCase(File.Ext(FilePath))
-                    Case "dxf"
-                        mdl = cad.ImportDxf(FilePath)
-                        If mdl.Count > 0 Then
-                            hFCAD.cImport = mdl
-                        Endif
-
-                    Case "dwg"
-                        Message.Info(("Not implemented yet"))
-                        ' mdl = cad.ImportDwg(FilePath)
-                        ' If mdl.Count > 0 Then
-                        '     hFCAD.cImport = mdl
-                        ' Endif
-                End Select
-
-            Endif
-
-        Case "open"
-
-            Dialog.Title = ("Open file")
-            Dialog.Filter = ["*.gcad", "GauchoCAD"]
-            Dialog.OpenFile(False)
-            FilePath = Dialog.Path
-
-            If Exist(FilePath) Then
-                Select String.LCase(File.Ext(FilePath))
-                    Case "gcad"
-                        cModel = cad.LoadGaucho(FilePath)
-                        LoadComboboxes(cModel)
-
-                        wtag = FilePath
-                        If Workspace1.Count = 0 Or ExistWin(wtag, Workspace1) = False Then
-                            hFCAD = New FCAD(cModel.Copy())
-                            hFCAD.Tag = wtag
-                            hFCAD.Title = File.Name(FilePath)
-                            Workspace1.Add(hFCAD)
-                        Else
-                            For Each w In Workspace1.Windows
-                                If w.Tag = wtag Then
-                                    Workspace1.ActiveWindow = w
-                                    Break
-                                Endif
-                            Next
-                        Endif
-                End Select
-            Endif
-        Case "new"
-
-            FileDef = adi &/ "default.gcad"
-            If Exist(FileDef) = False Then
-                Copy "./def.gcad" To FileDef
-            Endif
-
-            For i = 1 To 99
-                FilePath = User.Home &/ "drawing" & CStr(i) & ".gcad"
-                If ExistWin(FilePath, Workspace1) = False Then
-                    Break
-                Endif
-            Next
-
-            FileDef = adi &/ "default.gcad"
-            If Exist(FileDef) Then
-                If Exist(FilePath) = False Then
-                    Copy FileDef To FilePath
-                Endif
-            Endif
-
+      If Exist(FilePath) Then
+        Select String.LCase(File.Ext(FilePath))
+          Case "gcad"
             cModel = cad.LoadGaucho(FilePath)
-            LoadComboboxes(cModel.Copy())
+            LoadComboboxes(cModel)
 
             wtag = FilePath
             If Workspace1.Count = 0 Or ExistWin(wtag, Workspace1) = False Then
-
-                hFCAD = New FCAD(cModel)
-                hFCAD.Tag = wtag
-                hFCAD.Title = File.Name(FilePath)
-                Workspace1.Add(hFCAD)
+              hFCAD = New FCAD(cModel.Copy())
+              hFCAD.Tag = wtag
+              hFCAD.Title = File.Name(FilePath)
+              Workspace1.Add(hFCAD)
             Else
-                For Each w In Workspace1.Windows
-                    If w.Tag = wtag Then
-                        Workspace1.ActiveWindow = w
-                        Break
-                    Endif
-                Next
-            Endif
-
-        Case "info"
-            wtag = sTask
-            If Workspace1.Count = 0 Or ExistWin(wtag, Workspace1) = False Then
-                File.Save("/tmp/apppath.txt", Application.Dir)
-                cfg = sog.ProjInfo(Application.Path & "/.project")
-                hFAbout = New FAbout(cfg)
-                hFAbout.Tag = wtag
-                hFAbout.Title = ("About") & " " & Application.Name
-                Workspace1.Add(hFAbout)
-            Else
-                For Each w In Workspace1.Windows
-                    If w.Tag = wtag Then
-                        Workspace1.ActiveWindow = w
-                        Break
-                    Endif
-                Next
-            Endif
-
-        Case "help"
-            Print "Help"
-
-        Case "options"
-            wtag = sTask
-            If Workspace1.Count = 0 Or ExistWin(wtag, Workspace1) = False Then
-                '---------------------------------------------------
-                s = adi &/ "cfg.xml"
-                If Exist(File.Dir(s)) = False Then
-                    Mkdir File.Dir(s)
+              For Each w In Workspace1.Windows
+                If w.Tag = wtag Then
+                  Workspace1.ActiveWindow = w
+                  Break
                 Endif
-                If Exist(s) = False Then
-                    'ctn = xmg.XmlIni()
-                    ctn = cad.CADConfig()
-                    xmg.XmlConfMaker(s, ctn, Application.Name)
-                Endif
-                hFConfig = New FConfig(cex)
-                hFConfig.Title = ("Configuration")
-                hFConfig.Tag = wtag
-                Workspace1.Add(hFConfig)
-                '---------------------------------------------------
-            Else
-                For Each w In Workspace1.Windows
-                    If w.Tag = wtag Then
-                        Workspace1.ActiveWindow = w
-                        Break
-                    Endif
-                Next
+              Next
             Endif
+        End Select
+      Endif
+    Case "new"
 
-        Case "quit", "exit"
-            Me.Close
+      FileDef = adi &/ "default.gcad"
+      If Exist(FileDef) = False Then
+        Copy "./def.gcad" To FileDef
+      Endif
 
-    End Select
+      For i = 1 To 99
+        FilePath = User.Home &/ "drawing" & CStr(i) & ".gcad"
+        If ExistWin(FilePath, Workspace1) = False Then
+          Break
+        Endif
+      Next
+
+      FileDef = adi &/ "default.gcad"
+      If Exist(FileDef) Then
+        If Exist(FilePath) = False Then
+          Copy FileDef To FilePath
+        Endif
+      Endif
+
+      cModel = cad.LoadGaucho(FilePath)
+      LoadComboboxes(cModel.Copy())
+
+      wtag = FilePath
+      If Workspace1.Count = 0 Or ExistWin(wtag, Workspace1) = False Then
+
+        hFCAD = New FCAD(cModel)
+        hFCAD.Tag = wtag
+        hFCAD.Title = File.Name(FilePath)
+        Workspace1.Add(hFCAD)
+      Else
+        For Each w In Workspace1.Windows
+          If w.Tag = wtag Then
+            Workspace1.ActiveWindow = w
+            Break
+          Endif
+        Next
+      Endif
+
+    Case "info"
+      wtag = sTask
+      If Workspace1.Count = 0 Or ExistWin(wtag, Workspace1) = False Then
+        File.Save("/tmp/apppath.txt", Application.Dir)
+        cfg = sog.ProjInfo(Application.Path & "/.project")
+        hFAbout = New FAbout(cfg)
+        hFAbout.Tag = wtag
+        hFAbout.Title = ("About") & " " & Application.Name
+        Workspace1.Add(hFAbout)
+      Else
+        For Each w In Workspace1.Windows
+          If w.Tag = wtag Then
+            Workspace1.ActiveWindow = w
+            Break
+          Endif
+        Next
+      Endif
+
+    Case "help"
+      Print "Help"
+
+    Case "options"
+      wtag = sTask
+      If Workspace1.Count = 0 Or ExistWin(wtag, Workspace1) = False Then
+        '---------------------------------------------------
+        s = adi &/ "cfg.xml"
+        If Exist(File.Dir(s)) = False Then
+          Mkdir File.Dir(s)
+        Endif
+        If Exist(s) = False Then
+          'ctn = xmg.XmlIni()
+          ctn = cad.CADConfig()
+          xmg.XmlConfMaker(s, ctn, Application.Name)
+        Endif
+        hFConfig = New FConfig(cex)
+        hFConfig.Title = ("Configuration")
+        hFConfig.Tag = wtag
+        Workspace1.Add(hFConfig)
+        '---------------------------------------------------
+      Else
+        For Each w In Workspace1.Windows
+          If w.Tag = wtag Then
+            Workspace1.ActiveWindow = w
+            Break
+          Endif
+        Next
+      Endif
+
+    Case "quit", "exit"
+      Me.Close
+
+  End Select
 
 End
 
@@ -779,19 +779,19 @@ End
 
 Public Function ExistWin(wtag As String, ws As Workspace) As Boolean
 
-    Dim wExist As Boolean
-    Dim w As Window
+  Dim wExist As Boolean
+  Dim w As Window
 
-    wExist = False
+  wExist = False
 
-    For Each w In ws.Windows
-        If w.Tag = wtag Then
-            wExist = True
-            Break
-        Endif
-    Next
+  For Each w In ws.Windows
+    If w.Tag = wtag Then
+      wExist = True
+      Break
+    Endif
+  Next
 
-    Return wExist
+  Return wExist
 
 End
 
@@ -799,535 +799,535 @@ End
 
 Public Sub Workspace1_Activate()
 
-    Dim aWin As Window
+  Dim aWin As Window
 
-    If Workspace1.ActiveWindow Then
-        aWin = Workspace1.ActiveWindow
+  If Workspace1.ActiveWindow Then
+    aWin = Workspace1.ActiveWindow
 
-        If aWin.Name = "FCAD" Then
+    If aWin.Name = "FCAD" Then
 
-            hFCAD = aWin
-            LoadComboboxes(hFCAD.cModel)
+      hFCAD = aWin
+      LoadComboboxes(hFCAD.cModel)
 
-            Print aWin.Tag
-            CurrentFile = aWin.Tag
+      Print aWin.Tag
+      CurrentFile = aWin.Tag
 
-        Endif
     Endif
+  Endif
 
 End
 
 Public Sub tobLayers_Click()
 
-    Dim FLay As FLayers
+  Dim FLay As FLayers
 
-    FLay = New FLayers
-    FLay.Run(hFCAD.cModel)
+  FLay = New FLayers
+  FLay.Run(hFCAD.cModel)
 
 End
 
 Public Sub dprop_Click()
 
-    Dim obj As Object
-    Dim FLay As FLayers
+  Dim obj As Object
+  Dim FLay As FLayers
 
-    obj = Last
+  obj = Last
 
-    Select obj.Tag
-        Case "layer"
-            CurrentLayer = obj.Text
-            Print CurrentLayer
-        Case "OpenFormLayer"
-            FLay = New FLayers
-            FLay.Run(hFCAD.cModel)
-    End Select
+  Select obj.Tag
+    Case "layer"
+      CurrentLayer = obj.Text
+      Print CurrentLayer
+    Case "OpenFormLayer"
+      FLay = New FLayers
+      FLay.Run(hFCAD.cModel)
+  End Select
 
 End
 
 Public Sub KillJob() ' no funciona bien
-    ''TODO: Mejorar esta sub o hacer una nueva para CANCELAR el comando actual
+  ''TODO: Mejorar esta sub o hacer una nueva para CANCELAR el comando actual
 
-    gcd.clsJob.Finish()
-    gcd.clsJobPrevious = gcd.clsJob
-    gcd.clsJob = clsDefaultJob
+  gcd.clsJob.Finish()
+  gcd.clsJobPrevious = gcd.clsJob
+  gcd.clsJob = clsDefaultJob
 
 End
 
 Public Sub btnLtypes_MouseDown()
 
-    Dim lst As FLtypes
-    'Dim lty As New Collection
-    Dim vrx As Variant[]
-    Dim img2 As Image
+  Dim lst As FLtypes
+  'Dim lty As New Collection
+  Dim vrx As Variant[]
+  Dim img2 As Image
 
-    lst = New FLtypes(Starter.cLtypes, [btnLtypes.ScreenX, btnLtypes.ScreenY + btnLtypes.H])
+  lst = New FLtypes(Starter.cLtypes, [btnLtypes.ScreenX, btnLtypes.ScreenY + btnLtypes.H])
 
-    Print btnLtypes.Value
+  Print btnLtypes.Value
 
-    If SelectedLtype = False Then
-        lst.Run()
-        Do
-            If SelectedLtype = True Then
-                vrx = Starter.cLtypes[CStr(CurrentLtype)]
-                If vrx.Count > 2 Then
-                    If Object.Type(vrx[2]) = "Image" Then
-                        img2 = vrx[2]
-                        btnLtypes.Picture = img2.Picture
-                        btnLtypes.Tooltip = vrx[1]
-                        'SelectedLineType = False
-                    Endif
-                Endif
-                SelectedLtype = False
-                Break
-            Else
-                Wait 0.1
-            Endif
-        Loop
-    Endif
+  If SelectedLtype = False Then
+    lst.Run()
+    Do
+      If SelectedLtype = True Then
+        vrx = Starter.cLtypes[CStr(CurrentLtype)]
+        If vrx.Count > 2 Then
+          If Object.Type(vrx[2]) = "Image" Then
+            img2 = vrx[2]
+            btnLtypes.Picture = img2.Picture
+            btnLtypes.Tooltip = vrx[1]
+            'SelectedLineType = False
+          Endif
+        Endif
+        SelectedLtype = False
+        Break
+      Else
+        Wait 0.1
+      Endif
+    Loop
+  Endif
 
 End
 
 Public Sub btnColors_MouseDown()
 
-    Dim r As Integer
-    Dim g As Integer
-    Dim b As Integer
-    Dim img As Image
+  Dim r As Integer
+  Dim g As Integer
+  Dim b As Integer
+  Dim img As Image
 
-    FColors.ShowModal()
+  FColors.ShowModal()
 
-    r = CInt(Split(Starter.ColorsRGB[CurrentColor], ",")[0])
-    g = CInt(Split(Starter.ColorsRGB[CurrentColor], ",")[1])
-    b = CInt(Split(Starter.ColorsRGB[CurrentColor], ",")[2])
+  r = CInt(Split(Starter.ColorsRGB[CurrentColor], ",")[0])
+  g = CInt(Split(Starter.ColorsRGB[CurrentColor], ",")[1])
+  b = CInt(Split(Starter.ColorsRGB[CurrentColor], ",")[2])
 
-    imgColor = New Image(btnColors.H - 2, btnColors.H - 2, Color.RGB(r, g, b), 0)
+  imgColor = New Image(btnColors.H - 2, btnColors.H - 2, Color.RGB(r, g, b), 0)
 
-    img = dsk.ImageFrame(imgColor)
+  img = dsk.ImageFrame(imgColor)
 
-    btnColors.Picture = img.Picture
-    Select CurrentColor
-        Case 256
-            btnColors.Tooltip = ("Color") & ": " & "ByBlock"
-        Case 257
-            btnColors.Tooltip = ("Color") & ": " & "ByLayer"
-        Case Else
-            btnColors.Tooltip = ("Color") & ": " & CStr(CurrentColor)
-    End Select
+  btnColors.Picture = img.Picture
+  Select CurrentColor
+    Case 256
+      btnColors.Tooltip = ("Color") & ": " & "ByBlock"
+    Case 257
+      btnColors.Tooltip = ("Color") & ": " & "ByLayer"
+    Case Else
+      btnColors.Tooltip = ("Color") & ": " & CStr(CurrentColor)
+  End Select
 
 End
 
 Public Sub btnLayers_MouseDown()
 
-    Dim FLay As FLayers1
+  Dim FLay As FLayers1
 
-    FLay = New FLayers1([Workspace1.ScreenX, Workspace1.ScreenY])
+  FLay = New FLayers1([Workspace1.ScreenX, Workspace1.ScreenY])
 
-    FLay.Border = False
+  FLay.Border = False
 
-    FLay.Run(hFCAD.cModel)
+  FLay.Run(hFCAD.cModel)
 
 End
 
 Public Sub btnRefresh_Click()
-    ''FIXED: Poner esta accion en otro evento, por ejemplo despues de seleccionar entidades.
+  ''FIXED: Poner esta accion en otro evento, por ejemplo despues de seleccionar entidades.
 
-    SelectionRefresh()
+  SelectionRefresh()
 
 End
 
 Public Sub SelectionRefresh()
 
-    Dim e As Entity
-    Dim etype As New String[]
-    Dim i As Integer
-    Dim j As Integer
+  Dim e As Entity
+  Dim etype As New String[]
+  Dim i As Integer
+  Dim j As Integer
 
-    ComboBox1.Clear
-    ComboBox1.Text = ""
-    cProp.Clear
-    TableView1.Clear
+  ComboBox1.Clear
+  ComboBox1.Text = ""
+  cProp.Clear
+  TableView1.Clear
 
-    For i = 0 To APPMain.hFCAD.arrEntities.Max
-        e = APPMain.hFCAD.arrEntities[i]
+  For i = 0 To APPMain.hFCAD.arrEntities.Max
+    e = APPMain.hFCAD.arrEntities[i]
 
-        If e.Selected Then
-            If etype.Exist(e.Gender) = False Then
-                etype.Add(e.Gender)
-            Endif
-        Endif
-    Next
+    If e.Selected Then
+      If etype.Exist(e.Gender) = False Then
+        etype.Add(e.Gender)
+      Endif
+    Endif
+  Next
 
-    Select etype.Count
-        Case 0
-            'Aca se puede poner en off el panel de seleccion ya que no hay entidades seleccionadas
-            'skip
+  Select etype.Count
+    Case 0
+      'Aca se puede poner en off el panel de seleccion ya que no hay entidades seleccionadas
+      'skip
 
-        Case 1
-            ComboBox1.Add(etype[0])
-            ComboBox1.Text = etype[0]
-            LoadPropertiesList(etype[0])
+    Case 1
+      ComboBox1.Add(etype[0])
+      ComboBox1.Text = etype[0]
+      LoadPropertiesList(etype[0])
 
-        Case Else
-            ComboBox1.Add(("All"))
-            For j = 0 To etype.Max
-                ComboBox1.Add(etype[j])
-            Next
-            ComboBox1.Text = ("All")
-            LoadPropertiesList("varies")
-    End Select
+    Case Else
+      ComboBox1.Add(("All"))
+      For j = 0 To etype.Max
+        ComboBox1.Add(etype[j])
+      Next
+      ComboBox1.Text = ("All")
+      LoadPropertiesList("varies")
+  End Select
 
 End
 
 Public Sub btnSave_Click()
 
-    Dim i As Integer
-    Dim r As Integer
-    Dim e As Entity
-    Dim lay As Collection
-    Dim ly As Collection
-    Dim Changed As Boolean
-    Dim te As Entity
-    'Dim obj As Entity
+  Dim i As Integer
+  Dim r As Integer
+  Dim e As Entity
+  Dim lay As Collection
+  Dim ly As Collection
+  Dim Changed As Boolean
+  Dim te As Entity
+  'Dim obj As Entity
 
-    lay = APPMain.hFCAD.cModel["Layers"]
+  lay = APPMain.hFCAD.cModel["Layers"]
 
-    For i = 0 To APPMain.hFCAD.arrEntities.Max
-        Changed = False
-        e = APPMain.hFCAD.arrEntities[i]
-        APPMain.hFCAD.arrTmp.Clear
+  For i = 0 To APPMain.hFCAD.arrEntities.Max
+    Changed = False
+    e = APPMain.hFCAD.arrEntities[i]
+    APPMain.hFCAD.arrTmp.Clear
 
-        If e.Selected Then
-            'Copio la entidad en una lista temportal
-            e = APPMain.hFCAD.arrEntities[i]
+    If e.Selected Then
+      'Copio la entidad en una lista temportal
+      e = APPMain.hFCAD.arrEntities[i]
 
-            te = clsEntities.ClonEntity(e)
-            te.Handle = e.Handle
+      te = clsEntities.ClonEntity(e)
+      te.Handle = e.Handle
 
-            APPMain.hFCAD.arrTmp.Add(te)
+      APPMain.hFCAD.arrTmp.Add(te)
 
-            For r = 0 To TableView1.Rows.Count - 1
-                Select TableView1[r, 0].Text
-                    Case "Layer"
-                        cProp["Layer"] = TableView1[r, 1].Text
-                        If e.Layer <> cProp["Layer"] Then
-                            Changed = True
-                            e.Layer = cProp["Layer"]
-                            For Each ly In lay
-                                If ly["name"] = cProp["Layer"] Then
-                                    e.LayerId = ly["id"]
-                                    Break
-                                Endif
-                            Next
-                        Endif
+      For r = 0 To TableView1.Rows.Count - 1
+        Select TableView1[r, 0].Text
+          Case "Layer"
+            cProp["Layer"] = TableView1[r, 1].Text
+            If e.Layer <> cProp["Layer"] Then
+              Changed = True
+              e.Layer = cProp["Layer"]
+              For Each ly In lay
+                If ly["name"] = cProp["Layer"] Then
+                  e.LayerId = ly["id"]
+                  Break
+                Endif
+              Next
+            Endif
 
-                    Case "Color"
-                        cProp["Color"] = TableView1[r, 1].Text
-                        If e.colour <> cProp["Color"] Then
-                            Changed = True
-                            e.colour = cProp["Color"]
-                            e.ColorToPaint = cProp["Color"]
-                        Endif
+          Case "Color"
+            cProp["Color"] = TableView1[r, 1].Text
+            If e.colour <> cProp["Color"] Then
+              Changed = True
+              e.colour = cProp["Color"]
+              e.ColorToPaint = cProp["Color"]
+            Endif
 
-                End Select
-            Next
+        End Select
+      Next
 
-        Endif
+    Endif
 
-        If Changed = True Then
-            APPMain.hFCAD.arrUndo.Add(te)
-            APPMain.hFCAD.Regen
-        Endif
+    If Changed = True Then
+      APPMain.hFCAD.arrUndo.Add(te)
+      APPMain.hFCAD.Regen
+    Endif
 
-    Next
+  Next
 
 End
 
 Public Sub ComboBox1_Click()
 
-    LoadPropertiesList(ComboBox1.Text)
+  LoadPropertiesList(ComboBox1.Text)
 
 End
 
 Public Sub LoadPropertiesList(eFilter As String)
 
-    Dim e As Entity
-    Dim i As Integer
+  Dim e As Entity
+  Dim i As Integer
 
-    cProp.Clear
-    TableView1.Clear
+  cProp.Clear
+  TableView1.Clear
 
-    For i = 0 To APPMain.hFCAD.arrEntities.Max
-        e = APPMain.hFCAD.arrEntities[i]
+  For i = 0 To APPMain.hFCAD.arrEntities.Max
+    e = APPMain.hFCAD.arrEntities[i]
 
-        If e.Selected Then
+    If e.Selected Then
 
-            ' Layers
-            If cProp.Exist("Layer") = False Then
-                cProp.Add([e.Layer], "Layer")
-            Else
-                If cProp["Layer"].Exist(e.Layer) = False Then
-                    cProp["Layer"].Add(e.Layer)
-                Endif
-            Endif
-
-            'Colors
-            If cProp.Exist("Color") = False Then
-                cProp.Add([e.colour], "Color")
-            Else
-                If cProp["Color"].Exist(e.colour) = False Then
-                    cProp["Color"].Add(e.colour)
-                Endif
-            Endif
-
-            'LineType
-            If cProp.Exist("LType") = False Then
-                cProp.Add([e.LineType], "LType")
-            Else
-                If cProp["LType"].Exist(e.LineType) = False Then
-                    cProp["LType"].Add(e.LineType)
-                Endif
-            Endif
-
+      ' Layers
+      If cProp.Exist("Layer") = False Then
+        cProp.Add([e.Layer], "Layer")
+      Else
+        If cProp["Layer"].Exist(e.Layer) = False Then
+          cProp["Layer"].Add(e.Layer)
         Endif
-    Next
+      Endif
 
-    TableView1.Columns.Count = 2
-    TableView1.Rows.Count = 0
-    TableView1.Rows.Count = cProp.Count
+      'Colors
+      If cProp.Exist("Color") = False Then
+        cProp.Add([e.colour], "Color")
+      Else
+        If cProp["Color"].Exist(e.colour) = False Then
+          cProp["Color"].Add(e.colour)
+        Endif
+      Endif
+
+      'LineType
+      If cProp.Exist("LType") = False Then
+        cProp.Add([e.LineType], "LType")
+      Else
+        If cProp["LType"].Exist(e.LineType) = False Then
+          cProp["LType"].Add(e.LineType)
+        Endif
+      Endif
+
+    Endif
+  Next
+
+  TableView1.Columns.Count = 2
+  TableView1.Rows.Count = 0
+  TableView1.Rows.Count = cProp.Count
 
 End
 
 Public Sub TableView1_Data(Row As Integer, Column As Integer)
 
-    Dim prop As Variant
-    Dim i As Integer
+  Dim prop As Variant
+  Dim i As Integer
 
-    For Each prop In cProp
-        If i = Row Then
-            Select Column
+  For Each prop In cProp
+    If i = Row Then
+      Select Column
+        Case 0
+          TableView1[Row, Column].Text = cProp.Key
+        Case 1
+          Select Object.Type(prop)
+            Case "String[]", "Integer[]"
+              Select prop.count
                 Case 0
-                    TableView1[Row, Column].Text = cProp.Key
+                  'TableView1[Row, Column].Text = 0
                 Case 1
-                    Select Object.Type(prop)
-                        Case "String[]", "Integer[]"
-                            Select prop.count
-                                Case 0
-                                    'TableView1[Row, Column].Text = 0
-                                Case 1
-                                    TableView1[Row, Column].Text = prop[0]
+                  TableView1[Row, Column].Text = prop[0]
 
-                                Case Else
-                                    TableView1[Row, Column].Text = "*" & ("varies") & "*"
+                Case Else
+                  TableView1[Row, Column].Text = "*" & ("varies") & "*"
 
-                            End Select
+              End Select
 
-                    End Select
+          End Select
 
-            End Select
+      End Select
 
-        Endif
+    Endif
 
-        Inc i
-    Next
+    Inc i
+  Next
 
 End
 
 Public Sub TableView1_Click()
 
-    Dim lrx As New String[]         ''Layers list
-    Dim lay As Variant
+  Dim lrx As New String[]         ''Layers list
+  Dim lay As Variant
 
-    For Each lay In APPMain.hFCAD.cModel["Layers"]
-        lrx.Add(lay["name"])
-    Next
+  For Each lay In APPMain.hFCAD.cModel["Layers"]
+    lrx.Add(lay["name"])
+  Next
 
-    lrx.Add("*" & ("varies") & "*")
+  lrx.Add("*" & ("varies") & "*")
 
-    Select TableView1[TableView1.Row, 0].Text
-        Case "Layer"
-            TableView1.Edit(lrx, True)
-        Case "Color"
-            TableView1.Edit()
-    End Select
+  Select TableView1[TableView1.Row, 0].Text
+    Case "Layer"
+      TableView1.Edit(lrx, True)
+    Case "Color"
+      TableView1.Edit()
+  End Select
 
 End
 
 Public Sub TableView1_Save(Row As Integer, Column As Integer, Value As String)
 
-    TableView1[Row, Column].Text = Value
+  TableView1[Row, Column].Text = Value
 
-    Select TableView1[Row, 0].Text
-        Case "Layer"
-            TableView1[Row, Column].Text = Value
+  Select TableView1[Row, 0].Text
+    Case "Layer"
+      TableView1[Row, Column].Text = Value
 
-        Case "Color"
+    Case "Color"
 
-        Case "Style"
+    Case "Style"
 
-    End Select
+  End Select
 
 End
 
 Public Sub Form_KeyPress()
 
-    'Dim iAlias As Integer
-    Dim com As Variant
-    Dim umx As Integer     '' Index in undo array
-    Dim uEnty As Entity    '' Undo entity
-    Dim aEnty As Entity    '' Actual entity
-    Dim imx As Integer     '' Index in Entities array
+  'Dim iAlias As Integer
+  Dim com As Variant
+  Dim umx As Integer     '' Index in undo array
+  Dim uEnty As Entity    '' Undo entity
+  Dim aEnty As Entity    '' Actual entity
+  Dim imx As Integer     '' Index in Entities array
 
-    Print Key.Code
-    Dim t As Float = Timer
+  Print Key.Code
+  Dim t As Float = Timer
 
-    'If Workspace1.ActiveWindow Then
-    Select Key.Code
+  'If Workspace1.ActiveWindow Then
+  Select Key.Code
 
-        Case Key.Enter, Key.Return
-            Debug KeysAccumulator
+    Case Key.Enter, Key.Return
+      Debug KeysAccumulator
 
-            For Each com In Starter.cCommands
-                If com.count = 2 Then
-                    If com[1] = KeysAccumulator Then
-                        KeysAccumulator = com[0]
-                    Endif
+      For Each com In Starter.cCommands
+        If com.count = 2 Then
+          If com[1] = KeysAccumulator Then
+            KeysAccumulator = com[0]
+          Endif
+        Endif
+      Next
+
+      gcd.clsJob.KeyText(KeysAccumulator)
+      KeysAccumulator = ""
+
+    Case Key.f6
+
+      If btnBounds.Value = True Then
+        gcd.DrawBounds = False
+      Else
+        gcd.DrawBounds = True
+      Endif
+      btnBounds.Value = gcd.DrawBounds
+
+    Case Key.BackSpace
+
+      KeysAccumulator = Left(KeysAccumulator, -1)
+
+    Case Key.f8
+
+      Debug "Entidades transferidas en  ", Timer - t
+
+      If btnOrtho.Value = False Then
+        gcd.Orthogonal = True
+      Else
+        gcd.Orthogonal = False
+      Endif
+
+      btnOrtho.Value = gcd.Orthogonal
+
+      'gcd.Ortogonal = Not gcd.Ortogonal
+
+    Case Key.f7
+      If btnGrid.Value = False Then
+        puntos.Gridactive = True
+      Else
+        puntos.Gridactive = False
+      Endif
+      btnGrid.Value = puntos.Gridactive
+
+    Case Key.Esc
+
+      gcd.clsJob.Finish()  ' Now!
+      ' we cancel everything
+      gcd.clsJobPrevious = gcd.clsJob
+      gcd.clsJob = clsDefaultJob
+
+      SelectionRefresh()
+
+    Case Key.Space
+      Stop Event
+
+    Case Key.Del
+      gcd.clsJob.KeyText("Erase")
+
+    Case Key.ControlKey
+      KeysAccumulator = "Function"
+
+    Case Else
+      ' A GOOD KEY
+      If InStr(KeysAccumulator, "Function") > 0 Then
+
+        Select Key.Code
+          Case Asc("1") ' Properties
+            If PropertiesFlag = False Then
+              pnlProperties.Visible = True
+              PropertiesFlag = True
+            Else
+              pnlProperties.Visible = False
+              PropertiesFlag = False
+            Endif
+
+          Case Asc("2") ' Layers
+
+            'Case Asc("3") ' Blocks
+
+            'Case Asc("4...") ' More...
+            'KeysAccumulator &= "-" & Key.Text
+            'Case Else
+            '    KeysAccumulator = ""
+            'pnlProperties.Visible = False
+            'pnlDebug.Visible = False
+
+          Case Asc("z"), Asc("Z") ' Undo
+
+            If APPMain.hFCAD.arrUndo.Count > 0 Then
+              umx = APPMain.hFCAD.arrUndo.Max
+
+              uEnty = APPMain.hFCAD.arrUndo[umx]
+              For Each aEnty In APPMain.hFCAD.arrEntities
+                If aEnty.Handle = uEnty.Handle Then
+                  APPMain.hFCAD.arrEntities.Remove(imx, 1)
+                  APPMain.hFCAD.arrEntities.Add(uEnty, imx)
+                  APPMain.hFCAD.arrUndo.Remove(umx, 1)
+                  APPMain.hFCAD.Regen
+                  'gcd.Redraw
+                  Break
                 Endif
-            Next
+                Inc imx
+              Next
 
-            gcd.clsJob.KeyText(KeysAccumulator)
+            Endif
+          Case Else
             KeysAccumulator = ""
 
-        Case Key.f6
+        End Select
 
-            If btnBounds.Value = True Then
-                gcd.DrawBounds = False
-            Else
-                gcd.DrawBounds = True
-            Endif
-            btnBounds.Value = gcd.DrawBounds
+      Else
+        KeysAccumulator &= Key.Text
+        clsDrawingAids.ErrorMessage = ""
+      Endif
 
-        Case Key.BackSpace
-
-            KeysAccumulator = Left(KeysAccumulator, -1)
-
-        Case Key.f8
-
-            Debug "Entidades transferidas en  ", Timer - t
-
-            If btnOrtho.Value = False Then
-                gcd.Orthogonal = True
-            Else
-                gcd.Orthogonal = False
-            Endif
-
-            btnOrtho.Value = gcd.Orthogonal
-
-            'gcd.Ortogonal = Not gcd.Ortogonal
-
-        Case Key.f7
-            If btnGrid.Value = False Then
-                puntos.Gridactive = True
-            Else
-                puntos.Gridactive = False
-            Endif
-            btnGrid.Value = puntos.Gridactive
-
-        Case Key.Esc
-
-            gcd.clsJob.Finish()  ' Now!
-            ' we cancel everything
-            gcd.clsJobPrevious = gcd.clsJob
-            gcd.clsJob = clsDefaultJob
-
-            SelectionRefresh()
-
-        Case Key.Space
-            Stop Event
-
-        Case Key.Del
-            gcd.clsJob.KeyText("Erase")
-
-        Case Key.ControlKey
-            KeysAccumulator = "Function"
-
-        Case Else
-            ' A GOOD KEY
-            If InStr(KeysAccumulator, "Function") > 0 Then
-
-                Select Key.Code
-                    Case Asc("1") ' Properties
-                        If PropertiesFlag = False Then
-                            pnlProperties.Visible = True
-                            PropertiesFlag = True
-                        Else
-                            pnlProperties.Visible = False
-                            PropertiesFlag = False
-                        Endif
-
-                    Case Asc("2") ' Layers
-
-                        'Case Asc("3") ' Blocks
-
-                        'Case Asc("4...") ' More...
-                        'KeysAccumulator &= "-" & Key.Text
-                        'Case Else
-                        '    KeysAccumulator = ""
-                        'pnlProperties.Visible = False
-                        'pnlDebug.Visible = False
-
-                    Case Asc("z"), Asc("Z") ' Undo
-
-                        If APPMain.hFCAD.arrUndo.Count > 0 Then
-                            umx = APPMain.hFCAD.arrUndo.Max
-
-                            uEnty = APPMain.hFCAD.arrUndo[umx]
-                            For Each aEnty In APPMain.hFCAD.arrEntities
-                                If aEnty.Handle = uEnty.Handle Then
-                                    APPMain.hFCAD.arrEntities.Remove(imx, 1)
-                                    APPMain.hFCAD.arrEntities.Add(uEnty, imx)
-                                    APPMain.hFCAD.arrUndo.Remove(umx, 1)
-                                    APPMain.hFCAD.Regen
-                                    'gcd.Redraw
-                                    Break
-                                Endif
-                                Inc imx
-                            Next
-
-                        Endif
-                    Case Else
-                        KeysAccumulator = ""
-
-                End Select
-
-            Else
-                KeysAccumulator &= Key.Text
-                clsDrawingAids.ErrorMessage = ""
-            Endif
-
-    End Select
-    tmr500_timer
+  End Select
+  tmr500_timer
 
 End
 
 Public Sub tmr500_Timer()
 
-    If clsDrawingAids.PromtSlash = "|" Then clsDrawingAids.PromtSlash = "" Else clsDrawingAids.PromtSlash = "|"
-    clsDrawingAids.DibujaHelper
-    If clsDrawingAids.ErrorMessage <> "" Then
+  If clsDrawingAids.PromtSlash = "|" Then clsDrawingAids.PromtSlash = "" Else clsDrawingAids.PromtSlash = "|"
+  clsDrawingAids.DibujaHelper
+  If clsDrawingAids.ErrorMessage <> "" Then
 
-        lblCommand.Text = clsDrawingAids.ErrorMessage
-        lblCommand.Foreground = Color.Red
-        Inc TmrTicks
+    lblCommand.Text = clsDrawingAids.ErrorMessage
+    lblCommand.Foreground = Color.Red
+    Inc TmrTicks
 
-        If TmrTicks = 10 Then
-            clsDrawingAids.ErrorMessage = ""
-            TmrTicks = 0
-        End If
+    If TmrTicks = 10 Then
+      clsDrawingAids.ErrorMessage = ""
+      TmrTicks = 0
+    End If
 
-    Else
-        lblCommand.Foreground = Color.Black
-        lblCommand.Text = clsDrawingAids.trabajoYteclado
+  Else
+    lblCommand.Foreground = Color.Black
+    lblCommand.Text = clsDrawingAids.trabajoYteclado
 
-    Endif
+  Endif
 
 End

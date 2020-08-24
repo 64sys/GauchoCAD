@@ -12,20 +12,20 @@ Inherits String
 
 Public Function Count(sWhere As String, sWhich As String) As Integer
 
-    Dim k As Integer = 1
-    Dim q As Integer
-    Dim r As Integer
+  Dim k As Integer = 1
+  Dim q As Integer
+  Dim r As Integer
 
-    Repeat
-        q = InStr(sWhere, sWhich, k)
-        If q > 0 Then
-            Inc r
+  Repeat
+    q = InStr(sWhere, sWhich, k)
+    If q > 0 Then
+      Inc r
 
-            k = q + String.Len(sWhich)
-        Endif
-    Until InStr(sWhere, sWhich, k) = 0 Or k > String.Len(sWhere)
+      k = q + String.Len(sWhich)
+    Endif
+  Until InStr(sWhere, sWhich, k) = 0 Or k > String.Len(sWhere)
 
-    Return r
+  Return r
 
 End
 
@@ -33,32 +33,32 @@ End
 
 Public Function Flat(s As String) As String
 
-    Dim k As Integer = 1
-    Dim q As Integer
-    Dim r As Integer
+  Dim k As Integer = 1
+  Dim q As Integer
+  Dim r As Integer
 
-    Dim uni As String
-    Dim stx As New String[]
-    Dim u As String
-    Dim rep As String
-    Dim i As Integer
+  Dim uni As String
+  Dim stx As New String[]
+  Dim u As String
+  Dim rep As String
+  Dim i As Integer
 
-    Repeat
-        q = InStr(s, "\\U+", k)
-        If q > 0 Then
-            Inc r
-            uni = String.Mid(s, q, 7)
-            stx.Add(uni)
-            k = q + String.Len("\\U+")
-        Endif
-    Until InStr(s, "\\U+", k) = 0 Or k > String.Len(s)
+  Repeat
+    q = InStr(s, "\\U+", k)
+    If q > 0 Then
+      Inc r
+      uni = String.Mid(s, q, 7)
+      stx.Add(uni)
+      k = q + String.Len("\\U+")
+    Endif
+  Until InStr(s, "\\U+", k) = 0 Or k > String.Len(s)
 
-    For Each u In stx
-        i = Val("&h" & String.Mid(u, 4, 4) & "&")
-        rep = String.Chr(i)
-        s = Replace(s, u, rep)
-    Next
+  For Each u In stx
+    i = Val("&h" & String.Mid(u, 4, 4) & "&")
+    rep = String.Chr(i)
+    s = Replace(s, u, rep)
+  Next
 
-    Return s
+  Return s
 
 End

@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: GauchoCAD 3.15.0\n"
-"PO-Revision-Date: 2020-08-11 12:51 UTC\n"
+"PO-Revision-Date: 2020-08-11 13:07 UTC\n"
 "Last-Translator: bmk <bmk@gaucho>\n"
 "Language: es_AR\n"
 "MIME-Version: 1.0\n"
@@ -51,7 +51,7 @@ msgstr "Nuevo"
 
 #: APPMain.form:119
 msgid "Open"
-msgstr "Abierto"
+msgstr "Abrir"
 
 #: APPMain.form:126 FAlias.form:62 FLayers.form:60 FLayers1.form:60
 msgid "Save"

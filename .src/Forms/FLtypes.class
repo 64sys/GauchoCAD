@@ -26,83 +26,83 @@ Private wmax As Integer
 
 Public Sub _new(lty As Collection, cor As Integer[])
 
-    ltypes = lty
-    Coords = cor
+  ltypes = lty
+  Coords = cor
 
 End
 
 Public Sub Run() As Boolean
 
-    Dim vrx As Variant
-    Dim wtmp As Integer
+  Dim vrx As Variant
+  Dim wtmp As Integer
 
-    For Each vrx In ltypes
-        wtmp = dsk.TextWidth(vrx[1], Me.Font.Name, Me.Font.Size) + 8 + vrx[2].Picture.Width
-        If wtmp > wmax Then
-            wmax = wtmp
-        Endif
-    Next
+  For Each vrx In ltypes
+    wtmp = dsk.TextWidth(vrx[1], Me.Font.Name, Me.Font.Size) + 8 + vrx[2].Picture.Width
+    If wtmp > wmax Then
+      wmax = wtmp
+    Endif
+  Next
 
-    GridView1.Columns.Count = 2
-    GridView1.Columns[0].Expand = False
-    GridView1.Columns[0].Width = 0
-    GridView1.Columns[1].Expand = True
+  GridView1.Columns.Count = 2
+  GridView1.Columns[0].Expand = False
+  GridView1.Columns[0].Width = 0
+  GridView1.Columns[1].Expand = True
 
-    GridView1.Rows.Count = 0
-    GridView1.Rows.Count = ltypes.Count
+  GridView1.Rows.Count = 0
+  GridView1.Rows.Count = ltypes.Count
 
-    Me.Width = wmax
+  Me.Width = wmax
 
-    Me.Show
+  Me.Show
 
 End
 
 Public Sub Form_Open()
 
-    Me.Move(Coords[0], Coords[1])
+  Me.Move(Coords[0], Coords[1])
 
 End
 
 Public Sub GridView1_Data(Row As Integer, Column As Integer)
 
-    Dim img As Image
-    'Dim dash As Float[]
+  Dim img As Image
+  'Dim dash As Float[]
 
-    Select Column
-        Case 0
-            GridView1[Row, Column].Text = CStr(Row)
+  Select Column
+    Case 0
+      GridView1[Row, Column].Text = CStr(Row)
 
-        Case 1
+    Case 1
 
-            If ltypes[CStr(Row)][2] Then
-                img = ltypes[CStr(Row)][2]
-                GridView1[Row, Column].Picture = img.Picture
-            Else
-                img.Clear
-            Endif
+      If ltypes[CStr(Row)][2] Then
+        img = ltypes[CStr(Row)][2]
+        GridView1[Row, Column].Picture = img.Picture
+      Else
+        img.Clear
+      Endif
 
-            GridView1[Row, Column].Text = ltypes[CStr(Row)][1]
+      GridView1[Row, Column].Text = ltypes[CStr(Row)][1]
 
-    End Select
+  End Select
 
 End
 
 Public Sub GridView1_MouseDown()
 
-    If GridView1.Row <> -1 Then
-        APPMain.CurrentLtype = GridView1.Row
-        APPMain.SelectedLtype = True
-    Endif
-    Print GridView1[GridView1.Row, 0].Text
-    Print GridView1[GridView1.Row, 1].Text
+  If GridView1.Row <> -1 Then
+    APPMain.CurrentLtype = GridView1.Row
+    APPMain.SelectedLtype = True
+  Endif
+  Print GridView1[GridView1.Row, 0].Text
+  Print GridView1[GridView1.Row, 1].Text
 
-    Me.Close(True)
+  Me.Close(True)
 
 End
 
 Public Sub GridView1_LostFocus()
 
-    APPMain.SelectedLtype = True
-    Me.Close
+  APPMain.SelectedLtype = True
+  Me.Close
 
 End

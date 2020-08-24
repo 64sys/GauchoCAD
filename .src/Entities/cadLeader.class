@@ -43,107 +43,107 @@ Public StepsDone As Integer                 ' esto lo cambia cls ElementBuilder 
 
 Public Sub Translate(e As Entity, dX As Float, dY As Float, Optional OnlySelected As Boolean = False)
 
-    Dim i As Integer
+  Dim i As Integer
 
-    If OnlySelected Then
+  If OnlySelected Then
 
-        For i = 0 To e.Psel.Max
-            If e.Psel[i] Then
+    For i = 0 To e.Psel.Max
+      If e.Psel[i] Then
 
-                e.P[i * 2] += dx
-                e.P[i * 2 + 1] += dy
+        e.P[i * 2] += dx
+        e.P[i * 2 + 1] += dy
 
-            Endif
-        Next
+      Endif
+    Next
 
-    Else
+  Else
 
-        puntos.Translate(e.p, dx, dy)
-    Endif
+    puntos.Translate(e.p, dx, dy)
+  Endif
 
 End
 
 Public Sub Rotate(e As Entity, radians As Float)
 
-    puntos.Rotate(e.P, radians)
-    E.fParam[0] += radians
+  puntos.Rotate(e.P, radians)
+  E.fParam[0] += radians
 
 End
 
 Public Sub Scale(e As Entity, sX As Float, sY As Float)
 
-    Dim i As Integer
+  Dim i As Integer
 
-    E.fParam[1] *= sY
-    For i = 0 To e.p.max Step 2
+  E.fParam[1] *= sY
+  For i = 0 To e.p.max Step 2
 
-        e.P[i] = e.P[i] * sX
-        e.P[i + 1] = e.P[i + 1] * sY
+    e.P[i] = e.P[i] * sX
+    e.P[i + 1] = e.P[i + 1] * sY
 
-    Next
+  Next
 
 End
 
 Public Sub Draw(oE As Entity)
 
-    Dim angle As Float
+  Dim angle As Float
 
-    If Not oE.Visible Then Return
-    If oe.P.Count < 4 Then Return
+  If Not oE.Visible Then Return
+  If oe.P.Count < 4 Then Return
 
-    Dim tRect As New Float[], poli As New Float[]
+  Dim tRect As New Float[], poli As New Float[]
 
-    tRect = glPlus.TextExtends(oE.stringdata[0], oE.fParam[0])
+  tRect = glPlus.TextExtends(oE.stringdata[0], oE.fParam[0])
 
-    angle = Ang((oE.p[oE.p.max - 1] - oE.p[oE.p.max - 3]), (oE.p[oE.p.max] - oE.p[oE.p.max - 2]))
-    glPlus.DrawText(oE.stringdata[0], (oE.p[oE.p.max - 1] + oE.p[oE.p.max - 3]) / 2 - tRect[0] / 2, (oE.p[oE.p.Max] + oE.p[oE.p.max - 2]) / 2 + tRect[1] / 2, Angle, oe.fParam[0], oE.ColorToPaint)
-    ' TODO: arrow head cuando tengamos los parametros de Dim , como ser tamaño de la flecha, etc
-    GLplus.PolyLines(oE.p, oE.ColorToPaint, oE.LineWidth, oe.linetype)
+  angle = Ang((oE.p[oE.p.max - 1] - oE.p[oE.p.max - 3]), (oE.p[oE.p.max] - oE.p[oE.p.max - 2]))
+  glPlus.DrawText(oE.stringdata[0], (oE.p[oE.p.max - 1] + oE.p[oE.p.max - 3]) / 2 - tRect[0] / 2, (oE.p[oE.p.Max] + oE.p[oE.p.max - 2]) / 2 + tRect[1] / 2, Angle, oe.fParam[0], oE.ColorToPaint)
+  ' TODO: arrow head cuando tengamos los parametros de Dim , como ser tamaño de la flecha, etc
+  GLplus.PolyLines(oE.p, oE.ColorToPaint, oE.LineWidth, oe.linetype)
 
 End
 
 '' A fat version of the line
 Public Sub DrawSelected(oE As Entity)
 
-    GLplus.Polygon(oE.Polygon, gcd.ColorForSelected, oE.LineWidth, gcd.stiDashed)
-    GLplus.PolyLines(oE.p, Starter.flgWindowBackColor, oE.LineWidth, gcd.stiDashed)
-    GLplus.PolyLines(oE.p, gcd.ColorForSelected, oE.LineWidth, oE.LineType)
+  GLplus.Polygon(oE.Polygon, gcd.ColorForSelected, oE.LineWidth, gcd.stiDashed)
+  GLplus.PolyLines(oE.p, Starter.flgWindowBackColor, oE.LineWidth, gcd.stiDashed)
+  GLplus.PolyLines(oE.p, gcd.ColorForSelected, oE.LineWidth, oE.LineType)
 
 End
 
 '' A fat version of the line
 Public Sub DrawRemark(oE As Entity)
 
-    If Not oE.Visible Then Return
+  If Not oE.Visible Then Return
 
-    GLplus.Polygon(oE.Polygon, oE.ColorToPaint, oE.LineWidth, gcd.stiDashed)
-    GLplus.PolyLines(oE.p, Starter.flgWindowBackColor, oE.LineWidth, gcd.stiDashed)
-    GLplus.PolyLines(oE.p, oE.ColorToPaint, oE.LineWidth + 2, oE.LineType)
-    GLplus.lines([oE.P[0], oE.P[1], (oE.P[0] + oE.P[2]) / 8, (oE.P[1] + oE.P[3]) / 8], oE.ColorToPaint, oE.ColorToPaint, oE.LineWidth * 3, oe.LineType)
+  GLplus.Polygon(oE.Polygon, oE.ColorToPaint, oE.LineWidth, gcd.stiDashed)
+  GLplus.PolyLines(oE.p, Starter.flgWindowBackColor, oE.LineWidth, gcd.stiDashed)
+  GLplus.PolyLines(oE.p, oE.ColorToPaint, oE.LineWidth + 2, oE.LineType)
+  GLplus.lines([oE.P[0], oE.P[1], (oE.P[0] + oE.P[2]) / 8, (oE.P[1] + oE.P[3]) / 8], oE.ColorToPaint, oE.ColorToPaint, oE.LineWidth * 3, oe.LineType)
 
 End
 
 Public Function Draw2(oE As Entity)
 
-    Dim i As Integer
+  Dim i As Integer
 
-    If Not oE.Visible Then Return
+  If Not oE.Visible Then Return
 
-    paint.LineWidth = oE.LineWidth / appmain.hFcad.ScaleZoom / gcd.ScaleLines
+  paint.LineWidth = oE.LineWidth / appmain.hFcad.ScaleZoom / gcd.ScaleLines
 
-    If oE.Selected And Not gcd.ToolActive Then
-        paint.brush = Paint.Color(gcd.ColorForSelected)
-    Else
-        paint.brush = Paint.Color(oE.ColorToPaint)
-    Endif
+  If oE.Selected And Not gcd.ToolActive Then
+    paint.brush = Paint.Color(gcd.ColorForSelected)
+  Else
+    paint.brush = Paint.Color(oE.ColorToPaint)
+  Endif
 
-    paint.moveto(oE.p[0], oE.p[1])
-    For i = 2 To oE.P.Max Step 2
-        paint.lineto(oE.p[i], oE.p[i + 1])
+  paint.moveto(oE.p[0], oE.p[1])
+  For i = 2 To oE.P.Max Step 2
+    paint.lineto(oE.p[i], oE.p[i + 1])
 
-    Next
+  Next
 
-    paint.Stroke
+  paint.Stroke
 
 End
 
@@ -152,28 +152,28 @@ End
 
 Public Function BuildPOI(oE As Entity, Optional arrIndex As Integer = -1) As Integer
 
-    cadPLine.BuildPOI(oe)
+  cadPLine.BuildPOI(oe)
 
-    ' points
-    oe.poiPoints.insert([oE.p[0], oE.p[1]])
-    oe.poiType.Add(gcd.poiBasePoint)
-    'oe.poiEntities.Add(arrIndex)
+  ' points
+  oe.poiPoints.insert([oE.p[0], oE.p[1]])
+  oe.poiType.Add(gcd.poiBasePoint)
+  'oe.poiEntities.Add(arrIndex)
 
-    ' line
+  ' line
 
-    ' Polygon
+  ' Polygon
 
-    Dim tRect As New Float[], poli As New Float[]
+  Dim tRect As New Float[], poli As New Float[]
 
-    tRect = glPlus.TextExtends(oE.stringdata[0], oE.fParam[0])
-    poli.Insert([0, 0, tRect[0], 0, tRect[0], tRect[1], 0, tRect[1]]) ' armo el poligono , que ya tiene la escala
-    puntos.Rotate(Poli, oE.fParam[0] * Pi / 180)
-    puntos.Translate(Poli, oE.P[0], oE.P[1])
+  tRect = glPlus.TextExtends(oE.stringdata[0], oE.fParam[0])
+  poli.Insert([0, 0, tRect[0], 0, tRect[0], tRect[1], 0, tRect[1]]) ' armo el poligono , que ya tiene la escala
+  puntos.Rotate(Poli, oE.fParam[0] * Pi / 180)
+  puntos.Translate(Poli, oE.P[0], oE.P[1])
 
-    oe.Polygon.Clear
-    oe.Polygon.Insert(poli)
+  oe.Polygon.Clear
+  oe.Polygon.Insert(poli)
 
-    puntos.Translate(oe.Polygon, (oE.p[oE.p.max - 1] + oE.p[oE.p.max - 3]) / 2 - oE.P[0], (oE.p[oE.p.Max] + oE.p[oE.p.max - 2]) / 2 - oE.P[1])
+  puntos.Translate(oe.Polygon, (oE.p[oE.p.max - 1] + oE.p[oE.p.max - 3]) / 2 - oE.P[0], (oE.p[oE.p.Max] + oE.p[oE.p.max - 2]) / 2 - oE.P[1])
 
 End
 
@@ -181,25 +181,25 @@ End
 ' True means all is good, False will instruct the clsEntityBuilder to delete it
 Public Sub Finish(oE As Entity, Optional ParamsDone As Integer = -1) As Boolean
 
-    'Print "Finish en EntityBase"
-    'CreatePolygon(oe)
-    BuildPOI(oe)
+  'Print "Finish en EntityBase"
+  'CreatePolygon(oe)
+  BuildPOI(oe)
 
-    ' busco el tipo de linea, si hace falta
-    If oE.LineTypeName = "Dashed" Then oE.LineType = 1
-    ' tareas finales de armado del objeto
+  ' busco el tipo de linea, si hace falta
+  If oE.LineTypeName = "Dashed" Then oE.LineType = 1
+  ' tareas finales de armado del objeto
 
-    oE.psel.resize(oE.p.count / 2)
-    oE.ForDeletion = False
-    oE.DrawAble = True
-    oE.Selected = False
-    oE.Finished = True
+  oE.psel.resize(oE.p.count / 2)
+  oE.ForDeletion = False
+  oE.DrawAble = True
+  oE.Selected = False
+  oE.Finished = True
 
-    If Not True Then
+  If Not True Then
 
-        oE.ForDeletion = True
-        oE.DrawAble = False
+    oE.ForDeletion = True
+    oE.DrawAble = False
 
-    End If
+  End If
 
 End
