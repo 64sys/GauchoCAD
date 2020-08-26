@@ -364,12 +364,14 @@
       { cboLayers ComboBox dprop
         Name = "cboLayers"
         MoveScaled(68,0,15,5)
+        Visible = False
         Tag = "layer"
         ToolTip = ("Layers")
         ReadOnly = True
       }
       { tobLayers ToolButton
         MoveScaled(84,0,5,5)
+        Visible = False
         Picture = Picture["svg/layers/layers.svg"]
         Border = True
       }

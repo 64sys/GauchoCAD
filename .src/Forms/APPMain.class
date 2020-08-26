@@ -41,29 +41,23 @@ Public CurrentFile As String
 Public KeysAccumulator As String
 Public TmrTicks As Integer
 
-Public SelectedColour As Boolean
+Public SelectingColor As Boolean    '' Selecting Color
 Public CurrentColor As Integer
 Public imgColor As Image
 
-Public SelectedLayer As Boolean
+Public SelectingLayer As Boolean    '' Selecting Layer
 Public CurrentLayer As String
 
-Public SelectedLtype As Boolean
+Public SelectingLtype As Boolean    '' Selecting Linetype
 Public CurrentLtype As Integer
 
 Public SelectedWidth As Boolean
 
 Private PropertiesFlag As Boolean = False
-'Private LayersFlag As Boolean = False
-'Private BlocksFlag As Boolean = False
-'Private xxxFlag As Boolean = False ' Future expansion for mode panels to show
 
 'variables de ambiente
 Public flgShowInspector As Boolean = True
 Public HistoCom As New String[]     '' Commands history
-'Public ListCom As New String[]      '' Commands list
-'Public AliasCom As New String[]     '' Commands alias
-'Private p As Integer
 
 Public cMod As New Collection       '' All drawings common collection
 Public cProp As New Collection      '' Properties list
@@ -167,8 +161,8 @@ Public Sub Run(cin As Collection)
   btnColors.Reparent(pnlFile)
   btnLtypes.Reparent(pnlFile)
   btnLayers.Reparent(pnlFile)
-  cboLayers.Reparent(pnlFile)
-  tobLayers.Reparent(pnlFile)
+  'cboLayers.Reparent(pnlFile)
+  '  tobLayers.Reparent(pnlFile)
   cboWidths.Reparent(pnlFile)
   cboDimSts.Reparent(pnlFile)
 
@@ -195,88 +189,88 @@ Public Sub Run(cin As Collection)
 
 End
 
-Public Sub LoadColorsOriginalDeTincho()
+' Public Sub LoadColorsOriginalDeTincho()
+'
+'   Dim hMenu As Menu
+'   Dim mui As Menu
+'   Dim cCol As Collection
+'   Dim ix As Variant[]
+'   Dim isvg As String
+'
+'   cCol = Starter.cColors
+'
+'   mubColors.Menu = "Clx"
+'
+'   '' Filling the MenuButton menu
+'   hMenu = New Menu(Me) As "Clx" '' Create the initial menu
+'
+'   For Each ix In cCol
+'     mui = New Menu(hMenu) As "Clx"
+'     mui.Text = ix[0]
+'     mui.Tag = ix[1]
+'     Select ix[1]
+'       Case 255, 256, 0
+'         isvg = "./svg/colors/" & "7" & ".svg"
+'       Case 1, 2, 3, 4, 5, 6, 7
+'         isvg = "./svg/colors/" & cCol.Key & ".svg"
+'     End Select
+'
+'     If Exist(isvg) Then
+'       mui.Picture = Image.Load(isvg).Stretch(16, 16).Picture
+'     Endif
+'
+'     If cCol.Key = "7" Then
+'       mubColors.Picture = Image.Load(isvg).Stretch(16, 16).Picture
+'       mubColors.Tooltip = ix[0]
+'       mubColors.Text = ix[0]
+'     Endif
+'
+'   Next
+'
+' End
 
-  Dim hMenu As Menu
-  Dim mui As Menu
-  Dim cCol As Collection
-  Dim ix As Variant[]
-  Dim isvg As String
-
-  cCol = Starter.cColors
-
-  mubColors.Menu = "Clx"
-
-  '' Filling the MenuButton menu
-  hMenu = New Menu(Me) As "Clx" '' Create the initial menu
-
-  For Each ix In cCol
-    mui = New Menu(hMenu) As "Clx"
-    mui.Text = ix[0]
-    mui.Tag = ix[1]
-    Select ix[1]
-      Case 255, 256, 0
-        isvg = "./svg/colors/" & "7" & ".svg"
-      Case 1, 2, 3, 4, 5, 6, 7
-        isvg = "./svg/colors/" & cCol.Key & ".svg"
-    End Select
-
-    If Exist(isvg) Then
-      mui.Picture = Image.Load(isvg).Stretch(16, 16).Picture
-    Endif
-
-    If cCol.Key = "7" Then
-      mubColors.Picture = Image.Load(isvg).Stretch(16, 16).Picture
-      mubColors.Tooltip = ix[0]
-      mubColors.Text = ix[0]
-    Endif
-
-  Next
-
-End
-
-Public Sub LoadColors()
-
-  Dim hMenu As Menu
-  Dim mui As Menu
-  Dim cCol As Collection
-  Dim ix As Variant[]
-  'Dim isvg As String
-  Dim imgColorCircle As Image
-
-  cCol = Starter.cColors
-
-  mubColors.Menu = "Clx"
-
-  ' Fill the MenuButton menu
-  hMenu = New Menu(Me) As "Clx" '' Crea el menu inicial
-
-  For Each ix In cCol
-    mui = New Menu(hMenu) As "Clx"
-    mui.Text = ix[0]
-    mui.Tag = ix[1]
-
-    imgColorCircle = New Image(16, 16, mubColors.Background)    '' I dynamically create the image 16x16 size, but it can be any
-
-    Paint.Begin(imgColorCircle)                                 '' I am going to draw over the image I just created
-    Paint.Arc(8, 8, 7, 0, 2 * Pi)                               '' I add a circle, but it could be any shape
-    Paint.Brush = Paint.Color(Starter.gColor[Val(cCol.Key)])    '' the color was taken directly from the CAD color chart
-    Paint.Fill(True)                                            '' filling
-    Paint.Brush = Paint.Color(Color.Black)                      '' optionally I draw the outline that makes the best contrast with the menubutton
-    Paint.Stroke()                                              '' outline
-    Paint.End                                                   '' end of the Paint cycle on this image
-
-    mui.Picture = imgColorCircle.Picture                        '' I insert it in the Button
-
-    If cCol.Key = "7" Then                                      '' if it's 7, I choose it as default
-      mubColors.Picture = imgColorCircle.Picture
-      mubColors.Tooltip = ix[0]
-      mubColors.Text = ix[0]
-    Endif
-
-  Next
-
-End
+' Public Sub LoadColors()
+'
+'   Dim hMenu As Menu
+'   Dim mui As Menu
+'   Dim cCol As Collection
+'   Dim ix As Variant[]
+'   'Dim isvg As String
+'   Dim imgColorCircle As Image
+'
+'   cCol = Starter.cColors
+'
+'   mubColors.Menu = "Clx"
+'
+'   ' Fill the MenuButton menu
+'   hMenu = New Menu(Me) As "Clx" '' Crea el menu inicial
+'
+'   For Each ix In cCol
+'     mui = New Menu(hMenu) As "Clx"
+'     mui.Text = ix[0]
+'     mui.Tag = ix[1]
+'
+'     imgColorCircle = New Image(16, 16, mubColors.Background)    '' I dynamically create the image 16x16 size, but it can be any
+'
+'     Paint.Begin(imgColorCircle)                                 '' I am going to draw over the image I just created
+'     Paint.Arc(8, 8, 7, 0, 2 * Pi)                               '' I add a circle, but it could be any shape
+'     Paint.Brush = Paint.Color(Starter.gColor[Val(cCol.Key)])    '' the color was taken directly from the CAD color chart
+'     Paint.Fill(True)                                            '' filling
+'     Paint.Brush = Paint.Color(Color.Black)                      '' optionally I draw the outline that makes the best contrast with the menubutton
+'     Paint.Stroke()                                              '' outline
+'     Paint.End                                                   '' end of the Paint cycle on this image
+'
+'     mui.Picture = imgColorCircle.Picture                        '' I insert it in the Button
+'
+'     If cCol.Key = "7" Then                                      '' if it's 7, I choose it as default
+'       mubColors.Picture = imgColorCircle.Picture
+'       mubColors.Tooltip = ix[0]
+'       mubColors.Text = ix[0]
+'     Endif
+'
+'   Next
+'
+' End
 
 Public Sub Clx_Click()
 
@@ -519,7 +513,7 @@ Public Sub LoadComboboxes(cMdl As Collection)
 
   cMod = cMdl
 
-  cboLayers.Clear
+  'cboLayers.Clear
   cboWidths.Clear
   cboDimSts.Clear
 
@@ -702,6 +696,7 @@ Public Sub gTask(sTask As String)
       Endif
 
       cModel = cad.LoadGaucho(FilePath)
+
       LoadComboboxes(cModel.Copy())
 
       wtag = FilePath
@@ -856,28 +851,23 @@ End
 Public Sub btnLtypes_MouseDown()
 
   Dim lst As FLtypes
-  'Dim lty As New Collection
   Dim vrx As Variant[]
   Dim img2 As Image
 
-  lst = New FLtypes(Starter.cLtypes, [btnLtypes.ScreenX, btnLtypes.ScreenY + btnLtypes.H])
-
-  Print btnLtypes.Value
-
-  If SelectedLtype = False Then
+  If SelectingLtype = False Then
+    lst = New FLtypes(Starter.cLtypes, [btnLtypes.ScreenX, btnLtypes.ScreenY + btnLtypes.H])
     lst.Run()
     Do
-      If SelectedLtype = True Then
+      If SelectingLtype = True Then
         vrx = Starter.cLtypes[CStr(CurrentLtype)]
         If vrx.Count > 2 Then
           If Object.Type(vrx[2]) = "Image" Then
             img2 = vrx[2]
             btnLtypes.Picture = img2.Picture
             btnLtypes.Tooltip = vrx[1]
-            'SelectedLineType = False
           Endif
         Endif
-        SelectedLtype = False
+        SelectingLtype = False
         Break
       Else
         Wait 0.1
@@ -894,37 +884,62 @@ Public Sub btnColors_MouseDown()
   Dim b As Integer
   Dim img As Image
 
-  FColors.ShowModal()
+  Dim clr As FColors
 
-  r = CInt(Split(Starter.ColorsRGB[CurrentColor], ",")[0])
-  g = CInt(Split(Starter.ColorsRGB[CurrentColor], ",")[1])
-  b = CInt(Split(Starter.ColorsRGB[CurrentColor], ",")[2])
-
-  imgColor = New Image(btnColors.H - 2, btnColors.H - 2, Color.RGB(r, g, b), 0)
-
-  img = dsk.ImageFrame(imgColor)
-
-  btnColors.Picture = img.Picture
-  Select CurrentColor
-    Case 256
-      btnColors.Tooltip = ("Color") & ": " & "ByBlock"
-    Case 257
-      btnColors.Tooltip = ("Color") & ": " & "ByLayer"
-    Case Else
-      btnColors.Tooltip = ("Color") & ": " & CStr(CurrentColor)
-  End Select
+  If SelectingColor = False Then
+    clr = New FColors(CurrentColor, [Me.ScreenX, Me.ScreenY])
+    clr.Border = False
+    clr.Stacking = Window.Above
+    clr.Run()
+    Do
+      If SelectingColor = True Then
+        r = CInt(Split(Starter.ColorsRGB[CurrentColor], ",")[0])
+        g = CInt(Split(Starter.ColorsRGB[CurrentColor], ",")[1])
+        b = CInt(Split(Starter.ColorsRGB[CurrentColor], ",")[2])
+        imgColor = New Image(btnColors.H - 2, btnColors.H - 2, Color.RGB(r, g, b), 0)
+        img = dsk.ImageFrame(imgColor)
+        btnColors.Picture = img.Picture
+        btnColors.Refresh
+        Select CurrentColor
+          Case 256
+            btnColors.Tooltip = ("Color") & ": " & "ByBlock"
+          Case 257
+            btnColors.Tooltip = ("Color") & ": " & "ByLayer"
+          Case Else
+            btnColors.Tooltip = ("Color") & ": " & CStr(CurrentColor)
+        End Select
+        SelectingColor = False
+        Break
+      Else
+        Wait 0.001
+      Endif
+    Loop
+  Endif
 
 End
 
 Public Sub btnLayers_MouseDown()
 
   Dim FLay As FLayers1
+  Dim vrx As Variant[]
 
-  FLay = New FLayers1([Workspace1.ScreenX, Workspace1.ScreenY])
+  FLay = New FLayers1(hFCAD.cModel["Layers"], [Workspace1.ScreenX, Workspace1.ScreenY])
 
-  FLay.Border = False
-
-  FLay.Run(hFCAD.cModel)
+  If SelectingLayer = False Then
+    FLay.Stacking = Window.Above
+    FLay.Border = False
+    FLay.Run()
+    Do
+      If SelectingLayer = True Then
+        vrx = hFCAD.cModel["Layers"][CStr(CurrentLayer)]
+        btnLayers.Text = vrx["name"]
+        SelectingLayer = False
+        Break
+      Else
+        Wait 0.1
+      Endif
+    Loop
+  Endif
 
 End
 
@@ -1170,7 +1185,6 @@ End
 
 Public Sub Form_KeyPress()
 
-  'Dim iAlias As Integer
   Dim com As Variant
   Dim umx As Integer     '' Index in undo array
   Dim uEnty As Entity    '' Undo entity
@@ -1180,7 +1194,6 @@ Public Sub Form_KeyPress()
   Print Key.Code
   Dim t As Float = Timer
 
-  'If Workspace1.ActiveWindow Then
   Select Key.Code
 
     Case Key.Enter, Key.Return
@@ -1221,8 +1234,6 @@ Public Sub Form_KeyPress()
       Endif
 
       btnOrtho.Value = gcd.Orthogonal
-
-      'gcd.Ortogonal = Not gcd.Ortogonal
 
     Case Key.f7
       If btnGrid.Value = False Then
@@ -1331,3 +1342,14 @@ Public Sub tmr500_Timer()
   Endif
 
 End
+
+' Public Sub Form_Activate()
+'
+'   Dim img As Image
+'
+'   If Starter.cLtypes[CStr(CurrentLtype)][2] Then
+'     img = Starter.cLtypes[CStr(CurrentLtype)][2]
+'     btnLtypes.Picture = img.Picture
+'   Endif
+'
+' End

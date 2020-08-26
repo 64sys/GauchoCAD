@@ -18,21 +18,21 @@
       ScrollBar = Scroll.Horizontal
     }
     { Panel2 Panel
-      MoveScaled(1,31,100,6)
+      MoveScaled(1,32,100,6)
       Arrangement = Arrange.Horizontal
       Spacing = True
       Margin = True
       { ToolButton1 ToolButton LMenu
         Name = "ToolButton1"
-        MoveScaled(1,0,4,4)
+        MoveScaled(2,0,4,4)
         Tag = "add"
-        Picture = Picture["svg/layers/layer-add.svg"]
+        Picture = Picture["icon:/32/new"]
       }
       { ToolButton2 ToolButton LMenu
         Name = "ToolButton2"
         MoveScaled(9,0,4,4)
         Tag = "erase"
-        Picture = Picture["svg/layers/layer-erase.svg"]
+        Picture = Picture["icon:/32/erase"]
       }
       { Spring1 Spring
         MoveScaled(22,1,6,3)
@@ -42,14 +42,14 @@
         MoveScaled(35,1,14,4)
         Tag = "save"
         Text = ("Save")
-        Picture = Picture["svg/layers/stock_check-filled.svg"]
+        Picture = Picture["icon:/32/save"]
       }
       { ToolButton4 ToolButton LMenu
         Name = "ToolButton4"
         MoveScaled(52,0,15,4)
         Tag = "cancel"
         Text = ("Cancel")
-        Picture = Picture["svg/layers/dialog-no.svg"]
+        Picture = Picture["icon:/32/cancel"]
       }
     }
   }

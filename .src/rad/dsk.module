@@ -80,13 +80,14 @@ Public Function ImageFrame(img As Image) As Image
     Paint.NewPath
     Paint.Brush = Paint.Color(Color.Black)
 
-    Paint.LineWidth = 3
-    Paint.MoveTo(2, 2)
+    Paint.LineWidth = 1
+    Paint.MoveTo(1, 1)
 
-    Paint.LineTo(img.W - 2, 2)
-    Paint.LineTo(img.W - 2, img.H - 2)
-    Paint.LineTo(2, img.H - 2)
-    Paint.LineTo(2, 2)
+    Paint.LineTo(img.W - 1, 1)
+    Paint.LineTo(img.W - 1, img.H - 1)
+    Paint.LineTo(1, img.H - 1)
+    Paint.LineTo(1, 1)
+    Paint.LineTo(img.W - 1, 1)
 
     Paint.Stroke
     Paint.End

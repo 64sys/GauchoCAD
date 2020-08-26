@@ -86,15 +86,28 @@ Public Sub GridView1_Data(Row As Integer, Column As Integer)
   End Select
 
 End
+'
+' Public Sub GridView1_MouseDown()
+'
+'   If GridView1.Row <> -1 Then
+'     APPMain.CurrentLtype = GridView1.Row
+'     APPMain.SelectedLtype = True
+'     Print GridView1[GridView1.Row, 0].Text
+'     Print GridView1[GridView1.Row, 1].Text
+'   Endif
+'
+'   Me.Close(True)
+'
+' End
 
-Public Sub GridView1_MouseDown()
+Public Sub GridView1_Select()
 
   If GridView1.Row <> -1 Then
     APPMain.CurrentLtype = GridView1.Row
-    APPMain.SelectedLtype = True
+    APPMain.SelectingLtype = True
+    Print GridView1[GridView1.Row, 0].Text
+    Print GridView1[GridView1.Row, 1].Text
   Endif
-  Print GridView1[GridView1.Row, 0].Text
-  Print GridView1[GridView1.Row, 1].Text
 
   Me.Close(True)
 
@@ -102,7 +115,7 @@ End
 
 Public Sub GridView1_LostFocus()
 
-  APPMain.SelectedLtype = True
+  APPMain.SelectingLtype = True
   Me.Close
 
 End

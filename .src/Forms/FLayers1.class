@@ -37,19 +37,20 @@ Private CurrentRow As Integer
 Private loading As Boolean
 
 Private Coords As Integer[]
-Public SelectedColour As Boolean    '' Color selection flag
+Public SelectingColor As Boolean    '' Color selection flag
 Public CurrentColor As Integer      '' Selected color
 Private tx As Integer
 Private ty As Integer
 
-Public Sub _new(cor As Integer[])
+Public Sub _new(lay As Collection, cor As Integer[])
 
-  'ltypes = lty
+  cLayers = lay
   Coords = cor
 
 End
 
-Public Sub Run(cMod As Collection)
+'Public Sub Run(cMod As Collection)
+Public Sub Run()
 
   Dim col As String
   Dim i As Integer
@@ -62,19 +63,19 @@ Public Sub Run(cMod As Collection)
     xStyles.Add(xs[1])
   Next
 
-  If cMod.Exist("Layers") Then
-    cLayers = cMod["Layers"]
-  Endif
+  'If cMod.Exist("Layers") Then
+  '  cLayers = cMod["Layers"]
+  'Endif
 
-  stx = [("id"), ("Name"), ("Show"), ("Frozen"), ("Lock"), ("Color"), ("Style"), ("Width"), ("Print")]
-  lbx = ["id", "name", "show", "frozen", "locked", "colour", "style", "width", "print"]
+  stx = [("id"), ("State"), ("Name"), ("Show"), ("Frozen"), ("Lock"), ("Color"), ("Style"), ("Width"), ("Print")]
+  lbx = ["id", "state", "name", "show", "frozen", "locked", "colour", "style", "width", "print"]
 
   TableView1.Columns.Count = stx.Count
 
   For i = 0 To stx.Max
     col = stx[i]
     lbl = lbx[i]
-    If i = 1 Then
+    If i = 2 Then
       TableView1.Columns[i].Expand = True
       TableView1.Columns[i].Alignment = Align.Left
       TableView1.Columns[i].Title = col
@@ -85,9 +86,13 @@ Public Sub Run(cMod As Collection)
         TableView1.Columns[i].Width = 75
         TableView1.Columns[i].Title = col
       Case "id"
+        'TableView1.Columns[i].Alignment = Align.Center
+        TableView1.Columns[i].Width = 0
+        'TableView1.Columns[i].Title = "i"
+      Case "state"
         TableView1.Columns[i].Alignment = Align.Center
         TableView1.Columns[i].Width = 25
-        TableView1.Columns[i].Title = "i"
+        TableView1.Columns[i].Title = lbl
     End Select
 
   Next
@@ -113,7 +118,6 @@ Public Sub TableView1_Data(Row As Integer, Column As Integer)
   Dim i As Integer
   Dim st As Variant
   Dim pic As Picture
-  '    Dim tog As ToggleButton
 
   For Each v In cLayers 'draft 'gcd.cLayers
     If i = row Then
@@ -181,6 +185,18 @@ Public Sub TableView1_Data(Row As Integer, Column As Integer)
             TableView1[row, Column].WordWrap = False
           Endif
 
+        Case "state"
+
+          If st = True Then
+            pic = Image.Load("./svg/layers/stock_check-filled.svg").Stretch(21, 21).Picture
+            TableView1[row, Column].Picture = pic
+            TableView1[row, Column].WordWrap = True
+          Else
+            pic = Image.Load("./svg/layers/blank.svg").Stretch(21, 21).Picture
+            TableView1[row, Column].Picture = pic
+            TableView1[row, Column].WordWrap = False
+          Endif
+
       End Select
       'Break
     Endif
@@ -196,8 +212,6 @@ End
 Public Sub LMenu_Click()
 
   Dim obj As Object
-  '    Dim drf As Variant
-  'Dim n As Variant
 
   obj = Last
 
@@ -248,6 +262,7 @@ Public Sub LTask(lTask As String)
     Case "save"
       ' aplicamos los cambios de la tabla copiada a la tabla real del dibujo
       APPMain.hFCAD.cModel["Layers"] = cLayers.Copy()
+      APPMain.SelectingLayer = False
 
       'Dim t As Float = Timer                              ' IGNORAR: estos Timers y Debug son para monitorear el tiempo de actualizacion
 
@@ -263,7 +278,7 @@ Public Sub LTask(lTask As String)
       Me.Close
 
     Case "cancel"
-
+      APPMain.SelectingLayer = False
       Me.Close
 
   End Select
@@ -279,13 +294,11 @@ Public Sub TableView1_Click()
   Dim v As Variant
   Dim pval As Variant
 
-  'Dim FClr As FColors
+  Dim FClr As FColors16
   Dim r As Integer
   Dim g As Integer
   Dim b As Integer
-  'Dim tx As Integer
-  'Dim ty As Integer
-  'Dim imgColor As Image
+  Dim imgColor As Image
 
   Select lbx[TableView1.Column]
 
@@ -342,26 +355,27 @@ Public Sub TableView1_Click()
 
     Case "colour"
 
-      FColors.ShowModal()
+      If SelectingColor = False Then
+        FClr = New FColors16([Me.ScreenX, Me.ScreenY], Me)
+        FClr.Border = False
+        FClr.Stacking = Window.Above
+        FClr.Show()
+        Do
+          If SelectingColor = True Then
+            r = CInt(Split(Starter.ColorsRGB[CurrentColor], ",")[0])
+            g = CInt(Split(Starter.ColorsRGB[CurrentColor], ",")[1])
+            b = CInt(Split(Starter.ColorsRGB[CurrentColor], ",")[2])
+            TableView1[TableView1.Row, TableView1.Column].Background = Color.RGB(r, g, b)
+            TableView1[TableView1.Row, TableView1.Column].Text = CurrentColor
+            Print CurrentColor
+            SelectingColor = False
+            Break
+          Else
+            Wait 0.01
+          Endif
+        Loop
+      Endif
 
-      r = CInt(Split(Starter.ColorsRGB[CurrentColor], ",")[0])
-      g = CInt(Split(Starter.ColorsRGB[CurrentColor], ",")[1])
-      b = CInt(Split(Starter.ColorsRGB[CurrentColor], ",")[2])
-
-      TableView1[TableView1.Row, TableView1.Column].Background = CurrentColor
-
-      Select CurrentColor
-        Case 256
-          TableView1[TableView1.Row, TableView1.Column].Text = "ByBlock"
-        Case 257
-          TableView1[TableView1.Row, TableView1.Column].Text = "ByLayer"
-        Case Else
-          TableView1[TableView1.Row, TableView1.Column].Text = CStr(CurrentColor)
-      End Select
-
-      'Endif
-
-      'TableView1.Edit(xColors, True)
     Case "style"
       TableView1.Edit(xStyles, True)
     Case "width"
@@ -454,6 +468,7 @@ End
 
 Public Sub Form_LostFocus()
 
+  APPMain.SelectingLayer = False
   Me.Close
 
   'LTask("close")
@@ -464,5 +479,25 @@ Public Sub TableView1_MouseDown()
 
   tx = Mouse.X
   ty = Mouse.Y
+
+End
+
+Public Sub TableView1_DblClick()
+
+  Dim r As Integer
+
+  Select lbx[TableView1.Column]
+    Case "state"
+
+      TableView1[TableView1.Row, 1].WordWrap = True
+      TableView1[TableView1.Row, 1].Picture = Image.Load("./svg/layers/stock_check-filled.svg").Stretch(21, 21).Picture
+
+      For r = 0 To TableView1.Rows.Max
+        If r <> TableView1.Row Then
+          TableView1[r, 1].WordWrap = False
+          TableView1[r, 1].Picture = Image.Load("./svg/layers/blank.svg").Stretch(21, 21).Picture
+        Endif
+      Next
+  End Select
 
 End

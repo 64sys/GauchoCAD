@@ -41,50 +41,50 @@ Public StepsDone As Integer                 ' esto lo cambia cls ElementBuilder 
 
 Public Sub Draw(oE As Entity)
 
-    If Me.StepsDone = 0 And Not Loaded Then            ' need the filename first
+  If Me.StepsDone = 0 And Not Loaded Then            ' need the filename first
 
-        Dim f As String
-        Dialog.OpenFile(False)
-        Dialog.Filter = ["*.*"]
-        f = Dialog.Path
-        If Exist(f) Then
-            Me.stringdata[0] = f
-            imagen = Image.Load(f)
-            hBrush = paint.Image(Imagen)
+    Dim f As String
+    Dialog.OpenFile(False)
+    Dialog.Filter = ["*.*"]
+    f = Dialog.Path
+    If Exist(f) Then
+      Me.stringdata[0] = f
+      imagen = Image.Load(f)
+      hBrush = paint.Image(Imagen)
 
-            ' hBrush.Scale(W / hImage.W, H / hImage.H)
-            ' paint.brush = hBrush
-            ' paint.Rectangle(X, Y, W, H)
-            ' paint.Fill
-        Endif
-        Loaded = True
-        ' Catch
+      ' hBrush.Scale(W / hImage.W, H / hImage.H)
+      ' paint.brush = hBrush
+      ' paint.Rectangle(X, Y, W, H)
+      ' paint.Fill
+    Endif
+    Loaded = True
+    ' Catch
 
-        'SVGLoaded = False
+    'SVGLoaded = False
 
-    Else If Me.StepsDone = 1 Then                   ' we have the position
+  Else If Me.StepsDone = 1 Then                   ' we have the position
 
-        hBrush.Translate(Me.p[0], Me.p[1])
-        paint.brush = hBrush
-        paint.Fill
+    hBrush.Translate(Me.p[0], Me.p[1])
+    paint.brush = hBrush
+    paint.Fill
 
-    End If
+  End If
 
 End
 
 Public Sub PointClick(oE As Entity, Xr As Float, Yr As Float) As Boolean
 
-    ' this could be overriden in the child
+  ' this could be overriden in the child
 
-    If oE.Polygon.Count = 0 Then Return False
+  If oE.Polygon.Count = 0 Then Return False
 
-    If puntos.isInside(oE.Polygon, xr, Yr) Then
+  If puntos.isInside(oE.Polygon, xr, Yr) Then
 
-        Return True
-    Else
+    Return True
+  Else
 
-        Return False
-    End If
+    Return False
+  End If
 
 End
 
@@ -99,25 +99,25 @@ End
 ' True means all is good, False will instruct the clsEntityBuilder to delete it
 Public Sub Finish(oE As Entity, Optional ParamsDone As Integer = -1) As Boolean
 
-    'Print "Finish en EntityBase"
-    'CreatePolygon(oe)
-    BuildPOI(oe)
+  'Print "Finish en EntityBase"
+  'CreatePolygon(oe)
+  BuildPOI(oe)
 
-    ' busco el tipo de linea, si hace falta
-    If oE.LineTypeName = "Dashed" Then oE.LineType = 1
-    ' tareas finales de armado del objeto
+  ' busco el tipo de linea, si hace falta
+  If oE.LineTypeName = "Dashed" Then oE.LineType = 1
+  ' tareas finales de armado del objeto
 
-    oE.psel.resize(oE.p.count / 2)
-    oE.ForDeletion = False
-    oE.DrawAble = True
-    oE.Selected = False
-    oE.Finished = True
+  oE.psel.resize(oE.p.count / 2)
+  oE.ForDeletion = False
+  oE.DrawAble = True
+  oE.Selected = False
+  oE.Finished = True
 
-    If Not True Then
+  If Not True Then
 
-        oE.ForDeletion = True
-        oE.DrawAble = False
+    oE.ForDeletion = True
+    oE.DrawAble = False
 
-    End If
+  End If
 
 End

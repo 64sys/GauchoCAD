@@ -23,7 +23,6 @@
 '
 
 ' This modeule contains methods for working with cad files.
-
 Export
 
 '' This load all the info form a gaucho xml file, then put it in a collection a
@@ -71,7 +70,7 @@ Public Function SaveGaucho(sFile As String, cMdl As Collection)
         '
         ' Case "Version"
 
-      Case "Layers", "Colors", "Styles", "Weights", "DimSts", "Fonts"
+      Case "Layers", "Colors", "Styles", "Weights", "DimSts", "Fonts", "Vars"
         For Each att In var
           writer.StartElement("header")
           For Each v In att
@@ -209,6 +208,7 @@ Public Function LoadGaucho(sFile As String) As Collection
   Dim cWidths As New Collection
   Dim cDimSts As New Collection
   Dim cFonts As New Collection
+  Dim cVars As New Collection
   Dim cEntities As New Collection
   Dim cMdl As New Collection
   Dim hxml As New XmlDocument
@@ -228,7 +228,8 @@ Public Function LoadGaucho(sFile As String) As Collection
 
       Case "layer"
         c.Clear
-        c["id"] = Format(CInt(ent.Attributes["id"]), "00")
+        'c["id"] = Format(CInt(ent.Attributes["id"]), "00")
+        c["id"] = ent.Attributes["id"]
         c["type"] = ent.Attributes["type"]
         c["name"] = ent.Attributes["name"]
         c["show"] = CBool(ent.Attributes["show"])
@@ -238,7 +239,8 @@ Public Function LoadGaucho(sFile As String) As Collection
         c["style"] = CInt(ent.Attributes["style"])
         c["width"] = CInt(ent.Attributes["width"])
         c["print"] = CBool(ent.Attributes["print"])
-        cLayers.Add(c.Copy(), Format(CInt(ent.Attributes["id"]), "00"))
+        'cLayers.Add(c.Copy(), Format(CInt(ent.Attributes["id"]), "00"))
+        cLayers.Add(c.Copy(), ent.Attributes["id"])
 
       Case "style"
         c.Clear
@@ -268,6 +270,13 @@ Public Function LoadGaucho(sFile As String) As Collection
         c["name"] = ent.Attributes["name"]
         cFonts.Add(c.Copy(), ent.Attributes["id"])
 
+      Case "vars"
+        c.Clear
+        c["id"] = ent.Attributes["id"]
+        c["name"] = ent.Attributes["name"]
+        c["value"] = ent.Attributes["value"]
+        cVars.Add(c.Copy(), ent.Attributes["id"])
+
     End Select
   Next
 
@@ -276,6 +285,8 @@ Public Function LoadGaucho(sFile As String) As Collection
   cMdl.Add(cWidths, "Widths")
   cMdl.Add(cDimSts, "DimSts")
   cMdl.Add(cFonts, "Fonts")
+  'Flags / Variables
+  cMdl.Add(cVars, "Vars")
 
   ''TODO: poner las entidade en el cModel
   For Each ent In hxml.GetElementsByTagName("entity")

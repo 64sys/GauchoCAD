@@ -23,14 +23,21 @@
 'Private Coords As Integer[]
 'Private wmax As Integer
 Private iCurrentColor As Integer
+Private Coords As Integer[]
 
-'Public Sub _new(cor As Integer[])
-'
-'    Coords = cor
-'
-'End
+Public Sub _new(ByRef i As Integer, cor As Integer[])
 
-'Public Sub Run() As Boolean
+  iCurrentColor = i
+  Coords = cor
+
+End
+
+Public Sub Run() 'As Boolean
+
+  Me.Show
+
+End
+
 Public Sub Form_Open()
 
   Dim i As Integer
@@ -64,7 +71,8 @@ Public Sub Form_Open()
       .Tooltip = CStr(i)
       .Tag = i
       .Name = "pic" & CStr(i)
-      .Picture = img.Stretch(pnlPrimary.H - 8, pnlPrimary.H - 8).Picture
+      '.Picture = img.Stretch(pnlPrimary.H - 8, pnlPrimary.H - 8).Picture
+      .Picture = img.Picture
     End With
   Next
   For i = 250 To 255
@@ -80,7 +88,8 @@ Public Sub Form_Open()
       .Tooltip = CStr(i)
       .Tag = i
       .Name = "pic" & CStr(i)
-      .Picture = img.Stretch(pnlGray.H - 8, pnlGray.H - 8).Picture
+      '.Picture = img.Stretch(pnlGray.H - 8, pnlGray.H - 8).Picture
+      .Picture = img.Picture
     End With
   Next
 
@@ -100,11 +109,14 @@ Public Sub Form_Open()
         .Tooltip = CStr(i + j)
         .Tag = i + j
         .Name = "pic" & CStr(i + j)
-        .Picture = img.Stretch(xPanel.H - 8, xPanel.H - 8).Picture
+        '.Picture = img.Stretch(xPanel.H - 8, xPanel.H - 8).Picture
+        .Picture = img.Picture
       End With
     Next
 
   Next
+
+  Me.Move(Coords[0], Coords[1])
 
 End
 
@@ -116,7 +128,7 @@ Public Sub Colour_Click()
 
   iCurrentColor = obj.Tag
 
-  APPMain.SelectedColour = True
+  APPMain.SelectingColor = True
   APPMain.CurrentColor = iCurrentColor
 
   Me.Close

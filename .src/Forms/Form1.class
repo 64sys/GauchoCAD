@@ -2,18 +2,18 @@
 
 Public Sub Run() As Boolean
 
-    Return Not Me.ShowModal()
+  Return Not Me.ShowModal()
 
 End
 
 Public Sub btnOK_Click()
 
-    Me.Close(True)
+  Me.Close(True)
 
 End
 
 Public Sub btnCancel_Click()
 
-    Me.Close
+  Me.Close
 
 End
