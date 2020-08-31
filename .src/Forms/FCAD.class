@@ -99,7 +99,7 @@ Public GlListAllEntities As Integer
 Public GlListSelectedEntities As Integer
 
 ' Form variables
-Private WindowBackMode As String
+'Private WindowBackMode As String
 
 Public Sub Form_Open()
 

@@ -25,26 +25,48 @@ Private stx As New String[]
 Private lbx As New String[]
 
 Private xStyles As New String[]
-Private xWeights As New String[]
+'Private xWeights As New String[]
 'Private xColors As New String[]
 
 Private draft As New Collection
 
-Private cLayers As New Collection
+Private cLayers As Collection
+'Private cStyles As Collection
+'Private cLay As Collection
+Private cVars As Collection
 
 Private CurrentKey As String
 Private CurrentRow As Integer
+Private currLayer As String         '' Current layer in this form
 Private loading As Boolean
 
 Private Coords As Integer[]
 Public SelectingColor As Boolean    '' Color selection flag
 Public CurrentColor As Integer      '' Selected color
+
+Public SelectingLtype As Boolean    '' Ltype selection flag
+Public CurrentLtype As Integer      '' Selected Ltype
+
+Public SelectingWidht As Boolean    '' Width selection flag
+Public CurrentWidth As Integer      '' Selected Width
+
 Private tx As Integer
 Private ty As Integer
 
-Public Sub _new(lay As Collection, cor As Integer[])
+Public Sub _new(mdl As Collection, cor As Integer[])
 
-  cLayers = lay
+  If mdl.Exist("Layers") Then
+    cLayers = mdl["Layers"]
+  Endif
+
+  'If mdl.Exist("Styles") Then
+  '  cStyles = mdl["Styles"]
+  'Endif
+
+  If mdl.Exist("Vars") Then
+    cVars = mdl["Vars"]
+  Endif
+
   Coords = cor
 
 End
@@ -57,15 +79,10 @@ Public Sub Run()
   Dim lbl As String
   Dim xs As Variant
 
-  'Coords = cor
   xStyles.Clear
-  For Each xs In Starter.cLtypes
+  For Each xs In Starter.cStyles
     xStyles.Add(xs[1])
   Next
-
-  'If cMod.Exist("Layers") Then
-  '  cLayers = cMod["Layers"]
-  'Endif
 
   stx = [("id"), ("State"), ("Name"), ("Show"), ("Frozen"), ("Lock"), ("Color"), ("Style"), ("Width"), ("Print")]
   lbx = ["id", "state", "name", "show", "frozen", "locked", "colour", "style", "width", "print"]
@@ -114,94 +131,126 @@ End
 
 Public Sub TableView1_Data(Row As Integer, Column As Integer)
 
-  Dim v As Variant
-  Dim i As Integer
+  'Dim v As Variant
+  'Dim i As Integer
   Dim st As Variant
   Dim pic As Picture
+  'Dim var As Variant
+  Dim r As Integer
+  Dim g As Integer
+  Dim b As Integer
+  Dim current As Boolean
+  Dim vrx As Variant[]
 
-  For Each v In cLayers 'draft 'gcd.cLayers
-    If i = row Then
-      st = v[lbx[Column]]
-      Select lbx[Column]
+  If cVars.Exist("clayer") Then
+    current = True
+    currLayer = cVars["clayer"]
+  Else
+    current = True
+    currLayer = "0"
+  Endif
 
-        Case "id"
-          TableView1[row, Column].Text = st
+  'If i = row Then
+  st = cLayers[CStr(Row)][lbx[Column]]
+  'st = v[lbx[Column]]
+  Select lbx[Column]
 
-        Case "name"
-          TableView1[row, Column].Text = st 'cLayers.key
+    Case "id"
+      TableView1[row, Column].Text = st
 
-        Case "show"
+    Case "name"
+      TableView1[row, Column].Text = st 'cLayers.key
 
-          If st = True Then
-            pic = Image.Load("./svg/layers/lamp-on.png").Stretch(16, 16).Picture
-            TableView1[row, Column].Picture = pic
-            TableView1[row, Column].WordWrap = True
-          Else
-            pic = Image.Load("./svg/layers/lamp-off.png").Stretch(16, 16).Picture
-            TableView1[row, Column].Picture = pic
-            TableView1[row, Column].WordWrap = False
-          Endif
+    Case "show"
 
-        Case "frozen"
-          If st = True Then
-            pic = Image.Load("./svg/layers/frozen.png").Stretch(16, 16).Picture
-            TableView1[row, Column].Picture = pic
-            TableView1[row, Column].WordWrap = True
-          Else
-            pic = Image.Load("./svg/layers/liquid.png").Stretch(16, 16).Picture
-            TableView1[row, Column].Picture = pic
-            TableView1[row, Column].WordWrap = False
-          Endif
+      If st = True Then
+        pic = Image.Load("./svg/layers/lamp-on.png").Stretch(16, 16).Picture
+        TableView1[row, Column].Picture = pic
+        TableView1[row, Column].WordWrap = True
+      Else
+        pic = Image.Load("./svg/layers/lamp-off.png").Stretch(16, 16).Picture
+        TableView1[row, Column].Picture = pic
+        TableView1[row, Column].WordWrap = False
+      Endif
 
-        Case "locked"
-          If st = True Then
-            pic = Image.Load("./svg/layers/lock-on.png").Stretch(21, 21).Picture
-            TableView1[row, Column].Picture = pic
-            TableView1[row, Column].WordWrap = True
-          Else
-            pic = Image.Load("./svg/layers/lock-off.png").Stretch(21, 21).Picture
-            TableView1[row, Column].Picture = pic
-            TableView1[row, Column].WordWrap = False
-          Endif
+    Case "frozen"
+      If st = True Then
+        pic = Image.Load("./svg/layers/frozen.png").Stretch(16, 16).Picture
+        TableView1[row, Column].Picture = pic
+        TableView1[row, Column].WordWrap = True
+      Else
+        pic = Image.Load("./svg/layers/liquid.png").Stretch(16, 16).Picture
+        TableView1[row, Column].Picture = pic
+        TableView1[row, Column].WordWrap = False
+      Endif
 
-        Case "colour"
-          TableView1[row, Column].Text = st
+    Case "locked"
+      If st = True Then
+        pic = Image.Load("./svg/layers/lock-on.png").Stretch(21, 21).Picture
+        TableView1[row, Column].Picture = pic
+        TableView1[row, Column].WordWrap = True
+      Else
+        pic = Image.Load("./svg/layers/lock-off.png").Stretch(21, 21).Picture
+        TableView1[row, Column].Picture = pic
+        TableView1[row, Column].WordWrap = False
+      Endif
 
-        Case "style"
-          'TableView1[row, Column].Picture = Starter.cLtypes[st][2].Picture
-          TableView1[row, Column].Text = Starter.cLtypes[st][1]
+    Case "colour"
+      TableView1[Row, Column].Text = st
+      r = CInt(Split(Starter.ColorsRGB[st], ",")[0])
+      g = CInt(Split(Starter.ColorsRGB[st], ",")[1])
+      b = CInt(Split(Starter.ColorsRGB[st], ",")[2])
+      TableView1[Row, Column].Background = Color.RGB(r, g, b)
 
-        Case "width"
-          TableView1[row, Column].Text = st
+    Case "style"
+      For Each vrx In Starter.cStyles
+        If CInt(Starter.cStyles.Key) = st Then
+          TableView1[row, Column].Text = vrx[1]
+          Break
+        Else
+          TableView1[row, Column].Text = Starter.cStyles["0"][1]
+        Endif
+      Next
 
-        Case "print"
-          If st = True Then
-            pic = Image.Load("./svg/layers/print-on.png").Stretch(21, 21).Picture
-            TableView1[row, Column].Picture = pic
-            TableView1[row, Column].WordWrap = True
-          Else
-            pic = Image.Load("./svg/layers/print-off.png").Stretch(21, 21).Picture
-            TableView1[row, Column].Picture = pic
-            TableView1[row, Column].WordWrap = False
-          Endif
+    Case "width"
+      'If cWidths.Exist(CInt(st)) Then
+      For Each vrx In Starter.cWidths
+        If Starter.cWidths.Key = st Then
+          TableView1[row, Column].Text = CStr(vrx[0])
+          Break
+        Else
+          TableView1[row, Column].Text = CStr(0.1)
+        Endif
+      Next
+      'TableView1[row, Column].Text = st
+      'Endif
 
-        Case "state"
+    Case "print"
+      If st = True Then
+        pic = Image.Load("./svg/layers/print-on.png").Stretch(21, 21).Picture
+        TableView1[row, Column].Picture = pic
+        TableView1[row, Column].WordWrap = True
+      Else
+        pic = Image.Load("./svg/layers/print-off.png").Stretch(21, 21).Picture
+        TableView1[row, Column].Picture = pic
+        TableView1[row, Column].WordWrap = False
+      Endif
 
-          If st = True Then
-            pic = Image.Load("./svg/layers/stock_check-filled.svg").Stretch(21, 21).Picture
-            TableView1[row, Column].Picture = pic
-            TableView1[row, Column].WordWrap = True
-          Else
-            pic = Image.Load("./svg/layers/blank.svg").Stretch(21, 21).Picture
-            TableView1[row, Column].Picture = pic
-            TableView1[row, Column].WordWrap = False
-          Endif
+    Case "state"
 
-      End Select
-      'Break
-    Endif
-    Inc i
-  Next
+      If cLayers[CStr(Row)]["name"] = currLayer Then
+        pic = Image.Load("./svg/layers/stock_check-filled.svg").Stretch(21, 21).Picture
+        TableView1[row, Column].Picture = pic
+        TableView1[row, Column].WordWrap = True
+      Else
+        pic = Image.Load("./svg/layers/blank.svg").Stretch(21, 21).Picture
+        TableView1[row, Column].Picture = pic
+        TableView1[row, Column].WordWrap = False
+      Endif
+  End Select
+  'Endif
+  '  Inc i
+  'Next
 
   TableView1.Refresh
 
@@ -223,6 +272,12 @@ Public Sub LTask(lTask As String)
 
   Dim drf As Variant
   Dim n As Variant
+  'Dim var As Variant
+  Dim r As Integer
+
+  Dim i As Integer
+  Dim xLay As Collection
+  Dim vrx As Variant[]
 
   Select lTask 'obj.Tag
     Case "add"
@@ -234,23 +289,20 @@ Public Sub LTask(lTask As String)
 
       Next
 
-      n["id"] = Format(cLayers.Count, "00")
-      n["name"] = "layer-" & Format(cLayers.Count + 1, "00")
+      'n["id"] = Format(cLayers.Count, "00")
+      n["id"] = CStr(cLayers.Count)
+      n["name"] = "layer-" & n["id"] 'Format(cLayers.Count + 1, "00")
 
-      cLayers.Add(n, n["name"])
+      cLayers.Add(n, n["id"])
       TableView1.Rows.Count = 0
       TableView1.Rows.Count = cLayers.Count
-
-      'gcd.cLayers.Add()
 
     Case "erase"
       If loading = False Then
         Select CurrentKey
           Case "0", "", "00"
-            'skip
 
           Case Else
-            'draft.Remove(CurrentKey)
             cLayers.Remove(CurrentKey)
             loading = True
             TableView1.Rows.Count = 0
@@ -260,29 +312,76 @@ Public Sub LTask(lTask As String)
       Endif
 
     Case "save"
-      ' aplicamos los cambios de la tabla copiada a la tabla real del dibujo
-      APPMain.hFCAD.cModel["Layers"] = cLayers.Copy()
-      APPMain.SelectingLayer = False
+      'APPMain.hFCAD.cModel["Layers"] = cLayers.Copy()
+      'For Each var In cVars
+      '  If var["name"] = "clayer" Then
+      'var["value"] = currLayer
+      cVars["clayer"] = currLayer
+      '  Endif
+      'Next
 
-      'Dim t As Float = Timer                              ' IGNORAR: estos Timers y Debug son para monitorear el tiempo de actualizacion
+      For r = 0 To TableView1.Rows.Max
+        For i = 2 To lbx.Max
+          'sKey = TableView1[r, 0].Text
+          If cLayers.Exist(TableView1[r, 0].Text) Then
+            xLay = cLayers[TableView1[r, 0].Text]
+            If xLay.Exist(lbx[i]) Then
+              Select lbx[i]
+                Case "style"
 
-      ' aplicamos los parametros de los layers a las entidades
+                  For Each vrx In Starter.cStyles
+                    If TableView1[r, i].Text = vrx[1] Then
+                      xlay[lbx[i]] = CInt(Starter.cStyles.Key)
+                      Break
+                    Else
+                      xlay[lbx[i]] = -1
+                    Endif
+                  Next
+
+                Case "show", "frozen", "locked", "print"
+                  If TableView1[r, i].WordWrap Then
+                    xlay[lbx[i]] = True
+                  Else
+                    xlay[lbx[i]] = False
+                  Endif
+                Case "width"
+                  For Each vrx In Starter.cWidths
+                    If vrx[0] = CFloat(TableView1[r, i].Text) Then
+                      xlay[lbx[i]] = Starter.cWidths.Key
+                      Break
+                    Else
+                      xlay[lbx[i]] = "1"
+                    Endif
+                  Next
+                  ' If Starter.cWidths.Exist(TableView1[r, i].Text) Then
+                  '   xlay[lbx[i]] = CInt(TableView1[r, i].Text)
+                  ' Else
+                  '   xlay[lbx[i]] = 0
+                  ' Endif
+
+                Case Else
+                  xlay[lbx[i]] = TableView1[r, i].Text
+
+              End Select
+
+            Endif
+          Endif
+
+        Next
+      Next
+
+      'cVars["clayer"] = currLayer
       gcd.ApplyLayerProperties
-      'Debug "apply properties time ", Timer - t           ' IGNORAR: estos Timers y Debug son para monitorear el tiempo de actualizacion
-      't = Timer                                           ' IGNORAR: estos Timers y Debug son para monitorear el tiempo de actualizacion
-
-      ' regeneramos el grafico
       clsEntities.GLGenDrawList
 
-      'Debug "Regen time ", Timer - t                      ' IGNORAR: estos Timers y Debug son para monitorear el tiempo de actualizacion
+      APPMain.SelectingLayer = True
+
       Me.Close
 
     Case "cancel"
-      APPMain.SelectingLayer = False
+      APPMain.SelectingLayer = True
       Me.Close
-
   End Select
-  'Endif
 
 End
 
@@ -298,7 +397,13 @@ Public Sub TableView1_Click()
   Dim r As Integer
   Dim g As Integer
   Dim b As Integer
-  Dim imgColor As Image
+  'Dim imgColor As Image
+  Dim x As Integer
+  Dim y As Integer
+
+  Dim lst As FLtypes
+  Dim wts As FWidths
+  Dim vrx As Variant[]
 
   Select lbx[TableView1.Column]
 
@@ -377,9 +482,64 @@ Public Sub TableView1_Click()
       Endif
 
     Case "style"
-      TableView1.Edit(xStyles, True)
+
+      If SelectingLtype = False Then
+        x = TableView1[TableView1.Row, TableView1.Column].X + TableView1.ScreenX
+        y = TableView1[TableView1.Row, TableView1.Column].Y + TableView1.ScreenY + TableView1.Rows.Height * 2
+
+        lst = New FLtypes(Starter.cStyles, [x, y], Me)
+        lst.Stacking = Window.Above
+        lst.Run()
+        Do
+          If SelectingLtype = True Then
+
+            For Each vrx In Starter.cStyles
+              If CInt(Starter.cStyles.Key) = CurrentLtype Then
+                TableView1[TableView1.Row, TableView1.Column].Text = vrx[1]
+                Break
+              Else
+                TableView1[TableView1.Row, TableView1.Column].Text = ""
+              Endif
+            Next
+
+            SelectingLtype = False
+            Break
+          Else
+            Wait 0.1
+          Endif
+        Loop
+      Endif
+
     Case "width"
-      TableView1.Edit(xWeights, True)
+      If SelectingWidht = False Then
+        x = TableView1[TableView1.Row, TableView1.Column].X + TableView1.ScreenX
+        y = TableView1[TableView1.Row, TableView1.Column].Y + TableView1.ScreenY + TableView1.Rows.Height * 2
+
+        wts = New FWidths(Starter.cWidths, [x, y], Me)
+        wts.Stacking = Window.Above
+        wts.Run()
+        Do
+          If SelectingWidht = True Then
+
+            For Each vrx In Starter.cWidths
+              If CInt(Starter.cWidths.Key) = CurrentWidth Then
+                TableView1[TableView1.Row, TableView1.Column].Text = vrx[0]
+                Break
+              Else
+                TableView1[TableView1.Row, TableView1.Column].Text = ""
+              Endif
+            Next
+
+            SelectingWidht = False
+            Break
+          Else
+            Wait 0.1
+          Endif
+        Loop
+      Endif
+
+      'TableView1.Edit(xWeights, True)
+
   End Select
 
   pdat = lbx[TableView1.Column]
@@ -393,8 +553,6 @@ Public Sub TableView1_Click()
           v[pdat] = pval
         Case "colour", "style", "width"
           pval = Val(TableView1[TableView1.Row, TableView1.Column].Text)
-          'Case "label"
-          '    pval = TableView1[TableView1.Row, TableView1.Column].Text
           v[pdat] = pval
       End Select
 
@@ -445,9 +603,9 @@ Public Sub TableView1_Save(Row As Integer, Column As Integer, Value As String)
     Case "style"
       For Each v In cLayers 'draft
         If v["id"] = pkey Then
-          For Each lt In Starter.cLtypes
-            If lt[1] = Value Then
-              v[pdat] = CInt(Starter.cLtypes.Key)
+          For Each lt In Starter.cStyles
+            If lt["name"] = Value Then
+              v[pdat] = Value
             Endif
           Next
         Endif
@@ -459,9 +617,11 @@ End
 Public Sub TableView1_Select()
 
   If loading = False Then
-    CurrentRow = TableView1.Row
-    CurrentKey = TableView1[CurrentRow, 0].Text
-    Print CurrentRow
+    If TableView1.Row <> -1 Then
+      CurrentRow = TableView1.Row
+      CurrentKey = TableView1[CurrentRow, 0].Text
+      Print CurrentRow
+    Endif
   Endif
 
 End
@@ -491,6 +651,7 @@ Public Sub TableView1_DblClick()
 
       TableView1[TableView1.Row, 1].WordWrap = True
       TableView1[TableView1.Row, 1].Picture = Image.Load("./svg/layers/stock_check-filled.svg").Stretch(21, 21).Picture
+      currLayer = TableView1[TableView1.Row, 2].Text
 
       For r = 0 To TableView1.Rows.Max
         If r <> TableView1.Row Then

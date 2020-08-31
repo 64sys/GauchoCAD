@@ -34,7 +34,7 @@ Private lgg As Logger               '' Application event log.
 '------------------------------------------------------------------------------
 
 'Variables del formulario
-Public hFCAD As FCAD                    '' CAD Editor
+Public hFCAD As FCAD                '' CAD Editor
 Public CurrentForm As Form
 Public CurrentFile As String
 
@@ -51,7 +51,10 @@ Public CurrentLayer As String
 Public SelectingLtype As Boolean    '' Selecting Linetype
 Public CurrentLtype As Integer
 
-Public SelectedWidth As Boolean
+Public SelectingWidth As Boolean    '' Selecting width
+Public CurrentWidth As Integer
+
+'Public SelectedWidth As Boolean
 
 Private PropertiesFlag As Boolean = False
 
@@ -167,8 +170,11 @@ Public Sub Run(cin As Collection)
   cboDimSts.Reparent(pnlFile)
 
   AddLtypesPics()
-  btnLtypes.Picture = Starter.cLtypes["0"][2].Picture
-  btnLtypes.Tooltip = Starter.cLtypes["0"][1]
+
+  AddWidthsPics()
+
+  btnLtypes.Picture = Starter.cStyles["0"][2].Picture
+  btnLtypes.Tooltip = Starter.cStyles["0"][1]
 
   If CurrentColor = 0 Then
     CurrentColor = 3
@@ -301,7 +307,7 @@ Public Sub AddLtypesPics()
   If iTheme <> hColor.Luminance Then
     iTheme = hColor.Luminance
 
-    For Each lt In Starter.cLtypes
+    For Each lt In Starter.cStyles
 
       dash = lt[0]
 
@@ -331,15 +337,53 @@ Public Sub AddLtypesPics()
       Paint.Stroke
       Paint.End
 
-      If Starter.cLtypes[Starter.cLtypes.Key].Count = 3 Then
-        Starter.cLtypes[Starter.cLtypes.Key][2] = img
+      If Starter.cStyles[Starter.cStyles.Key].Count = 3 Then
+        Starter.cStyles[Starter.cStyles.Key][2] = img
       Else
-        Starter.cLtypes[Starter.cLtypes.Key].Add(img)
+        Starter.cStyles[Starter.cStyles.Key].Add(img)
       Endif
 
     Next
 
   Endif
+
+End
+
+Public Sub AddWidthsPics()
+
+  Dim wt As Variant
+  Dim img As Image
+  Dim hColor As ColorInfo
+
+  hColor = Color[Color.ButtonBackground]
+
+  ' If iTheme <> hColor.Luminance Then
+  iTheme = hColor.Luminance
+
+  For Each wt In Starter.cWidths
+
+    img = New Image(btnLtypes.Width, 8, btnLtypes.Background)
+
+    Paint.Begin(img)
+    Paint.NewPath
+
+    hColor = Color[Color.ButtonBackground]
+
+    If hColor.Luminance > 160 Then
+      Paint.Brush = Paint.Color(Color.Black)
+    Else
+      Paint.Brush = Paint.Color(Color.White)
+    Endif
+
+    Paint.LineWidth = wt
+    Paint.MoveTo(4, 4)
+    Paint.LineTo(btnLtypes.Width - 4, 4)
+    Paint.Stroke
+    Paint.End
+
+    Starter.cWidths[Starter.cWidths.Key] = [wt, img]
+
+  Next
 
 End
 
@@ -506,10 +550,11 @@ End
 
 Public Sub LoadComboboxes(cMdl As Collection)
 
-  Dim aLayer As Variant
+  'Dim aLayer As Variant
   'Dim aStyle As Variant
   Dim aWidth As Variant
   Dim aDimSt As Variant
+  Dim cVars As Collection
 
   cMod = cMdl
 
@@ -517,37 +562,34 @@ Public Sub LoadComboboxes(cMdl As Collection)
   cboWidths.Clear
   cboDimSts.Clear
 
-  If cMdl.Count > 0 Then
-    If cMdl.Exist("Layers") Then
-      For Each aLayer In cMdl["Layers"]
-        cboLayers.Add(aLayer["name"])
-      Next
-      For Each aLayer In cMdl["Layers"]
-        cboLayers.Text = aLayer["name"]
-        Break
-      Next
+  If cMdl.Exist("Vars") Then
+    cVars = cMdl["Vars"]
+    If cVars.Exist("clayer") Then
+      CurrentLayer = cVars["clayer"]
+    Else
+      CurrentLayer = "0"
     Endif
+    btnLayers.Text = CurrentLayer
+  Endif
 
-    If cMdl.Exist("Widths") Then
-      For Each aWidth In cMdl["Widths"]
-        cboWidths.Add(aWidth["value"])
-      Next
-      For Each aWidth In cMdl["Widths"]
-        cboWidths.Text = aWidth["value"]
-        Break
-      Next
-    Endif
+  If cMdl.Exist("Widths") Then
+    For Each aWidth In cMdl["Widths"]
+      cboWidths.Add(aWidth["value"])
+    Next
+    For Each aWidth In cMdl["Widths"]
+      cboWidths.Text = aWidth["value"]
+      Break
+    Next
+  Endif
 
-    If cMdl.Exist("DimSts") Then
-      For Each aDimSt In cMdl["DimSts"]
-        cboDimSts.Add(aDimSt["name"])
-      Next
-      For Each aDimSt In cMdl["DimSts"]
-        cboDimSts.Text = aDimSt["name"]
-        Break
-      Next
-    Endif
-
+  If cMdl.Exist("DimSts") Then
+    For Each aDimSt In cMdl["DimSts"]
+      cboDimSts.Add(aDimSt["name"])
+    Next
+    For Each aDimSt In cMdl["DimSts"]
+      cboDimSts.Text = aDimSt["name"]
+      Break
+    Next
   Endif
 
 End
@@ -855,11 +897,11 @@ Public Sub btnLtypes_MouseDown()
   Dim img2 As Image
 
   If SelectingLtype = False Then
-    lst = New FLtypes(Starter.cLtypes, [btnLtypes.ScreenX, btnLtypes.ScreenY + btnLtypes.H])
+    lst = New FLtypes(Starter.cStyles, [btnLtypes.ScreenX, btnLtypes.ScreenY + btnLtypes.H], Me)
     lst.Run()
     Do
       If SelectingLtype = True Then
-        vrx = Starter.cLtypes[CStr(CurrentLtype)]
+        vrx = Starter.cStyles[CStr(CurrentLtype)]
         If vrx.Count > 2 Then
           If Object.Type(vrx[2]) = "Image" Then
             img2 = vrx[2]
@@ -921,9 +963,15 @@ End
 Public Sub btnLayers_MouseDown()
 
   Dim FLay As FLayers1
-  Dim vrx As Variant[]
+  'Dim vrx As Variant[]
+  Dim cVars As Collection
+  'Dim var As Collection
+  Dim currLayer As Variant
 
-  FLay = New FLayers1(hFCAD.cModel["Layers"], [Workspace1.ScreenX, Workspace1.ScreenY])
+  'FLay = New FLayers1(hFCAD.cModel["Layers"], [Workspace1.ScreenX, Workspace1.ScreenY])
+  FLay = New FLayers1(hFCAD.cModel, [Workspace1.ScreenX, Workspace1.ScreenY])
+
+  cVars = hFCAD.cModel["Vars"]
 
   If SelectingLayer = False Then
     FLay.Stacking = Window.Above
@@ -931,10 +979,19 @@ Public Sub btnLayers_MouseDown()
     FLay.Run()
     Do
       If SelectingLayer = True Then
-        vrx = hFCAD.cModel["Layers"][CStr(CurrentLayer)]
-        btnLayers.Text = vrx["name"]
+        If cVars.Exist("clayer") Then
+          currLayer = cVars["clayer"]
+        Else
+          currLayer = "0"
+        Endif
+        'For Each var In cVars
+        'If var["name"] = "clayer" Then
+        'currLayer = v["name"]
+        btnLayers.Text = currLayer 'var["value"]
+        '   Break
+        ' Endif
+        'Next
         SelectingLayer = False
-        Break
       Else
         Wait 0.1
       Endif
@@ -1342,14 +1399,3 @@ Public Sub tmr500_Timer()
   Endif
 
 End
-
-' Public Sub Form_Activate()
-'
-'   Dim img As Image
-'
-'   If Starter.cLtypes[CStr(CurrentLtype)][2] Then
-'     img = Starter.cLtypes[CStr(CurrentLtype)][2]
-'     btnLtypes.Picture = img.Picture
-'   Endif
-'
-' End

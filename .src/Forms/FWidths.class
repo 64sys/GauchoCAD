@@ -20,15 +20,15 @@
 ' Foundation, Inc., 51 Franklin St, Fifth Floor,
 ' Boston, MA  02110-1301  USA
 '
-Private ltypes As Collection
+Private widths As Collection
 Private Coords As Integer[]
 Private wmax As Integer
 Private xForm As Form
 
-Public Sub _new(lty As Collection, cor As Integer[], frm As Form)
+Public Sub _new(lwi As Collection, cor As Integer[], frm As Form)
 
   xForm = frm
-  ltypes = lty
+  widths = lwi
   Coords = cor
 
 End
@@ -38,8 +38,8 @@ Public Sub Run() As Boolean
   Dim vrx As Variant
   Dim wtmp As Integer
 
-  For Each vrx In ltypes
-    wtmp = dsk.TextWidth(vrx[1], Me.Font.Name, Me.Font.Size) + 8 + vrx[2].Picture.Width
+  For Each vrx In widths
+    wtmp = dsk.TextWidth(widths.Key, Me.Font.Name, Me.Font.Size) + 16 + String.Len(CStr(vrx[0])) + vrx[1].Picture.Width
     If wtmp > wmax Then
       wmax = wtmp
     Endif
@@ -51,7 +51,7 @@ Public Sub Run() As Boolean
   GridView1.Columns[1].Expand = True
 
   GridView1.Rows.Count = 0
-  GridView1.Rows.Count = ltypes.Count
+  GridView1.Rows.Count = widths.Count
 
   Me.Width = wmax
 
@@ -72,18 +72,20 @@ Public Sub GridView1_Data(Row As Integer, Column As Integer)
 
   Select Column
     Case 0
-      GridView1[Row, Column].Text = CStr(Row)
-
-    Case 1
-
-      If ltypes[CStr(Row)][2] Then
-        img = ltypes[CStr(Row)][2]
-        GridView1[Row, Column].Picture = img.Picture
-      Else
-        img.Clear
+      If widths.Exist(CStr(Row)) Then
+        GridView1[Row, Column].Text = CStr(Row)
       Endif
 
-      GridView1[Row, Column].Text = ltypes[CStr(Row)][1]
+    Case 1
+      If widths.Exist(CStr(Row)) Then
+        If widths[CStr(Row)][0] Then
+          img = widths[CStr(Row)][1]
+          GridView1[Row, Column].Picture = img.Picture
+        Else
+          img.Clear
+        Endif
+        GridView1[Row, Column].Text = widths[CStr(Row)][0]
+      Endif
 
   End Select
 
@@ -109,9 +111,9 @@ Public Sub GridView1_Select()
   Dim vrx As Variant
   Dim iSty As Integer
 
-  For Each vrx In Starter.cStyles
-    If vrx[1] = GridView1[GridView1.Row, 1].Text Then
-      iSty = CInt(Starter.cStyles.Key)
+  For Each vrx In Starter.cWidths
+    If CStr(vrx[0]) = GridView1[GridView1.Row, 1].Text Then
+      iSty = CInt(Starter.cWidths.Key)
       Break
     Else
       iSty = -1
@@ -122,12 +124,12 @@ Public Sub GridView1_Select()
     Select xForm.Name
       Case "APPMain"
         fm = xForm
-        fm.CurrentLtype = iSty
-        fm.SelectingLtype = True
+        fm.CurrentWidth = iSty
+        fm.SelectingWidth = True
       Case "FLayers1"
         fl = xForm
-        fl.CurrentLtype = iSty 'fl.CurrentLtype = GridView1[GridView1.Row, 1].Text
-        fl.SelectingLtype = True
+        fl.CurrentWidth = iSty 'fl.CurrentLtype = GridView1[GridView1.Row, 1].Text
+        fl.SelectingWidht = True
     End Select
   Endif
 
@@ -143,10 +145,10 @@ Public Sub GridView1_LostFocus()
   Select xForm.Name
     Case "APPMain"
       fm = xForm
-      fm.SelectingLtype = True
+      fm.SelectingWidth = True
     Case "FLayers1"
       fl = xForm
-      fl.SelectingLtype = True
+      fl.SelectingWidht = True
   End Select
 
   Me.Close

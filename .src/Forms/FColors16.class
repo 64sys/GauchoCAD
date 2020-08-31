@@ -33,16 +33,16 @@ End
 Public Sub Form_Open()
 
   Dim i As Integer
-  Dim btn As ToolButton
+  'Dim btn As ToolButton
   Dim crs As New String[]
-  Dim img As Image
+  'Dim img As Image
   Dim s As Integer
   Dim r As Integer
   Dim g As Integer
   Dim b As Integer
   Dim j As Integer
   Dim k As Integer
-  Dim xPanel As Panel
+  'Dim xPanel As Panel
   Dim rw As Integer
 
   s = 20

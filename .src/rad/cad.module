@@ -70,7 +70,8 @@ Public Function SaveGaucho(sFile As String, cMdl As Collection)
         '
         ' Case "Version"
 
-      Case "Layers", "Colors", "Styles", "Weights", "DimSts", "Fonts", "Vars"
+        'Case "Layers", "Colors", "Styles", "Weights", "DimSts", "Fonts", "Vars"
+      Case "Layers", "Colors", "Weights", "DimSts", "Fonts", "Vars"
         For Each att In var
           writer.StartElement("header")
           For Each v In att
@@ -221,6 +222,9 @@ Public Function LoadGaucho(sFile As String) As Collection
 
   cMdl.Add(sFile, "File")
 
+  cMdl = Skeleton()
+  'cStyles = Styles()
+
   For Each ent In hxml.GetElementsByTagName("header")
     Select ent.Attributes["type"]
       Case "version"
@@ -239,15 +243,7 @@ Public Function LoadGaucho(sFile As String) As Collection
         c["style"] = CInt(ent.Attributes["style"])
         c["width"] = CInt(ent.Attributes["width"])
         c["print"] = CBool(ent.Attributes["print"])
-        'cLayers.Add(c.Copy(), Format(CInt(ent.Attributes["id"]), "00"))
         cLayers.Add(c.Copy(), ent.Attributes["id"])
-
-      Case "style"
-        c.Clear
-        c["id"] = ent.Attributes["id"]
-        c["type"] = ent.Attributes["type"]
-        c["name"] = ent.Attributes["name"]
-        cStyles.Add(c.Copy(), ent.Attributes["id"])
 
       Case "width"
         c.Clear
@@ -271,11 +267,12 @@ Public Function LoadGaucho(sFile As String) As Collection
         cFonts.Add(c.Copy(), ent.Attributes["id"])
 
       Case "vars"
-        c.Clear
-        c["id"] = ent.Attributes["id"]
-        c["name"] = ent.Attributes["name"]
-        c["value"] = ent.Attributes["value"]
-        cVars.Add(c.Copy(), ent.Attributes["id"])
+        'c.Clear
+        'c["id"] = ent.Attributes["id"]
+        'c["name"] = ent.Attributes["name"]
+        'c["value"] = ent.Attributes["value"]
+        'cVars.Add(c.Copy(), ent.Attributes["id"])
+        cVars.Add(ent.Attributes["value"], ent.Attributes["name"])
 
     End Select
   Next
@@ -357,6 +354,9 @@ Public Function LoadGaucho(sFile As String) As Collection
         Print c["a"]
 
     End Select
+
+    CheckModel()
+
     If c.Count > 0 Then
       'If c.Exist("id") Then
       cEntities.Add(c.Copy(), sKey)
@@ -370,6 +370,123 @@ Public Function LoadGaucho(sFile As String) As Collection
   cMdl.Add(cSout, "Entities")
 
   Return cMdl
+
+End
+
+'' This give the skeleton of a gaucho file as collection, a model collection including each section
+
+Public Function Skeleton() As Collection
+
+  Dim cMdl As New Collection
+
+  'cMdl.Add(cWidths, "Widths")
+  'cMdl.Add(cDimSts, "DimSts")
+  'cMdl.Add(cFonts, "Fonts")
+
+  ''
+  cMdl.Add(NewLayer(), "Layers")
+  cMdl.Add(NewVars(), "Vars")
+  cMdl.Add(Styles(), "Styles")
+
+  Return cMdl
+
+End
+
+Public Function CheckModel(cM As Collection) As Collection
+
+  If cM.Exist("Vars") = False Then
+    cM.Add(NewVars(), "Vars")
+  Endif
+
+  Return cM
+
+End
+
+'' This give the layer 0 and its information
+
+Public Function NewLayer() As Collection
+
+  Dim c As New Collection
+  Dim cLy As New Collection
+
+  c.Clear
+  c["id"] = "0"
+  c["type"] = "layer"
+  c["name"] = "0"
+  c["show"] = True
+  c["frozen"] = False
+  c["locked"] = False
+  c["colour"] = 0
+  c["style"] = 0
+  c["width"] = 0
+  c["print"] = True
+  cLy.Add(c.Copy(), "0")
+  c.Clear
+
+  Return cLy
+
+End
+
+Public Function NewVars() As Collection
+
+  Dim c As New Collection
+
+  c.add(1, "ltscale")
+  c.add(0, "attmode")
+  c.add(200, "textsize")
+  c.add("Standard", "textstyle")
+  c.add("0", "clayer")
+  c.add("ByLayer", "celtype")
+  c.add(0, "cecolor")
+  c.add(1, "celtscale")
+  c.add("Standard", "dimstyle")
+  c.add(4, "aunits")
+  c.add(10, "chamfera")
+  c.add(10, "chamferb")
+  c.add(0.0, "angbase")
+  c.add("Standard", "cmlstyle")
+  c.add(4, "insunits")
+
+  Return c
+
+End
+
+Public Function Styles() As Collection
+
+  Dim c As New Collection
+
+  c.Add([[3], "Continous"], "0")
+  c.Add([[14, 4, 4, 4], "Center"], "1")
+  c.Add([[10, 6, 3, 6], "Dashdot"], "2")
+  c.Add([[10, 6], "Dashed"], "3")
+  c.Add([[6, 4, 3, 4, 3, 4], "Divide"], "4")
+  c.Add([[3, 4], "Dot"], "5")
+  c.Add([[6, 4], "Hidden"], "6")
+  c.Add([[4, 3], "Hidden2"], "7")
+  c.Add([[12, 4, 4, 4, 4, 4], "Phantom"], "8")
+  c.Add([[3], "ByBLock"], "9")
+  c.Add([[3], "ByLayer"], "10")
+
+  Return c
+
+End
+
+Public Function NewWidths() As Collection
+
+  Dim c As New Collection
+
+  c.Add(0.1, "1")
+  c.Add(0.2, "2")
+  c.Add(0.3, "3")
+  c.Add(0.4, "4")
+  c.Add(0.5, "5")
+  c.Add(0.6, "6")
+  c.Add(0.7, "7")
+  c.Add(0.8, "8")
+  c.Add(0.9, "9")
+  c.Add(1.0, "10")
+
+  Return c
 
 End
 

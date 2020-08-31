@@ -50,7 +50,9 @@ Public flgWindowInfoColor As Integer           ' habria que agrupar todas las va
 Public cCommands As New Collection   '' Commands list
 Public cColors As New Collection     '' Colors list
 Public ColorsRGB As New String[]     '' Colors lists each item as r,g,b string
-Public cLtypes As New Collection     '' Linetypes list
+'Public cLtypes As New Collection     '' Linetypes list
+Public cStyles As New Collection     '' Linetypes list
+Public cWidths As New Collection     '' Widths list
 
 ' Variables de un solo uso
 Private ldd As Boolean              '' Testigo de finalización de carga.
@@ -67,9 +69,7 @@ End
 
 Public Sub Run()
 
-  '    Dim sFile As String
   Dim cex As New Collection         '' Colección con variables para pasar al siguiente módulo o formulario
-  '    Dim rpl As New Collection         '' Lista de nombres de tablas y campos y sus titulos para reemplazar nombres por titulos en el xml cuando es creado
   Dim thx As New String[]           '' Lista d etemas del editor interno
   Dim i As Integer
   Dim CADConfigData As New Collection
@@ -154,11 +154,14 @@ Public Sub Run()
   cCommands = LoadCommandsList()
 
   '' Load the colors list
-  cColors = LoadColors()
+  'cColors = LoadColors()
   ColorsRGB = cad.RGBColors()
 
   '' Load the linetypes list
-  cLtypes = LoadLtypes()
+  cStyles = cad.Styles()
+
+  '' Load the linetypes list
+  cWidths = cad.NewWidths()
 
   gcolor = cad.DecodeColor()
 
@@ -266,40 +269,40 @@ Private Function LoadCommandsList() As Collection
 
 End
 
-Private Function LoadColors() As Collection
-
-  Dim cColor As New Collection
-
-  cColor.Add(["ByBlock", 0], "0")
-  cColor.Add(["ByLayer", 256], "256")
-  cColor.Add([("Red"), 1], "1")
-  cColor.Add([("Yellow"), 2], "2")
-  cColor.Add([("Green"), 3], "3")
-  cColor.Add([("Cyan"), 4], "4")
-  cColor.Add([("Blue"), 5], "5")
-  cColor.Add([("Magenta"), 6], "6")
-  cColor.Add([("White"), 7], "7")
-
-  Return cColor
-
-End
-
-Public Function LoadLtypes() As Collection
-
-  Dim lty As New Collection
-
-  lty.Add([[3], "Continous"], "0") '1
-  lty.Add([[14, 4, 4, 4], "Center"], "1") '1
-  lty.Add([[10, 6, 3, 6], "Dashdot"], "2") '2
-  lty.Add([[10, 6], "Dashed"], "3") '3
-  lty.Add([[6, 4, 3, 4, 3, 4], "Divide"], "4") '4
-  lty.Add([[3, 4], "Dot"], "5") '6
-  lty.Add([[6, 4], "Hidden"], "6") '7
-  lty.Add([[4, 3], "Hidden2"], "7") '8
-  lty.Add([[12, 4, 4, 4, 4, 4], "Phantom"], "8") '9
-  lty.Add([[3], "ByBLock"], "9") '1
-  lty.Add([[3], "ByLayer"], "10") '1
-
-  Return lty
-
-End
+' Private Function LoadColors() As Collection
+'
+'   Dim cColor As New Collection
+'
+'   cColor.Add(["ByBlock", 0], "0")
+'   cColor.Add(["ByLayer", 256], "256")
+'   cColor.Add([("Red"), 1], "1")
+'   cColor.Add([("Yellow"), 2], "2")
+'   cColor.Add([("Green"), 3], "3")
+'   cColor.Add([("Cyan"), 4], "4")
+'   cColor.Add([("Blue"), 5], "5")
+'   cColor.Add([("Magenta"), 6], "6")
+'   cColor.Add([("White"), 7], "7")
+'
+'   Return cColor
+'
+' End
+'
+' Public Function LoadLtypes() As Collection
+'
+'   Dim lty As New Collection
+'
+'   lty.Add([[3], "Continous"], "0") '1
+'   lty.Add([[14, 4, 4, 4], "Center"], "1") '1
+'   lty.Add([[10, 6, 3, 6], "Dashdot"], "2") '2
+'   lty.Add([[10, 6], "Dashed"], "3") '3
+'   lty.Add([[6, 4, 3, 4, 3, 4], "Divide"], "4") '4
+'   lty.Add([[3, 4], "Dot"], "5") '6
+'   lty.Add([[6, 4], "Hidden"], "6") '7
+'   lty.Add([[4, 3], "Hidden2"], "7") '8
+'   lty.Add([[12, 4, 4, 4, 4, 4], "Phantom"], "8") '9
+'   lty.Add([[3], "ByBLock"], "9") '1
+'   lty.Add([[3], "ByLayer"], "10") '1
+'
+'   Return lty
+'
+' End
