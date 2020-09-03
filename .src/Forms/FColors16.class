@@ -91,6 +91,7 @@ End
 Public Sub GridView1_Select()
 
   Dim fl As FLayers1
+  Dim fm As APPMain
   Dim k As Integer
 
   Select xForm.Name
@@ -99,6 +100,11 @@ Public Sub GridView1_Select()
       fl.SelectingColor = True
       k = (GridView1.Row * 16) + GridView1.Column
       fl.CurrentColor = k
+    Case "APPMain"
+      fm = xForm
+      fm.SelectingColor = True
+      k = (GridView1.Row * 16) + GridView1.Column
+      fm.CurrentColor = k
   End Select
 
   Me.Close(True)

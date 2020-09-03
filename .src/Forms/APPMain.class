@@ -925,14 +925,13 @@ Public Sub btnColors_MouseDown()
   Dim g As Integer
   Dim b As Integer
   Dim img As Image
-
-  Dim clr As FColors
+  Dim FClr As FColors16
 
   If SelectingColor = False Then
-    clr = New FColors(CurrentColor, [Me.ScreenX, Me.ScreenY])
-    clr.Border = False
-    clr.Stacking = Window.Above
-    clr.Run()
+    FClr = New FColors16([btnColors.ScreenX, btnColors.ScreenY + btnColors.H], Me)
+    FClr.Border = False
+    FClr.Stacking = Window.Above
+    FClr.Show()
     Do
       If SelectingColor = True Then
         r = CInt(Split(Starter.ColorsRGB[CurrentColor], ",")[0])
@@ -953,7 +952,7 @@ Public Sub btnColors_MouseDown()
         SelectingColor = False
         Break
       Else
-        Wait 0.001
+        Wait 0.01
       Endif
     Loop
   Endif
