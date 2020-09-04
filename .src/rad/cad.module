@@ -439,6 +439,7 @@ Public Function NewVars() As Collection
   c.add("ByLayer", "celtype")
   c.add(0, "cecolor")
   c.add(1, "celtscale")
+  c.add(1, "celweight")
   c.add("Standard", "dimstyle")
   c.add(4, "aunits")
   c.add(10, "chamfera")

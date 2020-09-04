@@ -355,39 +355,8 @@
         MoveScaled(41,0,5,5)
         Background = Color.Yellow
       }
-      { mubColors MenuButton
-        MoveScaled(59,0,6,5)
-        Visible = False
-        Arrow = False
-        MenuOnly = True
-      }
-      { cboLayers ComboBox dprop
-        Name = "cboLayers"
-        MoveScaled(68,0,15,5)
-        Visible = False
-        Tag = "layer"
-        ToolTip = ("Layers")
-        ReadOnly = True
-      }
-      { tobLayers ToolButton
-        MoveScaled(84,0,5,5)
-        Visible = False
-        Picture = Picture["svg/layers/layers.svg"]
-        Border = True
-      }
-      { cboWidths ComboBox dprop
-        Name = "cboWidths"
-        MoveScaled(90,0,14,5)
-        Tag = "weight"
-        ToolTip = ("Line widths")
-        ReadOnly = True
-      }
-      { cboDimSts ComboBox dprop
-        Name = "cboDimSts"
-        MoveScaled(105,0,14,5)
-        Tag = "style"
-        ToolTip = ("Dimmension styles")
-        ReadOnly = True
+      { btnWidths Button
+        MoveScaled(49,0,15,5)
       }
     }
     { PanEdit1 Panel

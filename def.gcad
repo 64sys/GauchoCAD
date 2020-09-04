@@ -14,6 +14,7 @@
 <header id="5" type="vars" name="celtype" value="ByLayer" />
 <header id="6" type="vars" name="cecolor" value="0" />
 <header id="7" type="vars" name="celtscale" value="1" />
+<header id="7" type="vars" name="celweight" value="1" />
 <header id="8" type="vars" name="dimstyle" value="Standard" />
 <header id="9" type="vars" name="aunits" value="4" />
 <header id="10" type="vars" name="chamfera" value="10" />

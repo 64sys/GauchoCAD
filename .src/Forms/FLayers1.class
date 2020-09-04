@@ -346,12 +346,17 @@ Public Sub LTask(lTask As String)
                   Endif
                 Case "width"
                   For Each vrx In Starter.cWidths
-                    If vrx[0] = CFloat(TableView1[r, i].Text) Then
-                      xlay[lbx[i]] = Starter.cWidths.Key
-                      Break
+                    If TableView1[r, i].Text <> "" Then
+                      If vrx[0] = CFloat(TableView1[r, i].Text) Then
+                        xlay[lbx[i]] = Starter.cWidths.Key
+                        Break
+                      Else
+                        xlay[lbx[i]] = "1"
+                      Endif
                     Else
                       xlay[lbx[i]] = "1"
                     Endif
+
                   Next
                   ' If Starter.cWidths.Exist(TableView1[r, i].Text) Then
                   '   xlay[lbx[i]] = CInt(TableView1[r, i].Text)
@@ -461,7 +466,7 @@ Public Sub TableView1_Click()
     Case "colour"
 
       If SelectingColor = False Then
-        FClr = New FColors16([Me.ScreenX, Me.ScreenY], Me)
+        FClr = New FColors16([Me.ScreenX + TableView1.Current.X, Me.ScreenY], Me)
         FClr.Border = False
         FClr.Stacking = Window.Above
         FClr.Show()

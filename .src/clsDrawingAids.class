@@ -115,7 +115,7 @@ Public Sub DibujaHelper()
   If puntos.Gridactive Then HelperDibujo = HelperDibujo & "  F7-Grid = " & Format$(puntos.GridSpacing, "0.00 m")
   ' and so on...
 
-  texting(HelperDibujo, 40, 10 - appmain.hFcad.glarea1.h / 2, Starter.flgWindowInfoColor) ' Tincho - toma color de la configuración
+  texting(HelperDibujo, 40, 10 - APPMain.hFcad.glarea1.h / 2, Starter.flgWindowInfoColor) ' Tincho - toma color de la configuración
 
   ' helper del mouse
   If Len(Helper.Texto) = 0 Then Return

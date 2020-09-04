@@ -164,10 +164,11 @@ Public Sub Run(cin As Collection)
   btnColors.Reparent(pnlFile)
   btnLtypes.Reparent(pnlFile)
   btnLayers.Reparent(pnlFile)
+  btnWidths.Reparent(pnlFile)
   'cboLayers.Reparent(pnlFile)
-  '  tobLayers.Reparent(pnlFile)
-  cboWidths.Reparent(pnlFile)
-  cboDimSts.Reparent(pnlFile)
+  'tobLayers.Reparent(pnlFile)
+  'cboWidths.Reparent(pnlFile)
+  'cboDimSts.Reparent(pnlFile)
 
   AddLtypesPics()
 
@@ -175,6 +176,9 @@ Public Sub Run(cin As Collection)
 
   btnLtypes.Picture = Starter.cStyles["0"][2].Picture
   btnLtypes.Tooltip = Starter.cStyles["0"][1]
+
+  btnWidths.Picture = Starter.cWidths["1"][1].Picture
+  btnWidths.Tooltip = Starter.cWidths["1"][0]
 
   If CurrentColor = 0 Then
     CurrentColor = 3
@@ -277,22 +281,22 @@ End
 '   Next
 '
 ' End
-
-Public Sub Clx_Click()
-
-  Dim obj As Object
-
-  obj = Last
-
-  CurrentColor = obj.Tag
-  mubColors.Picture = obj.Picture
-  mubColors.Text = obj.Text
-  mubColors.Tooltip = obj.Text
-
-  txaDebug.Pos = 0
-  txaDebug.Insert(obj.Text & " is the current color\n")
-
-End
+'
+' Public Sub Clx_Click()
+'
+'   Dim obj As Object
+'
+'   obj = Last
+'
+'   CurrentColor = obj.Tag
+'   mubColors.Picture = obj.Picture
+'   mubColors.Text = obj.Text
+'   mubColors.Tooltip = obj.Text
+'
+'   txaDebug.Pos = 0
+'   txaDebug.Insert(obj.Text & " is the current color\n")
+'
+' End
 
 Public Sub AddLtypesPics()
 
@@ -375,7 +379,7 @@ Public Sub AddWidthsPics()
       Paint.Brush = Paint.Color(Color.White)
     Endif
 
-    Paint.LineWidth = wt
+    Paint.LineWidth = wt * 3
     Paint.MoveTo(4, 4)
     Paint.LineTo(btnLtypes.Width - 4, 4)
     Paint.Stroke
@@ -550,46 +554,53 @@ End
 
 Public Sub LoadComboboxes(cMdl As Collection)
 
-  'Dim aLayer As Variant
-  'Dim aStyle As Variant
-  Dim aWidth As Variant
-  Dim aDimSt As Variant
   Dim cVars As Collection
 
   cMod = cMdl
 
-  'cboLayers.Clear
-  cboWidths.Clear
-  cboDimSts.Clear
-
   If cMdl.Exist("Vars") Then
+
     cVars = cMdl["Vars"]
+
     If cVars.Exist("clayer") Then
       CurrentLayer = cVars["clayer"]
     Else
       CurrentLayer = "0"
     Endif
+
+    If cVars.Exist("cecolor") Then
+      If cVars["cecolor"] <> "" Then
+        CurrentColor = CInt(cVars["cecolor"])
+      Endif
+    Else
+      CurrentColor = 1
+    Endif
+
+    If cVars.Exist("celtype") Then
+      If Starter.cStyles.Exist(cVars["celtype"]) Then
+        CurrentLtype = Starter.cStyles[cVars["celtype"]]
+      Else
+        CurrentLtype = 1 'cVars["celtype"]
+      Endif
+    Else
+      CurrentLtype = 1
+    Endif
+
+    If cVars.Exist("celweight") Then
+      If Starter.cWidths.Exist(cVars["celweight"]) Then
+        CurrentWidth = Starter.cWidths[cVars["celweight"]]
+      Else
+        CurrentWidth = 1
+      Endif
+
+    Else
+      CurrentWidth = 1
+    Endif
+
     btnLayers.Text = CurrentLayer
-  Endif
+    'btnWidths.
+    ColorButtonRefresh(CurrentColor)
 
-  If cMdl.Exist("Widths") Then
-    For Each aWidth In cMdl["Widths"]
-      cboWidths.Add(aWidth["value"])
-    Next
-    For Each aWidth In cMdl["Widths"]
-      cboWidths.Text = aWidth["value"]
-      Break
-    Next
-  Endif
-
-  If cMdl.Exist("DimSts") Then
-    For Each aDimSt In cMdl["DimSts"]
-      cboDimSts.Add(aDimSt["name"])
-    Next
-    For Each aDimSt In cMdl["DimSts"]
-      cboDimSts.Text = aDimSt["name"]
-      Break
-    Next
   Endif
 
 End
@@ -919,12 +930,71 @@ Public Sub btnLtypes_MouseDown()
 
 End
 
+Public Sub btnWidths_MouseDown()
+
+  Dim frm As FWidths
+  Dim vrx As Variant[]
+  Dim img2 As Image
+
+  If SelectingLtype = False Then
+    frm = New FWidths(Starter.cWidths, [btnWidths.ScreenX, btnWidths.ScreenY + btnWidths.H], Me)
+    frm.Run()
+    Do
+      If SelectingWidth = True Then
+        vrx = Starter.cWidths[CStr(CurrentWidth)]
+        If vrx.Count > 1 Then
+          If Object.Type(vrx[1]) = "Image" Then
+            img2 = vrx[1]
+            btnWidths.Picture = img2.Picture
+            'btnWidths.Text = CStr(vrx[0])
+            btnWidths.Tooltip = ("Width") & " " & CStr(vrx[0]) & " mm"
+          Endif
+        Endif
+        SelectingWidth = False
+        Break
+      Else
+        Wait 0.1
+      Endif
+    Loop
+  Endif
+
+End
+
+' Public Sub btnWidths_MouseDown()
+'
+'   Dim lst As FWidths
+'   Dim vrx As Variant[]
+'   Dim img2 As Image
+'
+'   If SelectingLtype = False Then
+'     lst = New FWidths(Starter.cWidths, [btnWidths.ScreenX, btnWidths.ScreenY + btnWidths.H], Me)
+'     lst.Run()
+'     Do
+'       If SelectingWidth = True Then
+'         vrx = Starter.cWidths[CStr(CurrentWidth)]
+'         If vrx.Count > 2 Then
+'           If Object.Type(vrx[2]) = "Image" Then
+'             img2 = vrx[2]
+'             btnWidths.Picture = img2.Picture
+'             btnWidths.Tooltip = vrx[1]
+'           Endif
+'         Endif
+'         SelectingWidth = False
+'         Break
+'       Else
+'         Wait 0.1
+'       Endif
+'     Loop
+'   Endif
+'
+' End
+
 Public Sub btnColors_MouseDown()
 
-  Dim r As Integer
-  Dim g As Integer
-  Dim b As Integer
-  Dim img As Image
+  ' Dim r As Integer
+  ' Dim g As Integer
+  ' Dim b As Integer
+  ' Dim img As Image
   Dim FClr As FColors16
 
   If SelectingColor = False Then
@@ -934,21 +1004,22 @@ Public Sub btnColors_MouseDown()
     FClr.Show()
     Do
       If SelectingColor = True Then
-        r = CInt(Split(Starter.ColorsRGB[CurrentColor], ",")[0])
-        g = CInt(Split(Starter.ColorsRGB[CurrentColor], ",")[1])
-        b = CInt(Split(Starter.ColorsRGB[CurrentColor], ",")[2])
-        imgColor = New Image(btnColors.H - 2, btnColors.H - 2, Color.RGB(r, g, b), 0)
-        img = dsk.ImageFrame(imgColor)
-        btnColors.Picture = img.Picture
-        btnColors.Refresh
-        Select CurrentColor
-          Case 256
-            btnColors.Tooltip = ("Color") & ": " & "ByBlock"
-          Case 257
-            btnColors.Tooltip = ("Color") & ": " & "ByLayer"
-          Case Else
-            btnColors.Tooltip = ("Color") & ": " & CStr(CurrentColor)
-        End Select
+        ' r = CInt(Split(Starter.ColorsRGB[CurrentColor], ",")[0])
+        ' g = CInt(Split(Starter.ColorsRGB[CurrentColor], ",")[1])
+        ' b = CInt(Split(Starter.ColorsRGB[CurrentColor], ",")[2])
+        ' imgColor = New Image(btnColors.H - 2, btnColors.H - 2, Color.RGB(r, g, b), 0)
+        ' img = dsk.ImageFrame(imgColor)
+        ' btnColors.Picture = img.Picture
+        ' btnColors.Refresh
+        ' Select CurrentColor
+        '   Case 256
+        '     btnColors.Tooltip = ("Color") & ": " & "ByBlock"
+        '   Case 257
+        '     btnColors.Tooltip = ("Color") & ": " & "ByLayer"
+        '   Case Else
+        '     btnColors.Tooltip = ("Color") & ": " & CStr(CurrentColor)
+        ' End Select
+        ColorButtonRefresh(CurrentColor)
         SelectingColor = False
         Break
       Else
@@ -956,6 +1027,31 @@ Public Sub btnColors_MouseDown()
       Endif
     Loop
   Endif
+
+End
+
+Public Sub ColorButtonRefresh(currColor As Integer)
+
+  Dim r As Integer
+  Dim g As Integer
+  Dim b As Integer
+  Dim img As Image
+
+  r = CInt(Split(Starter.ColorsRGB[currColor], ",")[0])
+  g = CInt(Split(Starter.ColorsRGB[currColor], ",")[1])
+  b = CInt(Split(Starter.ColorsRGB[currColor], ",")[2])
+  imgColor = New Image(btnColors.H - 2, btnColors.H - 2, Color.RGB(r, g, b), 0)
+  img = dsk.ImageFrame(imgColor)
+  btnColors.Picture = img.Picture
+  btnColors.Refresh
+  Select CurrentColor
+    Case 256
+      btnColors.Tooltip = ("Color") & ": " & "ByBlock"
+    Case 257
+      btnColors.Tooltip = ("Color") & ": " & "ByLayer"
+    Case Else
+      btnColors.Tooltip = ("Color") & ": " & CStr(CurrentColor)
+  End Select
 
 End
 
@@ -1372,29 +1468,29 @@ Public Sub Form_KeyPress()
       Endif
 
   End Select
-  tmr500_timer
+  ' tmr500_timer
 
 End
 
-Public Sub tmr500_Timer()
-
-  If clsDrawingAids.PromtSlash = "|" Then clsDrawingAids.PromtSlash = "" Else clsDrawingAids.PromtSlash = "|"
-  clsDrawingAids.DibujaHelper
-  If clsDrawingAids.ErrorMessage <> "" Then
-
-    lblCommand.Text = clsDrawingAids.ErrorMessage
-    lblCommand.Foreground = Color.Red
-    Inc TmrTicks
-
-    If TmrTicks = 10 Then
-      clsDrawingAids.ErrorMessage = ""
-      TmrTicks = 0
-    End If
-
-  Else
-    lblCommand.Foreground = Color.Black
-    lblCommand.Text = clsDrawingAids.trabajoYteclado
-
-  Endif
-
-End
+' Public Sub tmr500_Timer()
+'
+'   If clsDrawingAids.PromtSlash = "|" Then clsDrawingAids.PromtSlash = "" Else clsDrawingAids.PromtSlash = "|"
+'   clsDrawingAids.DibujaHelper
+'   If clsDrawingAids.ErrorMessage <> "" Then
+'
+'     lblCommand.Text = clsDrawingAids.ErrorMessage
+'     lblCommand.Foreground = Color.Red
+'     Inc TmrTicks
+'
+'     If TmrTicks = 10 Then
+'       clsDrawingAids.ErrorMessage = ""
+'       TmrTicks = 0
+'     End If
+'
+'   Else
+'     lblCommand.Foreground = Color.Black
+'     lblCommand.Text = clsDrawingAids.trabajoYteclado
+'
+'   Endif
+'
+' End

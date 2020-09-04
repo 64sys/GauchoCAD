@@ -63,7 +63,9 @@ Public Sub Main()
 
   gcd.Main
 
-  APPMain.Workspace1.ActiveWindow.SetFocus
+  If APPMain.Workspace1.ActiveWindow Then
+    APPMain.Workspace1.ActiveWindow.SetFocus
+  Endif
 
 End
 

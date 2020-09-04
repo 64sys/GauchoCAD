@@ -934,102 +934,102 @@ Public Sub LoadDrawingMap2()
 
 End
 
-Public Sub LoadDrawingMap()
-
-  Dim cLayers As New Collection
-  Dim Layer As Variant
-  Dim app As APPMain
-  Dim ito As Variant
-  Dim it As Variant
-  Dim sKey As String
-  Dim sName As String
-  Dim mt As Variant
-  Dim mEt As Variant
-
-  If cModel.Count > 0 Then
-    TreeView1.Clear
-    TreeView1.Add("drawing", "Drawing")
-
-    'File ----------------------
-    If cModel.Exist("File") Then
-      TreeView1.Add("file", ("File") & ": " & File.Name(cModel["File"]),, "drawing")
-    Endif
-    'Version ----------------------
-    If cModel.Exist("Version") Then
-      TreeView1.Add("version", ("Version") & ": " & cModel["Version"],, "drawing")
-    Endif
-
-    cLayers.Clear
-    'Layers ----------------------
-    If cModel.Exist("Layers") Then
-      cLayers = cModel["Layers"]
-      TreeView1.Add("layers", "Layers",, "drawing")
-      For Each Layer In cLayers
-        TreeView1.Add(Layer["name"], Layer["name"],, "layers")
-      Next
-    Endif
-    'Styles ------------------------
-    'Widths ------------------------
-    'Dims --------------------------
-    'Fonts -------------------------
-
-    'Entities ----------------------
-    For Each mt In cModel
-
-      If TreeView1.Exist(cModel.Key) = False Then
-        TreeView1.Add(cModel.Key, cModel.Key,, "drawing")
-      Endif
-
-      Select cModel.Key
-        Case "Entities"
-          mEt = cModel[cModel.Key]
-          For Each mt In mEt
-            sName = String.LCase(mt["entity"])
-            If TreeView1.Exist("m" & sName) = False Then
-              TreeView1.Add("m" & sName, sName,, cModel.Key)
-            Endif
-          Next
-
-      End Select
-
-    Next
-
-    TreeView1["layers"].Expanded = True
-  Endif
-
-  If cImport.Count > 0 Then
-    TreeView1.Add("import", "Import")
-    For Each ito In cImport
-      sKey = cImport.Key
-      Select TypeOf(ito)
-        Case gb.Object
-          TreeView1.Add("i" & sKey, sKey,, "import")
-          For Each it In ito
-            Select sKey
-              Case "Entities"
-                sName = String.LCase(ito[ito.Key]["entity"])
-                If TreeView1.Exist("i" & sName) = False Then
-                  TreeView1.Add("i" & sName, sName,, "i" & sKey)
-                Endif
-              Case "Block"
-                sName = ito[ito.Key]["block"]
-                If TreeView1.Exist("i" & sName) = False Then
-                  TreeView1.Add("i" & sName, sName,, "i" & sKey)
-                Endif
-              Case Else
-                If TreeView1.Exist("i" & ito.Key) = False Then
-                  TreeView1.Add("i" & ito.Key, sName,, "i" & sKey)
-                Endif
-
-            End Select
-
-          Next
-        Case gb.String
-          TreeView1.Add("i" & sKey, sKey,, "import")
-      End Select
-    Next
-  Endif
-  APP = Me.Parent.Parent.Parent.Parent.Parent.Parent
-  APPMain.LoadComboboxes(cModel)
-
-End
+' Public Sub LoadDrawingMap()
+'
+'   Dim cLayers As New Collection
+'   Dim Layer As Variant
+'   Dim app As APPMain
+'   Dim ito As Variant
+'   Dim it As Variant
+'   Dim sKey As String
+'   Dim sName As String
+'   Dim mt As Variant
+'   Dim mEt As Variant
+'
+'   If cModel.Count > 0 Then
+'     TreeView1.Clear
+'     TreeView1.Add("drawing", "Drawing")
+'
+'     'File ----------------------
+'     If cModel.Exist("File") Then
+'       TreeView1.Add("file", ("File") & ": " & File.Name(cModel["File"]),, "drawing")
+'     Endif
+'     'Version ----------------------
+'     If cModel.Exist("Version") Then
+'       TreeView1.Add("version", ("Version") & ": " & cModel["Version"],, "drawing")
+'     Endif
+'
+'     cLayers.Clear
+'     'Layers ----------------------
+'     If cModel.Exist("Layers") Then
+'       cLayers = cModel["Layers"]
+'       TreeView1.Add("layers", "Layers",, "drawing")
+'       For Each Layer In cLayers
+'         TreeView1.Add(Layer["name"], Layer["name"],, "layers")
+'       Next
+'     Endif
+'     'Styles ------------------------
+'     'Widths ------------------------
+'     'Dims --------------------------
+'     'Fonts -------------------------
+'
+'     'Entities ----------------------
+'     For Each mt In cModel
+'
+'       If TreeView1.Exist(cModel.Key) = False Then
+'         TreeView1.Add(cModel.Key, cModel.Key,, "drawing")
+'       Endif
+'
+'       Select cModel.Key
+'         Case "Entities"
+'           mEt = cModel[cModel.Key]
+'           For Each mt In mEt
+'             sName = String.LCase(mt["entity"])
+'             If TreeView1.Exist("m" & sName) = False Then
+'               TreeView1.Add("m" & sName, sName,, cModel.Key)
+'             Endif
+'           Next
+'
+'       End Select
+'
+'     Next
+'
+'     TreeView1["layers"].Expanded = True
+'   Endif
+'
+'   If cImport.Count > 0 Then
+'     TreeView1.Add("import", "Import")
+'     For Each ito In cImport
+'       sKey = cImport.Key
+'       Select TypeOf(ito)
+'         Case gb.Object
+'           TreeView1.Add("i" & sKey, sKey,, "import")
+'           For Each it In ito
+'             Select sKey
+'               Case "Entities"
+'                 sName = String.LCase(ito[ito.Key]["entity"])
+'                 If TreeView1.Exist("i" & sName) = False Then
+'                   TreeView1.Add("i" & sName, sName,, "i" & sKey)
+'                 Endif
+'               Case "Block"
+'                 sName = ito[ito.Key]["block"]
+'                 If TreeView1.Exist("i" & sName) = False Then
+'                   TreeView1.Add("i" & sName, sName,, "i" & sKey)
+'                 Endif
+'               Case Else
+'                 If TreeView1.Exist("i" & ito.Key) = False Then
+'                   TreeView1.Add("i" & ito.Key, sName,, "i" & sKey)
+'                 Endif
+'
+'             End Select
+'
+'           Next
+'         Case gb.String
+'           TreeView1.Add("i" & sKey, sKey,, "import")
+'       End Select
+'     Next
+'   Endif
+'   APP = Me.Parent.Parent.Parent.Parent.Parent.Parent
+'   APPMain.LoadComboboxes(cModel)
+'
+' End
