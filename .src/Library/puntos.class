@@ -130,21 +130,15 @@ End
 
 '' Devuelve el segmento en el que esta el punto, considerando la tolerancia numerica
 '' o -1 si no estan en ningun segmento. Si el punto esta en un vertice, devuelve el primer segmento.
-Public Function inPolySegment(poligon As Float[], px As Float, py As Float) As Integer
+Public Function inPolySegment(poligon As Float[], px As Float, py As Float, Optional Tolerance As Float = 0) As Integer
 
   Dim i As Integer
 
-  For i = 0 To poligon.Count - 4 Step 2
+    If tolerance = 0 Then tolerance = NumericTolerance
 
-    If ((poligon[i + 2] - poligon[i]) <> 0) And ((px - poligon[i]) <> 0) Then
+    For i = 0 To poligon.Count - 4 Step 2
 
-      If Abs(Abs((poligon[i + 3] - poligon[i + 1]) / (poligon[i + 2] - poligon[i])) - Abs((py - poligon[i + 1]) / (px - poligon[i]))) < NumericTolerance Then Return (i + 2) / 2
-
-    Else If ((poligon[i + 2] - poligon[i]) = 0) And ((px - poligon[i]) = 0) Then
-
-      If InBetween(py, poligon[i + 1], poligon[i + 3]) Then Return (i + 2) / 2
-
-    Endif
+        If PointToLineDistance([px, py], poligon.Copy(i, 4)) <= tolerance Then Return (i + 2) / 2
 
   Next
 
