@@ -171,7 +171,7 @@ Public Sub Run(cin As Collection)
   'cboDimSts.Reparent(pnlFile)
 
   AddLtypesPics()
-
+  AddColorsPics()
   AddWidthsPics()
 
   btnLtypes.Picture = Starter.cStyles["0"][2].Picture
@@ -393,7 +393,7 @@ End
 
 Public Sub AddColorsPics()
 
-  Dim lt As Variant
+  Dim lt As Variant[]
   Dim img As Image
 
   For Each lt In Starter.cColors
@@ -401,6 +401,7 @@ Public Sub AddColorsPics()
     img = New Image(16, 16, btnLtypes.Background)
 
     Paint.Begin(img)
+
     Paint.NewPath
 
     Select Starter.flgWhiteAndBlack
@@ -411,6 +412,7 @@ Public Sub AddColorsPics()
     End Select
 
     Paint.Begin(img)
+    Paint.LineWidth = 2
     Paint.Arc(8, 8, 7, 0, 2 * Pi)
     Paint.Brush = Paint.Color(Val(Starter.cColors.Key))
     Paint.Fill(True)
@@ -418,7 +420,8 @@ Public Sub AddColorsPics()
     Paint.Stroke()
     Paint.End
 
-    Starter.cColors[Starter.cColors.Key].Add(img)
+    'lt.Insert([img.Copy()])
+    Starter.cColors[Starter.cColors.Key][1] = img.Copy()
 
   Next
 
@@ -1042,7 +1045,9 @@ Public Sub ColorButtonRefresh(currColor As Integer)
   b = CInt(Split(Starter.ColorsRGB[currColor], ",")[2])
   imgColor = New Image(btnColors.H - 2, btnColors.H - 2, Color.RGB(r, g, b), 0)
   img = dsk.ImageFrame(imgColor)
+  'img = Starter.cColors[CStr(currColor)][1]
   btnColors.Picture = img.Picture
+  'btnColors.Picture = imgColor.Picture
   btnColors.Refresh
   Select CurrentColor
     Case 256

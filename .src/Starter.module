@@ -158,6 +158,9 @@ Public Sub Run()
   '' Load the colors list
   'cColors = LoadColors()
   ColorsRGB = cad.RGBColors()
+  For i = 0 To ColorsRGB.Max
+    cColors.Add([ColorsRGB[i], True], CStr(i))
+  Next
 
   '' Load the linetypes list
   cStyles = cad.Styles()

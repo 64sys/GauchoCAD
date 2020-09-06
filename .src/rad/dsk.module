@@ -69,29 +69,76 @@ End
 
 '' Return the same image but with a frame
 
+Public Function ImageDot(xColor As Integer) As Image
+
+  Dim hColor As ColorInfo
+  Dim img As Image
+  Dim D As Integer
+
+  hColor = Color[Color.ButtonBackground]
+
+  img = New Image(128, 128)
+
+  Paint.Begin(img)
+
+  Paint.MoveTo(64, 64)
+
+  Paint.Arc(64, 64, 60, 0, 2 * Pi)
+  Paint.ClosePath
+
+  Paint.LineWidth = 10
+  'Paint.Brush = Paint.Color(Color.Blue)
+  Paint.Brush = Paint.Color(xColor)
+  Paint.Fill(True)
+
+  If hColor.Luminance > 160 Then
+    Paint.Brush = Paint.Color(Color.Black)
+  Else
+    Paint.Brush = Paint.Color(Color.White)
+  Endif
+
+  Paint.Stroke
+
+  Paint.End
+
+  Return img
+
+End
+
+'' Return the same image but with a frame
+
 Public Function ImageFrame(img As Image) As Image
 
-  Dim lt As Variant
+  'Dim lt As Variant
   'Dim img As Image
 
-  For Each lt In Starter.cColors
+  'For Each lt In Starter.cColors
+  Dim hColor As ColorInfo
 
-    Paint.Begin(img)
-    Paint.NewPath
+  hColor = Color[Color.ButtonBackground]
+
+  Paint.Begin(img)
+  Paint.NewPath
+
+  If hColor.Luminance > 160 Then
     Paint.Brush = Paint.Color(Color.Black)
+  Else
+    Paint.Brush = Paint.Color(Color.White)
+  Endif
 
-    Paint.LineWidth = 1
-    Paint.MoveTo(1, 1)
+  '  Paint.Brush = Paint.Color(Color.Black)
 
-    Paint.LineTo(img.W - 1, 1)
-    Paint.LineTo(img.W - 1, img.H - 1)
-    Paint.LineTo(1, img.H - 1)
-    Paint.LineTo(1, 1)
-    Paint.LineTo(img.W - 1, 1)
+  Paint.LineWidth = 2
+  Paint.MoveTo(1, 1)
+  Paint.LineTo(img.W - 1, 1)
+  Paint.LineTo(img.W - 1, img.H - 1)
+  Paint.LineTo(1, img.H - 1)
+  Paint.LineTo(1, 1)
+  Paint.LineTo(img.W - 1, 1)
 
-    Paint.Stroke
-    Paint.End
-  Next
+  Paint.Stroke
+  Paint.End
+  'Next
   Return img
 
 End

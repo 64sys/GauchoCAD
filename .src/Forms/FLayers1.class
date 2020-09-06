@@ -141,6 +141,7 @@ Public Sub TableView1_Data(Row As Integer, Column As Integer)
   Dim b As Integer
   Dim current As Boolean
   Dim vrx As Variant[]
+  Dim img As Image
 
   If cVars.Exist("clayer") Then
     current = True
@@ -200,7 +201,15 @@ Public Sub TableView1_Data(Row As Integer, Column As Integer)
       r = CInt(Split(Starter.ColorsRGB[st], ",")[0])
       g = CInt(Split(Starter.ColorsRGB[st], ",")[1])
       b = CInt(Split(Starter.ColorsRGB[st], ",")[2])
-      TableView1[Row, Column].Background = Color.RGB(r, g, b)
+
+      TableView1[TableView1.Row, TableView1.Column].Text = CurrentColor
+      If img Then
+        img.Clear
+        TableView1[Row, Column].Picture.Clear
+      Endif
+      img = dsk.ImageDot(Color.RGB(r, g, b)).Stretch(TableView1.Rows.Height - 1, TableView1.Rows.Height - 1)
+
+      TableView1[Row, Column].Picture = img.Picture
 
     Case "style"
       For Each vrx In Starter.cStyles
@@ -409,6 +418,7 @@ Public Sub TableView1_Click()
   Dim lst As FLtypes
   Dim wts As FWidths
   Dim vrx As Variant[]
+  Dim img As Image
 
   Select lbx[TableView1.Column]
 
@@ -475,8 +485,14 @@ Public Sub TableView1_Click()
             r = CInt(Split(Starter.ColorsRGB[CurrentColor], ",")[0])
             g = CInt(Split(Starter.ColorsRGB[CurrentColor], ",")[1])
             b = CInt(Split(Starter.ColorsRGB[CurrentColor], ",")[2])
-            TableView1[TableView1.Row, TableView1.Column].Background = Color.RGB(r, g, b)
+
+            'TableView1[TableView1.Row, TableView1.Column].Background = Color.RGB(r, g, b)
             TableView1[TableView1.Row, TableView1.Column].Text = CurrentColor
+
+            img = dsk.ImageDot(Color.RGB(r, g, b)).Stretch(TableView1.Rows.Height - 1, TableView1.Rows.Height - 1)
+
+            TableView1[TableView1.Row, TableView1.Column].Picture = img.Picture
+
             Print CurrentColor
             SelectingColor = False
             Break
