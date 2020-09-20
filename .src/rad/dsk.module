@@ -67,7 +67,7 @@ Public Function MimeAppPicture(strApp As String, intSize As Integer) As Picture 
 
 End
 
-'' Return the same image but with a frame
+'' Returns a circular image with the color indicated as a parameter
 
 Public Function ImageDot(xColor As Integer) As Image
 
@@ -83,11 +83,25 @@ Public Function ImageDot(xColor As Integer) As Image
 
   Paint.MoveTo(64, 64)
 
+  Paint.Rectangle(0, 0, 128, 128)
+  Paint.Stroke
+
   Paint.Arc(64, 64, 60, 0, 2 * Pi)
   Paint.ClosePath
 
+  Paint.LineWidth = 0
+
   Paint.LineWidth = 10
+
+  Paint.Brush = Paint.Color(Color.RGB(0, 0, 0, 255))
+
   'Paint.Brush = Paint.Color(Color.Blue)
+  If hColor.Luminance > 160 Then
+    Paint.Brush = Paint.Color(Color.Black)
+  Else
+    Paint.Brush = Paint.Color(Color.White)
+  Endif
+
   Paint.Brush = Paint.Color(xColor)
   Paint.Fill(True)
 

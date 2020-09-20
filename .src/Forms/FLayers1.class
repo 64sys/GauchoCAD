@@ -202,37 +202,30 @@ Public Sub TableView1_Data(Row As Integer, Column As Integer)
       g = CInt(Split(Starter.ColorsRGB[st], ",")[1])
       b = CInt(Split(Starter.ColorsRGB[st], ",")[2])
 
-      TableView1[TableView1.Row, TableView1.Column].Text = CurrentColor
+      TableView1[TableView1.Row, TableView1.Column].Text = st
       If img Then
         img.Clear
         TableView1[Row, Column].Picture.Clear
       Endif
       img = dsk.ImageDot(Color.RGB(r, g, b)).Stretch(TableView1.Rows.Height - 1, TableView1.Rows.Height - 1)
-
       TableView1[Row, Column].Picture = img.Picture
+      TableView1[Row, Column].Refresh
 
     Case "style"
-      For Each vrx In Starter.cStyles
-        If CInt(Starter.cStyles.Key) = st Then
-          TableView1[row, Column].Text = vrx[1]
-          Break
-        Else
-          TableView1[row, Column].Text = Starter.cStyles["0"][1]
-        Endif
-      Next
+      If Starter.cStyles.Exist(CStr(st)) Then
+        TableView1[row, Column].Text = Starter.cStyles[CStr(st)][1]
+      Else
+        TableView1[row, Column].Text = Starter.cStyles["0"][1]
+      Endif
 
     Case "width"
-      'If cWidths.Exist(CInt(st)) Then
+      TableView1[row, Column].Text = CStr(0.1)
       For Each vrx In Starter.cWidths
         If Starter.cWidths.Key = st Then
           TableView1[row, Column].Text = CStr(vrx[0])
           Break
-        Else
-          TableView1[row, Column].Text = CStr(0.1)
         Endif
       Next
-      'TableView1[row, Column].Text = st
-      'Endif
 
     Case "print"
       If st = True Then
@@ -321,19 +314,13 @@ Public Sub LTask(lTask As String)
       Endif
 
     Case "save"
-      'APPMain.hFCAD.cModel["Layers"] = cLayers.Copy()
-      'For Each var In cVars
-      '  If var["name"] = "clayer" Then
-      'var["value"] = currLayer
       cVars["clayer"] = currLayer
-      '  Endif
-      'Next
 
       For r = 0 To TableView1.Rows.Max
-        For i = 2 To lbx.Max
-          'sKey = TableView1[r, 0].Text
-          If cLayers.Exist(TableView1[r, 0].Text) Then
-            xLay = cLayers[TableView1[r, 0].Text]
+        If cLayers.Exist(TableView1[r, 0].Text) Then
+          xLay = cLayers[TableView1[r, 0].Text]
+
+          For i = 2 To lbx.Max
             If xLay.Exist(lbx[i]) Then
               Select lbx[i]
                 Case "style"
@@ -353,17 +340,18 @@ Public Sub LTask(lTask As String)
                   Else
                     xlay[lbx[i]] = False
                   Endif
+
                 Case "width"
                   For Each vrx In Starter.cWidths
                     If TableView1[r, i].Text <> "" Then
                       If vrx[0] = CFloat(TableView1[r, i].Text) Then
-                        xlay[lbx[i]] = Starter.cWidths.Key
+                        xlay[lbx[i]] = CInt(Starter.cWidths.Key)
                         Break
                       Else
-                        xlay[lbx[i]] = "1"
+                        xlay[lbx[i]] = 1
                       Endif
                     Else
-                      xlay[lbx[i]] = "1"
+                      xlay[lbx[i]] = 1
                     Endif
 
                   Next
@@ -373,15 +361,19 @@ Public Sub LTask(lTask As String)
                   '   xlay[lbx[i]] = 0
                   ' Endif
 
-                Case Else
-                  xlay[lbx[i]] = TableView1[r, i].Text
+                Case "colour"
+                  xlay[lbx[i]] = CInt(TableView1[r, i].Text)
+
+                Case "name"
+                  If xlay["id"] <> "0" Then
+                    xlay[lbx[i]] = TableView1[r, i].Text
+                  Endif
 
               End Select
 
             Endif
-          Endif
-
-        Next
+          Next
+        Endif
       Next
 
       'cVars["clayer"] = currLayer
@@ -419,44 +411,48 @@ Public Sub TableView1_Click()
   Dim wts As FWidths
   Dim vrx As Variant[]
   Dim img As Image
+  Dim mode As Boolean
 
   Select lbx[TableView1.Column]
 
     Case "show"
       Select TableView1[TableView1.Row, TableView1.Column].WordWrap
         Case False
-          TableView1[TableView1.Row, TableView1.Column].WordWrap = True
+          mode = True
           pic = Image.Load("./svg/layers/lamp-on.png").Stretch(16, 16).Picture
         Case True
-          TableView1[TableView1.Row, TableView1.Column].WordWrap = False
+          mode = False
           pic = Image.Load("./svg/layers/lamp-off.png").Stretch(16, 16).Picture
       End Select
+      TableView1[TableView1.Row, TableView1.Column].WordWrap = mode
       TableView1[TableView1.Row, TableView1.Column].Picture = pic
-
-      ' aplico los cambios al layer correspondiente
-      ' TODO: propagar al resto
-      cLayers[TableView1[TableView1.Row, 0].Text]["show"] = TableView1[TableView1.Row, TableView1.Column].WordWrap
 
     Case "frozen"
       Select TableView1[TableView1.Row, TableView1.Column].WordWrap
         Case False
-          TableView1[TableView1.Row, TableView1.Column].WordWrap = True
+          mode = True
+          'TableView1[TableView1.Row, TableView1.Column].WordWrap = True
           pic = Image.Load("./svg/layers/frozen.png").Stretch(16, 16).Picture
         Case True
-          TableView1[TableView1.Row, TableView1.Column].WordWrap = False
+          mode = False
+          'TableView1[TableView1.Row, TableView1.Column].WordWrap = False
           pic = Image.Load("./svg/layers/liquid.png").Stretch(16, 16).Picture
       End Select
+      TableView1[TableView1.Row, TableView1.Column].WordWrap = mode
       TableView1[TableView1.Row, TableView1.Column].Picture = pic
 
     Case "locked"
       Select TableView1[TableView1.Row, TableView1.Column].WordWrap
         Case False
-          TableView1[TableView1.Row, TableView1.Column].WordWrap = True
-          pic = Image.Load("./svg/layers/lock-off.png").Stretch(21, 21).Picture
-        Case True
-          TableView1[TableView1.Row, TableView1.Column].WordWrap = False
+          'TableView1[TableView1.Row, TableView1.Column].WordWrap = True
+          mode = True
           pic = Image.Load("./svg/layers/lock-on.png").Stretch(21, 21).Picture
+        Case True
+          'TableView1[TableView1.Row, TableView1.Column].WordWrap = False
+          mode = False
+          pic = Image.Load("./svg/layers/lock-off.png").Stretch(21, 21).Picture
       End Select
+      TableView1[TableView1.Row, TableView1.Column].WordWrap = mode
       TableView1[TableView1.Row, TableView1.Column].Picture = pic
 
     Case "print"
@@ -631,6 +627,7 @@ Public Sub TableView1_Save(Row As Integer, Column As Integer, Value As String)
           Next
         Endif
       Next
+
   End Select
 
 End

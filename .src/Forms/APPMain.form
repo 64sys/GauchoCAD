@@ -460,10 +460,9 @@
         MoveScaled(1,0,85,4)
         #Public = True
         Font = Font["Bold,+1"]
-        Background = Color.LightGray
-        Foreground = Color.Black
+        Background = Color.TextBackground
+        Foreground = Color.TextForeground
         Text = ("Command")
-        Border = Border.Raised
       }
       { txoCom TextBox
         MoveScaled(87,0,4,4)
