@@ -1,3 +1,4 @@
+![logo](logo48.png)
 # GauchoCAD
 GauchoCAD is a free CAD program written in the Gambas language.
 ### v0.0.81
