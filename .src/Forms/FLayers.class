@@ -205,8 +205,8 @@ Public Sub LMenu_Click()
 
       Next
 
-      n["id"] = Format(cLayers.Count, "00")
-      n["name"] = "layer-" & Format(cLayers.Count + 1, "00")
+      n["id"] = Format(cLayers.Count, "0")
+      n["name"] = "layer-" & Format(cLayers.Count + 1, "0")
 
       cLayers.Add(n, n["name"])
       TableView1.Rows.Count = 0
@@ -217,7 +217,7 @@ Public Sub LMenu_Click()
     Case "erase"
       If loading = False Then
         Select CurrentKey
-          Case "0", "", "00"
+        Case "0", "", "00"
             'skip
 
           Case Else

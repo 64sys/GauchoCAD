@@ -223,50 +223,50 @@ Public Function CheckAboveEntity(xr As Float, Yr As Float, tolerance As Float) A
         '     If angle >= APPMain.hFCAD.arrEntities[e].fParam[1] Or angle <= APPMain.hFCAD.arrEntities[e].fParam[2] Then Break
         '   End If
         'Break
-          x = major * Cos(angle) * Cos(angle2) - minor * Sin(angle) * Sin(angle2)
-          y = major * Cos(angle) * Sin(angle2) + minor * Sin(angle) * Cos(angle2)
+        x = major * Cos(angle) * Cos(angle2) - minor * Sin(angle) * Sin(angle2)
+        y = major * Cos(angle) * Sin(angle2) + minor * Sin(angle) * Cos(angle2)
 
-          ' veo si en esa posicion esta cerca de la elipse
-          If Abs(puntos.distancia(xr, yr, APPMain.hFCAD.arrEntities[e].P[0], APPMain.hFCAD.arrEntities[e].P[1]) - Sqr(x * x + y * y)) < tolerance Then
-            ' tengo que ver si esa en la porcion
-            angle = Angle * 180 / Pi
-            If angle < 0 Then angle += 360
-            If APPMain.hFCAD.arrEntities[e].fParam[1] <= APPMain.hFCAD.arrEntities[e].fParam[2] Then
-              If angle >= APPMain.hFCAD.arrEntities[e].fParam[1] And angle <= APPMain.hFCAD.arrEntities[e].fParam[2] Then Break
-            Else
-              If angle >= APPMain.hFCAD.arrEntities[e].fParam[1] Or angle <= APPMain.hFCAD.arrEntities[e].fParam[2] Then Break
-            End If
-            'Break
-
+        ' veo si en esa posicion esta cerca de la elipse
+        If Abs(puntos.distancia(xr, yr, APPMain.hFCAD.arrEntities[e].P[0], APPMain.hFCAD.arrEntities[e].P[1]) - Sqr(x * x + y * y)) < tolerance Then
+          ' tengo que ver si esa en la porcion
+          angle = Angle * 180 / Pi
+          If angle < 0 Then angle += 360
+          If APPMain.hFCAD.arrEntities[e].fParam[1] <= APPMain.hFCAD.arrEntities[e].fParam[2] Then
+            If angle >= APPMain.hFCAD.arrEntities[e].fParam[1] And angle <= APPMain.hFCAD.arrEntities[e].fParam[2] Then Break
+          Else
+            If angle >= APPMain.hFCAD.arrEntities[e].fParam[1] Or angle <= APPMain.hFCAD.arrEntities[e].fParam[2] Then Break
           End If
+          'Break
 
-          ' ademas verifico si esta sobre el centro
+        End If
 
-          If puntos.Around(xr, yr, APPMain.hFCAD.arrEntities[e].P[0], APPMain.hFCAD.arrEntities[e].P[1], tolerance) Then Break
+        ' ademas verifico si esta sobre el centro
 
-        Case "Solid", "Text", "MText"
+        If puntos.Around(xr, yr, APPMain.hFCAD.arrEntities[e].P[0], APPMain.hFCAD.arrEntities[e].P[1], tolerance) Then Break
 
-          ' Text, MText, Solid y otros
-          If puntos.isInside(APPMain.hFCAD.arrEntities[e].Polygon, xr, yr) Then Break
+      Case "Solid", "Text", "MText"
 
-      End Select
+        ' Text, MText, Solid y otros
+        If puntos.isInside(APPMain.hFCAD.arrEntities[e].Polygon, xr, yr) Then Break
 
-      modUtils.DoEvents(0.00100)
+    End Select
 
-    Next
+    modUtils.DoEvents(0.00100)
 
-  ExitSearch:
+  Next
 
-    flgSearchingEntity = False
-    'Debug "Above entity en ", Timer - t
-    If e = APPMain.hFCAD.arrEntities.Count Then
+ExitSearch:
 
-      Return -1
-    Else
+  flgSearchingEntity = False
+  'Debug "Above entity en ", Timer - t
+  If e = APPMain.hFCAD.arrEntities.Count Then
 
-      Return e
+    Return -1
+  Else
 
-    End If
+    Return e
+
+  End If
 
 End
 

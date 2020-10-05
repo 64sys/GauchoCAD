@@ -406,8 +406,8 @@ Public Procedure LoadFile(stn As String)
     Else If (lpcode = "0") And (lpvalue = "LAYER") Then
       Dim newLayer As New Collection
       Inc mLayerCount
-      APPMain.hFCAD.cModel["Layers"].Add(newlayer, Format(mLayerCount, "00"))
-      newlayer.Add(Format(mLayerCount, "00"), "id")
+      APPMain.hFCAD.cModel["Layers"].Add(newlayer, Format(mLayerCount, "0"))
+      newlayer.Add(Format(mLayerCount, "0"), "id")
       ReadData
       While (lpcode <> "0") And Not Eof(fp)
         If lpcode = "2" Then newlayer.Add(lpvalue, "name")

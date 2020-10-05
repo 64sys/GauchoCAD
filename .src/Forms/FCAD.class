@@ -749,26 +749,26 @@ Public Sub LayersTransfer()
           Next
 
           If r > -1 Then
-            tLay.Add(Format(r, "00"), "id")
+            tLay.Add(Format(r, "0"), "id")
             tLay.Add("layer", "type")
             For Each prop In ["name", "show", "frozen", "locked", "colour", "style", "width", "print"]
               tLay.Add(il[prop], prop)
             Next
-            mLay.Add(tLay.copy(), Format(r, "00"))
+            mLay.Add(tLay.copy(), Format(r, "0"))
             tLay.Clear
           Endif
 
         Next
       Else
         For Each il In iLay
-          tLay.Add(Format(i, "00"), "id")
+          tLay.Add(Format(i, "0"), "id")
           tLay.Add("layer", "type")
 
           For Each prop In ["name", "show", "frozen", "locked", "colour", "style", "width", "print"]
             tLay.Add(iLay[prop], prop)
           Next
 
-          mLay.Add(tLay.copy(), Format(i, "00"))
+          mLay.Add(tLay.copy(), Format(i, "0"))
           tLay.Clear
           Inc i
         Next
