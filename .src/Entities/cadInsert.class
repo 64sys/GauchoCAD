@@ -42,132 +42,132 @@ Public StepsDone As Integer                 ' esto lo cambia cls ElementBuilder 
 
 Public Sub Translate(e As Entity, dX As Float, dY As Float, Optional OnlySelected As Boolean = False)
 
-    Dim i As Integer
+  Dim i As Integer
 
-    If OnlySelected Then
+  If OnlySelected Then
 
-        For i = 0 To e.Psel.Max
-            If e.Psel[i] Then
+    For i = 0 To e.Psel.Max
+      If e.Psel[i] Then
 
-                e.P[i * 2] += dx
-                e.P[i * 2 + 1] += dy
+        e.P[i * 2] += dx
+        e.P[i * 2 + 1] += dy
 
-            Endif
-        Next
+      Endif
+    Next
 
-    Else
+  Else
 
-        puntos.Translate(e.p, dx, dy)
-    Endif
+    puntos.Translate(e.p, dx, dy)
+  Endif
 
 End
 
 Public Sub Rotate(e As Entity, radians As Float)
 
-    puntos.Rotate(e.P, radians)
-    E.fParam[2] += radians
+  puntos.Rotate(e.P, radians)
+  E.fParam[2] += radians
 
 End
 
 Public Sub Scale(e As Entity, sX As Float, sY As Float)
 
-    Dim i As Integer
+  Dim i As Integer
 
-    E.fParam[0] *= sX
-    E.fParam[1] *= sY
-    For i = 0 To e.p.max Step 2
+  E.fParam[0] *= sX
+  E.fParam[1] *= sY
+  For i = 0 To e.p.max Step 2
 
-        e.P[i] = e.P[i] * sX
-        e.P[i + 1] = e.P[i + 1] * sY
+    e.P[i] = e.P[i] * sX
+    e.P[i + 1] = e.P[i + 1] * sY
 
-    Next
+  Next
 
 End
 
 Public Sub Draw(oE As Entity)
 
-    Dim ET As Entity, i As Integer
+  Dim ET As Entity, i As Integer
 
-    If oe.Finished Then Return
+  If oe.Finished Then Return
 
-    i = clsEntities.FIndBlockID(oE.Block)
-    If i < 0 Then Return
+  i = clsEntities.FIndBlockID(oE.Block)
+  If i < 0 Then Return
 
-    gl.PushMatrix
-    gl.Translatef(appmain.hFcad.pixels(oE.p[0]) / appmain.hFcad.ScaleZoom, appmain.hFcad.pixels(oE.p[1]) / appmain.hFcad.ScaleZoom, 0)
-    gl.Rotatef(oE.fParam[2], 0, 0, 1)
-    gl.Scalef(oE.fParam[0], oE.fParam[1], 1)
+  gl.PushMatrix
+  gl.Translatef(appmain.hFcad.pixels(oE.p[0]) / appmain.hFcad.ScaleZoom, appmain.hFcad.pixels(oE.p[1]) / appmain.hFcad.ScaleZoom, 0)
+  gl.Rotatef(oE.fParam[2], 0, 0, 1)
+  gl.Scalef(oE.fParam[0], oE.fParam[1], 1)
 
-    For Each ET In appmain.hFCAD.arrBlocks[i].entities
-        et.visible = True
-        et.ClassHandler.Draw(et)
-    Next
-    gl.PopMatrix
+  For Each ET In appmain.hFCAD.arrBlocks[i].entities
+    et.visible = True
+    et.ClassHandler.Draw(et)
+  Next
+  gl.PopMatrix
 
 End
 
 '' A selected version of the entity
 Public Sub DrawSelected(oE As Entity)
 
-    Dim ET As Entity, i As Integer
+  Dim ET As Entity, i As Integer
 
-    For i = oe.iInsert + 1 To appmain.hFCAD.arrEntities.max
-        If appmain.hFCAD.arrEntities[i].iInsert <> oe.iInsert Then Break
-        appmain.hFCAD.arrEntities[i].ClassHandler.DrawSelected(appmain.hFCAD.arrEntities[i])
+  For i = oe.iInsert + 1 To appmain.hFCAD.arrEntities.max
+    If appmain.hFCAD.arrEntities[i].iInsert <> oe.iInsert Then Break
+    appmain.hFCAD.arrEntities[i].ClassHandler.DrawSelected(appmain.hFCAD.arrEntities[i])
 
-    Next
+  Next
 
 End
 
 '' A fat version of the entity
 Public Sub DrawRemark(oE As Entity)
 
-    Dim ET As Entity, i As Integer
+  Dim ET As Entity, i As Integer
 
-    For i = oe.iInsert + 1 To appmain.hFCAD.arrEntities.max
-        If appmain.hFCAD.arrEntities[i].iInsert <> oe.iInsert Then Break
-        appmain.hFCAD.arrEntities[i].ClassHandler.DrawRemark(appmain.hFCAD.arrEntities[i])
+  For i = oe.iInsert + 1 To appmain.hFCAD.arrEntities.max
+    If appmain.hFCAD.arrEntities[i].iInsert <> oe.iInsert Then Break
+    appmain.hFCAD.arrEntities[i].ClassHandler.DrawRemark(appmain.hFCAD.arrEntities[i])
 
-    Next
+  Next
 
 End
 
 '' A fat version of the entity
 Public Sub DrawRemarkBackup(oE As Entity)
 
-    Dim ET As Entity, i As Integer
+  Dim ET As Entity, i As Integer
 
-    i = clsEntities.FIndBlockID(oE.Block)
-    If i < 0 Then Return
+  i = clsEntities.FIndBlockID(oE.Block)
+  If i < 0 Then Return
 
-    gl.PushMatrix
-    gl.Translatef(appmain.hFcad.pixels(oE.p[0]) / appmain.hFcad.ScaleZoom, appmain.hFcad.pixels(oE.p[1]) / appmain.hFcad.ScaleZoom, 0)
-    gl.Rotatef(oE.fParam[2], 0, 0, 1)
-    gl.Scalef(oE.fParam[0], oE.fParam[1], 1)
+  gl.PushMatrix
+  gl.Translatef(appmain.hFcad.pixels(oE.p[0]) / appmain.hFcad.ScaleZoom, appmain.hFcad.pixels(oE.p[1]) / appmain.hFcad.ScaleZoom, 0)
+  gl.Rotatef(oE.fParam[2], 0, 0, 1)
+  gl.Scalef(oE.fParam[0], oE.fParam[1], 1)
 
-    For Each ET In appmain.hFCAD.arrBlocks[i].entities
-        et.visible = True
-        et.ClassHandler.DrawRemark(et)
-    Next
-    gl.PopMatrix
+  For Each ET In appmain.hFCAD.arrBlocks[i].entities
+    et.visible = True
+    et.ClassHandler.DrawRemark(et)
+  Next
+  gl.PopMatrix
 
 End
 
 Public Function Draw2(oE As Entity)
 
-    If Not oE.Visible Then Return
+  If Not oE.Visible Then Return
 
-    Dim ET As Entity, i As Integer
-    paint.save
-    paint.Translate(appmain.hFcad.pixels(oE.p[0]) / appmain.hFcad.ScaleZoom, appmain.hFcad.pixels(oE.p[1]) / appmain.hFcad.ScaleZoom)
-    paint.Scale(oE.fParam[0], oE.fParam[1])
-    paint.Rotate(oE.fParam[2])
-    gcd.ScaleLines = (Abs(oE.fParam[0]) + Abs(oE.fParam[1])) / 2
-    For Each ET In appmain.hFCAD.arrBlocks[i].entities
-        et.Draw
-    Next
-    gcd.ScaleLines = 1
-    paint.Restore
+  Dim ET As Entity, i As Integer
+  paint.save
+  paint.Translate(appmain.hFcad.pixels(oE.p[0]) / appmain.hFcad.ScaleZoom, appmain.hFcad.pixels(oE.p[1]) / appmain.hFcad.ScaleZoom)
+  paint.Scale(oE.fParam[0], oE.fParam[1])
+  paint.Rotate(oE.fParam[2])
+  gcd.ScaleLines = (Abs(oE.fParam[0]) + Abs(oE.fParam[1])) / 2
+  For Each ET In appmain.hFCAD.arrBlocks[i].entities
+    et.Draw
+  Next
+  gcd.ScaleLines = 1
+  paint.Restore
 
 End
 '' Creo los puntos de interes
@@ -175,15 +175,15 @@ End
 
 Public Function BuildPOI(oE As Entity, Optional arrIndex As Integer = -1) As Integer
 
-    If arrIndex < 0 Then arrIndex = appmain.hFCAD.arrEntities.Max       ' si este valor no es provisto , estos POI son de la ultima entidad
+  If arrIndex < 0 Then arrIndex = appmain.hFCAD.arrEntities.Max       ' si este valor no es provisto , estos POI son de la ultima entidad
 
-    oe.PoiPoints.Clear
-    oe.PoiType.Clear
+  oe.PoiPoints.Clear
+  oe.PoiType.Clear
 
-    ' points
-    oe.poiPoints.insert([oE.p[0], oE.p[1]])
-    oe.poiType.Add(gcd.poiBasePoint)
-    'oe.poiEntities.Add(arrIndex)
+  ' points
+  oe.poiPoints.insert([oE.p[0], oE.p[1]])
+  oe.poiType.Add(gcd.poiBasePoint)
+  'oe.poiEntities.Add(arrIndex)
 
 End
 
@@ -191,43 +191,43 @@ End
 ' True means all is good, False will instruct the clsEntityBuilder to delete it
 Public Sub Finish(oE As Entity, Optional ParamsDone As Integer = -1) As Boolean
 
-    Dim ET As Entity, i, iInsert As Integer
+  Dim ET As Entity, i, iInsert As Integer
 
-    'Print "Finish en EntityBase"
+  'Print "Finish en EntityBase"
 
-    BuildPOI(oe)
+  BuildPOI(oe)
 
-    ' busco el tipo de linea, si hace falta
-    If oE.LineTypeName = "Dashed" Then oE.LineType = 1
+  ' busco el tipo de linea, si hace falta
+  If oE.LineTypeName = "Dashed" Then oE.LineType = 1
 
-    oE.psel.resize(oE.p.count / 2)
-    oE.ForDeletion = False
-    oE.DrawAble = True
-    oE.Selected = False
-    oE.Finished = True
+  oE.psel.resize(oE.p.count / 2)
+  oE.ForDeletion = False
+  oE.DrawAble = True
+  oE.Selected = False
+  oE.Finished = True
 
-    i = clsEntities.FIndBlockID(oE.Block)
-    If i < 0 Then Return
+  i = clsEntities.FIndBlockID(oE.Block)
+  If i < 0 Then Return
 
-    ' en este momento la ultima entidad es este Insert, guardo el numero
+  ' en este momento la ultima entidad es este Insert, guardo el numero
 
-    iInsert = appmain.hFCAD.arrEntities.Max
+  iInsert = appmain.hFCAD.arrEntities.Max
+  appmain.hFCAD.arrEntities.Last.iInsert = iInsert
+  For Each ET In appmain.hFCAD.arrBlocks[i].entities
+    appmain.hFCAD.arrEntities.Add(clsEntities.ClonEntity(et))
+    appmain.hFCAD.arrEntities.Last.Block = oe.block
     appmain.hFCAD.arrEntities.Last.iInsert = iInsert
-    For Each ET In appmain.hFCAD.arrBlocks[i].entities
-        appmain.hFCAD.arrEntities.Add(clsEntities.ClonEntity(et))
-        appmain.hFCAD.arrEntities.Last.Block = oe.block
-        appmain.hFCAD.arrEntities.Last.iInsert = iInsert
-        appmain.hFCAD.arrEntities.Last.ClassHandler.finish(appmain.hFCAD.arrEntities.Last, -1)
-        appmain.hFCAD.arrEntities.Last.ClassHandler.Scale(appmain.hFCAD.arrEntities.Last, oe.fParam[0], oE.fParam[1])
-        appmain.hFCAD.arrEntities.Last.ClassHandler.Rotate(appmain.hFCAD.arrEntities.Last, oE.fParam[2] * Pi / 180)
-        appmain.hFCAD.arrEntities.Last.ClassHandler.Translate(appmain.hFCAD.arrEntities.Last, oE.p[0], oE.p[1])
-    Next
+    appmain.hFCAD.arrEntities.Last.ClassHandler.finish(appmain.hFCAD.arrEntities.Last, -1)
+    appmain.hFCAD.arrEntities.Last.ClassHandler.Scale(appmain.hFCAD.arrEntities.Last, oe.fParam[0], oE.fParam[1])
+    appmain.hFCAD.arrEntities.Last.ClassHandler.Rotate(appmain.hFCAD.arrEntities.Last, oE.fParam[2] * Pi / 180)
+    appmain.hFCAD.arrEntities.Last.ClassHandler.Translate(appmain.hFCAD.arrEntities.Last, oE.p[0], oE.p[1])
+  Next
 
-    If Not True Then
+  If Not True Then
 
-        oE.ForDeletion = True
-        oE.DrawAble = False
+    oE.ForDeletion = True
+    oE.DrawAble = False
 
-    End If
+  End If
 
 End
