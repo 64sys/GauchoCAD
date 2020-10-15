@@ -217,7 +217,7 @@ Public Sub LMenu_Click()
     Case "erase"
       If loading = False Then
         Select CurrentKey
-        Case "0", "", "00"
+          Case "0", "", "00"
             'skip
 
           Case Else

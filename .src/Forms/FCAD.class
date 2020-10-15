@@ -383,7 +383,7 @@ End
 Public Sub GLArea1_MouseWheel()
   ' ex  Public Sub drwArea_MouseWheel()
 
-  Dim px, py As Float
+  Dim px, py, factor As Float
   ' chequeamos si vale la pena seguir dibujando la grid, o sea, menos de 3 pixels
 
   If Pixels(puntos.GridSpacing) < 5 Then puntos.Gridactive = False Else puntos.Gridactive = True
@@ -392,7 +392,10 @@ Public Sub GLArea1_MouseWheel()
   py = Yreal(GLArea1.h / 2)
 
   ' TODO: , redondear para que la escala sea 1:100 1:75 1:50 etc
-  ScaleZoom = ScaleZoom * (1 + 0.075 * Mouse.Delta)
+
+  factor = (1 + 0.075 * Mouse.Delta)
+
+  ScaleZoom = ScaleZoom * factor
 
   ' pero con ciertos limites
   ' If ScaleZoom < 0.001 Then ScaleZoom = 0.001
@@ -404,22 +407,18 @@ Public Sub GLArea1_MouseWheel()
   ' la posicion de las cosas estara 2x mas alejado; yo quiero que lo que hay en el centro de la pantalla, siga ahi
   ' entonces Pc = drwarea/2 anes del zoom, debera estar en el mismo lugar
 
+  PanX = -Pixels(px)
   If mouse.x < glarea1.w * 0.2 Then
-    PanX -= (mouse.x - glarea1.w / 2) / 10 * Mouse.Delta
+    PanX -= ScaleZoom * 5 * Mouse.Delta
   Else If mouse.x > glarea1.w * 0.8 Then
-    PanX -= (mouse.x - glarea1.w / 2) / 10 * Mouse.Delta
-  Else
-    ' PanX = glarea1.w / 2 - Pixels(px)
-    PanX = -Pixels(px) ' post Paint
+    PanX += ScaleZoom * 5 * Mouse.Delta
   Endif
 
+  PanY = -Pixels(py)
   If mouse.y < glarea1.h * 0.2 Then
-    PanY += (mouse.y - glarea1.w / 2) / 10 * Mouse.Delta
+    PanY -= ScaleZoom * 5 * Mouse.Delta
   Else If mouse.y > glarea1.h * 0.8 Then
-    PanY += (mouse.y - glarea1.w / 2) / 10 * Mouse.Delta
-  Else
-    'PanY = (Pixels(py) + glarea1.h / 2)     ' el eje Y trabaja distinto, asi que debemos cambiar esto
-    PanY = -Pixels(py)                      ' cambio post Paint
+    PanY += ScaleZoom * 5 * Mouse.Delta
   Endif
 
   redraw

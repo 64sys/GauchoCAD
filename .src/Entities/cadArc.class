@@ -48,169 +48,169 @@ End
 
 Public Sub Translate(e As Entity, dX As Float, dY As Float, Optional OnlySelected As Boolean = False)
 
-    Dim i As Integer
+  Dim i As Integer
 
-    If OnlySelected Then
+  If OnlySelected Then
 
-        For i = 0 To e.Psel.Max
-            If e.Psel[i] Then
+    For i = 0 To e.Psel.Max
+      If e.Psel[i] Then
 
-                e.P[i * 2] += dx
-                e.P[i * 2 + 1] += dy
+        e.P[i * 2] += dx
+        e.P[i * 2 + 1] += dy
 
-            Endif
-        Next
+      Endif
+    Next
 
-    Else
+  Else
 
-        puntos.Translate(e.p, dx, dy)
-    Endif
+    puntos.Translate(e.p, dx, dy)
+  Endif
 
 End
 
 Public Sub Rotate(e As Entity, radians As Float)
 
-    puntos.Rotate(e.p, radians)
+  puntos.Rotate(e.p, radians)
 
-    ' el parametro lo tengo que pasar a grados porque la rutina que dibuja el texto usa eso
-    E.fParam[1] += radians * 180 / Pi
-    E.fParam[2] += radians * 180 / Pi
+  ' el parametro lo tengo que pasar a grados porque la rutina que dibuja el texto usa eso
+  E.fParam[1] += radians * 180 / Pi
+  E.fParam[2] += radians * 180 / Pi
 
-    ' If E.fParam[1] < 0 Then E.fParam[1] = 360 + E.fParam[1]
-    ' If E.fParam[2] < 0 Then E.fParam[2] = 360 + E.fParam[2]              ' grados
+  ' If E.fParam[1] < 0 Then E.fParam[1] = 360 + E.fParam[1]
+  ' If E.fParam[2] < 0 Then E.fParam[2] = 360 + E.fParam[2]              ' grados
 
 End
 
 Public Sub Scale(e As Entity, sX As Float, sY As Float)
 
-    Dim i As Integer
+  Dim i As Integer
 
-    E.fParam[0] *= Abs(sX)
+  E.fParam[0] *= Abs(sX)
 
-    For i = 0 To e.p.max Step 2
+  For i = 0 To e.p.max Step 2
 
-        e.P[i] = e.P[i] * sX
+    e.P[i] = e.P[i] * sX
 
-        e.P[i + 1] = e.P[i + 1] * sY
+    e.P[i + 1] = e.P[i + 1] * sY
 
-    Next
+  Next
 
-    ' start/end
-    If sx < 0 Then
-        E.fParam[1] = 180 - E.fParam[1]
-        E.fParam[2] = 180 - E.fParam[2]
-        e.fParam[3] *= -1
-    Endif
+  ' start/end
+  If sx < 0 Then
+    E.fParam[1] = 180 - E.fParam[1]
+    E.fParam[2] = 180 - E.fParam[2]
+    e.fParam[3] *= -1
+  Endif
 
-    If sy < 0 Then
-        E.fParam[1] = 360 - E.fParam[1]
-        E.fParam[2] = 360 - E.fParam[2]
-        e.fParam[3] *= -1
-    Endif
+  If sy < 0 Then
+    E.fParam[1] = 360 - E.fParam[1]
+    E.fParam[2] = 360 - E.fParam[2]
+    e.fParam[3] *= -1
+  Endif
 
-    'If e.fParam[1] > e.fParam[2] Then Swap e.fParam[1], e.fParam[2]
+  'If e.fParam[1] > e.fParam[2] Then Swap e.fParam[1], e.fParam[2]
 
 End
 
 Public Sub Draw(oE As Entity)
 
-    Dim x, y, theta, angle_increment As Float
-    Dim i As Integer
-    Dim difAng As Float
-    Dim major, minor, angle, la As Float
+  Dim x, y, theta, angle_increment As Float
+  Dim i As Integer
+  Dim difAng As Float
+  Dim major, minor, angle, la As Float
 
-    If Not oE.Visible Then Return
+  If Not oE.Visible Then Return
 
-    If Me.StepsDone = 1 Then
+  If Me.StepsDone = 1 Then
 
-        oE.fParam[2] = 360
+    oE.fParam[2] = 360
 
-    Else If Me.StepsDone = 2 Then
+  Else If Me.StepsDone = 2 Then
 
-        If oE.fParam[1] < 0 Then oE.fParam[1] = 360 + oE.fParam[1]
-        difang = (oE.fParam[2] - oE.fParam[1])
+    If oE.fParam[1] < 0 Then oE.fParam[1] = 360 + oE.fParam[1]
+    difang = (oE.fParam[2] - oE.fParam[1])
 
-        GLplus.Lines([oE.p[0], oE.p[1], oE.p[0] + oE.fParam[0] * Cos(oE.fParam[1] / 180 * Pi), oE.p[1] + oE.fParam[0] * Sin(oE.fParam[1] / 180 * Pi)], oE.ColorToPaint)
-        clsDrawingAids.Helper.texto = Format$(oE.fParam[1], "0.0 deg")
+    GLplus.Lines([oE.p[0], oE.p[1], oE.p[0] + oE.fParam[0] * Cos(oE.fParam[1] / 180 * Pi), oE.p[1] + oE.fParam[0] * Sin(oE.fParam[1] / 180 * Pi)], oE.ColorToPaint)
+    clsDrawingAids.Helper.texto = Format$(oE.fParam[1], "0.0 deg")
 
-    Else If Me.StepsDone = 3 Then
+  Else If Me.StepsDone = 3 Then
 
-        If oE.fParam[1] < 0 Then oE.fParam[1] = 360 + oE.fParam[1]
-        If oE.fParam[2] < 0 Then oE.fParam[2] = 360 + oE.fParam[2]              ' grados
-        Me.start = oE.fParam[1] / 180 * Pi                                      ' rad
-        Me.recorrido = (oE.fParam[2] - oE.fParam[1]) / 180 * Pi                 ' rad
-        If Me.recorrido < 0 Then
+    If oE.fParam[1] < 0 Then oE.fParam[1] = 360 + oE.fParam[1]
+    If oE.fParam[2] < 0 Then oE.fParam[2] = 360 + oE.fParam[2]              ' grados
+    Me.start = oE.fParam[1] / 180 * Pi                                      ' rad
+    Me.recorrido = (oE.fParam[2] - oE.fParam[1]) / 180 * Pi                 ' rad
+    If Me.recorrido < 0 Then
 
-            Me.recorrido += 2 * Pi
+      Me.recorrido += 2 * Pi
 
-        Endif
+    Endif
 
-        GL.Begin(gl.LINE_STRIP)
-        angle_increment = Pi * 2 / 360
-        For theta = 0 To Me.recorrido Step angle_increment
-            GLplus.Vertex2D(oE.p[0] + oE.fParam[0] * Cos(Me.start + theta), oE.p[1] + oE.fParam[0] * Sin(Me.start + theta), oE.ColorToPaint)
-        Next
-        gl.End
+    GL.Begin(gl.LINE_STRIP)
+    angle_increment = Pi * 2 / 360
+    For theta = 0 To Me.recorrido Step angle_increment
+      GLplus.Vertex2D(oE.p[0] + oE.fParam[0] * Cos(Me.start + theta), oE.p[1] + oE.fParam[0] * Sin(Me.start + theta), oE.ColorToPaint)
+    Next
+    gl.End
 
-        clsDrawingAids.Helper.texto = Format$(oE.fParam[1], "0.0 deg") & (" to ") & Format$(oE.fParam[2], "0.0 deg")
+    clsDrawingAids.Helper.texto = Format$(oE.fParam[1], "0.0 deg") & (" to ") & Format$(oE.fParam[2], "0.0 deg")
+  Else
+    ' If oE.fParam[1] < 0 Then oE.fParam[1] = 360 + oE.fParam[1]
+    'If oE.fParam[2] < oE.fParam[1] Then oE.fParam[2] = 360 + oE.fParam[2]              ' grados
+    'If oE.fParam[2] < 0 Then oE.fParam[1] = 360 + oE.fParam[1]
+
+    If oe.fParam[3] > 0 Then
+
+      If oE.fParam[2] < oE.fParam[1] Then oE.fParam[2] = 360 + oE.fParam[2]              ' grados
+
     Else
-        ' If oE.fParam[1] < 0 Then oE.fParam[1] = 360 + oE.fParam[1]
-        'If oE.fParam[2] < oE.fParam[1] Then oE.fParam[2] = 360 + oE.fParam[2]              ' grados
-        'If oE.fParam[2] < 0 Then oE.fParam[1] = 360 + oE.fParam[1]
 
-        If oe.fParam[3] > 0 Then
+      If oE.fParam[2] > oE.fParam[1] Then oE.fParam[2] = oE.fParam[2] - 360              ' grados
 
-            If oE.fParam[2] < oE.fParam[1] Then oE.fParam[2] = 360 + oE.fParam[2]              ' grados
+    Endif
 
-        Else
-
-            If oE.fParam[2] > oE.fParam[1] Then oE.fParam[2] = oE.fParam[2] - 360              ' grados
-
-        Endif
-
-        oE.polyline.Clear
-        GL.Begin(gl.LINE_STRIP)
-        angle_increment = Pi * 2 / 360 * oe.fParam[3]
-        'If Me.recorrido < 0 Then angle_increment *= -1
-        For theta = oE.fParam[1] / 180 * Pi To oE.fParam[2] / 180 * Pi Step angle_increment
-            ' el punto considerando 0,0 al centro
-            x = oE.p[0] + oE.fParam[0] * Cos(theta)
-            y = oE.p[1] + oE.fParam[0] * Sin(theta)
-            oE.polyline.Add(x)
-            oE.polyline.Add(y)
-            GLplus.Vertex2D(x, y, oE.ColorToPaint)
-        Next
-        gl.End
-    End If
+    oE.polyline.Clear
+    GL.Begin(gl.LINE_STRIP)
+    angle_increment = Pi * 2 / 360 * oe.fParam[3]
+    'If Me.recorrido < 0 Then angle_increment *= -1
+    For theta = oE.fParam[1] / 180 * Pi To oE.fParam[2] / 180 * Pi Step angle_increment
+      ' el punto considerando 0,0 al centro
+      x = oE.p[0] + oE.fParam[0] * Cos(theta)
+      y = oE.p[1] + oE.fParam[0] * Sin(theta)
+      oE.polyline.Add(x)
+      oE.polyline.Add(y)
+      GLplus.Vertex2D(x, y, oE.ColorToPaint)
+    Next
+    gl.End
+  End If
 
 End
 
 Public Sub DrawSelected(oE As Entity)
 
-    GLplus.PolyLines(oE.PolyLine, Starter.flgWindowBackColor, oE.LineWidth, gcd.stiDashed)
-    GLplus.PolyLines(oE.PolyLine, gcd.ColorForSelected, oE.LineWidth, oE.LineType)
+  GLplus.PolyLines(oE.PolyLine, Starter.flgWindowBackColor, oE.LineWidth, gcd.stiDashed)
+  GLplus.PolyLines(oE.PolyLine, gcd.ColorForSelected, oE.LineWidth, oE.LineType)
 
 End
 
 '' A fat version of the entity
 Public Sub DrawRemark(oE As Entity)
 
-    GLplus.PolyLines(oE.PolyLine, Starter.flgWindowBackColor, oE.LineWidth, gcd.stiDashed)
-    GLplus.PolyLines(oE.PolyLine, oE.ColorToPaint, oE.LineWidth + 2, oE.LineType)
+  GLplus.PolyLines(oE.PolyLine, Starter.flgWindowBackColor, oE.LineWidth, gcd.stiDashed)
+  GLplus.PolyLines(oE.PolyLine, oE.ColorToPaint, oE.LineWidth + 2, oE.LineType)
 
 End
 
 Public Function Draw2(oE As Entity)
 
-    If Not oE.Visible Then Return
+  If Not oE.Visible Then Return
 
-    paint.LineWidth = oE.LineWidth / appmain.hFcad.ScaleZoom / gcd.ScaleLines
+  paint.LineWidth = oE.LineWidth / appmain.hFcad.ScaleZoom / gcd.ScaleLines
 
-    paint.brush = Paint.Color(oE.ColorToPaint)
+  paint.brush = Paint.Color(oE.ColorToPaint)
 
-    paint.Arc(oE.p[0], oE.p[1], oE.fParam[0], start, recorrido)
+  paint.Arc(oE.p[0], oE.p[1], oE.fParam[0], start, recorrido)
 
-    paint.Stroke
+  paint.Stroke
 
 End
 
@@ -218,22 +218,22 @@ End
 ' True means all is good, False will instruct the clsEntityBuilder to delete it
 Public Sub Finish(oE As Entity, Optional ParamsDone As Integer = -1) As Boolean
 
-    ' calculo el recorrido del arco como
+  ' calculo el recorrido del arco como
 
-    ' tareas finales de armado del objeto
+  ' tareas finales de armado del objeto
 
-    oE.psel.resize(oE.p.count / 2)
-    oE.ForDeletion = False
-    oE.DrawAble = True
-    oE.Selected = False
-    oE.Finished = True
-    oe.fParam.Add(1) ' sentido de giro
+  oE.psel.resize(oE.p.count / 2)
+  oE.ForDeletion = False
+  oE.DrawAble = True
+  oE.Selected = False
+  oE.Finished = True
+  oe.fParam.Add(1) ' sentido de giro
 
-    If Not True Then
+  If Not True Then
 
-        oE.ForDeletion = True
-        oE.DrawAble = False
+    oE.ForDeletion = True
+    oE.DrawAble = False
 
-    End If
+  End If
 
 End

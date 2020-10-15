@@ -72,7 +72,6 @@
         { !tmr500 #Timer
           #MoveScaled(6,53)
           #Public = True
-          Enabled = True
           Delay = 300
         }
       }

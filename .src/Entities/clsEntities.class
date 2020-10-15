@@ -480,76 +480,122 @@ Public Sub DrawPoint(x As Float, y As Float, Optional colour As Integer = -1, Op
 
 End
 
+' Public Sub SelectElem(iEntity As Integer, Optional AndItsPoints As Boolean = True)
+'
+'   ' select all points and myself
+'
+'   Dim i As Integer
+'
+'   If APPMain.hFCAD.arrEntities[iEntity].iInsert >= 0 Then
+'     ' es parte de un bloque, lo selecciono completo
+'     i = GetParentBlock(iEntity)
+'     SelectAllElemFromBlock(iEntity, AndItsPoints)
+'     Return
+'   Endif
+'
+'   If AndItsPoints Then
+'     For i = 0 To APPMain.hFCAD.arrEntities[iEntity].Psel.Max
+'       APPMain.hFCAD.arrEntities[iEntity].Psel[i] = True
+'     Next
+'
+'   End If
+'   APPMain.hFCAD.arrEntities[iEntity].selected = True
+'
+' End
+
+' Public Sub SelectAllElemFromBlock(iBlock As Integer, Optional AndItsPoints As Boolean = True)
+'
+'   ' select all elements from a block
+'
+'   Dim i, ii, iii As Integer
+'
+'   APPMain.hFCAD.arrEntities[iBlock].selected = True                                                   ' seleccionamos el insert
+'
+'   For i = appmain.hFCAD.arrEntities[iBlock].iInsert + 1 To appmain.hFCAD.arrEntities.max             ' y sus entidades
+'
+'     If appmain.hFCAD.arrEntities[i].iInsert <> appmain.hFCAD.arrEntities[iBlock].iInsert Then Break
+'
+'     If AndItsPoints Then
+'       For ii = 0 To APPMain.hFCAD.arrEntities[i].Psel.Max
+'         APPMain.hFCAD.arrEntities[i].Psel[ii] = True                                      ' y sus puntos
+'       Next
+'
+'     End If
+'
+'     APPMain.hFCAD.arrEntities[i].selected = True
+'
+'   Next
+'
+' End
+
+' Public Sub DeSelectAllElemFromBlock(iBlock As Integer, Optional AndItsPoints As Boolean = True)
+'
+'   ' deselect all elements from a block
+'
+'   Dim i, ii, iii As Integer
+'
+'   For i = iBlock + 1 To appmain.hFCAD.arrEntities.max             ' y sus entidades
+'
+'     If appmain.hFCAD.arrEntities[i].iInsert <> iBlock Then Break
+'
+'     If AndItsPoints Then
+'       For ii = 0 To APPMain.hFCAD.arrEntities[i].Psel.Max
+'         APPMain.hFCAD.arrEntities[i].Psel[ii] = False                                      ' y sus puntos
+'       Next
+'
+'     End If
+'
+'     APPMain.hFCAD.arrEntities[i].selected = False
+'
+'   Next
+'
+' End
+
 Public Sub SelectElem(iEntity As Integer, Optional AndItsPoints As Boolean = True)
 
-  ' select all points and myself
+  Dim i, ii As Integer
 
-  Dim i As Integer
+  If APPMain.hFCAD.arrEntities[iEntity].Gender = "Insert" Then          ' es un inserto
+    If appmain.hFCAD.arrEntities[iEntity].iInsert >= 0 Then             ' esta dentro de otro insert?
+      If Not APPMain.hFCAD.arrEntities[iEntity].selected Then               ' si estaba seleccionada
+        SelectElem(appmain.hFCAD.arrEntities[iEntity].iInsert, AndItsPoints)  ' llamo recursivamente
+      End If
+    Else                                                                ' no, deselecciono hasta encontrar un -1
+      APPMain.hFCAD.arrEntities[iEntity].selected = True
+      For i = iEntity + 1 To appmain.hFCAD.arrEntities.max              ' y sus entidades
 
-  If APPMain.hFCAD.arrEntities[iEntity].iInsert >= 0 Then
-    ' es parte de un bloque, lo selecciono completo
-    i = GetParentBlock(iEntity)
-    SelectAllElemFromBlock(iEntity, AndItsPoints)
-    Return
+        If appmain.hFCAD.arrEntities[i].iInsert = -1 Then Break
+
+        APPMain.hFCAD.arrEntities[i].selected = True
+
+        If AndItsPoints Then
+          For ii = 0 To APPMain.hFCAD.arrEntities[i].Psel.Max
+            APPMain.hFCAD.arrEntities[i].Psel[ii] = True                                      ' y sus puntos
+          Next
+
+        End If
+
+      Next
+    End If
+  Else                                                          ' no es un inserto, pero es parte de uno?
+
+    If APPMain.hFCAD.arrEntities[iEntity].iInsert >= 0 Then     ' si, llamo recursivamente
+      If Not APPMain.hFCAD.arrEntities[iEntity].selected Then       ' pero solo si estaba seleccionada
+        SelectElem(APPMain.hFCAD.arrEntities[iEntity].iInsert, AndItsPoints)
+        Return
+      End If
+    Else                                                        ' no, simplemente deselecciono esta entidad
+
+      APPMain.hFCAD.arrEntities[iEntity].selected = True
+      If AndItsPoints Then
+        For i = 0 To APPMain.hFCAD.arrEntities[iEntity].Psel.Max
+          APPMain.hFCAD.arrEntities[iEntity].Psel[i] = True
+        Next
+
+      End If
+    End If
+
   Endif
-
-  If AndItsPoints Then
-    For i = 0 To APPMain.hFCAD.arrEntities[iEntity].Psel.Max
-      APPMain.hFCAD.arrEntities[iEntity].Psel[i] = True
-    Next
-
-  End If
-  APPMain.hFCAD.arrEntities[iEntity].selected = True
-
-End
-
-Public Sub SelectAllElemFromBlock(iBlock As Integer, Optional AndItsPoints As Boolean = True)
-
-  ' select all elements from a block
-
-  Dim i, ii, iii As Integer
-
-  APPMain.hFCAD.arrEntities[iBlock].selected = True                                                   ' seleccionamos el insert
-
-  For i = appmain.hFCAD.arrEntities[iBlock].iInsert + 1 To appmain.hFCAD.arrEntities.max             ' y sus entidades
-
-    If appmain.hFCAD.arrEntities[i].iInsert <> appmain.hFCAD.arrEntities[iBlock].iInsert Then Break
-
-    If AndItsPoints Then
-      For ii = 0 To APPMain.hFCAD.arrEntities[i].Psel.Max
-        APPMain.hFCAD.arrEntities[i].Psel[ii] = True                                      ' y sus puntos
-      Next
-
-    End If
-
-    APPMain.hFCAD.arrEntities[i].selected = True
-
-  Next
-
-End
-
-Public Sub DeSelectAllElemFromBlock(iBlock As Integer, Optional AndItsPoints As Boolean = True)
-
-  ' deselect all elements from a block
-
-  Dim i, ii, iii As Integer
-
-  APPMain.hFCAD.arrEntities[iBlock].selected = False                                                   ' seleccionamos el insert
-
-  For i = appmain.hFCAD.arrEntities[iBlock].iInsert + 1 To appmain.hFCAD.arrEntities.max             ' y sus entidades
-
-    If appmain.hFCAD.arrEntities[i].iInsert <> appmain.hFCAD.arrEntities[iBlock].iInsert Then Break
-
-    If AndItsPoints Then
-      For ii = 0 To APPMain.hFCAD.arrEntities[i].Psel.Max
-        APPMain.hFCAD.arrEntities[i].Psel[ii] = False                                      ' y sus puntos
-      Next
-
-    End If
-
-    APPMain.hFCAD.arrEntities[i].selected = False
-
-  Next
 
 End
 
@@ -557,22 +603,49 @@ Public Sub DeSelectElem(iEntity As Integer, Optional AndItsPoints As Boolean = T
 
   ' deselect all points and myself
 
-  Dim i As Integer
+  Dim i, ii As Integer
 
-  If APPMain.hFCAD.arrEntities[iEntity].iInsert >= 0 Then
-    ' es parte de un bloque, lo selecciono completo
-    i = GetParentBlock(iEntity)
-    deSelectAllElemFromBlock(iEntity, AndItsPoints)
-    Return
+  If APPMain.hFCAD.arrEntities[iEntity].Gender = "Insert" Then          ' es un inserto
+    If appmain.hFCAD.arrEntities[iEntity].iInsert >= 0 Then             ' esta dentro de otro insert?
+      If APPMain.hFCAD.arrEntities[iEntity].selected Then               ' si estaba seleccionada
+        DeSelectElem(appmain.hFCAD.arrEntities[iEntity].iInsert, AndItsPoints)  ' llamo recursivamente
+      End If
+    Else                                                                ' no, deselecciono hasta encontrar un -1
+      APPMain.hFCAD.arrEntities[iEntity].selected = False
+      For i = iEntity + 1 To appmain.hFCAD.arrEntities.max              ' y sus entidades
+
+        If appmain.hFCAD.arrEntities[i].iInsert = -1 Then Break
+
+        APPMain.hFCAD.arrEntities[i].selected = False
+
+        If AndItsPoints Then
+          For ii = 0 To APPMain.hFCAD.arrEntities[i].Psel.Max
+            APPMain.hFCAD.arrEntities[i].Psel[ii] = False                                      ' y sus puntos
+          Next
+
+        End If
+
+      Next
+    End If
+  Else                                                          ' no es un inserto, pero es parte de uno?
+
+    If APPMain.hFCAD.arrEntities[iEntity].iInsert >= 0 Then     ' si, llamo recursivamente
+      If APPMain.hFCAD.arrEntities[iEntity].selected Then       ' pero solo si estaba seleccionada
+        DeSelectElem(APPMain.hFCAD.arrEntities[iEntity].iInsert, AndItsPoints)
+        Return
+      End If
+    Else                                                        ' no, simplemente deselecciono esta entidad
+
+      APPMain.hFCAD.arrEntities[iEntity].selected = False
+      If AndItsPoints Then
+        For i = 0 To APPMain.hFCAD.arrEntities[iEntity].Psel.Max
+          APPMain.hFCAD.arrEntities[iEntity].Psel[i] = False
+        Next
+
+      End If
+    End If
+
   Endif
-
-  If AndItsPoints Then
-    For i = 0 To APPMain.hFCAD.arrEntities[iEntity].Psel.Max
-      APPMain.hFCAD.arrEntities[iEntity].Psel[i] = False
-    Next
-
-  End If
-  APPMain.hFCAD.arrEntities[iEntity].selected = False
 
 End
 

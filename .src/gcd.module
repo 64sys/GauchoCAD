@@ -560,6 +560,7 @@ Public Function ImportEntities2(colGrp As Collection, obxEntities As Entity[], O
         ' Insert viene con el punto de insercion XYZ, no puedo usar la rutina lectora de puntos
         'flxPoints.Add(colEnt["p"]["p0"][0])
         'flxPoints.Add(colEnt["p"]["p0"][1])
+        'If LCase$(colEnt["block"]) = "toma aa" Then Stop
         AddInsert(obxEntities, flxPoints, colEnt["scalex"], colEnt["scaley"], colEnt["angle"], colEnt["colour"], colEnt["style"], colEnt["layer"], colEnt["block"])
         Inc iTotalEntities
 
