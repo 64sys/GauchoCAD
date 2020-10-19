@@ -64,7 +64,7 @@ Public Function SaveGaucho(sFile As String, cMdl As Collection)
   writer.EndElement
 
   For Each var In cMdl
-    Print cMdl.Key
+    'Print cMdl.Key
     Select cMdl.Key
         ' Case "File"
         '
@@ -86,7 +86,7 @@ Public Function SaveGaucho(sFile As String, cMdl As Collection)
             writer.StartElement("entity")
             For Each v In att
               If stx.Exist(att.Key) Then
-                Print att.Key & ": " & ety.Key
+                'Print att.Key & ": " & ety.Key
                 Select TypeOf(v)
 
                   Case gb.Null
@@ -328,7 +328,7 @@ Public Function LoadGaucho(sFile As String) As Collection
         ' estos angulos vienen en radianes
         c["start_angle"] = CFloat(ent.Attributes["start_angle"]) 'FloatList(ent.Attributes["a"]) 'EncodePoint(ent.Attributes["a"], "a")
         c["end_angle"] = CFloat(ent.Attributes["end_angle"]) 'FloatList(ent.Attributes["a"]) 'EncodePoint(ent.Attributes["a"], "a")
-        Print "x"
+        'Print "x"
 
       Case "arc"
         c["p"] = EncodePoint(ent.Attributes["p"], "p")
@@ -336,7 +336,7 @@ Public Function LoadGaucho(sFile As String) As Collection
         ' estos angulos vienen en GRADOS
         c["start_angle"] = CFloat(ent.Attributes["start_angle"]) 'FloatList(ent.Attributes["a"]) 'EncodePoint(ent.Attributes["a"], "a")
         c["end_angle"] = CFloat(ent.Attributes["end_angle"]) 'FloatList(ent.Attributes["a"]) 'EncodePoint(ent.Attributes["a"], "a")
-        Print c["a"]
+        'Print c["a"]
 
       Case "text"
         c["p"] = EncodePoint(ent.Attributes["p"], "p")
@@ -351,7 +351,7 @@ Public Function LoadGaucho(sFile As String) As Collection
         c["scale"] = FloatList(ent.Attributes["scale"])
         c["block"] = ent.Attributes["block"]
 
-        Print c["a"]
+        'Print c["a"]
 
     End Select
 
@@ -547,7 +547,7 @@ Private Function EncodePoint(sPoint As String, sTag As String) As Collection
 
 End
 
-Public Function ExportSVG(model As Collection) As String
+Public Function SVGExport(model As Collection) As String
 
   Dim ent As Variant
   Dim xsvg As New XmlDocument
@@ -573,12 +573,12 @@ Public Function ExportSVG(model As Collection) As String
 
 End
 
-Public Function ImportDxf(sFile As String) As Collection
+Public Function DXFImport(sFile As String) As Collection
 
   'Dim model As New Collection       ''Complete model
   Dim sec As New Collection 'String[]
 
-  sec = GetDXFSections(sFile)
+  sec = DXFSections(sFile)
 
   ' If sections.Count > 0 Then
   '     Print sections.Count
@@ -588,7 +588,7 @@ Public Function ImportDxf(sFile As String) As Collection
 
 End
 
-Public Function ImportDwg(sFile As String) As Collection
+Public Function DWGImport(sFile As String) As Collection
 
   Dim sCont As String
   Dim cont As Collection
@@ -607,12 +607,16 @@ Public Function ImportDwg(sFile As String) As Collection
   Dim model As New Collection       ''Complete model
   Dim layers As Collection
   Dim AcHeader As Collection
+  Dim sFDebug As String
 
-  layers = GetLayersList(sFile)
+  layers = DWGLayersList(sFile)
 
-  vent = cad.GetEntityList()
+  vent = DWGEntityList()
 
   sCont = dwgread(sFile)
+  'sFDebug = File.Dir(sFile) &/ File.BaseName(sFile) & ".txt"
+  'File.Save(sFDebug, sCont)
+  'Shell "gedit " & sFDebug
 
   If sCont <> "" Then
     FileVersion = Split(sCont, "\n")[1]
@@ -620,7 +624,8 @@ Public Function ImportDwg(sFile As String) As Collection
     FileVersion = Replace(FileVersion, "(", ":")
     FileVersion = Split(FileVersion, ":")[1]
 
-    cont = Sections(sCont, FileVersion)
+    'cont = Sections(sCont, FileVersion)
+    cont = DWGSections(sCont, FileVersion)
 
     model.Add(sFile, "File")
     model.Add(FileVersion, "Version")
@@ -633,48 +638,56 @@ Public Function ImportDwg(sFile As String) As Collection
       Endif
     Endif
 
-    If cont.Exist("Handles") Then
+    '   If cont.Exist("Handles") Then
+    '
+    '     enty = Objects(cont["Handles"])
+    '
+    '     For Each v In vent
+    '       If v = True Then ' for debug change to False
+    '         If enty.Exist(vent.Key) Then
+    '           ctn = enty[vent.Key]
+    '           If ctn.Count > 0 Then
+    '             For Each x In ctn
+    '               comm = DWGDecodeCommon(x)
+    '               spec = DWGDecodeEntity(x)
+    '               'Ety = comm["Name"]
+    '               Ety = comm["entity"]
+    '               'Idx = comm["Id"]
+    '               Idx = comm["handle"]
+    '               set.Clear
+    '               'combinax
+    '               'If comm["Id"] = spec["Id"] Then
+    '               If comm["handle"] = spec["handle"] Then
+    '                 For Each v In comm
+    '                   set.Add(v, comm.Key)
+    '                 Next
+    '                 For Each v In spec
+    '                   If set.Exist(spec.Key) = False Then
+    '                     set.Add(v, spec.Key)
+    '                   Endif
+    '                 Next
+    '               Endif
+    '               'entities.Add(set.Copy(), set["Id"])
+    '               entities.Add(set.Copy(), set["handle"])
+    '             Next
+    '           Endif
+    '         Endif
+    '       Endif
+    '     Next
+    '   Endif
+    ' Endif
 
-      enty = Objects(cont["Handles"])
-
-      For Each v In vent
-        If v = True Then ' for debug change to False
-          If enty.Exist(vent.Key) Then
-            ctn = enty[vent.Key]
-            If ctn.Count > 0 Then
-              For Each x In ctn
-                comm = DecodeCommon(x)
-                spec = DecodeEntity(x)
-                Ety = comm["Name"]
-                Idx = comm["Id"]
-                set.Clear
-                'combinax
-                If comm["Id"] = spec["Id"] Then
-                  For Each v In comm
-                    set.Add(v, comm.Key)
-                  Next
-                  For Each v In spec
-                    If set.Exist(spec.Key) = False Then
-                      set.Add(v, spec.Key)
-                    Endif
-                  Next
-                Endif
-                entities.Add(set.Copy(), set["Id"])
-              Next
-            Endif
-          Endif
-        Endif
-      Next
+    If model.Exist("Entities") = False Then
+      If cont.Exist("Entities") Then
+        model.Add(cont["Entities"], "Entities")
+      Endif
     Endif
   Endif
-
-  model.Add(entities, "Entities")
-
   Return model
 
 End
 
-Public Function GetLayersList(sFile As String) As Collection
+Public Function DWGLayersList(sFile As String) As Collection
 
   Dim layers As New Collection
   Dim sOut As String
@@ -718,7 +731,7 @@ Public Function GetLayersList(sFile As String) As Collection
 
 End
 
-Public Function GetEntityList() As Collection
+Public Function DWGEntityList() As Collection
 
   Dim entity As New Collection
 
@@ -782,7 +795,7 @@ End
 'dwgwrite
 'dxf2dwg
 'dxfwrite
-Public Function dwgread(f As String, Optional fmt As String) As String
+Public Function DWGRead(f As String, Optional fmt As String) As String
 
   Dim sOut As String
 
@@ -800,7 +813,8 @@ Public Function dwgread(f As String, Optional fmt As String) As String
 
 End
 
-Public Function Sections(s As String, vsn As String) As Collection
+'Public Function Sections(s As String, vsn As String) As Collection
+Public Function DWGSections(s As String, vsn As String) As Collection
 
   Dim sWrd As String
   Dim cont As New Collection
@@ -811,6 +825,9 @@ Public Function Sections(s As String, vsn As String) As Collection
   Dim contx As String[]
   Dim tmx As New String[]
   Dim tm As String
+  Dim sCont As String
+  Dim cCont As New Collection
+  Dim out As New Collection
 
   Select vsn
 
@@ -838,6 +855,10 @@ Public Function Sections(s As String, vsn As String) As Collection
             If sName = "Header Variables" Then
               sName = "Header"
             Endif
+
+            If sName = "Handles" Then
+              sn = Replace(sn, "==========================================\n", "\t")
+            Endif
             cont.Add(sn, sName)
           Endif
         Endif
@@ -857,6 +878,7 @@ Public Function Sections(s As String, vsn As String) As Collection
             sName = Split(sHead, " ")[1]
             sName = Replace(sName, "AcDb:", "")
             cont.Add(sWrd & sn, sName)
+            '==========================================
           Endif
         Endif
       Next
@@ -899,29 +921,105 @@ Public Function Sections(s As String, vsn As String) As Collection
 
   End Select
 
-  Return cont
+  '' Arranging the data to standarize like DXF collection
+  For Each sCont In cont
+    Select cont.Key
+      Case "Handles" 'Entities en DXF
+        cCont = DWGEntities(sCont)
+        out.Add(cCont, "Entities")
+    End Select
+  Next
+
+  'Return cont
+  Return out
 
 End
 
-Public Function Objects(s As String) As Collection
-  'list,number
+' Public Function DWGEntities(sCont As String) As Collection
+'
+'   Dim stx As New String[]
+'   Dim out As New Collection
+'   Dim sout As New Collection
+'   Dim i As Integer
+'   Dim cItem As New Collection
+'   Dim sKey As String
+'   Dim cEnty As Collection
+'   Dim eN As Boolean
+'
+'   cEnty = DWGEntityList()
+'
+'   'sCont = Replace(sCont, "\t", " ")
+'   File.Save(User.Home &/ "handles.txt", sCont)
+'   Shell "gedit " & User.Home &/ "handles.txt"
+'
+'   'For Each eN In cEnty
+'   '  sCont = Replace(sCont, "  0\n" & cEnty.Key & "\n  5\n", "\t  0\n" & cEnty.Key & "\n  5\n")
+'   'Next
+'
+'   stx = Split(sCont, "\t")
+'
+'   For i = 0 To stx.Max
+'     If InStr(stx[i], "\nAdd entity ") > 0 And InStr(stx[i], " Decode entity ") > 0 Then
+'       cItem = DWGDecodeItem(stx[i])
+'       If cItem.Count > 1 Then
+'         sKey = ""
+'         If cItem.Exist("handle") Then
+'           sKey = cItem["entity"] & ":" & cItem["handle"]
+'           out.Add(cItem.Copy(), sKey)
+'         Endif
+'       Endif
+'     Endif
+'   Next
+'
+'   sout = EntitiesSort(out)
+'
+'   Return sout
+'
+' End
+
+Public Function DWGEntities(s As String) As Collection
 
   Dim stx As String[]
   Dim i As Integer
   Dim obt As String
-  'Dim sVer As String
-  Dim obx As String[]
+  Dim obx As New String[]
   Dim tmx As New Collection
   Dim j As Integer
-  Dim hdx As String[]
-  'Dim dtx As String[]
+  Dim hdx As New String[]
   Dim k As Integer
   Dim sTag As String
   Dim sVal As String
+  Dim vVal As Variant
   Dim st As String
   Dim out As New Collection
   Dim p As Integer
+
   Dim sType As String
+  Dim xVal As New String[]
+  Dim xType As String
+  Dim hDXF As String
+  Dim cProp As Collection
+  Dim item As String
+  Dim sData As String
+  Dim iKey As Integer
+  Dim tmx2 As New Collection
+  Dim iDek As Integer
+  Dim sCut As String
+  Dim sEnt As String
+  Dim sRaw As String
+  Dim t As String
+  Dim otx As New String[]
+  Dim enty As Collection
+  Dim alias As Collection
+  Dim sAlias As Variant
+  Dim r As Variant
+  Dim sOut As String
+  Dim arr As New Collection
+  Dim sKey As String
+  Dim out2 As Collection
+
+  enty = DWGEntityList()
+  alias = DWGAlias()
 
   s = Replace(s, "==========================================\n", "\t")
   stx = Split(s, "\t")
@@ -930,63 +1028,367 @@ Public Function Objects(s As String) As Collection
     For i = 1 To stx.Max
       tmx.Clear
       obt = stx[i]
+      obx.Clear
       obx = Split(obt, "\n")
-      hdx = Split(Replace(Replace(obx[0], ", ", "\t"), ": ", ":"), "\t")
-      For k = 0 To hdx.Max
-        sTag = Split(hdx[k], ":")[0]
-        sTag = Replace(sTag, " ", "")
-        sVal = Split(hdx[k], ":")[1]
-        If sTag = "Object number" Then
-          tmx.Add(CStr(Split(sVal, "/")[0]), "object_int")
-          tmx.Add(CStr(Split(sVal, "/")[1]), "object_hex")
+
+      If obx.Count > 1 Then
+        If InStr(obx[1], " Decode entity ") > 0 Then
+          hdx.Clear
+          hdx = Split(Replace(obx[1], " Decode entity ", "\t"), "\t")
+          vVal = hdx[hdx.Max]
+          'tmx.Add(vVal, "object_name")
+          tmx.Add(vVal, "entity")
+
+          If enty.Exist(hdx[hdx.Max]) Then
+            If enty[hdx[hdx.Max]] Then
+              Print "Acepted: " & hdx[hdx.Max]
+              File.Save("/tmp" &/ Format(i, "0000") & ".txt", obt)
+
+              otx = Split(Replace(obx[0], ", ", "\t"), "\t")
+
+              For Each t In otx
+                sRaw = Replace(t, ": ", ":")
+                sTag = String.Lower(Split(sRaw, ":")[0])
+                sTag = Replace(sTag, " ", "")
+                sVal = Replace(sRaw, Split(sRaw, ":")[0] & ":", "")
+                vVal = DWGDecodeItem([sTag, sVal])
+                If tmx.Exist(sTag) = False Then
+                  If sTag = "objectnumber" Then
+                    If InStr(sVal, "/") > 0 Then
+                      'tmx.Add(CStr(Split(sVal, "/")[0]), "object_int")
+                      'tmx.Add(CStr(Split(sVal, "/")[1]), "object_hex")
+                      tmx.Add(CStr(Split(sVal, "/")[0]), "id") 'Long
+                      'tmx.Add(CStr(Split(sVal, "/")[1]), "ix") ' Hex
+                    Endif
+                  Else
+                    tmx.Add(vVal, sTag)
+                  Endif
+                Endif
+              Next
+
+              For j = 2 To obx.Max
+
+                If InStr(obx[j], ":") > 0 Then
+                  sRaw = Replace(obx[j], ": ", ":")
+                  sTag = String.Lower(Split(sRaw, ":")[0])
+                  sTag = Replace(sTag, " ", "")
+                  If alias.Exist(sTag) Then
+                    sAlias = alias[sTag]
+                  Else
+                    sAlias = sTag
+                  Endif
+
+                  sVal = Replace(sRaw, Split(sRaw, ":")[0] & ":", "")
+
+                  vVal = DWGDecodeItem([sTag, sVal])
+                  If tmx.Exist(sTag) = False Then
+                    tmx.Add(vVal, sAlias)
+                  Else
+                    tmx.Add(vVal, sAlias & "[" & CStr(j) & "]")
+                  Endif
+                Else
+                Endif
+              Next
+              If tmx.Count > 0 Then
+                'out.Add([tmx.Copy()], tmx["object_name"])
+                sOut = ""
+                For Each r In tmx
+                  If TypeOf(r) <> 16 Then
+                    sOut &= tmx.Key & ": " & CStr(r) & "\n"
+                  Else
+                    sOut &= tmx.Key & ": [type 16]" & "\n"
+                  Endif
+                Next
+
+                'File.Save(User.Home &/ tmx["entity"] & ".txt", sOut)
+
+                arr = DWGArrangeEnty(tmx.Copy())
+
+                If arr.Exist("id") Then
+                  sKey = arr["entity"] & ":" & arr["id"]
+                  out.Add(arr.Copy(), sKey)
+                Endif
+
+                'If out.Exist(arr["entity"]) = False Then
+                '  out.Add(arr["entity"])
+                '  out.Add(arr.Copy(), arr["id"], arr["entity"])
+                'Else
+                '  out["entity"].Add([arr.Copy(), arr["id"]])
+                'Endif
+                'arr.Clear
+                'File.Save("/tmp"  &/ tmx["object_name"] & ".txt", obt)
+                'File.Save("/tmp"  &/ tmx["object_name"] & ".trim.txt", Trim(obt))
+              Endif
+              'Else
+              'Print "Rejected: " & hdx[hdx.Max]
+            Endif
+            'Else
+            'Print "Non-scheduled: " & hdx[hdx.Max]
+          Endif
         Else
-          tmx.Add(sVal, sTag)
+          'File.Save("/tmp" &/ Format(i, "0000") & "-skiped.txt", obt)
+
         Endif
-      Next
-
-      '"Add object BLOCK_CONTROL [0] Decode object BLOCK_CONTROL"
-      Select String.Mid(obx[1], 1, 4)
-        Case "Warn"
-          sType = Split(obx[2], " ")[Split(obx[2], " ").Max - 1]
-          p = 1
-        Case "Add "
-          sType = Split(obx[1], " ")[Split(obx[1], " ").Max - 1]
-          p = 0
-        Case Else
-          sType = "Error"
-      End Select
-
-      If sType <> "Error" Then
-        tmx.Add(sType, "XType")
-        sVal = Split(obx[1 + p], " ")[Split(obx[1 + p], " ").Max]
-        tmx.Add(sVal, "XName")
       Endif
 
-      For j = (2 + p) To obx.Max - 3
-        If InStr(obx[j], ": ") Then
-          st = Replace(obx[j], ": ", "\t")
-          sTag = Split(st, "\t")[0]
-          sTag = Replace(sTag, " ", "")
-          sVal = Split(st, "\t")[1]
-          tmx.Add(sVal, sTag)
-        Endif
-      Next
-
-      If tmx.Exist("XName") Then
-        If out.Exist(tmx["XName"]) Then
-          out[tmx["XName"]].Add(tmx.Copy())
-        Else
-          out.Add([tmx.Copy()], tmx["XName"])
-        Endif
-      Else
-        Print "entity error" & tmx["Object_int"]
-      Endif
     Next
   Endif
 
-  Return out
+  out2 = EntitiesSort(out)
+
+  Return out2
 
 End
+
+Public Function DWGDecodeItem(xRaw As String[]) As Variant
+
+  Dim tmx As New Collection
+  Dim out As New Collection
+  Dim sVal As String
+  Dim sTag As String
+  Dim hDXF As String
+  Dim xVal As String[]
+  Dim xType As String
+  Dim vVal As Variant
+  Dim xDat As New Collection
+  Dim k As Integer
+  Dim sName As String
+  Dim sKey As String
+  Dim sDxf As String
+  Dim sType As String
+  Dim tVal As String
+  Dim sGrp As String
+  Dim kword As String
+  Dim px As Float[]
+
+  sTag = String.Lower(xRaw[0])
+  If InStr(sTag, "entries[vcount]") > 0 Then
+    sGrp = "entries"
+  Endif
+  sVal = Replace(xRaw[1], " [", "[")
+
+  Print sTag & ": " & sVal
+
+  Select sTag
+
+    Case "ownerhandle", "layer", "style"
+      If InStr(sVal, "=>") > 0 Then
+        k = InStr(sVal, " => ")
+        If k > 0 Then
+          tVal = String.Mid(sVal, k + 4)
+          For Each kword In ["LAYER", "BLOCK_HEADER", "STYLE"]
+            If InStr(tVal, kword) > 0 Then
+              tVal = Replace(tVal, kword & " ", "")
+              Break
+            Endif
+          Next
+          vVal = tVal
+        Endif
+      Else
+        vVal = "Error"
+      Endif
+    Case "start", "end", "ins_pt"
+      px = DWGDecodeCoord(sVal)
+      If px.Count = 2 Then
+        px.Add(0.0)
+      Endif
+      vVal = px
+
+    Case "crc"
+      vVal = DWGDecodeCRC(sVal)
+
+      'Case "linewt"
+      '  vVal = DWGDecodeHex(sVal)
+
+    Case "color.index"
+      vVal = DWGDecodeColor(sVal)
+
+    Case "linewt"
+      If InStr(sVal, "[") > 0 Then
+        tVal = Split(sVal, "[")[0]
+        vVal = tVal
+      Else
+        vVal = sVal
+      Endif
+      vVal = DWGDecodeHex(tVal)
+
+    Case "handle"
+      vVal = DWGDecodeHandle(sVal)
+
+    Case "prev_entity", "next_entity", "xdicobjhandle"
+      If InStr(sVal, ")") > 0 Then
+        tVal = Split(sVal, ")")[0]
+        tVal = Replace(tVal, "(", "")
+        vVal = tVal
+      Else
+        vVal = sVal
+      Endif
+
+    Case "address"
+      vVal = sVal
+
+    Case "bitsize", "num_eed"
+      vVal = DWGDecodeInteger(sVal)
+
+    Case "ltype_flags"
+      vVal = sVal
+
+    Case "hdlsize"
+      If InStr(sVal, ",") > 0 Then
+        tVal = Split(sVal, ",")[0]
+      Else
+        tVal = sVal
+      Endif
+      vVal = DWGDecodeInteger(tVal)
+    Case "x", "y", "z"
+      vVal = DWGDecodeFloat(tVal)
+
+    Case "x_ang", "height"
+      vVal = DWGDecodeFloat(tVal)
+
+    Case Else
+      If InStr(sVal, "[") > 0 And Right(sVal) = "]" Then
+        If InStr(sVal, " ") > 0 Then
+          sType = Split(Split(sVal, "[")[1], " ")[0]
+          sDxf = Split(Split(sVal, "[")[1], " ")[1]
+        Else
+          sType = Split(sVal, "[")[1]
+          sType = Replace(sType, "]", "")
+          sDxf = ""
+        Endif
+        tVal = Split(sVal, "[")[0]
+
+        Select sType
+          Case "3B", "4BITS", "B", "BB" 'Byte
+            Try vVal = CByte(tVal)
+
+            If Error Then
+              Print Error.Backtrace
+              vVal = CByte("0")
+            Endif
+
+          Case "BD", "BE", "BT", "RD" 'FLoat
+            vVal = CFloat(tVal)
+
+          Case "DD" 'Coords
+            Select sDxf
+              Case ""
+                vVal = CFloat(tVal)
+              Case "10", "11", "20", "21", "30", "31", "40", "41"
+                vVal = DWGDecodeCoord(sVal)
+            End Select
+
+          Case "BL", "BLL", "MC", "MS", "RL", "UMC" 'Long
+            vVal = CLong(tVal)
+
+          Case "BS", "RS"  'Short
+            vVal = CShort(tVal)
+
+          Case "RC", "TF", "TFF", "TU", "TV" 'String
+            vVal = CString(tVal)
+
+          Case "CMC", "H" ' ¿String?
+            vVal = CString(tVal)
+
+          Case Else
+            vVal = tVal
+
+        End Select
+
+      Else
+        vVal = sVal
+      Endif
+
+  End Select
+
+  Return vVal
+
+End
+
+' Public Function Objects(s As String) As Collection
+'   'list,number
+'
+'   Dim stx As String[]
+'   Dim i As Integer
+'   Dim obt As String
+'   'Dim sVer As String
+'   Dim obx As String[]
+'   Dim tmx As New Collection
+'   Dim j As Integer
+'   Dim hdx As String[]
+'   'Dim dtx As String[]
+'   Dim k As Integer
+'   Dim sTag As String
+'   Dim sVal As String
+'   Dim st As String
+'   Dim out As New Collection
+'   Dim p As Integer
+'   Dim sType As String
+'
+'   s = Replace(s, "==========================================\n", "\t")
+'   stx = Split(s, "\t")
+'
+'   If stx.count > 0 Then
+'     For i = 1 To stx.Max
+'       tmx.Clear
+'       obt = stx[i]
+'       obx = Split(obt, "\n")
+'       hdx = Split(Replace(Replace(obx[0], ", ", "\t"), ": ", ":"), "\t")
+'       For k = 0 To hdx.Max
+'         sTag = Split(hdx[k], ":")[0]
+'         sTag = Replace(sTag, " ", "")
+'         sVal = Split(hdx[k], ":")[1]
+'         If sTag = "Object number" Then
+'           tmx.Add(CStr(Split(sVal, "/")[0]), "object_int")
+'           tmx.Add(CStr(Split(sVal, "/")[1]), "object_hex")
+'         Else
+'           tmx.Add(sVal, sTag)
+'         Endif
+'       Next
+'
+'       '"Add object BLOCK_CONTROL [0] Decode object BLOCK_CONTROL"
+'       Select String.Mid(obx[1], 1, 4)
+'         Case "Warn"
+'           sType = Split(obx[2], " ")[Split(obx[2], " ").Max - 1]
+'           p = 1
+'         Case "Add "
+'           sType = Split(obx[1], " ")[Split(obx[1], " ").Max - 1]
+'           p = 0
+'         Case Else
+'           sType = "Error"
+'       End Select
+'
+'       If sType <> "Error" Then
+'         tmx.Add(sType, "XType")
+'         sVal = Split(obx[1 + p], " ")[Split(obx[1 + p], " ").Max]
+'         tmx.Add(sVal, "XName")
+'       Endif
+'
+'       For j = (2 + p) To obx.Max - 3
+'         If InStr(obx[j], ": ") Then
+'           st = Replace(obx[j], ": ", "\t")
+'           sTag = Split(st, "\t")[0]
+'           sTag = Replace(sTag, " ", "")
+'           sVal = Split(st, "\t")[1]
+'           tmx.Add(sVal, sTag)
+'         Endif
+'       Next
+'
+'       If tmx.Exist("XName") Then
+'         If out.Exist(tmx["XName"]) Then
+'           out[tmx["XName"]].Add(tmx.Copy())
+'         Else
+'           out.Add([tmx.Copy()], tmx["XName"])
+'         Endif
+'       Else
+'         Print "entity error" & tmx["Object_int"]
+'       Endif
+'     Next
+'   Endif
+'
+'   Return out
+'
+' End
 
 Public Function Header(s As String) As Collection
 
@@ -1022,7 +1424,7 @@ End
 
 '' Decode the common fields for any entity
 
-Public Function DecodeCommon(c As Collection) As Collection
+Public Function DWGDecodeCommon(c As Collection) As Collection
 
   Dim v As Variant
   Dim prp As New Collection
@@ -1033,17 +1435,20 @@ Public Function DecodeCommon(c As Collection) As Collection
 
   If c.Exist("XName") Then
 
+    prp.Add(c["XName"], "entity")
+
     If c.Exist("Objectnumber") Then
       If InStr(c["Objectnumber"], "/") > 1 Then
         i = CInt(Split(c["Objectnumber"], "/")[0])
       Endif
-      prp.Add(i, "Id")
+      'prp.Add(i, "Id")
+      prp.Add(i, "handle")
     Endif
 
-    prp.Add(c["XName"], "Name")
+    'prp.Add(c["XName"], "Name")
 
     If c["XName"] = "LWPOLYLINE" Then
-      Print "LWPOLYLINE"
+      'Print "LWPOLYLINE"
     Endif
 
     For Each v In c
@@ -1052,27 +1457,30 @@ Public Function DecodeCommon(c As Collection) As Collection
       Select c.Key
 
         Case "layer"
-          sVal = DecodeLayer(CStr(v))
-          prp.Add(sVal, "Layer")
+          sVal = DWGDecodeLayer(CStr(v))
+          'prp.Add(sVal, "Layer")
+          prp.Add(sVal, "layer")
 
         Case "ltype_flags"
-          i = DecodeInteger(CStr(v))
-          prp.Add(i, "Style")
+          i = DWGDecodeInteger(CStr(v))
+          'prp.Add(i, "Style")
+          prp.Add(i, "style")
 
         Case "linewt"
-          i = DecodeHex(sVal)
-          prp.Add(i, "Weight")
+          i = DWGDecodeHex(sVal)
+          'prp.Add(i, "Weight")
+          prp.Add(i, "width")
 
         Case "ltype_scale"
-          f = DecodeFloat(CStr(v))
+          f = DWGDecodeFloat(CStr(v))
           prp.Add(f, c.Key)
 
         Case "plotstyle_flags"
-          i = DecodeInteger(CStr(v))
+          i = DWGDecodeInteger(CStr(v))
           prp.Add(i, c.Key)
 
         Case "invisible"
-          i = DecodeInteger(CStr(v))
+          i = DWGDecodeInteger(CStr(v))
           prp.Add(i, c.Key)
 
       End Select
@@ -1081,7 +1489,7 @@ Public Function DecodeCommon(c As Collection) As Collection
       sVal = ""
       If c.Exist("color.raw") Then
         sVal = String.Mid(c["color.raw"], 1, InStr(c["color.raw"], "[") - 1)
-        i = DecodeHex(sVal)
+        i = DWGDecodeHex(sVal)
       Else
         If c.Exist("color.index") Then
           sVal = String.Mid(c["color.index"], 1, InStr(c["color.index"], "[") - 1)
@@ -1091,9 +1499,11 @@ Public Function DecodeCommon(c As Collection) As Collection
       Endif
 
       If i >= 0 And i <= 256 Then
-        prp.Add(i, "Colour")
+        'prp.Add(i, "Colour")
+        prp.Add(i, "colour")
       Else
-        prp.Add(0, "Colour")
+        'prp.Add(0, "Colour")
+        prp.Add(0, "colour")
       Endif
 
     Next
@@ -1105,7 +1515,7 @@ End
 
 '' Decode the fields for a specific entity
 
-Public Function DecodeEntity(c As Collection) As Collection
+Public Function DWGDecodeEntity(c As Collection) As Collection
 
   Dim v As Variant
   Dim prp As New Collection
@@ -1126,6 +1536,7 @@ Public Function DecodeEntity(c As Collection) As Collection
   Dim d As Integer
   Dim sTag5 As String
   Dim sTag4 As String
+  Dim vVal As Variant
 
   If c.Exist("XName") Then
 
@@ -1133,10 +1544,11 @@ Public Function DecodeEntity(c As Collection) As Collection
       If InStr(c["Objectnumber"], "/") > 1 Then
         i = CInt(Split(c["Objectnumber"], "/")[0])
       Endif
-      prp.Add(i, "Id")
+      'prp.Add(i, "Id")
+      prp.Add(CStr(i), "handle")
     Endif
 
-    prp.Add(c["XName"], "Name")
+    prp.Add(c["XName"], "entity")
 
     Select c["XName"]
 
@@ -1145,32 +1557,32 @@ Public Function DecodeEntity(c As Collection) As Collection
         For Each v In c
           Select c.Key
             Case "insertion_pt"
-              pt = DecodeCoord(CStr(v))
-              prp.Add(pt, "P1")
+              pt = DWGDecodeCoord(CStr(v))
+              prp.Add(pt, "p1")
 
             Case "alignment_pt"
-              pt = DecodeCoord(CStr(v))
-              prp.Add(pt, "P2")
+              pt = DWGDecodeCoord(CStr(v))
+              prp.Add(pt, "p2")
 
             Case "rotation"
-              f = DecodeFloat(CStr(v))
-              prp.Add(f, "Angle")
+              f = DWGDecodeFloat(CStr(v))
+              prp.Add(f, "angle")
 
             Case "height"
-              f = DecodeFloat(CStr(v))
-              prp.Add(f, "Height")
+              f = DWGDecodeFloat(CStr(v))
+              prp.Add(f, "height")
 
             Case "horiz_alignment"
-              i = DecodeInteger(CStr(v))
-              prp.Add(i, "Horiz")
+              i = DWGDecodeInteger(CStr(v))
+              prp.Add(i, "horiz")
 
             Case "style"
-              sVal = DecodeTextStyle(CStr(v))
-              prp.Add(sVal, "Font")
+              sVal = DWGDecodeTextStyle(CStr(v))
+              prp.Add(sVal, "font")
 
             Case "text_value" ' I deide call just "text" to the tag
-              sVal = DecodeText(CStr(v))
-              prp.Add(sVal, "Text")
+              sVal = DWGDecodeText(CStr(v))
+              prp.Add(sVal, "text")
 
           End Select
         Next
@@ -1180,65 +1592,65 @@ Public Function DecodeEntity(c As Collection) As Collection
         For Each v In c
           Select c.Key
             Case "insertion_pt"
-              pt = DecodeCoord(CStr(v))
-              prp.Add(pt, "P1")
+              pt = DWGDecodeCoord(CStr(v))
+              prp.Add(pt, "p1")
 
             Case "extrusion"
-              pt = DecodeCoord(CStr(v))
+              pt = DWGDecodeCoord(CStr(v))
               prp.Add(pt, c.Key)
 
             Case "x_axis_dir"
-              pt = DecodeCoord(CStr(v))
+              pt = DWGDecodeCoord(CStr(v))
               prp.Add(pt, c.Key)
 
             Case "rect_width"
-              f = DecodeFloat(CStr(v))
+              f = DWGDecodeFloat(CStr(v))
               prp.Add(f, c.Key)
 
             Case "text_height"
-              f = DecodeFloat(CStr(v))
-              prp.Add(f, "Height")
+              f = DWGDecodeFloat(CStr(v))
+              prp.Add(f, "height")
 
             Case "attachment"
-              i = DecodeInteger(CStr(v))
+              i = DWGDecodeInteger(CStr(v))
               prp.Add(i, c.Key)
 
             Case "drawing_dir"
-              i = DecodeInteger(CStr(v))
+              i = DWGDecodeInteger(CStr(v))
               prp.Add(i, c.Key)
 
             Case "extents_height"
-              f = DecodeFloat(CStr(v))
+              f = DWGDecodeFloat(CStr(v))
               prp.Add(f, c.Key)
 
             Case "extents_width"
-              f = DecodeFloat(CStr(v))
+              f = DWGDecodeFloat(CStr(v))
               prp.Add(f, c.Key)
 
             Case "text"
-              sVal = DecodeText(CStr(v))
-              prp.Add(sVal, "Text")
+              sVal = DWGDecodeText(CStr(v))
+              prp.Add(sVal, "text")
 
             Case "linespace_style"
-              i = DecodeInteger(CStr(v))
+              i = DWGDecodeInteger(CStr(v))
               prp.Add(i, c.Key)
 
             Case "linespace_factor"
-              f = DecodeFloat(CStr(v))
+              f = DWGDecodeFloat(CStr(v))
               prp.Add(f, c.Key)
 
             Case "unknown_bit"
-              i = DecodeInteger(CStr(v))
+              i = DWGDecodeInteger(CStr(v))
               prp.Add(i, c.Key)
 
             Case "bg_fill_flag"
 
-              i = DecodeInteger(CStr(v))
+              i = DWGDecodeInteger(CStr(v))
               prp.Add(i, c.Key)
 
             Case "style"
-              sVal = DecodeTextStyle(CStr(v))
-              prp.Add(sVal, "Font")
+              sVal = DWGDecodeTextStyle(CStr(v))
+              prp.Add(sVal, "font")
 
           End Select
         Next
@@ -1248,32 +1660,32 @@ Public Function DecodeEntity(c As Collection) As Collection
         For Each v In c
           Select c.Key
             Case "insertion_pt"
-              pt = DecodeCoord(CStr(v))
-              prp.Add(pt, "P1")
+              pt = DWGDecodeCoord(CStr(v))
+              prp.Add(pt, "p1")
 
             Case "height"
-              f = DecodeFloat(CStr(v))
-              prp.Add(f, "Height")
+              f = DWGDecodeFloat(CStr(v))
+              prp.Add(f, "height")
 
             Case "default_value"
-              sVal = DecodeText(CStr(v))
-              prp.Add(sVal, "Default")
+              sVal = DWGDecodeText(CStr(v))
+              prp.Add(sVal, "default")
 
             Case "tag"
-              sVal = DecodeText(CStr(v))
-              prp.Add(sVal, "Tag")
+              sVal = DWGDecodeText(CStr(v))
+              prp.Add(sVal, "tag")
 
             Case "field_length"
-              i = DecodeInteger(CStr(v))
-              prp.Add(i, "Length")
+              i = DWGDecodeInteger(CStr(v))
+              prp.Add(i, "length")
 
             Case "prompt"
-              sVal = DecodeText(CStr(v))
-              prp.Add(sVal, "Prompt")
+              sVal = DWGDecodeText(CStr(v))
+              prp.Add(sVal, "prompt")
 
             Case "style"
-              sVal = DecodeTextStyle(CStr(v))
-              prp.Add(sVal, "Font")
+              sVal = DWGDecodeTextStyle(CStr(v))
+              prp.Add(sVal, "font")
 
           End Select
         Next
@@ -1283,63 +1695,63 @@ Public Function DecodeEntity(c As Collection) As Collection
         For Each v In c
           Select c.Key
             Case "insertion_pt"
-              pt = DecodeCoord(CStr(v))
-              prp.Add(pt, "P1")
+              pt = DWGDecodeCoord(CStr(v))
+              prp.Add(pt, "p1")
 
             Case "height"
-              f = DecodeFloat(CStr(v))
-              prp.Add(f, "Height")
+              f = DWGDecodeFloat(CStr(v))
+              prp.Add(f, "height")
 
             Case "text_value"
-              sVal = DecodeText(CStr(v))
-              prp.Add(sVal, "Text")
+              sVal = DWGDecodeText(CStr(v))
+              prp.Add(sVal, "text")
 
             Case "tag"
-              sVal = DecodeText(CStr(v))
-              prp.Add(sVal, "Tag")
+              sVal = DWGDecodeText(CStr(v))
+              prp.Add(sVal, "tag")
 
             Case "field_length"
-              i = DecodeInteger(CStr(v))
-              prp.Add(i, "Length")
+              i = DWGDecodeInteger(CStr(v))
+              prp.Add(i, "length")
 
             Case "style"
-              sVal = DecodeTextStyle(CStr(v))
-              prp.Add(sVal, "Font")
+              sVal = DWGDecodeTextStyle(CStr(v))
+              prp.Add(sVal, "font")
 
           End Select
         Next
 
       Case "POINT"
-        prp.Add([0, 0, 0], "P1")
+        prp.Add([0, 0, 0], "p1")
         For Each v In c
           Select c.Key
             Case "x"
-              f = DecodeFloat(CStr(v))
-              prp["P1"][0] = f
+              f = DWGDecodeFloat(CStr(v))
+              prp["p1"][0] = f
 
             Case "y"
-              f = DecodeFloat(CStr(v))
-              prp["P1"][1] = f
+              f = DWGDecodeFloat(CStr(v))
+              prp["p1"][1] = f
 
             Case "z"
-              f = DecodeFloat(CStr(v))
-              prp["P1"][2] = f
+              f = DWGDecodeFloat(CStr(v))
+              prp["p1"][2] = f
 
           End Select
         Next
 
-        f = DecodeFloat(c["x_ang"])
-        prp.Add(f, "Angle")
+        f = DWGDecodeFloat(c["x_ang"])
+        prp.Add(f, "angle")
 
       Case "LINE"
         For Each v In c
           Select c.Key
             Case "start"
-              pt = DecodeCoord(CStr(v))
-              prp.Add(pt, "P1")
+              pt = DWGDecodeCoord(CStr(v))
+              prp.Add(pt, "p1")
             Case "end"
-              pt = DecodeCoord(CStr(v))
-              prp.Add(pt, "P2")
+              pt = DWGDecodeCoord(CStr(v))
+              prp.Add(pt, "p2")
           End Select
         Next
 
@@ -1348,35 +1760,35 @@ Public Function DecodeEntity(c As Collection) As Collection
           Select c.Key
 
             Case "ins_pt"
-              pt = DecodeCoord(CStr(v))
-              prp.Add(pt, "P1")
+              pt = DWGDecodeCoord(CStr(v))
+              prp.Add(pt, "p1")
 
             Case "scale_flag"
-              i = DecodeInteger(CStr(v))
+              i = DWGDecodeInteger(CStr(v))
               prp.Add(i, c.Key)
 
             Case "scale"
-              pt = DecodeCoord(CStr(v))
-              prp.Add(pt, "Scale")
+              pt = DWGDecodeCoord(CStr(v))
+              prp.Add(pt, "scale")
 
             Case "rotation"
-              f = DecodeFloat(CStr(v))
-              prp.Add(f, "Angle")
+              f = DWGDecodeFloat(CStr(v))
+              prp.Add(f, "angle")
 
             Case "extrusion"
-              pt = DecodeCoord(CStr(v))
+              pt = DWGDecodeCoord(CStr(v))
               prp.Add(pt, c.Key)
 
             Case "has_attribs"
-              i = DecodeInteger(CStr(v))
+              i = DWGDecodeInteger(CStr(v))
               prp.Add(i, c.Key)
 
             Case "num_owned"
-              i = DecodeInteger(CStr(v))
+              i = DWGDecodeInteger(CStr(v))
               prp.Add(i, c.Key)
 
             Case "block_header"
-              sVal = DecodeBlockHeader(CStr(v))
+              sVal = DWGDecodeBlockHeader(CStr(v))
               prp.Add(sVal, c.Key)
 
           End Select
@@ -1386,12 +1798,12 @@ Public Function DecodeEntity(c As Collection) As Collection
         For Each v In c
           Select c.Key
             Case "center"
-              pt = DecodeCoord(CStr(v))
-              prp.Add(pt, "P1")
+              pt = DWGDecodeCoord(CStr(v))
+              prp.Add(pt, "p1")
 
             Case "radius"
-              f = DecodeFloat(CStr(v))
-              prp.Add(f, "Radius")
+              f = DWGDecodeFloat(CStr(v))
+              prp.Add(f, "radius")
           End Select
         Next
 
@@ -1399,20 +1811,20 @@ Public Function DecodeEntity(c As Collection) As Collection
         For Each v In c
           Select c.Key
             Case "center"
-              pt = DecodeCoord(CStr(v))
-              prp.Add(pt, "P1")
+              pt = DWGDecodeCoord(CStr(v))
+              prp.Add(pt, "p1")
 
             Case "radius"
-              f = DecodeFloat(CStr(v))
-              prp.Add(f, "Radius")
+              f = DWGDecodeFloat(CStr(v))
+              prp.Add(f, "radius")
 
             Case "start_angle"
-              f = DecodeFloat(CStr(v))
-              prp.Add(f, "Angle1")
+              f = DWGDecodeFloat(CStr(v))
+              prp.Add(f, "angle1")
 
             Case "end_angle"
-              f = DecodeFloat(CStr(v))
-              prp.Add(f, "Angle2")
+              f = DWGDecodeFloat(CStr(v))
+              prp.Add(f, "angle2")
           End Select
         Next
 
@@ -1420,28 +1832,28 @@ Public Function DecodeEntity(c As Collection) As Collection
         For Each v In c
           Select c.Key
             Case "center"
-              pt = DecodeCoord(CStr(v))
-              prp.Add(pt, "P1")
+              pt = DWGDecodeCoord(CStr(v))
+              prp.Add(pt, "p1")
 
             Case "sm_axis"
-              pt = DecodeCoord(CStr(v))
+              pt = DWGDecodeCoord(CStr(v))
               prp.Add(pt, c.Key)
 
             Case "extrusion"
-              pt = DecodeCoord(CStr(v))
+              pt = DWGDecodeCoord(CStr(v))
               prp.Add(pt, c.Key)
 
             Case "axis_ratio"
-              f = DecodeFloat(CStr(v))
+              f = DWGDecodeFloat(CStr(v))
               prp.Add(f, c.Key)
 
             Case "start_angle"
-              f = DecodeFloat(CStr(v))
-              prp.Add(f, "Angle1")
+              f = DWGDecodeFloat(CStr(v))
+              prp.Add(f, "angle1")
 
             Case "end_angle"
-              f = DecodeFloat(CStr(v))
-              prp.Add(f, "Angle2")
+              f = DWGDecodeFloat(CStr(v))
+              prp.Add(f, "angle2")
 
           End Select
 
@@ -1451,13 +1863,13 @@ Public Function DecodeEntity(c As Collection) As Collection
         For Each v In c
           Select c.Key
             Case "num_points"
-              i = DecodeInteger(CStr(v))
-              prp.Add(i, "Points")
+              i = DWGDecodeInteger(CStr(v))
+              prp.Add(i, "points")
               For p = 0 To i
                 sDec = "points[" & p & "]"
                 sTag = "p" & CStr(p)
                 If c.Exist(sDec) Then
-                  pt = DecodeCoord(CStr(c[sDec]))
+                  pt = DWGDecodeCoord(CStr(c[sDec]))
                   prp.Add(pt, sTag)
                 Endif
               Next
@@ -1469,67 +1881,67 @@ Public Function DecodeEntity(c As Collection) As Collection
           Select c.Key
 
             Case "is_gradient_fill"
-              i = DecodeInteger(CStr(v))
+              i = DWGDecodeInteger(CStr(v))
               prp.Add(i, c.Key)
 
             Case "reserved"
-              i = DecodeInteger(CStr(v))
+              i = DWGDecodeInteger(CStr(v))
               prp.Add(i, c.Key)
 
             Case "gradient_angle"
-              f = DecodeFloat(CStr(v))
+              f = DWGDecodeFloat(CStr(v))
               prp.Add(f, c.Key)
 
             Case "gradient_shift"
-              f = DecodeFloat(CStr(v))
+              f = DWGDecodeFloat(CStr(v))
               prp.Add(f, c.Key)
 
             Case "single_color_gradient"
-              i = DecodeInteger(CStr(v))
+              i = DWGDecodeInteger(CStr(v))
               prp.Add(i, c.Key)
 
             Case "gradient_tint"
-              f = DecodeFloat(CStr(v))
+              f = DWGDecodeFloat(CStr(v))
               prp.Add(f, c.Key)
 
             Case "num_colors"
-              i = DecodeInteger(CStr(v))
+              i = DWGDecodeInteger(CStr(v))
               prp.Add(i, c.Key)
 
             Case "gradient_name"
-              sVal = DecodeText(CStr(v))
+              sVal = DWGDecodeText(CStr(v))
               prp.Add(sVal, c.Key)
 
             Case "elevation"
-              f = DecodeFloat(CStr(v))
+              f = DWGDecodeFloat(CStr(v))
               prp.Add(f, c.Key)
 
             Case "extrusion"
-              pt = DecodeCoord(CStr(v))
+              pt = DWGDecodeCoord(CStr(v))
               prp.Add(pt, c.Key)
 
             Case "name"
-              sVal = DecodeText(CStr(v))
+              sVal = DWGDecodeText(CStr(v))
               prp.Add(sVal, c.Key)
 
             Case "solid_fill"
-              i = DecodeInteger(CStr(v))
+              i = DWGDecodeInteger(CStr(v))
               prp.Add(i, c.Key)
 
             Case "associative"
-              i = DecodeInteger(CStr(v))
+              i = DWGDecodeInteger(CStr(v))
               prp.Add(i, c.Key)
 
             Case "num_paths"
-              i = DecodeInteger(CStr(v))
+              i = DWGDecodeInteger(CStr(v))
               prp.Add(i, c.Key)
 
             Case "paths[0].flag"
-              i = DecodeInteger(CStr(v))
+              i = DWGDecodeInteger(CStr(v))
               prp.Add(i, c.Key)
 
             Case "paths[0].num_segs_or_paths"
-              i = DecodeInteger(CStr(v))
+              i = DWGDecodeInteger(CStr(v))
               prp.Add(i, c.Key)
 
               For p = 0 To i
@@ -1538,85 +1950,98 @@ Public Function DecodeEntity(c As Collection) As Collection
                 sTag2 = "paths[0].segs[p].second_endpoint"
 
                 If c.Exist(sTag) Then
-                  hx = DecodeHex(CStr(c[sTag]))
+                  hx = DWGDecodeHex(CStr(c[sTag]))
                   prp.Add(hx, sTag1)
                 Endif
 
                 If c.Exist(sTag1) Then
-                  pt1 = DecodeCoord(CStr(c[sTag1]))
+                  pt1 = DWGDecodeCoord(CStr(c[sTag1]))
                   prp.Add(pt1, sTag1)
                 Endif
 
                 If c.Exist(sTag2) Then
-                  pt2 = DecodeCoord(CStr(c[sTag2]))
+                  pt2 = DWGDecodeCoord(CStr(c[sTag2]))
                   prp.Add(pt2, sTag2)
                 Endif
 
               Next
 
             Case "paths[0].num_boundary_handles"
-              i = DecodeInteger(CStr(v))
+              i = DWGDecodeInteger(CStr(v))
               prp.Add(i, c.Key)
 
             Case "style"
-              i = DecodeInteger(CStr(v))
+              i = DWGDecodeInteger(CStr(v))
               prp.Add(i, c.Key)
 
             Case "pattern_type"
-              i = DecodeInteger(CStr(v))
+              i = DWGDecodeInteger(CStr(v))
               prp.Add(i, c.Key)
 
             Case "angle"
-              f = DecodeFloat(CStr(v))
+              f = DWGDecodeFloat(CStr(v))
               prp.Add(f, c.Key)
 
             Case "scale_spacing"
-              f = DecodeFloat(CStr(v))
+              f = DWGDecodeFloat(CStr(v))
               prp.Add(f, c.Key)
 
             Case "double_flag"
-              i = DecodeInteger(CStr(v))
+              i = DWGDecodeInteger(CStr(v))
               prp.Add(i, c.Key)
 
             Case "num_deflines"
-              i = DecodeInteger(CStr(v))
+              i = DWGDecodeInteger(CStr(v))
               prp.Add(i, c.Key)
 
               For p = 0 To i
 
                 sTag1 = "deflines[" & CStr(i) & "].pt0"
-                pt = DecodeCoord(CStr(c[sTag1]))
+                pt = DWGDecodeCoord(CStr(c[sTag1]))
                 prp.Add(pt, sTag1)
 
                 sTag2 = "deflines[" & CStr(i) & "].offset"
-                pt = DecodeCoord(CStr(c[sTag2]))
+                pt = DWGDecodeCoord(CStr(c[sTag2]))
                 prp.Add(pt, sTag2)
 
                 sTag3 = "deflines[" & CStr(i) & "].num_dashes"
-                n = DecodeInteger(CStr(c[sTag3]))
+                n = DWGDecodeInteger(CStr(c[sTag3]))
                 prp.Add(n, sTag3)
 
                 For d = 0 To n
                   sTag4 = "deflines[rcount1].dashes[" & CStr(d) & "]"
-                  f = DecodeFloat(CStr(c[sTag4]))
+                  f = DWGDecodeFloat(CStr(c[sTag4]))
                   prp.Add(f, sTag4)
                 Next
                 sTag5 = "deflines[rcount1].angle"
-                f = DecodeFloat(CStr(c[sTag5]))
+                f = DWGDecodeFloat(CStr(c[sTag5]))
                 prp.Add(f, sTag5)
 
               Next
 
             Case "num_seeds"
-              i = DecodeInteger(CStr(v))
+              i = DWGDecodeInteger(CStr(v))
               prp.Add(i, c.Key)
 
             Case "seeds[vcount]"
-              pt = DecodeCoord(CStr(v))
+              pt = DWGDecodeCoord(CStr(v))
               prp.Add(pt, c.Key)
 
           End Select
         Next
+      Case Else
+        For Each v In c
+          'Select c.Key
+          sVal = CStr(v)
+          If InStr(sVal, "[") > 0 And InStr(sVal, "]") > 0 Then
+            vVal = DWGDecodeItem(sVal)
+          Else
+            vVal = sVal
+          Endif
+          prp.Add(vVal, c.Key)
+          'End Select
+        Next
+
     End Select
   Endif
 
@@ -1624,7 +2049,7 @@ Public Function DecodeEntity(c As Collection) As Collection
 
 End
 
-Private Function DecodeCoord(s As String) As Float[]
+Public Function DWGDecodeCoord(s As String) As Float[]
 
   Dim pt As New Float[]
   Dim sVal As String
@@ -1643,7 +2068,35 @@ Private Function DecodeCoord(s As String) As Float[]
 
 End
 
-Private Function DecodeHex(s As String) As Integer
+Public Function DWGDecodeCRC(s As String) As String
+
+  Dim out As String
+
+  If InStr(s, "[RSx]") > 0 Then
+    out = Split(s, "[")[0]
+  Else
+    out = ""
+  Endif
+
+  Return out
+
+End
+
+Public Function DWGDecodeColor(s As String) As Byte
+
+  Dim out As Byte
+
+  If InStr(s, "[CMC.BS 62]") > 0 Then
+    out = CByte(Split(s, "[")[0])
+  Else
+    out = ""
+  Endif
+
+  Return out
+
+End
+
+Public Function DWGDecodeHex(s As String) As Integer
 
   Dim out As Integer
 
@@ -1657,7 +2110,7 @@ Private Function DecodeHex(s As String) As Integer
 
 End
 
-Private Function DecodeFloat(s As String) As Float
+Public Function DWGDecodeFloat(s As String) As Float
 
   Dim out As Float
   Dim sVal As String
@@ -1673,7 +2126,7 @@ Private Function DecodeFloat(s As String) As Float
 
 End
 
-Private Function DecodeInteger(s As String) As Integer
+Public Function DWGDecodeInteger(s As String) As Integer
 
   Dim out As Integer
   Dim sVal As String
@@ -1689,7 +2142,7 @@ Private Function DecodeInteger(s As String) As Integer
 
 End
 
-Private Function DecodeLayer(s As String) As String
+Public Function DWGDecodeLayer(s As String) As String
 
   Dim out As String
 
@@ -1703,7 +2156,21 @@ Private Function DecodeLayer(s As String) As String
 
 End
 
-Private Function DecodeBlockHeader(s As String) As String
+Public Function DWGDecodeHandle(s As String) As String
+
+  Dim out As String
+
+  If InStr(s, "[H 5]") > 0 Then
+    out = Split(s, "[")[0]
+  Else
+    out = s
+  Endif
+
+  Return out
+
+End
+
+Public Function DWGDecodeBlockHeader(s As String) As String
 
   Dim out As String
 
@@ -1717,7 +2184,7 @@ Private Function DecodeBlockHeader(s As String) As String
 
 End
 
-Private Function DecodeTextStyle(s As String) As String
+Public Function DWGDecodeTextStyle(s As String) As String
 
   Dim out As String
 
@@ -1731,7 +2198,7 @@ Private Function DecodeTextStyle(s As String) As String
 
 End
 
-Private Function DecodeText(s As String) As String
+Public Function DWGDecodeText(s As String) As String
 
   Dim out As String
 
@@ -1757,7 +2224,125 @@ Private Function DecodeText(s As String) As String
 
 End
 
-Private Function DimCodes() As Collection
+Public Function DWGAlias() As Collection
+
+  Dim d As New Collection
+
+  d.Add("width", "linewt")
+  d.Add("colour", "color.index")
+  'd.Add("width", "invisible")
+  d.Add("style", "ltype_flags")
+  d.Add("block", "ownerhandle")
+
+  Return d
+
+End
+
+Public Function DWGArrangeEnty(c As Collection) As Collection
+
+  Dim o As New Collection
+  Dim x As New Collection
+  Dim tag As String
+  Dim str As String
+  Dim p As Integer
+  Dim pt As String
+  Dim ps As String
+  Dim px As New Float[]
+  Dim flo As Float
+
+  If c.Exist("entity") Then
+
+    o.Add(c["entity"], "entity")
+
+    For Each tag In ["id", "handle", "layer", "style", "width", "colour", "invisible", "thikness", "block"]
+      If c.Exist(tag) Then
+        o.Add(c[tag], tag)
+      Endif
+    Next
+
+    Select c["entity"]
+
+      Case "ARC"
+        '"angle", "radious",
+      Case "ATTDEF"
+        If c.Exist("ins_pt") Then
+          x.Clear
+          x.Add(c["ins_pt"], "p0")
+          o.Add(x.Copy(), "p")
+          x.Clear
+        Endif
+        If c.Exist("height") Then
+          flo = DWGDecodeFloat(c["height"])
+          o.Add(flo, tag)
+        Endif
+        For Each tag In ["default_value", "tag", "prompt", "style"]
+          If c.Exist(tag) Then
+            str = UnQuote(c[tag])
+            o.Add(str, tag)
+          Endif
+        Next
+
+      Case "ATTRIB"
+
+      Case "CIRCLE"
+        '"point", "radious",
+
+      Case "HATCH"
+
+      Case "INSERT"
+        For Each tag In ["point", "angle", "radious", "scale"]
+          If c.Exist(tag) Then
+            o.Add(c[tag], tag)
+          Endif
+        Next
+
+      Case "LINE"
+        If c.Exist("start") And c.Exist("end") Then
+          x.Clear
+          x.Add(c["start"], "p0")
+          x.Add(c["end"], "p1")
+          o.Add(x.Copy(), "p")
+          x.Clear
+        Endif
+
+      Case "LWPOLYLINE"
+        If c.Exist("num_points") Then
+          o.Add(c["num_points"], "num_points")
+          x.Clear
+          For p = 0 To c["num_points"] - 1
+            pt = "p" & CStr(p)
+            ps = "points[" & CStr(p) & "]"
+
+            If c.Exist(ps) Then
+              px = DWGDecodeCoord(c[ps])
+              If px.Count = 2 Then
+                px.Add(0.0)
+              Endif
+              x.Add(px, pt)
+            Endif
+          Next
+          o.Add(x.Copy(), "p")
+          x.Clear
+        Endif
+
+      Case "MTEXT"
+
+      Case "POINT"
+        If c.Exist("x") And c.Exist("y") And c.Exist("z") Then
+
+        Endif
+        o.Add(c["num_points"], "num_points")
+
+      Case "TEXT"
+
+    End Select
+  Endif
+
+  Return o
+
+End
+
+Public Function DWGDimCodes() As Collection
 
   Dim d As New Collection
 
@@ -1837,7 +2422,7 @@ End
 
 '' This return a codes collection for the given entity name
 
-Public Function EntityDefaults(Optional ent As String) As Collection
+Public Function DXFEntityDefaults(Optional ent As String) As Collection
 
   Dim cod As New Collection
   'Common defaults
@@ -1880,7 +2465,7 @@ End
 
 '' This return a codes collection for the given entity name
 
-Public Function EntityCodes(Optional ent As String) As Collection
+Public Function DXFEntityCodes(Optional ent As String) As Collection
 
   Dim cod As New Collection
 
@@ -2505,7 +3090,7 @@ End
 
 'DXF ========================================================================
 
-Public Function GetDXFSections(sFile As String) As Collection
+Public Function DXFSections(sFile As String) As Collection
 
   Dim sContent As String
   Dim tmx As New String[]
@@ -2527,14 +3112,16 @@ Public Function GetDXFSections(sFile As String) As Collection
 
       out.Add(File.Name(sFile), "File")
 
-      For i = 1 To String.Len(sSub)
-        Print Asc(String.Mid(sSub, i, 1)) & " " & String.Mid(sSub, i, 1)
-      Next
-
+      'For i = 1 To String.Len(sSub)
+      '  Print Asc(String.Mid(sSub, i, 1)) & " " & String.Mid(sSub, i, 1)
+      'Next
       sContent = Replace(sContent, "\r\n", "\n")
       sContent = Replace(sContent, "\t", " ")
+      ''sContent = Trim(sContent) ' Testing
       sContent = Replace(sContent, "  0\nSECTION\n  2\n", "\t")
       sContent = Replace(sContent, "  0\nENDSEC\n", "\t")
+      ''sContent = Replace(sContent, "0\nSECTION\n2\n", "\t")
+      ''sContent = Replace(sContent, "0\nENDSEC\n", "\t")
       tmx = Split(sContent, "\t")
 
       If tmx.count > 0 Then
@@ -2544,27 +3131,27 @@ Public Function GetDXFSections(sFile As String) As Collection
             sName = Split(sec, "\n")[0]
             sCont = String.Mid(sec, String.Len(sName & "\n") + 1)
 
-            File.Save(User.Home &/ sName & ".txt", sCont)
+            'File.Save(User.Home &/ sName & ".txt", sCont)
             Select sName
               Case "HEADER"
-                cCont = GetDXFHeader(sCont)
+                cCont = DXFHeader(sCont)
                 If cCont.Exist("ACADVER") Then
                   out.Add(cCont["ACADVER"], "version")
                 Endif
                 out.Add(cCont, "Variables")
 
               Case "TABLES"
-                cCont = GetDXFTables(sCont)
+                cCont = DXFTables(sCont)
                 For Each isec In cCont
                   out.Add(isec.Copy(), cCont.Key)
                 Next
 
               Case "BLOCKS"
-                cCont = GetDXFBlocks(sCont)
+                cCont = DXFBlocks(sCont)
                 out.Add(cCont, "Blocks")
 
               Case "ENTITIES"
-                cCont = GetDXFEntities(sCont)
+                cCont = DXFEntities(sCont)
                 out.Add(cCont, "Entities")
 
                 'Case "CLASSES", "OBJECTS"
@@ -2581,7 +3168,7 @@ Public Function GetDXFSections(sFile As String) As Collection
 
 End
 
-Public Function GetDXFBlocks(sCont As String) As Collection
+Public Function DXFBlocks(sCont As String) As Collection
 
   Dim stx As New String[]
   Dim out As New Collection
@@ -2599,7 +3186,7 @@ Public Function GetDXFBlocks(sCont As String) As Collection
     If InStr(stx[i], "AcDbBlockBegin") > 0 Then
       If String2.Count(stx[i], "\n  0\n") > 1 And InStr(stx[i], "  0\nVIEWPORT") = 0 Then
         'cItem = DecodeDXFEntity(stx[i])
-        cItem = DecodeDXFBlock(stx[i])
+        cItem = DXFDecodeBlock(stx[i])
         If cItem.Count > 1 Then
           '     sKey = ""
           '     For Each e In cItem
@@ -2611,8 +3198,6 @@ Public Function GetDXFBlocks(sCont As String) As Collection
           '     If sKey <> "" Then
           out.Add(cItem.Copy(), cItem["block"])
           cItem.Clear
-          '     Endif
-          '
         Endif
       Endif
     Endif
@@ -2621,52 +3206,36 @@ Public Function GetDXFBlocks(sCont As String) As Collection
 
 End
 
-Public Function GetDXFEntities(sCont As String) As Collection
+Public Function DXFEntities(sCont As String) As Collection
 
   Dim stx As New String[]
-  'Dim cTmp As New Collection
   Dim out As New Collection
   Dim sout As New Collection
-  'Dim item As String
-  'Dim sRec As String
   Dim i As Integer
-  'Dim j As Integer
-  'Dim slx As String[]
-  'Dim sTag As String
-  'Dim sVal As String
-  'Dim blx As New String[]
-  'Dim k As Integer
   Dim cItem As New Collection
-  'Dim e As Variant
   Dim sKey As String
   Dim cEnty As Collection
   Dim eN As Variant
 
-  cEnty = GetEntityList()
+  cEnty = DWGEntityList()
 
   sCont = Replace(sCont, "\t", " ")
 
   For Each eN In cEnty
     sCont = Replace(sCont, "  0\n" & cEnty.Key & "\n  5\n", "\t  0\n" & cEnty.Key & "\n  5\n")
   Next
-  'sCont = Replace(sCont, "  0\n", "\t  0\n")
-  '  0\nLWPOLYLINE\n  5\n
 
   stx = Split(sCont, "\t")
 
   For i = 0 To stx.Max
     If InStr(stx[i], "\n100\nAcDbEntity\n") > 0 Then
-      'If String2.Count(stx[i], "\n  0\n") > 1 And InStr(stx[i], "  0\nVIEWPORT") = 0 Then
-      If InStr(stx[i], "  0\nLWPOLYLINE") > 0 Then
-        Print "x"
-      Endif
-      cItem = DecodeDXFItem(stx[i])
-      'cItem = DecodeDXFEntity(stx[i])
+      cItem.Clear
+      cItem = DXFDecodeItem(stx[i])
+      cItem.Add(CStr(i), "id")
       If cItem.Count > 1 Then
         sKey = ""
-        If cItem.Exist("handle") Then
-          'sKey = cItem["handle"]
-          sKey = cItem["entity"] & ":" & cItem["handle"]
+        If cItem.Exist("id") Then
+          sKey = cItem["entity"] & ":" & cItem["id"]
           out.Add(cItem.Copy(), sKey)
         Endif
       Endif
@@ -2676,8 +3245,6 @@ Public Function GetDXFEntities(sCont As String) As Collection
   sout = EntitiesSort(out)
 
   Return sout
-
-  'Return out
 
 End
 
@@ -2701,7 +3268,7 @@ Private Function EntitiesSort(c As Collection) As Collection
   For Each eName In stx
     For Each ety In c
       If eName = String.LCase(ety["entity"]) Then
-        Print ety["handle"]
+        'Print ety["handle"]
         tmp.Add(ety, ety["handle"])
       Endif
     Next
@@ -2713,12 +3280,12 @@ Private Function EntitiesSort(c As Collection) As Collection
 
 End
 
-Public Function GetDXFHeader(sCont As String) As Collection
+Public Function DXFHeader(sCont As String) As Collection
 
   Dim stx As New String[]
   Dim cTmp As New Collection
   Dim out As New Collection
-  Dim i As Integer
+  'Dim i As Integer
   Dim item As String
   Dim vrt As Variant
 
@@ -2729,27 +3296,30 @@ Public Function GetDXFHeader(sCont As String) As Collection
   For Each item In stx
     If item <> "" Then
       'cTmp = DecodeDXFItem(item)
-      cTmp = DecodeDXFHeader(item)
+      If TypeOf(item) = gb.String Then
+        cTmp = DXFDecodeHeader(item)
 
-      Select cTmp.Count
-        Case 0
-          'skip
-        Case 1
-          For Each vrt In cTmp
-            out.Add(vrt, cTmp.Key)
-          Next
+        Select cTmp.Count
+          Case 0
+            'skip
+          Case 1
+            For Each vrt In cTmp
+              out.Add(vrt, cTmp.Key)
+            Next
 
-        Case Else
-          Print "overload"
-      End Select
+            'Case Else
+            'Print "overload"
+        End Select
+      Endif
+
     Endif
-    Inc i
+    ' Inc i
   Next
   Return out
 
 End
 
-Public Function GetDXFTables(sCont As String) As Collection
+Public Function DXFTables(sCont As String) As Collection
 
   'Dim tmx As New String[]
   Dim stx As New String[]
@@ -2775,19 +3345,19 @@ Public Function GetDXFTables(sCont As String) As Collection
       If InStr(item, "\n  5\n") > 0 Then
         Select Split(item, "\n")[0]
           Case "LAYER"
-            cDecoded = GetDXFLayerList(item)
+            cDecoded = DXFLayerList(item)
             out.Add(cDecoded.Copy(), "Layers")
             cDecoded.Clear
           Case "LTYPE"
-            cDecoded = GetDXFLtypeList(item)
+            cDecoded = DXFLtypeList(item)
             out.Add(cDecoded.Copy(), "LineTypes")
             cDecoded.Clear
           Case "STYLE"
-            cDecoded = GetDXFStyleList(item)
+            cDecoded = DXFStyleList(item)
             out.Add(cDecoded.Copy(), "TextStyles")
             cDecoded.Clear
           Case "DIMSTYLE"
-            cDecoded = GetDXFDimStyleList(item)
+            cDecoded = DXFDimStyleList(item)
             out.Add(cDecoded.Copy(), "DimStyles")
             cDecoded.Clear
             ' Case "BLOCK_RECORD"
@@ -2802,7 +3372,7 @@ Public Function GetDXFTables(sCont As String) As Collection
 
 End
 
-Private Function GetDXFLayerList(sItem As String) As Collection
+Private Function DXFLayerList(sItem As String) As Collection
 
   Dim stx As String[]
   Dim i As Integer
@@ -2886,7 +3456,7 @@ Private Function GetDXFLayerList(sItem As String) As Collection
 
 End
 
-Private Function GetDXFLtypeList(sItem As String) As Collection
+Private Function DXFLtypeList(sItem As String) As Collection
 
   Dim stx As String[]
   Dim i As Integer
@@ -2944,7 +3514,7 @@ Private Function GetDXFLtypeList(sItem As String) As Collection
 
 End
 
-Private Function GetDXFStyleList(sItem As String) As Collection
+Private Function DXFStyleList(sItem As String) As Collection
 
   Dim stx As String[]
   Dim i As Integer
@@ -3025,7 +3595,7 @@ Private Function GetDXFStyleList(sItem As String) As Collection
 
 End
 
-Private Function GetDXFDimStyleList(sItem As String) As Collection
+Private Function DXFDimStyleList(sItem As String) As Collection
 
   Dim stx As String[]
   Dim i As Integer
@@ -3041,7 +3611,7 @@ Private Function GetDXFDimStyleList(sItem As String) As Collection
   Dim j As Integer
   Dim code As Collection
 
-  code = DimCodes()
+  code = DWGDimCodes()
 
   sCont = Replace(sItem, "\t", " ")
   sCont = Replace(sCont, "STYLE\n  5\n", "\t")
@@ -3077,7 +3647,7 @@ Private Function GetDXFDimStyleList(sItem As String) As Collection
 
 End
 
-Private Function GetDXFBLockList(sItem As String) As Collection
+Private Function DXFBLockList(sItem As String) As Collection
 
   Dim stx As String[]
   Dim i As Integer
@@ -3131,7 +3701,7 @@ Private Function GetDXFBLockList(sItem As String) As Collection
 
 End
 
-Private Function DecodeDXFEntity(sItem As String) As Collection
+Private Function DXFDecodeEntity(sItem As String) As Collection
 
   Dim stx As String[]
   Dim cTmp As New Collection
@@ -3168,7 +3738,7 @@ Private Function DecodeDXFEntity(sItem As String) As Collection
     sTag = "entity"
     sVal = stx[1]
     cTmp.Add(sVal, sTag)
-    codes = EntityCodes(sVal)
+    codes = DXFEntityCodes(sVal)
   Endif
 
   For i = 0 To stx.Max Step 2
@@ -3193,9 +3763,9 @@ Private Function DecodeDXFEntity(sItem As String) As Collection
       cTmp.Add(sVal, "entity")
     Else
       If stx[i] <> "" Then
-        If codes.Count = 0 Then
-          Print "Error codes"
-        Endif
+        'If codes.Count = 0 Then
+        '  Print "Error codes"
+        'Endif
 
         sTag = Replace(stx[i], " ", "")
         If codes.Exist(sTag) Then
@@ -3446,7 +4016,7 @@ End
 '' more property of the collection returned by this function that represents th
 '' e block.
 
-Private Function DecodeDXFBlock(sItem As String) As Collection
+Private Function DXFDecodeBlock(sItem As String) As Collection
 
   Dim sCont As String
   Dim btx As String[]
@@ -3460,7 +4030,7 @@ Private Function DecodeDXFBlock(sItem As String) As Collection
   Dim rw As Variant
   Dim bl As Variant
 
-  cEnty = GetEntityList()
+  cEnty = DWGEntityList()
 
   sCont = Replace(sItem, "\t", " ")
 
@@ -3476,7 +4046,7 @@ Private Function DecodeDXFBlock(sItem As String) As Collection
       ' If InStr(btx[i], "100\nAcDbBlockEnd") > 0 Then
       '
       ' Endif
-      cTmp = DecodeDXFItem(btx[i])
+      cTmp = DXFDecodeItem(btx[i])
 
       If cTmp.Count > 0 Then
         If cTmp.Exist("handle") Then
@@ -3517,7 +4087,7 @@ Private Function DecodeDXFBlock(sItem As String) As Collection
 
 End
 
-Private Function DecodeDXFItem(sItem As String) As Collection
+Private Function DXFDecodeItem(sItem As String) As Collection
 
   Dim stx As String[]
   Dim cTmp As New Collection
@@ -3542,10 +4112,10 @@ Private Function DecodeDXFItem(sItem As String) As Collection
     sVal = stx[1]
     cTmp.Add(sVal, sTag)
     If sVal = "INSERT" Then
-      Print sVal
+      'Print sVal
     Endif
-    codes = EntityCodes(sVal)
-    defaults = EntityDefaults(sVal)
+    codes = DXFEntityCodes(sVal)
+    defaults = DXFEntityDefaults(sVal)
   Endif
 
   For i = 0 To stx.Max - 1 Step 2
@@ -3589,10 +4159,10 @@ Private Function DecodeDXFItem(sItem As String) As Collection
         vrt = stx[i + 1]
         cTmp.Add(vrt, sTag)
 
-        Select sTag
-          Case "OLESTARTUP"
-            Print sTag & ": " & vrt
-        End Select
+        'Select sTag
+        '  Case "OLESTARTUP"
+        '    Print sTag & ": " & vrt
+        'End Select
     End Select
   Next
 
@@ -3621,7 +4191,7 @@ Private Function DecodeDXFItem(sItem As String) As Collection
   '     cTmp.Add(0, "colour")
   ' Endif
 
-  cPts = DecodeDXFCoords(sItem)
+  cPts = DXFDecodeCoords(sItem)
 
   If cPts Then
     For Each p In cPts
@@ -3634,7 +4204,7 @@ Private Function DecodeDXFItem(sItem As String) As Collection
 
 End
 
-Private Function DecodeDXFCoords(sItem As String) As Collection
+Private Function DXFDecodeCoords(sItem As String) As Collection
 
   Dim stx As String[]
   Dim c As New Collection
@@ -3667,10 +4237,10 @@ Private Function DecodeDXFCoords(sItem As String) As Collection
     ' sTag = "entity"
     sVal = stx[1]
     ' cTmp.Add(sVal, sTag)
-    If sVal = "LINE" Then
-      Print sVal
-    Endif
-    codes = EntityCodes(sVal)
+    'If sVal = "LINE" Then
+    '  Print sVal
+    'Endif
+    codes = DXFEntityCodes(sVal)
   Endif
 
   For i = 0 To stx.Max - 1 Step 2
@@ -3820,7 +4390,7 @@ Private Function DecodeDXFCoords(sItem As String) As Collection
 
 End
 
-Private Function DecodeDXFHeader(sItem As String) As Collection
+Private Function DXFDecodeHeader(sItem As String) As Collection
 
   Dim stx As String[]
   Dim cTmp As New Collection
@@ -3833,30 +4403,48 @@ Private Function DecodeDXFHeader(sItem As String) As Collection
 
   stx = Split(sItem, "\n")
 
-  sTag = stx[0]
+  If stx.Count = 4 Then
+    sTag = stx[0]
 
-  For i = 1 To stx.Max Step 2
-    Select Replace(stx[i], " ", "")
-      Case "1", "2", "3", "5", "6", "7" "8"
-        vrt = stx[i + 1]
-      Case "70", "62", "345", "346", "370", "280", "290", "380", "349" "390"
-        vrt = CInt(Replace(stx[i + 1], " ", ""))
-      Case "40", "50"
-        vrt = CFloat(Replace(stx[i + 1], " ", ""))
-      Case "10"
-        x = CFloat(Replace(stx[i + 1], " ", ""))
-        If Replace(stx[i + 2], " ", "") = "20" Then
-          y = CFloat(Replace(stx[i + 3], " ", ""))
-        Endif
-        If Replace(stx[i + 4], " ", "") = "30" Then
-          z = CFloat(Replace(stx[i + 5], " ", ""))
-        Endif
-        vrt = [x, y, z]
-        'Case "20", "30"
-        'skip
-    End Select
-    cTmp.Add(vrt, sTag)
-  Next
+    If InStr(sTag, "INTERFERECOLOR") > 0 Then
+      Print "milestone"
+    Endif
+
+    For i = 1 To stx.Max Step 2
+      Select Replace(stx[i], " ", "")
+        Case "1", "2", "3", "5", "6", "7" "8"
+          vrt = stx[i + 1]
+        Case "70", "62", "370", "280", "290", "380", "390"
+          vrt = CInt(Replace(stx[i + 1], " ", ""))
+        Case "345", "346", "349"
+          vrt = stx[i + 1]
+        Case "40", "50"
+          vrt = CFloat(Replace(stx[i + 1], " ", ""))
+        Case "10"
+          x = CFloat(Replace(stx[i + 1], " ", ""))
+          If Replace(stx[i + 2], " ", "") = "20" Then
+            y = CFloat(Replace(stx[i + 3], " ", ""))
+          Endif
+          If Replace(stx[i + 4], " ", "") = "30" Then
+            z = CFloat(Replace(stx[i + 5], " ", ""))
+          Endif
+          vrt = [x, y, z]
+          'Case "20", "30"
+          'skip
+      End Select
+
+      If sTag = " INTERFERECOLOR" Then
+        Print "milestone"
+      Endif
+      If vrt Then
+        cTmp.Add(vrt, sTag)
+        Print "Ok : " & sTag
+      Else
+        Print "Error in : " & sTag
+      Endif
+    Next
+  Endif
+
   Return cTmp
 
 End

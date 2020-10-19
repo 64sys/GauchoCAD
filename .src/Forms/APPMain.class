@@ -195,6 +195,10 @@ Public Sub Run(cin As Collection)
 
   btnColors.Tooltip = ("Color") & ": " & CStr(CurrentColor)
 
+  btnBounds.Picture = Image.Load("./svg/locks/bounds.svg").Stretch(35, 35).Picture
+  btnGrid.Picture = Image.Load("./svg/locks/grid.svg").Stretch(35, 35).Picture
+  btnOrtho.Picture = Image.Load("./svg/locks/ortho.svg").Stretch(35, 35).Picture
+
   Me.Show()
 
 End
@@ -591,7 +595,7 @@ Public Sub LoadComboboxes(cMdl As Collection)
 
     If cVars.Exist("celweight") Then
       If Starter.cWidths.Exist(cVars["celweight"]) Then
-        CurrentWidth = Starter.cWidths[cVars["celweight"]]
+        CurrentWidth = Starter.cWidths[cVars["celweight"]][0]
       Else
         CurrentWidth = 1
       Endif
@@ -686,17 +690,17 @@ Public Sub gTask(sTask As String)
 
         Select String.LCase(File.Ext(FilePath))
           Case "dxf"
-            mdl = cad.ImportDxf(FilePath)
+            mdl = cad.DXFImport(FilePath)
             If mdl.Count > 0 Then
               hFCAD.cImport = mdl
             Endif
 
           Case "dwg"
-            Message.Info(("Not implemented yet"))
-            ' mdl = cad.ImportDwg(FilePath)
-            ' If mdl.Count > 0 Then
-            '     hFCAD.cImport = mdl
-            ' Endif
+            'Message.Info(("Not implemented yet"))
+            mdl = cad.DWGImport(FilePath)
+            If mdl.Count > 0 Then
+              hFCAD.cImport = mdl
+            Endif
         End Select
 
       Endif

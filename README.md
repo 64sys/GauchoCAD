@@ -29,7 +29,7 @@ GauchoCAD is currently under development and the status is as follows:
 | <img src="./svg/entities/leader.svg" width="48" height="48"> | li | Leader | Create a leader |
 | <img src="./svg/entities/line.svg" width="48" height="48"> | l | Line | Create a line |
 | <img src="./svg/entities/mtext.svg" width="48" height="48"> | tt | Mtext | Create a mtext |
-| <img src="./svg/entities/pline.svg" width="48" height="48"> | po | Pline | Create a polyline |
+| <img src="./svg/entities/polyline.svg" width="48" height="48"> | po | Pline | Create a polyline |
 | <img src="./svg/entities/rectangle.svg" width="48" height="48"> | re | Rectangle | Create an rectangle |
 | <img src="./svg/entities/solid.svg" width="48" height="48"> | sa | Solid | Create an solid |
 | <img src="./svg/entities/spline.svg" width="48" height="48"> | sq | Spline | Create an spline |
@@ -39,6 +39,7 @@ GauchoCAD is currently under development and the status is as follows:
 # Tools
 | Icon | Alias | Name | Description |
 |------|:-----:|:----:|------------:|
+| <img src="./svg/tools/array.svg" width="48" height="48"> | ar | Array | Create a patern, it could be rectangular or polar |
 | <img src="./svg/tools/break.svg" width="48" height="48"> | bg | Break | Brak a entity in two parts |
 | <img src="./svg/tools/chamfer.svg" width="48" height="48"> | cd | Chamfer | Create a chamfer from two lines |
 | <img src="./svg/tools/copy.svg" width="48" height="48"> | c | Copy | Copy an entity |
@@ -49,11 +50,11 @@ GauchoCAD is currently under development and the status is as follows:
 | <img src="./svg/tools/mirror.svg" width="48" height="48"> | mn | Mirror | Create a new entity mirroring another |
 | <img src="./svg/tools/move.svg" width="48" height="48"> | m | Move | Move a site entity |
 | <img src="./svg/tools/offset.svg" width="48" height="48"> | fg | Offset | Create a parallel entity |
-| <img src="./svg/tools/pan.svg" width="48" height="48"> | zc | Pan | Displacement of sight |
 | <img src="./svg/tools/rotate.svg" width="48" height="48"> | rt | Rotate | Rotate an entity |
 | <img src="./svg/tools/scale.svg" width="48" height="48"> | sc | Scale | Scale an entity |
 | <img src="./svg/tools/stretch.svg" width="48" height="48"> | s | Stretch | Stretch an entity |
 | <img src="./svg/tools/trim.svg" width="48" height="48"> | tr | Trim | Cut an entity |
+| <img src="./svg/tools/pan.svg" width="48" height="48"> | zc | Pan | Displacement of sight |
 | <img src="./svg/tools/zoome.svg" width="48" height="48"> | zx | Zoome | View fit to all entities |
 | <img src="./svg/tools/zoomw.svg" width="48" height="48"> | z | Zoomw | View window |
 

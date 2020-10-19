@@ -225,7 +225,7 @@
     { mnuArray Menu tool
       Name = "mnuArray"
       Text = ("Array")
-      Visible = False
+      Picture = Picture["svg/tools/array.svg"]
       Tag = "array"
     }
     { mnuStretch Menu tool
@@ -485,7 +485,6 @@
           #Translate = False
           Tag = "bounds"
           ToolTip = "F6"
-          Text = "BOUNDS"
           Border = True
           Toggle = True
         }
@@ -495,7 +494,6 @@
           #Translate = False
           Tag = "grid"
           ToolTip = "F7"
-          Text = "GRID"
           Border = True
           Toggle = True
         }
@@ -505,7 +503,6 @@
           #Translate = False
           Tag = "ortho"
           ToolTip = "F8"
-          Text = "ORTHO"
           Border = True
           Toggle = True
         }

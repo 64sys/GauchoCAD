@@ -73,7 +73,7 @@ Public Function ImageDot(xColor As Integer) As Image
 
   Dim hColor As ColorInfo
   Dim img As Image
-  Dim D As Integer
+  'Dim D As Integer
 
   hColor = Color[Color.ButtonBackground]
 
