@@ -1038,6 +1038,9 @@ Public Function DWGEntities(s As String) As Collection
           vVal = hdx[hdx.Max]
           'tmx.Add(vVal, "object_name")
           tmx.Add(vVal, "entity")
+          If vVal = "TEXT" Then
+            Print "x"
+          Endif
 
           If enty.Exist(hdx[hdx.Max]) Then
             If enty[hdx[hdx.Max]] Then
@@ -1187,7 +1190,7 @@ Public Function DWGDecodeItem(xRaw As String[]) As Variant
       Else
         vVal = "Error"
       Endif
-    Case "start", "end", "ins_pt"
+    Case "start", "end", "ins_pt", "center", "alignment_pt"
       px = DWGDecodeCoord(sVal)
       If px.Count = 2 Then
         px.Add(0.0)
@@ -1203,7 +1206,10 @@ Public Function DWGDecodeItem(xRaw As String[]) As Variant
     Case "color.index"
       vVal = DWGDecodeColor(sVal)
 
-    Case "linewt"
+      'Case "color.raw" ': 0 x0[BSx 0]""
+      'vVal = DWGDecodeHex(sVal)
+
+    Case "linewt", "color.raw"
       If InStr(sVal, "[") > 0 Then
         tVal = Split(sVal, "[")[0]
         vVal = tVal
@@ -1214,6 +1220,14 @@ Public Function DWGDecodeItem(xRaw As String[]) As Variant
 
     Case "handle"
       vVal = DWGDecodeHandle(sVal)
+
+    Case "start_angle", "end_angle"
+      If InStr(sVal, "[") > 0 Then
+        tVal = Split(sVal, "[")[0]
+        vVal = DWGDecodeFloat(tVal)
+      Else
+        vVal = DWGDecodeFloat(sVal)
+      Endif
 
     Case "prev_entity", "next_entity", "xdicobjhandle"
       If InStr(sVal, ")") > 0 Then
@@ -1227,11 +1241,8 @@ Public Function DWGDecodeItem(xRaw As String[]) As Variant
     Case "address"
       vVal = sVal
 
-    Case "bitsize", "num_eed"
+    Case "bitsize", "num_eed", "horiz_alignment"
       vVal = DWGDecodeInteger(sVal)
-
-    Case "ltype_flags"
-      vVal = sVal
 
     Case "hdlsize"
       If InStr(sVal, ",") > 0 Then
@@ -1240,10 +1251,8 @@ Public Function DWGDecodeItem(xRaw As String[]) As Variant
         tVal = sVal
       Endif
       vVal = DWGDecodeInteger(tVal)
-    Case "x", "y", "z"
-      vVal = DWGDecodeFloat(tVal)
 
-    Case "x_ang", "height"
+    Case "x_ang", "height", "x", "y", "z", "radius", "rotation"
       vVal = DWGDecodeFloat(tVal)
 
     Case Else
@@ -2229,10 +2238,12 @@ Public Function DWGAlias() As Collection
   Dim d As New Collection
 
   d.Add("width", "linewt")
-  d.Add("colour", "color.index")
+  'd.Add("colour", "color.index")
   'd.Add("width", "invisible")
   d.Add("style", "ltype_flags")
   d.Add("block", "ownerhandle")
+  'd.Add("text", "text_value")
+  'd.Add("angle", "rotation")
 
   Return d
 
@@ -2249,21 +2260,49 @@ Public Function DWGArrangeEnty(c As Collection) As Collection
   Dim ps As String
   Dim px As New Float[]
   Dim flo As Float
+  Dim int As Integer
 
   If c.Exist("entity") Then
 
     o.Add(c["entity"], "entity")
 
-    For Each tag In ["id", "handle", "layer", "style", "width", "colour", "invisible", "thikness", "block"]
+    For Each tag In ["id", "handle", "layer", "style", "width", "invisible", "thikness", "block"]
       If c.Exist(tag) Then
         o.Add(c[tag], tag)
       Endif
     Next
 
+    If c.Exist("color.index") Then
+      o.Add(c["color.index"], "colour")
+    Else
+      If c.Exist("color.raw") Then
+        o.Add(c["color.raw"], "colour")
+      Else
+        o.Add(0, "colour")
+      Endif
+    Endif
+
     Select c["entity"]
 
       Case "ARC"
-        '"angle", "radious",
+        If c.Exist("center") Then
+          x.Clear
+          x.Add(c["center"], "p0")
+          o.Add(x.Copy(), "p")
+        Endif
+
+        If c.Exist("radius") Then
+          o.Add(c["radius"], "radius")
+        Endif
+
+        If c.Exist("start_angle") Then
+          o.Add(c["start_angle"], "start_angle")
+        Endif
+
+        If c.Exist("end_angle") Then
+          o.Add(c["end_angle"], "end_angle")
+        Endif
+
       Case "ATTDEF"
         If c.Exist("ins_pt") Then
           x.Clear
@@ -2285,7 +2324,14 @@ Public Function DWGArrangeEnty(c As Collection) As Collection
       Case "ATTRIB"
 
       Case "CIRCLE"
-        '"point", "radious",
+        If c.Exist("center") Then
+          x.Clear
+          x.Add(c["center"], "p0")
+          o.Add(x.Copy(), "p")
+        Endif
+        If c.Exist("radius") Then
+          o.Add(c["radius"], "radius")
+        Endif
 
       Case "HATCH"
 
@@ -2334,6 +2380,42 @@ Public Function DWGArrangeEnty(c As Collection) As Collection
         o.Add(c["num_points"], "num_points")
 
       Case "TEXT"
+
+        If c.Exist("height") Then
+          flo = c["height"]
+          o.Add(flo, "text_height")
+        Endif
+
+        If c.Exist("rotation") Then
+          flo = c["rotation"]
+        Else
+          flo = 0.0
+        Endif
+        o.Add(flo, "angle")
+
+        If c.Exist("horiz_alignment") Then
+          int = c["horiz_alignment"]
+          o.Add(int, "horiz_alignment")
+        Endif
+
+        If c.Exist("text") Then
+          str = UnQuote(c["text"])
+          o.Add(str, "text")
+        Endif
+
+        If c.Exist("text_style") Then
+          str = UnQuote(c["text_style"])
+          o.Add(str, "text_style")
+        Endif
+
+        If c.Exist("ins_pt") Then
+          x.Clear
+          x.Add(c["ins_pt"], "p0")
+          If c.Exist("alignment_pt") Then
+            x.Add(c["alignment_pt"], "p1")
+          Endif
+          o.Add(x.Copy(), "p")
+        Endif
 
     End Select
   Endif
