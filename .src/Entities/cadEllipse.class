@@ -44,169 +44,170 @@ Public angle As Float
 
 Public Sub Translate(e As Entity, dX As Float, dY As Float, Optional OnlySelected As Boolean = False)
 
-    Dim i As Integer
+  Dim i As Integer
 
-    If OnlySelected Then
+  If OnlySelected Then
 
-        For i = 0 To e.Psel.Max
-            If e.Psel[i] Then
+    For i = 0 To e.Psel.Max
+      If e.Psel[i] Then
 
-                e.P[i * 2] += dx
-                e.P[i * 2 + 1] += dy
+        e.P[i * 2] += dx
+        e.P[i * 2 + 1] += dy
 
-            Endif
-        Next
+      Endif
+    Next
 
-    Else
+  Else
 
-        puntos.Translate(e.p, dx, dy)
-    Endif
+    puntos.Translate(e.p, dx, dy)
+  Endif
 
 End
 
 Public Sub Rotate(e As Entity, radians As Float)
 
-    puntos.Rotate(e.p, radians)
+  puntos.Rotate(e.p, radians)
 
 End
 
 Public Sub Scale(e As Entity, sX As Float, sY As Float)
 
-    Dim i As Integer
+  Dim i As Integer
 
-    For i = 0 To e.p.max Step 2
+  For i = 0 To e.p.max Step 2
 
-        e.P[i] = e.P[i] * sX
+    e.P[i] = e.P[i] * sX
 
-        e.P[i + 1] = e.P[i + 1] * sY
+    e.P[i + 1] = e.P[i + 1] * sY
 
-    Next
+  Next
 
-    ' start/end
-    If sx < 0 Then
-        E.fParam[1] = 360 - E.fParam[1]
-        E.fParam[2] = 360 - E.fParam[2]
-        Swap e.fParam[1], e.fParam[2]
-        If E.fParam[2] < E.fParam[1] Then E.fParam[2] += 360
+  ' start/end
+  If sx < 0 Then
+    E.fParam[1] = 360 - E.fParam[1]
+    E.fParam[2] = 360 - E.fParam[2]
+    Swap e.fParam[1], e.fParam[2]
+    If E.fParam[2] < E.fParam[1] Then E.fParam[2] += 360
 
-    Endif
+  Endif
 
-    If sy < 0 Then
-        E.fParam[1] = 360 - E.fParam[1]
-        E.fParam[2] = 360 - E.fParam[2]
-        Swap e.fParam[1], e.fParam[2]
-        If E.fParam[2] < E.fParam[1] Then E.fParam[2] += 360
-    Endif
+  If sy < 0 Then
+    E.fParam[1] = 360 - E.fParam[1]
+    E.fParam[2] = 360 - E.fParam[2]
+    Swap e.fParam[1], e.fParam[2]
+    If E.fParam[2] < E.fParam[1] Then E.fParam[2] += 360
+  Endif
 
 End
 
 Public Sub Draw(oE As Entity)
 
-    If Not oE.Visible Then Return
+  If Not oE.Visible Then Return
 
-    Dim major, minor, la As Float
+  Dim major, minor, la As Float
 
-    major = Sqr((oE.p[2] - oE.p[0]) ^ 2 + (oE.p[3] - oE.p[1]) ^ 2)
-    angle = Ang(oE.p[2] - oE.p[0], oE.p[3] - oE.p[1])          ' Los coordenadas del eje mayor son relativas al centro
-    If Not oE.Finished Then
-        If Me.StepsDone < 2 Then
-            oE.fParam[0] = 0.5
-            Me.start = 0
-            Me.recorrido = 2 * Pi
-            Minor = major * oE.fParam[0]
-        Else If Me.StepsDone < 3 Then
-            Minor = major * oE.fParam[0]
-            'If oE.fParam[0] > major Then oE.fParam[0] = major
-            'Minor = oE.fParam[0]
+  major = Sqr((oE.p[2] - oE.p[0]) ^ 2 + (oE.p[3] - oE.p[1]) ^ 2)
+  angle = Ang(oE.p[2] - oE.p[0], oE.p[3] - oE.p[1])          ' Los coordenadas del eje mayor son relativas al centro
+  If Not oE.Finished Then
+    If Me.StepsDone < 2 Then
+      oE.fParam[0] = 0.5
+      Me.start = 0
+      Me.recorrido = 2 * Pi
+      Minor = major * oE.fParam[0]
+    Else If Me.StepsDone < 3 Then
+      Minor = major * oE.fParam[0]
+      'If oE.fParam[0] > major Then oE.fParam[0] = major
+      'Minor = oE.fParam[0]
 
-        Endif
     Endif
-    Minor = major * oE.fParam[0]
-    If major = 0 Then major = 1
+  Endif
+  Minor = major * oE.fParam[0]
+  If major = 0 Then major = 1
 
-    Dim x, y, theta, angle_increment As Float
-    Dim i As Integer
+  Dim x, y, theta, angle_increment As Float
+  Dim i As Integer
 
-    ' If oe.fParam[3] > 0 Then
-    '
-    '     If oE.fParam[2] < oE.fParam[1] Then oE.fParam[2] = 360 + oE.fParam[2]              ' grados
-    '
-    ' Else
-    '
-    '     If oE.fParam[2] > oE.fParam[1] Then oE.fParam[2] = oE.fParam[2] - 360              ' grados
-    '
-    ' Endif
+  ' If oe.fParam[3] > 0 Then
+  '
+  '     If oE.fParam[2] < oE.fParam[1] Then oE.fParam[2] = 360 + oE.fParam[2]              ' grados
+  '
+  ' Else
+  '
+  '     If oE.fParam[2] > oE.fParam[1] Then oE.fParam[2] = oE.fParam[2] - 360              ' grados
+  '
+  ' Endif
 
-    oE.PolyLine.Clear
-    GL.Begin(gl.LINE_STRIP)
+  oE.PolyLine.Clear
+  GL.Begin(gl.LINE_STRIP)
 
-    angle_increment = Pi * 2 / 360 '* oe.fParam[3]
+  angle_increment = Pi * 2 / 360 '* oe.fParam[3]
 
-    For theta = oE.fParam[1] / 180 * Pi To oE.fParam[2] / 180 * Pi Step angle_increment
-        ' el punto considerando 0,0 al centro
-        x = major * Cos(theta) * Cos(angle) - minor * Sin(theta) * Sin(angle)
-        y = major * Cos(theta) * Sin(angle) + minor * Sin(theta) * Cos(angle)
-        oE.PolyLine.Add(x + oE.p[0])
-        oE.PolyLine.Add(y + oE.p[1])
+  For theta = oE.fParam[1] / 180 * Pi To oE.fParam[2] / 180 * Pi Step angle_increment
+    ' el punto considerando 0,0 al centro
+    x = major * Cos(theta) * Cos(angle) - minor * Sin(theta) * Sin(angle)
+    y = major * Cos(theta) * Sin(angle) + minor * Sin(theta) * Cos(angle)
+    oE.PolyLine.Add(x + oE.p[0])
+    oE.PolyLine.Add(y + oE.p[1])
 
-    Next
+  Next
 
-    GL.End
-    GLplus.PolyLines(oE.PolyLine, oE.ColorToPaint, oe.LineWidth, oe.LineType)
+  GL.End
+  oE.ColorToPaint = gcd.GetGBColor(oE.colour, oE.Layerid)
+  GLplus.PolyLines(oE.PolyLine, oE.ColorToPaint, oe.LineWidth, oe.LineType)
 
 End
 
 '' A fat version of the entity
 Public Sub DrawSelected(oE As Entity)
 
-    GLplus.PolyLines(oE.PolyLine, Starter.flgWindowBackColor, oE.LineWidth, gcd.stiDashed)
-    GLplus.PolyLines(oE.PolyLine, gcd.ColorForSelected, oE.LineWidth, oE.LineType)
+  GLplus.PolyLines(oE.PolyLine, Starter.flgWindowBackColor, oE.LineWidth, gcd.stiDashed)
+  GLplus.PolyLines(oE.PolyLine, gcd.ColorForSelected, oE.LineWidth, oE.LineType)
 
 End
 
 '' A fat version of the entity
 Public Sub DrawRemark(oE As Entity)
 
-    GLplus.PolyLines(oE.PolyLine, Starter.flgWindowBackColor, oE.LineWidth, gcd.stiDashed)
-    GLplus.PolyLines(oE.PolyLine, oE.ColorToPaint, oE.LineWidth + 2, oE.LineType)
+  GLplus.PolyLines(oE.PolyLine, Starter.flgWindowBackColor, oE.LineWidth, gcd.stiDashed)
+  GLplus.PolyLines(oE.PolyLine, oE.ColorToPaint, oE.LineWidth + 2, oE.LineType)
 
 End
 
 Public Function Draw2(oE As Entity)
 
-    If Not oE.Visible Then Return
+  If Not oE.Visible Then Return
 
-    Dim major, minor, la As Float
+  Dim major, minor, la As Float
 
-    major = Sqr((oE.p[2] - oE.p[0]) ^ 2 + (oE.p[3] - oE.p[1]) ^ 2)
-    angle = Ang(oE.p[2] - oE.p[0], oE.p[3] - oE.p[1])          ' Los coordenadas del eje mayor son relativas al centro
-    If Not oE.Finished Then
-        If Me.StepsDone < 2 Then
-            oE.fParam[0] = 0.5
-            Me.start = 0
-            Me.recorrido = 2 * Pi
-            Minor = major * oE.fParam[0]
-        Else If Me.StepsDone < 3 Then
-            Minor = major * oE.fParam[0]
-            'If oE.fParam[0] > major Then oE.fParam[0] = major
-            'Minor = oE.fParam[0]
+  major = Sqr((oE.p[2] - oE.p[0]) ^ 2 + (oE.p[3] - oE.p[1]) ^ 2)
+  angle = Ang(oE.p[2] - oE.p[0], oE.p[3] - oE.p[1])          ' Los coordenadas del eje mayor son relativas al centro
+  If Not oE.Finished Then
+    If Me.StepsDone < 2 Then
+      oE.fParam[0] = 0.5
+      Me.start = 0
+      Me.recorrido = 2 * Pi
+      Minor = major * oE.fParam[0]
+    Else If Me.StepsDone < 3 Then
+      Minor = major * oE.fParam[0]
+      'If oE.fParam[0] > major Then oE.fParam[0] = major
+      'Minor = oE.fParam[0]
 
-        Endif
     Endif
-    Minor = major * oE.fParam[0]
-    If major = 0 Then major = 1
+  Endif
+  Minor = major * oE.fParam[0]
+  If major = 0 Then major = 1
 
-    paint.Save
+  paint.Save
 
-    paint.brush = Paint.Color(oE.ColorToPaint)
+  paint.brush = Paint.Color(oE.ColorToPaint)
 
-    paint.Translate(oE.p[0], oE.p[1])
-    paint.Rotate(-angle)
-    Paint.Scale(1, Minor / major)
-    paint.LineWidth = oE.LineWidth / appmain.hFcad.ScaleZoom / gcd.ScaleLines
-    paint.arc(0, 0, major, Me.start, Me.recorrido)
-    paint.Stroke
-    paint.Restore
+  paint.Translate(oE.p[0], oE.p[1])
+  paint.Rotate(-angle)
+  Paint.Scale(1, Minor / major)
+  paint.LineWidth = oE.LineWidth / appmain.hFcad.ScaleZoom / gcd.ScaleLines
+  paint.arc(0, 0, major, Me.start, Me.recorrido)
+  paint.Stroke
+  paint.Restore
 
 End
 
@@ -214,26 +215,26 @@ End
 ' True means all is good, False will instruct the clsEntityBuilder to delete it
 Public Sub Finish(oE As Entity, Optional ParamsDone As Integer = -1) As Boolean
 
-    ' calculo el recorrido del arco como
-    ' OJO en la ELLIPSE vienen en radianes, y en ARC en grados
+  ' calculo el recorrido del arco como
+  ' OJO en la ELLIPSE vienen en radianes, y en ARC en grados
 
-    'CreatePolygon
+  'CreatePolygon
 
-    ' tareas finales de armado del objeto
+  ' tareas finales de armado del objeto
 
-    oE.psel.resize(oE.p.count / 2)
-    oE.ForDeletion = False
-    oE.DrawAble = True
-    oE.Selected = False
-    oE.Finished = True
+  oE.psel.resize(oE.p.count / 2)
+  oE.ForDeletion = False
+  oE.DrawAble = True
+  oE.Selected = False
+  oE.Finished = True
 
-    If oE.fParam[2] < oE.fParam[1] Then oE.fParam[2] += 360
+  If oE.fParam[2] < oE.fParam[1] Then oE.fParam[2] += 360
 
-    If Not True Then
+  If Not True Then
 
-        oE.ForDeletion = True
-        oE.DrawAble = False
+    oE.ForDeletion = True
+    oE.DrawAble = False
 
-    End If
+  End If
 
 End

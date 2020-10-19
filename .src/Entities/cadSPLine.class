@@ -29,108 +29,108 @@ Public numDrawingPoints As Integer = 100
 
 Public Sub Translate(e As Entity, dX As Float, dY As Float, Optional OnlySelected As Boolean = False)
 
-    Dim i As Integer
+  Dim i As Integer
 
-    If OnlySelected Then
+  If OnlySelected Then
 
-        For i = 0 To e.Psel.Max
-            If e.Psel[i] Then
+    For i = 0 To e.Psel.Max
+      If e.Psel[i] Then
 
-                e.P[i * 2] += dx
-                e.P[i * 2 + 1] += dy
+        e.P[i * 2] += dx
+        e.P[i * 2 + 1] += dy
 
-            Endif
-        Next
+      Endif
+    Next
 
-    Else
+  Else
 
-        puntos.Translate(e.p, dx, dy)
-    Endif
+    puntos.Translate(e.p, dx, dy)
+  Endif
 
 End
 
 Public Sub Rotate(e As Entity, radians As Float)
 
-    puntos.Rotate(e.P, radians)
+  puntos.Rotate(e.P, radians)
 
 End
 
 Public Sub Scale(e As Entity, sX As Float, sY As Float)
 
-    Dim i As Integer
+  Dim i As Integer
 
-    For i = 0 To e.p.max Step 2
+  For i = 0 To e.p.max Step 2
 
-        e.P[i] = e.P[i] * sX
-        e.P[i + 1] = e.P[i + 1] * sY
+    e.P[i] = e.P[i] * sX
+    e.P[i + 1] = e.P[i + 1] * sY
 
-    Next
+  Next
 
 End
 
 Public Sub Draw(oE As Entity)
 
-    If Not oE.Visible Then Return
+  If Not oE.Visible Then Return
 
-    drawingPoints.Clear
+  drawingPoints.Clear
 
-    'oe.P.Clear
-    'oe.P.Insert([10, 10, 70, 310, 210, 210, 210, 10])
-
-    calculateDrawingPoints(oe.p)
-    GLplus.PolyLines(drawingPoints, oE.ColorToPaint, oE.LineWidth, oe.linetype)
+  'oe.P.Clear
+  'oe.P.Insert([10, 10, 70, 310, 210, 210, 210, 10])
+  oE.ColorToPaint = gcd.GetGBColor(oE.colour, oE.Layerid)
+  calculateDrawingPoints(oe.p)
+  GLplus.PolyLines(drawingPoints, oE.ColorToPaint, oE.LineWidth, oe.linetype)
 
 End
 
 '' A fat version of the entity
 Public Sub DrawSelected(oE As Entity)
 
-    GLplus.PolyLines(oE.PolyLine, Starter.flgWindowBackColor, oE.LineWidth, gcd.stiDashed)
-    GLplus.PolyLines(oE.PolyLine, gcd.ColorForSelected, oE.LineWidth, oE.LineType)
+  GLplus.PolyLines(oE.PolyLine, Starter.flgWindowBackColor, oE.LineWidth, gcd.stiDashed)
+  GLplus.PolyLines(oE.PolyLine, gcd.ColorForSelected, oE.LineWidth, oE.LineType)
 
 End
 
 Public Sub Draw2(oE As Entity)
 
-    ' FIXME: requiere reparacion -> OpenGL
-    Return
+  ' FIXME: requiere reparacion -> OpenGL
+  Return
 
-    If Not oE.Visible Then Return
+  If Not oE.Visible Then Return
 
-    Dim i As Integer
+  Dim i As Integer
 
-    paint.LineWidth = oE.LineWidth / appmain.hFcad.ScaleZoom / gcd.ScaleLines
+  paint.LineWidth = oE.LineWidth / appmain.hFcad.ScaleZoom / gcd.ScaleLines
 
-    If oE.Selected And Not gcd.ToolActive Then
-        paint.brush = Paint.Color(gcd.ColorForSelected)
-    Else
-        paint.brush = Paint.Color(oE.ColorToPaint)
-    Endif
+  If oE.Selected And Not gcd.ToolActive Then
+    paint.brush = Paint.Color(gcd.ColorForSelected)
+  Else
+    paint.brush = Paint.Color(oE.ColorToPaint)
+  Endif
 
-    If Me.StepsDone = 1 Then
-        paint.moveto(oE.p[0], oE.p[1])
-        paint.lineto(oE.p[2], oE.p[3])
+  If Me.StepsDone = 1 Then
+    paint.moveto(oE.p[0], oE.p[1])
+    paint.lineto(oE.p[2], oE.p[3])
 
-    Else If Me.StepsDone = 2 Then
-        paint.moveto(oE.p[0], oE.p[1])
-        paint.lineto(oE.p[2], oE.p[3])
-        paint.lineto(oE.p[4], oE.p[5])
+  Else If Me.StepsDone = 2 Then
+    paint.moveto(oE.p[0], oE.p[1])
+    paint.lineto(oE.p[2], oE.p[3])
+    paint.lineto(oE.p[4], oE.p[5])
 
-    Else If Me.StepsDone >= 3 Then 'If oE.P.Count / 2 < 5 Then
-        paint.moveto(oE.p[0], oE.p[1])
-        paint.curveto(oE.p[2], oE.p[3], oE.p[4], oE.p[5], oE.p[6], oE.p[7])
-        '
-        ' Else
-        '
-        '     'For i = 2 To oE.P.Max - 6 Step 2
-        '         paint.moveto(oE.p[i], oE.p[i + 1])
-        '         paint.curveto(oE.p[i + 2], oE.p[i + 3], oE.p[i + 4], oE.p[i + 5], oE.p[i + 6], oE.p[i + 7])
-        '
-        '     'Next
-    End If
-
+  Else If Me.StepsDone >= 3 Then 'If oE.P.Count / 2 < 5 Then
+    paint.moveto(oE.p[0], oE.p[1])
+    paint.curveto(oE.p[2], oE.p[3], oE.p[4], oE.p[5], oE.p[6], oE.p[7])
     '
-    paint.Stroke
+    ' Else
+    '
+    '     'For i = 2 To oE.P.Max - 6 Step 2
+    '         paint.moveto(oE.p[i], oE.p[i + 1])
+    '         paint.curveto(oE.p[i + 2], oE.p[i + 3], oE.p[i + 4], oE.p[i + 5], oE.p[i + 6], oE.p[i + 7])
+    '
+    '     'Next
+  End If
+
+  '
+  paint.Stroke
 
 End
 '' Creo los puntos de interes
@@ -138,7 +138,7 @@ End
 
 Public Function BuildPOI(oE As Entity, Optional arrIndex As Integer = -1) As Integer
 
-    cadPLine.BuildPOI(oe)
+  cadPLine.BuildPOI(oe)
 
 End
 
@@ -146,74 +146,74 @@ End
 ' True means all is good, False will instruct the clsEntityBuilder to delete it
 Public Sub Finish(oE As Entity, Optional ParamsDone As Integer = -1) As Boolean
 
-    'Print "Finish en EntityBase"
-    'CreatePolygon(oe)
-    BuildPOI(oe)
+  'Print "Finish en EntityBase"
+  'CreatePolygon(oe)
+  BuildPOI(oe)
 
-    ' busco el tipo de linea, si hace falta
-    If oE.LineTypeName = "Dashed" Then oE.LineType = 1
-    ' tareas finales de armado del objeto
+  ' busco el tipo de linea, si hace falta
+  If oE.LineTypeName = "Dashed" Then oE.LineType = 1
+  ' tareas finales de armado del objeto
 
-    oE.psel.resize(oE.p.count / 2)
-    oE.ForDeletion = False
-    oE.DrawAble = True
-    oE.Selected = False
-    oE.Finished = True
+  oE.psel.resize(oE.p.count / 2)
+  oE.ForDeletion = False
+  oE.DrawAble = True
+  oE.Selected = False
+  oE.Finished = True
 
-    If Not True Then
+  If Not True Then
 
-        oE.ForDeletion = True
-        oE.DrawAble = False
+    oE.ForDeletion = True
+    oE.DrawAble = False
 
-    End If
+  End If
 
 End
 
 Public Function calculateNewPoint(points As Float[], t As Float) As Float[]
-    ' Coordinates calculated using the general formula are relative To
-    ' origin at bottom left.
+  ' Coordinates calculated using the general formula are relative To
+  ' origin at bottom left.
 
-    Dim x As Float = 0
-    Dim y As Float = 0
-    Dim n As Integer = points.Count / 2 - 1
-    Dim i As Integer
-    Dim bin As Float
+  Dim x As Float = 0
+  Dim y As Float = 0
+  Dim n As Integer = points.Count / 2 - 1
+  Dim i As Integer
+  Dim bin As Float
 
-    For i = 0 To n
-        bin = C(n, i) * (1 - t) ^ (n - i) * t ^ i
-        x += bin * points[i * 2]
-        y += bin * points[i * 2 + 1]
-    Next
-    Return [x, y]
+  For i = 0 To n
+    bin = C(n, i) * (1 - t) ^ (n - i) * t ^ i
+    x += bin * points[i * 2]
+    y += bin * points[i * 2 + 1]
+  Next
+  Return [x, y]
 
 End
 
 Public Function calculateDrawingPoints(points As Float[])
 
-    Dim interval As Float = 1 / numDrawingPoints
-    Dim t As Float = interval
-    Dim i As Integer
+  Dim interval As Float = 1 / numDrawingPoints
+  Dim t As Float = interval
+  Dim i As Integer
 
-    drawingPoints.insert(calculateNewPoint(points, 0))
-    For i = 0 To numDrawingPoints - 1
-        drawingPoints.insert(calculateNewPoint(points, t))
-        t += interval
-    Next
+  drawingPoints.insert(calculateNewPoint(points, 0))
+  For i = 0 To numDrawingPoints - 1
+    drawingPoints.insert(calculateNewPoint(points, t))
+    t += interval
+  Next
 
 End
 
 Public Function C(n As Integer, k As Integer) As Float
 
-    Dim coeff As Float = 1
-    Dim x As Float
+  Dim coeff As Float = 1
+  Dim x As Float
 
-    For x = n - k + 1 To n
-        coeff *= x
+  For x = n - k + 1 To n
+    coeff *= x
 
-    Next
-    For x = 1 To k
-        coeff /= x
-    Next
-    Return coeff
+  Next
+  For x = 1 To k
+    coeff /= x
+  Next
+  Return coeff
 
 End

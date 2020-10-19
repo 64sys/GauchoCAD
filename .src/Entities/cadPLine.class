@@ -43,95 +43,95 @@ Public StepsDone As Integer                 ' esto lo cambia cls ElementBuilder 
 
 Public Sub Translate(e As Entity, dX As Float, dY As Float, Optional OnlySelected As Boolean = False)
 
-    Dim i As Integer
+  Dim i As Integer
 
-    If OnlySelected Then
+  If OnlySelected Then
 
-        For i = 0 To e.Psel.Max
-            If e.Psel[i] Then
+    For i = 0 To e.Psel.Max
+      If e.Psel[i] Then
 
-                e.P[i * 2] += dx
-                e.P[i * 2 + 1] += dy
+        e.P[i * 2] += dx
+        e.P[i * 2 + 1] += dy
 
-            Endif
-        Next
+      Endif
+    Next
 
-    Else
+  Else
 
-        puntos.Translate(e.p, dx, dy)
-    Endif
+    puntos.Translate(e.p, dx, dy)
+  Endif
 
 End
 
 Public Sub Rotate(e As Entity, radians As Float)
 
-    puntos.Rotate(e.p, radians)
+  puntos.Rotate(e.p, radians)
 
 End
 
 Public Sub Scale(e As Entity, sX As Float, sY As Float)
 
-    Dim i As Integer
+  Dim i As Integer
 
-    For i = 0 To e.p.max Step 2
+  For i = 0 To e.p.max Step 2
 
-        e.P[i] = e.P[i] * sX
+    e.P[i] = e.P[i] * sX
 
-        e.P[i + 1] = e.P[i + 1] * sY
+    e.P[i + 1] = e.P[i + 1] * sY
 
-    Next
+  Next
 
 End
 
 Public Sub Draw(oE As Entity)
 
-    If Not oE.Visible Then Return
+  If Not oE.Visible Then Return
 
-    oE.ColorToPaint = gcd.GetGBColor(oE.colour, oE.Layerid)
+  oE.ColorToPaint = gcd.GetGBColor(oE.colour, oE.Layerid)
 
-    GLplus.PolyLines(oE.p, oE.ColorToPaint, oE.LineWidth, oe.linetype)
+  GLplus.PolyLines(oE.p, oE.ColorToPaint, oE.LineWidth, oe.linetype)
 
 End
 
 '' A fat version of the entity
 Public Sub DrawSelected(oE As Entity)
 
-    GLplus.PolyLines(oE.P, Starter.flgWindowBackColor, oE.LineWidth, gcd.stiDashed)
-    GLplus.PolyLines(oE.P, gcd.ColorForSelected, oE.LineWidth, oE.LineType)
+  GLplus.PolyLines(oE.P, Starter.flgWindowBackColor, oE.LineWidth, gcd.stiDashed)
+  GLplus.PolyLines(oE.P, gcd.ColorForSelected, oE.LineWidth, oE.LineType)
 
 End
 
 '' A fat version of the line
 Public Sub DrawRemark(oE As Entity)
 
-    If Not oE.Visible Then Return
+  If Not oE.Visible Then Return
 
-    GLplus.PolyLines(oE.p, Starter.flgWindowBackColor, oE.LineWidth, gcd.stiDashed)
-    GLplus.PolyLines(oE.p, oE.ColorToPaint, oE.LineWidth + 2, oE.LineType)
+  GLplus.PolyLines(oE.p, Starter.flgWindowBackColor, oE.LineWidth, gcd.stiDashed)
+  GLplus.PolyLines(oE.p, oE.ColorToPaint, oE.LineWidth + 2, oE.LineType)
 
 End
 
 Public Function Draw2(oE As Entity)
 
-    Dim i As Integer
+  Dim i As Integer
 
-    If Not oE.Visible Then Return
+  If Not oE.Visible Then Return
 
-    paint.LineWidth = oE.LineWidth / appmain.hFcad.ScaleZoom / gcd.ScaleLines
+  paint.LineWidth = oE.LineWidth / appmain.hFcad.ScaleZoom / gcd.ScaleLines
 
-    If oE.Selected And Not gcd.ToolActive Then
-        paint.brush = Paint.Color(gcd.ColorForSelected)
-    Else
-        paint.brush = Paint.Color(oE.ColorToPaint)
-    Endif
+  If oE.Selected And Not gcd.ToolActive Then
+    paint.brush = Paint.Color(gcd.ColorForSelected)
+  Else
+    paint.brush = Paint.Color(oE.ColorToPaint)
+  Endif
 
-    paint.moveto(oE.p[0], oE.p[1])
-    For i = 2 To oE.P.Max Step 2
-        paint.lineto(oE.p[i], oE.p[i + 1])
+  paint.moveto(oE.p[0], oE.p[1])
+  For i = 2 To oE.P.Max Step 2
+    paint.lineto(oE.p[i], oE.p[i + 1])
 
-    Next
+  Next
 
-    paint.Stroke
+  paint.Stroke
 
 End
 
@@ -140,31 +140,31 @@ End
 
 Public Function BuildPOI(oE As Entity, Optional arrIndex As Integer = -1) As Integer
 
-    If arrIndex < 0 Then arrIndex = appmain.hFCAD.arrEntities.Max       ' si este valor no es provisto , estos POI son de la ultima entidad
-    Dim i As Integer
-    oe.PoiPoints.Clear
-    oe.PoiType.Clear
+  If arrIndex < 0 Then arrIndex = appmain.hFCAD.arrEntities.Max       ' si este valor no es provisto , estos POI son de la ultima entidad
+  Dim i As Integer
+  oe.PoiPoints.Clear
+  oe.PoiType.Clear
 
-    oe.poiPoints.insert([oE.P[0], oE.P[1]])
+  oe.poiPoints.insert([oE.P[0], oE.P[1]])
+  oe.poiType.Add(gcd.poiEndPoint)
+  'oe.poiEntities.Add(arrIndex)
+
+  For i = 0 To oE.P.count - 4 Step 2
+
+    oe.poiPoints.insert([(oE.P[i + 0] + oE.P[i + 2]) / 2, (oE.P[i + 1] + oE.P[i + 3]) / 2])   ' mid
+    oe.poiType.Add(gcd.poiMidPoint)
+    'oe.poiEntities.Add(arrIndex)
+
+    oe.poiPoints.insert([oE.P[i + 2], oE.P[i + 3]])
     oe.poiType.Add(gcd.poiEndPoint)
     'oe.poiEntities.Add(arrIndex)
 
-    For i = 0 To oE.P.count - 4 Step 2
+    ' line
+    'appmain.hFCAD.poiLines.insert([oE.p[i], oE.p[i + 1], oE.p[i + 2], oE.p[i + 3]])
+    'APPMain.hFCAD.poiLinesEntities.Add(arrIndex)
+    ' appmain.hFCAD.poiLinesRelPoint.Insert([i / 2, i / 2 + 1])
 
-        oe.poiPoints.insert([(oE.P[i + 0] + oE.P[i + 2]) / 2, (oE.P[i + 1] + oE.P[i + 3]) / 2])   ' mid
-        oe.poiType.Add(gcd.poiMidPoint)
-        'oe.poiEntities.Add(arrIndex)
-
-        oe.poiPoints.insert([oE.P[i + 2], oE.P[i + 3]])
-        oe.poiType.Add(gcd.poiEndPoint)
-        'oe.poiEntities.Add(arrIndex)
-
-        ' line
-        'appmain.hFCAD.poiLines.insert([oE.p[i], oE.p[i + 1], oE.p[i + 2], oE.p[i + 3]])
-        'APPMain.hFCAD.poiLinesEntities.Add(arrIndex)
-        ' appmain.hFCAD.poiLinesRelPoint.Insert([i / 2, i / 2 + 1])
-
-    Next
+  Next
 
 End
 
@@ -172,25 +172,25 @@ End
 ' True means all is good, False will instruct the clsEntityBuilder to delete it
 Public Sub Finish(oE As Entity, Optional ParamsDone As Integer = -1) As Boolean
 
-    'Print "Finish en EntityBase"
-    'CreatePolygon(oe)
-    BuildPOI(oe)
+  'Print "Finish en EntityBase"
+  'CreatePolygon(oe)
+  BuildPOI(oe)
 
-    ' busco el tipo de linea, si hace falta
-    If oE.LineTypeName = "Dashed" Then oE.LineType = 1
-    ' tareas finales de armado del objeto
+  ' busco el tipo de linea, si hace falta
+  If oE.LineTypeName = "Dashed" Then oE.LineType = 1
+  ' tareas finales de armado del objeto
 
-    oE.psel.resize(oE.p.count / 2)
-    oE.ForDeletion = False
-    oE.DrawAble = True
-    oE.Selected = False
-    oE.Finished = True
+  oE.psel.resize(oE.p.count / 2)
+  oE.ForDeletion = False
+  oE.DrawAble = True
+  oE.Selected = False
+  oE.Finished = True
 
-    If Not True Then
+  If Not True Then
 
-        oE.ForDeletion = True
-        oE.DrawAble = False
+    oE.ForDeletion = True
+    oE.DrawAble = False
 
-    End If
+  End If
 
 End

@@ -3470,11 +3470,11 @@ Private Function dxfSave4Blocks() As Integer
     ' 64 = This definition Is A referenced external reference(ignored On Input )
     Print #hFIle, "1"
     Print #hFIle, " 10"                          ' Base point X
-    Print #hFIle, APPMain.hFCAD.arrBlocks[i].x
+    Print #hFIle, CStr(APPMain.hFCAD.arrBlocks[i].x)
     Print #hFIle, " 20"
-    Print #hFIle, APPMain.hFCAD.arrBlocks[i].y
+    Print #hFIle, CStr(APPMain.hFCAD.arrBlocks[i].y)
     Print #hFIle, " 30"
-    Print #hFIle, "0"
+    Print #hFIle, CStr("0")
     Print #hFIle, "  3"                           ' name
     Print #hFIle, APPMain.hFCAD.arrBlocks[i].name
     Print #hFIle, "  1"                     ' Xref path name
