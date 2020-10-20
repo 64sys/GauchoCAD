@@ -458,7 +458,7 @@
       MoveScaled(3,66,129,5)
       Arrangement = Arrange.Horizontal
       { !lblCommand Label
-        MoveScaled(2,0,64,4)
+        MoveScaled(2,0,38,4)
         #Public = True
         Font = Font["Bold,+1"]
         Background = Color.TextBackground
@@ -466,8 +466,7 @@
         Text = ("Command")
       }
       { txoCom TextBox
-        MoveScaled(65,0,26,4)
-        Enabled = False
+        MoveScaled(48,0,42,4)
         Font = Font["Bold,+1"]
         Background = Color.TextBackground
       }
