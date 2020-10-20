@@ -69,11 +69,11 @@ Public Function MouseDown(mouseX As Integer, mouseY As Integer) ' esta rutina es
 
       If appmain.hFcad.arrEntities[appmain.hFcad.iEntity[3]].selected Then
 
-        ' veo si esta en un blip
+        ' veo si esta en un grip
         For i = 0 To appmain.hFcad.arrEntities[appmain.hFcad.iEntity[3]].PoiType.Max
           If puntos.Around(Me.SelStartXr, Me.SelStartYr, appmain.hFcad.arrEntities[appmain.hFcad.iEntity[3]].PoiPoints[i * 2], appmain.hFcad.arrEntities[appmain.hFcad.iEntity[3]].PoiPoints[i * 2 + 1], appmain.hFCAD.Metros(8)) Then
 
-            ' estoy editando la entidad desde un blip
+            ' estoy editando la entidad desde un grip
             EntityForEdit = appmain.hFcad.arrEntities[appmain.hFcad.iEntity[3]]
             GripPoint = i
             iEntityForEdit = appmain.hFcad.iEntity[3]
@@ -109,12 +109,12 @@ Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' esta rutina es l
 
   Me.SelEndX = mousex
   Me.SelEndy = mouseY
-
+  Me.PoiChecking = True
   If Me.Active Then
     Dim Crossing As Boolean = False
     ' corrijo para start<end
     Me.Active = False
-    Me.PoiChecking = True
+
     If Me.SelStartX > Me.SelEndX Then
       crossing = True
       Swap Me.SelStartX, Me.SelEndX
@@ -141,10 +141,12 @@ Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' esta rutina es l
       Me.selectionCount = clsEntities.SelectionSquare(Me.SelStartXr, Me.SelStartYr, Me.SelEndXr, Me.SelEndyr, tipo, crossing)
       Debug "Select parsing time ", Timer - t
 
-      clsEntities.GLGenDrawListSel(0)
-      AppMain.SelectionRefresh()
+    Else
+      clsEntities.DeSelection()
 
     End If
+    clsEntities.GLGenDrawListSel(0)
+    AppMain.SelectionRefresh()
 
     clsDrawingAids.HelperTrabajo = ("Selected") & " " & Str$(Me.selectionCount) & " " & ("elements")
 
@@ -154,6 +156,10 @@ Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' esta rutina es l
     GripPoint = -1
     clsEntities.glGenDrawList(iEntityForEdit)
     'Me.Finish()
+
+  Else
+
+    'Stop
 
   End If
 

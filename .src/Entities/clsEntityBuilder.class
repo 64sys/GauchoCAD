@@ -63,355 +63,360 @@ Public XYreal As Float[]
 
 Public Function Start(Optional ElemToBuild As Variant, Optional Mode As Integer = 0)
 
-    ' Parameters that we can process
+  ' Parameters that we can process
 
-    ' P point x,y
-    ' + add a point every time, used like this "P+"
-    ' F float, text entered (mouse is ignored)
-    ' T text
-    ' A angle, can be given by mouse or text
-    ' L distance, idem
+  ' P point x,y
+  ' + add a point every time, used like this "P+"
+  ' F float, text entered (mouse is ignored)
+  ' T text
+  ' A angle, can be given by mouse or text
+  ' L distance, idem
 
-    ' TODO: implement
-    ' C color, can be given by typing the color
+  ' TODO: implement
+  ' C color, can be given by typing the color
 
-    ' B boolean yes/no si/no
-    ' D date
+  ' B boolean yes/no si/no
+  ' D date
 
-    ' Verify if its a valid class to build
-    If TypeOf(ElemToBuild) <> gb.Object Then                                            ' not Entity class given
+  ' limpiamos la seleccion
+  clsEntities.DeSelection()
 
-        If LastEntity Then                                            ' we know the last element, try to create a new one
-            elem = New Entity
-            elem.ClassHandler = LastEntity.ClassHandler
-            elem.Gender = elem.ClassHandler.Gender
+  clsEntities.GLGenDrawListSel(0)
 
-        Else                                                                            ' the is no way to know what element was done last
+  ' Verify if its a valid class to build
+  If TypeOf(ElemToBuild) <> gb.Object Then                                            ' not Entity class given
 
-            clsDrawingAids.ErrorMessage = ("Can create entity")
-            gcd.clsJob = clsDefaultJob                                               ' back to select mode
-            gcd.clsJobPrevious = clsDefaultJob
-            Return
+    If LastEntity Then                                            ' we know the last element, try to create a new one
+      elem = New Entity
+      elem.ClassHandler = LastEntity.ClassHandler
+      elem.Gender = elem.ClassHandler.Gender
 
-        End If
+    Else                                                                            ' the is no way to know what element was done last
 
-    Else                                                                                ' Valid entity
-        ' start building the element
-        elem = New Entity
-        elem.ClassHandler = elemtobuild
-        elem.Gender = elem.ClassHandler.Gender
+      clsDrawingAids.ErrorMessage = ("Can create entity")
+      gcd.clsJob = clsDefaultJob                                               ' back to select mode
+      gcd.clsJobPrevious = clsDefaultJob
+      Return
+
     End If
 
-    clsEntities.FillEntity(elem)
-    ' reset from previous element
-    elem.ClassHandler.StepsDone = 0
+  Else                                                                                ' Valid entity
+    ' start building the element
+    elem = New Entity
+    elem.ClassHandler = elemtobuild
+    elem.Gender = elem.ClassHandler.Gender
+  End If
 
-    'elem.gbcolor = appmain.CurrentColor
+  clsEntities.FillEntity(elem)
+  ' reset from previous element
+  elem.ClassHandler.StepsDone = 0
 
-    iPoints = 0
-    iFloat = 0
-    iString = 0
+  'elem.gbcolor = appmain.CurrentColor
 
-    Pointstotal = elem.p.count / 2                                          ' at this point P is either set or 0 if non determined
-    StepsTotal = Len(elem.ClassHandler.ParamType)
+  iPoints = 0
+  iFloat = 0
+  iString = 0
 
-    ' get the helper list, and parameter types from the element
-    Try Paramhelperlist = Split(elem.ClassHandler.ParamHelper, ";")                      ' optional
-    Try Paramdefault = Split(elem.ClassHandler.ParamDefault, ";")                        ' optional
+  Pointstotal = elem.p.count / 2                                          ' at this point P is either set or 0 if non determined
+  StepsTotal = Len(elem.ClassHandler.ParamType)
 
-    NextParamType = UCase(Mid(elem.ClassHandler.ParamType, elem.ClassHandler.StepsDone + 1, 1))
-    clsDrawingAids.HelperTrabajoNext = ParamHelperList[0]
+  ' get the helper list, and parameter types from the element
+  Try Paramhelperlist = Split(elem.ClassHandler.ParamHelper, ";")                      ' optional
+  Try Paramdefault = Split(elem.ClassHandler.ParamDefault, ";")                        ' optional
 
-    ' instructions to FCAD
-    gcd.OrthogonalIgnored = elem.ClassHandler.OrthogonalIgnored
-    gcd.OrthogonalForced = elem.ClassHandler.OrthogonalForced
+  NextParamType = UCase(Mid(elem.ClassHandler.ParamType, elem.ClassHandler.StepsDone + 1, 1))
+  clsDrawingAids.HelperTrabajoNext = ParamHelperList[0]
 
-    elem.layer = appmain.CurrentLayer
-    elem.layerid = gcd.GetLayerID(appmain.CurrentLayer)
+  ' instructions to FCAD
+  gcd.OrthogonalIgnored = elem.ClassHandler.OrthogonalIgnored
+  gcd.OrthogonalForced = elem.ClassHandler.OrthogonalForced
 
-    elem.colour = appmain.CurrentColor
-    elem.ColorToPaint = Starter.gColor[elem.colour]
+  elem.layer = appmain.CurrentLayer
+  elem.layerid = gcd.GetLayerID(appmain.CurrentLayer)
 
-    clsDrawingAids.HelperTrabajo = elem.ClassHandler.HelperTrabajo
+  elem.colour = appmain.CurrentColor
+  elem.ColorToPaint = Starter.gColor[elem.colour]
+
+  clsDrawingAids.HelperTrabajo = elem.ClassHandler.HelperTrabajo
 
 End
 
 Public Function KeyText(EnteredText As String) ' esta rutina es llamada por FCAD en el evento FCAD_KeyPress cuando recibe una texto + <Enter>
 
-    ' this could be many things, but lets concentrate in what to expect and check if its correct
+  ' this could be many things, but lets concentrate in what to expect and check if its correct
 
-    ' The element provides a constant called ParamType wich is a string like "PPFCTB"
+  ' The element provides a constant called ParamType wich is a string like "PPFCTB"
 
-    ' P = point in X,Y format with decimal point as dot "."
-    '     it can also be @X,Y wich means that the coordinates are relative to the last point
+  ' P = point in X,Y format with decimal point as dot "."
+  '     it can also be @X,Y wich means that the coordinates are relative to the last point
 
-    ' F = float, thats any number
+  ' F = float, thats any number
 
-    ' T = a text or a single character too
+  ' T = a text or a single character too
 
-    ' C = color input
+  ' C = color input
 
-    ' B = boolean, Yes/Si or No
+  ' B = boolean, Yes/Si or No
 
-    ' Lets see what are we expecting
-    Dim Xt, Zt As Float, ErrTxt As String, Relative As Boolean
+  ' Lets see what are we expecting
+  Dim Xt, Zt As Float, ErrTxt As String, Relative As Boolean
 
-    Select Case NextParamType
+  Select Case NextParamType
 
-        Case "P", "+"
-            errtxt = ", expected a valid point like 12.4,9.5  or @12.34,10.5"
-            ' lets filter
-            EnteredText = Trim$(UCase$(EnteredText))
-            ' So we expect a position x,y , but in some cases it can be
-            ' C = close
-            ' U = undo, delete last segment
-            ' and others
+    Case "P", "+"
+      errtxt = ", expected a valid point like 12.4,9.5  or @12.34,10.5"
+      ' lets filter
+      EnteredText = Trim$(UCase$(EnteredText))
+      ' So we expect a position x,y , but in some cases it can be
+      ' C = close
+      ' U = undo, delete last segment
+      ' and others
 
-            If Left(EnteredText, 1) = "C" Then          ' close the element
-                ' got othe first point and exit
-                elem.P[iPoints * 2] = elem.P[0]
-                elem.P[iPoints * 2 + 1] = elem.P[1]
-                Me.Finish
+      If Left(EnteredText, 1) = "C" Then          ' close the element
+        ' got othe first point and exit
+        elem.P[iPoints * 2] = elem.P[0]
+        elem.P[iPoints * 2 + 1] = elem.P[1]
+        Me.Finish
 
-            Else If Left(EnteredText, 1) = "U" Then     ' undo last command and go
+      Else If Left(EnteredText, 1) = "U" Then     ' undo last command and go
 
-                elem.P.remove(elem.P.max)
-                elem.P.remove(elem.P.max)
-                Me.Finish
-            Else                                        ' an X,Y or @X,Y
+        elem.P.remove(elem.P.max)
+        elem.P.remove(elem.P.max)
+        Me.Finish
+      Else                                        ' an X,Y or @X,Y
 
-                If InStr(EnteredText, "@") > 0 Then    ' may be a point
-                    Relative = True
-                    EnteredText = Replace(EnteredText, "@", "")
-                Endif
-                Xt = CFloat(Split(EnteredText, ",")[0])
-                Zt = CFloat(Split(EnteredText, ",")[1])
+        If InStr(EnteredText, "@") > 0 Then    ' may be a point
+          Relative = True
+          EnteredText = Replace(EnteredText, "@", "")
+        Endif
+        Xt = CFloat(Split(EnteredText, ",")[0])
+        Zt = CFloat(Split(EnteredText, ",")[1])
 
-                ' if we are stll here, input was good
-                elem.P[iPoints * 2] = Xt
-                elem.P[iPoints * 2 + 1] = Zt
+        ' if we are stll here, input was good
+        elem.P[iPoints * 2] = Xt
+        elem.P[iPoints * 2 + 1] = Zt
 
-                If Relative And (elem.P.count > 2) Then
-                    elem.P[iPoints * 2] += elem.P[(iPoints - 1) * 2]
-                    elem.P[iPoints * 2 + 1] += elem.P[(iPoints - 1) * 2 + 1]
+        If Relative And (elem.P.count > 2) Then
+          elem.P[iPoints * 2] += elem.P[(iPoints - 1) * 2]
+          elem.P[iPoints * 2 + 1] += elem.P[(iPoints - 1) * 2 + 1]
 
-                Endif
-                Inc iPoints
-                AdvanceStep
+        Endif
+        Inc iPoints
+        AdvanceStep
 
-            End If
+      End If
 
-        Case "T"
-            errtxt = ", expected text, not a point"
-            ' its a valid input?
-            If EnteredText = "" Then
+    Case "T"
+      errtxt = ", expected text, not a point"
+      ' its a valid input?
+      If EnteredText = "" Then
 
-                'elem.stringdata[0] = EnteredText
-                elem.stringdata[0] &= ParamDefault[elem.ClassHandler.StepsDone]
-            Else If elem.stringdata[0] <> "" Then                      ' we have a previous entry
+        'elem.stringdata[0] = EnteredText
+        elem.stringdata[0] &= ParamDefault[elem.ClassHandler.StepsDone]
+      Else If elem.stringdata[0] <> "" Then                      ' we have a previous entry
 
-                elem.stringdata[0] &= "|" & EnteredText  ' split if necessary
+        elem.stringdata[0] &= "|" & EnteredText  ' split if necessary
 
-            Else
+      Else
 
-                elem.stringdata[0] &= EnteredText                      ' first entry
+        elem.stringdata[0] &= EnteredText                      ' first entry
 
-            End If
+      End If
 
-            AdvanceStep
+      AdvanceStep
 
-        Case "F", "M", "A", "L"                 ' Float, Mixed, Angle, Longitud
-            errtxt = "enter a valid text size"
+    Case "F", "M", "A", "L"                 ' Float, Mixed, Angle, Longitud
+      errtxt = "enter a valid text size"
 
-            If EnteredText = "" Then
+      If EnteredText = "" Then
 
-                Try elem.fParam[iFloat] = ParamDefault[elem.ClassHandler.StepsDone]
+        Try elem.fParam[iFloat] = ParamDefault[elem.ClassHandler.StepsDone]
 
-            Else
+      Else
 
-                elem.fParam[iFloat] = CFloat(EnteredText)
+        elem.fParam[iFloat] = CFloat(EnteredText)
 
-            Endif
+      Endif
 
-            Inc iFloat
-            AdvanceStep
+      Inc iFloat
+      AdvanceStep
 
-        Case "C"                                ' color
-            If Dialog.SelectColor() Then
-                elem.fParam[iFloat] = CFloat(Dialog.Color)
-                Inc iFloat
-                AdvanceStep
+    Case "C"                                ' color
+      If Dialog.SelectColor() Then
+        elem.fParam[iFloat] = CFloat(Dialog.Color)
+        Inc iFloat
+        AdvanceStep
 
-            Endif
-            Key.Cod
+      Endif
+      Key.Cod
 
-    End Select
+  End Select
 
 Finally
 
-    Return
+  Return
 
 Catch
 
-    ' unexpected input
-    clsDrawingAids.ErrorMessage = ("Bad input" & ErrTxt)
+  ' unexpected input
+  clsDrawingAids.ErrorMessage = ("Bad input" & ErrTxt)
 
 End
 
 Public Sub AdvanceStep()
 
-    Inc elem.ClassHandler.StepsDone
-    If elem.ClassHandler.StepsDone = StepsTotal Then
+  Inc elem.ClassHandler.StepsDone
+  If elem.ClassHandler.StepsDone = StepsTotal Then
 
-        Me.Finish
-    Else
+    Me.Finish
+  Else
 
-        ' prepare next stuff
-        '
-        NextParamType = UCase(Mid(elem.ClassHandler.ParamType, elem.ClassHandler.StepsDone + 1, 1))
-        If NextParamType = "+" Then ' add another point
-            elem.p.add(0)
-            elem.p.add(0)
-            elem.level.add(0)
+    ' prepare next stuff
+    '
+    NextParamType = UCase(Mid(elem.ClassHandler.ParamType, elem.ClassHandler.StepsDone + 1, 1))
+    If NextParamType = "+" Then ' add another point
+      elem.p.add(0)
+      elem.p.add(0)
+      elem.level.add(0)
 
-            elem.Psel.add(0)
-            Dec elem.ClassHandler.StepsDone
-        Endif
-
-        Try clsDrawingAids.HelperTrabajoNext = ParamHelperList[elem.ClassHandler.StepsDone]          ' try in case of lack of desciption or keep last
-        If ParamDefault.Count > elem.ClassHandler.StepsDone Then                            ' not null
-            ParamDefault[elem.ClassHandler.StepsDone] = Trim$(ParamDefault[elem.ClassHandler.StepsDone])
-            If ParamDefault[elem.ClassHandler.StepsDone] <> "" Then clsDrawingAids.HelperTrabajoNext &= "[" & ParamDefault[elem.ClassHandler.StepsDone] & "]"           ' try in case of lack of desciption or keep last
-        End If
-
-        ' last point
-        appmain.hFCAD.LastPoint.Clear
-        Try appmain.hFCAD.LastPoint.Insert([elem.P[(iPoints - 1) * 2], elem.P[(iPoints - 1) * 2 + 1]])
-
-        ' we set the next point in the same position of this
-        Try elem.P[iPoints * 2] = elem.P[(iPoints - 1) * 2]
-        Try elem.P[iPoints * 2 + 1] = elem.P[(iPoints - 1) * 2 + 1]
-
+      elem.Psel.add(0)
+      Dec elem.ClassHandler.StepsDone
     Endif
 
-    appmain.hFCAD.redraw
+    Try clsDrawingAids.HelperTrabajoNext = ParamHelperList[elem.ClassHandler.StepsDone]          ' try in case of lack of desciption or keep last
+    If ParamDefault.Count > elem.ClassHandler.StepsDone Then                            ' not null
+      ParamDefault[elem.ClassHandler.StepsDone] = Trim$(ParamDefault[elem.ClassHandler.StepsDone])
+      If ParamDefault[elem.ClassHandler.StepsDone] <> "" Then clsDrawingAids.HelperTrabajoNext &= "[" & ParamDefault[elem.ClassHandler.StepsDone] & "]"           ' try in case of lack of desciption or keep last
+    End If
+
+    ' last point
+    appmain.hFCAD.LastPoint.Clear
+    Try appmain.hFCAD.LastPoint.Insert([elem.P[(iPoints - 1) * 2], elem.P[(iPoints - 1) * 2 + 1]])
+
+    ' we set the next point in the same position of this
+    Try elem.P[iPoints * 2] = elem.P[(iPoints - 1) * 2]
+    Try elem.P[iPoints * 2 + 1] = elem.P[(iPoints - 1) * 2 + 1]
+
+  Endif
+
+  appmain.hFCAD.redraw
 
 End
 
 Public Function MouseMove(mouseX As Integer, mouseY As Integer) ' esta rutina es llamada por FCAD en el evento DrawingArea_MouseMove
 
-    If (Me.iPoints > elem.P.Count / 2) And InStr("LAP", NextParamType) = 0 Then Return ' we are expecting a parameter
+  If (Me.iPoints > elem.P.Count / 2) And InStr("LAP", NextParamType) = 0 Then Return ' we are expecting a parameter
 
-    ' if we expect a parameter, it will be passed
-    If NextParamType = "A" Then
+  ' if we expect a parameter, it will be passed
+  If NextParamType = "A" Then
 
-        ' return the angle from horizontal to us
-        elem.fParam[iFloat] = Ang(appmain.hFcad.Xreal(mouseX) - elem.p[elem.p.max - 1], appmain.hFcad.Yreal(mouseY) - elem.p[elem.p.max])
-        elem.fParam[iFloat] *= 180 / Pi
-        appmain.hFCAD.redraw
-        Return              ' nothing more to do here
-    End If
+    ' return the angle from horizontal to us
+    elem.fParam[iFloat] = Ang(appmain.hFcad.Xreal(mouseX) - elem.p[elem.p.max - 1], appmain.hFcad.Yreal(mouseY) - elem.p[elem.p.max])
+    elem.fParam[iFloat] *= 180 / Pi
+    appmain.hFCAD.redraw
+    Return              ' nothing more to do here
+  End If
 
-    If NextParamType = "L" Then
+  If NextParamType = "L" Then
 
-        ' return the angle from horizontal to us
-        elem.fParam[iFloat] = puntos.distancia(puntos.Near(appmain.hFcad.Xreal(mouseX)), puntos.Near(appmain.hFcad.Yreal(mouseY)), elem.p[elem.p.max - 1], elem.p[elem.p.max])
-
-        appmain.hFCAD.redraw
-        Return              ' nothing more to do here
-    End If
-
-    If Me.iPoints >= elem.P.Count / 2 Then Return
-
-    elem.P[iPoints * 2] = puntos.Near(appmain.hFcad.Xreal(mouseX))
-    elem.P[iPoints * 2 + 1] = puntos.Near(appmain.hFcad.Yreal(mouseY))
-
-    ' y si tengo enganche?
-
-    If (appmain.hFcad.iEntity[2] >= 0) And (gcd.OrthogonalForced = False) Then
-
-        ' esto re enganchado
-
-        elem.p[iPoints * 2] = appmain.hFcad.iEntity[0]
-        elem.p[iPoints * 2 + 1] = appmain.hFcad.iEntity[1]
-
-        ' aca tengo que verificar el ortogonal
-
-    Else If Me.iPoints > 0 Then                                                                          ' puedo hacer ortogonal
-        If gcd.OrthogonalForced Or (Not gcd.OrthogonalIgnored And gcd.Orthogonal) Then          ' hablame de operadores logicos
-
-            If Abs(elem.p[iPoints * 2] - elem.P[(iPoints - 1) * 2]) > Abs(elem.p[iPoints * 2 + 1] - elem.P[(iPoints - 1) * 2 + 1]) Then ' prevalece X
-                elem.p[iPoints * 2 + 1] = elem.P[(iPoints - 1) * 2 + 1]
-            Else
-                elem.p[iPoints * 2] = elem.P[(iPoints - 1) * 2]
-            Endif
-
-        End If
-
-    End If
+    ' return the angle from horizontal to us
+    elem.fParam[iFloat] = puntos.distancia(puntos.Near(appmain.hFcad.Xreal(mouseX)), puntos.Near(appmain.hFcad.Yreal(mouseY)), elem.p[elem.p.max - 1], elem.p[elem.p.max])
 
     appmain.hFCAD.redraw
+    Return              ' nothing more to do here
+  End If
+
+  If Me.iPoints >= elem.P.Count / 2 Then Return
+
+  elem.P[iPoints * 2] = puntos.Near(appmain.hFcad.Xreal(mouseX))
+  elem.P[iPoints * 2 + 1] = puntos.Near(appmain.hFcad.Yreal(mouseY))
+
+  ' y si tengo enganche?
+
+  If (appmain.hFcad.iEntity[2] >= 0) And (gcd.OrthogonalForced = False) Then
+
+    ' esto re enganchado
+
+    elem.p[iPoints * 2] = appmain.hFcad.iEntity[0]
+    elem.p[iPoints * 2 + 1] = appmain.hFcad.iEntity[1]
+
+    ' aca tengo que verificar el ortogonal
+
+  Else If Me.iPoints > 0 Then                                                                          ' puedo hacer ortogonal
+    If gcd.OrthogonalForced Or (Not gcd.OrthogonalIgnored And gcd.Orthogonal) Then          ' hablame de operadores logicos
+
+      If Abs(elem.p[iPoints * 2] - elem.P[(iPoints - 1) * 2]) > Abs(elem.p[iPoints * 2 + 1] - elem.P[(iPoints - 1) * 2 + 1]) Then ' prevalece X
+        elem.p[iPoints * 2 + 1] = elem.P[(iPoints - 1) * 2 + 1]
+      Else
+        elem.p[iPoints * 2] = elem.P[(iPoints - 1) * 2]
+      Endif
+
+    End If
+
+  End If
+
+  appmain.hFCAD.redraw
 
 End
 
 Public Function MouseDown(mouseX As Integer, mouseY As Integer) ' esta rutina es llamada por FCAD en el evento DrawingArea_MouseDown
 
-    clsDrawingAids.ErrorMessage = ""
-    If (Me.iPoints > elem.P.Count / 2) And InStr("LAP", NextParamType) = 0 Then Return ' we are expecting a parameter
+  clsDrawingAids.ErrorMessage = ""
+  If (Me.iPoints > elem.P.Count / 2) And InStr("LAP", NextParamType) = 0 Then Return ' we are expecting a parameter
 
-    ' if we expect a parameter, it will be passed
-    If NextParamType = "A" Then
+  ' if we expect a parameter, it will be passed
+  If NextParamType = "A" Then
 
-        ' return the angle from horizontal to us
-        elem.fParam[iFloat] = Ang(appmain.hFcad.Xreal(mouseX) - elem.p[elem.p.max - 1], appmain.hFcad.Yreal(mouseY) - elem.p[elem.p.max])
-        elem.fParam[iFloat] *= 180 / Pi
+    ' return the angle from horizontal to us
+    elem.fParam[iFloat] = Ang(appmain.hFcad.Xreal(mouseX) - elem.p[elem.p.max - 1], appmain.hFcad.Yreal(mouseY) - elem.p[elem.p.max])
+    elem.fParam[iFloat] *= 180 / Pi
 
-        Inc iFloat
-        AdvanceStep
-        Return              ' nothing more to do here
-    End If
-
-    If NextParamType = "L" Then
-
-        ' return the angle from horizontal to us
-        elem.fParam[iFloat] = puntos.distancia(puntos.Near(appmain.hFcad.Xreal(mouseX)), puntos.Near(appmain.hFcad.Yreal(mouseY)), elem.p[elem.p.max - 1], elem.p[elem.p.max])
-        Inc iFloat
-        AdvanceStep
-        Return              ' nothing more to do here
-    End If
-
-    If iPoints >= elem.P.Count / 2 Then Return
-
-    ' we are waiting for a point
-
-    elem.P[iPoints * 2] = puntos.Near(appmain.hFcad.Xreal(mouseX))
-    elem.P[iPoints * 2 + 1] = puntos.Near(appmain.hFcad.Yreal(mouseY))
-
-    ' y si tengo enganche?
-
-    If (appmain.hFcad.iEntity[2] >= 0) And (gcd.OrthogonalForced = False) Then
-
-        ' esto re enganchado
-
-        elem.p[iPoints * 2] = appmain.hFcad.iEntity[0]
-        elem.p[iPoints * 2 + 1] = appmain.hFcad.iEntity[1]
-
-        ' aca tengo que verificar el ortogonal
-
-    Else If Me.iPoints > 0 Then                                                                          ' puedo hacer ortogonal
-        If gcd.OrthogonalForced Or (Not gcd.OrthogonalIgnored And gcd.Orthogonal) Then          ' hablame de operadores logicos
-
-            If Abs(elem.p[iPoints * 2] - elem.P[(iPoints - 1) * 2]) > Abs(elem.p[iPoints * 2 + 1] - elem.P[(iPoints - 1) * 2 + 1]) Then ' prevalece X
-                elem.p[iPoints * 2 + 1] = elem.P[(iPoints - 1) * 2 + 1]
-            Else
-                elem.p[iPoints * 2] = elem.P[(iPoints - 1) * 2]
-            Endif
-
-        End If
-
-    End If
-    Inc iPoints
+    Inc iFloat
     AdvanceStep
+    Return              ' nothing more to do here
+  End If
+
+  If NextParamType = "L" Then
+
+    ' return the angle from horizontal to us
+    elem.fParam[iFloat] = puntos.distancia(puntos.Near(appmain.hFcad.Xreal(mouseX)), puntos.Near(appmain.hFcad.Yreal(mouseY)), elem.p[elem.p.max - 1], elem.p[elem.p.max])
+    Inc iFloat
+    AdvanceStep
+    Return              ' nothing more to do here
+  End If
+
+  If iPoints >= elem.P.Count / 2 Then Return
+
+  ' we are waiting for a point
+
+  elem.P[iPoints * 2] = puntos.Near(appmain.hFcad.Xreal(mouseX))
+  elem.P[iPoints * 2 + 1] = puntos.Near(appmain.hFcad.Yreal(mouseY))
+
+  ' y si tengo enganche?
+
+  If (appmain.hFcad.iEntity[2] >= 0) And (gcd.OrthogonalForced = False) Then
+
+    ' esto re enganchado
+
+    elem.p[iPoints * 2] = appmain.hFcad.iEntity[0]
+    elem.p[iPoints * 2 + 1] = appmain.hFcad.iEntity[1]
+
+    ' aca tengo que verificar el ortogonal
+
+  Else If Me.iPoints > 0 Then                                                                          ' puedo hacer ortogonal
+    If gcd.OrthogonalForced Or (Not gcd.OrthogonalIgnored And gcd.Orthogonal) Then          ' hablame de operadores logicos
+
+      If Abs(elem.p[iPoints * 2] - elem.P[(iPoints - 1) * 2]) > Abs(elem.p[iPoints * 2 + 1] - elem.P[(iPoints - 1) * 2 + 1]) Then ' prevalece X
+        elem.p[iPoints * 2 + 1] = elem.P[(iPoints - 1) * 2 + 1]
+      Else
+        elem.p[iPoints * 2] = elem.P[(iPoints - 1) * 2]
+      Endif
+
+    End If
+
+  End If
+  Inc iPoints
+  AdvanceStep
 
 End
 
@@ -421,46 +426,47 @@ End
 
 Public Sub CancelarConstruccion()
 
-    elem.ForDeletion = True       ' it will be removed later
-    elem.DrawAble = False         ' don't draw me anymore
+  elem.ForDeletion = True       ' it will be removed later
+  elem.DrawAble = False         ' don't draw me anymore
 
 End
 
 Public Sub Draw()               ' called byappmain.hFCAD.drwArea_Draw
 
-    If Me.iPoints < elem.ClassHandler.pointstodraw Then Return
+  If Me.iPoints < elem.ClassHandler.pointstodraw Then Return
 
-    elem.ClassHandler.draw(elem)
+  elem.ClassHandler.draw(elem)
 
 End
 
 Public Sub Finish()
 
-    APPMain.hFCAD.arrEntities.Add(elem)
+  APPMain.hFCAD.arrEntities.Add(elem)
 
-    elem.ClassHandler.Finish(elem, elem.ClassHandler.StepsDone)
+  elem.ClassHandler.Finish(elem, elem.ClassHandler.StepsDone)
 
-    LastEntity = elem                                       ' save it to repeat on rigth click
+  LastEntity = elem                                       ' save it to repeat on rigth click
 
-    gcd.clsJobPrevious = Me
-    gcd.clsJob = clsDefaultJob
-    clsDrawingAids.CleanTexts
+  gcd.clsJobPrevious = Me
+  gcd.clsJob = clsDefaultJob
+  clsDefaultJob.PoiChecking = True
+  clsDrawingAids.CleanTexts
 
-    ' sort them
-    'APPMain.hFCAD.arrEntities.Sort()
-    'clsMouseTracking.ReBuildPOIPoints
-    clsEntities.GLGenDrawList
+  ' sort them
+  'APPMain.hFCAD.arrEntities.Sort()
+  'clsMouseTracking.ReBuildPOIPoints
+  clsEntities.GLGenDrawList
 
-    appmain.hFCAD.redraw
+  appmain.hFCAD.redraw
 
 End
 
 Public Sub Cancel()
 
-    elem = Null
-    gcd.clsJobPrevious = Me
-    gcd.clsJob = clsDefaultJob
-    clsDrawingAids.CleanTexts
-    appmain.hFCAD.redraw
+  elem = Null
+  gcd.clsJobPrevious = Me
+  gcd.clsJob = clsDefaultJob
+  clsDrawingAids.CleanTexts
+  appmain.hFCAD.redraw
 
 End

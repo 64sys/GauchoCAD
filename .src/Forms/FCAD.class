@@ -187,10 +187,10 @@ Public Sub GLArea1_draw()
   If iEntity[3] >= 0 And iEntity[3] < arrEntities.Count Then
 
     ' si no esta seleccionada, la resalto
-    If Not arrEntities[iEntity[3]].Selected Then
-      iParent = clsEntities.GetParentBlock(iEntity[3]) ' esto verifica si tiene que resaltar el bloque completo
-      arrEntities[iParent].ClassHandler.DrawRemark(arrEntities[iParent])
-    End If
+    'If Not arrEntities[iEntity[3]].Selected Then
+    iParent = clsEntities.GetParentBlock(iEntity[3]) ' esto verifica si tiene que resaltar el bloque completo
+    arrEntities[iParent].ClassHandler.DrawRemark(arrEntities[iParent])
+    'End If
 
   End If
   clsDrawingAids.DrawCoordenadas

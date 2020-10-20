@@ -43,181 +43,181 @@ Public StepsDone As Integer                 ' esto lo cambia cls ElementBuilder 
 
 Public Sub Translate(e As Entity, dX As Float, dY As Float, Optional OnlySelected As Boolean = False)
 
-    Dim i As Integer
+  Dim i As Integer
 
-    If OnlySelected Then
+  If OnlySelected Then
 
-        For i = 0 To e.Psel.Max
-            If e.Psel[i] Then
+    For i = 0 To e.Psel.Max
+      If e.Psel[i] Then
 
-                e.P[i * 2] += dx
-                e.P[i * 2 + 1] += dy
+        e.P[i * 2] += dx
+        e.P[i * 2 + 1] += dy
 
-            Endif
-        Next
+      Endif
+    Next
 
-    Else
+  Else
 
-        puntos.Translate(e.p, dx, dy)
-    Endif
+    puntos.Translate(e.p, dx, dy)
+  Endif
 
-    CreatePolygon(e)
-    BuildPOI(e)
+  CreatePolygon(e)
+  BuildPOI(e)
 
 End
 
 Public Sub Rotate(e As Entity, radians As Float)
 
-    puntos.Rotate(e.P, radians)
+  puntos.Rotate(e.P, radians)
 
-    ' el parametro lo tengo que pasar a grados porque la rutina que dibuja el texto usa eso
-    E.fParam[0] += radians * 180 / Pi
+  ' el parametro lo tengo que pasar a grados porque la rutina que dibuja el texto usa eso
+  E.fParam[0] += radians * 180 / Pi
 
-    CreatePolygon(e)
-    BuildPOI(e)
+  CreatePolygon(e)
+  BuildPOI(e)
 
 End
 
 Public Sub Scale(e As Entity, sX As Float, sY As Float)
 
-    Dim i As Integer
+  Dim i As Integer
 
-    E.fParam[1] *= sY
-    For i = 0 To e.p.max Step 2
+  E.fParam[1] *= sY
+  For i = 0 To e.p.max Step 2
 
-        e.P[i] = e.P[i] * sX
-        e.P[i + 1] = e.P[i + 1] * sY
+    e.P[i] = e.P[i] * sX
+    e.P[i + 1] = e.P[i + 1] * sY
 
-    Next
+  Next
 
-    CreatePolygon(e)
-    BuildPOI(e)
+  CreatePolygon(e)
+  BuildPOI(e)
 
 End
 
 Public Sub Draw(oE As Entity)
 
-    If Not oE.Visible Then Return
-    oE.ColorToPaint = gcd.GetGBColor(oE.colour, oE.Layerid)
+  If Not oE.Visible Then Return
+  oE.ColorToPaint = gcd.GetGBColor(oE.colour, oE.Layerid)
 
-    glPlus.DrawMultilineText(oE.stringdata[0], oE.p[0], oE.p[1], oE.fParam[0], oE.fParam[1], oE.ColorToPaint)
+  glPlus.DrawMultilineText(oE.stringdata[0], oE.p[0], oE.p[1], oE.fParam[0], oE.fParam[1], oE.ColorToPaint)
 
-    If oE.stringdata[0] <> "" Then CreatePolygon(oe)
+  If oE.stringdata[0] <> "" Then CreatePolygon(oe)
 
 End
 
 '' A fat version of the line
 Public Sub DrawSelected(oE As Entity)
 
-    GLplus.Polygon(oE.Polygon, gcd.ColorForSelected, oE.LineWidth, gcd.stiDashed)
+  GLplus.Polygon(oE.Polygon, gcd.ColorForSelected, oE.LineWidth, gcd.stiDashed)
 
 End
 
 '' A fat version of the line
 Public Sub DrawRemark(oE As Entity)
 
-    If Not oE.Visible Then Return
+  If Not oE.Visible Then Return
 
-    GLplus.Polygon(oE.Polygon, oE.ColorToPaint, oE.LineWidth, gcd.stiDashed)
+  GLplus.Polygon(oE.Polygon, oE.ColorToPaint, oE.LineWidth, gcd.stiDashed)
 
 End
 
 Public Function Draw2(oE As Entity)
 
-    If Not oE.Visible Then Return
+  If Not oE.Visible Then Return
 
-    Dim angulo As Float, hText As New PaintExtents, lText As String
+  Dim angulo As Float, hText As New PaintExtents, lText As String
 
-    Dim FontScalePrev As Float
+  Dim FontScalePrev As Float
 
-    paint.Save
+  paint.Save
 
-    'FontScalePrev = paint.FontScale
+  'FontScalePrev = paint.FontScale
 
-    paint.LineWidth = 1
-    ' La cota puede estar inclinada, entonces debo rotarla
+  paint.LineWidth = 1
+  ' La cota puede estar inclinada, entonces debo rotarla
 
-    If oE.fParam.Count > 0 Then
+  If oE.fParam.Count > 0 Then
 
-        angulo = oE.fParam[0] / 180 * Pi
+    angulo = oE.fParam[0] / 180 * Pi
 
-    Else
+  Else
 
-        angulo = 0
+    angulo = 0
 
+  End If
+
+  If oE.stringdata[0] = "" Then
+
+    ltext = "ABCdef123"
+
+  Else
+
+    ltext = oE.stringdata[0]
+
+  End If
+
+  If oE.fParam.Count > 1 Then
+
+    If oE.fParam[1] <= 0 Then
+      paint.Font.Size = 10
+    Else ' FIXME: hay problemas con el ancho del total del texto que no acompaña el zooming
+      paint.Font.Size = oE.fParam[1]
     End If
 
-    If oE.stringdata[0] = "" Then
+  Else
+    ' cuando ScaleZoom es 0.15 el texto coincide con DXF
+    ' entonces voy a trabajar con esa relacion
 
-        ltext = "ABCdef123"
+    paint.Font.Size = 10
 
-    Else
+  End If
 
-        ltext = oE.stringdata[0]
+  htext = paint.TextExtents(ltext)
 
-    End If
+  paint.brush = Paint.Color(oE.ColorToPaint)
 
-    If oE.fParam.Count > 1 Then
+  paint.Translate(oE.p[0], oE.p[1])
+  paint.Rotate(-angulo)
+  paint.Scale(1, -1)
 
-        If oE.fParam[1] <= 0 Then
-            paint.Font.Size = 10
-        Else ' FIXME: hay problemas con el ancho del total del texto que no acompaña el zooming
-            paint.Font.Size = oE.fParam[1]
-        End If
+  paint.DrawText(ltext)
 
-    Else
-        ' cuando ScaleZoom es 0.15 el texto coincide con DXF
-        ' entonces voy a trabajar con esa relacion
+  paint.Stroke
 
-        paint.Font.Size = 10
-
-    End If
-
-    htext = paint.TextExtents(ltext)
-
-    paint.brush = Paint.Color(oE.ColorToPaint)
-
-    paint.Translate(oE.p[0], oE.p[1])
-    paint.Rotate(-angulo)
-    paint.Scale(1, -1)
-
-    paint.DrawText(ltext)
-
-    paint.Stroke
-
-    paint.Restore
+  paint.Restore
 
 End
 
 Public Sub CreatePolygon(oE As Entity)
 
-    Dim tRect As New Float[]
+  Dim tRect As New Float[]
 
-    oE.Polygon.Clear
+  oE.Polygon.Clear
 
-    tRect = glPlus.MTextExtends(oE.stringdata[0], oE.p[0], oE.p[1], oE.fParam[1])
+  tRect = glPlus.MTextExtends(oE.stringdata[0], oE.p[0], oE.p[1], oE.fParam[1])
 
-    ' armo el poligono , que ya tiene la escala
+  ' armo el poligono , que ya tiene la escala
 
-    oE.Polygon.Insert([tRect[0], tRect[1], tRect[0] + tRect[2], tRect[1], tRect[0] + tRect[2], tRect[1] + tRect[3], tRect[0], tRect[1] + tRect[3]])
+  oE.Polygon.Insert([tRect[0], tRect[1], tRect[0] + tRect[2], tRect[1], tRect[0] + tRect[2], tRect[1] + tRect[3], tRect[0], tRect[1] + tRect[3]])
 
-    puntos.Translate(oE.Polygon, -oE.P[0], -oE.P[1])
-    puntos.Rotate(oE.Polygon, oE.fParam[0] * Pi / 180)
-    puntos.Translate(oE.Polygon, oE.P[0], oE.P[1])
+  puntos.Translate(oE.Polygon, -oE.P[0], -oE.P[1])
+  puntos.Rotate(oE.Polygon, oE.fParam[0] * Pi / 180)
+  puntos.Translate(oE.Polygon, oE.P[0], oE.P[1])
 
 End
 '' Creo los puntos de interes
 '' Build point of interest
 
 Public Function BuildPOI(oE As Entity, Optional arrIndex As Integer = -1) As Integer
-    ' points
+  ' points
 
-    oe.PoiPoints.Clear
-    oe.PoiType.Clear
+  oe.PoiPoints.Clear
+  oe.PoiType.Clear
 
-    oe.poiPoints.insert([oE.p[0], oE.p[1]])
-    oe.poiType.Add(gcd.poiBasePoint)
-    'oe.poiEntities.Add(arrIndex)
+  oe.poiPoints.insert([oE.p[0], oE.p[1]])
+  oe.poiType.Add(gcd.poiBasePoint)
+  'oe.poiEntities.Add(arrIndex)
 
 End
 
@@ -225,25 +225,25 @@ End
 ' True means all is good, False will instruct the clsEntityBuilder to delete it
 Public Sub Finish(oE As Entity, Optional ParamsDone As Integer = -1) As Boolean
 
-    'Print "Finish en EntityBase"
-    'CreatePolygon(oe)
-    BuildPOI(oe)
+  'Print "Finish en EntityBase"
+  'CreatePolygon(oe)
+  BuildPOI(oe)
 
-    ' busco el tipo de linea, si hace falta
-    If oE.LineTypeName = "Dashed" Then oE.LineType = 1
-    ' tareas finales de armado del objeto
+  ' busco el tipo de linea, si hace falta
+  If oE.LineTypeName = "Dashed" Then oE.LineType = 1
+  ' tareas finales de armado del objeto
 
-    oE.psel.resize(oE.p.count / 2)
-    oE.ForDeletion = False
-    oE.DrawAble = True
-    oE.Selected = False
-    oE.Finished = True
+  oE.psel.resize(oE.p.count / 2)
+  oE.ForDeletion = False
+  oE.DrawAble = True
+  oE.Selected = False
+  oE.Finished = True
 
-    If Not True Then
+  If Not True Then
 
-        oE.ForDeletion = True
-        oE.DrawAble = False
+    oE.ForDeletion = True
+    oE.DrawAble = False
 
-    End If
+  End If
 
 End

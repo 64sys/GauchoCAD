@@ -43,113 +43,120 @@ Public StepsDone As Integer                 ' esto lo cambia cls ElementBuilder 
 
 Public Sub Translate(e As Entity, dX As Float, dY As Float, Optional OnlySelected As Boolean = False)
 
-    Dim i As Integer
+  Dim i As Integer
 
-    If OnlySelected Then
+  If OnlySelected Then
 
-        For i = 0 To e.Psel.Max
-            If e.Psel[i] Then
+    For i = 0 To e.Psel.Max
+      If e.Psel[i] Then
 
-                e.P[i * 2] += dx
-                e.P[i * 2 + 1] += dy
+        e.P[i * 2] += dx
+        e.P[i * 2 + 1] += dy
 
-            Endif
-        Next
+      Endif
+    Next
 
-    Else
+  Else
 
-        puntos.Translate(e.p, dx, dy)
-    Endif
+    puntos.Translate(e.p, dx, dy)
+  Endif
 
 End
 
 Public Sub Rotate(e As Entity, radians As Float)
 
-    puntos.Rotate(e.P, radians)
+  puntos.Rotate(e.P, radians)
 
 End
 
 Public Sub Scale(e As Entity, sX As Float, sY As Float)
 
-    Dim i As Integer
+  Dim i As Integer
 
-    For i = 0 To e.p.max Step 2
+  For i = 0 To e.p.max Step 2
 
-        e.P[i] = e.P[i] * sX
-        e.P[i + 1] = e.P[i + 1] * sY
+    e.P[i] = e.P[i] * sX
+    e.P[i + 1] = e.P[i + 1] * sY
 
-    Next
+  Next
 
 End
 
 Public Sub Draw(oE As Entity)
 
-    If Not oE.Visible Then Return
+  If Not oE.Visible Then Return
 
-    oE.ColorToPaint = gcd.GetGBColor(oE.colour, oE.Layerid)
+  oE.ColorToPaint = gcd.GetGBColor(oE.colour, oE.Layerid)
 
-    If Not oe.Finished Then
-        If Me.StepsDone < 1 Then
+  If Not oe.Finished Then
+    If Me.StepsDone < 1 Then
 
-            oE.P[2] = oE.P[0]
-            oE.P[3] = oE.P[1]
+      oE.P[2] = oE.P[0]
+      oE.P[3] = oE.P[1]
 
-            glPlus.Lines(oE.p, oE.ColorToPaint, oE.LineWidth)
-
-        End If
-
-        If Me.StepsDone < 2 Then
-
-            oE.P[4] = oE.P[2]
-            oE.P[5] = oE.P[3]
-
-        End If
-
-        If Me.StepsDone < 3 Then
-
-            oE.P[6] = oE.P[4]
-            oE.P[7] = oE.P[5]
-
-        Endif
+      glPlus.Lines(oE.p, oE.ColorToPaint, oE.LineWidth)
 
     End If
 
-    If oe.P.Count < 2 Then Return
-    GLplus.PolygonFilled(oE.p, oE.ColorToPaint, oE.ColorToPaint, oE.LineWidth, oe.LineType)
+    If Me.StepsDone < 2 Then
+
+      oE.P[4] = oE.P[2]
+      oE.P[5] = oE.P[3]
+
+    End If
+
+    If Me.StepsDone < 3 Then
+
+      oE.P[6] = oE.P[4]
+      oE.P[7] = oE.P[5]
+
+    Endif
+
+  End If
+
+  If oe.P.Count < 2 Then Return
+  GLplus.PolygonFilled(oE.p, oE.ColorToPaint, oE.ColorToPaint, oE.LineWidth, oe.LineType)
 
 End
 
 '' A fat version of the entity
 Public Sub DrawSelected(oE As Entity)
 
-    GLplus.Polygon(oE.p, Starter.flgWindowBackColor, oE.LineWidth, gcd.stiDashed)
-    GLplus.Polygon(oE.p, gcd.ColorForSelected, oE.LineWidth, oE.LineType)
+  GLplus.Polygon(oE.p, Starter.flgWindowBackColor, oE.LineWidth, gcd.stiDashed)
+  GLplus.Polygon(oE.p, gcd.ColorForSelected, oE.LineWidth, oE.LineType)
 
 End
 
 '' A fat version of the line
 Public Sub DrawRemark(oE As Entity)
 
-    GLplus.Polygon(oE.p, Starter.flgWindowBackColor, oE.LineWidth, gcd.stiDashed)
-    GLplus.Polygon(oE.p, oE.ColorToPaint, oE.LineWidth + 2, oE.LineType)
+  '  GLplus.Polygon(oE.p, Starter.flgWindowBackColor, oE.LineWidth, gcd.stiDashed)
+  '  GLplus.Polygon(oE.p, oE.ColorToPaint, oE.LineWidth + 2, oE.LineType)
+  If oe.Selected Then
+    GLplus.Polygon(oE.P, Starter.flgWindowBackColor, oE.LineWidth + 2, gcd.stiDashed)
+    GLplus.Polygon(oE.P, gcd.ColorForSelected, oE.LineWidth + 2, oE.LineType)
+  Else
+    GLplus.Polygon(oE.P, Starter.flgWindowBackColor, oE.LineWidth, gcd.stiDashed)
+    GLplus.Polygon(oE.P, oE.ColorToPaint, oE.LineWidth + 2, oE.LineType)
+  Endif
 
 End
 
 Public Function Draw2(oE As Entity)
 
-    If Not oE.Visible Then Return
+  If Not oE.Visible Then Return
 
-    Dim i As Integer
+  Dim i As Integer
 
-    If oE.Selected And Not gcd.ToolActive Then
-        paint.brush = Paint.Color(gcd.ColorForSelected)
-    Else
-        paint.brush = Paint.Color(oE.ColorToPaint)
-    Endif
+  If oE.Selected And Not gcd.ToolActive Then
+    paint.brush = Paint.Color(gcd.ColorForSelected)
+  Else
+    paint.brush = Paint.Color(oE.ColorToPaint)
+  Endif
 
-    Paint.Polygon(oE.p)
+  Paint.Polygon(oE.p)
 
-    paint.Fill
+  paint.Fill
 
 End
 
@@ -158,7 +165,7 @@ End
 
 Public Function BuildPOI(oE As Entity, Optional arrIndex As Integer = -1) As Integer
 
-    cadPLine.BuildPOI(oe)
+  cadPLine.BuildPOI(oe)
 
 End
 ' This function will return False if the element couldn't be created for some reason: bad or incomple user input
@@ -166,26 +173,26 @@ End
 
 Public Sub Finish(oE As Entity, Optional ParamsDone As Integer = -1) As Boolean
 
-    'Print "Finish en EntityBase"
-    'CreatePolygon(oe)
-    BuildPOI(oe)
-    oE.Polygon = oE.P
+  'Print "Finish en EntityBase"
+  'CreatePolygon(oe)
+  BuildPOI(oe)
+  oE.Polygon = oE.P
 
-    ' busco el tipo de linea, si hace falta
-    If oE.LineTypeName = "Dashed" Then oE.LineType = 1
-    ' tareas finales de armado del objeto
+  ' busco el tipo de linea, si hace falta
+  If oE.LineTypeName = "Dashed" Then oE.LineType = 1
+  ' tareas finales de armado del objeto
 
-    oE.psel.resize(oE.p.count / 2)
-    oE.ForDeletion = False
-    oE.DrawAble = True
-    oE.Selected = False
-    oE.Finished = True
+  oE.psel.resize(oE.p.count / 2)
+  oE.ForDeletion = False
+  oE.DrawAble = True
+  oE.Selected = False
+  oE.Finished = True
 
-    If Not True Then
+  If Not True Then
 
-        oE.ForDeletion = True
-        oE.DrawAble = False
+    oE.ForDeletion = True
+    oE.DrawAble = False
 
-    End If
+  End If
 
 End
