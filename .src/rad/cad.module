@@ -1038,9 +1038,10 @@ Public Function DWGEntities(s As String) As Collection
           vVal = hdx[hdx.Max]
           'tmx.Add(vVal, "object_name")
           tmx.Add(vVal, "entity")
-          If vVal = "TEXT" Then
-            Print "x"
-          Endif
+          File.Save("/tmp" &/ vVal & ".txt", obt)
+          'If vVal = "TEXT" Then
+          '  Print "x"
+          'Endif
 
           If enty.Exist(hdx[hdx.Max]) Then
             If enty[hdx[hdx.Max]] Then
@@ -1174,7 +1175,7 @@ Public Function DWGDecodeItem(xRaw As String[]) As Variant
 
   Select sTag
 
-    Case "ownerhandle", "layer", "style"
+    Case "ownerhandle", "layer", "style", "block_header"
       If InStr(sVal, "=>") > 0 Then
         k = InStr(sVal, " => ")
         If k > 0 Then
@@ -1190,10 +1191,18 @@ Public Function DWGDecodeItem(xRaw As String[]) As Variant
       Else
         vVal = "Error"
       Endif
-    Case "start", "end", "ins_pt", "center", "alignment_pt"
+
+    Case "start", "end", "ins_pt", "center", "alignment_pt", "sm_axis", "extrusion"
       px = DWGDecodeCoord(sVal)
       If px.Count = 2 Then
         px.Add(0.0)
+      Endif
+      vVal = px
+
+    Case "scale"
+      px = DWGDecodeCoord(sVal)
+      If px.Count = 2 Then
+        px.Add(1.0)
       Endif
       vVal = px
 
@@ -1221,7 +1230,7 @@ Public Function DWGDecodeItem(xRaw As String[]) As Variant
     Case "handle"
       vVal = DWGDecodeHandle(sVal)
 
-    Case "start_angle", "end_angle"
+    Case "start_angle", "end_angle", "axis_ratio"
       If InStr(sVal, "[") > 0 Then
         tVal = Split(sVal, "[")[0]
         vVal = DWGDecodeFloat(tVal)
@@ -2284,6 +2293,28 @@ Public Function DWGArrangeEnty(c As Collection) As Collection
 
     Select c["entity"]
 
+      Case "ELLIPSE"
+        x.Clear
+        If c.Exist("center") Then
+          x.Add(c["center"], "p0")
+          If c.Exist("sm_axis") Then
+            x.Add(c["sm_axis"], "p1")
+          Endif
+          o.Add(x.Copy(), "p")
+        Endif
+
+        If c.Exist("axis_ratio") Then
+          o.Add(c["axis_ratio"], "ratio")
+        Endif
+
+        If c.Exist("start_angle") Then
+          o.Add(c["start_angle"], "start_angle")
+        Endif
+
+        If c.Exist("end_angle") Then
+          o.Add(c["end_angle"], "end_angle")
+        Endif
+
       Case "ARC"
         If c.Exist("center") Then
           x.Clear
@@ -2336,11 +2367,30 @@ Public Function DWGArrangeEnty(c As Collection) As Collection
       Case "HATCH"
 
       Case "INSERT"
-        For Each tag In ["point", "angle", "radious", "scale"]
-          If c.Exist(tag) Then
-            o.Add(c[tag], tag)
+
+        If c.Exist("ins_pt") Then
+          x.Clear
+          x.Add(c["ins_pt"], "p0")
+          o.Add(x.Copy(), "p")
+        Endif
+
+        If c.Exist("scale") Then
+          If c["scale"].Count > 1 Then
+            o.Add(c["scale"][0], "scalex")
+            o.Add(c["scale"][1], "scaley")
+            If c["scale"].Count > 2 Then
+              o.Add(c["scale"][2], "scalez")
+            Endif
           Endif
-        Next
+        Endif
+
+        If c.Exist("rotation") Then
+          o.Add(c["rotation"], "angle")
+        Endif
+
+        If c.Exist("block_header") Then
+          o.Add(c["block_header"], "block")
+        Endif
 
       Case "LINE"
         If c.Exist("start") And c.Exist("end") Then
@@ -2372,6 +2422,42 @@ Public Function DWGArrangeEnty(c As Collection) As Collection
         Endif
 
       Case "MTEXT"
+
+        If c.Exist("text_height") Then
+          flo = c["text_height"]
+          o.Add(flo, "text_height")
+        Endif
+
+        If c.Exist("rotation") Then
+          flo = c["rotation"]
+        Else
+          flo = 0.0
+        Endif
+        o.Add(flo, "angle")
+
+        If c.Exist("horiz_alignment") Then
+          int = c["horiz_alignment"]
+          o.Add(int, "horiz_alignment")
+        Endif
+
+        If c.Exist("text") Then
+          str = UnQuote(c["text"])
+          o.Add(str, "text")
+        Endif
+
+        If c.Exist("text_style") Then
+          str = UnQuote(c["text_style"])
+          o.Add(str, "text_style")
+        Endif
+
+        If c.Exist("ins_pt") Then
+          x.Clear
+          x.Add(c["ins_pt"], "p0")
+          If c.Exist("alignment_pt") Then
+            x.Add(c["alignment_pt"], "p1")
+          Endif
+          o.Add(x.Copy(), "p")
+        Endif
 
       Case "POINT"
         If c.Exist("x") And c.Exist("y") And c.Exist("z") Then
