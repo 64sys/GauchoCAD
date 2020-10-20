@@ -436,6 +436,7 @@
         }
         { TableView1 TableView
           MoveScaled(2,13,14,24)
+          Expand = True
           Border = False
         }
         { btnSave Button
@@ -457,7 +458,7 @@
       MoveScaled(3,66,129,5)
       Arrangement = Arrange.Horizontal
       { !lblCommand Label
-        MoveScaled(1,0,85,4)
+        MoveScaled(2,0,64,4)
         #Public = True
         Font = Font["Bold,+1"]
         Background = Color.TextBackground
@@ -465,8 +466,7 @@
         Text = ("Command")
       }
       { txoCom TextBox
-        MoveScaled(87,0,4,4)
-        Visible = False
+        MoveScaled(65,0,26,4)
         Enabled = False
         Font = Font["Bold,+1"]
         Background = Color.TextBackground
@@ -481,7 +481,7 @@
         }
         { btnBounds ToolButton locks
           Name = "btnBounds"
-          MoveScaled(3,0,9,5)
+          MoveScaled(3,0,5,5)
           #Translate = False
           Tag = "bounds"
           ToolTip = "F6"
@@ -490,7 +490,7 @@
         }
         { btnGrid ToolButton locks
           Name = "btnGrid"
-          MoveScaled(8,0,9,5)
+          MoveScaled(8,0,5,5)
           #Translate = False
           Tag = "grid"
           ToolTip = "F7"
@@ -499,7 +499,7 @@
         }
         { btnOrtho ToolButton locks
           Name = "btnOrtho"
-          MoveScaled(15,0,9,5)
+          MoveScaled(15,0,5,5)
           #Translate = False
           Tag = "ortho"
           ToolTip = "F8"

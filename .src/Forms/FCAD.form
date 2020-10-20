@@ -43,7 +43,6 @@
       }
       { SidePanel1 SidePanel
         MoveScaled(79,2,21,59)
-        Visible = False
         Arrangement = Arrange.Vertical
         Orientation = Align.Right
         { Panel2 Panel
