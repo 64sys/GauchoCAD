@@ -358,6 +358,11 @@
       { btnWidths Button
         MoveScaled(49,0,15,5)
       }
+      { ProgressBar1 ProgressBar
+        MoveScaled(98,0,24,5)
+        Visible = False
+        Expand = True
+      }
     }
     { PanEdit1 Panel
       MoveScaled(3,8,149,57)
@@ -440,7 +445,7 @@
           Border = False
         }
         { btnSave Button
-          MoveScaled(0,45,16,4)
+          MoveScaled(1,45,16,4)
           Text = ("Save")
         }
       }

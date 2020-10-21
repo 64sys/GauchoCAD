@@ -1107,11 +1107,12 @@ Public Function DWGEntities(s As String) As Collection
                 'File.Save(User.Home &/ tmx["entity"] & ".txt", sOut)
 
                 arr = DWGArrangeEnty(tmx.Copy())
-
+                'If arr.Exist("error") = False Then
                 If arr.Exist("id") Then
                   sKey = arr["entity"] & ":" & arr["id"]
                   out.Add(arr.Copy(), sKey)
                 Endif
+                'Endif
 
                 'If out.Exist(arr["entity"]) = False Then
                 '  out.Add(arr["entity"])
@@ -2104,10 +2105,15 @@ Public Function DWGDecodeColor(s As String) As Byte
 
   Dim out As Byte
 
-  If InStr(s, "[CMC.BS 62]") > 0 Then
-    out = CByte(Split(s, "[")[0])
+  'If InStr(s, "[CMC.BS 62]") > 0 Then
+  If InStr(s, "[") > 0 Then
+    s = Replace(s, " [", "[")
+    Try out = CByte(Split(s, "[")[0])
+    If Error Then
+      out = 0
+    Endif
   Else
-    out = ""
+    out = 0
   Endif
 
   Return out
@@ -2262,6 +2268,7 @@ Public Function DWGArrangeEnty(c As Collection) As Collection
 
   Dim o As New Collection
   Dim x As New Collection
+  Dim err As New String[]
   Dim tag As String
   Dim str As String
   Dim p As Integer
@@ -2275,11 +2282,41 @@ Public Function DWGArrangeEnty(c As Collection) As Collection
 
     o.Add(c["entity"], "entity")
 
-    For Each tag In ["id", "handle", "layer", "style", "width", "invisible", "thikness", "block"]
+    If c.Exist("id") Then
+      o.Add(c["id"], "id")
+    Else
+      o.Add("id", "error")
+    Endif
+
+    If c.Exist("handle") Then
+      o.Add(c["handle"], "handle")
+    Else
+      If c.Exist("id") Then
+        o.Add(c["id"], "handle")
+      Else
+        o.Add("handle", "error")
+      Endif
+    Endif
+
+    For Each tag In ["layer", "style", "width"]
       If c.Exist(tag) Then
         o.Add(c[tag], tag)
+      Else
+        err.Add(tag)
       Endif
     Next
+
+    If c.Exist("invisible") Then
+      o.Add(c["invisible"], "invisible")
+    Else
+      o.Add(0, "invisible")
+    Endif
+
+    If c.Exist("block") Then
+      o.Add(c["block"], "block")
+    Else
+      o.Add("", "block")
+    Endif
 
     If c.Exist("color.index") Then
       o.Add(c["color.index"], "colour")
@@ -2301,18 +2338,26 @@ Public Function DWGArrangeEnty(c As Collection) As Collection
             x.Add(c["sm_axis"], "p1")
           Endif
           o.Add(x.Copy(), "p")
+        Else
+          err.Add("p")
         Endif
 
         If c.Exist("axis_ratio") Then
           o.Add(c["axis_ratio"], "ratio")
+        Else
+          err.Add("ratio")
         Endif
 
         If c.Exist("start_angle") Then
           o.Add(c["start_angle"], "start_angle")
+        Else
+          err.Add("start_angle")
         Endif
 
         If c.Exist("end_angle") Then
           o.Add(c["end_angle"], "end_angle")
+        Else
+          err.Add("end_angle")
         Endif
 
       Case "ARC"
@@ -2320,18 +2365,26 @@ Public Function DWGArrangeEnty(c As Collection) As Collection
           x.Clear
           x.Add(c["center"], "p0")
           o.Add(x.Copy(), "p")
+        Else
+          err.Add("p")
         Endif
 
         If c.Exist("radius") Then
           o.Add(c["radius"], "radius")
+        Else
+          err.Add("radius")
         Endif
 
         If c.Exist("start_angle") Then
           o.Add(c["start_angle"], "start_angle")
+        Else
+          err.Add("start_angle")
         Endif
 
         If c.Exist("end_angle") Then
           o.Add(c["end_angle"], "end_angle")
+        Else
+          err.Add("end_angle")
         Endif
 
       Case "ATTDEF"
@@ -2340,28 +2393,38 @@ Public Function DWGArrangeEnty(c As Collection) As Collection
           x.Add(c["ins_pt"], "p0")
           o.Add(x.Copy(), "p")
           x.Clear
+        Else
+          err.Add("p")
         Endif
         If c.Exist("height") Then
           flo = DWGDecodeFloat(c["height"])
           o.Add(flo, tag)
+        Else
+          err.Add("height")
         Endif
         For Each tag In ["default_value", "tag", "prompt", "style"]
           If c.Exist(tag) Then
             str = UnQuote(c[tag])
             o.Add(str, tag)
+          Else
+            err.Add(tag)
           Endif
         Next
 
-      Case "ATTRIB"
+        'Case "ATTRIB"
 
       Case "CIRCLE"
         If c.Exist("center") Then
           x.Clear
           x.Add(c["center"], "p0")
           o.Add(x.Copy(), "p")
+        Else
+          err.Add("p")
         Endif
         If c.Exist("radius") Then
           o.Add(c["radius"], "radius")
+        Else
+          err.Add("radius")
         Endif
 
       Case "HATCH"
@@ -2372,6 +2435,8 @@ Public Function DWGArrangeEnty(c As Collection) As Collection
           x.Clear
           x.Add(c["ins_pt"], "p0")
           o.Add(x.Copy(), "p")
+        Else
+          err.Add("p")
         Endif
 
         If c.Exist("scale") Then
@@ -2381,15 +2446,22 @@ Public Function DWGArrangeEnty(c As Collection) As Collection
             If c["scale"].Count > 2 Then
               o.Add(c["scale"][2], "scalez")
             Endif
+          Else
+            err.Add("scalex")
+            err.Add("scaley")
           Endif
         Endif
 
         If c.Exist("rotation") Then
           o.Add(c["rotation"], "angle")
+        Else
+          err.Add("angle")
         Endif
 
         If c.Exist("block_header") Then
           o.Add(c["block_header"], "block")
+        Else
+          err.Add("block")
         Endif
 
       Case "LINE"
@@ -2399,6 +2471,8 @@ Public Function DWGArrangeEnty(c As Collection) As Collection
           x.Add(c["end"], "p1")
           o.Add(x.Copy(), "p")
           x.Clear
+        Else
+          err.Add("p")
         Endif
 
       Case "LWPOLYLINE"
@@ -2415,10 +2489,14 @@ Public Function DWGArrangeEnty(c As Collection) As Collection
                 px.Add(0.0)
               Endif
               x.Add(px, pt)
+            Else
+              err.Add("p")
             Endif
           Next
           o.Add(x.Copy(), "p")
           x.Clear
+        Else
+          err.Add("p")
         Endif
 
       Case "MTEXT"
@@ -2426,6 +2504,8 @@ Public Function DWGArrangeEnty(c As Collection) As Collection
         If c.Exist("text_height") Then
           flo = c["text_height"]
           o.Add(flo, "text_height")
+        Else
+          err.Add("text_height")
         Endif
 
         If c.Exist("rotation") Then
@@ -2443,11 +2523,15 @@ Public Function DWGArrangeEnty(c As Collection) As Collection
         If c.Exist("text") Then
           str = UnQuote(c["text"])
           o.Add(str, "text")
+        Else
+          err.Add("text")
         Endif
 
         If c.Exist("text_style") Then
           str = UnQuote(c["text_style"])
           o.Add(str, "text_style")
+        Else
+          err.Add("text_style")
         Endif
 
         If c.Exist("ins_pt") Then
@@ -2461,15 +2545,23 @@ Public Function DWGArrangeEnty(c As Collection) As Collection
 
       Case "POINT"
         If c.Exist("x") And c.Exist("y") And c.Exist("z") Then
-
+          x.Clear
+          px.Add(c["x"])
+          px.Add(c["y"])
+          px.Add(c["z"])
+          x.Add(px, "p0")
+          o.Add(x, "p")
+        Else
+          err.Add("p")
         Endif
-        o.Add(c["num_points"], "num_points")
 
       Case "TEXT"
 
         If c.Exist("height") Then
           flo = c["height"]
           o.Add(flo, "text_height")
+        Else
+          err.Add("text_height")
         Endif
 
         If c.Exist("rotation") Then
@@ -2487,11 +2579,15 @@ Public Function DWGArrangeEnty(c As Collection) As Collection
         If c.Exist("text") Then
           str = UnQuote(c["text"])
           o.Add(str, "text")
+        Else
+          err.Add("text")
         Endif
 
         If c.Exist("text_style") Then
           str = UnQuote(c["text_style"])
           o.Add(str, "text_style")
+        Else
+          err.Add("text_style")
         Endif
 
         If c.Exist("ins_pt") Then
@@ -2501,14 +2597,44 @@ Public Function DWGArrangeEnty(c As Collection) As Collection
             x.Add(c["alignment_pt"], "p1")
           Endif
           o.Add(x.Copy(), "p")
+        Else
+          err.Add("p")
         Endif
 
     End Select
   Endif
 
+  If err.Count > 0 Then
+    o.Add(err, "error")
+  Endif
+
   Return o
 
 End
+
+' Public Function GetPoints(c As Collection) As Float[]
+'
+'   Dim fx As New Float[]
+'   Dim p As Float[]
+'   Dim i As Integer
+'
+'   fx.Clear
+'
+'   If c.Exist("p") Then
+'     If TypeOf(c["p"]) = gb.Object Then
+'       For Each p In c["p"]
+'         For i = 0 To p.max Step 3
+'           fx.Add(p[i])                 'X
+'           fx.Add(p[i + 1])             'Y
+'           'flxPoints.Add(p[i + 2])            'Z Future use
+'         Next
+'       Next
+'     Endif
+'   Endif
+'
+'   Return fx
+'
+' End
 
 Public Function DWGDimCodes() As Collection
 
@@ -3659,13 +3785,25 @@ Private Function DXFLtypeList(sItem As String) As Collection
             cTmp.Add(sVal, "desc")
 
           Case "72"
-            cTmp.Add(CInt(sVal), "align")
+            If IsNumber(sVal) Then
+              cTmp.Add(CInt(sVal), "align")
+            Else
+              cTmp.Add(0, "align")
+            Endif
 
           Case "73"
-            cTmp.Add(CInt(sVal), "elements")
+            If IsNumber(sVal) Then
+              cTmp.Add(CInt(sVal), "elements")
+            Else
+              cTmp.Add(0, "elements")
+            Endif
 
           Case "40"
-            cTmp.Add(CFloat(sVal), "patern")
+            If IsNumber(sVal) Then
+              cTmp.Add(CFloat(sVal), "patern")
+            Else
+              cTmp.Add(0.0, "patern")
+            Endif
 
         End Select
 
@@ -3722,12 +3860,25 @@ Private Function DXFStyleList(sItem As String) As Collection
                 cTmp.Add(True, "vertical")
             End Select
           Case "40"
-            cTmp.Add(CFloat(sVal), "fixed")
+            If IsNumber(sVal) Then
+              cTmp.Add(CFloat(sVal), "fixed")
+            Else
+              cTmp.Add(0.0, "fixed")
+            Endif
 
           Case "41"
-            cTmp.Add(CFloat(sVal), "wfactor")
+            If IsNumber(sVal) Then
+              cTmp.Add(CFloat(sVal), "wfactor")
+            Else
+              cTmp.Add(0.0, "wfactor")
+            Endif
+
           Case "50"
-            cTmp.Add(CFloat(sVal), "oblique")
+            If IsNumber(sVal) Then
+              cTmp.Add(CFloat(sVal), "oblique")
+            Else
+              cTmp.Add(0.0, "oblique")
+            Endif
 
           Case "71"
             Select sVal
@@ -3738,7 +3889,11 @@ Private Function DXFStyleList(sItem As String) As Collection
             End Select
 
           Case "42"
-            cTmp.Add(CFloat(sVal), "last")
+            If IsNumber(sVal) Then
+              cTmp.Add(CFloat(sVal), "last")
+            Else
+              cTmp.Add(0.0, "last")
+            Endif
 
           Case "3"
             cTmp.Add(sVal, "font")
@@ -3802,7 +3957,12 @@ Private Function DXFDimStyleList(sItem As String) As Collection
             Case "string"
               cTmp.Add(sVal, code[sTag][0])
             Case "float"
-              cTmp.Add(CFloat(sVal), code[sTag][0])
+              If IsNumber(sVal) Then
+                cTmp.Add(CFloat(sVal), code[sTag][0])
+              Else
+                cTmp.Add(0.0, code[sTag][0])
+              Endif
+
           End Select
         Endif
       Next
@@ -3891,14 +4051,16 @@ Private Function DXFDecodeEntity(sItem As String) As Collection
   Dim pt2 As String
   Dim spt As New String[]
   Dim cp As New Collection
+  Dim a0 As Float
   Dim a1 As Float
-  Dim a2 As Float
   Dim r As Float
   Dim sx As Float
   Dim c As Integer
   Dim sy As Float
   Dim sz As Float
   Dim tg As Variant
+  Dim flo As Float
+  Dim int As Integer
 
   stx = Split(sItem, "\n")
 
@@ -4026,20 +4188,41 @@ Private Function DXFDecodeEntity(sItem As String) As Collection
 
       Case "ELLIPSE", "CIRCLE", "ARC"
         If cTmp.Exist("ratio") Then ' For ellipse
-          r = CFloat(cTmp["ratio"])
+          If IsNumber(cTmp["ratio"]) Then
+            r = CFloat(cTmp["ratio"])
+          Else
+            r = 0.0
+          Endif
           cTmp2.Add(r, "ratio")
         Endif
 
         If cTmp.Exist("radius") Then ' For circle and arc
-          r = CFloat(cTmp["radius"])
+          If IsNumber(cTmp["radius"]) Then
+            r = CFloat(cTmp["radius"])
+          Else
+            r = 0.0
+          Endif
           cTmp2.Add(r, "radius")
         Endif
+        'Endif
 
         If cTmp.Exist("angle0") And cTmp.Exist("angle1") Then ' For ellipse and arc
-          a1 = CFloat(cTmp["angle0"])
-          a2 = CFloat(cTmp["angle1"])
-          cTmp2.Add(a1, "start_angle")
+          If IsNumber(cTmp["angle0"]) Then
+            a0 = CFloat(cTmp["angle0"])
+          Else
+            a0 = 0.0
+          Endif
+
+          If IsNumber(cTmp["angle1"]) Then
+            a1 = CFloat(cTmp["angle1"])
+          Else
+            a1 = 0.0
+          Endif
+          cTmp2.Add(a0, "start_angle")
           cTmp2.Add(a1, "end_angle")
+        Else
+          cTmp2.Add(0.0, "start_angle")
+          cTmp2.Add(0.0, "end_angle")
         Endif
 
       Case "INSERT"
@@ -4051,27 +4234,47 @@ Private Function DXFDecodeEntity(sItem As String) As Collection
         Endif
 
         If cTmp.Exist("angle") Then
-          cTmp2.Add(CFloat(cTmp["angle"]), "angle")
+          If IsNumber(cTmp["angle"]) Then
+            flo = CFloat(cTmp["angle"])
+          Else
+            flo = 0.0
+          Endif
+          cTmp2.Add(flo, "angle")
         Else
-          cTmp2.Add(0, "angle")
+          cTmp2.Add(0.0, "angle")
         Endif
 
         If cTmp.Exist("scalex") Then
-          sx = CFloat(cTmp["scalex"])
+          If IsNumber(cTmp["scalex"]) Then
+            flo = CFloat(cTmp["scalex"])
+          Else
+            flo = 1.0
+          Endif
+          sx = flo
         Else
-          sx = CFloat(1)
+          sx = 1.0
         Endif
 
         If cTmp.Exist("scaley") Then
-          sy = CFloat(cTmp["scaley"])
+          If IsNumber(cTmp["scaley"]) Then
+            flo = CFloat(cTmp["scaley"])
+          Else
+            flo = 1.0
+          Endif
+          sy = flo
         Else
-          sy = CFloat(1)
+          sy = 1.0
         Endif
 
         If cTmp.Exist("scalez") Then
-          sz = CFloat(cTmp["scalez"])
+          If IsNumber(cTmp["scalez"]) Then
+            flo = CFloat(cTmp["scalez"])
+          Else
+            flo = 1.0
+          Endif
+          sz = flo
         Else
-          sz = CFloat(1)
+          sz = 1.0
         Endif
 
         cTmp2.Add([sx, sy, sz], "scale")
@@ -4083,15 +4286,25 @@ Private Function DXFDecodeEntity(sItem As String) As Collection
         Endif
 
         If cTmp.Exist("rows") Then
-          cTmp2.Add(CInt(cTmp["rows"]), "ro")
+          If IsNumber(cTmp["rows"]) Then
+            int = Int(cTmp["rows"])
+          Else
+            int = 1
+          Endif
+          cTmp2.Add(int, "ro")
         Else
           cTmp2.Add(1, "ro")
         Endif
 
         If cTmp.Exist("cspace") Then
-          cTmp2.Add(CFloat(cTmp["cspace"]), "cs")
+          If IsNumber(cTmp["cspace"]) Then
+            flo = CFloat(cTmp["cspace"])
+          Else
+            flo = 0.0
+          Endif
+          cTmp2.Add(flo, "cs")
         Else
-          cTmp2.Add(0, "cs")
+          cTmp2.Add(0.0, "cs")
         Endif
 
       Case "TEXT"
@@ -4100,26 +4313,56 @@ Private Function DXFDecodeEntity(sItem As String) As Collection
           Select cTmp.Key
 
             Case "texth"
-              cTmp2.Add(CFloat(tg), "height")
+              If IsNumber(tg) Then
+                flo = CFloat(tg)
+              Else
+                flo = 0.0
+              Endif
+              cTmp2.Add(flo, "height")
             Case "text"
               cTmp2.Add(CStr(tg), "text")
             Case "hjust"
-              cTmp2.Add(CInt(tg), "just_h")
+              If IsNumber(tg) Then
+                int = Int(tg)
+              Else
+                int = 0
+              Endif
+              cTmp2.Add(int, "just_h")
 
             Case "vjust"
-              cTmp2.Add(CInt(tg), "just_v")
+              If IsNumber(tg) Then
+                int = Int(tg)
+              Else
+                int = 0
+              Endif
+              cTmp2.Add(int, "just_v")
 
             Case "angle"
-              cTmp2.Add(CFloat(tg), "angle")
+              If IsNumber(tg) Then
+                flo = CFloat(tg)
+              Else
+                flo = 0.0
+              Endif
+              cTmp2.Add(flo, "angle")
 
             Case "wfactor"
-              cTmp2.Add(CFloat(tg), "wfactor")
+              If IsNumber(tg) Then
+                flo = CFloat(tg)
+              Else
+                flo = 0.0
+              Endif
+              cTmp2.Add(flo, "wfactor")
 
             Case "tstyle"
               cTmp2.Add(CStr(tg), "font")
 
             Case "oblique"
-              cTmp2.Add(CFloat(tg), "oblique")
+              If IsNumber(tg) Then
+                flo = CFloat(tg)
+              Else
+                flo = 0.0
+              Endif
+              cTmp2.Add(flo, "oblique")
 
           End Select
         Next
@@ -4134,7 +4377,12 @@ Private Function DXFDecodeEntity(sItem As String) As Collection
           Select cTmp.Key
 
             Case "texth"
-              cTmp2.Add(CFloat(tg), "height")
+              If IsNumber(tg) Then
+                flo = CFloat(tg)
+              Else
+                flo = 0.0
+              Endif
+              cTmp2.Add(flo, "height")
             Case "text"
               If cTmp.Exist("text2") Then
                 cTmp2.Add(CStr(tg) & cTmp["text2"], "text")
@@ -4143,7 +4391,12 @@ Private Function DXFDecodeEntity(sItem As String) As Collection
               Endif
 
             Case "angle"
-              cTmp2.Add(CFloat(tg), "angle")
+              If IsNumber(tg) Then
+                flo = CFloat(tg)
+              Else
+                flo = 0.0
+              Endif
+              cTmp2.Add(flo, "angle")
 
           End Select
         Next
@@ -4272,6 +4525,7 @@ Private Function DXFDecodeItem(sItem As String) As Collection
   Dim p As Variant
   Dim df As Variant
   Dim defaults As New Collection
+  Dim str As String
 
   stx = Split(sItem, "\n")
 
@@ -4300,13 +4554,25 @@ Private Function DXFDecodeItem(sItem As String) As Collection
         If codes.Exist(sKey) Then
           sTag = codes[sKey]
         Endif
-        vrt = CInt(Replace(stx[i + 1], " ", ""))
+
+        str = Replace(stx[i + 1], " ", "")
+        If IsNumber(str) Then
+          vrt = CInt(str)
+        Else
+          vrt = 0
+        Endif
+
         cTmp.Add(vrt, sTag)
       Case "40", "50", "41", "42", "43"
         If codes.Exist(sKey) Then
           sTag = codes[sKey]
         Endif
-        vrt = CFloat(Replace(stx[i + 1], " ", ""))
+        str = Replace(stx[i + 1], " ", "")
+        If IsNumber(str) Then
+          vrt = CFloat(str)
+        Else
+          vrt = 0.0
+        Endif
         cTmp.Add(vrt, sTag)
       Case "10", "20", "30", "11", "21", "31" ' coordenadas habituales
 
@@ -4396,6 +4662,7 @@ Private Function DXFDecodeCoords(sItem As String) As Collection
   Dim ptx As New String[]
   Dim k As Integer
   Dim tp As String
+  Dim str As String
 
   stx = Split(sItem, "\n")
 
@@ -4421,7 +4688,12 @@ Private Function DXFDecodeCoords(sItem As String) As Collection
         Else
           sTag = sKey
         Endif
-        vrt = CFloat(Replace(stx[i + 1], " ", ""))
+        str = Replace(stx[i + 1], " ", "")
+        If IsNumber(str) Then
+          vrt = CFloat(str)
+        Else
+          vrt = 0.0
+        Endif
         c.Add(vrt, sTag)
     End Select
   Next
@@ -4450,7 +4722,12 @@ Private Function DXFDecodeCoords(sItem As String) As Collection
         Else
           sTag = sKey
         Endif
-        vrt = CFloat(Replace(stx[i + 1], " ", ""))
+        str = Replace(stx[i + 1], " ", "")
+        If IsNumber(str) Then
+          vrt = CFloat(str)
+        Else
+          vrt = 0.0
+        Endif
 
         If rep.Exist(sTag) And rep[sTag][0] > 1 Then
           rep[sTag][1] = rep[sTag][1] + 1
@@ -4568,6 +4845,7 @@ Private Function DXFDecodeHeader(sItem As String) As Collection
   Dim x As Float
   Dim y As Float
   Dim z As Float
+  Dim str As String
 
   stx = Split(sItem, "\n")
 
@@ -4587,23 +4865,49 @@ Private Function DXFDecodeHeader(sItem As String) As Collection
         Case "345", "346", "349"
           vrt = stx[i + 1]
         Case "40", "50"
-          vrt = CFloat(Replace(stx[i + 1], " ", ""))
-        Case "10"
-          x = CFloat(Replace(stx[i + 1], " ", ""))
-          If Replace(stx[i + 2], " ", "") = "20" Then
-            y = CFloat(Replace(stx[i + 3], " ", ""))
+          str = Replace(stx[i + 1], " ", "")
+          If IsNumber(str) Then
+            vrt = CFloat(str)
+          Else
+            vrt = 0.0
           Endif
+          'vrt = CFloat(Replace(stx[i + 1], " ", ""))
+
+        Case "10"
+          str = Replace(stx[i + 1], " ", "")
+          If IsNumber(str) Then
+            x = CFloat(str)
+          Else
+            x = 0.0
+          Endif
+
+          If Replace(stx[i + 2], " ", "") = "20" Then
+            str = Replace(stx[i + 3], " ", "")
+            If IsNumber(str) Then
+              y = CFloat(str)
+            Else
+              y = 0.0
+            Endif
+
+          Endif
+
           If Replace(stx[i + 4], " ", "") = "30" Then
-            z = CFloat(Replace(stx[i + 5], " ", ""))
+            str = Replace(stx[i + 5], " ", "")
+            If IsNumber(str) Then
+              z = CFloat(str)
+            Else
+              z = 0.0
+            Endif
+            'z = CFloat(str)
           Endif
           vrt = [x, y, z]
           'Case "20", "30"
           'skip
       End Select
 
-      If sTag = " INTERFERECOLOR" Then
-        Print "milestone"
-      Endif
+      'If sTag = " INTERFERECOLOR" Then
+      '  Print "milestone"
+      'Endif
       If vrt Then
         cTmp.Add(vrt, sTag)
         Print "Ok : " & sTag

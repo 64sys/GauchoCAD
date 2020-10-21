@@ -524,76 +524,77 @@ Public Function ImportEntities2(colGrp As Collection, obxEntities As Entity[], O
   Dim sText As String
 
   For Each colEnt In colGrp
-    flxPoints.Clear
-    LineWidth = Abs(LineWidth)
-    Select LCase$(colEnt["entity"]) 'colData.Key
+    If colEnt.Exist("error") = False Then
+      flxPoints.Clear
+      LineWidth = Abs(LineWidth)
+      Select LCase$(colEnt["entity"]) 'colData.Key
 
-      Case "line"
-        GoSub GetPoints
-        AddLine(obxEntities, flxPoints, colEnt["colour"], LineWidth, colEnt["style"], colEnt["layer"], BlockName)
-        Inc iTotalEntities
-      Case "spline"
-        GoSub GetPoints
-        AddSPLine(obxEntities, flxPoints, colEnt["colour"], LineWidth, colEnt["style"], colEnt["layer"], BlockName)
-        Inc iTotalEntities
-      Case "lwpolyline", "polyline"
-        GoSub GetPoints
-        AddPolyLine(obxEntities, flxPoints, colEnt["colour"], LineWidth, colEnt["style"], colEnt["layer"], BlockName)
-        Inc iTotalEntities
-      Case "solid"
-        GoSub GetPoints
-        AddSolid(obxEntities, flxPoints, colEnt["colour"], LineWidth, colEnt["style"], colEnt["layer"], BlockName)
-        Inc iTotalEntities
-      Case "ellipse"
-        GoSub GetPoints
+        Case "line"
+          GoSub GetPoints
+          AddLine(obxEntities, flxPoints, colEnt["colour"], LineWidth, colEnt["style"], colEnt["layer"], BlockName)
+          Inc iTotalEntities
+        Case "spline"
+          GoSub GetPoints
+          AddSPLine(obxEntities, flxPoints, colEnt["colour"], LineWidth, colEnt["style"], colEnt["layer"], BlockName)
+          Inc iTotalEntities
+        Case "lwpolyline", "polyline"
+          GoSub GetPoints
+          AddPolyLine(obxEntities, flxPoints, colEnt["colour"], LineWidth, colEnt["style"], colEnt["layer"], BlockName)
+          Inc iTotalEntities
+        Case "solid"
+          GoSub GetPoints
+          AddSolid(obxEntities, flxPoints, colEnt["colour"], LineWidth, colEnt["style"], colEnt["layer"], BlockName)
+          Inc iTotalEntities
+        Case "ellipse"
+          GoSub GetPoints
 
-        AddEllipse(obxEntities, flxPoints, colEnt["ratio"], colEnt["start_angle"], colEnt["end_angle"], colEnt["colour"], LineWidth, colEnt["style"], colEnt["layer"], BlockName)
-        Inc iTotalEntities
+          AddEllipse(obxEntities, flxPoints, colEnt["ratio"], colEnt["start_angle"], colEnt["end_angle"], colEnt["colour"], LineWidth, colEnt["style"], colEnt["layer"], BlockName)
+          Inc iTotalEntities
 
-      Case "circle"
-        GoSub GetPoints
-        AddCircle(obxEntities, flxPoints, colEnt["radius"], colEnt["colour"], LineWidth, colEnt["style"], colEnt["layer"], BlockName)
-        Inc iTotalEntities
+        Case "circle"
+          GoSub GetPoints
+          AddCircle(obxEntities, flxPoints, colEnt["radius"], colEnt["colour"], LineWidth, colEnt["style"], colEnt["layer"], BlockName)
+          Inc iTotalEntities
 
-      Case "arc"
-        GoSub GetPoints
-        AddArc(obxEntities, flxPoints, colEnt["radius"], colEnt["start_angle"], colEnt["end_angle"], colEnt["colour"], LineWidth, colEnt["style"], colEnt["layer"], BlockName)
-        Inc iTotalEntities
+        Case "arc"
+          GoSub GetPoints
+          AddArc(obxEntities, flxPoints, colEnt["radius"], colEnt["start_angle"], colEnt["end_angle"], colEnt["colour"], LineWidth, colEnt["style"], colEnt["layer"], BlockName)
+          Inc iTotalEntities
 
-      Case "insert"
-        GoSub GetPoints
-        ' Insert viene con el punto de insercion XYZ, no puedo usar la rutina lectora de puntos
-        'flxPoints.Add(colEnt["p"]["p0"][0])
-        'flxPoints.Add(colEnt["p"]["p0"][1])
-        'If LCase$(colEnt["block"]) = "toma aa" Then Stop
-        AddInsert(obxEntities, flxPoints, colEnt["scalex"], colEnt["scaley"], colEnt["angle"], colEnt["colour"], colEnt["style"], colEnt["layer"], colEnt["block"])
-        Inc iTotalEntities
+        Case "insert"
+          GoSub GetPoints
+          ' Insert viene con el punto de insercion XYZ, no puedo usar la rutina lectora de puntos
+          'flxPoints.Add(colEnt["p"]["p0"][0])
+          'flxPoints.Add(colEnt["p"]["p0"][1])
+          'If LCase$(colEnt["block"]) = "toma aa" Then Stop
+          AddInsert(obxEntities, flxPoints, colEnt["scalex"], colEnt["scaley"], colEnt["angle"], colEnt["colour"], colEnt["style"], colEnt["layer"], colEnt["block"])
+          Inc iTotalEntities
 
-      Case "text"
-        GoSub GetPoints
-        'flxPoints.Add(colEnt["p"]["p0"][0])
-        'flxPoints.Add(colEnt["p"]["p0"][1])
-        sText = colEnt["text"]
-        Try sText = colEnt["text2"] & sText
-        AddText(obxEntities, flxPoints, colEnt["angle"], colEnt["text_height"], sText, colEnt["colour"], LineWidth, colEnt["style"], colEnt["layer"], BlockName)
-        Inc iTotalEntities
+        Case "text"
+          GoSub GetPoints
+          'flxPoints.Add(colEnt["p"]["p0"][0])
+          'flxPoints.Add(colEnt["p"]["p0"][1])
+          sText = colEnt["text"]
+          Try sText = colEnt["text2"] & sText
+          AddText(obxEntities, flxPoints, colEnt["angle"], colEnt["text_height"], sText, colEnt["colour"], LineWidth, colEnt["style"], colEnt["layer"], BlockName)
+          Inc iTotalEntities
 
-      Case "mtext"
-        GoSub GetPoints
-        'flxPoints.Add(colEnt["p"]["p0"][0])
-        'flxPoints.Add(colEnt["p"]["p0"][1])
-        sText = colEnt["text"]
-        Try sText = colEnt["text2"] & sText
-        AddMText(obxEntities, flxPoints, colEnt["angle"], colEnt["text_height"], sText, colEnt["colour"], LineWidth, colEnt["style"], colEnt["layer"], BlockName)
-        Inc iTotalEntities
+        Case "mtext"
+          GoSub GetPoints
+          'flxPoints.Add(colEnt["p"]["p0"][0])
+          'flxPoints.Add(colEnt["p"]["p0"][1])
+          sText = colEnt["text"]
+          Try sText = colEnt["text2"] & sText
+          AddMText(obxEntities, flxPoints, colEnt["angle"], colEnt["text_height"], sText, colEnt["colour"], LineWidth, colEnt["style"], colEnt["layer"], BlockName)
+          Inc iTotalEntities
 
-      Case "dimmension"
-        GoSub GetPoints
-        AddDim(obxEntities, flxPoints, colEnt["angle"], colEnt["text_height"], colEnt["text"], colEnt["colour"], LineWidth, colEnt["style"], colEnt["layer"], BlockName)
-        Inc iTotalEntities
+        Case "dimmension"
+          GoSub GetPoints
+          AddDim(obxEntities, flxPoints, colEnt["angle"], colEnt["text_height"], colEnt["text"], colEnt["colour"], LineWidth, colEnt["style"], colEnt["layer"], BlockName)
+          Inc iTotalEntities
 
-    End Select
-
+      End Select
+    Endif
   Next
 
   Return iTotalEntities

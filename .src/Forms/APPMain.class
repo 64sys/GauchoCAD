@@ -1027,6 +1027,7 @@ Public Sub btnColors_MouseDown()
         '     btnColors.Tooltip = ("Color") & ": " & CStr(CurrentColor)
         ' End Select
         ColorButtonRefresh(CurrentColor)
+        ChangeColorRefresh()
         SelectingColor = False
         Break
       Else
@@ -1061,6 +1062,43 @@ Public Sub ColorButtonRefresh(currColor As Integer)
     Case Else
       btnColors.Tooltip = ("Color") & ": " & CStr(CurrentColor)
   End Select
+
+End
+
+Public Sub ChangeColorRefresh()
+
+  Dim i As Integer
+  Dim r As Integer
+  Dim e As Entity
+  Dim lay As Collection
+  Dim ly As Collection
+  Dim Changed As Boolean
+  Dim te As Entity
+
+  For i = 0 To APPMain.hFCAD.arrEntities.Max
+    Changed = False
+    e = APPMain.hFCAD.arrEntities[i]
+    APPMain.hFCAD.arrTmp.Clear
+
+    If e.Selected Then
+      e = APPMain.hFCAD.arrEntities[i]
+      te = clsEntities.ClonEntity(e)
+      te.Handle = e.Handle
+      APPMain.hFCAD.arrTmp.Add(te)
+      cProp["Color"] = CurrentColor
+      If e.colour <> cProp["Color"] Then
+        Changed = True
+        e.colour = cProp["Color"]
+        e.ColorToPaint = cProp["Color"]
+      Endif
+    Endif
+
+    If Changed = True Then
+      APPMain.hFCAD.arrUndo.Add(te)
+      APPMain.hFCAD.Regen
+    Endif
+
+  Next
 
 End
 
