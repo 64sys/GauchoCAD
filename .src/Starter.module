@@ -53,6 +53,7 @@ Public ColorsRGB As New String[]     '' Colors lists each item as r,g,b string
 'Public cLtypes As New Collection     '' Linetypes list
 Public cStyles As New Collection     '' Linetypes list
 Public cWidths As New Collection     '' Widths list
+Public sDecimal As String            '' Character used in system for separation decimal
 
 ' Variables de un solo uso
 Private ldd As Boolean              '' Testigo de finalización de carga.
@@ -75,6 +76,8 @@ Public Sub Run()
   Dim thx As New String[]           '' Lista d etemas del editor interno
   Dim i As Integer
   Dim CADConfigData As New Collection
+
+  sDecimal = sog.GetLcNumeric()[0]
 
   '' Verificar que existe el direcotrio del porgrama en Home
   adi = User.Home &/ "." & String.LCase(vag.NoSymbols(Application.Title))

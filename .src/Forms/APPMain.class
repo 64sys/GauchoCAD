@@ -1068,10 +1068,7 @@ End
 Public Sub ChangeColorRefresh()
 
   Dim i As Integer
-  Dim r As Integer
   Dim e As Entity
-  Dim lay As Collection
-  Dim ly As Collection
   Dim Changed As Boolean
   Dim te As Entity
 
@@ -1080,7 +1077,7 @@ Public Sub ChangeColorRefresh()
     e = APPMain.hFCAD.arrEntities[i]
     APPMain.hFCAD.arrTmp.Clear
 
-    If e.Selected Then
+    If e.Selected And e.iInsert = -1 Then
       e = APPMain.hFCAD.arrEntities[i]
       te = clsEntities.ClonEntity(e)
       te.Handle = e.Handle

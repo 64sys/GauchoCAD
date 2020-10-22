@@ -875,6 +875,7 @@ Public Sub LoadDrawingMap2()
 
   ctn.Add(cModel, "model")
   ctn.Add(cImport, "import")
+  ctn.Add(arrEntities, "entities")
 
   For Each dra In ctn
 

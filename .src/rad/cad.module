@@ -4508,7 +4508,7 @@ Private Function DXFDecodeBlock(sItem As String) As Collection
 
 End
 
-Private Function DXFDecodeItem(sItem As String) As Collection
+Public Function DXFDecodeItem(sItem As String) As Collection
 
   Dim stx As String[]
   Dim cTmp As New Collection
@@ -4533,9 +4533,9 @@ Private Function DXFDecodeItem(sItem As String) As Collection
     sTag = "entity"
     sVal = stx[1]
     cTmp.Add(sVal, sTag)
-    If sVal = "INSERT" Then
-      'Print sVal
-    Endif
+    'If sVal = "INSERT" Then
+    '  'Print sVal
+    'Endif
     codes = DXFEntityCodes(sVal)
     defaults = DXFEntityDefaults(sVal)
   Endif
@@ -4556,7 +4556,7 @@ Private Function DXFDecodeItem(sItem As String) As Collection
         Endif
 
         str = Replace(stx[i + 1], " ", "")
-        If IsNumber(str) Then
+        If IsNumber(Replace(str, ".", ",")) Then
           vrt = CInt(str)
         Else
           vrt = 0
@@ -4568,15 +4568,25 @@ Private Function DXFDecodeItem(sItem As String) As Collection
           sTag = codes[sKey]
         Endif
         str = Replace(stx[i + 1], " ", "")
-        If IsNumber(str) Then
+        If IsNumber(Replace(str, ".", ",")) Then
           vrt = CFloat(str)
         Else
           vrt = 0.0
         Endif
         cTmp.Add(vrt, sTag)
       Case "10", "20", "30", "11", "21", "31" ' coordenadas habituales
+        If codes.Exist(sKey) Then
+          sTag = codes[sKey]
+        Endif
+        vrt = stx[i + 1]
+        cTmp.Add(vrt, sTag)
 
       Case "12", "22", "32", "13", "23", "33" ' coordenadas extras
+        If codes.Exist(sKey) Then
+          sTag = codes[sKey]
+        Endif
+        vrt = stx[i + 1]
+        cTmp.Add(vrt, sTag)
 
       Case "14", "24", "34", "15", "25", "35" ' coordenadas de dimensiones
 
@@ -4688,8 +4698,10 @@ Private Function DXFDecodeCoords(sItem As String) As Collection
         Else
           sTag = sKey
         Endif
+
         str = Replace(stx[i + 1], " ", "")
-        If IsNumber(str) Then
+
+        If IsNumber(Replace(str, ".", ",")) Then
           vrt = CFloat(str)
         Else
           vrt = 0.0
@@ -4723,7 +4735,7 @@ Private Function DXFDecodeCoords(sItem As String) As Collection
           sTag = sKey
         Endif
         str = Replace(stx[i + 1], " ", "")
-        If IsNumber(str) Then
+        If IsNumber(Replace(str, ".", ",")) Then
           vrt = CFloat(str)
         Else
           vrt = 0.0
@@ -4866,7 +4878,7 @@ Private Function DXFDecodeHeader(sItem As String) As Collection
           vrt = stx[i + 1]
         Case "40", "50"
           str = Replace(stx[i + 1], " ", "")
-          If IsNumber(str) Then
+          If IsNumber(Replace(str, ".", ",")) Then
             vrt = CFloat(str)
           Else
             vrt = 0.0
@@ -4875,7 +4887,7 @@ Private Function DXFDecodeHeader(sItem As String) As Collection
 
         Case "10"
           str = Replace(stx[i + 1], " ", "")
-          If IsNumber(str) Then
+          If IsNumber(Replace(str, ".", ",")) Then
             x = CFloat(str)
           Else
             x = 0.0
@@ -4883,7 +4895,7 @@ Private Function DXFDecodeHeader(sItem As String) As Collection
 
           If Replace(stx[i + 2], " ", "") = "20" Then
             str = Replace(stx[i + 3], " ", "")
-            If IsNumber(str) Then
+            If IsNumber(Replace(str, ".", ",")) Then
               y = CFloat(str)
             Else
               y = 0.0
@@ -4893,7 +4905,7 @@ Private Function DXFDecodeHeader(sItem As String) As Collection
 
           If Replace(stx[i + 4], " ", "") = "30" Then
             str = Replace(stx[i + 5], " ", "")
-            If IsNumber(str) Then
+            If IsNumber(Replace(str, ".", ",")) Then
               z = CFloat(str)
             Else
               z = 0.0
