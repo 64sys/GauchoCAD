@@ -57,6 +57,7 @@ Public CurrentWidth As Integer
 'Public SelectedWidth As Boolean
 
 Private PropertiesFlag As Boolean = False
+Private RawFlag As Boolean = False
 
 'variables de ambiente
 Public flgShowInspector As Boolean = True
@@ -64,6 +65,7 @@ Public HistoCom As New String[]     '' Commands history
 
 Public cMod As New Collection       '' All drawings common collection
 Public cProp As New Collection      '' Properties list
+Public cRaw As New Collection       '' Raw properties list
 Private iTheme As Integer           '' Theme luminance (determine if Dark or Light)
 
 'Public iSteps As Integer            '' Total steps for Progressbar
@@ -201,6 +203,8 @@ Public Sub Run(cin As Collection)
   btnBounds.Picture = Image.Load("./svg/locks/bounds.svg").Stretch(35, 35).Picture
   btnGrid.Picture = Image.Load("./svg/locks/grid.svg").Stretch(35, 35).Picture
   btnOrtho.Picture = Image.Load("./svg/locks/ortho.svg").Stretch(35, 35).Picture
+
+  TableView1.Rows.Height = 35
 
   Me.Show()
 
@@ -710,6 +714,7 @@ Public Sub gTask(sTask As String)
             ProgressBar1.Value = 1
             If mdl.Count > 0 Then
               hFCAD.cImport = mdl
+              Appmain.hFcad.Form_Activate()
             Endif
             APPMain.hFCAD.Regen
             ProgressBar1.Visible = False
@@ -719,6 +724,7 @@ Public Sub gTask(sTask As String)
             ProgressBar1.Value = 1
             If mdl.Count > 0 Then
               hFCAD.cImport = mdl
+              Appmain.hFcad.Form_Activate()
             Endif
             APPMain.hFCAD.Regen
             ProgressBar1.Visible = False
@@ -894,32 +900,32 @@ Public Sub Workspace1_Activate()
 
 End
 
-Public Sub tobLayers_Click()
+' Public Sub tobLayers_Click()
+'
+'   Dim FLay As FLayers
+'
+'   FLay = New FLayers
+'   FLay.Run(hFCAD.cModel)
+'
+' End
 
-  Dim FLay As FLayers
-
-  FLay = New FLayers
-  FLay.Run(hFCAD.cModel)
-
-End
-
-Public Sub dprop_Click()
-
-  Dim obj As Object
-  Dim FLay As FLayers
-
-  obj = Last
-
-  Select obj.Tag
-    Case "layer"
-      CurrentLayer = obj.Text
-      Print CurrentLayer
-    Case "OpenFormLayer"
-      FLay = New FLayers
-      FLay.Run(hFCAD.cModel)
-  End Select
-
-End
+' Public Sub dprop_Click()
+'
+'   Dim obj As Object
+'   Dim FLay As FLayers
+'
+'   obj = Last
+'
+'   Select obj.Tag
+'     Case "layer"
+'       CurrentLayer = obj.Text
+'       Print CurrentLayer
+'     Case "OpenFormLayer"
+'       FLay = New FLayers
+'       FLay.Run(hFCAD.cModel)
+'   End Select
+'
+' End
 
 Public Sub KillJob() ' no funciona bien
   ''TODO: Mejorar esta sub o hacer una nueva para CANCELAR el comando actual
@@ -1261,6 +1267,21 @@ Public Sub btnSave_Click()
               e.ColorToPaint = cProp["Color"]
             Endif
 
+          Case "LineType"
+            ' cProp["LineType"] = TableView1[r, 1].Text
+            ' If e.LineTypeName <> cProp["LineTypeName"] Then
+            '   Changed = True
+            '   e.LineType = cProp["LineType"]
+            '   For Each lt In lty
+            '     If lt["name"] = cProp["LineTypeName"] Then
+            '       e.LineType = lt["id"]
+            '       Break
+            '     Endif
+            '   Next
+            ' Endif
+
+          Case "LineWidth"
+
         End Select
       Next
 
@@ -1285,14 +1306,26 @@ Public Sub LoadPropertiesList(eFilter As String)
 
   Dim e As Entity
   Dim i As Integer
+  Dim xC As Class
+  Dim sym As String
+  Dim fym As String
 
   cProp.Clear
+  cRaw.Clear
   TableView1.Clear
+  TableView3.Clear
 
   For i = 0 To APPMain.hFCAD.arrEntities.Max
     e = APPMain.hFCAD.arrEntities[i]
-
     If e.Selected Then
+      If cRaw.Count = 0 Then
+        xC = Classes["Entity"]
+        For Each sym In xC.Symbols
+          fym &= sym & "\n"
+          cRaw.Add(e.Block, sym)
+        Next
+        File.Save(User.home &/ "entity-symbols.txt", fym)
+      Endif
 
       ' Layers
       If cProp.Exist("Layer") = False Then
@@ -1321,6 +1354,15 @@ Public Sub LoadPropertiesList(eFilter As String)
         Endif
       Endif
 
+      'LineWidth
+      If cProp.Exist("Width") = False Then
+        cProp.Add([e.LineType], "Width")
+      Else
+        If cProp["Width"].Exist(e.LineWidth) = False Then
+          cProp["Width"].Add(e.LineWidth)
+        Endif
+      Endif
+
     Endif
   Next
 
@@ -1328,12 +1370,21 @@ Public Sub LoadPropertiesList(eFilter As String)
   TableView1.Rows.Count = 0
   TableView1.Rows.Count = cProp.Count
 
+  ' TableView3.Columns.Count = 2
+  ' TableView3.Rows.Count = 0
+  ' TableView3.Rows.Count = e.
+
 End
 
 Public Sub TableView1_Data(Row As Integer, Column As Integer)
 
   Dim prop As Variant
   Dim i As Integer
+  Dim r As Integer
+  Dim g As Integer
+  Dim b As Integer
+  Dim img As Image
+  Dim z As Integer
 
   For Each prop In cProp
     If i = Row Then
@@ -1348,6 +1399,19 @@ Public Sub TableView1_Data(Row As Integer, Column As Integer)
                   'TableView1[Row, Column].Text = 0
                 Case 1
                   TableView1[Row, Column].Text = prop[0]
+                  Select cProp.Key
+                    Case "Color"
+                      r = CInt(Split(Starter.ColorsRGB[prop[0]], ",")[0])
+                      g = CInt(Split(Starter.ColorsRGB[prop[0]], ",")[1])
+                      b = CInt(Split(Starter.ColorsRGB[prop[0]], ",")[2])
+                      z = TableView1.Rows.Height - 12
+
+                      TableView1[Row, Column].Text = prop[0] 'CurrentColor
+                      imgColor = New Image(z, z, Color.RGB(r, g, b), 0)
+                      img = dsk.ImageFrame(imgColor.Stretch(z, z))
+                      TableView1[Row, Column].Picture = img.Picture
+
+                  End Select
 
                 Case Else
                   TableView1[Row, Column].Text = "*" & ("varies") & "*"
@@ -1369,6 +1433,17 @@ Public Sub TableView1_Click()
 
   Dim lrx As New String[]         ''Layers list
   Dim lay As Variant
+  Dim FClr As FColors16
+  Dim r As Integer
+  Dim g As Integer
+  Dim b As Integer
+  Dim img As Image
+  Dim imgColor As Image
+  Dim z As Integer
+  'Linetype
+  Dim lst As FLtypes
+  Dim vrx As Variant[]
+  Dim img2 As Image
 
   For Each lay In APPMain.hFCAD.cModel["Layers"]
     lrx.Add(lay["name"])
@@ -1380,7 +1455,55 @@ Public Sub TableView1_Click()
     Case "Layer"
       TableView1.Edit(lrx, True)
     Case "Color"
-      TableView1.Edit()
+      If SelectingColor = False Then
+        FClr = New FColors16([Me.ScreenX + TableView1.Current.X, Me.ScreenY], Me)
+        FClr.Border = False
+        FClr.Stacking = Window.Above
+        FClr.Show()
+        Do
+          If SelectingColor = True Then
+            r = CInt(Split(Starter.ColorsRGB[CurrentColor], ",")[0])
+            g = CInt(Split(Starter.ColorsRGB[CurrentColor], ",")[1])
+            b = CInt(Split(Starter.ColorsRGB[CurrentColor], ",")[2])
+
+            z = TableView1.Rows.Height - 12
+
+            TableView1[TableView1.Row, TableView1.Column].Text = CurrentColor
+            imgColor = New Image(z, z, Color.RGB(r, g, b), 0)
+            img = dsk.ImageFrame(imgColor.Stretch(z, z))
+            TableView1[TableView1.Row, TableView1.Column].Picture = img.Picture
+
+            Print CurrentColor
+            SelectingColor = False
+            Break
+          Else
+            Wait 0.01
+          Endif
+        Loop
+      Endif
+    Case "LType"
+      If SelectingLtype = False Then
+        lst = New FLtypes(Starter.cStyles, [TableView1.ScreenX, TableView1.ScreenY + TableView1.Rows.Height], Me)
+        lst.Run()
+        Do
+          If SelectingLtype = True Then
+            vrx = Starter.cStyles[TableView1[TableView1.Row, 1].Text]
+            If vrx.Count > 2 Then
+              If Object.Type(vrx[2]) = "Image" Then
+                img2 = vrx[2]
+                TableView1[TableView1.Row, 1].Picture = img2.Picture
+                'btnLtypes.Picture = img2.Picture
+                'btnLtypes.Tooltip = vrx[1]
+              Endif
+            Endif
+            SelectingLtype = False
+            Break
+          Else
+            Wait 0.1
+          Endif
+        Loop
+      Endif
+
   End Select
 
 End
@@ -1503,6 +1626,15 @@ Public Sub Form_KeyPress()
             '    KeysAccumulator = ""
             'pnlProperties.Visible = False
             'pnlDebug.Visible = False
+
+          Case Asc("3") ' Raw properties for debuging
+            If RawFlag = False Then
+              pnlRaw.Visible = True
+              RawFlag = True
+            Else
+              pnlRaw.Visible = False
+              RawFlag = False
+            Endif
 
           Case Asc("z"), Asc("Z") ' Undo
 

@@ -376,7 +376,7 @@
       Spacing = True
       Margin = True
       { Panel3 SidePanel
-        MoveScaled(2,1,24,62)
+        MoveScaled(2,3,24,62)
         Arrangement = Arrange.Vertical
         Orientation = Align.Right
         { pnlEntities Panel
@@ -433,7 +433,7 @@
         }
       }
       { pnlProperties Panel
-        MoveScaled(75,3,24,50)
+        MoveScaled(75,2,24,50)
         Visible = False
         Arrangement = Arrange.Vertical
         { btnRefresh Button
@@ -445,7 +445,7 @@
           ReadOnly = True
         }
         { TableView1 TableView
-          MoveScaled(2,13,14,24)
+          MoveScaled(2,17,14,25)
           Expand = True
           Border = False
         }
@@ -455,10 +455,20 @@
         }
       }
       { pnlBlock Panel
-        MoveScaled(100,3,23,50)
+        MoveScaled(100,2,23,50)
         Visible = False
         { TableView2 TableView
-          MoveScaled(5,10,14,24)
+          MoveScaled(2,17,14,24)
+          Expand = True
+          Border = False
+        }
+      }
+      { pnlRaw Panel
+        MoveScaled(125,2,24,50)
+        Visible = False
+        Arrangement = Arrange.Vertical
+        { TableView3 TableView
+          MoveScaled(2,3,14,25)
           Expand = True
           Border = False
         }
