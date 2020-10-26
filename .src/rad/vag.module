@@ -24,6 +24,69 @@
 
 Export
 
+'' Return a float value, trim spaces, replace coma to point if is necesary.
+
+Public Function CFloat(var As Variant) As Float
+
+  Dim str As String
+  Dim flo As Float
+
+  Select TypeOf(var)
+    Case gb.String
+      str = Trim(var)
+      If InStr(var, ",") > 0 Then
+        str = Replace(str, ",", ".")
+        If InStr(var, " ") > 0 Then
+          str = Replace(str, " ", "")
+        Endif
+      Endif
+      flo = CFloat(str)
+
+    Case gb.Float
+      flo = var
+
+    Case gb.Integer, gb.Byte, gb.Long, gb.Short
+      flo = CFloat(var)
+
+  End Select
+
+  Return flo
+
+End
+
+'' Return a float value, trim spaces, replace coma to point if is necesary.
+
+Public Function CInt(var As Variant) As Integer
+
+  Dim str As String
+  Dim int As Integer
+
+  Select TypeOf(var)
+    Case gb.String
+      str = Trim(var)
+      If InStr(var, ",") > 0 Then
+        str = Replace(str, ",", ".")
+        If InStr(var, " ") > 0 Then
+          str = Replace(str, " ", "")
+        Endif
+      Endif
+      If InStr(str, ".") Then
+        str = Split(str, ".")[0]
+      Endif
+      int = CInt(str)
+
+    Case gb.Float
+      int = Int(var)
+
+    Case gb.Integer, gb.Byte, gb.Long, gb.Short
+      int = CInt(var)
+
+  End Select
+
+  Return int
+
+End
+
 Public Function Formula(str As String) As String
 
   Dim r As String

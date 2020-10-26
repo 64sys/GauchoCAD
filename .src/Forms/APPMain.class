@@ -66,6 +66,9 @@ Public cMod As New Collection       '' All drawings common collection
 Public cProp As New Collection      '' Properties list
 Private iTheme As Integer           '' Theme luminance (determine if Dark or Light)
 
+'Public iSteps As Integer            '' Total steps for Progressbar
+'Public iSDone As Integer            '' Done steps for Progressbar
+
 Public Sub Run(cin As Collection)
 
   Dim obj As Object
@@ -200,6 +203,19 @@ Public Sub Run(cin As Collection)
   btnOrtho.Picture = Image.Load("./svg/locks/ortho.svg").Stretch(35, 35).Picture
 
   Me.Show()
+
+End
+
+Public Sub Progress(iSteps As Integer, iSDone As Integer)
+
+  If iSteps > iSDone Then
+    'iSDone = iSteps - 1
+    ProgressBar1.Value = CFloat(iSDone) / CFloat(iSteps)
+    ProgressBar1.Refresh
+    Wait 0.0001
+  Else
+    ProgressBar1.Visible = False
+  Endif
 
 End
 
@@ -621,7 +637,6 @@ Public Sub gTask(sTask As String)
 
   Dim hFConfig As FConfig                 '' Edit program configuration
   Dim hFAbout As FAbout                  '' Formulario que muestra informacin del programa
-  'Dim hFImport As FImport                 '' Impor from others formats
   Dim w As Window
   Dim wtag As String
 
@@ -668,7 +683,6 @@ Public Sub gTask(sTask As String)
       hFCAD.cModel["File"] = FilePath
       cad.SaveGaucho(FilePath, hFCAD.cModel)
       hFCAD.Text = File.Name(FilePath)
-      'Print hFCAD.CurrentFile
 
     Catch
       Message.Info(Error.Text)
@@ -684,6 +698,8 @@ Public Sub gTask(sTask As String)
       cadDxf.Start(, 1)
 
     Case "import"
+      ProgressBar1.Visible = True
+      ProgressBar1.Value = 0
       stx = dsk.FileChooser(User.Home, ["dxf", "dwg"])
       If stx.count > 0 Then
         FilePath = stx[0]
@@ -691,16 +707,22 @@ Public Sub gTask(sTask As String)
         Select String.LCase(File.Ext(FilePath))
           Case "dxf"
             mdl = cad.DXFImport(FilePath)
+            ProgressBar1.Value = 1
             If mdl.Count > 0 Then
               hFCAD.cImport = mdl
             Endif
+            APPMain.hFCAD.Regen
+            ProgressBar1.Visible = False
 
           Case "dwg"
-            'Message.Info(("Not implemented yet"))
             mdl = cad.DWGImport(FilePath)
+            ProgressBar1.Value = 1
             If mdl.Count > 0 Then
               hFCAD.cImport = mdl
             Endif
+            APPMain.hFCAD.Regen
+            ProgressBar1.Visible = False
+
         End Select
 
       Endif
