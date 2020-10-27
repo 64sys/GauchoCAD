@@ -134,11 +134,11 @@ Public Function inPolySegment(poligon As Float[], px As Float, py As Float, Opti
 
   Dim i As Integer
 
-    If tolerance = 0 Then tolerance = NumericTolerance
+  If tolerance = 0 Then tolerance = NumericTolerance
 
-    For i = 0 To poligon.Count - 4 Step 2
+  For i = 0 To poligon.Count - 4 Step 2
 
-        If PointToLineDistance([px, py], poligon.Copy(i, 4)) <= tolerance Then Return (i + 2) / 2
+    If PointToLineDistance([px, py], poligon.Copy(i, 4)) <= tolerance Then Return (i + 2) / 2
 
   Next
 
@@ -375,6 +375,121 @@ Public Function lineLineIntersection(A As Float[], B As Float[], C As Float[], D
     Dim y As Float = (a1 * c2 - a2 * c1) / determinant
     Return [x, y]
   End If
+
+End
+'' Devuelve la interseccion de A-B con D-C
+
+Public Function lineLineIntersection2(Ax As Float, Ay As Float, Bx As Float, By As Float, Cx As Float, Cy As Float, Dx As Float, Dy As Float) As Float[]
+
+  '     / / Line AB represented As A1x + b1y = c1
+  Dim a1 As Float = By - Ay
+  Dim b1 As Float = Ax - Bx
+  Dim c1 As Float = a1 * (Ax) + b1 * (Ay)
+  '
+  '     / / Line CD represented As A2x + b2y = c2
+  Dim a2 As Float = Dy - Cy
+  Dim b2 As Float = Cx - Dx
+  Dim c2 As Float = a2 * (Cx) + b2 * (Cy)
+  '
+  Dim determinant As Float = a1 * b2 - a2 * b1
+  '
+  If (determinant = 0) Then
+    '
+    '         / / The lines are parallel.This Is Simplified
+    '         / / by returning a pair Of FLT_MAX
+    Return [Ax, Ay]
+    '
+  Else
+    '
+    Dim x As Float = (b2 * c1 - b1 * c2) / determinant
+    Dim y As Float = (a1 * c2 - a2 * c1) / determinant
+    Return [x, y]
+  End If
+
+End
+
+' Devuelve un conjunto de lineas que representan la interseccion de una linea con una polilinea cerrada
+Public Function LinePolyIntersection(flxLine As Float[], flxPoly As Float[]) As Float[]
+
+  ' la polylinea se considera cerrada y de mas de 3 puntos, caso contrario se devuelve la linea sin cambios
+  ' la linea es de dos puntos , si esta afuera de la polilinea, se devuelve un array vacio
+  ' Chequeos previos:
+  Dim FirstInside As Boolean
+  Dim LastInside As Boolean
+  Dim i As Integer
+  Dim flxRta As New Float[]
+
+  If flxLine.Count <> 4 Then Return []
+
+  If flxPoly.Count < 6 Then Return flxLine.Copy()
+
+  ' fuera de los casos triviales, entonces armo el array de intersecciones
+  Dim flxIntersections As New Float[]
+
+  ' determino si el primer punto esta dentro de la poly
+  If puntos.isInside(flxPoly, flxLine[0], flxLine[1]) Then FirstInside = True
+
+  ' y el ultimo
+  If puntos.isInside(flxPoly, flxLine[2], flxLine[3]) Then LastInside = True
+
+  ' busco todas las intersecciones de la linea con la polilinea
+  For i = 0 To flxPoly.count - 4 Step 2
+    If puntos.doIntersect(flxLine[0], flxLine[1], flxLine[2], flxLine[3], flxPoly[i + 0], flxPoly[i + 1], flxPoly[i + 2], flxPoly[i + 3]) Then
+      flxIntersections.Insert(puntos.lineLineIntersection2(flxLine[0], flxLine[1], flxLine[2], flxLine[3], flxPoly[i + 0], flxPoly[i + 1], flxPoly[i + 2], flxPoly[i + 3]))
+    Endif
+  Next
+  ' ' y el cierre de la poly
+  ' If puntos.doIntersect(flxLine[0], flxLine[1], flxLine[2], flxLine[3], flxPoly[flxPoly.Max - 1], flxPoly[flxPoly.Max], flxPoly[0], flxPoly[1]) Then
+  '   flxIntersections.Insert(puntos.lineLineIntersection2(flxLine[0], flxLine[1], flxLine[2], flxLine[3], flxPoly[flxPoly.Max - 1], flxPoly[flxPoly.Max], flxPoly[0], flxPoly[1]))
+  ' Endif
+
+  ' si el primer punto esta adentro, pero no se da el caso particular que coincide con parte de la polilinea, lo agrego
+
+  If flxIntersections.Count > 0 Then
+
+    If FirstInside Xor (flxLine[0] = flxIntersections[0] And flxLine[1] = flxIntersections[1]) Then
+      flxRta.Insert(flxLine.Copy(0, 2))
+
+    End If
+
+    ' y luego agrego todas las intersecciones
+    flxRta.Insert(flxIntersections.Copy())
+
+    ' si el ultimo punto esta adentro, pero no se da el caso particular que coincide con parte de la polilinea, lo agrego
+    If LastInside Then
+      If (flxLine[2] <> flxIntersections[flxIntersections.Max - 1]) Or (flxLine[3] <> flxIntersections[flxIntersections.Max]) Then
+
+        flxRta.Insert(flxLine.Copy(2, 2))
+      End If
+    End If
+
+  Else
+
+    If FirstInside Then flxRta.Insert(flxLine.Copy(0, 2))
+    If LastInside Then flxRta.Insert(flxLine.Copy(2, 2))
+
+  End If
+
+  If flxRta.Count = 6 Then Return []
+  If flxRta.Count = 2 Then Return []
+
+  Return flxRta
+
+End
+
+' devuelve un conjunto de lineas que representan la interseccion de dos polilineas, la primera
+' es abierta; la segunda, cerrada
+Public Function PolyPolyIntersection(flxPolyOpen As Float[], flxPolyClosed As Float[]) As Float[]
+
+  Dim i As Integer
+
+  Dim flxRta As New Float[]
+
+  For i = 0 To flxPolyOpen.Count - 4 Step 2
+    flxRta.Insert(LinePolyIntersection(flxPolyOpen.Copy(i, 4), flxPolyClosed))
+  Next
+
+  Return flxRta
 
 End
 

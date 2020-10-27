@@ -30,9 +30,9 @@ Inherits ToolsBase
 
 Public Function Start(Optional Mode_ As Integer = 0) As Boolean
 
-  Dim ly As FLayers
+  Dim ly As FLayers1
 
-  ly = New FLayers
+  ly = New FLayers1
   ly.Text = ("Layers")
   ly.Run()
 

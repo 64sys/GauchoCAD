@@ -95,6 +95,7 @@ Public Function MouseDown(mouseX As Integer, mouseY As Integer) ' esta rutina es
         AppMain.SelectionRefresh()
       Endif
       Me.Active = False
+
       clsEntities.GLGenDrawListSel(0)
 
     Else

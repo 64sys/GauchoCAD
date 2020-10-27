@@ -64,6 +64,12 @@ Public Struct arrBlockSt
   entities As Entity[]
 End Struct
 
+Public LastHatch As Integer
+Public LastHatchFile As String
+Public LastScale As Float
+Public LastAngle As Float
+
+Public arrExtras As New Entity[]          ' For entities
 Public arrBlocks As New ArrBlockSt[]
 Public arrEntities As New Entity[]             '' were al elements live
 Public arrTmp As New Entity[]             '' Temporal array to put a copy of an entity before change something in it
@@ -131,7 +137,7 @@ Public Sub Form_Activate()
   Debug "activate " & Me.Title
   If FirstTime Then           ' esto ocurre cuando me llega un archivo cargado que tengo que mostrar por primera vez
     Debug "FirstTIme " & Me.Title
-    Debug "FirstTIme " & Me.Title
+
     gcd.ImportBlocks(cModel)
     gcd.ImportModel(cModel["Entities"], arrEntities)
     gcd.ApplyLayerProperties(1)

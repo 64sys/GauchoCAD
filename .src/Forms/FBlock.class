@@ -19,70 +19,70 @@ End
 
 Public Sub DrawingArea1_Draw()
 
-    Dim entidad As Entity
+  Dim entidad As Entity
 
-    If entyBlock.Count = 0 Then Return
+  If entyBlock.Count = 0 Then Return
 
-    Paint.Translate(DrawingArea1.w / 2 + (flxLimits[2] - flxLimits[0]) / 2 / entScale, DrawingArea1.h / 2 + (flxLimits[3] - flxLimits[1]) / 2 / entScale)
-    'Paint.Translate((flxLimits[2] - flxLimits[0]) / 2 / entScale, (flxLimits[3] - flxLimits[1]) / 2 / entScale)
-    Paint.Scale(entScale, -entScale)
+  Paint.Translate(DrawingArea1.w / 2 + (flxLimits[2] - flxLimits[0]) / 2 / entScale, DrawingArea1.h / 2 + (flxLimits[3] - flxLimits[1]) / 2 / entScale)
+  'Paint.Translate((flxLimits[2] - flxLimits[0]) / 2 / entScale, (flxLimits[3] - flxLimits[1]) / 2 / entScale)
+  Paint.Scale(entScale, -entScale)
 
-    For Each entidad In entyBlock
-        entidad.ClassHandler.draw2(entidad)
-    Next
+  For Each entidad In entyBlock
+    entidad.ClassHandler.draw2(entidad)
+  Next
 
 End
 
 Public Sub btnCAncel_Click()
 
-    Me.Close(0)
+  Me.Close(0)
 
 End
 
 Public Sub DirView1_Click()
 
-    Dim sFilename As String
+  Dim sFilename As String
 
-    ListBox1.Clear
-    For Each sFilename In Dir(DirView1.Current, "*.dxf")
+  ListBox1.Clear
+  For Each sFilename In Dir(DirView1.Current, "*.dxf")
 
-        ListBox1.Add(Left$(sFilename, -4))
-    Next
+    ListBox1.Add(Left$(sFilename, -4))
+  Next
 
 End
 
 Public Sub ListBox1_Click()
 
-    entyBlock.Clear
+  entyBlock.Clear
 
-    cadDxf.arrToFill = entyBlock
+  cadDxf.arrToFill = entyBlock
 
-    cadDxf.LoadFile(DirView1.Current &/ listBox1.Text & ".dxf")         ' cargo la entidad
+  cadDxf.LoadFile(DirView1.Current &/ listBox1.Text & ".dxf")         ' cargo la entidad
 
-    BlockName = listBox1.Text
+  BlockName = listBox1.Text
 
-    flxLimits = clsEntities.ComputeLimits(entyBlock)                    ' computo el tamaño de la entidad, y luego determino la escala
+  flxLimits = clsEntities.ComputeLimits(entyBlock)                    ' computo el tamaño de la entidad, y luego determino la escala
 
-    If Abs(flxLimits[2] - flxLimits[0]) > Abs(flxLimits[3] - flxLimits[1]) Then
+  If Abs(flxLimits[2] - flxLimits[0]) > Abs(flxLimits[3] - flxLimits[1]) Then
 
-        entScale = 200 / Abs(flxLimits[2] - flxLimits[0]) / 1.5
+    entScale = 200 / Abs(flxLimits[2] - flxLimits[0]) / 1.5
 
-    Else
+  Else
 
-        entScale = 200 / Abs(flxLimits[3] - flxLimits[1]) / 1.5
+    entScale = 200 / Abs(flxLimits[3] - flxLimits[1]) / 1.5
 
-    Endif
+  Endif
 
-    DrawingArea1.Refresh
+  DrawingArea1.Refresh
 
 End
 
 Public Sub btnOK_Click()
 
-    scaleX = Val(txtScalex.Text)
-    scaley = Val(txtScaley.Text)
-    degRotation = Val(txtRotation.Text)
-    mirrored = tbnMirrored.Value
-    Me.Close(1) ' por ahora , cualquier cosa distinta de cero es una intencion de insercion
+  scaleX = Val(txtScalex.Text)
+  scaley = Val(txtScaley.Text)
+  degRotation = Val(txtRotation.Text)
+  mirrored = tbnMirrored.Value
+  Me.Close(1) ' por ahora , cualquier cosa distinta de cero es una intencion de insercion
 
 End

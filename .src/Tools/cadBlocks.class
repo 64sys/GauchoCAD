@@ -24,120 +24,120 @@ Inherits ToolsBase
 Public Const Gender As String = "Blocks"
 
 Public Struct arrBlockSt
-    name As String
-    x As Float
-    y As Float
-    scaleX As Float
-    scaleY As Float
-    degRotation As Float
-    mirrored As Boolean
-    layer As String
-    entities As Entity[]
+  name As String
+  x As Float
+  y As Float
+  scaleX As Float
+  scaleY As Float
+  degRotation As Float
+  mirrored As Boolean
+  layer As String
+  entities As Entity[]
 End Struct
 
 Public eBlock As New ArrBlockSt
 
 Public Function Start(Optional filename As Variant, Optional _mode As Integer = 0) As Boolean
 
-    Dim xf As String[]
-    Dim f As String
-    Dim iREt As Integer
+  Dim xf As String[]
+  Dim f As String
+  Dim iREt As Integer
 
-    eBlock.entities = New Entity[]
-    iRet = FBlock.Showmodal()
+  eBlock.entities = New Entity[]
+  iRet = FBlock.Showmodal()
 
-    If iret = 0 Then Me.Finish
+  If iret = 0 Then Me.Finish
 
-    ' el user eligio un bloque y lo quiere insertar en algun punto
+  ' el user eligio un bloque y lo quiere insertar en algun punto
 
 End
 
 Public Sub Draw()
 
-    Dim ET As Entity, i As Integer
+  Dim ET As Entity, i As Integer
 
-    If FBlock.entyBlock.Count = 0 Then Return
+  If FBlock.entyBlock.Count = 0 Then Return
 
-    gl.PushMatrix
-    gl.Translatef(fBlock.x / appmain.hFcad.ScaleZoom, fBlock.y / appmain.hFcad.ScaleZoom, 0)
-    gl.Rotatef(FBlock.degRotation, 0, 0, 1)
-    gl.Scalef(FBlock.scaleX, fBlock.scaleY, 1)
+  gl.PushMatrix
+  gl.Translatef(fBlock.x / appmain.hFcad.ScaleZoom, fBlock.y / appmain.hFcad.ScaleZoom, 0)
+  gl.Rotatef(FBlock.degRotation, 0, 0, 1)
+  gl.Scalef(FBlock.scaleX, fBlock.scaleY, 1)
 
-    For Each ET In FBlock.entyBlock
-        'et.visible = True
+  For Each ET In FBlock.entyBlock
+    'et.visible = True
 
-        et.ClassHandler.Draw(et)
-    Next
+    et.ClassHandler.Draw(et)
+  Next
 
-    gl.PopMatrix
+  gl.PopMatrix
 
 End
 
 Public Function MouseMove(mouseX As Integer, mouseY As Integer) ' esta rutina es llamada por FCAD en el evento DrawingArea_MouseMove
 
-    fBlock.x = puntos.Near(appmain.hFcad.Xreal(mouseX))
-    fBlock.y = puntos.Near(appmain.hFcad.Yreal(mouseY))
+  fBlock.x = puntos.Near(appmain.hFcad.Xreal(mouseX))
+  fBlock.y = puntos.Near(appmain.hFcad.Yreal(mouseY))
 
-    ' y si tengo enganche?
+  ' y si tengo enganche?
 
-    If appmain.hFcad.iEntity[2] >= 0 Then
+  If appmain.hFcad.iEntity[2] >= 0 Then
 
-        ' esto re enganchado
+    ' esto re enganchado
 
-        fBlock.x = appmain.hFcad.iEntity[0]
-        fBlock.y = appmain.hFcad.iEntity[1]
+    fBlock.x = appmain.hFcad.iEntity[0]
+    fBlock.y = appmain.hFcad.iEntity[1]
 
-    End If
+  End If
 
 End
 
 Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' called by FCAD-> DrawingArea_MouseUp
 
-    ' creo el bloque (si no existe y luego el insert)
-    Dim entInsert As New Entity
-    Dim i, ie As Integer
-    Dim sBloque As String
-    Dim entPart As Entity
+  ' creo el bloque (si no existe y luego el insert)
+  Dim entInsert As New Entity
+  Dim i, ie As Integer
+  Dim sBloque As String
+  Dim entPart As Entity
 
-    ' busco el bloque
+  ' busco el bloque
 
-    For i = 0 To appmain.hFCAD.arrBlocks.Max
+  For i = 0 To appmain.hFCAD.arrBlocks.Max
 
-        If appmain.hFCAD.arrBlocks[i].name = FBlock.BlockName Then Break
+    If appmain.hFCAD.arrBlocks[i].name = FBlock.BlockName Then Break
 
+  Next
+
+  If i = appmain.hFCAD.arrBlocks.Count Then ' armo el bloque
+
+    appmain.hFCAD.arrBlocks.Add(eBlock)
+    eBlock.name = FBlock.BlockName
+    For ie = 0 To FBlock.entyBlock.Max
+      eBlock.entities.Add(clsEntities.ClonEntity(FBlock.entyBlock[ie]))
     Next
 
-    If i = appmain.hFCAD.arrBlocks.Count Then ' armo el bloque
+  End If
 
-        appmain.hFCAD.arrBlocks.Add(eBlock)
-        eBlock.name = FBlock.BlockName
-        For ie = 0 To FBlock.entyBlock.Max
-            eBlock.entities.Add(clsEntities.ClonEntity(FBlock.entyBlock[ie]))
-        Next
+  ' ahora creo el insert
 
-    End If
+  appmain.hFCAD.arrEntities.Add(entInsert)
+  entInsert.Block = eBlock.name
+  entInsert.ClassHandler = cadInsert
+  entInsert.Layer = appmain.CurrentLayer
+  entInsert.Gender = cadInsert.Gender
+  entInsert.P.Add(fBlock.x)
+  entInsert.P.Add(fBlock.y)
 
-    ' ahora creo el insert
+  entInsert.fParam.Add(FBlock.scaleX)
+  entInsert.fParam.Add(FBlock.scaleY)
+  entInsert.fParam.Add(FBlock.degRotation)
+  entInsert.ClassHandler.Finish(entInsert, -1)
 
-    appmain.hFCAD.arrEntities.Add(entInsert)
-    entInsert.Block = eBlock.name
-    entInsert.ClassHandler = cadInsert
-    entInsert.Layer = appmain.CurrentLayer
-    entInsert.Gender = cadInsert.Gender
-    entInsert.P.Add(fBlock.x)
-    entInsert.P.Add(fBlock.y)
+  clsEntityBuilder.LastEntity = entInsert                                       ' save it to repeat on rigth click
 
-    entInsert.fParam.Add(FBlock.scaleX)
-    entInsert.fParam.Add(FBlock.scaleY)
-    entInsert.fParam.Add(FBlock.degRotation)
-    entInsert.ClassHandler.Finish(entInsert, -1)
+  gcd.clsJobPrevious = Me
+  gcd.clsJob = clsDefaultJob
+  clsDrawingAids.CleanTexts
 
-    clsEntityBuilder.LastEntity = entInsert                                       ' save it to repeat on rigth click
-
-    gcd.clsJobPrevious = Me
-    gcd.clsJob = clsDefaultJob
-    clsDrawingAids.CleanTexts
-
-    appmain.hFCAD.Regen
+  appmain.hFCAD.Regen
 
 End
