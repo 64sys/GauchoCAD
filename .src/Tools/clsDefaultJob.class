@@ -84,6 +84,8 @@ Public Function MouseDown(mouseX As Integer, mouseY As Integer) ' esta rutina es
 
             Endif
 
+            Me.PoiChecking = True
+
             Break
 
           Endif

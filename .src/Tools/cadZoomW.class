@@ -28,88 +28,88 @@ Create Static
 Public Const Gender As String = "ZoomW"
 
 Public Function Start(Optional ElemToBuild As Variant, Optional _Mode As Integer = 0) As Boolean
-    ' Modes:
-    '       0 = Move, all points in the element must be selected, or click on it.
-    '       1 = Stretch, selection may be partial, each element is called to see if the support stretching
+  ' Modes:
+  '       0 = Move, all points in the element must be selected, or click on it.
+  '       1 = Stretch, selection may be partial, each element is called to see if the support stretching
 
-    Me.Mode = _Mode
-    Me.PoiChecking = False
+  Me.Mode = _Mode
+  Me.PoiChecking = False
 
 End
 
 Public Function MouseDown(mouseX As Integer, mouseY As Integer) ' esta rutina es llamada por FCAD en el evento DrawingArea_MouseDown
 
-    If Mouse.Left Then
-        Me.SelStartX = mouseX
-        Me.SelStartY = mouseY
-        Me.SelEndX = Me.SelStartX
-        Me.SelEndy = Me.SelStartY
+  If Mouse.Left Then
+    Me.SelStartX = mouseX
+    Me.SelStartY = mouseY
+    Me.SelEndX = Me.SelStartX
+    Me.SelEndy = Me.SelStartY
 
-        Me.SelStartXr = APPMain.hFCAD.Xreal(mouseX)
-        Me.SelStartYr = APPMain.hFCAD.Yreal(mouseY)
+    Me.SelStartXr = APPMain.hFCAD.Xreal(mouseX)
+    Me.SelStartYr = APPMain.hFCAD.Yreal(mouseY)
 
-        Me.Active = True
-    End If
+    Me.Active = True
+  End If
 
 End
 
 Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' esta rutina es llamada por FCAD en el evento DrawingArea_MouseUp
 
-    Me.SelEndX = mousex
-    Me.SelEndy = mouseY
-    Me.Active = False
+  Me.SelEndX = mousex
+  Me.SelEndy = mouseY
+  Me.Active = False
 
-    ' corrijo para start<end
-    If Me.SelStartX > Me.SelEndX Then Swap Me.SelStartX, Me.SelEndX
-    If Me.SelStartY < Me.SelEndy Then Swap Me.SelStartY, Me.SelEndy                     ' this is FLIPPED
+  ' corrijo para start<end
+  If Me.SelStartX > Me.SelEndX Then Swap Me.SelStartX, Me.SelEndX
+  If Me.SelStartY < Me.SelEndy Then Swap Me.SelStartY, Me.SelEndy                     ' this is FLIPPED
 
-    ' Paso a coordenadas reales
-    Me.SelStartXr = appmain.hFcad.Xreal(Me.SelStartX)
-    Me.SelStartYr = appmain.hFcad.Yreal(Me.SelStartY)
-    Me.SelEndXr = appmain.hFcad.Xreal(Me.SelEndX)
-    Me.SelEndyr = appmain.hFcad.Yreal(Me.SelEndy)
+  ' Paso a coordenadas reales
+  Me.SelStartXr = appmain.hFcad.Xreal(Me.SelStartX)
+  Me.SelStartYr = appmain.hFcad.Yreal(Me.SelStartY)
+  Me.SelEndXr = appmain.hFcad.Xreal(Me.SelEndX)
+  Me.SelEndyr = appmain.hFcad.Yreal(Me.SelEndy)
 
-    ' veo si el rectangulo es suficientemente grande como para representar una seleccion por rectangulo
-    If (Me.SelEndX - Me.SelStartX + (-Me.SelEndy + Me.SelStartY)) < 10 Then ' es un rectangulo minusculo
+  ' veo si el rectangulo es suficientemente grande como para representar una seleccion por rectangulo
+  If (Me.SelEndX - Me.SelStartX + (-Me.SelEndy + Me.SelStartY)) < 10 Then ' es un rectangulo minusculo
 
-        clsDrawingAids.ErrorMessage = ("Window is too small")
+    clsDrawingAids.ErrorMessage = ("Window is too small")
 
-    Else
-        ' engañamos a estas vars
+  Else
+    ' engañamos a estas vars
 
-        appmain.hFCAD.Xmayor = Me.SelEndXr
-        appmain.hFCAD.Xmenor = Me.SelStartXr
+    appmain.hFCAD.Xmayor = Me.SelEndXr
+    appmain.hFCAD.Xmenor = Me.SelStartXr
 
-        appmain.hFCAD.Ymayor = Me.SelEndYr
-        appmain.hFCAD.Ymenor = Me.SelStartYr
+    appmain.hFCAD.Ymayor = Me.SelEndYr
+    appmain.hFCAD.Ymenor = Me.SelStartYr
 
-        cadZoomE.Start(, 1)
-        Me.Finish
+    cadZoomE.Start(, 1)
+    Me.Finish
 
-    End If
+  End If
 
 End
 
 Public Function MouseMove(mouseX As Integer, mouseY As Integer) ' esta rutina es llamada por FCAD en el evento DrawingArea_MouseMove
 
-    Me.SelEndX = mousex
+  Me.SelEndX = mousex
 
-    Me.SelEndy = mouseY
+  Me.SelEndy = mouseY
 
-    Me.SelEndXr = APPMain.hFCAD.Xreal(mouseX)
-    Me.SelEndYr = APPMain.hFCAD.Yreal(mouseY)
+  Me.SelEndXr = APPMain.hFCAD.Xreal(mouseX)
+  Me.SelEndYr = APPMain.hFCAD.Yreal(mouseY)
 
-    appmain.hFCAD.redraw
+  appmain.hFCAD.redraw
 
 End
 
 Public Sub Draw() ' esta rutina es llamada por FCAD en el evento DrawingArea_Draw
-    ' por ultimo, y para que se vea arriba, la seleccion
+  ' por ultimo, y para que se vea arriba, la seleccion
 
-    If Not Me.Active Then Return
+  If Not Me.Active Then Return
 
-    Dim xyStart, xyEnd As Float[]
+  Dim xyStart, xyEnd As Float[]
 
-    GLplus.Rectangle2D(Me.SelStartXr, Me.SelStartYr, Me.SelEndXr - Me.SelStartXr, Me.SelEndYr - Me.SelStartYr,,,,, Color.DarkBlue, 1, 2)
+  GLplus.Rectangle2D(Me.SelStartXr, Me.SelStartYr, Me.SelEndXr - Me.SelStartXr, Me.SelEndYr - Me.SelStartYr,,,,, Color.DarkBlue, 1, 0, 2)
 
 End
