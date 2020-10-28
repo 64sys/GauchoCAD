@@ -28,7 +28,7 @@ Create Static
 Public Const Gender As String = "Default"
 
 Public EntityForEdit As Entity
-Public iEntityForEdit As Integer
+Public iEntityForEdit As Integer = -1
 Public GripPoint As Integer = -1
 Public dX As Float
 Public dY As Float
@@ -85,6 +85,7 @@ Public Function MouseDown(mouseX As Integer, mouseY As Integer) ' esta rutina es
             Endif
 
             Me.PoiChecking = True
+            appmain.hFCAD.flgShowPOIinfo = True
 
             Break
 
@@ -158,6 +159,7 @@ Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' esta rutina es l
     EntityForEdit.ClassHandler.buildpoi(EntityForEdit)
     GripPoint = -1
     clsEntities.glGenDrawList(iEntityForEdit)
+    iEntityForEdit = -1
     'Me.Finish()
 
   Else
@@ -174,6 +176,16 @@ Public Function MouseMove(mouseX As Integer, mouseY As Integer) ' esta rutina es
   Me.SelEndy = mouseY
   Me.SelEndXr = appmain.hFcad.Xreal(Me.SelEndX)
   Me.SelEndyr = appmain.hFcad.Yreal(Me.SelEndy)
+  If (appmain.hFcad.iEntity[2] >= 0) Then
+
+    Me.SelEndXr = appmain.hFcad.iEntity[0]
+    Me.SelEndYr = appmain.hFcad.iEntity[1]
+
+  Else
+    Me.SelEndXr = appmain.hFcad.Xreal(Me.SelEndX)
+    Me.SelEndyr = appmain.hFcad.Yreal(Me.SelEndy)
+
+  End If
 
   If Me.Active Then
 

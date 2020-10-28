@@ -33,6 +33,7 @@ Public Sub ComboBox1_Click()
 
   APPMain.hFCAD.LastHatch = ComboBox1.Index
   APPMain.hFCAD.LastHatchFile = Application.Path &/ "patterns" &/ ComboBox1.Text & ".dxf"
+  APPMain.hFCAD.LastHatchPattern = ComboBox1.Text
 
 End
 

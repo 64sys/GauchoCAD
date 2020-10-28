@@ -108,7 +108,7 @@ Public Sub DibujaHelper()
 
   trabajoYteclado = HelperTrabajo & " > " & sNext & appmain.KeysAccumulator & PromtSlash
 
-  'Texting(trabajoYteclado, 10 - appmain.hFcad.glarea1.w / 2, 10 - appmain.hFcad.glarea1.h / 2, Starter.flgWindowInfoColor) ' Tincho - toma color de la configuración
+  Texting(trabajoYteclado, 10 - appmain.hFcad.glarea1.w / 2, 10 - appmain.hFcad.glarea1.h / 2, Starter.flgWindowInfoColor) ' Tincho - toma color de la configuración
 
   HelperDibujo = ""
   If gcd.Orthogonal Then HelperDibujo = "F8-Ortho"

@@ -77,6 +77,7 @@ Public Function Start(Optional filename As Variant, Optional _mode As Integer = 
         entHatch.Gender = "Hatch"
         entHatch.ClassHandler = cadHatch
         entHatch.StringData.Add(APPMain.hFCAD.LastHatchFile)
+        entHatch.StringData.Add(APPMain.hFCAD.LastHatchPattern)
         iRet = FHatch.Showmodal()
 
         Debug APPMain.hFCAD.LastHatchFile

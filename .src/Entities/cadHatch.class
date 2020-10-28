@@ -107,6 +107,7 @@ Public Function BuildPOI(oE As Entity, Optional arrIndex As Integer = -1) As Int
   If arrIndex < 0 Then arrIndex = appmain.hFCAD.arrEntities.Max       ' si este valor no es provisto , estos POI son de la ultima entidad
   Dim i As Integer
 
+  oe.PoiPoints.Clear
   oe.poiPoints.insert([oE.P[0], oE.P[1]])
   oe.poiType.Add(gcd.poiEndPoint)
   'oe.poiEntities.Add(arrIndex)
@@ -163,5 +164,26 @@ Public Sub Cancel()
   gcd.clsJob = clsDefaultJob
   clsDrawingAids.CleanTexts
   appmain.hFCAD.redraw
+
+End
+
+Public Sub Translate(e As Entity, dX As Float, dY As Float, Optional OnlySelected As Boolean = False)
+
+  cadPLine.Translate(e, dX, dY, OnlySelected)
+  puntos.Translate(e.PolyLine, dx, dy)
+
+End
+
+Public Sub Rotate(e As Entity, radians As Float)
+
+  cadPLine.Rotate(e, radians)
+  puntos.Rotate(e.PolyLine, radians)
+
+End
+
+Public Sub Scale(e As Entity, sX As Float, sY As Float)
+
+  cadPLine.Scale(e, sx, sy)
+  puntos.Scale(e.PolyLine, sx, sy)
 
 End

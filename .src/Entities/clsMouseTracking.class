@@ -160,6 +160,10 @@ Public Function CheckAboveEntity(xr As Float, Yr As Float, tolerance As Float) A
   flgSearchingEntity = True
   For e = 0 To APPMain.hFCAD.arrEntities.Max      ' for each es 10 veces mas lento que recorrer el array
 
+    ' En el caso que la entidad sea la que estoy editando desde los grips, tengo que evitarla
+
+    If e = clsDefaultJob.iEntityForEdit Then Continue
+
     Select Case APPMain.hFCAD.arrEntities[e].Gender
 
       Case "Line"
@@ -249,6 +253,10 @@ Public Function CheckAboveEntity(xr As Float, Yr As Float, tolerance As Float) A
         ' Text, MText, Solid y otros
         If puntos.isInside(APPMain.hFCAD.arrEntities[e].Polygon, xr, yr) Then Break
 
+      Case "Hatch"
+
+        If puntos.isInside(APPMain.hFCAD.arrEntities[e].P, xr, yr) Then Break
+
     End Select
 
     modUtils.DoEvents(0.00100)
@@ -263,7 +271,7 @@ ExitSearch:
 
     Return -1
   Else
-
+    Debug "Encontre una entidad " & APPMain.hFCAD.arrEntities[e].Gender
     Return e
 
   End If

@@ -66,6 +66,7 @@ End Struct
 
 Public LastHatch As Integer
 Public LastHatchFile As String
+Public LastHatchPattern As String
 Public LastScale As Float
 Public LastAngle As Float
 
@@ -99,6 +100,7 @@ Public poiPoligonEntities As New Integer[]      '' related entity
 Public LastPoint As New Float[]                '' ultimo punto marcado o null si no existe
 Public iEntity As New Single[]             '' las coordenadas del punto encontrado y el tipo de punto
 Public flgShowPOIinfo As Boolean = True
+Public EntitySearchMode As Integer = 0  ' 0 = no search; 1 = search entity ; 2 = search POI
 
 ' OpenGl stuff
 Public GlListAllEntities As Integer
@@ -282,10 +284,23 @@ Public Sub GLArea1_MouseMove()
   Select Case gcd.clsJob.gender
 
     Case "Default"                                                  ' 1. Seleccionando
-      flgShowPOIinfo = False
+
       If gcd.clsJob.poichecking Then
-        If Not clsMouseTracking.flgSearchingEntity Then
-          iEntity[3] = clsMouseTracking.CheckAboveEntity(Xreal(mouse.x), Yreal(mouse.Y), Metros(16))
+        If gcd.clsJob.iEntityForEdit < 0 Then
+          If Not clsMouseTracking.flgSearchingEntity Then
+            iEntity[3] = clsMouseTracking.CheckAboveEntity(Xreal(mouse.x), Yreal(mouse.Y), Metros(16))
+          End If
+        Else
+          If Not clsMouseTracking.flgSearchingPOI Then
+            iEntity = clsMouseTracking.CheckPOI(Xreal(mouse.x), Yreal(mouse.Y))
+          Else    ' estoy buscando, pero me movi, asi que me desengancho del POI anterior
+
+            iEntity[0] = Xreal(mouse.x)
+            iEntity[1] = Yreal(mouse.y)
+            iEntity[2] = -1                 ' POI type
+            iEntity[3] = -1                 ' Hooked entity
+
+          End If
         End If
       End If
       gcd.clsJob.MouseMove(mouse.x, mouse.y) ' dispatch event to the Job
@@ -300,6 +315,8 @@ Public Sub GLArea1_MouseMove()
 
         Endif
       End If
+
+      '======================= otra Tool
     Case Else
 
       If gcd.clsJob.poichecking Then
@@ -433,7 +450,7 @@ End
 
 Public Sub form_KeyPress()
 
-  Return
+  'Return
 
   Dim t As Float = Timer
 
