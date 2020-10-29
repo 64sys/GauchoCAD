@@ -39,7 +39,7 @@ Public Sub Run() As Boolean
   Dim wtmp As Integer
 
   For Each vrx In widths
-    wtmp = dsk.TextWidth(widths.Key, Me.Font.Name, Me.Font.Size) + 16 + String.Len(CStr(vrx[0])) + vrx[2].Picture.Width
+    wtmp = dsk.TextWidth(widths.Key, Me.Font.Name, Me.Font.Size) + 32 + String.Len(CStr(vrx[0])) + vrx[2].Picture.Width
     If wtmp > wmax Then
       wmax = wtmp
     Endif

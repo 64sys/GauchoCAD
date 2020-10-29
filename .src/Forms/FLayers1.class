@@ -213,9 +213,9 @@ Public Sub TableView1_Data(Row As Integer, Column As Integer)
 
     Case "style"
       If Starter.cStyles.Exist(CStr(st)) Then
-        TableView1[row, Column].Text = Starter.cStyles[CStr(st)][1]
+        TableView1[row, Column].Text = Starter.cStyles[CStr(st)][2]
       Else
-        TableView1[row, Column].Text = Starter.cStyles["0"][1]
+        TableView1[row, Column].Text = Starter.cStyles["0"][2]
       Endif
 
     Case "width"
@@ -275,7 +275,6 @@ Public Sub LTask(lTask As String)
 
   Dim drf As Variant
   Dim n As Variant
-  'Dim var As Variant
   Dim r As Integer
 
   Dim i As Integer
@@ -292,7 +291,6 @@ Public Sub LTask(lTask As String)
 
       Next
 
-      'n["id"] = Format(cLayers.Count, "00")
       n["id"] = CStr(cLayers.Count)
       n["name"] = "layer-" & n["id"] 'Format(cLayers.Count + 1, "00")
 
@@ -327,7 +325,7 @@ Public Sub LTask(lTask As String)
                 Case "style"
 
                   For Each vrx In Starter.cStyles
-                    If TableView1[r, i].Text = vrx[1] Then
+                    If TableView1[r, i].Text = vrx[2] Then
                       xlay[lbx[i]] = CInt(Starter.cStyles.Key)
                       Break
                     Else
@@ -513,7 +511,7 @@ Public Sub TableView1_Click()
 
             For Each vrx In Starter.cStyles
               If CInt(Starter.cStyles.Key) = CurrentLtype Then
-                TableView1[TableView1.Row, TableView1.Column].Text = vrx[1]
+                TableView1[TableView1.Row, TableView1.Column].Text = vrx[2]
                 Break
               Else
                 TableView1[TableView1.Row, TableView1.Column].Text = ""

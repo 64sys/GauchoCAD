@@ -981,8 +981,8 @@ Public Sub btnWidths_MouseDown()
       If SelectingWidth = True Then
         vrx = Starter.cWidths[CStr(CurrentWidth)]
         If vrx.Count > 1 Then
-          If Object.Type(vrx[1]) = "Image" Then
-            img2 = vrx[1]
+          If Object.Type(vrx[2]) = "Image" Then
+            img2 = vrx[2]
             btnWidths.Picture = img2.Picture
             btnWidths.Tooltip = ("Width") & " " & CStr(vrx[0]) & " mm"
           Endif
@@ -1508,6 +1508,9 @@ Public Sub TableView1_Click()
   Select TableView1[TableView1.Row, 0].Text
     Case "Layer"
       TableView1.Edit(lrx, True)
+
+      PropSave()
+
     Case "Color"
       If SelectingColor = False Then
         FClr = New FColors16([Workspace1.ScreenX + Workspace1.W - 320 - 5, TableView1.ScreenY - ComboBox1.H + 9], Me)
