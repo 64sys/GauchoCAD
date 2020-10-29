@@ -39,7 +39,7 @@ Public Sub Run() As Boolean
   Dim wtmp As Integer
 
   For Each vrx In widths
-    wtmp = dsk.TextWidth(widths.Key, Me.Font.Name, Me.Font.Size) + 16 + String.Len(CStr(vrx[0])) + vrx[1].Picture.Width
+    wtmp = dsk.TextWidth(widths.Key, Me.Font.Name, Me.Font.Size) + 16 + String.Len(CStr(vrx[0])) + vrx[2].Picture.Width
     If wtmp > wmax Then
       wmax = wtmp
     Endif
@@ -79,7 +79,7 @@ Public Sub GridView1_Data(Row As Integer, Column As Integer)
     Case 1
       If widths.Exist(CStr(Row)) Then
         If widths[CStr(Row)][0] Then
-          img = widths[CStr(Row)][1]
+          img = widths[CStr(Row)][2]
           GridView1[Row, Column].Picture = img.Picture
         Else
           img.Clear
@@ -112,7 +112,8 @@ Public Sub GridView1_Select()
   Dim iSty As Integer
 
   For Each vrx In Starter.cWidths
-    If CStr(vrx[0]) = GridView1[GridView1.Row, 1].Text Then
+    'If CStr(vrx[0]) = GridView1[GridView1.Row, 1].Text Then
+    If vrx[0] = GridView1[GridView1.Row, 1].Text Then
       iSty = CInt(Starter.cWidths.Key)
       Break
     Else

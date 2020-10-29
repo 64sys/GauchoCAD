@@ -468,7 +468,7 @@
         Visible = False
         Arrangement = Arrange.Vertical
         { TableView3 TableView
-          MoveScaled(2,3,14,25)
+          MoveScaled(2,2,20,46)
           Expand = True
           Border = False
         }
@@ -509,7 +509,7 @@
         }
         { btnGrid ToolButton locks
           Name = "btnGrid"
-          MoveScaled(8,0,5,5)
+          MoveScaled(9,0,5,5)
           #Translate = False
           Tag = "grid"
           ToolTip = "F7"

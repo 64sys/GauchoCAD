@@ -222,7 +222,8 @@ Public Sub TableView1_Data(Row As Integer, Column As Integer)
       TableView1[row, Column].Text = CStr(0.1)
       For Each vrx In Starter.cWidths
         If Starter.cWidths.Key = st Then
-          TableView1[row, Column].Text = CStr(vrx[0])
+          'TableView1[row, Column].Text = CStr(vrx[0])
+          TableView1[row, Column].Text = vrx[0]
           Break
         Endif
       Next

@@ -179,10 +179,10 @@ Public Sub Run(cin As Collection)
   AddColorsPics()
   AddWidthsPics()
 
-  btnLtypes.Picture = Starter.cStyles["0"][2].Picture
+  btnLtypes.Picture = Starter.cStyles["0"][3].Picture
   btnLtypes.Tooltip = Starter.cStyles["0"][1]
 
-  btnWidths.Picture = Starter.cWidths["1"][1].Picture
+  btnWidths.Picture = Starter.cWidths["1"][2].Picture
   btnWidths.Tooltip = Starter.cWidths["1"][0]
 
   If CurrentColor = 0 Then
@@ -328,7 +328,7 @@ Public Sub AddLtypesPics()
   Dim dash As Float[]
   Dim img As Image
   Dim hColor As ColorInfo
-  'Dim iTheme As Integer
+  Dim pxl As Integer
 
   hColor = Color[Color.ButtonBackground]
 
@@ -365,8 +365,8 @@ Public Sub AddLtypesPics()
       Paint.Stroke
       Paint.End
 
-      If Starter.cStyles[Starter.cStyles.Key].Count = 3 Then
-        Starter.cStyles[Starter.cStyles.Key][2] = img
+      If Starter.cStyles[Starter.cStyles.Key].Count = 4 Then
+        Starter.cStyles[Starter.cStyles.Key][3] = img
       Else
         Starter.cStyles[Starter.cStyles.Key].Add(img)
       Endif
@@ -382,10 +382,11 @@ Public Sub AddWidthsPics()
   Dim wt As Variant
   Dim img As Image
   Dim hColor As ColorInfo
+  Dim mm As String
+  Dim px As Float
 
   hColor = Color[Color.ButtonBackground]
 
-  ' If iTheme <> hColor.Luminance Then
   iTheme = hColor.Luminance
 
   For Each wt In Starter.cWidths
@@ -403,14 +404,15 @@ Public Sub AddWidthsPics()
       Paint.Brush = Paint.Color(Color.White)
     Endif
 
-    Paint.LineWidth = wt * 3
+    mm = wt[0]
+    px = wt[1]
+
+    Paint.LineWidth = px ' CFloat(wt) * 3
     Paint.MoveTo(4, 4)
     Paint.LineTo(btnLtypes.Width - 4, 4)
     Paint.Stroke
     Paint.End
-
-    Starter.cWidths[Starter.cWidths.Key] = [wt, img]
-
+    Starter.cWidths[Starter.cWidths.Key] = [mm, px, img]
   Next
 
 End
@@ -615,7 +617,8 @@ Public Sub LoadComboboxes(cMdl As Collection)
 
     If cVars.Exist("celweight") Then
       If Starter.cWidths.Exist(cVars["celweight"]) Then
-        CurrentWidth = Starter.cWidths[cVars["celweight"]][0]
+        'CurrentWidth = Starter.cWidths[cVars["celweight"]][0]
+        CurrentWidth = cVars["celweight"]
       Else
         CurrentWidth = 1
       Endif
@@ -949,10 +952,10 @@ Public Sub btnLtypes_MouseDown()
       If SelectingLtype = True Then
         vrx = Starter.cStyles[CStr(CurrentLtype)]
         If vrx.Count > 2 Then
-          If Object.Type(vrx[2]) = "Image" Then
-            img2 = vrx[2]
+          If Object.Type(vrx[3]) = "Image" Then
+            img2 = vrx[3]
             btnLtypes.Picture = img2.Picture
-            btnLtypes.Tooltip = vrx[1]
+            btnLtypes.Tooltip = vrx[2]
           Endif
         Endif
         SelectingLtype = False
@@ -971,7 +974,7 @@ Public Sub btnWidths_MouseDown()
   Dim vrx As Variant[]
   Dim img2 As Image
 
-  If SelectingLtype = False Then
+  If SelectingWidth = False Then
     frm = New FWidths(Starter.cWidths, [btnWidths.ScreenX, btnWidths.ScreenY + btnWidths.H], Me)
     frm.Run()
     Do
@@ -981,7 +984,6 @@ Public Sub btnWidths_MouseDown()
           If Object.Type(vrx[1]) = "Image" Then
             img2 = vrx[1]
             btnWidths.Picture = img2.Picture
-            'btnWidths.Text = CStr(vrx[0])
             btnWidths.Tooltip = ("Width") & " " & CStr(vrx[0]) & " mm"
           Endif
         Endif
@@ -1217,7 +1219,8 @@ Public Sub SelectionRefresh()
 
 End
 
-Public Sub btnSave_Click()
+'Public Sub btnSave_Click()
+Public Sub PropSave()
 
   Dim i As Integer
   Dim r As Integer
@@ -1227,6 +1230,8 @@ Public Sub btnSave_Click()
   Dim Changed As Boolean
   Dim te As Entity
   'Dim obj As Entity
+  Dim lt As Variant[]
+  Dim lwt As Variant[]
 
   lay = APPMain.hFCAD.cModel["Layers"]
 
@@ -1260,27 +1265,53 @@ Public Sub btnSave_Click()
             Endif
 
           Case "Color"
-            cProp["Color"] = TableView1[r, 1].Text
-            If e.colour <> cProp["Color"] Then
-              Changed = True
-              e.colour = cProp["Color"]
-              e.ColorToPaint = cProp["Color"]
+            If cProp.Exist("Color") Then
+              If TypeOf(cProp["Color"]) = gb.String Then
+                If InStr(cProp["Color"], "*") = 0 Then
+                  cProp["Color"] = TableView1[r, 1].Text
+                  If e.colour <> cProp["Color"] Then
+                    Changed = True
+                    e.colour = cProp["Color"]
+                    e.ColorToPaint = cProp["Color"]
+                  Endif
+                Endif
+              Else
+                If TypeOf(cProp["Color"]) = gb.Object Then
+                  If cProp["Color"].Count = 1 Then
+                    cProp["Color"][0] = TableView1[r, 1].Text
+                    If e.colour <> cProp["Color"][0] Then
+                      Changed = True
+                      e.colour = cProp["Color"][0]
+                      e.ColorToPaint = cProp["Color"][0]
+                    Endif
+                  Endif
+                Endif
+              Endif
             Endif
 
-          Case "LineType"
-            ' cProp["LineType"] = TableView1[r, 1].Text
-            ' If e.LineTypeName <> cProp["LineTypeName"] Then
-            '   Changed = True
-            '   e.LineType = cProp["LineType"]
-            '   For Each lt In lty
-            '     If lt["name"] = cProp["LineTypeName"] Then
-            '       e.LineType = lt["id"]
-            '       Break
-            '     Endif
-            '   Next
-            ' Endif
+          Case "LType"
+            If InStr(cProp["LineType"], "*") = 0 Then
+              cProp["LineType"] = TableView1[r, 1].Text
+              If e.LineTypeName <> cProp["LineTypeName"] Then
+                Changed = True
+                e.LineType = cProp["LineType"]
+                For Each lt In Starter.cStyles 'lty
+                  If lt["name"] = cProp["LineTypeName"] Then
+                    e.LineType = lt["id"]
+                    Break
+                  Endif
+                Next
+              Endif
+            Endif
 
-          Case "LineWidth"
+          Case "Width"
+
+            For Each lwt In Starter.cWidths
+              If lwt[0] = TableView1[r, 1].Text
+                e.LineWidth = CInt(Starter.cWidths.Key)
+                Break
+              Endif
+            Next
 
         End Select
       Next
@@ -1356,7 +1387,7 @@ Public Sub LoadPropertiesList(eFilter As String)
 
       'LineWidth
       If cProp.Exist("Width") = False Then
-        cProp.Add([e.LineType], "Width")
+        cProp.Add([e.LineWidth], "Width")
       Else
         If cProp["Width"].Exist(e.LineWidth) = False Then
           cProp["Width"].Add(e.LineWidth)
@@ -1385,6 +1416,8 @@ Public Sub TableView1_Data(Row As Integer, Column As Integer)
   Dim b As Integer
   Dim img As Image
   Dim z As Integer
+  Dim vrx As Variant
+  Dim iwt As Integer
 
   For Each prop In cProp
     If i = Row Then
@@ -1410,6 +1443,23 @@ Public Sub TableView1_Data(Row As Integer, Column As Integer)
                       imgColor = New Image(z, z, Color.RGB(r, g, b), 0)
                       img = dsk.ImageFrame(imgColor.Stretch(z, z))
                       TableView1[Row, Column].Picture = img.Picture
+
+                    Case "LType"
+                      vrx = Starter.cStyles[prop[0]]
+                      If vrx.Count > 3 Then
+                        TableView1[Row, Column].Text = vrx[2]
+                      Endif
+
+                    Case "Width"
+                      If prop[0] = 0 Then
+                        iwt = 1
+                      Else
+                        iwt = prop[0]
+                      Endif
+                      vrx = Starter.cWidths[CStr(iwt)]
+                      If vrx.Count > 1 Then
+                        TableView1[Row, Column].Text = vrx[0]
+                      Endif
 
                   End Select
 
@@ -1444,6 +1494,10 @@ Public Sub TableView1_Click()
   Dim lst As FLtypes
   Dim vrx As Variant[]
   Dim img2 As Image
+  Dim wtmp As Integer
+  Dim wmax As Integer
+
+  Dim frm As FWidths
 
   For Each lay In APPMain.hFCAD.cModel["Layers"]
     lrx.Add(lay["name"])
@@ -1456,7 +1510,7 @@ Public Sub TableView1_Click()
       TableView1.Edit(lrx, True)
     Case "Color"
       If SelectingColor = False Then
-        FClr = New FColors16([Me.ScreenX + TableView1.Current.X, Me.ScreenY], Me)
+        FClr = New FColors16([Workspace1.ScreenX + Workspace1.W - 320 - 5, TableView1.ScreenY - ComboBox1.H + 9], Me)
         FClr.Border = False
         FClr.Stacking = Window.Above
         FClr.Show()
@@ -1480,21 +1534,28 @@ Public Sub TableView1_Click()
             Wait 0.01
           Endif
         Loop
+        PropSave()
       Endif
     Case "LType"
       If SelectingLtype = False Then
-        lst = New FLtypes(Starter.cStyles, [TableView1.ScreenX, TableView1.ScreenY + TableView1.Rows.Height], Me)
+
+        For Each vrx In Starter.cStyles
+          wtmp = dsk.TextWidth(vrx[2], Me.Font.Name, Me.Font.Size) + 8 + vrx[3].Picture.Width
+          If wtmp > wmax Then
+            wmax = wtmp
+          Endif
+        Next
+
+        lst = New FLtypes(Starter.cStyles, [Workspace1.ScreenX + Workspace1.W - wtmp - 16, TableView1.ScreenY - ComboBox1.H + 9], Me)
         lst.Run()
         Do
           If SelectingLtype = True Then
-            vrx = Starter.cStyles[TableView1[TableView1.Row, 1].Text]
-            If vrx.Count > 2 Then
-              If Object.Type(vrx[2]) = "Image" Then
-                img2 = vrx[2]
-                TableView1[TableView1.Row, 1].Picture = img2.Picture
-                'btnLtypes.Picture = img2.Picture
-                'btnLtypes.Tooltip = vrx[1]
-              Endif
+            vrx = Starter.cStyles[CStr(CurrentLtype)]
+            If vrx.Count > 3 Then
+              'If Object.Type(vrx[2]) = "Image" Then
+              'img2 = vrx[2]
+              TableView1[TableView1.Row, 1].Text = vrx[2]
+              'Endif
             Endif
             SelectingLtype = False
             Break
@@ -1502,6 +1563,33 @@ Public Sub TableView1_Click()
             Wait 0.1
           Endif
         Loop
+        PropSave()
+      Endif
+
+    Case "Width"
+      If SelectingWidth = False Then
+
+        For Each vrx In Starter.cWidths
+          wtmp = dsk.TextWidth(vrx[0], Me.Font.Name, Me.Font.Size) + 8 + vrx[2].Picture.Width
+          If wtmp > wmax Then
+            wmax = wtmp
+          Endif
+        Next
+        frm = New FWidths(Starter.cWidths, [Workspace1.ScreenX + Workspace1.W - wtmp - 16, TableView1.ScreenY - ComboBox1.H + 9], Me)
+        frm.Run()
+        Do
+          If SelectingWidth = True Then
+            vrx = Starter.cWidths[CStr(CurrentWidth)]
+            If vrx.Count > 1 Then
+              TableView1[TableView1.Row, 1].Text = vrx[0]
+            Endif
+            SelectingWidth = False
+            Break
+          Else
+            Wait 0.1
+          Endif
+        Loop
+        PropSave()
       Endif
 
   End Select
@@ -1531,6 +1619,7 @@ Public Sub Form_KeyPress()
   Dim uEnty As Entity    '' Undo entity
   Dim aEnty As Entity    '' Actual entity
   Dim imx As Integer     '' Index in Entities array
+  Dim SelectMode As Boolean
 
   Print Key.Code
   Dim t As Float = Timer
@@ -1636,6 +1725,30 @@ Public Sub Form_KeyPress()
               RawFlag = False
             Endif
 
+          Case Asc("a"), Asc("A") ' Select/Unselect All
+            SelectMode = True
+            For Each aEnty In APPMain.hFCAD.arrEntities
+              If aEnty.Selected Then
+                SelectMode = False
+                Break
+              Endif
+            Next
+
+            If SelectMode Then
+              For Each aEnty In APPMain.hFCAD.arrEntities
+                If aEnty.Selected = False Then
+                  aEnty.Selected = True
+                Endif
+              Next
+            Else
+              For Each aEnty In APPMain.hFCAD.arrEntities
+                If aEnty.Selected Then
+                  aEnty.Selected = False
+                Endif
+              Next
+            Endif
+            APPMain.hFCAD.Regen
+
           Case Asc("z"), Asc("Z") ' Undo
 
             If APPMain.hFCAD.arrUndo.Count > 0 Then
@@ -1692,3 +1805,15 @@ End
 '   Endif
 '
 ' End
+
+' Public Sub TableView1_Change()
+'
+'   PropSave()
+'
+' End
+
+Public Sub btnSave_Click()
+
+  PropSave()
+
+End
