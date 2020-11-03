@@ -404,12 +404,10 @@
           }
         }
       }
-      { !Workspace1 Workspace
-        MoveScaled(28,4,21,49)
-        #Public = True
-        Background = Color.TextBackground
-        Expand = True
-        Border = False
+      { GLArea1 GLArea
+        MoveScaled(27,6,23,47)
+        Background = Color.Black
+        Foreground = Color.White
       }
       { pnlDebug Panel
         MoveScaled(51,3,22,50)

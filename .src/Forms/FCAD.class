@@ -1056,3 +1056,15 @@ End
 '   APPMain.LoadComboboxes(cModel)
 '
 ' End
+
+Public Sub GLArea1_DblClick()
+
+  If iEntity[3] >= 0 Then
+
+    FInspector.Run(arrEntities[iEntity[3]])
+  Else
+    FInspector.Close
+
+  Endif
+
+End

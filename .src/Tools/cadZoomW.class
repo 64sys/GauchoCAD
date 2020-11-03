@@ -113,3 +113,16 @@ Public Sub Draw() ' esta rutina es llamada por FCAD en el evento DrawingArea_Dra
   GLplus.Rectangle2D(Me.SelStartXr, Me.SelStartYr, Me.SelEndXr - Me.SelStartXr, Me.SelEndYr - Me.SelStartYr,,,,, Color.DarkBlue, 1, 0, 2)
 
 End
+
+Public Sub Finish()
+
+  gcd.clsJob = gcd.clsJobPrevious
+  gcd.clsJobPrevious = Me
+
+  clsDrawingAids.CleanTexts
+
+  Me.Active = False
+
+  gcd.ToolActive = True
+
+End

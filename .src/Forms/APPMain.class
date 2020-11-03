@@ -537,47 +537,25 @@ End
 
 Public Sub entity_Click()
 
-  Dim obj As Object
-
-  obj = Last
-
-  If Workspace1.ActiveWindow Then
-    gcd.clsJob.KeyText(obj.Tag)
-  Endif
+  gcd.clsJob.KeyText(Last.Tag)
 
 End
 
 Public Sub tool_Click()
 
-  Dim obj As Object
-
-  obj = Last
-
-  If Workspace1.ActiveWindow Then
-    gcd.clsJob.KeyText(obj.Tag)
-  Endif
+  gcd.clsJob.KeyText(Last.Tag)
 
 End
 
 Public Sub menuapp_Click()
 
-  Dim obj As Object
-
-  obj = Last
-
-  gTask(obj.Tag)
+  gTask(Last.Tag)
 
 End
 
 Public Sub view_Click()
 
-  Dim obj As Object
-
-  obj = Last
-
-  If Workspace1.ActiveWindow Then
-    gcd.clsJob.KeyText(obj.Tag)
-  Endif
+  gcd.clsJob.KeyText(Last.Tag)
 
 End
 
@@ -878,6 +856,14 @@ Public Function ExistWin(wtag As String, ws As Workspace) As Boolean
   Next
 
   Return wExist
+
+End
+
+Public Sub ZoomWindow()
+
+  gcd.clsJobPrevious = gcd.clsJob
+  gcd.clsJob = cadZoomW
+  gcd.clsJob.Start
 
 End
 

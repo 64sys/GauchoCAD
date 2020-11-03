@@ -137,6 +137,10 @@ Public Function Start(Optional ElemToBuild As Variant, Optional Mode As Integer 
   elem.colour = appmain.CurrentColor
   elem.ColorToPaint = Starter.gColor[elem.colour]
 
+  elem.LineType = appmain.CurrentLtype
+
+  elem.LineWidth = appmain.CurrentWidth
+
   clsDrawingAids.HelperTrabajo = elem.ClassHandler.HelperTrabajo
 
 End

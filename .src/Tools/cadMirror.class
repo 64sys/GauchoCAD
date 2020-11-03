@@ -1,5 +1,7 @@
 ' Gambas class file
 
+' Gambas class file
+
 ' GauchoCAD
 ' A simple CAD made in Gambas
 '
@@ -30,173 +32,173 @@ Private KeepOriginal As Boolean
 Private glSelectedList As Integer
 
 Public Function Start(Optional ElemToBuild As Variant, Optional _Mode As Integer = 0) As Boolean
-    ' Llamada por FCAD al inicio de la aplicacion de esta herramienta
+  ' Llamada por FCAD al inicio de la aplicacion de esta herramienta
 
-    Dim i As Integer
-    ' Aprovechamos para establecer los helpers (comentarios de ayuda en pantalla)
-    Me.PointsDone = 0
-    Me.PointsTotal = 3
+  Dim i As Integer
+  ' Aprovechamos para establecer los helpers (comentarios de ayuda en pantalla)
+  Me.PointsDone = 0
+  Me.PointsTotal = 3
 
-    clsDrawingAids.HelperTrabajo = ("Mirror") & " "
+  clsDrawingAids.HelperTrabajo = ("Mirror") & " "
 
-    ' chequeamos si hubo seleccion previa
-    Me.SelectionCount = clsEntities.GetSelectionCount()
+  ' chequeamos si hubo seleccion previa
+  Me.SelectionCount = clsEntities.GetSelectionCount()
 
-    If Me.SelectionCount = 0 Then                                     ' we have no elements in the selection
+  If Me.SelectionCount = 0 Then                                     ' we have no elements in the selection
 
-        clsDrawingAids.Helper.texto = clsDrawingAids.HelperTrabajo & ": " & ("Select entities")
+    clsDrawingAids.Helper.texto = clsDrawingAids.HelperTrabajo & ": " & ("Select entities")
 
-        gcd.clsJobPrevious = Me
-        gcd.clsJob = clsDefaultJob
+    gcd.clsJobPrevious = Me
+    gcd.clsJob = clsDefaultJob
 
-    Else                                                                    ' need the first point
+  Else                                                                    ' need the first point
 
-        Me.inxSelected.Clear
-        clsDrawingAids.Helper.texto = clsDrawingAids.HelperTrabajo & ": " & ("Base point")
-        clsDrawingAids.HelperTrabajo = clsDrawingAids.HelperTrabajo & Str(Me.SelectionCount) & " " & ("elements")
+    Me.inxSelected.Clear
+    clsDrawingAids.Helper.texto = clsDrawingAids.HelperTrabajo & ": " & ("Base point")
+    clsDrawingAids.HelperTrabajo = clsDrawingAids.HelperTrabajo & Str(Me.SelectionCount) & " " & ("elements")
 
-        For i = 0 To appmain.hFCAD.arrEntities.Max                  ' recolecto las entidades a modificar
-            If appmain.hFCAD.arrEntities[i].selected Then Me.inxSelected.Add(i)                               ' y las meto en un  array
+    For i = 0 To appmain.hFCAD.arrEntities.Max                  ' recolecto las entidades a modificar
+      If appmain.hFCAD.arrEntities[i].selected Then Me.inxSelected.Add(i)                               ' y las meto en un  array
 
-        Next
+    Next
 
-        ' genero drawing lists
+    ' genero drawing lists
 
-        clsEntities.GLGenDrawListAll(False)
-        appmain.hFCAD.redraw
+    clsEntities.GLGenDrawListAll(False)
+    appmain.hFCAD.redraw
 
-    Endif
-    Me.Active = True
-    gcd.ToolActive = True
+  Endif
+  Me.Active = True
+  gcd.ToolActive = True
 
 End
 
 Public Function MouseUp(mouseX As Integer, mouseY As Integer)
 
-    Dim i As Integer
+  Dim i As Integer
 
-    Inc Me.PointsDone
+  Inc Me.PointsDone
 
-    If Me.PointsDone = 1 Then ' acabo de marcar el punto base
+  If Me.PointsDone = 1 Then ' acabo de marcar el punto base
 
-        ' ya tengo cosas seleccionadas
-        clsDrawingAids.Helper.texto = clsDrawingAids.HelperTrabajo & ": " & ("Angle") & " [90]"
+    ' ya tengo cosas seleccionadas
+    clsDrawingAids.Helper.texto = clsDrawingAids.HelperTrabajo & ": " & ("Angle") & " [90]"
 
-        ' punto real base
-        Me.SelStartXr = puntos.Near(appmain.hFcad.Xreal(mousex))
-        Me.SelStartYr = puntos.Near(appmain.hFcad.Yreal(mouseY))
+    ' punto real base
+    Me.SelStartXr = puntos.Near(appmain.hFcad.Xreal(mousex))
+    Me.SelStartYr = puntos.Near(appmain.hFcad.Yreal(mouseY))
 
-        Me.glTranslate[0] = Me.SelStartXr
-        Me.glTranslate[1] = Me.SelStartYr
-        Me.glTranslate[2] = 0
+    Me.glTranslate[0] = Me.SelStartXr
+    Me.glTranslate[1] = Me.SelStartYr
+    Me.glTranslate[2] = 0
 
-        gl.PushMatrix
-        gl.NewList(appmain.hFCAD.GlListSelectedEntities, gl.COMPILE)                      ' genero los graficos dentro de la lista
-        gl.Translatef(-Me.SelStartXr, -Me.SelStartYr, 0)
-        For i = 0 To appmain.hFCAD.arrEntities.Max 'Me.inxSelected.Max
-            If appmain.hFCAD.arrEntities[i].selected Then gl.CallList(APPMain.hFCAD.arrEntities[i].glDrwList)
-        Next
-        gl.EndList
-        gl.PopMatrix
+    gl.PushMatrix
+    gl.NewList(appmain.hFCAD.GlListSelectedEntities, gl.COMPILE)                      ' genero los graficos dentro de la lista
+    gl.Translatef(-Me.SelStartXr, -Me.SelStartYr, 0)
+    For i = 0 To appmain.hFCAD.arrEntities.Max 'Me.inxSelected.Max
+      If appmain.hFCAD.arrEntities[i].selected Then gl.CallList(APPMain.hFCAD.arrEntities[i].glDrwList)
+    Next
+    gl.EndList
+    gl.PopMatrix
 
-        ' prevenir acciones tontas como hacer click en otro elemento antes de terminar con el actual
-        ' TODO: reparar -> appmain.hFCAD.DesHabilitarBotones
-    Else If Me.PointsDone = 2 Then ' acabo de marcar el punto destino
-        '     ' permitir otros trabajos
-        '     ' TODO: reparar -> appmain.hFCAD.HabilitarBotones
-        'Me.SelEndXr = puntos.Near(appmain.hFcad.Xreal(mousex)
-        'Me.SelEndyr = puntos.Near(appmain.hFcad.Yreal(mouseY))
-        clsDrawingAids.Helper.texto = clsDrawingAids.HelperTrabajo & ": " & ("Keep originals") & " (Y/N)[Y]"
-        'Radianes = Ang(Me.SelEndXr - Me.SelStartXr, Me.SelEndYr - Me.SelStartYr)
-        '
-        'Me.Finish()
+    ' prevenir acciones tontas como hacer click en otro elemento antes de terminar con el actual
+    ' TODO: reparar -> appmain.hFCAD.DesHabilitarBotones
+  Else If Me.PointsDone = 2 Then ' acabo de marcar el punto destino
+    '     ' permitir otros trabajos
+    '     ' TODO: reparar -> appmain.hFCAD.HabilitarBotones
+    'Me.SelEndXr = puntos.Near(appmain.hFcad.Xreal(mousex)
+    'Me.SelEndyr = puntos.Near(appmain.hFcad.Yreal(mouseY))
+    clsDrawingAids.Helper.texto = clsDrawingAids.HelperTrabajo & ": " & ("Keep originals") & " (Y/N)[Y]"
+    'Radianes = Ang(Me.SelEndXr - Me.SelStartXr, Me.SelEndYr - Me.SelStartYr)
+    '
+    'Me.Finish()
 
-    Endif
+  Endif
 
 End
 
 Public Function MouseMove(mouseX As Integer, mouseY As Integer) ' called by FCAD-> DrawingArea_MouseMove
 
-    If Me.PointsDone = 1 Then
-        '     ' we compare Real values from the starting point to the location
-        '     ' represente by the mouse now, taking account that the drawing
-        '     ' could have being moved by the mouse wheel
-        '
-        '     ' new Real position is
-        Me.SelEndXr = puntos.Near(appmain.hFcad.Xreal(mouseX))
-        Me.SelEndyr = puntos.Near(appmain.hFcad.Yreal(mouseY))
+  If Me.PointsDone = 1 Then
+    '     ' we compare Real values from the starting point to the location
+    '     ' represente by the mouse now, taking account that the drawing
+    '     ' could have being moved by the mouse wheel
+    '
+    '     ' new Real position is
+    Me.SelEndXr = puntos.Near(appmain.hFcad.Xreal(mouseX))
+    Me.SelEndyr = puntos.Near(appmain.hFcad.Yreal(mouseY))
 
-        Radianes = 2 * Ang(Me.SelEndXr - Me.SelStartXr, Me.SelEndYr - Me.SelStartYr)
+    Radianes = 2 * Ang(Me.SelEndXr - Me.SelStartXr, Me.SelEndYr - Me.SelStartYr)
 
-        Me.glAngle = Radianes * 180 / Pi
+    Me.glAngle = Radianes * 180 / Pi
 
-        Me.glScale[0] = 1
-        Me.glScale[1] = -1
-        Me.glScale[2] = 1
-    End If
-    appmain.hFCAD.redraw
+    Me.glScale[0] = 1
+    Me.glScale[1] = -1
+    Me.glScale[2] = 1
+  End If
+  appmain.hFCAD.redraw
 
 End
 
 Public Function KeyText(EnteredText As String) ' esta rutina es llamada por FCAD en el evento FCAD_KeyPress cuando recibe una texto + <Enter>
 
-    If Me.PointsDone = 1 Then
+  If Me.PointsDone = 1 Then
 
-        If EnteredText = "" Then
-            Radianes = 90 / 180 * Pi
-            Inc Me.PointsDone
+    If EnteredText = "" Then
+      Radianes = 90 / 180 * Pi
+      Inc Me.PointsDone
 
-            clsDrawingAids.Helper.texto = clsDrawingAids.HelperTrabajo & ": " & ("Keep originals") & " (Y/N)[Y]"
+      clsDrawingAids.Helper.texto = clsDrawingAids.HelperTrabajo & ": " & ("Keep originals") & " (Y/N)[Y]"
 
-        Else
-            Radianes = CFloat(EnteredText) / 180 * Pi
-            Inc Me.PointsDone
-            clsDrawingAids.Helper.texto = clsDrawingAids.HelperTrabajo & ": " & ("Keep originals") & " (Y/N)[Y]"
-        End If
-
-    Else If Me.PointsDone = 2 Then
-        If LCase$(Left$(EnteredText, 1)) = "y" Then
-            KeepOriginal = True
-            Inc Me.PointsDone
-            Me.Finish
-        Else If LCase$(Left$(EnteredText, 1)) = "n" Then
-            KeepOriginal = False
-            Inc Me.PointsDone
-            Me.Finish
-        Endif
-
+    Else
+      Radianes = CFloat(EnteredText) / 180 * Pi
+      Inc Me.PointsDone
+      clsDrawingAids.Helper.texto = clsDrawingAids.HelperTrabajo & ": " & ("Keep originals") & " (Y/N)[Y]"
     End If
+
+  Else If Me.PointsDone = 2 Then
+    If LCase$(Left$(EnteredText, 1)) = "y" Then
+      KeepOriginal = True
+      Inc Me.PointsDone
+      Me.Finish
+    Else If LCase$(Left$(EnteredText, 1)) = "n" Then
+      KeepOriginal = False
+      Inc Me.PointsDone
+      Me.Finish
+    Endif
+
+  End If
 
 Catch
 
-    clsDrawingAids.ErrorMessage = ("Bad input")
+  clsDrawingAids.ErrorMessage = ("Bad input")
 
 End
 
 Public Sub Finish()
 
-    Dim i As Integer, ip As Integer, Prot As New Float[]
+  Dim i As Integer, ip As Integer, Prot As New Float[]
 
-    If Me.PointsDone = Me.PointsTotal Then
+  If Me.PointsDone = Me.PointsTotal Then
 
-        If KeepOriginal Then clsEntities.ClonElements(True)
+    If KeepOriginal Then clsEntities.ClonElements(True)
 
-        ' en todos los casos, roto los puntos
-        clsEntities.Move(-Me.SelStartXr, -Me.SelStartYr, True)
-        clsEntities.Scale(1, -1, True)
-        clsEntities.Rotate(Radianes, True)
-        clsEntities.Move(Me.SelStartXr, Me.SelStartYr, True)
+    ' en todos los casos, roto los puntos
+    clsEntities.Move(-Me.SelStartXr, -Me.SelStartYr, True)
+    clsEntities.Scale(1, -1, True)
+    clsEntities.Rotate(Radianes, True)
+    clsEntities.Move(Me.SelStartXr, Me.SelStartYr, True)
 
-        clsEntities.Finish
+    clsEntities.Finish
 
-    Endif
+  Endif
 
-    gcd.clsJobPrevious = Me
-    gcd.clsJob = clsDefaultJob
-    clsDrawingAids.CleanTexts
-    clsEntities.DeSelection()
-    appmain.hFCAD.Regen
-    Me.Active = False
-    gcd.ToolActive = False
+  gcd.clsJobPrevious = Me
+  gcd.clsJob = clsDefaultJob
+  clsDrawingAids.CleanTexts
+  clsEntities.DeSelection()
+  appmain.hFCAD.Regen
+  Me.Active = False
+  gcd.ToolActive = False
 
 End
