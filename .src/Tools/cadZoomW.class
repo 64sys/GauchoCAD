@@ -45,8 +45,8 @@ Public Function MouseDown(mouseX As Integer, mouseY As Integer) ' esta rutina es
     Me.SelEndX = Me.SelStartX
     Me.SelEndy = Me.SelStartY
 
-    Me.SelStartXr = APPMain.hFCAD.Xreal(mouseX)
-    Me.SelStartYr = APPMain.hFCAD.Yreal(mouseY)
+    Me.SelStartXr = appmain.CurrentDrawing.Xreal(mouseX)
+    Me.SelStartYr = appmain.CurrentDrawing.Yreal(mouseY)
 
     Me.Active = True
   End If
@@ -64,10 +64,10 @@ Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' esta rutina es l
   If Me.SelStartY < Me.SelEndy Then Swap Me.SelStartY, Me.SelEndy                     ' this is FLIPPED
 
   ' Paso a coordenadas reales
-  Me.SelStartXr = appmain.hFcad.Xreal(Me.SelStartX)
-  Me.SelStartYr = appmain.hFcad.Yreal(Me.SelStartY)
-  Me.SelEndXr = appmain.hFcad.Xreal(Me.SelEndX)
-  Me.SelEndyr = appmain.hFcad.Yreal(Me.SelEndy)
+  Me.SelStartXr = appmain.CurrentDrawing.Xreal(Me.SelStartX)
+  Me.SelStartYr = appmain.CurrentDrawing.Yreal(Me.SelStartY)
+  Me.SelEndXr = appmain.CurrentDrawing.Xreal(Me.SelEndX)
+  Me.SelEndyr = appmain.CurrentDrawing.Yreal(Me.SelEndy)
 
   ' veo si el rectangulo es suficientemente grande como para representar una seleccion por rectangulo
   If (Me.SelEndX - Me.SelStartX + (-Me.SelEndy + Me.SelStartY)) < 10 Then ' es un rectangulo minusculo
@@ -77,11 +77,11 @@ Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' esta rutina es l
   Else
     ' engañamos a estas vars
 
-    appmain.hFCAD.Xmayor = Me.SelEndXr
-    appmain.hFCAD.Xmenor = Me.SelStartXr
+    appmain.CurrentDrawing.Xmayor = Me.SelEndXr
+    appmain.CurrentDrawing.Xmenor = Me.SelStartXr
 
-    appmain.hFCAD.Ymayor = Me.SelEndYr
-    appmain.hFCAD.Ymenor = Me.SelStartYr
+    appmain.CurrentDrawing.Ymayor = Me.SelEndYr
+    appmain.CurrentDrawing.Ymenor = Me.SelStartYr
 
     cadZoomE.Start(, 1)
     Me.Finish
@@ -96,10 +96,10 @@ Public Function MouseMove(mouseX As Integer, mouseY As Integer) ' esta rutina es
 
   Me.SelEndy = mouseY
 
-  Me.SelEndXr = APPMain.hFCAD.Xreal(mouseX)
-  Me.SelEndYr = APPMain.hFCAD.Yreal(mouseY)
+  Me.SelEndXr = appmain.CurrentDrawing.Xreal(mouseX)
+  Me.SelEndYr = appmain.CurrentDrawing.Yreal(mouseY)
 
-  appmain.hFCAD.redraw
+  appmain.redraw
 
 End
 

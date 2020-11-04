@@ -49,7 +49,7 @@ Public Function Start(Optional filename As Variant, Optional _mode As Integer = 
 
       iRet = FHatch.Showmodal()
 
-      Debug APPMain.hFCAD.LastHatchFile
+      Debug appmain.CurrentDrawing.LastHatchFile
 
       Select Case iRet
         Case 2 ' busqueda de contorno
@@ -68,7 +68,7 @@ Public Function Start(Optional filename As Variant, Optional _mode As Integer = 
 
       nSel = clsEntities.GetSelectionCount()
 
-      If (APPMain.hFCAD.arrEntities[APPMain.hFCAD.arrSelecIndex[0]].Gender <> "PLine") And (APPMain.hFCAD.arrEntities[APPMain.hFCAD.arrSelecIndex[0]].PolyLine.Count < 6) Then
+      If (appmain.CurrentDrawing.arrEntities[appmain.CurrentDrawing.arrSelecIndex[0]].Gender <> "PLine") And (appmain.CurrentDrawing.arrEntities[appmain.CurrentDrawing.arrSelecIndex[0]].PolyLine.Count < 6) Then
         Message("El contorno esta mal definido")
 
       Else
@@ -76,11 +76,11 @@ Public Function Start(Optional filename As Variant, Optional _mode As Integer = 
         entHatch = New Entity
         entHatch.Gender = "Hatch"
         entHatch.ClassHandler = cadHatch
-        entHatch.StringData.Add(APPMain.hFCAD.LastHatchFile)
-        entHatch.StringData.Add(APPMain.hFCAD.LastHatchPattern)
+        entHatch.StringData.Add(appmain.CurrentDrawing.LastHatchFile)
+        entHatch.StringData.Add(appmain.CurrentDrawing.LastHatchPattern)
         iRet = FHatch.Showmodal()
 
-        Debug APPMain.hFCAD.LastHatchFile
+        Debug appmain.CurrentDrawing.LastHatchFile
         Select Case iRet
           Case 2 ' nueva busqueda de contorno
             gcd.clsJobPrevious = Me
@@ -94,8 +94,8 @@ Public Function Start(Optional filename As Variant, Optional _mode As Integer = 
 
           Case 3 ' confirma el Hatch
 
-            entHatch.fParam.Add(APPMain.hFCAD.LastScale)
-            entHatch.fParam.Add(APPMain.hFCAD.LastAngle)
+            entHatch.fParam.Add(appmain.CurrentDrawing.LastScale)
+            entHatch.fParam.Add(appmain.CurrentDrawing.LastAngle)
 
             entHatch.layer = appmain.CurrentLayer
             entHatch.layerid = gcd.GetLayerID(appmain.CurrentLayer)
@@ -103,20 +103,20 @@ Public Function Start(Optional filename As Variant, Optional _mode As Integer = 
             entHatch.colour = appmain.CurrentColor
             entHatch.ColorToPaint = Starter.gColor[entHatch.colour]
 
-            If APPMain.hFCAD.arrEntities[APPMain.hFCAD.arrSelecIndex[0]].Gender <> "PLine" Then
-              If APPMain.hFCAD.arrEntities[APPMain.hFCAD.arrSelecIndex[0]].PolyLine.Count >= 6 Then
-                entHatch.P.Insert(APPMain.hFCAD.arrEntities[APPMain.hFCAD.arrSelecIndex[0]].PolyLine.Copy())
+            If appmain.CurrentDrawing.arrEntities[appmain.CurrentDrawing.arrSelecIndex[0]].Gender <> "PLine" Then
+              If appmain.CurrentDrawing.arrEntities[appmain.CurrentDrawing.arrSelecIndex[0]].PolyLine.Count >= 6 Then
+                entHatch.P.Insert(appmain.CurrentDrawing.arrEntities[appmain.CurrentDrawing.arrSelecIndex[0]].PolyLine.Copy())
               Endif
 
             Else
 
-              entHatch.P.Insert(APPMain.hFCAD.arrEntities[APPMain.hFCAD.arrSelecIndex[0]].p.Copy())
+              entHatch.P.Insert(appmain.CurrentDrawing.arrEntities[appmain.CurrentDrawing.arrSelecIndex[0]].p.Copy())
 
             Endif
 
             FillEntityWithHatch()
 
-            APPMain.hFCAD.arrEntities.Add(entHatch)
+            appmain.CurrentDrawing.arrEntities.Add(entHatch)
 
             entHatch.ClassHandler.Finish(entHatch, entHatch.ClassHandler.StepsDone)
 
@@ -129,7 +129,7 @@ Public Function Start(Optional filename As Variant, Optional _mode As Integer = 
 
             clsEntities.GLGenDrawList
 
-            appmain.hFCAD.redraw
+            appmain.redraw
 
         End Select
 

@@ -57,15 +57,15 @@ Public Function Start(Optional ElemToBuild As Variant, Optional _Mode As Integer
     clsDrawingAids.Helper.texto = clsDrawingAids.HelperTrabajo & ": " & ("Base point")
     clsDrawingAids.HelperTrabajo = clsDrawingAids.HelperTrabajo & Str(Me.SelectionCount) & " " & ("elements")
 
-    For i = 0 To appmain.hFCAD.arrEntities.Max                  ' recolecto las entidades a modificar
-      If appmain.hFCAD.arrEntities[i].selected Then Me.inxSelected.Add(i)                               ' y las meto en un  array
+    For i = 0 To AppMain.CurrentDrawing.arrEntities.Max                  ' recolecto las entidades a modificar
+      If AppMain.CurrentDrawing.arrEntities[i].selected Then Me.inxSelected.Add(i)                               ' y las meto en un  array
 
     Next
 
     ' genero drawing lists
 
     clsEntities.GLGenDrawListAll(False)
-    appmain.hFCAD.redraw
+    appmain.redraw
 
   Endif
   Me.Active = True
@@ -85,29 +85,29 @@ Public Function MouseUp(mouseX As Integer, mouseY As Integer)
     clsDrawingAids.Helper.texto = clsDrawingAids.HelperTrabajo & ": " & ("Angle") & " [90]"
 
     ' punto real base
-    Me.SelStartXr = puntos.Near(appmain.hFcad.Xreal(mousex))
-    Me.SelStartYr = puntos.Near(appmain.hFcad.Yreal(mouseY))
+    Me.SelStartXr = puntos.Near(appmain.Xreal(mousex))
+    Me.SelStartYr = puntos.Near(appmain.yreal(mouseY))
 
     Me.glTranslate[0] = Me.SelStartXr
     Me.glTranslate[1] = Me.SelStartYr
     Me.glTranslate[2] = 0
 
     gl.PushMatrix
-    gl.NewList(appmain.hFCAD.GlListSelectedEntities, gl.COMPILE)                      ' genero los graficos dentro de la lista
+    gl.NewList(AppMain.CurrentDrawing.GlListSelectedEntities, gl.COMPILE)                      ' genero los graficos dentro de la lista
     gl.Translatef(-Me.SelStartXr, -Me.SelStartYr, 0)
-    For i = 0 To appmain.hFCAD.arrEntities.Max 'Me.inxSelected.Max
-      If appmain.hFCAD.arrEntities[i].selected Then gl.CallList(APPMain.hFCAD.arrEntities[i].glDrwList)
+    For i = 0 To AppMain.CurrentDrawing.arrEntities.Max 'Me.inxSelected.Max
+      If AppMain.CurrentDrawing.arrEntities[i].selected Then gl.CallList(AppMain.CurrentDrawing.arrEntities[i].glDrwList)
     Next
     gl.EndList
     gl.PopMatrix
 
     ' prevenir acciones tontas como hacer click en otro elemento antes de terminar con el actual
-    ' TODO: reparar -> appmain.hFCAD.DesHabilitarBotones
+    ' TODO: reparar -> appmain.CurrentDrawing.DesHabilitarBotones
   Else If Me.PointsDone = 2 Then ' acabo de marcar el punto destino
     '     ' permitir otros trabajos
-    '     ' TODO: reparar -> appmain.hFCAD.HabilitarBotones
-    'Me.SelEndXr = puntos.Near(appmain.hFcad.Xreal(mousex)
-    'Me.SelEndyr = puntos.Near(appmain.hFcad.Yreal(mouseY))
+    '     ' TODO: reparar -> appmain.CurrentDrawing.HabilitarBotones
+    'Me.SelEndXr = puntos.Near(appmain.Xreal(mousex)
+    'Me.SelEndyr = puntos.Near(appmain.Yreal(mouseY))
     clsDrawingAids.Helper.texto = clsDrawingAids.HelperTrabajo & ": " & ("Keep originals") & " (Y/N)[Y]"
     'Radianes = Ang(Me.SelEndXr - Me.SelStartXr, Me.SelEndYr - Me.SelStartYr)
     '
@@ -125,8 +125,8 @@ Public Function MouseMove(mouseX As Integer, mouseY As Integer) ' called by FCAD
     '     ' could have being moved by the mouse wheel
     '
     '     ' new Real position is
-    Me.SelEndXr = puntos.Near(appmain.hFcad.Xreal(mouseX))
-    Me.SelEndyr = puntos.Near(appmain.hFcad.Yreal(mouseY))
+    Me.SelEndXr = puntos.Near(appmain.Xreal(mouseX))
+    Me.SelEndyr = puntos.Near(appmain.yreal(mouseY))
 
     Radianes = 2 * Ang(Me.SelEndXr - Me.SelStartXr, Me.SelEndYr - Me.SelStartYr)
 
@@ -136,7 +136,7 @@ Public Function MouseMove(mouseX As Integer, mouseY As Integer) ' called by FCAD
     Me.glScale[1] = -1
     Me.glScale[2] = 1
   End If
-  appmain.hFCAD.redraw
+  appmain.redraw
 
 End
 
@@ -197,7 +197,7 @@ Public Sub Finish()
   gcd.clsJob = clsDefaultJob
   clsDrawingAids.CleanTexts
   clsEntities.DeSelection()
-  appmain.hFCAD.Regen
+  appmain.regen
   Me.Active = False
   gcd.ToolActive = False
 

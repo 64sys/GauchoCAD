@@ -124,7 +124,7 @@ Public Function Draw2(oE As Entity)
 
   If Not oE.Visible Then Return
 
-  paint.LineWidth = oE.LineWidth / appmain.hFcad.ScaleZoom / gcd.ScaleLines
+  paint.LineWidth = oE.LineWidth / appmain.CurrentDrawing.ScaleZoom / gcd.ScaleLines
 
   If oE.Selected And Not gcd.ToolActive Then
     paint.brush = Paint.Color(gcd.ColorForSelected)
@@ -147,7 +147,7 @@ End
 
 Public Function BuildPOI(oE As Entity, Optional arrIndex As Integer = -1) As Integer
 
-  If arrIndex < 0 Then arrIndex = appmain.hFCAD.arrEntities.Max       ' si este valor no es provisto , estos POI son de la ultima entidad
+  If arrIndex < 0 Then arrIndex = appmain.CurrentDrawing.arrEntities.Max       ' si este valor no es provisto , estos POI son de la ultima entidad
   Dim i As Integer
   oe.PoiPoints.Clear
   oe.PoiType.Clear
@@ -167,9 +167,9 @@ Public Function BuildPOI(oE As Entity, Optional arrIndex As Integer = -1) As Int
     'oe.poiEntities.Add(arrIndex)
 
     ' line
-    'appmain.hFCAD.poiLines.insert([oE.p[i], oE.p[i + 1], oE.p[i + 2], oE.p[i + 3]])
-    'APPMain.hFCAD.poiLinesEntities.Add(arrIndex)
-    ' appmain.hFCAD.poiLinesRelPoint.Insert([i / 2, i / 2 + 1])
+    'appmain.CurrentDrawing.poiLines.insert([oE.p[i], oE.p[i + 1], oE.p[i + 2], oE.p[i + 3]])
+    'appmain.CurrentDrawing.poiLinesEntities.Add(arrIndex)
+    ' appmain.CurrentDrawing.poiLinesRelPoint.Insert([i / 2, i / 2 + 1])
 
   Next
 

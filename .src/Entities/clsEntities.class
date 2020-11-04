@@ -38,8 +38,8 @@ Public Function FIndBlockID(BlockName As String) As Integer
 
   Dim i As Integer
 
-  For i = 0 To APPMain.hFCAD.arrBlocks.Max
-    If APPMain.hFCAD.arrBlocks[i].name = BlockName Then Return i
+  For i = 0 To AppMain.CurrentDrawing.arrBlocks.Max
+    If AppMain.CurrentDrawing.arrBlocks[i].name = BlockName Then Return i
   Next
   Return -1
 
@@ -55,22 +55,22 @@ Public Function ReconstruirBloques() As Boolean
 
   Print "Recostruyendo bloques"
 
-  For i = 0 To APPMain.hFCAD.arrEntities.Max
-    clsDrawingAids.HelperTrabajo = ("Loading blocks ") & Format$(i / APPMain.hFCAD.arrEntities.Max, "0.00%")
+  For i = 0 To AppMain.CurrentDrawing.arrEntities.Max
+    clsDrawingAids.HelperTrabajo = ("Loading blocks ") & Format$(i / AppMain.CurrentDrawing.arrEntities.Max, "0.00%")
     Wait 0.0001
-    If APPMain.hFCAD.arrEntities[i].gender = "Block" Then
+    If AppMain.CurrentDrawing.arrEntities[i].gender = "Block" Then
       Dim newBlock As New ArrBlockst
-      newBlock.name = APPMain.hFCAD.arrEntities[i].block
-      newBlock.x = APPMain.hFCAD.arrEntities[i].p[0]
-      newBlock.y = APPMain.hFCAD.arrEntities[i].p[1]
+      newBlock.name = AppMain.CurrentDrawing.arrEntities[i].block
+      newBlock.x = AppMain.CurrentDrawing.arrEntities[i].p[0]
+      newBlock.y = AppMain.CurrentDrawing.arrEntities[i].p[1]
       newBlock.entities = New Entity[]
       ' busco los objetos de este bloque y los reconstruyo
-      For i2 = iStart To APPMain.hFCAD.arrEntities.max
-        If APPMain.hFCAD.arrEntities[i2].block = newBlock.name And APPMain.hFCAD.arrEntities[i2].gender <> "Block" Then ' sin recursividad en bloques
-          If APPMain.hFCAD.arrEntities[i2].block = newBlock.name And APPMain.hFCAD.arrEntities[i2].gender <> "Insert" Then 'no quiero insertarme a mi mismo
+      For i2 = iStart To AppMain.CurrentDrawing.arrEntities.max
+        If AppMain.CurrentDrawing.arrEntities[i2].block = newBlock.name And AppMain.CurrentDrawing.arrEntities[i2].gender <> "Block" Then ' sin recursividad en bloques
+          If AppMain.CurrentDrawing.arrEntities[i2].block = newBlock.name And AppMain.CurrentDrawing.arrEntities[i2].gender <> "Insert" Then 'no quiero insertarme a mi mismo
             PartesEncontradas = True
             Dim o2 As Entity
-            o2 = ClonEntity(APPMain.hFCAD.arrEntities[i2])
+            o2 = ClonEntity(AppMain.CurrentDrawing.arrEntities[i2])
 
             o2.ClassHandler.finish(o2, -1)
             newBlock.entities.Add(o2)
@@ -84,7 +84,7 @@ Public Function ReconstruirBloques() As Boolean
 
         Endif
       Next
-      APPMain.hFCAD.arrBlocks.Add(newBlock)
+      AppMain.CurrentDrawing.arrBlocks.Add(newBlock)
     End If
   Next
 
@@ -103,9 +103,9 @@ Public Sub GetFreeBlockNumber() As Integer
 
   Dim i, n As Integer = 1
 
-  For i = 0 To APPMain.hFCAD.arrEntities.Max
+  For i = 0 To AppMain.CurrentDrawing.arrEntities.Max
 
-    If APPMain.hFCAD.arrEntities[i].BlockNumber > n Then n = APPMain.hFCAD.arrEntities[i].BlockNumber + 1
+    If AppMain.CurrentDrawing.arrEntities[i].BlockNumber > n Then n = AppMain.CurrentDrawing.arrEntities[i].BlockNumber + 1
 
   Next
   Return n
@@ -149,35 +149,35 @@ Public Sub glGenDrawList(Optional iEntity As Integer = -1)
 
   If iEntity >= 0 Then
 
-    If Not gl.islist(APPMain.hFCAD.arrEntities[iEntity].glDrwList) Then APPMain.hFCAD.arrEntities[iEntity].glDrwList = gl.GenLists(1)
-    gl.NewList(APPMain.hFCAD.arrEntities[iEntity].glDrwList, gl.COMPILE)
-    APPMain.hFCAD.arrEntities[iEntity].ClassHandler.Draw(APPMain.hFCAD.arrEntities[iEntity])
+    If Not gl.islist(AppMain.CurrentDrawing.arrEntities[iEntity].glDrwList) Then AppMain.CurrentDrawing.arrEntities[iEntity].glDrwList = gl.GenLists(1)
+    gl.NewList(AppMain.CurrentDrawing.arrEntities[iEntity].glDrwList, gl.COMPILE)
+    AppMain.CurrentDrawing.arrEntities[iEntity].ClassHandler.Draw(AppMain.CurrentDrawing.arrEntities[iEntity])
     gl.EndList
 
-    If Not gl.islist(APPMain.hFCAD.arrEntities[iEntity].glDrwListSel) Then APPMain.hFCAD.arrEntities[iEntity].glDrwListSel = gl.GenLists(1)
-    gl.NewList(APPMain.hFCAD.arrEntities[iEntity].glDrwListSel, gl.COMPILE)
-    APPMain.hFCAD.arrEntities[iEntity].ClassHandler.DrawSelected(APPMain.hFCAD.arrEntities[iEntity])
+    If Not gl.islist(AppMain.CurrentDrawing.arrEntities[iEntity].glDrwListSel) Then AppMain.CurrentDrawing.arrEntities[iEntity].glDrwListSel = gl.GenLists(1)
+    gl.NewList(AppMain.CurrentDrawing.arrEntities[iEntity].glDrwListSel, gl.COMPILE)
+    AppMain.CurrentDrawing.arrEntities[iEntity].ClassHandler.DrawSelected(AppMain.CurrentDrawing.arrEntities[iEntity])
     gl.EndList
 
   Else
 
-    If Not gl.islist(APPMain.hFCAD.GlListAllEntities) Then APPMain.hFCAD.GlListAllEntities = gl.GenLists(1)
+    If Not gl.islist(AppMain.CurrentDrawing.GlListAllEntities) Then AppMain.CurrentDrawing.GlListAllEntities = gl.GenLists(1)
     Dim t As Float = Timer
     ' listas de entidades
-    For i = 0 To APPMain.hFCAD.arrEntities.Max
+    For i = 0 To AppMain.CurrentDrawing.arrEntities.Max
 
-      If Not gl.islist(APPMain.hFCAD.arrEntities[i].glDrwList) Then APPMain.hFCAD.arrEntities[i].glDrwList = gl.GenLists(1)
-      gl.NewList(APPMain.hFCAD.arrEntities[i].glDrwList, gl.COMPILE)
-      APPMain.hFCAD.arrEntities[i].ClassHandler.Draw(APPMain.hFCAD.arrEntities[i])
+      If Not gl.islist(AppMain.CurrentDrawing.arrEntities[i].glDrwList) Then AppMain.CurrentDrawing.arrEntities[i].glDrwList = gl.GenLists(1)
+      gl.NewList(AppMain.CurrentDrawing.arrEntities[i].glDrwList, gl.COMPILE)
+      AppMain.CurrentDrawing.arrEntities[i].ClassHandler.Draw(AppMain.CurrentDrawing.arrEntities[i])
       gl.EndList
 
     Next
     Debug "GLlista de entidades generada en  ", Timer - t
     ' lista de entidaes seleccionadas
-    For i = 0 To APPMain.hFCAD.arrEntities.Max
-      If Not gl.islist(APPMain.hFCAD.arrEntities[i].glDrwListSel) Then APPMain.hFCAD.arrEntities[i].glDrwListSel = gl.GenLists(1)
-      gl.NewList(APPMain.hFCAD.arrEntities[i].glDrwListSel, gl.COMPILE)
-      APPMain.hFCAD.arrEntities[i].ClassHandler.DrawSelected(APPMain.hFCAD.arrEntities[i])
+    For i = 0 To AppMain.CurrentDrawing.arrEntities.Max
+      If Not gl.islist(AppMain.CurrentDrawing.arrEntities[i].glDrwListSel) Then AppMain.CurrentDrawing.arrEntities[i].glDrwListSel = gl.GenLists(1)
+      gl.NewList(AppMain.CurrentDrawing.arrEntities[i].glDrwListSel, gl.COMPILE)
+      AppMain.CurrentDrawing.arrEntities[i].ClassHandler.DrawSelected(AppMain.CurrentDrawing.arrEntities[i])
       gl.EndList
     Next
 
@@ -197,15 +197,15 @@ Public Sub glGenDrawListSel(Optional mode As Integer = 0)
   Dim idDrawing As Integer ' la instancia de dibujo en la que estamos
   Dim i As Integer
 
-  If Not gl.islist(APPMain.hFCAD.GlListSelectedEntities) Then APPMain.hFCAD.GlListSelectedEntities = gl.GenLists(1)
+  If Not gl.islist(AppMain.CurrentDrawing.GlListSelectedEntities) Then AppMain.CurrentDrawing.GlListSelectedEntities = gl.GenLists(1)
 
-  gl.NewList(APPMain.hFCAD.GlListSelectedEntities, gl.COMPILE)
+  gl.NewList(AppMain.CurrentDrawing.GlListSelectedEntities, gl.COMPILE)
 
-  For i = 0 To APPMain.hFCAD.arrEntities.Max
+  For i = 0 To AppMain.CurrentDrawing.arrEntities.Max
 
-    If APPMain.hFCAD.arrEntities[i].Selected Then
-      If mode = 0 Then gl.CallList(APPMain.hFCAD.arrEntities[i].glDrwListSel)
-      If mode = 1 Then gl.CallList(APPMain.hFCAD.arrEntities[i].glDrwList)
+    If AppMain.CurrentDrawing.arrEntities[i].Selected Then
+      If mode = 0 Then gl.CallList(AppMain.CurrentDrawing.arrEntities[i].glDrwListSel)
+      If mode = 1 Then gl.CallList(AppMain.CurrentDrawing.arrEntities[i].glDrwList)
     End If
   Next
 
@@ -219,10 +219,10 @@ Public Sub glGenDrawListAll(Optional ExcludeSelected As Boolean = False)
 
   Dim i As Integer
 
-  gl.NewList(APPMain.hFCAD.GlListAllEntities, gl.COMPILE)
+  gl.NewList(AppMain.CurrentDrawing.GlListAllEntities, gl.COMPILE)
 
-  For i = 0 To APPMain.hFCAD.arrEntities.max
-    If Not (APPMain.hFCAD.arrEntities[i].Selected And ExcludeSelected) Then gl.CallList(APPMain.hFCAD.arrEntities[i].glDrwList)
+  For i = 0 To AppMain.CurrentDrawing.arrEntities.max
+    If Not (AppMain.CurrentDrawing.arrEntities[i].Selected And ExcludeSelected) Then gl.CallList(AppMain.CurrentDrawing.arrEntities[i].glDrwList)
 
   Next
 
@@ -234,12 +234,12 @@ Public Sub DrawPoiSymbolsAll()
 
   Dim i, total As Integer
 
-  For i = 0 To APPMain.hFCAD.arrEntities.Max
+  For i = 0 To AppMain.CurrentDrawing.arrEntities.Max
 
-    If APPMain.hFCAD.arrEntities[i].Selected Then
+    If AppMain.CurrentDrawing.arrEntities[i].Selected Then
 
-      If (APPMain.hFCAD.arrEntities[i].iInsert < 0) Or (APPMain.hFCAD.arrEntities[i].Gender = "Insert") Then
-        DrawPoiSymbols(APPMain.hFCAD.arrEntities[i])
+      If (AppMain.CurrentDrawing.arrEntities[i].iInsert < 0) Or (AppMain.CurrentDrawing.arrEntities[i].Gender = "Insert") Then
+        DrawPoiSymbols(AppMain.CurrentDrawing.arrEntities[i])
         Inc total
       End If
     End If
@@ -280,12 +280,12 @@ Public Sub Finish(Optional selected As Boolean = True)
   ' creo copias de cada elemento seleccionado
   Dim m As Integer, i As Integer
 
-  m = APPMain.hFCAD.arrEntities.Max
+  m = AppMain.CurrentDrawing.arrEntities.Max
   For i = 0 To m
     If selected Then                                                    ' apply to only the selected ones
-      If APPMain.hFCAD.arrEntities[i].Selected Then APPMain.hFCAD.arrEntities[i].ClassHandler.Finish(APPMain.hFCAD.arrEntities[i], -1)
+      If AppMain.CurrentDrawing.arrEntities[i].Selected Then AppMain.CurrentDrawing.arrEntities[i].ClassHandler.Finish(AppMain.CurrentDrawing.arrEntities[i], -1)
     Else                                                                ' apply to all
-      APPMain.hFCAD.arrEntities[i].ClassHandler.Finish(APPMain.hFCAD.arrEntities[i], -1)
+      AppMain.CurrentDrawing.arrEntities[i].ClassHandler.Finish(AppMain.CurrentDrawing.arrEntities[i], -1)
     End If
 
   Next
@@ -297,18 +297,18 @@ Public Sub ClonElements(Optional selected As Boolean = True, SkipParts As Boolea
   ' creo copias de cada elemento seleccionado
   Dim m, i As Integer
 
-  m = APPMain.hFCAD.arrEntities.Max
+  m = AppMain.CurrentDrawing.arrEntities.Max
   For i = 0 To m
-    If APPMain.hFCAD.arrEntities[i].Selected Then
+    If AppMain.CurrentDrawing.arrEntities[i].Selected Then
 
       If SkipParts Then
-        If (APPMain.hFCAD.arrEntities[i].iInsert < 0) Or (APPMain.hFCAD.arrEntities[i].iInsert = i) Then
-          APPMain.hFCAD.arrEntities.Add(ClonEntity(APPMain.hFCAD.arrEntities[i]))
-          APPMain.hFCAD.arrEntities.Last.ClassHandler.finish(APPMain.hFCAD.arrEntities.Last, -1)
+        If (AppMain.CurrentDrawing.arrEntities[i].iInsert < 0) Or (AppMain.CurrentDrawing.arrEntities[i].iInsert = i) Then
+          AppMain.CurrentDrawing.arrEntities.Add(ClonEntity(AppMain.CurrentDrawing.arrEntities[i]))
+          AppMain.CurrentDrawing.arrEntities.Last.ClassHandler.finish(AppMain.CurrentDrawing.arrEntities.Last, -1)
         End If
       Else
-        APPMain.hFCAD.arrEntities.Add(ClonEntity(APPMain.hFCAD.arrEntities[i]))
-        APPMain.hFCAD.arrEntities.Last.ClassHandler.finish(APPMain.hFCAD.arrEntities.Last, -1)
+        AppMain.CurrentDrawing.arrEntities.Add(ClonEntity(AppMain.CurrentDrawing.arrEntities[i]))
+        AppMain.CurrentDrawing.arrEntities.Last.ClassHandler.finish(AppMain.CurrentDrawing.arrEntities.Last, -1)
 
       Endif
 
@@ -350,11 +350,11 @@ Public Function DeSelection(Optional elementos As String = "todo", Accion As Str
   elementos = LCase(elementos)
 
   '   primero vacio la seleccion anterior
-  APPMain.hFCAD.arrSelecIndex.Clear
+  AppMain.CurrentDrawing.arrSelecIndex.Clear
 
-  For iii = 0 To APPMain.hFCAD.arrEntities.Max
+  For iii = 0 To AppMain.CurrentDrawing.arrEntities.Max
 
-    clase = APPMain.hFCAD.arrEntities[iii].Gender
+    clase = AppMain.CurrentDrawing.arrEntities[iii].Gender
 
     Select Case accion
 
@@ -362,7 +362,7 @@ Public Function DeSelection(Optional elementos As String = "todo", Accion As Str
 
         If SelFull() And (elementos = "todo" Or elementos = clase) Then
 
-          APPMain.hFCAD.arrSelecIndex.Add(iii)
+          AppMain.CurrentDrawing.arrSelecIndex.Add(iii)
           SelectElem(iii)
           Inc i
 
@@ -375,7 +375,7 @@ Public Function DeSelection(Optional elementos As String = "todo", Accion As Str
       Case "estirar" ' necesito que dos puntos contiguos esten seleccionados
 
         If SelPArtial() And (elementos = "todo" Or elementos = clase) Then
-          APPMain.hFCAD.arrSelecIndex.Add(iii)
+          AppMain.CurrentDrawing.arrSelecIndex.Add(iii)
           SelectElem(iii, False) ' dont touch the points
           Inc i
 
@@ -406,11 +406,11 @@ Public Function GetSelectionCount() As Integer
 
   Dim i, ii As Integer
 
-  APPMain.hFCAD.arrSelecIndex.Clear
-  For i = 0 To APPMain.hFCAD.arrEntities.Max
-    If APPMain.hFCAD.arrEntities[i].Selected Then
+  AppMain.CurrentDrawing.arrSelecIndex.Clear
+  For i = 0 To AppMain.CurrentDrawing.arrEntities.Max
+    If AppMain.CurrentDrawing.arrEntities[i].Selected Then
       Inc ii
-      APPMain.hFCAD.arrSelecIndex.Add(i)
+      AppMain.CurrentDrawing.arrSelecIndex.Add(i)
     End If
   Next
   Return ii
@@ -423,16 +423,16 @@ Public Function DeleteSelected(Optional Purge As Boolean = False) As Integer
 
   '  Purgue will also delete those with .ForDeletion = true
 
-  For i = APPMain.hFCAD.arrEntities.Max To 0 Step -1
+  For i = AppMain.CurrentDrawing.arrEntities.Max To 0 Step -1
     If Purge Then
-      If APPMain.hFCAD.arrEntities[i].ForDeletion Then
-        APPMain.hFCAD.arrEntities.Remove(i)
+      If AppMain.CurrentDrawing.arrEntities[i].ForDeletion Then
+        AppMain.CurrentDrawing.arrEntities.Remove(i)
         Inc c
       End If
     Else
 
-      If APPMain.hFCAD.arrEntities[i].ForDeletion Or APPMain.hFCAD.arrEntities[i].Selected Then
-        APPMain.hFCAD.arrEntities.Remove(i)
+      If AppMain.CurrentDrawing.arrEntities[i].ForDeletion Or AppMain.CurrentDrawing.arrEntities[i].Selected Then
+        AppMain.CurrentDrawing.arrEntities.Remove(i)
         Inc c
       End If
     End If
@@ -446,17 +446,17 @@ Public Function SelectFromPoint(Xr As Float, Zr As Float, Optional Autoselect As
 
   Dim i As Integer
 
-  For i = APPMain.hFCAD.arrEntities.Max To 0 Step -1
+  For i = AppMain.CurrentDrawing.arrEntities.Max To 0 Step -1
     ' last elements are drawn last so the click belongs to them
-    If APPMain.hFCAD.arrEntities[i].PointClick(Xr, Zr) Then
+    If AppMain.CurrentDrawing.arrEntities[i].PointClick(Xr, Zr) Then
       If Autoselect Then
-        If Not APPMain.hFCAD.arrEntities[i].Selected Then
-          SelectElem(APPMain.hFCAD.arrEntities[i])
+        If Not AppMain.CurrentDrawing.arrEntities[i].Selected Then
+          SelectElem(AppMain.CurrentDrawing.arrEntities[i])
         Else
-          DeSelectElem(APPMain.hFCAD.arrEntities[i])
+          DeSelectElem(AppMain.CurrentDrawing.arrEntities[i])
         End If
       End If
-      Return APPMain.hFCAD.arrEntities[i]
+      Return AppMain.CurrentDrawing.arrEntities[i]
     End If
 
   Next
@@ -486,7 +486,7 @@ End
 '
 '   Dim i As Integer
 '
-'   If APPMain.hFCAD.arrEntities[iEntity].iInsert >= 0 Then
+'   If appmain.CurrentDrawing.arrEntities[iEntity].iInsert >= 0 Then
 '     ' es parte de un bloque, lo selecciono completo
 '     i = GetParentBlock(iEntity)
 '     SelectAllElemFromBlock(iEntity, AndItsPoints)
@@ -494,12 +494,12 @@ End
 '   Endif
 '
 '   If AndItsPoints Then
-'     For i = 0 To APPMain.hFCAD.arrEntities[iEntity].Psel.Max
-'       APPMain.hFCAD.arrEntities[iEntity].Psel[i] = True
+'     For i = 0 To appmain.CurrentDrawing.arrEntities[iEntity].Psel.Max
+'       appmain.CurrentDrawing.arrEntities[iEntity].Psel[i] = True
 '     Next
 '
 '   End If
-'   APPMain.hFCAD.arrEntities[iEntity].selected = True
+'   appmain.CurrentDrawing.arrEntities[iEntity].selected = True
 '
 ' End
 
@@ -509,20 +509,20 @@ End
 '
 '   Dim i, ii, iii As Integer
 '
-'   APPMain.hFCAD.arrEntities[iBlock].selected = True                                                   ' seleccionamos el insert
+'   appmain.CurrentDrawing.arrEntities[iBlock].selected = True                                                   ' seleccionamos el insert
 '
-'   For i = appmain.hFCAD.arrEntities[iBlock].iInsert + 1 To appmain.hFCAD.arrEntities.max             ' y sus entidades
+'   For i = appmain.CurrentDrawing.arrEntities[iBlock].iInsert + 1 To appmain.CurrentDrawing.arrEntities.max             ' y sus entidades
 '
-'     If appmain.hFCAD.arrEntities[i].iInsert <> appmain.hFCAD.arrEntities[iBlock].iInsert Then Break
+'     If appmain.CurrentDrawing.arrEntities[i].iInsert <> appmain.CurrentDrawing.arrEntities[iBlock].iInsert Then Break
 '
 '     If AndItsPoints Then
-'       For ii = 0 To APPMain.hFCAD.arrEntities[i].Psel.Max
-'         APPMain.hFCAD.arrEntities[i].Psel[ii] = True                                      ' y sus puntos
+'       For ii = 0 To appmain.CurrentDrawing.arrEntities[i].Psel.Max
+'         appmain.CurrentDrawing.arrEntities[i].Psel[ii] = True                                      ' y sus puntos
 '       Next
 '
 '     End If
 '
-'     APPMain.hFCAD.arrEntities[i].selected = True
+'     appmain.CurrentDrawing.arrEntities[i].selected = True
 '
 '   Next
 '
@@ -534,18 +534,18 @@ End
 '
 '   Dim i, ii, iii As Integer
 '
-'   For i = iBlock + 1 To appmain.hFCAD.arrEntities.max             ' y sus entidades
+'   For i = iBlock + 1 To appmain.CurrentDrawing.arrEntities.max             ' y sus entidades
 '
-'     If appmain.hFCAD.arrEntities[i].iInsert <> iBlock Then Break
+'     If appmain.CurrentDrawing.arrEntities[i].iInsert <> iBlock Then Break
 '
 '     If AndItsPoints Then
-'       For ii = 0 To APPMain.hFCAD.arrEntities[i].Psel.Max
-'         APPMain.hFCAD.arrEntities[i].Psel[ii] = False                                      ' y sus puntos
+'       For ii = 0 To appmain.CurrentDrawing.arrEntities[i].Psel.Max
+'         appmain.CurrentDrawing.arrEntities[i].Psel[ii] = False                                      ' y sus puntos
 '       Next
 '
 '     End If
 '
-'     APPMain.hFCAD.arrEntities[i].selected = False
+'     appmain.CurrentDrawing.arrEntities[i].selected = False
 '
 '   Next
 '
@@ -555,22 +555,22 @@ Public Sub SelectElem(iEntity As Integer, Optional AndItsPoints As Boolean = Tru
 
   Dim i, ii As Integer
 
-  If APPMain.hFCAD.arrEntities[iEntity].Gender = "Insert" Then          ' es un inserto
-    If appmain.hFCAD.arrEntities[iEntity].iInsert >= 0 Then             ' esta dentro de otro insert?
-      If Not APPMain.hFCAD.arrEntities[iEntity].selected Then               ' si estaba seleccionada
-        SelectElem(appmain.hFCAD.arrEntities[iEntity].iInsert, AndItsPoints)  ' llamo recursivamente
+  If AppMain.CurrentDrawing.arrEntities[iEntity].Gender = "Insert" Then          ' es un inserto
+    If AppMain.CurrentDrawing.arrEntities[iEntity].iInsert >= 0 Then             ' esta dentro de otro insert?
+      If Not AppMain.CurrentDrawing.arrEntities[iEntity].selected Then               ' si estaba seleccionada
+        SelectElem(AppMain.CurrentDrawing.arrEntities[iEntity].iInsert, AndItsPoints)  ' llamo recursivamente
       End If
     Else                                                                ' no, deselecciono hasta encontrar un -1
-      APPMain.hFCAD.arrEntities[iEntity].selected = True
-      For i = iEntity + 1 To appmain.hFCAD.arrEntities.max              ' y sus entidades
+      AppMain.CurrentDrawing.arrEntities[iEntity].selected = True
+      For i = iEntity + 1 To AppMain.CurrentDrawing.arrEntities.max              ' y sus entidades
 
-        If appmain.hFCAD.arrEntities[i].iInsert = -1 Then Break
+        If AppMain.CurrentDrawing.arrEntities[i].iInsert = -1 Then Break
 
-        APPMain.hFCAD.arrEntities[i].selected = True
+        AppMain.CurrentDrawing.arrEntities[i].selected = True
 
         If AndItsPoints Then
-          For ii = 0 To APPMain.hFCAD.arrEntities[i].Psel.Max
-            APPMain.hFCAD.arrEntities[i].Psel[ii] = True                                      ' y sus puntos
+          For ii = 0 To AppMain.CurrentDrawing.arrEntities[i].Psel.Max
+            AppMain.CurrentDrawing.arrEntities[i].Psel[ii] = True                                      ' y sus puntos
           Next
 
         End If
@@ -579,17 +579,17 @@ Public Sub SelectElem(iEntity As Integer, Optional AndItsPoints As Boolean = Tru
     End If
   Else                                                          ' no es un inserto, pero es parte de uno?
 
-    If APPMain.hFCAD.arrEntities[iEntity].iInsert >= 0 Then     ' si, llamo recursivamente
-      If Not APPMain.hFCAD.arrEntities[iEntity].selected Then       ' pero solo si estaba seleccionada
-        SelectElem(APPMain.hFCAD.arrEntities[iEntity].iInsert, AndItsPoints)
+    If AppMain.CurrentDrawing.arrEntities[iEntity].iInsert >= 0 Then     ' si, llamo recursivamente
+      If Not AppMain.CurrentDrawing.arrEntities[iEntity].selected Then       ' pero solo si estaba seleccionada
+        SelectElem(AppMain.CurrentDrawing.arrEntities[iEntity].iInsert, AndItsPoints)
         Return
       End If
     Else                                                        ' no, simplemente deselecciono esta entidad
 
-      APPMain.hFCAD.arrEntities[iEntity].selected = True
+      AppMain.CurrentDrawing.arrEntities[iEntity].selected = True
       If AndItsPoints Then
-        For i = 0 To APPMain.hFCAD.arrEntities[iEntity].Psel.Max
-          APPMain.hFCAD.arrEntities[iEntity].Psel[i] = True
+        For i = 0 To AppMain.CurrentDrawing.arrEntities[iEntity].Psel.Max
+          AppMain.CurrentDrawing.arrEntities[iEntity].Psel[i] = True
         Next
 
       End If
@@ -605,22 +605,22 @@ Public Sub DeSelectElem(iEntity As Integer, Optional AndItsPoints As Boolean = T
 
   Dim i, ii As Integer
 
-  If APPMain.hFCAD.arrEntities[iEntity].Gender = "Insert" Then          ' es un inserto
-    If appmain.hFCAD.arrEntities[iEntity].iInsert >= 0 Then             ' esta dentro de otro insert?
-      If APPMain.hFCAD.arrEntities[iEntity].selected Then               ' si estaba seleccionada
-        DeSelectElem(appmain.hFCAD.arrEntities[iEntity].iInsert, AndItsPoints)  ' llamo recursivamente
+  If AppMain.CurrentDrawing.arrEntities[iEntity].Gender = "Insert" Then          ' es un inserto
+    If AppMain.CurrentDrawing.arrEntities[iEntity].iInsert >= 0 Then             ' esta dentro de otro insert?
+      If AppMain.CurrentDrawing.arrEntities[iEntity].selected Then               ' si estaba seleccionada
+        DeSelectElem(AppMain.CurrentDrawing.arrEntities[iEntity].iInsert, AndItsPoints)  ' llamo recursivamente
       End If
     Else                                                                ' no, deselecciono hasta encontrar un -1
-      APPMain.hFCAD.arrEntities[iEntity].selected = False
-      For i = iEntity + 1 To appmain.hFCAD.arrEntities.max              ' y sus entidades
+      AppMain.CurrentDrawing.arrEntities[iEntity].selected = False
+      For i = iEntity + 1 To AppMain.CurrentDrawing.arrEntities.max              ' y sus entidades
 
-        If appmain.hFCAD.arrEntities[i].iInsert = -1 Then Break
+        If AppMain.CurrentDrawing.arrEntities[i].iInsert = -1 Then Break
 
-        APPMain.hFCAD.arrEntities[i].selected = False
+        AppMain.CurrentDrawing.arrEntities[i].selected = False
 
         If AndItsPoints Then
-          For ii = 0 To APPMain.hFCAD.arrEntities[i].Psel.Max
-            APPMain.hFCAD.arrEntities[i].Psel[ii] = False                                      ' y sus puntos
+          For ii = 0 To AppMain.CurrentDrawing.arrEntities[i].Psel.Max
+            AppMain.CurrentDrawing.arrEntities[i].Psel[ii] = False                                      ' y sus puntos
           Next
 
         End If
@@ -629,17 +629,17 @@ Public Sub DeSelectElem(iEntity As Integer, Optional AndItsPoints As Boolean = T
     End If
   Else                                                          ' no es un inserto, pero es parte de uno?
 
-    If APPMain.hFCAD.arrEntities[iEntity].iInsert >= 0 Then     ' si, llamo recursivamente
-      If APPMain.hFCAD.arrEntities[iEntity].selected Then       ' pero solo si estaba seleccionada
-        DeSelectElem(APPMain.hFCAD.arrEntities[iEntity].iInsert, AndItsPoints)
+    If AppMain.CurrentDrawing.arrEntities[iEntity].iInsert >= 0 Then     ' si, llamo recursivamente
+      If AppMain.CurrentDrawing.arrEntities[iEntity].selected Then       ' pero solo si estaba seleccionada
+        DeSelectElem(AppMain.CurrentDrawing.arrEntities[iEntity].iInsert, AndItsPoints)
         Return
       End If
     Else                                                        ' no, simplemente deselecciono esta entidad
 
-      APPMain.hFCAD.arrEntities[iEntity].selected = False
+      AppMain.CurrentDrawing.arrEntities[iEntity].selected = False
       If AndItsPoints Then
-        For i = 0 To APPMain.hFCAD.arrEntities[iEntity].Psel.Max
-          APPMain.hFCAD.arrEntities[iEntity].Psel[i] = False
+        For i = 0 To AppMain.CurrentDrawing.arrEntities[iEntity].Psel.Max
+          AppMain.CurrentDrawing.arrEntities[iEntity].Psel[i] = False
         Next
 
       End If
@@ -691,7 +691,7 @@ Public Sub Move(dX As Float, dY As Float, Optional OnlySelected As Boolean = Fal
   ' crea un backup de todos los puntos
   Dim e As Entity, i As Integer
 
-  For Each e In APPMain.hFCAD.arrEntities
+  For Each e In AppMain.CurrentDrawing.arrEntities
     If (e.selected And OnlySelected) Or Not OnlySelected Then
 
       e.ClassHandler.Translate(e, dX, dY, OnlyPointSelected)
@@ -707,7 +707,7 @@ Public Sub Rotate(degAngle As Float, Optional OnlySelected As Boolean = False, O
   ' crea un backup de todos los puntos
   Dim e As Entity, i As Integer
 
-  For Each e In APPMain.hFCAD.arrEntities
+  For Each e In AppMain.CurrentDrawing.arrEntities
     If (e.selected And OnlySelected) Or Not OnlySelected Then
 
       e.ClassHandler.Rotate(e, degAngle)
@@ -723,7 +723,7 @@ Public Sub Scale(sX As Float, sY As Float, Optional sZ As Float = 1, OnlySelecte
   ' crea un backup de todos los puntos
   Dim e As Entity, i As Integer
 
-  For Each e In APPMain.hFCAD.arrEntities
+  For Each e In AppMain.CurrentDrawing.arrEntities
     If (e.selected And OnlySelected) Or Not OnlySelected Then
 
       e.ClassHandler.Scale(e, sX, sY)
@@ -742,16 +742,16 @@ Public Function SelectionSquare(X1real As Float, Y1real As Float, X2real As Floa
   NuevaSumaResta = LCase$(NuevaSumaResta)
 
   If NuevaSumaResta = "nueva" Then ' nueva seleccion
-    For i = 0 To APPMain.hFCAD.arrEntities.Max
-      APPMain.hFCAD.arrEntities[i].selected = False
-      For i2 = 0 To APPMain.hFCAD.arrEntities[i].Psel.max
-        APPMain.hFCAD.arrEntities[i].Psel[i2] = False
+    For i = 0 To AppMain.CurrentDrawing.arrEntities.Max
+      AppMain.CurrentDrawing.arrEntities[i].selected = False
+      For i2 = 0 To AppMain.CurrentDrawing.arrEntities[i].Psel.max
+        AppMain.CurrentDrawing.arrEntities[i].Psel[i2] = False
       Next
     Next
     TotalSeleccionados = 0
   End If
 
-  For i = 0 To APPMain.hFCAD.arrEntities.Max
+  For i = 0 To AppMain.CurrentDrawing.arrEntities.Max
     ' cada entidad debe decidir si esta seleccionada o no
     If crossing Then
       If SelPArtial(i, X1real, Y1real, X2real, Y2real) Then
@@ -798,42 +798,42 @@ End
 '     NuevaSumaResta = LCase$(NuevaSumaResta)
 '
 '     If NuevaSumaResta = "nueva" Then
-'         For i = 0 To APPMain.hFCAD.arrEntities.Max
-'             APPMain.hFCAD.arrEntities[i].selected = False
-'             For i2 = 0 To APPMain.hFCAD.arrEntities[i].Psel.max
-'                 APPMain.hFCAD.arrEntities[i].Psel[i2] = False
+'         For i = 0 To appmain.CurrentDrawing.arrEntities.Max
+'             appmain.CurrentDrawing.arrEntities[i].selected = False
+'             For i2 = 0 To appmain.CurrentDrawing.arrEntities[i].Psel.max
+'                 appmain.CurrentDrawing.arrEntities[i].Psel[i2] = False
 '             Next
 '         Next
 '     End If
 '     Debug "Deselect time ", Timer - t
 '
 '     ' reviso los poligonos
-'     For i = 0 To APPMain.hFCAD.poiPoligonEntities.Max
+'     For i = 0 To appmain.CurrentDrawing.poiPoligonEntities.Max
 '
 '         If crossing Then
-'             If puntos.IsPoligonCrossingRect(APPMain.hFCAD.poiPoligons, X1real, Y1real, X2real, Y2real, APPMain.hFCAD.poiPoligonStartIndex[i], APPMain.hFCAD.poiPoligonElements[i]) Then
+'             If puntos.IsPoligonCrossingRect(appmain.CurrentDrawing.poiPoligons, X1real, Y1real, X2real, Y2real, appmain.CurrentDrawing.poiPoligonStartIndex[i], appmain.CurrentDrawing.poiPoligonElements[i]) Then
 '                 ' el punto esta en el recuadro
 '                 If NuevaSumaResta <> "resta" Then
 '                     Inc TotalSeleccionados
-'                     APPMain.hFCAD.arrEntities[i].selected = True
+'                     appmain.CurrentDrawing.arrEntities[i].selected = True
 '
 '                 Else If NuevaSumaResta = "resta" Then
 '                     Dec TotalSeleccionados
-'                     APPMain.hFCAD.arrEntities[i].selected = False
+'                     appmain.CurrentDrawing.arrEntities[i].selected = False
 '
 '                 End If
 '
 '             Endif
 '         Else
-'             If puntos.IsPoligonInsideRect(APPMain.hFCAD.poiPoligons, X1real, Y1real, X2real, Y2real, APPMain.hFCAD.poiPoligonStartIndex[i], APPMain.hFCAD.poiPoligonElements[i]) Then
+'             If puntos.IsPoligonInsideRect(appmain.CurrentDrawing.poiPoligons, X1real, Y1real, X2real, Y2real, appmain.CurrentDrawing.poiPoligonStartIndex[i], appmain.CurrentDrawing.poiPoligonElements[i]) Then
 '                 ' el punto esta en el recuadro
 '                 If NuevaSumaResta <> "resta" Then
 '                     Inc TotalSeleccionados
-'                     APPMain.hFCAD.arrEntities[i].selected = True
+'                     appmain.CurrentDrawing.arrEntities[i].selected = True
 '
 '                 Else If NuevaSumaResta = "resta" Then
 '                     Dec TotalSeleccionados
-'                     APPMain.hFCAD.arrEntities[i].selected = False
+'                     appmain.CurrentDrawing.arrEntities[i].selected = False
 '
 '                 End If
 '
@@ -844,17 +844,17 @@ End
 '
 '     ' reviso las lineas
 '     If crossing Then
-'         For i = 0 To APPMain.hFCAD.poiLines.Max Step 2                                                                                                  ' para cada punto
-'             If puntos.InBetween(APPMain.hFCAD.poiLines[i], X1real, X2real) And puntos.InBetween(APPMain.hFCAD.poiLines[i + 1], Y1real, Y2real) Then     ' esta dentro
+'         For i = 0 To appmain.CurrentDrawing.poiLines.Max Step 2                                                                                                  ' para cada punto
+'             If puntos.InBetween(appmain.CurrentDrawing.poiLines[i], X1real, X2real) And puntos.InBetween(appmain.CurrentDrawing.poiLines[i + 1], Y1real, Y2real) Then     ' esta dentro
 '                 ' el punto esta en el recuadro
 '                 If NuevaSumaResta <> "resta" Then
 '                     Inc TotalSeleccionados
-'                     APPMain.hFCAD.arrEntities[APPMain.hFCAD.poiLinesEntities[i / 4]].selected = True
-'                     APPMain.hFCAD.arrEntities[APPMain.hFCAD.poiLinesEntities[i / 4]].Psel[APPMain.hFCAD.poiLinesRelPoint[i / 2]] = True
+'                     appmain.CurrentDrawing.arrEntities[appmain.CurrentDrawing.poiLinesEntities[i / 4]].selected = True
+'                     appmain.CurrentDrawing.arrEntities[appmain.CurrentDrawing.poiLinesEntities[i / 4]].Psel[appmain.CurrentDrawing.poiLinesRelPoint[i / 2]] = True
 '                 Else If NuevaSumaResta = "resta" Then
 '                     Dec TotalSeleccionados
-'                     APPMain.hFCAD.arrEntities[APPMain.hFCAD.poiLinesEntities[i / 4]].selected = False
-'                     APPMain.hFCAD.arrEntities[APPMain.hFCAD.poiLinesEntities[i / 4]].Psel[APPMain.hFCAD.poiLinesRelPoint[i / 2]] = False
+'                     appmain.CurrentDrawing.arrEntities[appmain.CurrentDrawing.poiLinesEntities[i / 4]].selected = False
+'                     appmain.CurrentDrawing.arrEntities[appmain.CurrentDrawing.poiLinesEntities[i / 4]].Psel[appmain.CurrentDrawing.poiLinesRelPoint[i / 2]] = False
 '
 '                 End If
 '
@@ -864,17 +864,17 @@ End
 '
 '     Else    ' full selection
 '         ' hago un crossing primero y luego me fijo si estan todos
-'         For i = 0 To APPMain.hFCAD.poiLines.Max Step 2                                                                                                  ' para cada punto
-'             If puntos.InBetween(APPMain.hFCAD.poiLines[i], X1real, X2real) And puntos.InBetween(APPMain.hFCAD.poiLines[i + 1], Y1real, Y2real) Then     ' esta dentro
+'         For i = 0 To appmain.CurrentDrawing.poiLines.Max Step 2                                                                                                  ' para cada punto
+'             If puntos.InBetween(appmain.CurrentDrawing.poiLines[i], X1real, X2real) And puntos.InBetween(appmain.CurrentDrawing.poiLines[i + 1], Y1real, Y2real) Then     ' esta dentro
 '                 ' el punto esta en el recuadro
 '                 If NuevaSumaResta <> "resta" Then
 '                     Inc TotalSeleccionados
-'                     APPMain.hFCAD.arrEntities[APPMain.hFCAD.poiLinesEntities[i / 4]].selected = True
-'                     APPMain.hFCAD.arrEntities[APPMain.hFCAD.poiLinesEntities[i / 4]].Psel[APPMain.hFCAD.poiLinesRelPoint[i / 2]] = True
+'                     appmain.CurrentDrawing.arrEntities[appmain.CurrentDrawing.poiLinesEntities[i / 4]].selected = True
+'                     appmain.CurrentDrawing.arrEntities[appmain.CurrentDrawing.poiLinesEntities[i / 4]].Psel[appmain.CurrentDrawing.poiLinesRelPoint[i / 2]] = True
 '                 Else If NuevaSumaResta = "resta" Then
 '                     Dec TotalSeleccionados
-'                     APPMain.hFCAD.arrEntities[APPMain.hFCAD.poiLinesEntities[i / 4]].selected = False
-'                     APPMain.hFCAD.arrEntities[APPMain.hFCAD.poiLinesEntities[i / 4]].Psel[APPMain.hFCAD.poiLinesRelPoint[i / 2]] = False
+'                     appmain.CurrentDrawing.arrEntities[appmain.CurrentDrawing.poiLinesEntities[i / 4]].selected = False
+'                     appmain.CurrentDrawing.arrEntities[appmain.CurrentDrawing.poiLinesEntities[i / 4]].Psel[appmain.CurrentDrawing.poiLinesRelPoint[i / 2]] = False
 '
 '                 End If
 '
@@ -883,12 +883,12 @@ End
 '         Next
 '
 '         CurrentEntityIndex = 0
-'         For i = 0 To APPMain.hFCAD.arrEntities.Max
+'         For i = 0 To appmain.CurrentDrawing.arrEntities.Max
 '
-'             If APPMain.hFCAD.arrEntities[i].Selected Then 'chequeo si todos estan seleccionados
+'             If appmain.CurrentDrawing.arrEntities[i].Selected Then 'chequeo si todos estan seleccionados
 '                 todos = True
-'                 For i2 = 0 To APPMain.hFCAD.arrEntities[i].Psel.Max
-'                     If APPMain.hFCAD.arrEntities[i].Psel = False Then
+'                 For i2 = 0 To appmain.CurrentDrawing.arrEntities[i].Psel.Max
+'                     If appmain.CurrentDrawing.arrEntities[i].Psel = False Then
 '                         todos = False
 '                         Break
 '                     Endif
@@ -896,9 +896,9 @@ End
 '
 '                 If (todos And NuevaSumaResta = "resta") Or Not todos Then
 '                     Dec TotalSeleccionados
-'                     APPMain.hFCAD.arrEntities[i].selected = False
-'                     For i2 = 0 To APPMain.hFCAD.arrEntities[i].Psel.Max
-'                         APPMain.hFCAD.arrEntities[i].Psel = False
+'                     appmain.CurrentDrawing.arrEntities[i].selected = False
+'                     For i2 = 0 To appmain.CurrentDrawing.arrEntities[i].Psel.Max
+'                         appmain.CurrentDrawing.arrEntities[i].Psel = False
 '
 '                     Next
 '
@@ -921,7 +921,7 @@ Public Function ComputeLimits(Optional entities As Entity[], OnlyVisibles As Boo
   Dim entGroup As Entity[]
   Dim Xmenor As Float = 1e10, Ymenor As Float = 1e10, Xmayor As Float = -1e10, Ymayor As Float = -1e10
 
-  If Not entities Then entGroup = APPMain.hFCAD.arrEntities Else entGroup = Entities
+  If Not entities Then entGroup = AppMain.CurrentDrawing.arrEntities Else entGroup = Entities
 
   For Each e In entGroup
     'If e.block = "" Then
@@ -965,33 +965,33 @@ Public Function SelFull(i As Integer, X1real As Float, Y1real As Float, X2real A
 
   Dim ii As Integer, puedo As Boolean
 
-  Select Case APPMain.hFCAD.arrEntities[i].Gender
+  Select Case AppMain.CurrentDrawing.arrEntities[i].Gender
 
     Case Else
 
       ' Si tengo un bounding poligon, entonces verifico que todos los puntos esten dentro
-      If APPMain.hFCAD.arrEntities[i].Polygon.Count > 0 Then
+      If AppMain.CurrentDrawing.arrEntities[i].Polygon.Count > 0 Then
 
-        Return puntos.IsPoligonInsideRect(APPMain.hFCAD.arrEntities[i].Polygon, X1real, Y1real, X2real, Y2real)
+        Return puntos.IsPoligonInsideRect(AppMain.CurrentDrawing.arrEntities[i].Polygon, X1real, Y1real, X2real, Y2real)
 
       Else    ' no tengo un poligono, entonces verifico que todos los puntos definitorios de al entidad esten dentro
 
         puedo = True                     ' supongamos que puedo, por ahora
-        For ii = 0 To APPMain.hFCAD.arrEntities[i].p.max Step 2
-          If Not (APPMain.hFCAD.arrEntities[i].p[ii] >= X1real And APPMain.hFCAD.arrEntities[i].p[ii] <= X2real) And (APPMain.hFCAD.arrEntities[i].p[ii + 1] >= Y1real And APPMain.hFCAD.arrEntities[i].p[ii + 1] <= Y2real) Then
+        For ii = 0 To AppMain.CurrentDrawing.arrEntities[i].p.max Step 2
+          If Not (AppMain.CurrentDrawing.arrEntities[i].p[ii] >= X1real And AppMain.CurrentDrawing.arrEntities[i].p[ii] <= X2real) And (AppMain.CurrentDrawing.arrEntities[i].p[ii + 1] >= Y1real And AppMain.CurrentDrawing.arrEntities[i].p[ii + 1] <= Y2real) Then
             puedo = False
           End If
         Next
 
         If puedo Then
-          For ii = 0 To APPMain.hFCAD.arrEntities[i].PSel.Max
-            APPMain.hFCAD.arrEntities[i].PSel[ii] = True
+          For ii = 0 To AppMain.CurrentDrawing.arrEntities[i].PSel.Max
+            AppMain.CurrentDrawing.arrEntities[i].PSel[ii] = True
           Next
 
           Return True
         Else
-          For ii = 0 To APPMain.hFCAD.arrEntities[i].PSel.Max
-            APPMain.hFCAD.arrEntities[i].PSel[ii] = False
+          For ii = 0 To AppMain.CurrentDrawing.arrEntities[i].PSel.Max
+            AppMain.CurrentDrawing.arrEntities[i].PSel[ii] = False
           Next
 
           Return False
@@ -1008,16 +1008,16 @@ Public Function SelPartial(i As Integer, X1real As Float, Y1real As Float, X2rea
 
   Dim ii As Integer, puedo As Boolean = False
 
-  Select Case APPMain.hFCAD.arrEntities[i].Gender
+  Select Case AppMain.CurrentDrawing.arrEntities[i].Gender
 
     Case Else
 
       ' Si tengo un bounding poligon, entonces verifico que alguna linea lo cruce
-      puedo = puntos.IsPoligonCrossingRect(APPMain.hFCAD.arrEntities[i].Polygon, X1real, Y1real, X2real, Y2real)
+      puedo = puntos.IsPoligonCrossingRect(AppMain.CurrentDrawing.arrEntities[i].Polygon, X1real, Y1real, X2real, Y2real)
 
-      For Ii = 0 To APPMain.hFCAD.arrEntities[i].p.max Step 2
-        If (APPMain.hFCAD.arrEntities[i].p[iI] >= X1real And APPMain.hFCAD.arrEntities[i].p[Ii] <= X2real) And (APPMain.hFCAD.arrEntities[i].p[iI + 1] >= Y1real And APPMain.hFCAD.arrEntities[i].p[iI + 1] <= Y2real) Then
-          APPMain.hFCAD.arrEntities[i].PSel[iI / 2] = True
+      For Ii = 0 To AppMain.CurrentDrawing.arrEntities[i].p.max Step 2
+        If (AppMain.CurrentDrawing.arrEntities[i].p[iI] >= X1real And AppMain.CurrentDrawing.arrEntities[i].p[Ii] <= X2real) And (AppMain.CurrentDrawing.arrEntities[i].p[iI + 1] >= Y1real And AppMain.CurrentDrawing.arrEntities[i].p[iI + 1] <= Y2real) Then
+          AppMain.CurrentDrawing.arrEntities[i].PSel[iI / 2] = True
           puedo = True
         End If
       Next
@@ -1040,9 +1040,9 @@ Public Function GetParentBlock(iEntity As Integer) As Integer
   iParent = iEntity
   Do
 
-    If APPMain.hFCAD.arrEntities[iParent].iInsert >= 0 Then
-      If iParent = APPMain.hFCAD.arrEntities[iParent].iInsert Then Break
-      iParent = APPMain.hFCAD.arrEntities[iParent].iInsert
+    If AppMain.CurrentDrawing.arrEntities[iParent].iInsert >= 0 Then
+      If iParent = AppMain.CurrentDrawing.arrEntities[iParent].iInsert Then Break
+      iParent = AppMain.CurrentDrawing.arrEntities[iParent].iInsert
     Else
       Break
     End If

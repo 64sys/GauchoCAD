@@ -96,7 +96,7 @@ Public Sub DibujaHelper()
 
   ' If ErrorMessage <> "" Then
   '
-  '     texting(ErrorMessage, 10 - appmain.hFcad.glarea1.w / 2, 30 - appmain.hFcad.glarea1.h / 2, Color.Red)
+  '     texting(ErrorMessage, 10 - appmain.glarea1.w / 2, 30 - appmain.glarea1.h / 2, Color.Red)
   '
   '     If ErrorTimer = 15 Then ErrorMessage = ""
   ' Else
@@ -108,19 +108,19 @@ Public Sub DibujaHelper()
 
   trabajoYteclado = HelperTrabajo & " > " & sNext & appmain.KeysAccumulator & PromtSlash
 
-  Texting(trabajoYteclado, 10 - appmain.hFcad.glarea1.w / 2, 10 - appmain.hFcad.glarea1.h / 2, Starter.flgWindowInfoColor) ' Tincho - toma color de la configuración
+  Texting(trabajoYteclado, 10 - appmain.glarea1.w / 2, 10 - appmain.glarea1.h / 2, Starter.flgWindowInfoColor) ' Tincho - toma color de la configuración
 
   HelperDibujo = ""
   If gcd.Orthogonal Then HelperDibujo = "F8-Ortho"
   If puntos.Gridactive Then HelperDibujo = HelperDibujo & "  F7-Grid = " & Format$(puntos.GridSpacing, "0.00 m")
   ' and so on...
 
-  texting(HelperDibujo, 40, 10 - APPMain.hFcad.glarea1.h / 2, Starter.flgWindowInfoColor) ' Tincho - toma color de la configuración
+  texting(HelperDibujo, 40, 10 - appmain.glarea1.h / 2, Starter.flgWindowInfoColor) ' Tincho - toma color de la configuración
 
   ' helper del mouse
   If Len(Helper.Texto) = 0 Then Return
 
-  Texting(Helper.Texto, appmain.hFcad.CursorX - appmain.hFcad.glarea1.w / 2, -appmain.hFcad.CursorY + appmain.hFcad.glarea1.h / 2, Color.DarkGreen, 10)
+  Texting(Helper.Texto, appmain.CursorX - appmain.glarea1.w / 2, -appmain.CursorY + appmain.glarea1.h / 2, Color.DarkGreen, 10)
 
 End Sub
 
@@ -129,11 +129,11 @@ Public Sub DrawCoordenadas()
   ' helpers
   Dim l As String, l2 As String, lEsc As String
 
-  l = Format$(puntos.Near(appmain.hFcad.Xreal(appmain.hFcad.cursorX)), "0.00") & "mts : " & Format$(puntos.Near(appmain.hFcad.Yreal(appmain.hFcad.cursorY)), "0.00") & "mts"
+  l = Format$(puntos.Near(appmain.Xreal(appmain.cursorX)), "0.00") & "mts : " & Format$(puntos.Near(appmain.Yreal(appmain.cursorY)), "0.00") & "mts"
 
   '    l2 = "Mouse: " & Str$(puntos.cursorX) & ": " & Str$(puntos.cursorY)
 
-  l2 = "ScaleZoom " & Str$(appmain.hFcad.ScaleZoom) & " - Pan: " & Str$(appmain.hFCAD.PanX) & ", " & Str$(appmain.hFCAD.PanY)
+  l2 = "ScaleZoom " & Str$(appmain.CurrentDrawing.ScaleZoom) & " - Pan: " & Str$(appmain.CurrentDrawing.PanX) & ", " & Str$(appmain.CurrentDrawing.PanY)
 
   'FCAD.nDraws = 0
 
@@ -142,12 +142,12 @@ Public Sub DrawCoordenadas()
 
   Dim e As Float, z As Float
   e = 1080 / 0.29 ' pixeles por metro segun el tamaño real de la pantalla
-  z = appmain.hFcad.Metros(1) ' metros por pixel segun la ampliacion del usuario (rueda del mouse)
-  lEsc = "Esc 1:" & Format$(1 / appmain.hFcad.ScaleZoom * 100 * ScreenDensity, "0")
+  z = appmain.Metros(1) ' metros por pixel segun la ampliacion del usuario (rueda del mouse)
+  lEsc = "Esc 1:" & Format$(1 / appmain.CurrentDrawing.ScaleZoom * 100 * ScreenDensity, "0")
 
-  Texting(l, 10 - appmain.hFcad.glarea1.w / 2, appmain.hFcad.glarea1.h / 2 - 15, Starter.flgWindowInfoColor)
-  Texting(l2, 10 - appmain.hFcad.glarea1.w / 2, appmain.hFcad.glarea1.h / 2 - 35, Starter.flgWindowInfoColor)
-  Texting(lEsc, appmain.hFcad.glarea1.w / 2 - 100, 10 - appmain.hFcad.glarea1.h / 2, Starter.flgWindowInfoColor)
+  Texting(l, 10 - appmain.glarea1.w / 2, appmain.glarea1.h / 2 - 15, Starter.flgWindowInfoColor)
+  Texting(l2, 10 - appmain.glarea1.w / 2, appmain.glarea1.h / 2 - 35, Starter.flgWindowInfoColor)
+  Texting(lEsc, appmain.glarea1.w / 2 - 100, 10 - appmain.glarea1.h / 2, Starter.flgWindowInfoColor)
 
 End
 
@@ -156,7 +156,7 @@ Public Sub DrawEjes()
   ' helper de los ejes coordenados
   ' TODO:  no se porque el fondo de las dashes me sale gris y no blanco
   ' paint.brush = Paint.Color(Color.RGB(0, 0, 0, 0))
-  ' paint.LineWidth = 1 / appmain.hFcad.ScaleZoom
+  ' paint.LineWidth = 1 / appmain.CurrentDrawing.ScaleZoom
   ' paint.Dash = DashDot
   ' paint.MoveTo(0 - (DashDot[0] + DashDot[1] + DashDot[2] / 2), 0) ' me voy al origen de coordenadas
   ' paint.relLineTo(1000, 0)
@@ -167,54 +167,54 @@ Public Sub DrawEjes()
 
 End
 
-Public Sub DrawCaudricula()
-
-  ' crossing lines each gridspace and darker each 10m
-
-  Dim i, xgg, ygg, xg, yg As Single, espaciado As Single, starting As Single
-
-  espaciado = appmain.hFcad.pixels(puntos.GridSpacing) ' tamaño de la grid en pixeles
-
-  xg = appmain.hFcad.Xreal(0) ' Puntos reales aproximados al 0,0 de la pantalla
-  yg = appmain.hFcad.Yreal(0)
-
-  xg = puntos.Near(xg) ' punto en mundo real ajustado a grid
-  yg = puntos.Near(yg)
-
-  xg = puntos.Xpix(xg) - espaciado * 2 ' punto inicial en la drawing area
-  yg = puntos.Ypix(yg) - espaciado * 2
-
-  xgg = xg
-  ygg = yg
-
-  starting = yg ' guardo el Y inicial
-
-  paint.brush = Paint.Color(Color.Gray)
-  paint.LineWidth = 1
-
-  ' lineas finas
-  Do ' lineas horizontales
-    If espaciado < 5 Then Break
-    paint.MoveTo(xg, yg)
-    paint.RelLineTo(FCAD.drwArea.W + espaciado, 0)
-    yg += espaciado - 0.5
-
-  Loop Until yg > (FCAD.drwArea.Height + espaciado * 2)
-
-  xg = xgg
-  yg = ygg
-  Do ' verticales
-    If espaciado < 5 Then Break
-    paint.MoveTo(xg, yg)
-    paint.RelLineTo(0, appmain.hFCAD.DdrwArea.Height + espaciado)
-    xg += espaciado - 0.5
-  Loop Until xg > (FCAD.drwArea.Width + espaciado * 2)
-
-  ' lineas gruesas
-
-  paint.Stroke
-
-End
+' Public Sub DrawCaudricula()
+'
+'   ' crossing lines each gridspace and darker each 10m
+'
+'   Dim i, xgg, ygg, xg, yg As Single, espaciado As Single, starting As Single
+'
+'   espaciado = appmain.pixels(puntos.GridSpacing) ' tamaño de la grid en pixeles
+'
+'   xg = appmain.CurrentDrawing.Xreal(0) ' Puntos reales aproximados al 0,0 de la pantalla
+'   yg = appmain.CurrentDrawing.Yreal(0)
+'
+'   xg = puntos.Near(xg) ' punto en mundo real ajustado a grid
+'   yg = puntos.Near(yg)
+'
+'   xg = puntos.Xpix(xg) - espaciado * 2 ' punto inicial en la drawing area
+'   yg = puntos.Ypix(yg) - espaciado * 2
+'
+'   xgg = xg
+'   ygg = yg
+'
+'   starting = yg ' guardo el Y inicial
+'
+'   paint.brush = Paint.Color(Color.Gray)
+'   paint.LineWidth = 1
+'
+'   ' lineas finas
+'   Do ' lineas horizontales
+'     If espaciado < 5 Then Break
+'     paint.MoveTo(xg, yg)
+'     paint.RelLineTo(FCAD.drwArea.W + espaciado, 0)
+'     yg += espaciado - 0.5
+'
+'   Loop Until yg > (FCAD.drwArea.Height + espaciado * 2)
+'
+'   xg = xgg
+'   yg = ygg
+'   Do ' verticales
+'     If espaciado < 5 Then Break
+'     paint.MoveTo(xg, yg)
+'     paint.RelLineTo(0, appmain.CurrentDrawing.DdrwArea.Height + espaciado)
+'     xg += espaciado - 0.5
+'   Loop Until xg > (FCAD.drwArea.Width + espaciado * 2)
+'
+'   ' lineas gruesas
+'
+'   paint.Stroke
+'
+' End
 
 Public Sub DrawPolygons() ' and other debugging stuff
 
@@ -222,16 +222,16 @@ Public Sub DrawPolygons() ' and other debugging stuff
 
   HelperTrabajo2 = "gcd.clsJob: " & Str(gcd.clsJob) & "->" & Str(clsEntityBuilder.elem)
   '
-  Texting(HelperTrabajo2, 300, appmain.hFcad.glarea1.h - 20, Color.Blue)
+  Texting(HelperTrabajo2, 300, appmain.glarea1.h - 20, Color.Blue)
   '
   HelperTrabajo2 = "gcd.clsJobPrevious: " & Str(gcd.clsJobPrevious)
   '
 
-  Texting(HelperTrabajo2, 300, appmain.hFcad.glarea1.h - 40, Color.Blue)
+  Texting(HelperTrabajo2, 300, appmain.glarea1.h - 40, Color.Blue)
 
   If gcd.clsJob.gender = "Builder" Then Return
 
-  For Each e In APPMain.hFCAD.arrEntities
+  For Each e In appmain.CurrentDrawing.arrEntities
 
     If e.Polygon.count > 0 Then glPlus.Polygon(e.Polygon, Color.Blue, 1)
 

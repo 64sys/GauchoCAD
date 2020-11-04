@@ -94,11 +94,11 @@ Public Sub Draw(oE As Entity)
   If i < 0 Then Return
 
   gl.PushMatrix
-  gl.Translatef(appmain.hFcad.pixels(oE.p[0]) / appmain.hFcad.ScaleZoom, appmain.hFcad.pixels(oE.p[1]) / appmain.hFcad.ScaleZoom, 0)
+  gl.Translatef(appmain.pixels(oE.p[0]) / appmain.CurrentDrawing.ScaleZoom, appmain.pixels(oE.p[1]) / appmain.CurrentDrawing.ScaleZoom, 0)
   gl.Rotatef(oE.fParam[2], 0, 0, 1)
   gl.Scalef(oE.fParam[0], oE.fParam[1], 1)
 
-  For Each ET In appmain.hFCAD.arrBlocks[i].entities
+  For Each ET In appmain.CurrentDrawing.arrBlocks[i].entities
     et.visible = True
     et.ClassHandler.Draw(et)
   Next
@@ -113,9 +113,9 @@ Public Sub DrawSelected(oE As Entity)
   '
   ' ' FIXME this does not work for Inserts cointaining other inserst
   '
-  ' For i = oe.iInsert + 1 To appmain.hFCAD.arrEntities.max
-  '   If appmain.hFCAD.arrEntities[i].iInsert <> oe.iInsert Then Break
-  '   appmain.hFCAD.arrEntities[i].ClassHandler.DrawSelected(appmain.hFCAD.arrEntities[i])
+  ' For i = oe.iInsert + 1 To appmain.CurrentDrawing.arrEntities.max
+  '   If appmain.CurrentDrawing.arrEntities[i].iInsert <> oe.iInsert Then Break
+  '   appmain.CurrentDrawing.arrEntities[i].ClassHandler.DrawSelected(appmain.CurrentDrawing.arrEntities[i])
   '
   ' Next
 
@@ -126,9 +126,9 @@ Public Sub DrawRemark(oE As Entity)
 
   Dim ET As Entity, i As Integer
 
-  For i = oe.iInsert + 1 To appmain.hFCAD.arrEntities.max
-    If appmain.hFCAD.arrEntities[i].iInsert = -1 Then Break
-    appmain.hFCAD.arrEntities[i].ClassHandler.DrawRemark(appmain.hFCAD.arrEntities[i])
+  For i = oe.iInsert + 1 To appmain.CurrentDrawing.arrEntities.max
+    If appmain.CurrentDrawing.arrEntities[i].iInsert = -1 Then Break
+    appmain.CurrentDrawing.arrEntities[i].ClassHandler.DrawRemark(appmain.CurrentDrawing.arrEntities[i])
 
   Next
 
@@ -143,11 +143,11 @@ End
 '   If i < 0 Then Return
 '
 '   gl.PushMatrix
-'   gl.Translatef(appmain.hFcad.pixels(oE.p[0]) / appmain.hFcad.ScaleZoom, appmain.hFcad.pixels(oE.p[1]) / appmain.hFcad.ScaleZoom, 0)
+'   gl.Translatef(appmain.pixels(oE.p[0]) / appmain.CurrentDrawing.ScaleZoom, appmain.pixels(oE.p[1]) / appmain.CurrentDrawing.ScaleZoom, 0)
 '   gl.Rotatef(oE.fParam[2], 0, 0, 1)
 '   gl.Scalef(oE.fParam[0], oE.fParam[1], 1)
 '
-'   For Each ET In appmain.hFCAD.arrBlocks[i].entities
+'   For Each ET In appmain.CurrentDrawing.arrBlocks[i].entities
 '     et.visible = True
 '     et.ClassHandler.DrawRemark(et)
 '   Next
@@ -161,11 +161,11 @@ Public Function Draw2(oE As Entity)
   '
   ' Dim ET As Entity, i As Integer
   ' paint.save
-  ' paint.Translate(appmain.hFcad.pixels(oE.p[0]) / appmain.hFcad.ScaleZoom, appmain.hFcad.pixels(oE.p[1]) / appmain.hFcad.ScaleZoom)
+  ' paint.Translate(appmain.pixels(oE.p[0]) / appmain.CurrentDrawing.ScaleZoom, appmain.pixels(oE.p[1]) / appmain.CurrentDrawing.ScaleZoom)
   ' paint.Scale(oE.fParam[0], oE.fParam[1])
   ' paint.Rotate(oE.fParam[2])
   ' gcd.ScaleLines = (Abs(oE.fParam[0]) + Abs(oE.fParam[1])) / 2
-  ' For Each ET In appmain.hFCAD.arrBlocks[i].entities
+  ' For Each ET In appmain.CurrentDrawing.arrBlocks[i].entities
   '   et.Draw
   ' Next
   ' gcd.ScaleLines = 1
@@ -177,7 +177,7 @@ End
 
 Public Function BuildPOI(oE As Entity, Optional arrIndex As Integer = -1) As Integer
 
-  If arrIndex < 0 Then arrIndex = appmain.hFCAD.arrEntities.Max       ' si este valor no es provisto , estos POI son de la ultima entidad
+  If arrIndex < 0 Then arrIndex = appmain.CurrentDrawing.arrEntities.Max       ' si este valor no es provisto , estos POI son de la ultima entidad
 
   oe.PoiPoints.Clear
   oe.PoiType.Clear
@@ -212,24 +212,24 @@ Public Sub Finish(oE As Entity, Optional ParamsDone As Integer = -1) As Boolean
   If i < 0 Then Return
 
   ' en este momento la ultima entidad es este Insert, guardo el numero
-  iInsert = appmain.hFCAD.arrEntities.Max
+  iInsert = appmain.CurrentDrawing.arrEntities.Max
 
   ' hay un caso particular: cuando un bloque contiene un Insert, debo prevenir esta situacion
   If iInsert >= 0 Then
 
     ' esta linea no haria falta
-    'appmain.hFCAD.arrEntities.Last.iInsert = iInsert
-    For Each ET In appmain.hFCAD.arrBlocks[i].entities
-      appmain.hFCAD.arrEntities.Add(clsEntities.ClonEntity(et))
-      'appmain.hFCAD.arrEntities.Last.Block = oe.block
-      appmain.hFCAD.arrEntities.Last.iInsert = iInsert
+    'appmain.CurrentDrawing.arrEntities.Last.iInsert = iInsert
+    For Each ET In appmain.CurrentDrawing.arrBlocks[i].entities
+      appmain.CurrentDrawing.arrEntities.Add(clsEntities.ClonEntity(et))
+      'appmain.CurrentDrawing.arrEntities.Last.Block = oe.block
+      appmain.CurrentDrawing.arrEntities.Last.iInsert = iInsert
 
       ' ------------------------------ ERROR TODO: verificar esto, lo puse para evitar recursividad infinita
-      appmain.hFCAD.arrEntities.Last.ClassHandler.finish(appmain.hFCAD.arrEntities.Last, -1)
+      appmain.CurrentDrawing.arrEntities.Last.ClassHandler.finish(appmain.CurrentDrawing.arrEntities.Last, -1)
 
-      appmain.hFCAD.arrEntities.Last.ClassHandler.Scale(appmain.hFCAD.arrEntities.Last, oe.fParam[0], oE.fParam[1])
-      appmain.hFCAD.arrEntities.Last.ClassHandler.Rotate(appmain.hFCAD.arrEntities.Last, oE.fParam[2] * Pi / 180)
-      appmain.hFCAD.arrEntities.Last.ClassHandler.Translate(appmain.hFCAD.arrEntities.Last, oE.p[0], oE.p[1])
+      appmain.CurrentDrawing.arrEntities.Last.ClassHandler.Scale(appmain.CurrentDrawing.arrEntities.Last, oe.fParam[0], oE.fParam[1])
+      appmain.CurrentDrawing.arrEntities.Last.ClassHandler.Rotate(appmain.CurrentDrawing.arrEntities.Last, oE.fParam[2] * Pi / 180)
+      appmain.CurrentDrawing.arrEntities.Last.ClassHandler.Translate(appmain.CurrentDrawing.arrEntities.Last, oE.p[0], oE.p[1])
     Next
   End If
 

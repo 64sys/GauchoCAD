@@ -59,7 +59,7 @@ Public Sub Draw()
   If FBlock.entyBlock.Count = 0 Then Return
 
   gl.PushMatrix
-  gl.Translatef(fBlock.x / appmain.hFcad.ScaleZoom, fBlock.y / appmain.hFcad.ScaleZoom, 0)
+  gl.Translatef(fBlock.x / AppMain.CurrentDrawing.ScaleZoom, fBlock.y / AppMain.CurrentDrawing.ScaleZoom, 0)
   gl.Rotatef(FBlock.degRotation, 0, 0, 1)
   gl.Scalef(FBlock.scaleX, fBlock.scaleY, 1)
 
@@ -75,17 +75,17 @@ End
 
 Public Function MouseMove(mouseX As Integer, mouseY As Integer) ' esta rutina es llamada por FCAD en el evento DrawingArea_MouseMove
 
-  fBlock.x = puntos.Near(appmain.hFcad.Xreal(mouseX))
-  fBlock.y = puntos.Near(appmain.hFcad.Yreal(mouseY))
+  fBlock.x = puntos.Near(appmain.Xreal(mouseX))
+  fBlock.y = puntos.Near(appmain.yreal(mouseY))
 
   ' y si tengo enganche?
 
-  If appmain.hFcad.iEntity[2] >= 0 Then
+  If AppMain.CurrentDrawing.iEntity[2] >= 0 Then
 
     ' esto re enganchado
 
-    fBlock.x = appmain.hFcad.iEntity[0]
-    fBlock.y = appmain.hFcad.iEntity[1]
+    fBlock.x = AppMain.CurrentDrawing.iEntity[0]
+    fBlock.y = AppMain.CurrentDrawing.iEntity[1]
 
   End If
 
@@ -101,15 +101,15 @@ Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' called by FCAD->
 
   ' busco el bloque
 
-  For i = 0 To appmain.hFCAD.arrBlocks.Max
+  For i = 0 To AppMain.CurrentDrawing.arrBlocks.Max
 
-    If appmain.hFCAD.arrBlocks[i].name = FBlock.BlockName Then Break
+    If AppMain.CurrentDrawing.arrBlocks[i].name = FBlock.BlockName Then Break
 
   Next
 
-  If i = appmain.hFCAD.arrBlocks.Count Then ' armo el bloque
+  If i = AppMain.CurrentDrawing.arrBlocks.Count Then ' armo el bloque
 
-    appmain.hFCAD.arrBlocks.Add(eBlock)
+    AppMain.CurrentDrawing.arrBlocks.Add(eBlock)
     eBlock.name = FBlock.BlockName
     For ie = 0 To FBlock.entyBlock.Max
       eBlock.entities.Add(clsEntities.ClonEntity(FBlock.entyBlock[ie]))
@@ -119,7 +119,7 @@ Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' called by FCAD->
 
   ' ahora creo el insert
 
-  appmain.hFCAD.arrEntities.Add(entInsert)
+  AppMain.CurrentDrawing.arrEntities.Add(entInsert)
   entInsert.Block = eBlock.name
   entInsert.ClassHandler = cadInsert
   entInsert.Layer = appmain.CurrentLayer
@@ -138,6 +138,6 @@ Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' called by FCAD->
   gcd.clsJob = clsDefaultJob
   clsDrawingAids.CleanTexts
 
-  appmain.hFCAD.Regen
+  appmain.regen
 
 End

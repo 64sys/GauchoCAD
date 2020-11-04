@@ -232,7 +232,7 @@ Public Sub LMenu_Click()
 
     Case "save"
       ' aplicamos los cambios de la tabla copiada a la tabla real del dibujo
-      APPMain.hFCAD.cModel["Layers"] = cLayers.Copy()
+      appmain.CurrentDrawing.cModel["Layers"] = cLayers.Copy()
 
       Dim t As Float = Timer                              ' IGNORAR: estos Timers y Debug son para monitorear el tiempo de actualizacion
 

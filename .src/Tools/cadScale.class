@@ -70,8 +70,8 @@ Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' called by FCAD->
     clsDrawingAids.Helper.texto = ("Final point")
 
     ' punto real base
-    Me.SelStartXr = puntos.Near(appmain.hFcad.Xreal(mousex))
-    Me.SelStartYr = puntos.Near(appmain.hFcad.Yreal(mouseY))
+    Me.SelStartXr = puntos.Near(appmain.CurrentDrawing.Xreal(mousex))
+    Me.SelStartYr = puntos.Near(appmain.CurrentDrawing.Yreal(mouseY))
 
     ' and we save the mouse click
     Me.SelStartX = mousex
@@ -82,19 +82,19 @@ Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' called by FCAD->
     Me.glTranslate[2] = 0
 
     gl.PushMatrix
-    gl.NewList(appmain.hFCAD.GlListSelectedEntities, gl.COMPILE)                      ' genero los graficos dentro de la lista
+    gl.NewList(appmain.CurrentDrawing.GlListSelectedEntities, gl.COMPILE)                      ' genero los graficos dentro de la lista
     gl.Translatef(-Me.SelStartXr, -Me.SelStartYr, 0)
-    For i = 0 To appmain.hFCAD.arrEntities.Max 'Me.inxSelected.Max
-      If appmain.hFCAD.arrEntities[i].selected Then gl.CallList(APPMain.hFCAD.arrEntities[i].glDrwList)
+    For i = 0 To appmain.CurrentDrawing.arrEntities.Max 'Me.inxSelected.Max
+      If appmain.CurrentDrawing.arrEntities[i].selected Then gl.CallList(appmain.CurrentDrawing.arrEntities[i].glDrwList)
     Next
     gl.EndList
     gl.PopMatrix
 
     ' prevenir acciones tontas como hacer click en otro elemento antes de terminar con el actual
-    ' TODO: reparar -> appmain.hFCAD.DesHabilitarBotones
+    ' TODO: reparar -> appmain.CurrentDrawing.DesHabilitarBotones
   Else If Me.PointsDone = 2 Then ' acabo de marcar el punto destino
     ' permitir otros trabajos
-    ' TODO: reparar -> appmain.hFCAD.HabilitarBotones
+    ' TODO: reparar -> appmain.CurrentDrawing.HabilitarBotones
 
     ' we have the point set from MouseMove
     Me.SelEndX = mousex
@@ -109,7 +109,7 @@ Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' called by FCAD->
     Me.Finish()
 
   Endif
-  appmain.hFCAD.redraw
+  appmain.redraw
 
 End
 
@@ -121,8 +121,8 @@ Public Function MouseMove(mouseX As Integer, mouseY As Integer) ' called by FCAD
     ' could have being moved by the mouse wheel
 
     ' new Real position is
-    Me.SelEndXr = puntos.Near(appmain.hFcad.Xreal(mousex))
-    Me.SelEndyr = puntos.Near(appmain.hFcad.Yreal(mouseY))
+    Me.SelEndXr = puntos.Near(appmain.CurrentDrawing.Xreal(mousex))
+    Me.SelEndyr = puntos.Near(appmain.CurrentDrawing.Yreal(mouseY))
 
     '  we need To determine scale factor
     '

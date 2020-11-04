@@ -51,9 +51,9 @@ Public Function Start(Optional ElemToBuild As Variant, Optional _Mode As Integer
 
   Else
     ' verificamos si la entidad puede ser partida
-    Me.iEntitySelected = APPMain.hFCAD.arrSelecIndex[0]
+    Me.iEntitySelected = appmain.CurrentDrawing.arrSelecIndex[0]
 
-    Select Case APPMain.hFCAD.arrEntities[Me.iEntitySelected].Gender
+    Select Case appmain.CurrentDrawing.arrEntities[Me.iEntitySelected].Gender
       Case "Line", "Pline", "Circle", "Arc", "Ellipse", "Spline"
         clsEntities.SelectElem(Me.iEntitySelected)
         clsDrawingAids.Helper.texto = ("Breakpoint of entity")
@@ -73,19 +73,19 @@ Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' called by FCAD->
   Dim flxIntersec As Float[]
   Dim e, e2 As Entity
 
-  Me.SelStartXr = appmain.hFcad.Xreal(mousex)
-  Me.SelStartYr = appmain.hFcad.Yreal(mouseY)
+  Me.SelStartXr = appmain.CurrentDrawing.Xreal(mousex)
+  Me.SelStartYr = appmain.CurrentDrawing.Yreal(mouseY)
 
   ' si llegue aca es porque ya tengo una entidad seleccionada
 
   ' verifico que este sobre la entidad a romper
   If Me.PointsDone = 1 Then ' estoy intentando seleccionar una entidad
 
-    If appmain.hFcad.iEntity[3] <> Me.iEntitySelected Then ' el mouse se fue de la entidad a romper
+    If appmain.CurrentDrawing.iEntity[3] <> Me.iEntitySelected Then ' el mouse se fue de la entidad a romper
       clsDrawingAids.ErrorMessage = ("Invalid breakpoint")
       Return
     End If
-    e = APPMain.hFCAD.arrEntities[Me.iEntitySelected]       ' esto lo hago para reducir el largo del codigo
+    e = appmain.CurrentDrawing.arrEntities[Me.iEntitySelected]       ' esto lo hago para reducir el largo del codigo
     Select Case e.Gender
       Case "Line"
         flxIntersec = clsMouseTracking.GetNearestPoint(e, Me.SelStartXr, Me.SelStartYr)
@@ -102,7 +102,7 @@ Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' called by FCAD->
         e2.P[3] = flxIntersec[1]
         e2.ClassHandler.finish(e2)
         ' la agrego al dibujo
-        appmain.hFCAD.arrEntities.Add(e2)
+        appmain.CurrentDrawing.arrEntities.Add(e2)
 
         e.P[0] = flxIntersec[0]                ' y ahora recorto la entidad original
         e.P[1] = flxIntersec[1]
@@ -110,7 +110,7 @@ Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' called by FCAD->
 
         ' regenro las listas openGL de ambas entidades
         clsEntities.glGenDrawList(Me.iEntitySelected)
-        clsEntities.glGenDrawList(appmain.hFCAD.arrEntities.max)
+        clsEntities.glGenDrawList(appmain.CurrentDrawing.arrEntities.max)
 
         Me.Finish
 
@@ -120,8 +120,8 @@ Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' called by FCAD->
     End Select
 
     ' punto real base
-    Me.SelStartXr = appmain.hFcad.Xreal(mousex)
-    Me.SelStartYr = appmain.hFcad.Yreal(mouseY)
+    Me.SelStartXr = appmain.CurrentDrawing.Xreal(mousex)
+    Me.SelStartYr = appmain.CurrentDrawing.Yreal(mouseY)
   End If
 
 End

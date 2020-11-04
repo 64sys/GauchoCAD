@@ -40,12 +40,12 @@ Public Function Start(Optional ElemToBuild As Variant, Optional _Mode As Integer
 
     limits = clsEntities.ComputeLimits()
 
-    appmain.hFcad.xmenor = limits[0]
-    appmain.hFcad.Ymenor = limits[1]
-    appmain.hFcad.xmayor = limits[2]
-    appmain.hFcad.ymayor = limits[3]
+    appmain.CurrentDrawing.xmenor = limits[0]
+    appmain.CurrentDrawing.Ymenor = limits[1]
+    appmain.CurrentDrawing.xmayor = limits[2]
+    appmain.CurrentDrawing.ymayor = limits[3]
   End If
-  If APPMain.hFCAD.arrEntities.Count = 0 Then Return
+  If appmain.CurrentDrawing.arrEntities.Count = 0 Then Return
 
   Dim SZx As Float
   ' ahora calculo donde estaria el centro de este dibujo
@@ -53,27 +53,27 @@ Public Function Start(Optional ElemToBuild As Variant, Optional _Mode As Integer
   Dim cx, cy As Float
   Dim px, py As Integer           ' coordenadas del punto medio
 
-  cx = (appmain.hFcad.xmayor - appmain.hFcad.xmenor) ' tamaño del mundo
-  cy = (appmain.hFcad.Ymayor - appmain.hFcad.Ymenor)
+  cx = (appmain.CurrentDrawing.xmayor - appmain.CurrentDrawing.xmenor) ' tamaño del mundo
+  cy = (appmain.CurrentDrawing.Ymayor - appmain.CurrentDrawing.Ymenor)
 
   If cx = 0 Then cx = 0.00001
   If cy = 0 Then cy = 0.00001
-  appmain.hFcad.ScaleZoom = appmain.hFcad.glarea1.h / cy * 0.9
+  appmain.CurrentDrawing.ScaleZoom = appmain.glarea1.h / cy * 0.9
 
-  szx = appmain.hFcad.glarea1.w / cx * 0.9
+  szx = appmain.glarea1.w / cx * 0.9
 
-  If szx < appmain.hFcad.ScaleZoom Then appmain.hFcad.ScaleZoom = szx
+  If szx < appmain.CurrentDrawing.ScaleZoom Then appmain.CurrentDrawing.ScaleZoom = szx
 
-  px = (appmain.hFcad.xmayor + appmain.hFcad.xmenor) / 2
-  py = (appmain.hFcad.Ymayor + appmain.hFcad.Ymenor) / 2
+  px = (appmain.CurrentDrawing.xmayor + appmain.CurrentDrawing.xmenor) / 2
+  py = (appmain.CurrentDrawing.Ymayor + appmain.CurrentDrawing.Ymenor) / 2
 
-  appmain.hFCAD.PanX = -appmain.hFcad.pixels(px)
-  appmain.hFCAD.PanY = -appmain.hFcad.pixels(py)   ' el eje Y trabaja distinto, asi que debemos cambiar esto
+  appmain.CurrentDrawing.PanX = -appmain.pixels(px)
+  appmain.CurrentDrawing.PanY = -appmain.pixels(py)   ' el eje Y trabaja distinto, asi que debemos cambiar esto
 
-  If appmain.hFcad.ScaleZoom > 1e6 Or appmain.hFcad.ScaleZoom < 1e-6 Then
-    appmain.hFcad.scalezoom = 1
-    appmain.hFCAD.PanX = 0
-    appmain.hFCAD.PanY = 0
+  If appmain.CurrentDrawing.ScaleZoom > 1e6 Or appmain.CurrentDrawing.ScaleZoom < 1e-6 Then
+    appmain.CurrentDrawing.scalezoom = 1
+    appmain.CurrentDrawing.PanX = 0
+    appmain.CurrentDrawing.PanY = 0
   End If
 
   Me.Finish

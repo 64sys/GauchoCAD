@@ -294,8 +294,8 @@ Public Sub AdvanceStep()
     End If
 
     ' last point
-    appmain.hFCAD.LastPoint.Clear
-    Try appmain.hFCAD.LastPoint.Insert([elem.P[(iPoints - 1) * 2], elem.P[(iPoints - 1) * 2 + 1]])
+    appmain.CurrentDrawing.LastPoint.Clear
+    Try appmain.CurrentDrawing.LastPoint.Insert([elem.P[(iPoints - 1) * 2], elem.P[(iPoints - 1) * 2 + 1]])
 
     ' we set the next point in the same position of this
     Try elem.P[iPoints * 2] = elem.P[(iPoints - 1) * 2]
@@ -303,7 +303,7 @@ Public Sub AdvanceStep()
 
   Endif
 
-  appmain.hFCAD.redraw
+  appmain.redraw
 
 End
 
@@ -315,34 +315,34 @@ Public Function MouseMove(mouseX As Integer, mouseY As Integer) ' esta rutina es
   If NextParamType = "A" Then
 
     ' return the angle from horizontal to us
-    elem.fParam[iFloat] = Ang(appmain.hFcad.Xreal(mouseX) - elem.p[elem.p.max - 1], appmain.hFcad.Yreal(mouseY) - elem.p[elem.p.max])
+    elem.fParam[iFloat] = Ang(appmain.Xreal(mouseX) - elem.p[elem.p.max - 1], appmain.Yreal(mouseY) - elem.p[elem.p.max])
     elem.fParam[iFloat] *= 180 / Pi
-    appmain.hFCAD.redraw
+    appmain.redraw
     Return              ' nothing more to do here
   End If
 
   If NextParamType = "L" Then
 
     ' return the angle from horizontal to us
-    elem.fParam[iFloat] = puntos.distancia(puntos.Near(appmain.hFcad.Xreal(mouseX)), puntos.Near(appmain.hFcad.Yreal(mouseY)), elem.p[elem.p.max - 1], elem.p[elem.p.max])
+    elem.fParam[iFloat] = puntos.distancia(puntos.Near(appmain.Xreal(mouseX)), puntos.Near(appmain.Yreal(mouseY)), elem.p[elem.p.max - 1], elem.p[elem.p.max])
 
-    appmain.hFCAD.redraw
+    appmain.redraw
     Return              ' nothing more to do here
   End If
 
   If Me.iPoints >= elem.P.Count / 2 Then Return
 
-  elem.P[iPoints * 2] = puntos.Near(appmain.hFcad.Xreal(mouseX))
-  elem.P[iPoints * 2 + 1] = puntos.Near(appmain.hFcad.Yreal(mouseY))
+  elem.P[iPoints * 2] = puntos.Near(appmain.Xreal(mouseX))
+  elem.P[iPoints * 2 + 1] = puntos.Near(appmain.Yreal(mouseY))
 
   ' y si tengo enganche?
 
-  If (appmain.hFcad.iEntity[2] >= 0) And (gcd.OrthogonalForced = False) Then
+  If (appmain.CurrentDrawing.iEntity[2] >= 0) And (gcd.OrthogonalForced = False) Then
 
     ' esto re enganchado
 
-    elem.p[iPoints * 2] = appmain.hFcad.iEntity[0]
-    elem.p[iPoints * 2 + 1] = appmain.hFcad.iEntity[1]
+    elem.p[iPoints * 2] = appmain.CurrentDrawing.iEntity[0]
+    elem.p[iPoints * 2 + 1] = appmain.CurrentDrawing.iEntity[1]
 
     ' aca tengo que verificar el ortogonal
 
@@ -359,7 +359,7 @@ Public Function MouseMove(mouseX As Integer, mouseY As Integer) ' esta rutina es
 
   End If
 
-  appmain.hFCAD.redraw
+  appmain.redraw
 
 End
 
@@ -372,7 +372,7 @@ Public Function MouseDown(mouseX As Integer, mouseY As Integer) ' esta rutina es
   If NextParamType = "A" Then
 
     ' return the angle from horizontal to us
-    elem.fParam[iFloat] = Ang(appmain.hFcad.Xreal(mouseX) - elem.p[elem.p.max - 1], appmain.hFcad.Yreal(mouseY) - elem.p[elem.p.max])
+    elem.fParam[iFloat] = Ang(appmain.Xreal(mouseX) - elem.p[elem.p.max - 1], appmain.Yreal(mouseY) - elem.p[elem.p.max])
     elem.fParam[iFloat] *= 180 / Pi
 
     Inc iFloat
@@ -383,7 +383,7 @@ Public Function MouseDown(mouseX As Integer, mouseY As Integer) ' esta rutina es
   If NextParamType = "L" Then
 
     ' return the angle from horizontal to us
-    elem.fParam[iFloat] = puntos.distancia(puntos.Near(appmain.hFcad.Xreal(mouseX)), puntos.Near(appmain.hFcad.Yreal(mouseY)), elem.p[elem.p.max - 1], elem.p[elem.p.max])
+    elem.fParam[iFloat] = puntos.distancia(puntos.Near(appmain.Xreal(mouseX)), puntos.Near(appmain.Yreal(mouseY)), elem.p[elem.p.max - 1], elem.p[elem.p.max])
     Inc iFloat
     AdvanceStep
     Return              ' nothing more to do here
@@ -393,17 +393,17 @@ Public Function MouseDown(mouseX As Integer, mouseY As Integer) ' esta rutina es
 
   ' we are waiting for a point
 
-  elem.P[iPoints * 2] = puntos.Near(appmain.hFcad.Xreal(mouseX))
-  elem.P[iPoints * 2 + 1] = puntos.Near(appmain.hFcad.Yreal(mouseY))
+  elem.P[iPoints * 2] = puntos.Near(appmain.Xreal(mouseX))
+  elem.P[iPoints * 2 + 1] = puntos.Near(appmain.Yreal(mouseY))
 
   ' y si tengo enganche?
 
-  If (appmain.hFcad.iEntity[2] >= 0) And (gcd.OrthogonalForced = False) Then
+  If (appmain.CurrentDrawing.iEntity[2] >= 0) And (gcd.OrthogonalForced = False) Then
 
     ' esto re enganchado
 
-    elem.p[iPoints * 2] = appmain.hFcad.iEntity[0]
-    elem.p[iPoints * 2 + 1] = appmain.hFcad.iEntity[1]
+    elem.p[iPoints * 2] = appmain.CurrentDrawing.iEntity[0]
+    elem.p[iPoints * 2 + 1] = appmain.CurrentDrawing.iEntity[1]
 
     ' aca tengo que verificar el ortogonal
 
@@ -435,7 +435,7 @@ Public Sub CancelarConstruccion()
 
 End
 
-Public Sub Draw()               ' called byappmain.hFCAD.drwArea_Draw
+Public Sub Draw()               ' called byappmain.CurrentDrawing.drwArea_Draw
 
   If Me.iPoints < elem.ClassHandler.pointstodraw Then Return
 
@@ -445,7 +445,7 @@ End
 
 Public Sub Finish()
 
-  APPMain.hFCAD.arrEntities.Add(elem)
+  appmain.CurrentDrawing.arrEntities.Add(elem)
 
   elem.ClassHandler.Finish(elem, elem.ClassHandler.StepsDone)
 
@@ -457,11 +457,11 @@ Public Sub Finish()
   clsDrawingAids.CleanTexts
 
   ' sort them
-  'APPMain.hFCAD.arrEntities.Sort()
+  'appmain.CurrentDrawing.arrEntities.Sort()
   'clsMouseTracking.ReBuildPOIPoints
   clsEntities.GLGenDrawList
 
-  appmain.hFCAD.redraw
+  appmain.redraw
 
 End
 
@@ -471,6 +471,6 @@ Public Sub Cancel()
   gcd.clsJobPrevious = Me
   gcd.clsJob = clsDefaultJob
   clsDrawingAids.CleanTexts
-  appmain.hFCAD.redraw
+  appmain.redraw
 
 End

@@ -102,9 +102,13 @@ Public Const dimOrdinate As Integer = 6
 Public Const dimHorizontal As Integer = 7
 Public Const dimVertical As Integer = 8
 
+Public Drawings As New ClsDrawing[]
+Public DrawingReady As Boolean = False
+Public CurrentDrawing As ClsDrawing
+
 Public Sub Redraw()
 
-  appmain.hFCAD.redraw
+  appmain.redraw
 
 End
 
@@ -118,7 +122,7 @@ End
 
 Public Function Metros(l As Integer) As Float
 
-  Return APPMain.hFCAD.Metros(l)
+  Return appmain.Metros(l)
 
 End
 
@@ -171,17 +175,17 @@ Public Sub ExportBlocks(colData As Collection) ', obxEntities As Entity[]) As In
     colData.Add(colBlocks, "Blocks")
   End If
 
-  For i = 0 To APPMain.hFCAD.arrBlocks.max
+  For i = 0 To AppMain.CurrentDrawing.arrBlocks.max
     colBlk = New Collection
-    colData["Blocks"].Add(colBlk, APPMain.hFCAD.arrBlocks[i].name)
+    colData["Blocks"].Add(colBlk, AppMain.CurrentDrawing.arrBlocks[i].name)
 
-    colData["Blocks"][APPMain.hFCAD.arrBlocks[i].name].Add("BLOCK", "entity")
-    colData["Blocks"][APPMain.hFCAD.arrBlocks[i].name].Add(APPMain.hFCAD.arrBlocks[i].name, "block")
-    colData["Blocks"][APPMain.hFCAD.arrBlocks[i].name].Add("BYLAYER", "style")
+    colData["Blocks"][AppMain.CurrentDrawing.arrBlocks[i].name].Add("BLOCK", "entity")
+    colData["Blocks"][AppMain.CurrentDrawing.arrBlocks[i].name].Add(AppMain.CurrentDrawing.arrBlocks[i].name, "block")
+    colData["Blocks"][AppMain.CurrentDrawing.arrBlocks[i].name].Add("BYLAYER", "style")
     colEnt = New Collection
-    colData["Blocks"][APPMain.hFCAD.arrBlocks[i].name].Add(colEnt, "Entities")
-    For iTE = 0 To APPMain.hFCAD.arrBlocks[i].entities.Max
-      ExportEntities(colData["Blocks"]["Entities"], APPMain.hFCAD.arrBlocks[i].entities)
+    colData["Blocks"][AppMain.CurrentDrawing.arrBlocks[i].name].Add(colEnt, "Entities")
+    For iTE = 0 To AppMain.CurrentDrawing.arrBlocks[i].entities.Max
+      ExportEntities(colData["Blocks"]["Entities"], AppMain.CurrentDrawing.arrBlocks[i].entities)
     Next
 
   Next
@@ -197,7 +201,7 @@ Public Sub ImportBlocks(colData As Collection) ', obxEntities As Entity[]) As In
     Dim newBlock As New ArrBlockSt
     newBlock.entities = New Entity[]
     newBlock.name = colBlk["block"]
-    APPMain.hFCAD.arrBlocks.Add(newBlock)
+    AppMain.CurrentDrawing.arrBlocks.Add(newBlock)
     ImportEntities2(colBlk["Entities"], newBlock.entities, newBlock.name)
 
   Next
@@ -867,7 +871,7 @@ Public Function AddBlock(Points As Float[], Block As String) As Entity[]
   newBlock.name = block
   newBlock.x = Points[0]
   newBlock.y = Points[1]
-  APPMain.hFCAD.arrBlocks.Add(newBlock)
+  AppMain.CurrentDrawing.arrBlocks.Add(newBlock)
 
   Return newBlock.entities
 
@@ -882,11 +886,11 @@ Public Function ApplyLayerProperties(Optional mode As Integer = 0)
 
   Print "Aplicando propiedades del Layers"
 
-  For Each e In APPMain.hFCAD.arrEntities
+  For Each e In AppMain.CurrentDrawing.arrEntities
 
     If mode = 1 Then
       ' reconstruyo el ID del layer en la entidad, para ello busco en la lista cual coincide con su nombre
-      For Each cLayer In APPMain.hFCAD.cModel["Layers"]
+      For Each cLayer In AppMain.CurrentDrawing.cModel["Layers"]
         If e.layer = cLayer["name"] Then
           e.layerID = cLayer["id"]
           Break
@@ -896,10 +900,10 @@ Public Function ApplyLayerProperties(Optional mode As Integer = 0)
     Endif
 
     ' nombre, el que pudo haber cambiado (exepto el "0")
-    e.layer = APPMain.hFCAD.cModel["Layers"][e.layerID]["name"]
+    e.layer = AppMain.CurrentDrawing.cModel["Layers"][e.layerID]["name"]
 
     ' visibiliad
-    If APPMain.hFCAD.cModel["Layers"][e.layerID]["show"] Then e.visible = True Else e.visible = False
+    If AppMain.CurrentDrawing.cModel["Layers"][e.layerID]["show"] Then e.visible = True Else e.visible = False
 
   Next
 
@@ -913,7 +917,7 @@ Public Function ApplyLayerPropertieToEntity(e As Entity)
   Dim LayerName As String
 
   ' reconstruyo el ID del layer en la entidad, para ello busco en la lista cual coincide con su nombre
-  For Each cLayer In APPMain.hFCAD.cModel["Layers"]
+  For Each cLayer In AppMain.CurrentDrawing.cModel["Layers"]
     If e.layer = cLayer["name"] Then
       e.layerID = cLayer["id"]
       Break
@@ -921,10 +925,10 @@ Public Function ApplyLayerPropertieToEntity(e As Entity)
   Next
 
   ' nombre, el que pudo haber cambiado (exepto el "0")
-  e.layer = APPMain.hFCAD.cModel["Layers"][e.layerID]["name"]
+  e.layer = AppMain.CurrentDrawing.cModel["Layers"][e.layerID]["name"]
 
   ' visibiliad
-  If APPMain.hFCAD.cModel["Layers"][e.layerID]["show"] Then e.visible = True Else e.visible = False
+  If AppMain.CurrentDrawing.cModel["Layers"][e.layerID]["show"] Then e.visible = True Else e.visible = False
 
 End
 
@@ -932,7 +936,7 @@ Public Function GetLayerID(LayerName As String) As String
 
   Dim cLayer As Collection
 
-  For Each cLayer In APPMain.hFCAD.cModel["Layers"]
+  For Each cLayer In AppMain.CurrentDrawing.cModel["Layers"]
     If cLayer["name"] = LayerName Then Return cLayer["id"]
   Next
 
@@ -943,15 +947,15 @@ Public Function GetGBColor(CADcolor As Integer, layerID As String) As Integer
   ' color
   If CADcolor = 256 Then          ' buscar color del layer
 
-    Return Starter.gColor[APPMain.hFCAD.cModel["Layers"][layerID]["colour"]]
+    Return Starter.gColor[AppMain.CurrentDrawing.cModel["Layers"][layerID]["colour"]]
 
   Else If CADcolor = 257 Then     ' buscar color del objeto
 
-    Return Starter.gColor[APPMain.hFCAD.cModel["Layers"][layerID]["colour"]]     ' FIXME: cambiar esto
+    Return Starter.gColor[AppMain.CurrentDrawing.cModel["Layers"][layerID]["colour"]]     ' FIXME: cambiar esto
 
   Else If CADcolor = 0 Then       ' buscar color del bloque
 
-    Return Starter.gColor[APPMain.hFCAD.cModel["Layers"][layerID]["colour"]]     ' FIXME: cambiar esto
+    Return Starter.gColor[AppMain.CurrentDrawing.cModel["Layers"][layerID]["colour"]]     ' FIXME: cambiar esto
 
   Else
 

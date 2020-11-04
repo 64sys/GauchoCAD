@@ -10,9 +10,9 @@ Public Function PoiTotalPoints() As Integer
 
   Dim i, t As Integer
 
-  For i = 0 To appmain.hFCAD.arrEntities.Max
+  For i = 0 To AppMain.CurrentDrawing.arrEntities.Max
 
-    t += appmain.hFCAD.arrEntities[i].PoiType.Count
+    t += AppMain.CurrentDrawing.arrEntities[i].PoiType.Count
   Next
   Return t
 
@@ -28,30 +28,30 @@ Dim rData As New Float[]
 Dim e, breathe, iPoligon, iLine, iTotalPoints As Integer
 Dim t As Float = Timer
 
-APPMain.hFCAD.poiPoints.Clear           ' limpio
-APPMain.hFCAD.poiType.Clear
+AppMain.CurrentDrawing.poiPoints.Clear           ' limpio
+AppMain.CurrentDrawing.poiType.Clear
 
 iTotalPoints = PoiTotalPoints()         ' calculo el tamaño total para redimensionar, esto es mas rapido que ir insertando
 
-APPMain.hFCAD.poiType.Resize(iTotalPoints)
-appmain.hFCAD.poiEntities.Resize(iTotalPoints)
-APPMain.hFCAD.poiPoints.Resize(iTotalPoints * 2)
+AppMain.CurrentDrawing.poiType.Resize(iTotalPoints)
+AppMain.CurrentDrawing.poiEntities.Resize(iTotalPoints)
+AppMain.CurrentDrawing.poiPoints.Resize(iTotalPoints * 2)
 
-For e = 0 To APPMain.hFCAD.arrEntities.Max
+For e = 0 To AppMain.CurrentDrawing.arrEntities.Max
 
-  For i = 0 To APPMain.hFCAD.arrEntities[e].PoiType.Max
-    APPMain.hFCAD.poiType[ii] = APPMain.hFCAD.arrEntities[e].PoiType[i]
-    appmain.hFCAD.poiEntities[ii] = e
-    APPMain.hFCAD.poiPoints[ii * 2] = APPMain.hFCAD.arrEntities[e].PoiPoints[i]
-    APPMain.hFCAD.poiPoints[ii * 2 + 1] = APPMain.hFCAD.arrEntities[e].PoiPoints[i + 1]
+  For i = 0 To AppMain.CurrentDrawing.arrEntities[e].PoiType.Max
+    AppMain.CurrentDrawing.poiType[ii] = AppMain.CurrentDrawing.arrEntities[e].PoiType[i]
+    AppMain.CurrentDrawing.poiEntities[ii] = e
+    AppMain.CurrentDrawing.poiPoints[ii * 2] = AppMain.CurrentDrawing.arrEntities[e].PoiPoints[i]
+    AppMain.CurrentDrawing.poiPoints[ii * 2 + 1] = AppMain.CurrentDrawing.arrEntities[e].PoiPoints[i + 1]
     Inc ii
   Next
 
 Next
 Debug "POI points built in ", Timer - t
 
-For e = 1 To APPMain.hFCAD.arrEntities.Max
-  If e = APPMain.hFCAD.arrEntities.Max Then t = Timer
+For e = 1 To AppMain.CurrentDrawing.arrEntities.Max
+  If e = AppMain.CurrentDrawing.arrEntities.Max Then t = Timer
 
   RebuilIntersections(e)
 
@@ -69,20 +69,20 @@ Dim breathe, iPoligon, iLine, iTotalPoints As Integer
 Dim t As Float = Timer
 Dim e As Entity
 
-e = APPMain.hFCAD.arrEntities[iEntity]
+e = AppMain.CurrentDrawing.arrEntities[iEntity]
 
 ' veo cada caso en particular
 Select Case e.Gender
   Case "Line"
     For i2 = iEntity - 1 To 0 Step -1
 
-      Select Case APPMain.hFCAD.arrEntities[i2].Gender
+      Select Case AppMain.CurrentDrawing.arrEntities[i2].Gender
 
         Case "Line"
-          If puntos.doIntersect(e.P[0], e.P[1], e.P[2], e.P[3], APPMain.hFCAD.arrEntities[i2].P[0], APPMain.hFCAD.arrEntities[i2].P[1], APPMain.hFCAD.arrEntities[i2].P[2], APPMain.hFCAD.arrEntities[i2].P[3]) Then
-            APPMain.hFCAD.poiPoints.Insert(puntos.lineLineIntersection([e.P[0], e.P[1]], [e.P[2], e.P[3]], [APPMain.hFCAD.arrEntities[i2].P[0], APPMain.hFCAD.arrEntities[i2].P[1]], [APPMain.hFCAD.arrEntities[i2].P[2], APPMain.hFCAD.arrEntities[i2].P[3]]))
-            appmain.hFCAD.poiEntities.Add(iEntity)
-            APPMain.hFCAD.poiType.Add(gcd.poiIntersection)
+          If puntos.doIntersect(e.P[0], e.P[1], e.P[2], e.P[3], AppMain.CurrentDrawing.arrEntities[i2].P[0], AppMain.CurrentDrawing.arrEntities[i2].P[1], AppMain.CurrentDrawing.arrEntities[i2].P[2], AppMain.CurrentDrawing.arrEntities[i2].P[3]) Then
+            AppMain.CurrentDrawing.poiPoints.Insert(puntos.lineLineIntersection([e.P[0], e.P[1]], [e.P[2], e.P[3]], [AppMain.CurrentDrawing.arrEntities[i2].P[0], AppMain.CurrentDrawing.arrEntities[i2].P[1]], [AppMain.CurrentDrawing.arrEntities[i2].P[2], AppMain.CurrentDrawing.arrEntities[i2].P[3]]))
+            AppMain.CurrentDrawing.poiEntities.Add(iEntity)
+            AppMain.CurrentDrawing.poiType.Add(gcd.poiIntersection)
 
           Endif
 
@@ -102,41 +102,41 @@ Public Sub ReBuildPOI()
   Dim e, breathe, iPoligon, iLine, iPoint As Integer
   Dim t As Float = Timer
 
-  APPMain.hFCAD.poiEntities.Clear
-  APPMain.hFCAD.poiLines.Clear
-  APPMain.hFCAD.poiLinesEntities.Clear
-  APPMain.hFCAD.poiPoints.Clear
-  APPMain.hFCAD.poiPoligonElements.Clear
-  APPMain.hFCAD.poiPoligonEntities.Clear
-  APPMain.hFCAD.poiPoligons.Clear
-  APPMain.hFCAD.poiPoligonStartIndex.Clear
-  APPMain.hFCAD.poiType.Clear
+  AppMain.CurrentDrawing.poiEntities.Clear
+  AppMain.CurrentDrawing.poiLines.Clear
+  AppMain.CurrentDrawing.poiLinesEntities.Clear
+  AppMain.CurrentDrawing.poiPoints.Clear
+  AppMain.CurrentDrawing.poiPoligonElements.Clear
+  AppMain.CurrentDrawing.poiPoligonEntities.Clear
+  AppMain.CurrentDrawing.poiPoligons.Clear
+  AppMain.CurrentDrawing.poiPoligonStartIndex.Clear
+  AppMain.CurrentDrawing.poiType.Clear
 
-  For e = 0 To APPMain.hFCAD.arrEntities.Max
+  For e = 0 To AppMain.CurrentDrawing.arrEntities.Max
 
-    Select Case APPMain.hFCAD.arrEntities[e].Gender
+    Select Case AppMain.CurrentDrawing.arrEntities[e].Gender
 
       Case "Line"
 
-        appmain.hFCAD.poiLines.insert([APPMain.hFCAD.arrEntities[e].p[0], APPMain.hFCAD.arrEntities[e].p[1], APPMain.hFCAD.arrEntities[e].p[2], APPMain.hFCAD.arrEntities[e].p[3]])
-        APPMain.hFCAD.poiLinesEntities.Add(e)
+        AppMain.CurrentDrawing.poiLines.insert([AppMain.CurrentDrawing.arrEntities[e].p[0], AppMain.CurrentDrawing.arrEntities[e].p[1], AppMain.CurrentDrawing.arrEntities[e].p[2], AppMain.CurrentDrawing.arrEntities[e].p[3]])
+        AppMain.CurrentDrawing.poiLinesEntities.Add(e)
 
       Case "PLine"
-        For i = 0 To APPMain.hFCAD.arrEntities[e].P.count - 4 Step 2
-          appmain.hFCAD.poiLines.insert([APPMain.hFCAD.arrEntities[e].p[i], APPMain.hFCAD.arrEntities[e].p[i + 1], APPMain.hFCAD.arrEntities[e].p[i + 2], APPMain.hFCAD.arrEntities[e].p[i + 3]])
+        For i = 0 To AppMain.CurrentDrawing.arrEntities[e].P.count - 4 Step 2
+          AppMain.CurrentDrawing.poiLines.insert([AppMain.CurrentDrawing.arrEntities[e].p[i], AppMain.CurrentDrawing.arrEntities[e].p[i + 1], AppMain.CurrentDrawing.arrEntities[e].p[i + 2], AppMain.CurrentDrawing.arrEntities[e].p[i + 3]])
         Next
-        For i = 0 To APPMain.hFCAD.arrEntities[e].P.Count / 4
-          APPMain.hFCAD.poiLinesEntities.Add(e)
+        For i = 0 To AppMain.CurrentDrawing.arrEntities[e].P.Count / 4
+          AppMain.CurrentDrawing.poiLinesEntities.Add(e)
         Next
       Case "Circle", "Arc", "Ellipse"
-        appmain.hFCAD.poiLines.insert(APPMain.hFCAD.arrEntities[e].PolyLine)
-        For i = 0 To APPMain.hFCAD.arrEntities[e].PolyLine.Count / 4
-          APPMain.hFCAD.poiLinesEntities.Add(e)
+        AppMain.CurrentDrawing.poiLines.insert(AppMain.CurrentDrawing.arrEntities[e].PolyLine)
+        For i = 0 To AppMain.CurrentDrawing.arrEntities[e].PolyLine.Count / 4
+          AppMain.CurrentDrawing.poiLinesEntities.Add(e)
         Next
       Case "Solid", "Text", "MText"
 
-        appmain.hFCAD.poiPoligons.insert(APPMain.hFCAD.arrEntities[e].Polygon)
-        APPMain.hFCAD.poiLinesEntities.Add(e)
+        AppMain.CurrentDrawing.poiPoligons.insert(AppMain.CurrentDrawing.arrEntities[e].Polygon)
+        AppMain.CurrentDrawing.poiLinesEntities.Add(e)
 
     End Select
 
@@ -158,41 +158,41 @@ Public Function CheckAboveEntity(xr As Float, Yr As Float, tolerance As Float) A
   Dim T As Float = Timer
 
   flgSearchingEntity = True
-  For e = 0 To APPMain.hFCAD.arrEntities.Max      ' for each es 10 veces mas lento que recorrer el array
+  For e = 0 To AppMain.CurrentDrawing.arrEntities.Max      ' for each es 10 veces mas lento que recorrer el array
 
     ' En el caso que la entidad sea la que estoy editando desde los grips, tengo que evitarla
 
     If e = clsDefaultJob.iEntityForEdit Then Continue
 
-    Select Case APPMain.hFCAD.arrEntities[e].Gender
+    Select Case AppMain.CurrentDrawing.arrEntities[e].Gender
 
       Case "Line"
 
-        If puntos.doIntersect(xr - tolerance, yr, xr + tolerance, yr, APPMain.hFCAD.arrEntities[e].P[0], APPMain.hFCAD.arrEntities[e].P[1], APPMain.hFCAD.arrEntities[e].P[2], APPMain.hFCAD.arrEntities[e].P[3]) Or puntos.doIntersect(xr, yr - tolerance, xr, yr + tolerance, APPMain.hFCAD.arrEntities[e].P[0], APPMain.hFCAD.arrEntities[e].P[1], APPMain.hFCAD.arrEntities[e].P[2], APPMain.hFCAD.arrEntities[e].P[3]) Then Break
+        If puntos.doIntersect(xr - tolerance, yr, xr + tolerance, yr, AppMain.CurrentDrawing.arrEntities[e].P[0], AppMain.CurrentDrawing.arrEntities[e].P[1], AppMain.CurrentDrawing.arrEntities[e].P[2], AppMain.CurrentDrawing.arrEntities[e].P[3]) Or puntos.doIntersect(xr, yr - tolerance, xr, yr + tolerance, AppMain.CurrentDrawing.arrEntities[e].P[0], AppMain.CurrentDrawing.arrEntities[e].P[1], AppMain.CurrentDrawing.arrEntities[e].P[2], AppMain.CurrentDrawing.arrEntities[e].P[3]) Then Break
 
       Case "PLine"
 
-        For i = 0 To APPMain.hFCAD.arrEntities[e].P.count - 4 Step 2
-          If puntos.doIntersect(xr - tolerance, Yr, Xr + tolerance, Yr, APPMain.hFCAD.arrEntities[e].P[i + 0], APPMain.hFCAD.arrEntities[e].P[i + 1], APPMain.hFCAD.arrEntities[e].P[i + 2], APPMain.hFCAD.arrEntities[e].P[i + 3]) Or puntos.doIntersect(xr, Yr - tolerance, Xr, Yr + tolerance, APPMain.hFCAD.arrEntities[e].P[i + 0], APPMain.hFCAD.arrEntities[e].P[i + 1], APPMain.hFCAD.arrEntities[e].P[i + 2], APPMain.hFCAD.arrEntities[e].P[i + 3]) Then Goto ExitSearch
+        For i = 0 To AppMain.CurrentDrawing.arrEntities[e].P.count - 4 Step 2
+          If puntos.doIntersect(xr - tolerance, Yr, Xr + tolerance, Yr, AppMain.CurrentDrawing.arrEntities[e].P[i + 0], AppMain.CurrentDrawing.arrEntities[e].P[i + 1], AppMain.CurrentDrawing.arrEntities[e].P[i + 2], AppMain.CurrentDrawing.arrEntities[e].P[i + 3]) Or puntos.doIntersect(xr, Yr - tolerance, Xr, Yr + tolerance, AppMain.CurrentDrawing.arrEntities[e].P[i + 0], AppMain.CurrentDrawing.arrEntities[e].P[i + 1], AppMain.CurrentDrawing.arrEntities[e].P[i + 2], AppMain.CurrentDrawing.arrEntities[e].P[i + 3]) Then Goto ExitSearch
         Next
       Case "Circle"
 
-        If Abs(puntos.distancia(xr, yr, APPMain.hFCAD.arrEntities[e].P[0], APPMain.hFCAD.arrEntities[e].P[1]) - APPMain.hFCAD.arrEntities[e].fParam[0]) < tolerance Then Break
-        If puntos.Around(xr, yr, APPMain.hFCAD.arrEntities[e].P[0], APPMain.hFCAD.arrEntities[e].P[1], tolerance) Then Break
+        If Abs(puntos.distancia(xr, yr, AppMain.CurrentDrawing.arrEntities[e].P[0], AppMain.CurrentDrawing.arrEntities[e].P[1]) - AppMain.CurrentDrawing.arrEntities[e].fParam[0]) < tolerance Then Break
+        If puntos.Around(xr, yr, AppMain.CurrentDrawing.arrEntities[e].P[0], AppMain.CurrentDrawing.arrEntities[e].P[1], tolerance) Then Break
 
       Case "Arc"
 
-        If puntos.Around(xr, yr, APPMain.hFCAD.arrEntities[e].P[0], APPMain.hFCAD.arrEntities[e].P[1], tolerance) Then Break
+        If puntos.Around(xr, yr, AppMain.CurrentDrawing.arrEntities[e].P[0], AppMain.CurrentDrawing.arrEntities[e].P[1], tolerance) Then Break
 
-        If Abs(puntos.distancia(xr, yr, APPMain.hFCAD.arrEntities[e].P[0], APPMain.hFCAD.arrEntities[e].P[1]) - APPMain.hFCAD.arrEntities[e].fParam[0]) < tolerance Then
+        If Abs(puntos.distancia(xr, yr, AppMain.CurrentDrawing.arrEntities[e].P[0], AppMain.CurrentDrawing.arrEntities[e].P[1]) - AppMain.CurrentDrawing.arrEntities[e].fParam[0]) < tolerance Then
 
           ' tengo que ver si esa en la porcion
-          angle = Ang(xr - APPMain.hFCAD.arrEntities[e].P[0], yr - APPMain.hFCAD.arrEntities[e].P[1]) * 180 / Pi
+          angle = Ang(xr - AppMain.CurrentDrawing.arrEntities[e].P[0], yr - AppMain.CurrentDrawing.arrEntities[e].P[1]) * 180 / Pi
           If angle < 0 Then angle += 360
-          If APPMain.hFCAD.arrEntities[e].fParam[1] <= APPMain.hFCAD.arrEntities[e].fParam[2] Then
-            If angle >= APPMain.hFCAD.arrEntities[e].fParam[1] And angle <= APPMain.hFCAD.arrEntities[e].fParam[2] Then Break
+          If AppMain.CurrentDrawing.arrEntities[e].fParam[1] <= AppMain.CurrentDrawing.arrEntities[e].fParam[2] Then
+            If angle >= AppMain.CurrentDrawing.arrEntities[e].fParam[1] And angle <= AppMain.CurrentDrawing.arrEntities[e].fParam[2] Then Break
           Else
-            If angle >= APPMain.hFCAD.arrEntities[e].fParam[1] Or angle <= APPMain.hFCAD.arrEntities[e].fParam[2] Then Break
+            If angle >= AppMain.CurrentDrawing.arrEntities[e].fParam[1] Or angle <= AppMain.CurrentDrawing.arrEntities[e].fParam[2] Then Break
           End If
 
         End If
@@ -200,45 +200,45 @@ Public Function CheckAboveEntity(xr As Float, Yr As Float, tolerance As Float) A
       Case "Ellipse"
 
         ' necesito determinar el radio en el angulo del punto que estaria sobre la elipse
-        angle = Ang(xr - APPMain.hFCAD.arrEntities[e].P[0], yr - APPMain.hFCAD.arrEntities[e].P[1]) ' * 180 / Pi
+        angle = Ang(xr - AppMain.CurrentDrawing.arrEntities[e].P[0], yr - AppMain.CurrentDrawing.arrEntities[e].P[1]) ' * 180 / Pi
 
         ' el radio en este agulo viene dado por
 
-        major = Sqr((APPMain.hFCAD.arrEntities[e].p[2] - APPMain.hFCAD.arrEntities[e].p[0]) ^ 2 + (APPMain.hFCAD.arrEntities[e].p[3] - APPMain.hFCAD.arrEntities[e].p[1]) ^ 2)
-        Minor = major * APPMain.hFCAD.arrEntities[e].fParam[0]
-        angle2 = Ang(APPMain.hFCAD.arrEntities[e].p[2] - APPMain.hFCAD.arrEntities[e].p[0], APPMain.hFCAD.arrEntities[e].p[3] - APPMain.hFCAD.arrEntities[e].p[1])
+        major = Sqr((AppMain.CurrentDrawing.arrEntities[e].p[2] - AppMain.CurrentDrawing.arrEntities[e].p[0]) ^ 2 + (AppMain.CurrentDrawing.arrEntities[e].p[3] - AppMain.CurrentDrawing.arrEntities[e].p[1]) ^ 2)
+        Minor = major * AppMain.CurrentDrawing.arrEntities[e].fParam[0]
+        angle2 = Ang(AppMain.CurrentDrawing.arrEntities[e].p[2] - AppMain.CurrentDrawing.arrEntities[e].p[0], AppMain.CurrentDrawing.arrEntities[e].p[3] - AppMain.CurrentDrawing.arrEntities[e].p[1])
 
-        ' x = APPMain.hFCAD.arrEntities[e].p[0] + major * Cos(angle) * Cos(angle2) - minor * Sin(angle) * Sin(angle2)
-        ' y = APPMain.hFCAD.arrEntities[e].p[1] + major * Cos(angle) * Sin(angle2) + minor * Sin(angle) * Cos(angle2)
+        ' x = appmain.CurrentDrawing.arrEntities[e].p[0] + major * Cos(angle) * Cos(angle2) - minor * Sin(angle) * Sin(angle2)
+        ' y = appmain.CurrentDrawing.arrEntities[e].p[1] + major * Cos(angle) * Sin(angle2) + minor * Sin(angle) * Cos(angle2)
 
-        x = APPMain.hFCAD.arrEntities[e].p[0] + major * Cos(angle) * Cos(angle2) - minor * Sin(angle) * Sin(angle2)
-        y = APPMain.hFCAD.arrEntities[e].p[1] + major * Cos(angle) * Sin(angle2) + minor * Sin(angle) * Cos(angle2)
+        x = AppMain.CurrentDrawing.arrEntities[e].p[0] + major * Cos(angle) * Cos(angle2) - minor * Sin(angle) * Sin(angle2)
+        y = AppMain.CurrentDrawing.arrEntities[e].p[1] + major * Cos(angle) * Sin(angle2) + minor * Sin(angle) * Cos(angle2)
 
         ' veo si en esa posicion esta cerca de la elipse
         'If Abs(puntos.distancia(xr, yr, x, y)) < tolerance Then
 
-        ' If Abs(puntos.distancia(xr, yr, APPMain.hFCAD.arrEntities[e].P[0], APPMain.hFCAD.arrEntities[e].P[1]) - Sqr(x * x + y * y)) < tolerance Then
+        ' If Abs(puntos.distancia(xr, yr, appmain.CurrentDrawing.arrEntities[e].P[0], appmain.CurrentDrawing.arrEntities[e].P[1]) - Sqr(x * x + y * y)) < tolerance Then
         '   ' tengo que ver si esa en la porcion
         '   angle = Angle * 180 / Pi
         '   If angle < 0 Then angle += 360
-        '   If APPMain.hFCAD.arrEntities[e].fParam[1] <= APPMain.hFCAD.arrEntities[e].fParam[2] Then
-        '     If angle >= APPMain.hFCAD.arrEntities[e].fParam[1] And angle <= APPMain.hFCAD.arrEntities[e].fParam[2] Then Break
+        '   If appmain.CurrentDrawing.arrEntities[e].fParam[1] <= appmain.CurrentDrawing.arrEntities[e].fParam[2] Then
+        '     If angle >= appmain.CurrentDrawing.arrEntities[e].fParam[1] And angle <= appmain.CurrentDrawing.arrEntities[e].fParam[2] Then Break
         '   Else
-        '     If angle >= APPMain.hFCAD.arrEntities[e].fParam[1] Or angle <= APPMain.hFCAD.arrEntities[e].fParam[2] Then Break
+        '     If angle >= appmain.CurrentDrawing.arrEntities[e].fParam[1] Or angle <= appmain.CurrentDrawing.arrEntities[e].fParam[2] Then Break
         '   End If
         'Break
         x = major * Cos(angle) * Cos(angle2) - minor * Sin(angle) * Sin(angle2)
         y = major * Cos(angle) * Sin(angle2) + minor * Sin(angle) * Cos(angle2)
 
         ' veo si en esa posicion esta cerca de la elipse
-        If Abs(puntos.distancia(xr, yr, APPMain.hFCAD.arrEntities[e].P[0], APPMain.hFCAD.arrEntities[e].P[1]) - Sqr(x * x + y * y)) < tolerance Then
+        If Abs(puntos.distancia(xr, yr, AppMain.CurrentDrawing.arrEntities[e].P[0], AppMain.CurrentDrawing.arrEntities[e].P[1]) - Sqr(x * x + y * y)) < tolerance Then
           ' tengo que ver si esa en la porcion
           angle = Angle * 180 / Pi
           If angle < 0 Then angle += 360
-          If APPMain.hFCAD.arrEntities[e].fParam[1] <= APPMain.hFCAD.arrEntities[e].fParam[2] Then
-            If angle >= APPMain.hFCAD.arrEntities[e].fParam[1] And angle <= APPMain.hFCAD.arrEntities[e].fParam[2] Then Break
+          If AppMain.CurrentDrawing.arrEntities[e].fParam[1] <= AppMain.CurrentDrawing.arrEntities[e].fParam[2] Then
+            If angle >= AppMain.CurrentDrawing.arrEntities[e].fParam[1] And angle <= AppMain.CurrentDrawing.arrEntities[e].fParam[2] Then Break
           Else
-            If angle >= APPMain.hFCAD.arrEntities[e].fParam[1] Or angle <= APPMain.hFCAD.arrEntities[e].fParam[2] Then Break
+            If angle >= AppMain.CurrentDrawing.arrEntities[e].fParam[1] Or angle <= AppMain.CurrentDrawing.arrEntities[e].fParam[2] Then Break
           End If
           'Break
 
@@ -246,16 +246,16 @@ Public Function CheckAboveEntity(xr As Float, Yr As Float, tolerance As Float) A
 
         ' ademas verifico si esta sobre el centro
 
-        If puntos.Around(xr, yr, APPMain.hFCAD.arrEntities[e].P[0], APPMain.hFCAD.arrEntities[e].P[1], tolerance) Then Break
+        If puntos.Around(xr, yr, AppMain.CurrentDrawing.arrEntities[e].P[0], AppMain.CurrentDrawing.arrEntities[e].P[1], tolerance) Then Break
 
       Case "Solid", "Text", "MText"
 
         ' Text, MText, Solid y otros
-        If puntos.isInside(APPMain.hFCAD.arrEntities[e].Polygon, xr, yr) Then Break
+        If puntos.isInside(AppMain.CurrentDrawing.arrEntities[e].Polygon, xr, yr) Then Break
 
       Case "Hatch"
 
-        If puntos.isInside(APPMain.hFCAD.arrEntities[e].P, xr, yr) Then Break
+        If puntos.isInside(AppMain.CurrentDrawing.arrEntities[e].P, xr, yr) Then Break
 
     End Select
 
@@ -267,11 +267,11 @@ ExitSearch:
 
   flgSearchingEntity = False
   'Debug "Above entity en ", Timer - t
-  If e = APPMain.hFCAD.arrEntities.Count Then
+  If e = AppMain.CurrentDrawing.arrEntities.Count Then
 
     Return -1
   Else
-    Debug "Encontre una entidad " & APPMain.hFCAD.arrEntities[e].Gender
+    Debug "Encontre una entidad " & AppMain.CurrentDrawing.arrEntities[e].Gender
     Return e
 
   End If
@@ -309,19 +309,19 @@ Public Sub CheckPOI(xr As Float, Yr As Float) As Float[]
 
   Dim t As Float = Timer
 
-  tolerance = APPMain.hFCAD.Metros(16)
+  tolerance = appmain.Metros(16)
   'Debug "Checking POI"
 
   iPoligon = -1
   iLine = -1
 
-  'iPoligon = puntos.FindPOIPoligon(xr, yr, APPMain.hFCAD.poiPoligons, APPMain.hFCAD.poiPoligonStartIndex, APPMain.hFCAD.poiPoligonElements)
-  'iLine = puntos.FindPOILines(xr, yr, APPMain.hFCAD.poiLines, APPMain.hFCAD.Metros(16))
-  ' rdata = puntos.FindPOI(xr, yr, APPMain.hFCAD.poiPoints, APPMain.hFCAD.Metros(16))
+  'iPoligon = puntos.FindPOIPoligon(xr, yr, appmain.CurrentDrawing.poiPoligons, appmain.CurrentDrawing.poiPoligonStartIndex, appmain.CurrentDrawing.poiPoligonElements)
+  'iLine = puntos.FindPOILines(xr, yr, appmain.CurrentDrawing.poiLines, appmain.CurrentDrawing.Metros(16))
+  ' rdata = puntos.FindPOI(xr, yr, appmain.CurrentDrawing.poiPoints, appmain.CurrentDrawing.Metros(16))
   ' i = rdata[2]
   ' If i >= 0 Then
-  '     rData[2] = appmain.hFCAD.poiType[i]
-  '     rData.Add(appmain.hFCAD.poiEntities[i])
+  '     rData[2] = appmain.CurrentDrawing.poiType[i]
+  '     rData.Add(appmain.CurrentDrawing.poiEntities[i])
   '
   ' Else
   '     rdata.Clear
@@ -329,18 +329,18 @@ Public Sub CheckPOI(xr As Float, Yr As Float) As Float[]
   ' Endif
   ' Me.flgSearchingPOI = False
   ' Return rdata
-  'Debug "total poi check time ", Timer - t, APPMain.hFCAD.poiPoligons.Count + APPMain.hFCAD.poiLines.Count + APPMain.hFCAD.poiPoints.Count, " points parsed"
+  'Debug "total poi check time ", Timer - t, appmain.CurrentDrawing.poiPoligons.Count + appmain.CurrentDrawing.poiLines.Count + appmain.CurrentDrawing.poiPoints.Count, " points parsed"
 
   indexEntity = CheckAboveEntity(xr, yr, tolerance)
 
-  ' If iLine > 0 Then e = appmain.hFCAD.arrEntities[appmain.hFCAD.poiLinesEntities[iLine]]
-  ' If iPoligon > 0 Then e = appmain.hFCAD.arrEntities[iPoligon]
+  ' If iLine > 0 Then e = appmain.CurrentDrawing.arrEntities[appmain.CurrentDrawing.poiLinesEntities[iLine]]
+  ' If iPoligon > 0 Then e = appmain.CurrentDrawing.arrEntities[iPoligon]
   rdata.Insert([0, 0, -1, -1])
 
   If indexEntity >= 0 Then                                               ' ofrezco opciones de enganche
-    e = APPMain.hFCAD.arrEntities[indexEntity]
+    e = AppMain.CurrentDrawing.arrEntities[indexEntity]
     'Debug "Encontrada entidad ", e.Gender, " en ", Timer - t
-    If APPMain.hFCAD.LastPoint.max > 0 Then                     ' tengo un punto anterior
+    If AppMain.CurrentDrawing.LastPoint.max > 0 Then                     ' tengo un punto anterior
 
       Select Case e.Gender
 
@@ -355,10 +355,10 @@ Public Sub CheckPOI(xr As Float, Yr As Float) As Float[]
             ' ecuacion de la recta perpendicular que pasa por el punto anterior
             If pend1 <> 0 Then
               pend2 = -1 / pend1
-              base2 = APPMain.hFCAD.LastPoint[1] - pend2 * APPMain.hFCAD.LastPoint[0]
+              base2 = AppMain.CurrentDrawing.LastPoint[1] - pend2 * AppMain.CurrentDrawing.LastPoint[0]
 
               ' necesito otro punto
-              If APPMain.hFCAD.LastPoint[0] <> 0 Then
+              If AppMain.CurrentDrawing.LastPoint[0] <> 0 Then
                 puntoA.Add(0)
                 puntoA.Add(base2)
               Else
@@ -368,17 +368,17 @@ Public Sub CheckPOI(xr As Float, Yr As Float) As Float[]
               End If
 
               ' determino la interseccion de ambas
-              puntoB = puntos.lineLineIntersection(APPMain.hFCAD.LastPoint, puntoA, [e.P[0], e.P[1]], [e.P[2], e.P[3]])
+              puntoB = puntos.lineLineIntersection(AppMain.CurrentDrawing.LastPoint, puntoA, [e.P[0], e.P[1]], [e.P[2], e.P[3]])
             Else ' la recta es horizontal
 
-              puntoB.Add(APPMain.hFCAD.LastPoint[0])
+              puntoB.Add(AppMain.CurrentDrawing.LastPoint[0])
               puntoB.Add(e.P[1])
 
             End If
           Else        ' la recta es vertical
 
             puntoB.Add(e.P[0])
-            puntoB.Add(APPMain.hFCAD.LastPoint[1])
+            puntoB.Add(AppMain.CurrentDrawing.LastPoint[1])
 
           End If
 
@@ -391,12 +391,12 @@ Public Sub CheckPOI(xr As Float, Yr As Float) As Float[]
           Endif
 
           ' busco tambien intersecciones
-          For i2 = 0 To APPMain.hFCAD.arrEntities.Max
-            Select Case APPMain.hFCAD.arrEntities[i2].Gender
+          For i2 = 0 To AppMain.CurrentDrawing.arrEntities.Max
+            Select Case AppMain.CurrentDrawing.arrEntities[i2].Gender
 
               Case "Line"
-                If puntos.doIntersect(e.P[0], e.P[1], e.P[2], e.P[3], APPMain.hFCAD.arrEntities[i2].P[0], APPMain.hFCAD.arrEntities[i2].P[1], APPMain.hFCAD.arrEntities[i2].P[2], APPMain.hFCAD.arrEntities[i2].P[3]) Then
-                  pInter = puntos.lineLineIntersection([e.P[0], e.P[1]], [e.P[2], e.P[3]], [APPMain.hFCAD.arrEntities[i2].P[0], APPMain.hFCAD.arrEntities[i2].P[1]], [APPMain.hFCAD.arrEntities[i2].P[2], APPMain.hFCAD.arrEntities[i2].P[3]])
+                If puntos.doIntersect(e.P[0], e.P[1], e.P[2], e.P[3], AppMain.CurrentDrawing.arrEntities[i2].P[0], AppMain.CurrentDrawing.arrEntities[i2].P[1], AppMain.CurrentDrawing.arrEntities[i2].P[2], AppMain.CurrentDrawing.arrEntities[i2].P[3]) Then
+                  pInter = puntos.lineLineIntersection([e.P[0], e.P[1]], [e.P[2], e.P[3]], [AppMain.CurrentDrawing.arrEntities[i2].P[0], AppMain.CurrentDrawing.arrEntities[i2].P[1]], [AppMain.CurrentDrawing.arrEntities[i2].P[2], AppMain.CurrentDrawing.arrEntities[i2].P[3]])
                   DistInter = puntos.distancia(xr, yr, pInter[0], pInter[1])
 
                 Endif
@@ -417,8 +417,8 @@ Public Sub CheckPOI(xr As Float, Yr As Float) As Float[]
           Dim tx, ty, t1x, t1y, t2x, t2y As Float
           Dim r As Float = e.fParam[0]
 
-          Dim Px As Float = APPMain.hFCAD.LastPoint[0]
-          Dim Py As Float = APPMain.hFCAD.LastPoint[1]
+          Dim Px As Float = AppMain.CurrentDrawing.LastPoint[0]
+          Dim Py As Float = AppMain.CurrentDrawing.LastPoint[1]
 
           Dim dx As Float = Px - Cx
           Dim dy As Float = Py - Cy

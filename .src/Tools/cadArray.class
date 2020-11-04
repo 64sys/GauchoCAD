@@ -74,8 +74,8 @@ Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' called by FCAD->
 
   If Me.PointsDone = 0 Then
     ' punto real base
-    Me.SelStartXr = puntos.Near(appmain.hFcad.Xreal(mouseX))
-    Me.SelStartYr = puntos.Near(appmain.hFcad.Yreal(mouseY))
+    Me.SelStartXr = puntos.Near(appmain.CurrentDrawing.Xreal(mouseX))
+    Me.SelStartYr = puntos.Near(appmain.CurrentDrawing.Yreal(mouseY))
     Inc Me.PointsDone
 
     clsDrawingAids.Helper.texto = clsDrawingAids.HelperTrabajo & ": " & ("Orthogonal or polar") & " [o]"
@@ -159,12 +159,12 @@ Public Sub Finish()
 
         If rx = 1 And ry = 1 Then Continue
 
-        For Each o In APPMain.hFCAD.arrEntities
+        For Each o In appmain.CurrentDrawing.arrEntities
           If o.selected Then
             newO = clsEntities.ClonEntity(o)               ' devuelve una entidad en exactamente la misma posicion
 
             newO.ClassHandler.traslate(newO, dx, dy)
-            APPMain.hFCAD.arrEntities.Add(newO)
+            appmain.CurrentDrawing.arrEntities.Add(newO)
             ' For i = 0 To newO.p.max Step 2
             '     newO.p[i] += dx * (rx - 1)
             ' Next
@@ -189,13 +189,13 @@ Public Sub Finish()
     Dim Nuevos As Float[]
     For rY = 2 To Np
 
-      For Each o In APPMain.hFCAD.arrEntities
+      For Each o In appmain.CurrentDrawing.arrEntities
         If o.selected Then
           newO = clsEntities.ClonEntity(o)               ' devuelve una entidad en exactamente la misma posicion
           newO.classhandler.translate(newO, -Me.SelStartXr, -Me.SelStartYr)
           newO.ClassHandler.rotate(newO, dp * (ry - 1))
           newO.classhandler.translate(newO, Me.SelStartXr, Me.SelStartYr)
-          APPMain.hFCAD.arrEntities.Add(newO)
+          appmain.CurrentDrawing.arrEntities.Add(newO)
 
           ' For i = 0 To newO.p.max Step 2
           '
@@ -220,7 +220,7 @@ Public Sub Finish()
   clsDrawingAids.CleanTexts
   clsEntities.DeSelection()
   gcd.DrawOriginals = False
-  appmain.hFCAD.Regen
+  appmain.regen
   Me.Active = False
   gcd.ToolActive = False
 

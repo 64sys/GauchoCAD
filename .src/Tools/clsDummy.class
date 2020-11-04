@@ -45,7 +45,7 @@ Public Mode As Integer
 
 Public Function MouseDown(mouseX As Integer, mouseY As Integer) ' called by FCAD-> DrawingArea_MouseDown
 
-    ' This too does nothing here, but you can use it
+  ' This too does nothing here, but you can use it
 
 End
 
@@ -57,7 +57,7 @@ Public Function MouseMove(mouseX As Integer, mouseY As Integer) ' called by FCAD
 
 End
 
-Public Sub Draw()               ' called byappmain.hFCAD.drwArea_Draw
+Public Sub Draw()               ' called byappmain.CurrentDrawing.drwArea_Draw
 
 End
 

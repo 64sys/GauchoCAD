@@ -43,15 +43,15 @@ Public Function SaveToFile(nName As String) As Boolean
 
   'tm.Clear              ' Tincho
 
-  ct.Add(APPMain.hFCAD.cModel["layers"], "layers")
-  'ct.Add(APPMain.hFCAD.cModel["colors"], "colors")
-  ct.Add(APPMain.hFCAD.cModel["styles"], "styles")
-  'ct.Add(APPMain.hFCAD.cModel, "weights")
+  ct.Add(appmain.CurrentDrawing.cModel["layers"], "layers")
+  'ct.Add(appmain.CurrentDrawing.cModel["colors"], "colors")
+  ct.Add(appmain.CurrentDrawing.cModel["styles"], "styles")
+  'ct.Add(appmain.CurrentDrawing.cModel, "weights")
 
   enty.Clear
   If nNAme = "" Then nName = gcd.FileName
 
-  For Each obj In APPMain.hFCAD.arrEntities
+  For Each obj In appmain.CurrentDrawing.arrEntities
     tm.Clear              ' Tincho
 
     p = ""                 '<----Martin: Limpieza para reutilizacion

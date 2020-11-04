@@ -35,14 +35,14 @@ Public Function MouseDown(mouseX As Integer, mouseY As Integer) ' called by FCAD
 
   Me.SelStartX = mouseX
   Me.SelStartY = mouseY
-  appmain.hFCAD.glarea1.Mouse = Mouse.SizeAll
+  appmain.glarea1.Mouse = Mouse.SizeAll
   Me.active = True
 
 End
 
 Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' called by FCAD-> DrawingArea_MouseUp
 
-  appmain.hFCAD.glarea1.Mouse = Mouse.Cross
+  appmain.glarea1.Mouse = Mouse.Cross
   Me.active = False
 
 End
@@ -50,11 +50,11 @@ End
 Public Function MouseMove(mouseX As Integer, mouseY As Integer) ' called by FCAD-> DrawingArea_MouseMove
 
   If Not Me.active Then Return
-  appmain.hFCAD.PanX += (mousex - Me.SelStartX)
-  appmain.hFCAD.PanY -= (mouseY - Me.SelStartY)
+  appmain.CurrentDrawing.PanX += (mousex - Me.SelStartX)
+  appmain.CurrentDrawing.PanY -= (mouseY - Me.SelStartY)
 
   Me.SelStartX = mouseX
   Me.SelStartY = mouseY
-  appmain.hFCAD.redraw
+  appmain.redraw
 
 End

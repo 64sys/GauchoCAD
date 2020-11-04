@@ -190,7 +190,7 @@ Public Function Start(Optional ElemToBuild As Variant, Optional _mode As Integer
 
   If Not ElemToBuild Then
 
-    arrToFill = APPMain.hFCAD.arrEntities
+    arrToFill = AppMain.CurrentDrawing.arrEntities
 
   Endif
 
@@ -406,7 +406,7 @@ Public Procedure LoadFile(stn As String)
     Else If (lpcode = "0") And (lpvalue = "LAYER") Then
       Dim newLayer As New Collection
       Inc mLayerCount
-      APPMain.hFCAD.cModel["Layers"].Add(newlayer, Format(mLayerCount, "0"))
+      AppMain.CurrentDrawing.cModel["Layers"].Add(newlayer, Format(mLayerCount, "0"))
       newlayer.Add(Format(mLayerCount, "0"), "id")
       ReadData
       While (lpcode <> "0") And Not Eof(fp)
@@ -438,7 +438,7 @@ Public Procedure LoadFile(stn As String)
 
       ReadData
       While (lpcode <> "0") And Not Eof(fp)
-        If lpcode = "2" Then APPMain.hFCAD.cModel["DimSts"].Add(newCol, lpvalue)
+        If lpcode = "2" Then AppMain.CurrentDrawing.cModel["DimSts"].Add(newCol, lpvalue)
 
         If lpcode = "40" Then newCol.Add(CFloat(lpvalue), "DIMSCALE")
         'If lpcode = "3" Then newCol.Add(CFloat(lpvalue), "DIMPOST")
@@ -2936,10 +2936,10 @@ Private Function dxfSave2Tables() As Integer
   Print #hFIle, "100"
   Print #hFIle, "AcDbSymbolTable"
   Print #hFIle, "70"                      ' ENTRIES IN TABLE
-  Print #hFIle, APPMain.hFCAD.cModel["Layers"].Count
+  Print #hFIle, AppMain.CurrentDrawing.cModel["Layers"].Count
   Dim i As Integer, lay As Collection
   ' individual layers
-  For Each lay In APPMain.hFCAD.cModel["Layers"]
+  For Each lay In AppMain.CurrentDrawing.cModel["Layers"]
     Print #hFIle, "  0"
     Print #hFIle, "LAYER"
     Print #hFIle, "  5"                   ' handle
@@ -3324,7 +3324,7 @@ Private Function dxfSave3BlockRecord() As Integer
   Print #hFIle, "281"
   Print #hFIle, "  0"
   ' block record
-  For i = 0 To APPMain.hFCAD.arrBlocks.Max
+  For i = 0 To AppMain.CurrentDrawing.arrBlocks.Max
     Print #hFIle, "  0"
     Print #hFIle, "BLOCK_RECORD"
     Print #hFIle, "  5"                   ' handle
@@ -3336,7 +3336,7 @@ Private Function dxfSave3BlockRecord() As Integer
     Print #hFIle, "100"
     Print #hFIle, "AcDbBlockTableRecord"
     Print #hFIle, "2"                                   ' block name
-    Print #hFIle, APPMain.hFCAD.arrBlocks[i].name       ' "*D1"
+    Print #hFIle, AppMain.CurrentDrawing.arrBlocks[i].name       ' "*D1"
     Print #hFIle, "70"                                  ' insertion units
     Print #hFIle, "  0"                                   ' 0 = unitless
     Print #hFIle, "280"                                 ' explotability
@@ -3443,7 +3443,7 @@ Private Function dxfSave4Blocks() As Integer
   Print #hFIle, "AcDbBlockEnd"
   ' a partir de aca van los bloques
   '===========================================================================================================
-  For i = 0 To APPMain.hFCAD.arrBlocks.Max
+  For i = 0 To AppMain.CurrentDrawing.arrBlocks.Max
     Print #hFIle, "  0"
     Print #hFIle, "BLOCK"
     Print #hFIle, "  5"                           ' handle
@@ -3453,11 +3453,11 @@ Private Function dxfSave4Blocks() As Integer
     Print #hFIle, "100"
     Print #hFIle, "AcDbEntity"
     Print #hFIle, "  8"                           ' layer
-    Print #hFIle, APPMain.hFCAD.arrBlocks[i].layer
+    Print #hFIle, AppMain.CurrentDrawing.arrBlocks[i].layer
     Print #hFIle, "100"
     Print #hFIle, "AcDbBlockBegin"
     Print #hFIle, "  2"
-    Print #hFIle, APPMain.hFCAD.arrBlocks[i].name
+    Print #hFIle, AppMain.CurrentDrawing.arrBlocks[i].name
     Print #hFIle, " 70"
     ' Block - type flags(bit - coded values, may be combined):
     ' 0 = Indicates none Of the following flags apply
@@ -3470,32 +3470,32 @@ Private Function dxfSave4Blocks() As Integer
     ' 64 = This definition Is A referenced external reference(ignored On Input )
     Print #hFIle, "1"
     Print #hFIle, " 10"                          ' Base point X
-    Print #hFIle, CStr(APPMain.hFCAD.arrBlocks[i].x)
+    Print #hFIle, CStr(AppMain.CurrentDrawing.arrBlocks[i].x)
     Print #hFIle, " 20"
-    Print #hFIle, CStr(APPMain.hFCAD.arrBlocks[i].y)
+    Print #hFIle, CStr(AppMain.CurrentDrawing.arrBlocks[i].y)
     Print #hFIle, " 30"
     Print #hFIle, CStr("0")
     Print #hFIle, "  3"                           ' name
-    Print #hFIle, APPMain.hFCAD.arrBlocks[i].name
+    Print #hFIle, AppMain.CurrentDrawing.arrBlocks[i].name
     Print #hFIle, "  1"                     ' Xref path name
     Print #hFIle, ""
     Print #hFIle, "  4"                     ' description (optional)
     Print #hFIle, ""
 
     ' entidades del block
-    For iii = 0 To APPMain.hFCAD.arrBlocks[i].entities.Max
-      dxfSave51Entity(APPMain.hFCAD.arrBlocks[i].entities[iii])
+    For iii = 0 To AppMain.CurrentDrawing.arrBlocks[i].entities.Max
+      dxfSave51Entity(AppMain.CurrentDrawing.arrBlocks[i].entities[iii])
     Next
     Print #hFIle, "  0"
     Print #hFIle, "ENDBLK"
     Print #hFIle, "  5"
-    Print #hFIle, APPMain.hFCAD.arrBlocks[i].layer
+    Print #hFIle, AppMain.CurrentDrawing.arrBlocks[i].layer
     Print #hFIle, "330"
     Print #hFIle, "51"
     Print #hFIle, "100"
     Print #hFIle, "AcDbEntity"
     Print #hFIle, "  8"
-    Print #hFIle, APPMain.hFCAD.arrBlocks[i].layer
+    Print #hFIle, AppMain.CurrentDrawing.arrBlocks[i].layer
     Print #hFIle, "100"
     Print #hFIle, "AcDbBlockEnd"
 
@@ -3518,7 +3518,7 @@ Private Function dxfSave5Entities() As Integer
   Print #hFIle, "ENTITIES"
 
   ' here go all entities
-  For Each e In APPMain.hFCAD.arrEntities
+  For Each e In AppMain.CurrentDrawing.arrEntities
     dxfSave51Entity(e)
   Next
 

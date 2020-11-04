@@ -100,7 +100,7 @@ Public Sub Finish(oE As Entity, Optional ParamsDone As Integer = -1) As Boolean
   oE.fParam.add(iBlock)
   oE.Finished = True
 
-  For Each e In APPMain.hFCAD.arrEntities
+  For Each e In appmain.CurrentDrawing.arrEntities
     If e.Selected Then                      ' parto of this
       If e.Block <> "" Then                   ' entity is part of a block
 
