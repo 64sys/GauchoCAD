@@ -42,9 +42,9 @@ Public Function Start(Optional filename As Variant, Optional _mode As Integer = 
   End If
   clsEntities.ReconstruirBloques
   Me.Finish
-  ' appmain.CurrentDrawing.LoadLayers()
-  ' appmain.CurrentDrawing.LoadWeights()    ' esto no funciona porque la ventana no esta añadida al workspace
-  ' appmain.CurrentDrawing.LoadStyles()
+  ' gcd.CurrentDrawing.LoadLayers()
+  ' gcd.CurrentDrawing.LoadWeights()    ' esto no funciona porque la ventana no esta añadida al workspace
+  ' gcd.CurrentDrawing.LoadStyles()
 
   clsEntities.GLGenDrawList
 
@@ -145,7 +145,7 @@ Public Sub LoadFromFile(Optional FilePath As String)
     newObj = New Entity
 
     ' agrego el objeto ya mismo
-    AppMain.CurrentDrawing.arrEntities.Add(newObj)
+    gcd.CurrentDrawing.arrEntities.Add(newObj)
 
     ' leo todos los puntos X y los agrego directamente en el elemento , los guardo en un nuevo formato para poder serializar
     arrStr = Split(ent.Attributes["p"], ":")           ' "p=1:3:5:6:8"

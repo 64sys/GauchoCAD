@@ -501,7 +501,7 @@ Public Function Circle(center As Float[], radious As Float, Optional colour As I
 
   Dim i As Integer, q As New GluQuadric
 
-  gl.Translatef(center[0] * appmain.CurrentDrawing.ScaleZoom, center[1] * appmain.CurrentDrawing.ScaleZoom, 0)
+  gl.Translatef(center[0] * gcd.CurrentDrawing.ScaleZoom, center[1] * gcd.CurrentDrawing.ScaleZoom, 0)
   Glu.Disk(q, radious, radious, 20, 1)
   q = Null
   gl.Translatef(-center[0], -center[1], 0)

@@ -45,9 +45,9 @@ Public Function Start(Optional ElemToBuild As Variant, Optional _Mode As Integer
 
   Else                                                                    ' EXPLOTA !!!
 
-    For i = appmain.CurrentDrawing.arrEntities.Max To 0 Step -1
+    For i = gcd.CurrentDrawing.arrEntities.Max To 0 Step -1
 
-      e = appmain.CurrentDrawing.arrEntities[i]
+      e = gcd.CurrentDrawing.arrEntities[i]
       If e.Selected Then
         Select Case e.Gender
           Case "Insert", "Dimension"

@@ -106,6 +106,135 @@ Public Drawings As New ClsDrawing[]
 Public DrawingReady As Boolean = False
 Public CurrentDrawing As ClsDrawing
 
+'' This transfer layers from imported file, one collection actually, to the model collection
+
+Public Sub LayersTransfer()
+
+  Dim tLay As New Collection
+  Dim i As Integer
+  Dim il As Variant
+  Dim ml As Variant
+  Dim prop As String
+  Dim iLay As Collection
+  Dim mLay As Collection
+  Dim r As Integer
+
+  If CurrentDrawing.cImport.Count > 0 Then
+    If CurrentDrawing.cImport.Exist("Layers") Then
+      iLay = CurrentDrawing.cImport["Layers"]
+      If CurrentDrawing.cModel.Exist("Layers") Then
+        mLay = CurrentDrawing.cModel["Layers"]
+
+        For Each il In iLay
+          r = 0
+          For Each ml In mLay
+            If ml["name"] = il["name"] Then
+              r = -1
+              Break
+            Else
+              Inc r
+            Endif
+          Next
+
+          If r > -1 Then
+            tLay.Add(Format(r, "0"), "id")
+            tLay.Add("layer", "type")
+            For Each prop In ["name", "show", "frozen", "locked", "colour", "style", "width", "print"]
+              tLay.Add(il[prop], prop)
+            Next
+            mLay.Add(tLay.copy(), Format(r, "0"))
+            tLay.Clear
+          Endif
+
+        Next
+      Else
+        For Each il In iLay
+          tLay.Add(Format(i, "0"), "id")
+          tLay.Add("layer", "type")
+
+          For Each prop In ["name", "show", "frozen", "locked", "colour", "style", "width", "print"]
+            tLay.Add(iLay[prop], prop)
+          Next
+
+          mLay.Add(tLay.copy(), Format(i, "0"))
+          tLay.Clear
+          Inc i
+        Next
+      Endif
+    Endif
+  Endif
+
+End
+
+Public Sub BlocksTransfer()
+
+  Dim iEnt As Collection
+  Dim mEnt As Collection
+  Dim grp As Collection
+  Dim e As Variant
+  Dim mGrp As Collection
+
+  If CurrentDrawing.cImport.Count > 0 Then
+    If CurrentDrawing.cImport.Exist("Blocks") Then
+      iEnt = CurrentDrawing.cImport["Blocks"]
+      If CurrentDrawing.cModel.Exist("Blocks") Then
+        mEnt = CurrentDrawing.cModel["Blocks"]
+
+        For Each grp In iEnt
+          If mEnt.Exist(iEnt.Key) = False Then
+            mEnt.Add(grp.Copy(), iEnt.Key)
+          Else
+            mGrp = mEnt[iEnt.Key]
+            For Each e In grp
+              mGrp.Add(e, grp.Key)
+            Next
+
+          Endif
+
+        Next
+      Else
+
+        CurrentDrawing.cModel.Add(iEnt.Copy(), "Blocks")
+
+      Endif
+    Endif
+  Endif
+
+End
+
+Public Sub EntitiesTransfer2()
+
+  Dim iEnt As Collection
+  Dim mEnt As Collection
+  Dim grp As Collection
+  Dim e As Variant
+  Dim mGrp As Collection
+
+  If CurrentDrawing.cImport.Count > 0 Then
+    If CurrentDrawing.cImport.Exist("Entities") Then
+      iEnt = CurrentDrawing.cImport["Entities"]
+      If CurrentDrawing.cModel.Exist("Entities") Then
+        mEnt = CurrentDrawing.cModel["Entities"]
+
+        For Each grp In iEnt
+          If mEnt.Exist(iEnt.Key) = False Then
+            mEnt.Add(grp.Copy(), iEnt.Key)
+          Else
+            mGrp = mEnt[iEnt.Key]
+            For Each e In grp
+              mGrp.Add(e, grp.Key)
+            Next
+
+          Endif
+
+        Next
+
+      Endif
+    Endif
+  Endif
+
+End
+
 Public Sub Redraw()
 
   appmain.redraw
@@ -175,17 +304,17 @@ Public Sub ExportBlocks(colData As Collection) ', obxEntities As Entity[]) As In
     colData.Add(colBlocks, "Blocks")
   End If
 
-  For i = 0 To AppMain.CurrentDrawing.arrBlocks.max
+  For i = 0 To gcd.CurrentDrawing.arrBlocks.max
     colBlk = New Collection
-    colData["Blocks"].Add(colBlk, AppMain.CurrentDrawing.arrBlocks[i].name)
+    colData["Blocks"].Add(colBlk, gcd.CurrentDrawing.arrBlocks[i].name)
 
-    colData["Blocks"][AppMain.CurrentDrawing.arrBlocks[i].name].Add("BLOCK", "entity")
-    colData["Blocks"][AppMain.CurrentDrawing.arrBlocks[i].name].Add(AppMain.CurrentDrawing.arrBlocks[i].name, "block")
-    colData["Blocks"][AppMain.CurrentDrawing.arrBlocks[i].name].Add("BYLAYER", "style")
+    colData["Blocks"][gcd.CurrentDrawing.arrBlocks[i].name].Add("BLOCK", "entity")
+    colData["Blocks"][gcd.CurrentDrawing.arrBlocks[i].name].Add(gcd.CurrentDrawing.arrBlocks[i].name, "block")
+    colData["Blocks"][gcd.CurrentDrawing.arrBlocks[i].name].Add("BYLAYER", "style")
     colEnt = New Collection
-    colData["Blocks"][AppMain.CurrentDrawing.arrBlocks[i].name].Add(colEnt, "Entities")
-    For iTE = 0 To AppMain.CurrentDrawing.arrBlocks[i].entities.Max
-      ExportEntities(colData["Blocks"]["Entities"], AppMain.CurrentDrawing.arrBlocks[i].entities)
+    colData["Blocks"][gcd.CurrentDrawing.arrBlocks[i].name].Add(colEnt, "Entities")
+    For iTE = 0 To gcd.CurrentDrawing.arrBlocks[i].entities.Max
+      ExportEntities(colData["Blocks"]["Entities"], gcd.CurrentDrawing.arrBlocks[i].entities)
     Next
 
   Next
@@ -201,7 +330,7 @@ Public Sub ImportBlocks(colData As Collection) ', obxEntities As Entity[]) As In
     Dim newBlock As New ArrBlockSt
     newBlock.entities = New Entity[]
     newBlock.name = colBlk["block"]
-    AppMain.CurrentDrawing.arrBlocks.Add(newBlock)
+    gcd.CurrentDrawing.arrBlocks.Add(newBlock)
     ImportEntities2(colBlk["Entities"], newBlock.entities, newBlock.name)
 
   Next
@@ -871,7 +1000,7 @@ Public Function AddBlock(Points As Float[], Block As String) As Entity[]
   newBlock.name = block
   newBlock.x = Points[0]
   newBlock.y = Points[1]
-  AppMain.CurrentDrawing.arrBlocks.Add(newBlock)
+  gcd.CurrentDrawing.arrBlocks.Add(newBlock)
 
   Return newBlock.entities
 
@@ -886,11 +1015,11 @@ Public Function ApplyLayerProperties(Optional mode As Integer = 0)
 
   Print "Aplicando propiedades del Layers"
 
-  For Each e In AppMain.CurrentDrawing.arrEntities
+  For Each e In gcd.CurrentDrawing.arrEntities
 
     If mode = 1 Then
       ' reconstruyo el ID del layer en la entidad, para ello busco en la lista cual coincide con su nombre
-      For Each cLayer In AppMain.CurrentDrawing.cModel["Layers"]
+      For Each cLayer In gcd.CurrentDrawing.cModel["Layers"]
         If e.layer = cLayer["name"] Then
           e.layerID = cLayer["id"]
           Break
@@ -900,10 +1029,10 @@ Public Function ApplyLayerProperties(Optional mode As Integer = 0)
     Endif
 
     ' nombre, el que pudo haber cambiado (exepto el "0")
-    e.layer = AppMain.CurrentDrawing.cModel["Layers"][e.layerID]["name"]
+    e.layer = gcd.CurrentDrawing.cModel["Layers"][e.layerID]["name"]
 
     ' visibiliad
-    If AppMain.CurrentDrawing.cModel["Layers"][e.layerID]["show"] Then e.visible = True Else e.visible = False
+    If gcd.CurrentDrawing.cModel["Layers"][e.layerID]["show"] Then e.visible = True Else e.visible = False
 
   Next
 
@@ -917,7 +1046,7 @@ Public Function ApplyLayerPropertieToEntity(e As Entity)
   Dim LayerName As String
 
   ' reconstruyo el ID del layer en la entidad, para ello busco en la lista cual coincide con su nombre
-  For Each cLayer In AppMain.CurrentDrawing.cModel["Layers"]
+  For Each cLayer In gcd.CurrentDrawing.cModel["Layers"]
     If e.layer = cLayer["name"] Then
       e.layerID = cLayer["id"]
       Break
@@ -925,10 +1054,10 @@ Public Function ApplyLayerPropertieToEntity(e As Entity)
   Next
 
   ' nombre, el que pudo haber cambiado (exepto el "0")
-  e.layer = AppMain.CurrentDrawing.cModel["Layers"][e.layerID]["name"]
+  e.layer = gcd.CurrentDrawing.cModel["Layers"][e.layerID]["name"]
 
   ' visibiliad
-  If AppMain.CurrentDrawing.cModel["Layers"][e.layerID]["show"] Then e.visible = True Else e.visible = False
+  If gcd.CurrentDrawing.cModel["Layers"][e.layerID]["show"] Then e.visible = True Else e.visible = False
 
 End
 
@@ -936,7 +1065,7 @@ Public Function GetLayerID(LayerName As String) As String
 
   Dim cLayer As Collection
 
-  For Each cLayer In AppMain.CurrentDrawing.cModel["Layers"]
+  For Each cLayer In gcd.CurrentDrawing.cModel["Layers"]
     If cLayer["name"] = LayerName Then Return cLayer["id"]
   Next
 
@@ -947,15 +1076,15 @@ Public Function GetGBColor(CADcolor As Integer, layerID As String) As Integer
   ' color
   If CADcolor = 256 Then          ' buscar color del layer
 
-    Return Starter.gColor[AppMain.CurrentDrawing.cModel["Layers"][layerID]["colour"]]
+    Return Starter.gColor[gcd.CurrentDrawing.cModel["Layers"][layerID]["colour"]]
 
   Else If CADcolor = 257 Then     ' buscar color del objeto
 
-    Return Starter.gColor[AppMain.CurrentDrawing.cModel["Layers"][layerID]["colour"]]     ' FIXME: cambiar esto
+    Return Starter.gColor[gcd.CurrentDrawing.cModel["Layers"][layerID]["colour"]]     ' FIXME: cambiar esto
 
   Else If CADcolor = 0 Then       ' buscar color del bloque
 
-    Return Starter.gColor[AppMain.CurrentDrawing.cModel["Layers"][layerID]["colour"]]     ' FIXME: cambiar esto
+    Return Starter.gColor[gcd.CurrentDrawing.cModel["Layers"][layerID]["colour"]]     ' FIXME: cambiar esto
 
   Else
 

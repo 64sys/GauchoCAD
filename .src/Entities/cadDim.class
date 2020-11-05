@@ -181,8 +181,8 @@ Public Function Start(Optional Mode As Integer = gcd.dimRadius)
       NextParamType = "P"
       ' ahora creo el bloque asociado
       newBlock.entities = New Entity[]
-      newBlock.name = "*D" & Str$(appmain.CurrentDrawing.arrBlocks.Count)
-      appmain.CurrentDrawing.arrBlocks.Add(newBlock)
+      newBlock.name = "*D" & Str$(gcd.CurrentDrawing.arrBlocks.Count)
+      gcd.CurrentDrawing.arrBlocks.Add(newBlock)
       ' linea principal
       gcd.AddLine(newBlock.entities, [0, 0, 0, 0], elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
 
@@ -210,8 +210,8 @@ Public Function Start(Optional Mode As Integer = gcd.dimRadius)
 
       ' ahora creo el bloque asociado
       newBlock.entities = New Entity[]
-      newBlock.name = "*D" & Str$(appmain.CurrentDrawing.arrBlocks.Count)
-      appmain.CurrentDrawing.arrBlocks.Add(newBlock)
+      newBlock.name = "*D" & Str$(gcd.CurrentDrawing.arrBlocks.Count)
+      gcd.CurrentDrawing.arrBlocks.Add(newBlock)
       ' la linea principal ahora es un arco
       gcd.Addarc(newBlock.entities, [0, 0], 0, 0, 0, elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
 
@@ -237,8 +237,8 @@ Public Function Start(Optional Mode As Integer = gcd.dimRadius)
 
       ' ahora creo el bloque asociado
       newBlock.entities = New Entity[]
-      newBlock.name = "*D" & Str$(appmain.CurrentDrawing.arrBlocks.Count)
-      appmain.CurrentDrawing.arrBlocks.Add(newBlock)
+      newBlock.name = "*D" & Str$(gcd.CurrentDrawing.arrBlocks.Count)
+      gcd.CurrentDrawing.arrBlocks.Add(newBlock)
 
       ' linea principal
       gcd.AddLine(newBlock.entities, [0, 0, 0, 0], elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
@@ -260,8 +260,8 @@ Public Function Start(Optional Mode As Integer = gcd.dimRadius)
 
       ' ahora creo el bloque asociado
       newBlock.entities = New Entity[]
-      newBlock.name = "*D" & Str$(appmain.CurrentDrawing.arrBlocks.Count)
-      appmain.CurrentDrawing.arrBlocks.Add(newBlock)
+      newBlock.name = "*D" & Str$(gcd.CurrentDrawing.arrBlocks.Count)
+      gcd.CurrentDrawing.arrBlocks.Add(newBlock)
 
       ' linea principal
       gcd.AddLine(newBlock.entities, [0, 0, 0, 0], elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
@@ -497,62 +497,62 @@ Public Sub ReBuildBlock()
         elem.fParam[2] = Ang(ClickXr - elem.P[0], ClickYr - elem.P[1]) * 180 / Pi
 
         ' la primer entidad del bloque es la linea principal
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[0].P[0] = 0           ' X0
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[0].P[1] = 0           ' Y0
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].P[0] = 0           ' X0
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].P[1] = 0           ' Y0
 
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[0].P[2] = d           ' X1
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[0].P[3] = 0           ' Y1
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].P[2] = d           ' X1
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].P[3] = 0           ' Y1
 
         ' la segunda es la primer linea de demarcacion (sin cambios)
-        'appmain.CurrentDrawing.arrBlocks[iBloque].entities[1].P[0] = 0           ' X0
-        'appmain.CurrentDrawing.arrBlocks[iBloque].entities[1].P[1] = 0           ' Y0
+        'gcd.CurrentDrawing.arrBlocks[iBloque].entities[1].P[0] = 0           ' X0
+        'gcd.CurrentDrawing.arrBlocks[iBloque].entities[1].P[1] = 0           ' Y0
 
-        'appmain.CurrentDrawing.arrBlocks[iBloque].entities[1].P[2] = d           ' X1
-        'appmain.CurrentDrawing.arrBlocks[iBloque].entities[1].P[3] = 0           ' Y1
+        'gcd.CurrentDrawing.arrBlocks[iBloque].entities[1].P[2] = d           ' X1
+        'gcd.CurrentDrawing.arrBlocks[iBloque].entities[1].P[3] = 0           ' Y1
 
         ' la tercera es la segunda linea de demarcacion
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[2].P[0] = d           ' X0
-        'appmain.CurrentDrawing.arrBlocks[iBloque].entities[2].P[1] = 0           ' Y0
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[2].P[0] = d           ' X0
+        'gcd.CurrentDrawing.arrBlocks[iBloque].entities[2].P[1] = 0           ' Y0
 
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[2].P[2] = d           ' X1
-        'appmain.CurrentDrawing.arrBlocks[iBloque].entities[2].P[3] = 0           ' Y1
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[2].P[2] = d           ' X1
+        'gcd.CurrentDrawing.arrBlocks[iBloque].entities[2].P[3] = 0           ' Y1
 
         ' la sexta es el texto
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[5].StringData[0] = Format(d, Me.DimFormat)
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[5].StringData[0] = Format(d, Me.DimFormat)
 
-        flxTextExt = glPlus.MTextExtends(appmain.CurrentDrawing.arrBlocks[iBloque].entities[5].StringData[0], 0, 0, appmain.CurrentDrawing.arrBlocks[iBloque].entities[5].fParam[1])
+        flxTextExt = glPlus.MTextExtends(gcd.CurrentDrawing.arrBlocks[iBloque].entities[5].StringData[0], 0, 0, gcd.CurrentDrawing.arrBlocks[iBloque].entities[5].fParam[1])
 
         ' la cuarta y quinta son las flechas , tengo que verificar si entran, o el texto
         If flxTextExt[2] * 1.1 > d Then                      ' no entra
 
-          appmain.CurrentDrawing.arrBlocks[iBloque].entities[3].P[0] = d           ' X0
-          appmain.CurrentDrawing.arrBlocks[iBloque].entities[3].P[2] = Me.DimArrowSize + d           ' X0
-          appmain.CurrentDrawing.arrBlocks[iBloque].entities[3].P[4] = Me.DimArrowSize + d           ' X0
-          appmain.CurrentDrawing.arrBlocks[iBloque].entities[3].P[6] = d           ' X0
+          gcd.CurrentDrawing.arrBlocks[iBloque].entities[3].P[0] = d           ' X0
+          gcd.CurrentDrawing.arrBlocks[iBloque].entities[3].P[2] = Me.DimArrowSize + d           ' X0
+          gcd.CurrentDrawing.arrBlocks[iBloque].entities[3].P[4] = Me.DimArrowSize + d           ' X0
+          gcd.CurrentDrawing.arrBlocks[iBloque].entities[3].P[6] = d           ' X0
 
-          appmain.CurrentDrawing.arrBlocks[iBloque].entities[4].P[0] = 0           ' X0
-          appmain.CurrentDrawing.arrBlocks[iBloque].entities[4].P[2] = -Me.DimArrowSize
-          appmain.CurrentDrawing.arrBlocks[iBloque].entities[4].P[4] = -Me.DimArrowSize
-          appmain.CurrentDrawing.arrBlocks[iBloque].entities[4].P[6] = 0           ' X0
+          gcd.CurrentDrawing.arrBlocks[iBloque].entities[4].P[0] = 0           ' X0
+          gcd.CurrentDrawing.arrBlocks[iBloque].entities[4].P[2] = -Me.DimArrowSize
+          gcd.CurrentDrawing.arrBlocks[iBloque].entities[4].P[4] = -Me.DimArrowSize
+          gcd.CurrentDrawing.arrBlocks[iBloque].entities[4].P[6] = 0           ' X0
 
           ' el texto va afuera
-          appmain.CurrentDrawing.arrBlocks[iBloque].entities[5].P[0] = d + Me.DimArrowSize / 2
-          appmain.CurrentDrawing.arrBlocks[iBloque].entities[5].P[1] = Me.DimArrowWidth
+          gcd.CurrentDrawing.arrBlocks[iBloque].entities[5].P[0] = d + Me.DimArrowSize / 2
+          gcd.CurrentDrawing.arrBlocks[iBloque].entities[5].P[1] = Me.DimArrowWidth
 
         Else                                                                ' entra
-          appmain.CurrentDrawing.arrBlocks[iBloque].entities[3].P[0] = 0           ' X0
-          appmain.CurrentDrawing.arrBlocks[iBloque].entities[3].P[2] = Me.DimArrowSize
-          appmain.CurrentDrawing.arrBlocks[iBloque].entities[3].P[4] = Me.DimArrowSize
-          appmain.CurrentDrawing.arrBlocks[iBloque].entities[3].P[6] = 0           ' X0
+          gcd.CurrentDrawing.arrBlocks[iBloque].entities[3].P[0] = 0           ' X0
+          gcd.CurrentDrawing.arrBlocks[iBloque].entities[3].P[2] = Me.DimArrowSize
+          gcd.CurrentDrawing.arrBlocks[iBloque].entities[3].P[4] = Me.DimArrowSize
+          gcd.CurrentDrawing.arrBlocks[iBloque].entities[3].P[6] = 0           ' X0
 
-          appmain.CurrentDrawing.arrBlocks[iBloque].entities[4].P[0] = d           ' X0
-          appmain.CurrentDrawing.arrBlocks[iBloque].entities[4].P[2] = -Me.DimArrowSize + d           ' X0
-          appmain.CurrentDrawing.arrBlocks[iBloque].entities[4].P[4] = -Me.DimArrowSize + d           ' X0
-          appmain.CurrentDrawing.arrBlocks[iBloque].entities[4].P[6] = d           ' X0
+          gcd.CurrentDrawing.arrBlocks[iBloque].entities[4].P[0] = d           ' X0
+          gcd.CurrentDrawing.arrBlocks[iBloque].entities[4].P[2] = -Me.DimArrowSize + d           ' X0
+          gcd.CurrentDrawing.arrBlocks[iBloque].entities[4].P[4] = -Me.DimArrowSize + d           ' X0
+          gcd.CurrentDrawing.arrBlocks[iBloque].entities[4].P[6] = d           ' X0
 
           ' el texto va adentro
-          appmain.CurrentDrawing.arrBlocks[iBloque].entities[5].P[0] = d / 2 - flxTextExt[2] / 2
-          appmain.CurrentDrawing.arrBlocks[iBloque].entities[5].P[1] = Me.DimArrowWidth
+          gcd.CurrentDrawing.arrBlocks[iBloque].entities[5].P[0] = d / 2 - flxTextExt[2] / 2
+          gcd.CurrentDrawing.arrBlocks[iBloque].entities[5].P[1] = Me.DimArrowWidth
 
         End If
 
@@ -562,30 +562,30 @@ Public Sub ReBuildBlock()
         'Debug extension
 
         ' linea principal
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[0].P[1] = extension           ' Y0
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[0].P[3] = extension           ' Y1
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].P[1] = extension           ' Y0
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].P[3] = extension           ' Y1
 
         ' linea de demarcacion
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[1].P[1] = Me.DimExtension + extension           ' Y0
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[1].P[3] = -Me.DimExtension + extension           ' Y1
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[1].P[1] = Me.DimExtension + extension           ' Y0
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[1].P[3] = -Me.DimExtension + extension           ' Y1
 
         ' segunda linea de demarcacion
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[2].P[1] = Me.DimExtension + extension           ' Y0
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[2].P[3] = -Me.DimExtension + extension           ' Y1
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[2].P[1] = Me.DimExtension + extension           ' Y0
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[2].P[3] = -Me.DimExtension + extension           ' Y1
 
         ' texto
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[5].P[1] = Me.DimArrowWidth + extension
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[5].P[1] = Me.DimArrowWidth + extension
 
         ' flechas
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[3].P[1] = extension           ' X0
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[3].P[3] = extension + Me.DimArrowWidth
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[3].P[5] = extension - Me.DimArrowWidth
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[3].P[7] = extension           ' X0
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[3].P[1] = extension           ' X0
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[3].P[3] = extension + Me.DimArrowWidth
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[3].P[5] = extension - Me.DimArrowWidth
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[3].P[7] = extension           ' X0
 
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[4].P[1] = extension           ' X0
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[4].P[3] = extension + Me.DimArrowWidth
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[4].P[5] = extension - Me.DimArrowWidth
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[4].P[7] = extension           ' X0
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[4].P[1] = extension           ' X0
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[4].P[3] = extension + Me.DimArrowWidth
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[4].P[5] = extension - Me.DimArrowWidth
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[4].P[7] = extension           ' X0
 
       End If
 
@@ -608,91 +608,91 @@ Public Sub ReBuildBlock()
         'elem.fParam[2] = Ang(ClickXr - elem.P[0], ClickYr - elem.P[1]) * 180 / Pi
 
         ' la primer entidad del bloque es el arco
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[0].P[0] = 0 'elem.P[0]
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[0].P[1] = 0 'elem.P[1]
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].P[0] = 0 'elem.P[0]
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].P[1] = 0 'elem.P[1]
 
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[0] = d          ' radio
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[1] = Ang(ClickXr - elem.P[0], ClickYr - elem.P[1]) * 180 / Pi
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[2] = 0
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[0] = d          ' radio
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[1] = Ang(ClickXr - elem.P[0], ClickYr - elem.P[1]) * 180 / Pi
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[2] = 0
 
         ' las lineas de extension (las hago HORIZONTALES y las roto)
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[1].P.Clear
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[1].P.Insert([-Me.DimExtension, 0, Me.DimExtension, 0])
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[2].P.Clear
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[2].P.Insert([-Me.DimExtension, 0, Me.DimExtension, 0])
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[1].P.Clear
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[1].P.Insert([-Me.DimExtension, 0, Me.DimExtension, 0])
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[2].P.Clear
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[2].P.Insert([-Me.DimExtension, 0, Me.DimExtension, 0])
 
         ' flechas
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[3].P.Clear
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[3].P.Insert([0, 0, -Me.DimArrowWidth, Me.DimArrowSize, Me.DimArrowWidth, Me.DimArrowSize, 0, 0])
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[3].P.Clear
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[3].P.Insert([0, 0, -Me.DimArrowWidth, Me.DimArrowSize, Me.DimArrowWidth, Me.DimArrowSize, 0, 0])
 
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[4].P.Clear
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[4].P.Insert([0, 0, -Me.DimArrowWidth, -Me.DimArrowSize, Me.DimArrowWidth, -Me.DimArrowSize, 0, 0])
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[4].P.Clear
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[4].P.Insert([0, 0, -Me.DimArrowWidth, -Me.DimArrowSize, Me.DimArrowWidth, -Me.DimArrowSize, 0, 0])
 
         ' roto
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[1].ClassHandler.Rotate(appmain.CurrentDrawing.arrBlocks[iBloque].entities[1], appmain.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[1] / 180 * Pi)
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[2].ClassHandler.Rotate(appmain.CurrentDrawing.arrBlocks[iBloque].entities[2], appmain.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[1] / 180 * Pi)
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[3].ClassHandler.Rotate(appmain.CurrentDrawing.arrBlocks[iBloque].entities[3], appmain.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[1] / 180 * Pi)
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[4].ClassHandler.Rotate(appmain.CurrentDrawing.arrBlocks[iBloque].entities[4], appmain.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[1] / 180 * Pi)
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[1].ClassHandler.Rotate(gcd.CurrentDrawing.arrBlocks[iBloque].entities[1], gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[1] / 180 * Pi)
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[2].ClassHandler.Rotate(gcd.CurrentDrawing.arrBlocks[iBloque].entities[2], gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[1] / 180 * Pi)
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[3].ClassHandler.Rotate(gcd.CurrentDrawing.arrBlocks[iBloque].entities[3], gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[1] / 180 * Pi)
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[4].ClassHandler.Rotate(gcd.CurrentDrawing.arrBlocks[iBloque].entities[4], gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[1] / 180 * Pi)
 
         ' traslado
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[1].ClassHandler.Translate(appmain.CurrentDrawing.arrBlocks[iBloque].entities[1], elem.P[2] - elem.P[0], elem.P[3] - elem.P[1])
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[2].ClassHandler.Translate(appmain.CurrentDrawing.arrBlocks[iBloque].entities[2], elem.P[2] - elem.P[0], elem.P[3] - elem.P[1])
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[3].ClassHandler.Translate(appmain.CurrentDrawing.arrBlocks[iBloque].entities[3], elem.P[2] - elem.P[0], elem.P[3] - elem.P[1])
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[4].ClassHandler.Translate(appmain.CurrentDrawing.arrBlocks[iBloque].entities[4], elem.P[2] - elem.P[0], elem.P[3] - elem.P[1])
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[1].ClassHandler.Translate(gcd.CurrentDrawing.arrBlocks[iBloque].entities[1], elem.P[2] - elem.P[0], elem.P[3] - elem.P[1])
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[2].ClassHandler.Translate(gcd.CurrentDrawing.arrBlocks[iBloque].entities[2], elem.P[2] - elem.P[0], elem.P[3] - elem.P[1])
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[3].ClassHandler.Translate(gcd.CurrentDrawing.arrBlocks[iBloque].entities[3], elem.P[2] - elem.P[0], elem.P[3] - elem.P[1])
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[4].ClassHandler.Translate(gcd.CurrentDrawing.arrBlocks[iBloque].entities[4], elem.P[2] - elem.P[0], elem.P[3] - elem.P[1])
 
         ' la sexta es el texto
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[5].StringData[0] = Format(0, Me.DimFormatAng)
-        flxTextExt = glPlus.MTextExtends(appmain.CurrentDrawing.arrBlocks[iBloque].entities[5].StringData[0], 0, 0, appmain.CurrentDrawing.arrBlocks[iBloque].entities[5].fParam[1])
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[5].StringData[0] = Format(0, Me.DimFormatAng)
+        flxTextExt = glPlus.MTextExtends(gcd.CurrentDrawing.arrBlocks[iBloque].entities[5].StringData[0], 0, 0, gcd.CurrentDrawing.arrBlocks[iBloque].entities[5].fParam[1])
 
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[5].P[0] = elem.P[2] - elem.P[0]
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[5].P[1] = elem.P[3] - elem.P[1]
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[5].P[0] = elem.P[2] - elem.P[0]
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[5].P[1] = elem.P[3] - elem.P[1]
 
       Else If iPoints = 2 Then ' marco el segundo punto, lo que modifica los parametros del bloque
         elem.Visible = True
         elem.P[4] = ClickXr
         elem.P[5] = ClickYr
 
-        'appmain.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[1] = Ang(ClickXr - elem.P[0], ClickYr - elem.P[1]) * 180 / Pi
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[2] = Ang(ClickXr - elem.P[0], ClickYr - elem.P[1]) * 180 / Pi
+        'gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[1] = Ang(ClickXr - elem.P[0], ClickYr - elem.P[1]) * 180 / Pi
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[2] = Ang(ClickXr - elem.P[0], ClickYr - elem.P[1]) * 180 / Pi
 
         ' las lineas de extension (las hago HORIZONTALES y las roto)
-        'appmain.CurrentDrawing.arrBlocks[iBloque].entities[1].P.Clear
-        'appmain.CurrentDrawing.arrBlocks[iBloque].entities[1].P.Insert([-Me.DimExtension, 0, Me.DimExtension, 0])
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[2].P.Clear
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[2].P.Insert([-Me.DimExtension, 0, Me.DimExtension, 0])
+        'gcd.CurrentDrawing.arrBlocks[iBloque].entities[1].P.Clear
+        'gcd.CurrentDrawing.arrBlocks[iBloque].entities[1].P.Insert([-Me.DimExtension, 0, Me.DimExtension, 0])
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[2].P.Clear
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[2].P.Insert([-Me.DimExtension, 0, Me.DimExtension, 0])
 
         ' flechas
-        'appmain.CurrentDrawing.arrBlocks[iBloque].entities[3].P.Clear
-        'appmain.CurrentDrawing.arrBlocks[iBloque].entities[3].P.Insert([0, 0, -Me.DimArrowWidth, Me.DimArrowSize, Me.DimArrowWidth, Me.DimArrowSize, 0, 0])
+        'gcd.CurrentDrawing.arrBlocks[iBloque].entities[3].P.Clear
+        'gcd.CurrentDrawing.arrBlocks[iBloque].entities[3].P.Insert([0, 0, -Me.DimArrowWidth, Me.DimArrowSize, Me.DimArrowWidth, Me.DimArrowSize, 0, 0])
 
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[4].P.Clear
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[4].P.Insert([0, 0, -Me.DimArrowWidth, -Me.DimArrowSize, Me.DimArrowWidth, -Me.DimArrowSize, 0, 0])
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[4].P.Clear
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[4].P.Insert([0, 0, -Me.DimArrowWidth, -Me.DimArrowSize, Me.DimArrowWidth, -Me.DimArrowSize, 0, 0])
 
         ' roto
 
-        'appmain.CurrentDrawing.arrBlocks[iBloque].entities[1].ClassHandler.Rotate(appmain.CurrentDrawing.arrBlocks[iBloque].entities[1], appmain.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[1] / 180 * Pi)
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[2].ClassHandler.Rotate(appmain.CurrentDrawing.arrBlocks[iBloque].entities[2], appmain.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[2] / 180 * Pi)
-        'appmain.CurrentDrawing.arrBlocks[iBloque].entities[3].ClassHandler.Rotate(appmain.CurrentDrawing.arrBlocks[iBloque].entities[3], appmain.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[1] / 180 * Pi)
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[4].ClassHandler.Rotate(appmain.CurrentDrawing.arrBlocks[iBloque].entities[4], appmain.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[2] / 180 * Pi)
+        'gcd.CurrentDrawing.arrBlocks[iBloque].entities[1].ClassHandler.Rotate(gcd.CurrentDrawing.arrBlocks[iBloque].entities[1], gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[1] / 180 * Pi)
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[2].ClassHandler.Rotate(gcd.CurrentDrawing.arrBlocks[iBloque].entities[2], gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[2] / 180 * Pi)
+        'gcd.CurrentDrawing.arrBlocks[iBloque].entities[3].ClassHandler.Rotate(gcd.CurrentDrawing.arrBlocks[iBloque].entities[3], gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[1] / 180 * Pi)
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[4].ClassHandler.Rotate(gcd.CurrentDrawing.arrBlocks[iBloque].entities[4], gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[2] / 180 * Pi)
 
         ' muevo
-        fRotXY = puntos.RotateFromPointWithAngle(elem.P[0], elem.P[1], (appmain.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[2] - appmain.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[1]) / 180 * Pi, elem.P[2], elem.P[3])
+        fRotXY = puntos.RotateFromPointWithAngle(elem.P[0], elem.P[1], (gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[2] - gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[1]) / 180 * Pi, elem.P[2], elem.P[3])
 
-        'appmain.CurrentDrawing.arrBlocks[iBloque].entities[2].ClassHandler.Translate(appmain.CurrentDrawing.arrBlocks[iBloque].entities[2], elem.P[4] - elem.P[0], elem.P[5] - elem.P[1])
-        'appmain.CurrentDrawing.arrBlocks[iBloque].entities[4].ClassHandler.Translate(appmain.CurrentDrawing.arrBlocks[iBloque].entities[4], elem.P[4] - elem.P[0], elem.P[5] - elem.P[1])
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[2].ClassHandler.Translate(appmain.CurrentDrawing.arrBlocks[iBloque].entities[2], fRotXY[0] - elem.P[0], fRotXY[1] - elem.P[1])
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[4].ClassHandler.Translate(appmain.CurrentDrawing.arrBlocks[iBloque].entities[4], fRotXY[0] - elem.P[0], fRotXY[1] - elem.P[1])
+        'gcd.CurrentDrawing.arrBlocks[iBloque].entities[2].ClassHandler.Translate(gcd.CurrentDrawing.arrBlocks[iBloque].entities[2], elem.P[4] - elem.P[0], elem.P[5] - elem.P[1])
+        'gcd.CurrentDrawing.arrBlocks[iBloque].entities[4].ClassHandler.Translate(gcd.CurrentDrawing.arrBlocks[iBloque].entities[4], elem.P[4] - elem.P[0], elem.P[5] - elem.P[1])
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[2].ClassHandler.Translate(gcd.CurrentDrawing.arrBlocks[iBloque].entities[2], fRotXY[0] - elem.P[0], fRotXY[1] - elem.P[1])
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[4].ClassHandler.Translate(gcd.CurrentDrawing.arrBlocks[iBloque].entities[4], fRotXY[0] - elem.P[0], fRotXY[1] - elem.P[1])
 
         ' la sexta es el texto
-        If (appmain.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[2] - appmain.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[1]) < 0 Then appmain.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[2] += 360
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[5].StringData[0] = Format((appmain.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[2] - appmain.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[1]), Me.DimFormatAng)
-        fRotXY = puntos.RotateFromPointWithAngle(elem.P[0], elem.P[1], (appmain.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[2] - appmain.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[1]) / 180 * Pi / 2, elem.P[2], elem.P[3])
+        If (gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[2] - gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[1]) < 0 Then gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[2] += 360
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[5].StringData[0] = Format((gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[2] - gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[1]), Me.DimFormatAng)
+        fRotXY = puntos.RotateFromPointWithAngle(elem.P[0], elem.P[1], (gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[2] - gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[1]) / 180 * Pi / 2, elem.P[2], elem.P[3])
 
-        flxTextExt = glPlus.MTextExtends(appmain.CurrentDrawing.arrBlocks[iBloque].entities[5].StringData[0], 0, 0, appmain.CurrentDrawing.arrBlocks[iBloque].entities[5].fParam[1])
+        flxTextExt = glPlus.MTextExtends(gcd.CurrentDrawing.arrBlocks[iBloque].entities[5].StringData[0], 0, 0, gcd.CurrentDrawing.arrBlocks[iBloque].entities[5].fParam[1])
 
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[5].P[0] = fRotXY[0] - elem.P[0]
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[5].P[1] = fRotXY[1] - elem.P[1]
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[5].fParam[0] = (appmain.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[2] + appmain.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[1]) / 2 - 90
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[5].P[0] = fRotXY[0] - elem.P[0]
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[5].P[1] = fRotXY[1] - elem.P[1]
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[5].fParam[0] = (gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[2] + gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[1]) / 2 - 90
 
       Else If iPoints = 3 Then ' aca marco la extension, que es todo lo anterior, pero con otro radio
 
@@ -701,47 +701,47 @@ Public Sub ReBuildBlock()
 
         ' nuevo radio
         d = puntos.distancia(elem.P[0], elem.P[1], ClickXr, ClickYr)
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[0] = d          ' radio del arco
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[0] = d          ' radio del arco
 
         ' regenero
 
         ' las lineas de extension (las hago HORIZONTALES y las roto)
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[1].P.Clear
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[1].P.Insert([-Me.DimExtension, 0, Me.DimExtension, 0])
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[2].P.Clear
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[2].P.Insert([-Me.DimExtension, 0, Me.DimExtension, 0])
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[1].P.Clear
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[1].P.Insert([-Me.DimExtension, 0, Me.DimExtension, 0])
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[2].P.Clear
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[2].P.Insert([-Me.DimExtension, 0, Me.DimExtension, 0])
 
         ' flechas
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[3].P.Clear
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[3].P.Insert([0, 0, -Me.DimArrowWidth, Me.DimArrowSize, Me.DimArrowWidth, Me.DimArrowSize, 0, 0])
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[3].P.Clear
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[3].P.Insert([0, 0, -Me.DimArrowWidth, Me.DimArrowSize, Me.DimArrowWidth, Me.DimArrowSize, 0, 0])
 
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[4].P.Clear
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[4].P.Insert([0, 0, -Me.DimArrowWidth, -Me.DimArrowSize, Me.DimArrowWidth, -Me.DimArrowSize, 0, 0])
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[4].P.Clear
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[4].P.Insert([0, 0, -Me.DimArrowWidth, -Me.DimArrowSize, Me.DimArrowWidth, -Me.DimArrowSize, 0, 0])
 
         ' roto
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[1].ClassHandler.Rotate(appmain.CurrentDrawing.arrBlocks[iBloque].entities[1], appmain.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[1] / 180 * Pi)
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[2].ClassHandler.Rotate(appmain.CurrentDrawing.arrBlocks[iBloque].entities[2], appmain.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[2] / 180 * Pi)
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[3].ClassHandler.Rotate(appmain.CurrentDrawing.arrBlocks[iBloque].entities[3], appmain.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[1] / 180 * Pi)
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[4].ClassHandler.Rotate(appmain.CurrentDrawing.arrBlocks[iBloque].entities[4], appmain.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[2] / 180 * Pi)
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[1].ClassHandler.Rotate(gcd.CurrentDrawing.arrBlocks[iBloque].entities[1], gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[1] / 180 * Pi)
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[2].ClassHandler.Rotate(gcd.CurrentDrawing.arrBlocks[iBloque].entities[2], gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[2] / 180 * Pi)
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[3].ClassHandler.Rotate(gcd.CurrentDrawing.arrBlocks[iBloque].entities[3], gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[1] / 180 * Pi)
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[4].ClassHandler.Rotate(gcd.CurrentDrawing.arrBlocks[iBloque].entities[4], gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[2] / 180 * Pi)
 
         ' muevo
-        fRotXY = puntos.RotateFromPointWithAngle(elem.P[0], elem.P[1], appmain.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[1] / 180 * Pi, d + elem.P[0], elem.P[1])
+        fRotXY = puntos.RotateFromPointWithAngle(elem.P[0], elem.P[1], gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[1] / 180 * Pi, d + elem.P[0], elem.P[1])
         ' traslado una flecha y una linea de extension
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[1].ClassHandler.Translate(appmain.CurrentDrawing.arrBlocks[iBloque].entities[1], fRotXY[0] - elem.P[0], fRotXY[1] - elem.P[1])
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[3].ClassHandler.Translate(appmain.CurrentDrawing.arrBlocks[iBloque].entities[3], fRotXY[0] - elem.P[0], fRotXY[1] - elem.P[1])
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[1].ClassHandler.Translate(gcd.CurrentDrawing.arrBlocks[iBloque].entities[1], fRotXY[0] - elem.P[0], fRotXY[1] - elem.P[1])
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[3].ClassHandler.Translate(gcd.CurrentDrawing.arrBlocks[iBloque].entities[3], fRotXY[0] - elem.P[0], fRotXY[1] - elem.P[1])
 
         ' muevo
-        fRotXY = puntos.RotateFromPointWithAngle(elem.P[0], elem.P[1], appmain.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[2] / 180 * Pi, d + elem.P[0], elem.P[1])
+        fRotXY = puntos.RotateFromPointWithAngle(elem.P[0], elem.P[1], gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[2] / 180 * Pi, d + elem.P[0], elem.P[1])
         ' traslado las otras
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[2].ClassHandler.Translate(appmain.CurrentDrawing.arrBlocks[iBloque].entities[2], fRotXY[0] - elem.P[0], fRotXY[1] - elem.P[1])
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[4].ClassHandler.Translate(appmain.CurrentDrawing.arrBlocks[iBloque].entities[4], fRotXY[0] - elem.P[0], fRotXY[1] - elem.P[1])
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[2].ClassHandler.Translate(gcd.CurrentDrawing.arrBlocks[iBloque].entities[2], fRotXY[0] - elem.P[0], fRotXY[1] - elem.P[1])
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[4].ClassHandler.Translate(gcd.CurrentDrawing.arrBlocks[iBloque].entities[4], fRotXY[0] - elem.P[0], fRotXY[1] - elem.P[1])
 
         ' la sexta es el texto
 
-        fRotXY = puntos.RotateFromPointWithAngle(elem.P[0], elem.P[1], (appmain.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[2] + appmain.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[1]) / 180 * Pi / 2, d + elem.P[0], elem.P[1])
+        fRotXY = puntos.RotateFromPointWithAngle(elem.P[0], elem.P[1], (gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[2] + gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[1]) / 180 * Pi / 2, d + elem.P[0], elem.P[1])
 
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[5].P[0] = fRotXY[0] - elem.P[0]
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[5].P[1] = fRotXY[1] - elem.P[1]
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[5].P[0] = fRotXY[0] - elem.P[0]
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[5].P[1] = fRotXY[1] - elem.P[1]
 
       End If
 
@@ -766,34 +766,34 @@ Public Sub ReBuildBlock()
         elem.fParam[2] = Ang(ClickXr - elem.P[0], ClickYr - elem.P[1]) * 180 / Pi
 
         ' la primer entidad del bloque es la linea principal
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[0].P[0] = 0           ' X0
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[0].P[1] = 0           ' Y0
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].P[0] = 0           ' X0
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].P[1] = 0           ' Y0
 
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[0].P[2] = d           ' X1
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[0].P[3] = 0           ' Y1
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].P[2] = d           ' X1
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].P[3] = 0           ' Y1
 
         ' la segunda es la primer linea de demarcacion (sin cambios)
-        'appmain.CurrentDrawing.arrBlocks[iBloque].entities[1].P[0] = 0           ' X0
-        'appmain.CurrentDrawing.arrBlocks[iBloque].entities[1].P[1] = 0           ' Y0
+        'gcd.CurrentDrawing.arrBlocks[iBloque].entities[1].P[0] = 0           ' X0
+        'gcd.CurrentDrawing.arrBlocks[iBloque].entities[1].P[1] = 0           ' Y0
 
-        'appmain.CurrentDrawing.arrBlocks[iBloque].entities[1].P[2] = d           ' X1
-        'appmain.CurrentDrawing.arrBlocks[iBloque].entities[1].P[3] = 0           ' Y1
+        'gcd.CurrentDrawing.arrBlocks[iBloque].entities[1].P[2] = d           ' X1
+        'gcd.CurrentDrawing.arrBlocks[iBloque].entities[1].P[3] = 0           ' Y1
 
         ' la sexta es el texto
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[3].StringData[0] = Format(d, Me.DimFormat)
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[3].StringData[0] = Format(d, Me.DimFormat)
 
-        flxTextExt = glPlus.MTextExtends(appmain.CurrentDrawing.arrBlocks[iBloque].entities[3].StringData[0], 0, 0, appmain.CurrentDrawing.arrBlocks[iBloque].entities[3].fParam[1])
+        flxTextExt = glPlus.MTextExtends(gcd.CurrentDrawing.arrBlocks[iBloque].entities[3].StringData[0], 0, 0, gcd.CurrentDrawing.arrBlocks[iBloque].entities[3].fParam[1])
 
         ' la tercera es una flecha
 
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[2].P[0] = d           ' X0
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[2].P[2] = -Me.DimArrowSize + d           ' X0
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[2].P[4] = -Me.DimArrowSize + d           ' X0
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[2].P[6] = d           ' X0
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[2].P[0] = d           ' X0
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[2].P[2] = -Me.DimArrowSize + d           ' X0
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[2].P[4] = -Me.DimArrowSize + d           ' X0
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[2].P[6] = d           ' X0
 
         ' el texto va adentro
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[3].P[0] = d / 2 - flxTextExt[2] / 2
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[3].P[1] = Me.DimArrowWidth
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[3].P[0] = d / 2 - flxTextExt[2] / 2
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[3].P[1] = Me.DimArrowWidth
 
       End If
 
@@ -819,30 +819,30 @@ Public Sub ReBuildBlock()
         elem.fParam[2] = Ang(ClickXr - elem.P[0], ClickYr - elem.P[1]) * 180 / Pi
 
         ' la primer entidad del bloque es la linea principal
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[0].P[0] = 0           ' X0
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[0].P[1] = 0           ' Y0
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].P[0] = 0           ' X0
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].P[1] = 0           ' Y0
 
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[0].P[2] = d           ' X1
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[0].P[3] = 0           ' Y1
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].P[2] = d           ' X1
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].P[3] = 0           ' Y1
 
         ' la sexta es el texto
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[3].StringData[0] = Format(d, Me.DimFormat)
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[3].StringData[0] = Format(d, Me.DimFormat)
 
-        flxTextExt = glPlus.MTextExtends(appmain.CurrentDrawing.arrBlocks[iBloque].entities[3].StringData[0], 0, 0, appmain.CurrentDrawing.arrBlocks[iBloque].entities[3].fParam[1])
+        flxTextExt = glPlus.MTextExtends(gcd.CurrentDrawing.arrBlocks[iBloque].entities[3].StringData[0], 0, 0, gcd.CurrentDrawing.arrBlocks[iBloque].entities[3].fParam[1])
 
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[1].P[0] = 0           ' X0
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[1].P[2] = Me.DimArrowSize
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[1].P[4] = Me.DimArrowSize
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[1].P[6] = 0           ' X0
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[1].P[0] = 0           ' X0
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[1].P[2] = Me.DimArrowSize
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[1].P[4] = Me.DimArrowSize
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[1].P[6] = 0           ' X0
 
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[2].P[0] = d           ' X0
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[2].P[2] = -Me.DimArrowSize + d           ' X0
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[2].P[4] = -Me.DimArrowSize + d           ' X0
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[2].P[6] = d           ' X0
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[2].P[0] = d           ' X0
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[2].P[2] = -Me.DimArrowSize + d           ' X0
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[2].P[4] = -Me.DimArrowSize + d           ' X0
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[2].P[6] = d           ' X0
 
         ' el texto va adentro
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[3].P[0] = d / 2 - flxTextExt[2] / 2
-        appmain.CurrentDrawing.arrBlocks[iBloque].entities[3].P[1] = Me.DimArrowWidth
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[3].P[0] = d / 2 - flxTextExt[2] / 2
+        gcd.CurrentDrawing.arrBlocks[iBloque].entities[3].P[1] = Me.DimArrowWidth
 
       End If
 
@@ -880,11 +880,11 @@ Public Function MouseMove(mouseX As Integer, mouseY As Integer) ' esta rutina es
   ClickYr = puntos.Near(appmain.Yreal(mouseY))
 
   ' y si tengo enganche?
-  If (appmain.CurrentDrawing.iEntity[2] >= 0) And (gcd.OrthogonalForced = False) Then
+  If (gcd.CurrentDrawing.iEntity[2] >= 0) And (gcd.OrthogonalForced = False) Then
 
     ' esto re enganchado
-    ClickXr = appmain.CurrentDrawing.iEntity[0]
-    ClickYr = appmain.CurrentDrawing.iEntity[1]
+    ClickXr = gcd.CurrentDrawing.iEntity[0]
+    ClickYr = gcd.CurrentDrawing.iEntity[1]
 
     ' aca tengo que verificar el ortogonal
   Else If Me.StepsDone > 0 Then                                                                          ' puedo hacer ortogonal
@@ -939,12 +939,12 @@ Public Function MouseDown(mouseX As Integer, mouseY As Integer) ' esta rutina es
 
   ' y si tengo enganche?
 
-  If (appmain.CurrentDrawing.iEntity[2] >= 0) And (gcd.OrthogonalForced = False) Then
+  If (gcd.CurrentDrawing.iEntity[2] >= 0) And (gcd.OrthogonalForced = False) Then
 
     ' esto re enganchado
 
-    ClickXr = appmain.CurrentDrawing.iEntity[0]
-    ClickYr = appmain.CurrentDrawing.iEntity[1]
+    ClickXr = gcd.CurrentDrawing.iEntity[0]
+    ClickYr = gcd.CurrentDrawing.iEntity[1]
 
     ' aca tengo que verificar el ortogonal
 

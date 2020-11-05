@@ -36,9 +36,6 @@ Private lgg As Logger               '' Application event log.
 'Variables del formulario
 'Public CurrentDrawing As FCAD                '' CAD Editor
 
-Public Drawings As New ClsDrawing[]
-Public DrawingReady As Boolean = False
-Public CurrentDrawing As ClsDrawing
 Public CurrentForm As Form
 Public CurrentFile As String
 
@@ -552,7 +549,7 @@ Public Sub GLArea1_draw()
 
   Dim iParent As Integer
 
-  If Not DrawingReady Then Return
+  If Not gcd.DrawingReady Then Return
 
   gcd.drwDrawingClass = gcd.drwOpenGLClass
 
@@ -560,9 +557,9 @@ Public Sub GLArea1_draw()
 
   gl.LoadIdentity
 
-  gl.Translatef(CurrentDrawing.PanX, CurrentDrawing.PanY, 0)
+  gl.Translatef(gcd.CurrentDrawing.PanX, gcd.CurrentDrawing.PanY, 0)
 
-  gl.Scalef(CurrentDrawing.ScaleZoom, CurrentDrawing.ScaleZoom, 1)
+  gl.Scalef(gcd.CurrentDrawing.ScaleZoom, gcd.CurrentDrawing.ScaleZoom, 1)
 
   ' el orden del dibujo es importante en paint, porque una cosa tapa a la otra; en openGL aparentemente es al reves, lo primero se dibuja primero
 
@@ -572,12 +569,12 @@ Public Sub GLArea1_draw()
   If gcd.DrawBounds Then clsDrawingAids.DrawPolygons
 
   ' entidad resaltada
-  If CurrentDrawing.iEntity[3] >= 0 And CurrentDrawing.iEntity[3] < CurrentDrawing.arrEntities.Count Then
+  If gcd.CurrentDrawing.iEntity[3] >= 0 And gcd.CurrentDrawing.iEntity[3] < gcd.CurrentDrawing.arrEntities.Count Then
 
     ' si no esta seleccionada, la resalto
     'If Not arrEntities[iEntity[3]].Selected Then
-    iParent = clsEntities.GetParentBlock(CurrentDrawing.iEntity[3]) ' esto verifica si tiene que resaltar el bloque completo
-    CurrentDrawing.arrEntities[iParent].ClassHandler.DrawRemark(CurrentDrawing.arrEntities[iParent])
+    iParent = clsEntities.GetParentBlock(gcd.CurrentDrawing.iEntity[3]) ' esto verifica si tiene que resaltar el bloque completo
+    gcd.CurrentDrawing.arrEntities[iParent].ClassHandler.DrawRemark(gcd.CurrentDrawing.arrEntities[iParent])
     'End If
 
   End If
@@ -587,16 +584,16 @@ Public Sub GLArea1_draw()
 
   gcd.clsJob.Draw
 
-  gl.CallList(CurrentDrawing.GlListAllEntities)                      ' si GL no tiene contexto, la lista no se genera. Es necesario que la instancia de FCAD este cargada.
+  gl.CallList(gcd.CurrentDrawing.GlListAllEntities)                      ' si GL no tiene contexto, la lista no se genera. Es necesario que la instancia de FCAD este cargada.
 
   ' POI dinamicos
-  If CurrentDrawing.flgShowPOIinfo Then
+  If gcd.CurrentDrawing.flgShowPOIinfo Then
 
-    ' Select CaseCurrentDrawing.iEntity[2]
+    ' Select Case gcd.CurrentDrawing.iEntity[2]
     '     Case gcd.poimi
-    glPlus.Rectangle2D(CurrentDrawing.iEntity[0] - Metros(4), CurrentDrawing.iEntity[1] - Metros(4), Metros(8), Metros(8), Color.Blue,,,, Color.Blue, 1, 1)
+    glPlus.Rectangle2D(gcd.CurrentDrawing.iEntity[0] - Metros(4), gcd.CurrentDrawing.iEntity[1] - Metros(4), Metros(8), Metros(8), Color.Blue,,,, Color.Blue, 1, 1)
     ' Case 2
-    '     glPlus.PolygonFilled([iEntity[0] - Metros(4),CurrentDrawing.iEntity[1],CurrentDrawing.iEntity[0],CurrentDrawing.iEntity[1] + Metros(4),CurrentDrawing.iEntity[0] + Metros(4),CurrentDrawing.iEntity[1],CurrentDrawing.iEntity[0],CurrentDrawing.iEntity[1] - Metros(4)], Color.Blue, Color.Green)
+    '     glPlus.PolygonFilled([iEntity[0] - Metros(4),gcd.CurrentDrawing.iEntity[1],gcd.CurrentDrawing.iEntity[0],gcd.CurrentDrawing.iEntity[1] + Metros(4),gcd.CurrentDrawing.iEntity[0] + Metros(4),gcd.CurrentDrawing.iEntity[1],gcd.CurrentDrawing.iEntity[0],gcd.CurrentDrawing.iEntity[1] - Metros(4)], Color.Blue, Color.Green)
 
     'End Select
 
@@ -668,17 +665,17 @@ Public Sub GLArea1_MouseMove()
       If gcd.clsJob.poichecking Then
         If gcd.clsJob.iEntityForEdit < 0 Then
           If Not clsMouseTracking.flgSearchingEntity Then
-            CurrentDrawing.iEntity[3] = clsMouseTracking.CheckAboveEntity(Xreal(mouse.x), Yreal(mouse.Y), Metros(16))
+            gcd.CurrentDrawing.iEntity[3] = clsMouseTracking.CheckAboveEntity(Xreal(mouse.x), Yreal(mouse.Y), Metros(16))
           End If
         Else
           If Not clsMouseTracking.flgSearchingPOI Then
-            CurrentDrawing.iEntity = clsMouseTracking.CheckPOI(Xreal(mouse.x), Yreal(mouse.Y))
+            gcd.CurrentDrawing.iEntity = clsMouseTracking.CheckPOI(Xreal(mouse.x), Yreal(mouse.Y))
           Else    ' estoy buscando, pero me movi, asi que me desengancho del POI anterior
 
-            CurrentDrawing.iEntity[0] = Xreal(mouse.x)
-            CurrentDrawing.iEntity[1] = Yreal(mouse.y)
-            CurrentDrawing.iEntity[2] = -1                 ' POI type
-            CurrentDrawing.iEntity[3] = -1                 ' Hooked entity
+            gcd.CurrentDrawing.iEntity[0] = Xreal(mouse.x)
+            gcd.CurrentDrawing.iEntity[1] = Yreal(mouse.y)
+            gcd.CurrentDrawing.iEntity[2] = -1                 ' POI type
+            gcd.CurrentDrawing.iEntity[3] = -1                 ' Hooked entity
 
           End If
         End If
@@ -687,9 +684,9 @@ Public Sub GLArea1_MouseMove()
 
       If gcd.ShowInspector Then
 
-        If CurrentDrawing.iEntity[3] >= 0 Then
+        If gcd.CurrentDrawing.iEntity[3] >= 0 Then
 
-          FInspector.Run(CurrentDrawing.arrEntities[CurrentDrawing.iEntity[3]])
+          FInspector.Run(gcd.CurrentDrawing.arrEntities[gcd.CurrentDrawing.iEntity[3]])
         Else
           FInspector.Close
 
@@ -701,13 +698,13 @@ Public Sub GLArea1_MouseMove()
 
       If gcd.clsJob.poichecking Then
         If Not clsMouseTracking.flgSearchingPOI Then
-          CurrentDrawing.iEntity = clsMouseTracking.CheckPOI(Xreal(mouse.x), Yreal(mouse.Y))
+          gcd.CurrentDrawing.iEntity = clsMouseTracking.CheckPOI(Xreal(mouse.x), Yreal(mouse.Y))
         Else    ' estoy buscando, pero me movi, asi que me desengancho del POI anterior
 
-          CurrentDrawing.iEntity[0] = Xreal(mouse.x)
-          CurrentDrawing.iEntity[1] = Yreal(mouse.y)
-          CurrentDrawing.iEntity[2] = -1                 ' POI type
-          CurrentDrawing.iEntity[3] = -1                 ' Hooked entity
+          gcd.CurrentDrawing.iEntity[0] = Xreal(mouse.x)
+          gcd.CurrentDrawing.iEntity[1] = Yreal(mouse.y)
+          gcd.CurrentDrawing.iEntity[2] = -1                 ' POI type
+          gcd.CurrentDrawing.iEntity[3] = -1                 ' Hooked entity
 
         End If
 
@@ -715,11 +712,11 @@ Public Sub GLArea1_MouseMove()
 
       If gcd.clsJob.EntityChecking Then
         If Not clsMouseTracking.flgSearchingEntity Then
-          CurrentDrawing.iEntity[3] = clsMouseTracking.CheckAboveEntity(Xreal(mouse.x), Yreal(mouse.Y), Metros(16))
+          gcd.CurrentDrawing.iEntity[3] = clsMouseTracking.CheckAboveEntity(Xreal(mouse.x), Yreal(mouse.Y), Metros(16))
         End If
       End If
 
-      CurrentDrawing.flgShowPOIinfo = True
+      gcd.CurrentDrawing.flgShowPOIinfo = True
 
       clsDrawingAids.Helper.dX = 15
       clsDrawingAids.Helper.dY = 15
@@ -760,26 +757,26 @@ End
 
 Public Function Xreal(ScreenX As Float) As Float
 
-  Return Metros((screenx - glarea1.w / 2 - CurrentDrawing.PanX))
+  Return Metros((screenx - glarea1.w / 2 - gcd.CurrentDrawing.PanX))
 
 End
 
 Public Function Yreal(ScreenY As Float) As Float
 
-  Return Metros((-ScreenY + glarea1.h / 2 - CurrentDrawing.PanY))
+  Return Metros((-ScreenY + glarea1.h / 2 - gcd.CurrentDrawing.PanY))
 
 End
 
 Public Function Pixels(distancia As Float) As Float  ' converts meters to pixels
   ' transforma Metros en Pixeles sin tener en cuenta el Pan
 
-  Return distancia * CurrentDrawing.ScaleZoom
+  Return distancia * gcd.CurrentDrawing.ScaleZoom
 
 End
 
 Public Function Metros(pixeles As Integer) As Float  ' converts pixels to meters
 
-  Return pixeles / CurrentDrawing.ScaleZoom
+  Return pixeles / gcd.CurrentDrawing.ScaleZoom
 
 End
 
@@ -798,7 +795,7 @@ Public Sub GLArea1_MouseWheel()
 
   factor = (1 + 0.075 * Mouse.Delta)
 
-  CurrentDrawing.ScaleZoom = CurrentDrawing.ScaleZoom * factor
+  gcd.CurrentDrawing.ScaleZoom = gcd.CurrentDrawing.ScaleZoom * factor
 
   ' pero con ciertos limites
   ' If ScaleZoom < 0.001 Then ScaleZoom = 0.001
@@ -810,18 +807,18 @@ Public Sub GLArea1_MouseWheel()
   ' la posicion de las cosas estara 2x mas alejado; yo quiero que lo que hay en el centro de la pantalla, siga ahi
   ' entonces Pc = drwarea/2 anes del zoom, debera estar en el mismo lugar
 
-  CurrentDrawing.PanX = -Pixels(px)
+  gcd.CurrentDrawing.PanX = -Pixels(px)
   If mouse.x < glarea1.w * 0.2 Then
-    CurrentDrawing.PanX -= CurrentDrawing.ScaleZoom * 5 * Mouse.Delta
+    gcd.CurrentDrawing.PanX -= gcd.CurrentDrawing.ScaleZoom * 5 * Mouse.Delta
   Else If mouse.x > glarea1.w * 0.8 Then
-    CurrentDrawing.PanX += CurrentDrawing.ScaleZoom * 5 * Mouse.Delta
+    gcd.CurrentDrawing.PanX += gcd.CurrentDrawing.ScaleZoom * 5 * Mouse.Delta
   Endif
 
-  CurrentDrawing.PanY = -Pixels(py)
+  gcd.CurrentDrawing.PanY = -Pixels(py)
   If mouse.y < glarea1.h * 0.2 Then
-    CurrentDrawing.PanY -= CurrentDrawing.ScaleZoom * 5 * Mouse.Delta
+    gcd.CurrentDrawing.PanY -= gcd.CurrentDrawing.ScaleZoom * 5 * Mouse.Delta
   Else If mouse.y > glarea1.h * 0.8 Then
-    CurrentDrawing.PanY += CurrentDrawing.ScaleZoom * 5 * Mouse.Delta
+    gcd.CurrentDrawing.PanY += gcd.CurrentDrawing.ScaleZoom * 5 * Mouse.Delta
   Endif
 
   redraw
@@ -957,9 +954,9 @@ Public Sub gTask(sTask As String)
         gTask("saveas")
       Else
         '' Transfer data from arrEntitites to cModel
-        gcd.ExportBlocks(CurrentDrawing.cModel)
-        gcd.ExportEntities(CurrentDrawing.cModel["Entities"], CurrentDrawing.arrEntities)
-        cad.SaveGaucho(CurrentFile, CurrentDrawing.cModel)
+        gcd.ExportBlocks(gcd.CurrentDrawing.cModel)
+        gcd.ExportEntities(gcd.CurrentDrawing.cModel["Entities"], gcd.CurrentDrawing.arrEntities)
+        cad.SaveGaucho(CurrentFile, gcd.CurrentDrawing.cModel)
       Endif
 
     Case "saveas"
@@ -972,11 +969,11 @@ Public Sub gTask(sTask As String)
       Endif
 
       '' Transfer data from arrEntitites to cModel
-      gcd.ExportBlocks(CurrentDrawing.cModel)
-      gcd.ExportEntities(CurrentDrawing.cModel["Entities"], CurrentDrawing.arrEntities)
-      CurrentDrawing.cModel["File"] = FilePath
-      cad.SaveGaucho(FilePath, CurrentDrawing.cModel)
-      CurrentDrawing.Text = File.Name(FilePath)
+      gcd.ExportBlocks(gcd.CurrentDrawing.cModel)
+      gcd.ExportEntities(gcd.CurrentDrawing.cModel["Entities"], gcd.CurrentDrawing.arrEntities)
+      gcd.CurrentDrawing.cModel["File"] = FilePath
+      cad.SaveGaucho(FilePath, gcd.CurrentDrawing.cModel)
+      gcd.CurrentDrawing.Text = File.Name(FilePath)
 
       ' Catch
       '   Message.Info(Error.Text)
@@ -1000,21 +997,33 @@ Public Sub gTask(sTask As String)
 
         Select String.LCase(File.Ext(FilePath))
           Case "dxf"
-            mdl = cad.DXFImport(FilePath)
+            mdl = cad.DXFImport(FilePath)       ' esto crea una coleccion con lo importado del DXF
             ProgressBar1.Value = 1
             If mdl.Count > 0 Then
-              CurrentDrawing.cImport = mdl
-              AppMain.CurrentDrawing.Form_Activate()
+              gcd.CurrentDrawing.cImport = mdl  ' Copio la coleccion de datos a cImport, previo a trnasferir a cModel
+              gcd.EntitiesTransfer2()           ' Transfiero las entidades a cModel
+              gcd.BlocksTransfer()              ' transfiero los bloques
+              gcd.LayersTransfer()              ' transfiero los Layers
+              LoadDrawingMap2()                               ' lleno el TreeView
+              LoadComboboxes(gcd.CurrentDrawing.cModel)       ' recargo los ComboBox
+              gcd.ImportBlocks(gcd.CurrentDrawing.cModel)     ' Importo los Bloques de cModel a formato binario
+              gcd.ImportModel(gcd.CurrentDrawing.cModel["Entities"], gcd.CurrentDrawing.arrEntities)  ' idem entidades
+              gcd.CurrentDrawing.cImport.Clear    ' libero espacio, limpiando cImport
+              gcd.ApplyLayerProperties(1)         ' aplico las propiedades de los layers a las entidades
+              'clsMouseTracking.ReBuildPOIPoints   ' construyo los puntos de interes para el tracking del mouse
+              Regen
+              cadZoomE.Start()                    ' Hago un Zoom Extents
+
             Endif
-            appmain.regen
+
             ProgressBar1.Visible = False
 
           Case "dwg"
             mdl = cad.DWGImport(FilePath)
             ProgressBar1.Value = 1
             If mdl.Count > 0 Then
-              CurrentDrawing.cImport = mdl
-              AppMain.CurrentDrawing.Form_Activate()
+              gcd.CurrentDrawing.cImport = mdl
+              gcd.CurrentDrawing.Form_Activate()
             Endif
             appmain.regen
             ProgressBar1.Visible = False
@@ -1037,17 +1046,17 @@ Public Sub gTask(sTask As String)
             LoadComboboxes(cModel)
 
             wtag = FilePath
-            If Drawings.Count = 0 Or ExistWin(wtag) < 0 Then
-              cModel = cad.LoadGaucho(FilePath)
+            If gcd.Drawings.Count = 0 Or ExistWin(wtag) < 0 Then
+              gcd.CurrentDrawing.cModel = cad.LoadGaucho(FilePath)
               LoadComboboxes(cModel)
               NewDrawing = New ClsDrawing
-              Drawings.Add(NewDrawing)
-              CurrentDrawing = New FCAD(cModel.Copy())
-              CurrentDrawing.Tag = wtag
-              CurrentDrawing.Title = File.Name(FilePath)
+              GCD.Drawings.Add(NewDrawing)
+              gcd.CurrentDrawing = New FCAD(cModel.Copy())
+              gcd.CurrentDrawing.Tag = wtag
+              gcd.CurrentDrawing.Title = File.Name(FilePath)
 
             Else
-              CurrentDrawing = ExistWin(wtag)
+              gcd.CurrentDrawing = ExistWin(wtag)
             Endif
         End Select
       Endif
@@ -1073,16 +1082,16 @@ Public Sub gTask(sTask As String)
       Endif
 
       NewDrawing = New ClsDrawing
-      Drawings.Add(NewDrawing)
-      CurrentDrawing = Drawings.Last
+      gcd.Drawings.Add(NewDrawing)
+      gcd.CurrentDrawing = gcd.Drawings.Last
 
-      CurrentDrawing.cModel = cad.LoadGaucho(FilePath)
+      gcd.CurrentDrawing.cModel = cad.LoadGaucho(FilePath)
 
-      LoadComboboxes(CurrentDrawing.cModel.Copy())
+      LoadComboboxes(gcd.CurrentDrawing.cModel.Copy())
 
     Case "info"
       wtag = sTask
-      If Drawings.Count = 0 Or ExistWin(wtag) < 0 Then
+      If gcd.Drawings.Count = 0 Or ExistWin(wtag) < 0 Then
         File.Save("/tmp/apppath.txt", Application.Dir)
         cfg = sog.ProjInfo(Application.Path & "/.project")
         hFAbout = New FAbout(cfg)
@@ -1090,7 +1099,7 @@ Public Sub gTask(sTask As String)
         hFAbout.Title = ("About") & " " & Application.Name
 
       Else
-        CurrentDrawing = ExistWin(wtag)
+        gcd.CurrentDrawing = ExistWin(wtag)
       Endif
 
     Case "help"
@@ -1098,31 +1107,31 @@ Public Sub gTask(sTask As String)
 
     Case "options"
       wtag = sTask
-      If Drawings.Count = 0 Or ExistWin(wtag) < 0 Then
-        '---------------------------------------------------
-        s = adi &/ "cfg.xml"
-        If Exist(File.Dir(s)) = False Then
-          Mkdir File.Dir(s)
-        Endif
-        If Exist(s) = False Then
-          'ctn = xmg.XmlIni()
-          ctn = cad.CADConfig()
-          xmg.XmlConfMaker(s, ctn, Application.Name)
-        Endif
-        hFConfig = New FConfig(cex)
-        hFConfig.Title = ("Configuration")
-        hFConfig.Tag = wtag
-        hFConfig.Showmodal() 'Workspace1.Add(hFConfig)
-        '---------------------------------------------------
-      Else
-        ' FIXME: no se que hacer con esto
-        ' For Each w In Workspace1.Windows
-        '   If w.Tag = wtag Then
-        '     Workspace1.ActiveWindow = w
-        '     Break
-        '   Endif
-        ' Next
+      'If gcd.Drawings.Count = 0 Or ExistWin(wtag) < 0 Then
+      '---------------------------------------------------
+      s = adi &/ "cfg.xml"
+      If Exist(File.Dir(s)) = False Then
+        Mkdir File.Dir(s)
       Endif
+      If Exist(s) = False Then
+        'ctn = xmg.XmlIni()
+        ctn = cad.CADConfig()
+        xmg.XmlConfMaker(s, ctn, Application.Name)
+      Endif
+      hFConfig = New FConfig(cex)
+      'hFConfig.Title = ("Configuration")
+      'hFConfig.Tag = wtag
+      'hFConfig.Showmodal() 'Workspace1.Add(hFConfig)
+      '---------------------------------------------------
+      'Else
+      ' FIXME: no se que hacer con esto
+      ' For Each w In Workspace1.Windows
+      '   If w.Tag = wtag Then
+      '     Workspace1.ActiveWindow = w
+      '     Break
+      '   Endif
+      ' Next
+      'Endif
 
     Case "quit", "exit"
       Me.Close
@@ -1159,9 +1168,9 @@ Public Function ExistWin(wtag As String) As Integer
 
   Dim i As Integer
 
-  For i = 0 To Drawings.Max
+  For i = 0 To gcd.Drawings.Max
 
-    If Drawings[i].FileName = wtag Then Return i
+    If gcd.Drawings[i].FileName = wtag Then Return i
 
   Next
 
@@ -1189,7 +1198,7 @@ End
 '     If aWin.Name = "FCAD" Then
 '
 '       CurrentDrawing = aWin
-'       LoadComboboxes(CurrentDrawing.cModel)
+'       LoadComboboxes(gcd.CurrentDrawing.cModel)
 '
 '       Print aWin.Tag
 '       CurrentFile = aWin.Tag
@@ -1204,7 +1213,7 @@ End
 '   Dim FLay As FLayers
 '
 '   FLay = New FLayers
-'   FLay.Run(CurrentDrawing.cModel)
+'   FLay.Run(gcd.CurrentDrawing.cModel)
 '
 ' End
 
@@ -1221,7 +1230,7 @@ End
 '       Print CurrentLayer
 '     Case "OpenFormLayer"
 '       FLay = New FLayers
-'       FLay.Run(CurrentDrawing.cModel)
+'       FLay.Run(gcd.CurrentDrawing.cModel)
 '   End Select
 '
 ' End
@@ -1398,16 +1407,16 @@ Public Sub ChangeColorRefresh()
   Dim Changed As Boolean
   Dim te As Entity
 
-  For i = 0 To AppMain.CurrentDrawing.arrEntities.Max
+  For i = 0 To gcd.CurrentDrawing.arrEntities.Max
     Changed = False
-    e = AppMain.CurrentDrawing.arrEntities[i]
-    AppMain.CurrentDrawing.arrTmp.Clear
+    e = gcd.CurrentDrawing.arrEntities[i]
+    gcd.CurrentDrawing.arrTmp.Clear
 
     If e.Selected And e.iInsert = -1 Then
-      e = AppMain.CurrentDrawing.arrEntities[i]
+      e = gcd.CurrentDrawing.arrEntities[i]
       te = clsEntities.ClonEntity(e)
       te.Handle = e.Handle
-      AppMain.CurrentDrawing.arrTmp.Add(te)
+      gcd.CurrentDrawing.arrTmp.Add(te)
       cProp["Color"] = CurrentColor
       If e.colour <> cProp["Color"] Then
         Changed = True
@@ -1417,7 +1426,7 @@ Public Sub ChangeColorRefresh()
     Endif
 
     If Changed = True Then
-      AppMain.CurrentDrawing.arrUndo.Add(te)
+      gcd.CurrentDrawing.arrUndo.Add(te)
       appmain.regen
     Endif
 
@@ -1433,10 +1442,10 @@ Public Sub btnLayers_MouseDown()
   'Dim var As Collection
   Dim currLayer As Variant
 
-  'FLay = New FLayers1(CurrentDrawing.cModel["Layers"], [Workspace1.ScreenX, Workspace1.ScreenY])
-  FLay = New FLayers1(CurrentDrawing.cModel, [Me.ScreenX, Me.ScreenY])
+  'FLay = New FLayers1(gcd.CurrentDrawing.cModel["Layers"], [Workspace1.ScreenX, Workspace1.ScreenY])
+  FLay = New FLayers1(gcd.CurrentDrawing.cModel, [Me.ScreenX, Me.ScreenY])
 
-  cVars = CurrentDrawing.cModel["Vars"]
+  cVars = gcd.CurrentDrawing.cModel["Vars"]
 
   If SelectingLayer = False Then
     FLay.Stacking = Window.Above
@@ -1484,8 +1493,8 @@ Public Sub SelectionRefresh()
   cProp.Clear
   TableView1.Clear
 
-  For i = 0 To AppMain.CurrentDrawing.arrEntities.Max
-    e = AppMain.CurrentDrawing.arrEntities[i]
+  For i = 0 To gcd.CurrentDrawing.arrEntities.Max
+    e = gcd.CurrentDrawing.arrEntities[i]
 
     If e.Selected Then
       If etype.Exist(e.Gender) = False Then
@@ -1529,21 +1538,21 @@ Public Sub PropSave()
   Dim lt As Variant[]
   Dim lwt As Variant[]
 
-  lay = AppMain.CurrentDrawing.cModel["Layers"]
+  lay = gcd.CurrentDrawing.cModel["Layers"]
 
-  For i = 0 To AppMain.CurrentDrawing.arrEntities.Max
+  For i = 0 To gcd.CurrentDrawing.arrEntities.Max
     Changed = False
-    e = AppMain.CurrentDrawing.arrEntities[i]
-    AppMain.CurrentDrawing.arrTmp.Clear
+    e = gcd.CurrentDrawing.arrEntities[i]
+    gcd.CurrentDrawing.arrTmp.Clear
 
     If e.Selected Then
       'Copio la entidad en una lista temportal
-      e = AppMain.CurrentDrawing.arrEntities[i]
+      e = gcd.CurrentDrawing.arrEntities[i]
 
       te = clsEntities.ClonEntity(e)
       te.Handle = e.Handle
 
-      AppMain.CurrentDrawing.arrTmp.Add(te)
+      gcd.CurrentDrawing.arrTmp.Add(te)
 
       For r = 0 To TableView1.Rows.Count - 1
         Select TableView1[r, 0].Text
@@ -1615,7 +1624,7 @@ Public Sub PropSave()
     Endif
 
     If Changed = True Then
-      AppMain.CurrentDrawing.arrUndo.Add(te)
+      gcd.CurrentDrawing.arrUndo.Add(te)
       appmain.regen
     Endif
 
@@ -1642,8 +1651,8 @@ Public Sub LoadPropertiesList(eFilter As String)
   TableView1.Clear
   TableView3.Clear
 
-  For i = 0 To AppMain.CurrentDrawing.arrEntities.Max
-    e = AppMain.CurrentDrawing.arrEntities[i]
+  For i = 0 To gcd.CurrentDrawing.arrEntities.Max
+    e = gcd.CurrentDrawing.arrEntities[i]
     If e.Selected Then
       If cRaw.Count = 0 Then
         xC = Classes["Entity"]
@@ -1795,7 +1804,7 @@ Public Sub TableView1_Click()
 
   Dim frm As FWidths
 
-  For Each lay In AppMain.CurrentDrawing.cModel["Layers"]
+  For Each lay In gcd.CurrentDrawing.cModel["Layers"]
     lrx.Add(lay["name"])
   Next
 
@@ -2026,7 +2035,7 @@ Public Sub Form_KeyPress()
 
           Case Asc("a"), Asc("A") ' Select/Unselect All
             SelectMode = True
-            For Each aEnty In AppMain.CurrentDrawing.arrEntities
+            For Each aEnty In gcd.CurrentDrawing.arrEntities
               If aEnty.Selected Then
                 SelectMode = False
                 Break
@@ -2034,13 +2043,13 @@ Public Sub Form_KeyPress()
             Next
 
             If SelectMode Then
-              For Each aEnty In AppMain.CurrentDrawing.arrEntities
+              For Each aEnty In gcd.CurrentDrawing.arrEntities
                 If aEnty.Selected = False Then
                   aEnty.Selected = True
                 Endif
               Next
             Else
-              For Each aEnty In AppMain.CurrentDrawing.arrEntities
+              For Each aEnty In gcd.CurrentDrawing.arrEntities
                 If aEnty.Selected Then
                   aEnty.Selected = False
                 Endif
@@ -2050,15 +2059,15 @@ Public Sub Form_KeyPress()
 
           Case Asc("z"), Asc("Z") ' Undo
 
-            If AppMain.CurrentDrawing.arrUndo.Count > 0 Then
-              umx = AppMain.CurrentDrawing.arrUndo.Max
+            If gcd.CurrentDrawing.arrUndo.Count > 0 Then
+              umx = gcd.CurrentDrawing.arrUndo.Max
 
-              uEnty = AppMain.CurrentDrawing.arrUndo[umx]
-              For Each aEnty In AppMain.CurrentDrawing.arrEntities
+              uEnty = gcd.CurrentDrawing.arrUndo[umx]
+              For Each aEnty In gcd.CurrentDrawing.arrEntities
                 If aEnty.Handle = uEnty.Handle Then
-                  AppMain.CurrentDrawing.arrEntities.Remove(imx, 1)
-                  AppMain.CurrentDrawing.arrEntities.Add(uEnty, imx)
-                  AppMain.CurrentDrawing.arrUndo.Remove(umx, 1)
+                  gcd.CurrentDrawing.arrEntities.Remove(imx, 1)
+                  gcd.CurrentDrawing.arrEntities.Add(uEnty, imx)
+                  gcd.CurrentDrawing.arrUndo.Remove(umx, 1)
                   appmain.regen
                   'gcd.Redraw
                   Break
@@ -2084,8 +2093,8 @@ End
 
 Public Sub TransferToCollections()
 
-  gcd.ExportBlocks(CurrentDrawing.cModel)
-  gcd.ExportEntities(CurrentDrawing.cModel["Entities"], CurrentDrawing.arrEntities)
+  gcd.ExportBlocks(gcd.CurrentDrawing.cModel)
+  gcd.ExportEntities(gcd.CurrentDrawing.cModel["Entities"], gcd.CurrentDrawing.arrEntities)
 
 End
 ' Public Sub tmr500_Timer()
@@ -2123,39 +2132,6 @@ Public Sub btnSave_Click()
 
 End
 
-Public Sub Form_Activate()
-
-  ' If FirstTime Then           ' esto ocurre cuando me llega un archivo cargado que tengo que mostrar por primera vez
-  '   Debug "FirstTIme " & Me.Title
-  '
-  gcd.ImportBlocks(CurrentDrawing.cModel)
-  gcd.ImportModel(CurrentDrawing.cModel["Entities"], CurrentDrawing.arrEntities)
-  gcd.ApplyLayerProperties(1)
-  Regen()                 ' estas dos lineas se agregan porque la ventana carga un archivo en _New pero no lo
-  cadZoomE.Start()        ' puede mostrar hasta tener una GLArea conformada y a la vista
-
-  DrawingReady = True
-  GLplus.Init(glarea1)    ' Esto corrige el que no se van lo que se dibuja
-  ' Endif
-  ' If cImport.Count > 0 Then
-  '
-  '   EntitiesTransfer2()
-  '   BlocksTransfer()
-  '   LayersTransfer()
-  '   LoadDrawingMap2()
-  '   APPMain.LoadComboboxes(cModel)
-  '   'APPMain.LoadComboboxes(cModel)
-  '   gcd.ImportBlocks(cModel)
-  '   gcd.ImportModel(cModel["Entities"], arrEntities)
-  '   cImport.Clear
-  '   gcd.ApplyLayerProperties(1)
-  '   regen
-  '   'clsMouseTracking.ReBuildPOIPoints
-  '   cadZoomE.Start()
-  ' Endif
-
-End
-
 Public Sub LoadVars()
 
   Dim ctn As New Collection
@@ -2174,8 +2150,8 @@ Public Sub LoadVars()
   TreeView1.Add("model", "Model")
   TreeView1.Add("import", "Import")
 
-  ctn.Add(CurrentDrawing.cModel, "model")
-  ctn.Add(CurrentDrawing.cImport, "import")
+  ctn.Add(gcd.CurrentDrawing.cModel, "model")
+  ctn.Add(gcd.CurrentDrawing.cImport, "import")
 
   For Each dra In ctn
 
@@ -2252,9 +2228,9 @@ Public Sub LoadDrawingMap2()
   TreeView1.Add("model", "Model")
   TreeView1.Add("import", "Import")
 
-  ctn.Add(CurrentDrawing.cModel, "model")
-  ctn.Add(CurrentDrawing.cImport, "import")
-  ctn.Add(CurrentDrawing.arrEntities, "entities")
+  ctn.Add(gcd.CurrentDrawing.cModel, "model")
+  ctn.Add(gcd.CurrentDrawing.cImport, "import")
+  ctn.Add(gcd.CurrentDrawing.arrEntities, "entities")
 
   For Each dra In ctn
 

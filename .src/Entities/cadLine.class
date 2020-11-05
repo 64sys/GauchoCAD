@@ -122,7 +122,7 @@ Public Function Draw2(oE As Entity)
 
   If Not oE.Visible Then Return
 
-  paint.LineWidth = oE.LineWidth / appmain.CurrentDrawing.ScaleZoom / gcd.ScaleLines
+  paint.LineWidth = oE.LineWidth / gcd.CurrentDrawing.ScaleZoom / gcd.ScaleLines
 
   paint.brush = Paint.Color(oE.ColorToPaint)
   paint.MoveTo(oE.p[0], oE.p[1])
@@ -136,7 +136,7 @@ End
 
 Public Function BuildPOI(oE As Entity, Optional arrIndex As Integer = -1) As Integer
 
-  If arrIndex < 0 Then arrIndex = appmain.CurrentDrawing.arrEntities.Max       ' si este valor no es provisto , estos POI son de la ultima entidad
+  If arrIndex < 0 Then arrIndex = gcd.CurrentDrawing.arrEntities.Max       ' si este valor no es provisto , estos POI son de la ultima entidad
 
   oe.PoiPoints.Clear
   oe.PoiType.Clear
@@ -147,16 +147,16 @@ Public Function BuildPOI(oE As Entity, Optional arrIndex As Integer = -1) As Int
 
   oe.poiPoints.insert([(oE.P[0] + oE.P[2]) / 2, (oE.P[1] + oE.P[3]) / 2])   ' mid
   oe.poiType.Add(gcd.poiMidPoint)
-  'APPMain.CurrentDrawing.poiEntities.Add(arrIndex)
+  'gcd.CurrentDrawing.poiEntities.Add(arrIndex)
 
   oe.poiPoints.insert([oE.p[2], oE.p[3]])
   oe.poiType.Add(gcd.poiEndPoint)
-  'APPMain.CurrentDrawing.poiEntities.Add(arrIndex)
+  'gcd.CurrentDrawing.poiEntities.Add(arrIndex)
 
   ' line
-  ' appmain.CurrentDrawing.poiLines.insert([oE.p[0], oE.p[1], oE.p[2], oE.p[3]])
-  ' APPMain.CurrentDrawing.poiLinesEntities.Add(arrIndex)
-  'appmain.CurrentDrawing.poiLinesRelPoint.Insert([0, 1])
+  ' gcd.CurrentDrawing.poiLines.insert([oE.p[0], oE.p[1], oE.p[2], oE.p[3]])
+  ' gcd.CurrentDrawing.poiLinesEntities.Add(arrIndex)
+  'gcd.CurrentDrawing.poiLinesRelPoint.Insert([0, 1])
 
 End
 

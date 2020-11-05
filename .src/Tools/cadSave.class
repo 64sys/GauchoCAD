@@ -43,15 +43,15 @@ Public Function SaveToFile(nName As String) As Boolean
 
   'tm.Clear              ' Tincho
 
-  ct.Add(appmain.CurrentDrawing.cModel["layers"], "layers")
-  'ct.Add(appmain.CurrentDrawing.cModel["colors"], "colors")
-  ct.Add(appmain.CurrentDrawing.cModel["styles"], "styles")
-  'ct.Add(appmain.CurrentDrawing.cModel, "weights")
+  ct.Add(gcd.CurrentDrawing.cModel["layers"], "layers")
+  'ct.Add(gcd.CurrentDrawing.cModel["colors"], "colors")
+  ct.Add(gcd.CurrentDrawing.cModel["styles"], "styles")
+  'ct.Add(gcd.CurrentDrawing.cModel, "weights")
 
   enty.Clear
   If nNAme = "" Then nName = gcd.FileName
 
-  For Each obj In appmain.CurrentDrawing.arrEntities
+  For Each obj In gcd.CurrentDrawing.arrEntities
     tm.Clear              ' Tincho
 
     p = ""                 '<----Martin: Limpieza para reutilizacion

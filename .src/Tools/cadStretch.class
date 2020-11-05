@@ -72,15 +72,15 @@ Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' called by FCAD->
     clsDrawingAids.Helper.texto = ("Final point")
 
     ' punto real base
-    Me.SelStartXr = puntos.Near(appmain.CurrentDrawing.Xreal(mousex))
-    Me.SelStartYr = puntos.Near(appmain.CurrentDrawing.Yreal(mouseY))
+    Me.SelStartXr = puntos.Near(AppMain.Xreal(mousex))
+    Me.SelStartYr = puntos.Near(AppMain.Yreal(mouseY))
     dX = Me.SelStartXr
     dY = Me.SelStartYr
     ' prevenir acciones tontas como hacer click en otro elemento antes de terminar con el actual
-    ' TODO: reparar -> appmain.CurrentDrawing.DesHabilitarBotones
+    ' TODO: reparar -> gcd.CurrentDrawing.DesHabilitarBotones
   Else If Me.PointsDone = 2 Then ' acabo de marcar el punto destino
     ' permitir otros trabajos
-    ' TODO: reparar -> appmain.CurrentDrawing.HabilitarBotones
+    ' TODO: reparar -> gcd.CurrentDrawing.HabilitarBotones
 
     ' we have the point set from MouseMove
 
@@ -98,8 +98,8 @@ Public Function MouseMove(mouseX As Integer, mouseY As Integer) ' called by FCAD
     ' could have being moved by the mouse wheel
 
     ' new Real position is
-    Me.SelEndXr = puntos.Near(appmain.CurrentDrawing.Xreal(mouseX))
-    Me.SelEndyr = puntos.Near(appmain.CurrentDrawing.Yreal(mouseY))
+    Me.SelEndXr = puntos.Near(AppMain.Xreal(mouseX))
+    Me.SelEndyr = puntos.Near(AppMain.Yreal(mouseY))
 
     If gcd.Orthogonal Then
 
@@ -124,13 +124,13 @@ Public Function MouseMove(mouseX As Integer, mouseY As Integer) ' called by FCAD
 
 End
 
-Public Sub Draw()               ' called by appmain.CurrentDrawing.drwArea_Draw
+Public Sub Draw()               ' called by gcd.CurrentDrawing.drwArea_Draw
 
   Dim i As Integer
 
-  For i = 0 To appmain.CurrentDrawing.arrSelecIndex.Max
+  For i = 0 To gcd.CurrentDrawing.arrSelecIndex.Max
 
-    appmain.CurrentDrawing.arrEntities[appmain.CurrentDrawing.arrSelecIndex[i]].ClassHandler.Draw(appmain.CurrentDrawing.arrEntities[appmain.CurrentDrawing.arrSelecIndex[i]])
+    gcd.CurrentDrawing.arrEntities[gcd.CurrentDrawing.arrSelecIndex[i]].ClassHandler.Draw(gcd.CurrentDrawing.arrEntities[gcd.CurrentDrawing.arrSelecIndex[i]])
 
   Next
 
@@ -138,7 +138,7 @@ Public Sub Draw()               ' called by appmain.CurrentDrawing.drwArea_Draw
   gl.Translatef(Me.glTranslate[0], Me.glTranslate[1], Me.glTranslate[2])
   gl.Rotatef(Me.glAngle, Me.glRotate[0], Me.glRotate[1], Me.glRotate[2])
   gl.Scalef(Me.glScale[0], Me.glScale[1], Me.glScale[2])
-  gl.CallList(appmain.CurrentDrawing.GlListSelectedEntities)                      ' si GL no tiene contexto, la lista no se genera. Es necesario que la instancia de FCAD este cargada.
+  gl.CallList(gcd.CurrentDrawing.GlListSelectedEntities)                      ' si GL no tiene contexto, la lista no se genera. Es necesario que la instancia de FCAD este cargada.
   gl.PopMatrix
 
 End

@@ -87,7 +87,7 @@ Public Sub Run(cin As Collection) As Boolean
     Observer = New Observer(Me) As "Observer"
 
     Me.Menus.Hide
-    Me.Show()
+    Me.Showmodal()
 
   Else
     Message.Error(("Configuration file does not exist"))

@@ -72,14 +72,14 @@ Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' called by FCAD->
     clsDrawingAids.Helper.texto = ("Final point")
 
     ' punto real base
-    Me.SelStartXr = puntos.Near(appmain.CurrentDrawing.Xreal(mousex))
-    Me.SelStartYr = puntos.Near(appmain.CurrentDrawing.Yreal(mouseY))
+    Me.SelStartXr = puntos.Near(AppMain.Xreal(mousex))
+    Me.SelStartYr = puntos.Near(AppMain.Yreal(mouseY))
 
     ' prevenir acciones tontas como hacer click en otro elemento antes de terminar con el actual
-    ' TODO: reparar -> appmain.CurrentDrawing.DesHabilitarBotones
+    ' TODO: reparar -> gcd.CurrentDrawing.DesHabilitarBotones
   Else If Me.PointsDone = 2 Then ' acabo de marcar el punto destino
     ' permitir otros trabajos
-    ' TODO: reparar -> appmain.CurrentDrawing.HabilitarBotones
+    ' TODO: reparar -> gcd.CurrentDrawing.HabilitarBotones
 
     ' job finished correctly
 
@@ -102,8 +102,8 @@ Public Function MouseMove(mouseX As Integer, mouseY As Integer) ' called by FCAD
     ' could have being moved by the mouse wheel
 
     ' new Real position is
-    Me.SelEndXr = puntos.Near(appmain.CurrentDrawing.Xreal(mouseX))
-    Me.SelEndyr = puntos.Near(appmain.CurrentDrawing.Yreal(mouseY))
+    Me.SelEndXr = puntos.Near(AppMain.Xreal(mouseX))
+    Me.SelEndyr = puntos.Near(AppMain.Yreal(mouseY))
 
     If gcd.Orthogonal Then
 

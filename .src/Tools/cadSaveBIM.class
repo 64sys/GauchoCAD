@@ -43,15 +43,15 @@ Public Function SaveToFileBIN(nName As String) As Boolean
 
   'tm.Clear              ' Tincho
   'For Each lay In gcd.cLayers
-  ct.Add(appmain.CurrentDrawing.cModel, "layers")
-  'ct.Add(appmain.CurrentDrawing.cModel, "colors")
-  'ct.Add(appmain.CurrentDrawing.cModel, "styles")
-  'ct.Add(appmain.CurrentDrawing.cModel, "weights")
+  ct.Add(gcd.CurrentDrawing.cModel, "layers")
+  'ct.Add(gcd.CurrentDrawing.cModel, "colors")
+  'ct.Add(gcd.CurrentDrawing.cModel, "styles")
+  'ct.Add(gcd.CurrentDrawing.cModel, "weights")
   'Next
   enty.Clear
   If nNAme = "" Then nName = gcd.FileName
 
-  For Each obj In appmain.CurrentDrawing.arrEntities
+  For Each obj In gcd.CurrentDrawing.arrEntities
     tm.Clear              ' Tincho
 
     p = ""                 '<----Martin: Limpieza para reutilizacion

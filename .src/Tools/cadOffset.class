@@ -62,10 +62,10 @@ Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' called by FCAD->
 
   If Me.PointsDone = 1 Then ' estoy intentando seleccionar una entidad
 
-    If appmain.CurrentDrawing.iEntity[3] >= 0 Then
-      Select Case appmain.CurrentDrawing.arrEntities[appmain.CurrentDrawing.iEntity[3]].Gender
+    If gcd.CurrentDrawing.iEntity[3] >= 0 Then
+      Select Case gcd.CurrentDrawing.arrEntities[gcd.CurrentDrawing.iEntity[3]].Gender
         Case "Line", "Pline", "Circle", "Arc", "Ellipse", "Spline"
-          Me.iEntitySelected = appmain.CurrentDrawing.iEntity[3]
+          Me.iEntitySelected = gcd.CurrentDrawing.iEntity[3]
           clsEntities.SelectElem(Me.iEntitySelected)
           clsDrawingAids.Helper.texto = ("Side to offset")
           Me.PointsDone = 2
@@ -75,18 +75,18 @@ Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' called by FCAD->
       End Select
 
       ' punto real base
-      Me.SelStartXr = appmain.CurrentDrawing.Xreal(mousex)
-      Me.SelStartYr = appmain.CurrentDrawing.Yreal(mouseY)
+      Me.SelStartXr = AppMain.Xreal(mousex)
+      Me.SelStartYr = AppMain.Yreal(mouseY)
     End If
 
   Else If Me.PointsDone = 2 Then ' acabo de marcar el punto destino
-    Me.SelEndXr = appmain.CurrentDrawing.Xreal(mousex)
-    Me.SelEndYr = appmain.CurrentDrawing.Yreal(mouseY)
+    Me.SelEndXr = AppMain.Xreal(mousex)
+    Me.SelEndYr = AppMain.Yreal(mouseY)
 
-    e = appmain.CurrentDrawing.arrEntities[Me.iEntitySelected]
+    e = gcd.CurrentDrawing.arrEntities[Me.iEntitySelected]
     ' creo una nueva entidad en el mismo lugar
-    appmain.CurrentDrawing.arrEntities.Add(clsEntities.ClonEntity(e))
-    e = appmain.CurrentDrawing.arrEntities.Last
+    gcd.CurrentDrawing.arrEntities.Add(clsEntities.ClonEntity(e))
+    e = gcd.CurrentDrawing.arrEntities.Last
     e.ClassHandler.Finish(e, -1)
 
     Select Case e.Gender

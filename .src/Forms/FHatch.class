@@ -17,7 +17,7 @@ Public Sub form_Show()
 
   ' necesito saber si estoy volviendo
 
-  ComboBox1.Index = appmain.CurrentDrawing.LastHatch
+  ComboBox1.Index = gcd.CurrentDrawing.LastHatch
 
 End
 
@@ -31,9 +31,9 @@ Public Sub ComboBox1_Click()
 
   DrawingArea1.Refresh
 
-  appmain.CurrentDrawing.LastHatch = ComboBox1.Index
-  appmain.CurrentDrawing.LastHatchFile = Application.Path &/ "patterns" &/ ComboBox1.Text & ".dxf"
-  appmain.CurrentDrawing.LastHatchPattern = ComboBox1.Text
+  gcd.CurrentDrawing.LastHatch = ComboBox1.Index
+  gcd.CurrentDrawing.LastHatchFile = Application.Path &/ "patterns" &/ ComboBox1.Text & ".dxf"
+  gcd.CurrentDrawing.LastHatchPattern = ComboBox1.Text
 
 End
 
@@ -66,13 +66,13 @@ End
 
 Public Sub txtScale_KeyPress()
 
-  Try appmain.CurrentDrawing.LastScale = Val(txtScale.Text)
+  Try gcd.CurrentDrawing.LastScale = Val(txtScale.Text)
 
 End
 
 Public Sub txtRotation_KeyPress()
 
-  Try appmain.CurrentDrawing.LastAngle = Val(txtRotation.Text)
+  Try gcd.CurrentDrawing.LastAngle = Val(txtRotation.Text)
 
 End
 
@@ -80,10 +80,10 @@ Public Sub btnOK_Click()
 
   ' cadHatchBuilder.LastHatch = ComboBox1.Index
   ' cadHatchBuilder.LastHatchFile = Application.Path &/ "patterns" &/ ComboBox1.Text & ".dxf"
-  appmain.CurrentDrawing.LastAngle = modUtils.CPval(txtRotation.Text)
+  gcd.CurrentDrawing.LastAngle = modUtils.CPval(txtRotation.Text)
 
-  appmain.CurrentDrawing.LastScale = modUtils.CPval(txtScale.Text)
-  If appmain.CurrentDrawing.LastScale = 0 Then appmain.CurrentDrawing.LastScale = 1
+  gcd.CurrentDrawing.LastScale = modUtils.CPval(txtScale.Text)
+  If gcd.CurrentDrawing.LastScale = 0 Then gcd.CurrentDrawing.LastScale = 1
 
   Me.Close(3)
 
