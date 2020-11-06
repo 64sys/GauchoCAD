@@ -539,7 +539,7 @@ Public Sub Form_Open()
 
 End
 
-Public Sub form_Resize()
+Public Sub Form_Activate()
 
   GLplus.Init(glarea1)
 
@@ -549,7 +549,7 @@ Public Sub GLArea1_draw()
 
   Dim iParent As Integer
 
-  If Not gcd.DrawingReady Then Return
+  'If Not gcd.DrawingReady Then Return
 
   gcd.drwDrawingClass = gcd.drwOpenGLClass
 
@@ -591,7 +591,7 @@ Public Sub GLArea1_draw()
 
     ' Select Case gcd.CurrentDrawing.iEntity[2]
     '     Case gcd.poimi
-    glPlus.Rectangle2D(gcd.CurrentDrawing.iEntity[0] - Metros(4), gcd.CurrentDrawing.iEntity[1] - Metros(4), Metros(8), Metros(8), Color.Blue,,,, Color.Blue, 1, 1)
+    'glPlus.Rectangle2D(gcd.CurrentDrawing.iEntity[0] - Metros(4), gcd.CurrentDrawing.iEntity[1] - Metros(4), Metros(8), Metros(8), Color.Blue,,,, Color.Blue, 1, 1)
     ' Case 2
     '     glPlus.PolygonFilled([iEntity[0] - Metros(4),gcd.CurrentDrawing.iEntity[1],gcd.CurrentDrawing.iEntity[0],gcd.CurrentDrawing.iEntity[1] + Metros(4),gcd.CurrentDrawing.iEntity[0] + Metros(4),gcd.CurrentDrawing.iEntity[1],gcd.CurrentDrawing.iEntity[0],gcd.CurrentDrawing.iEntity[1] - Metros(4)], Color.Blue, Color.Green)
 
@@ -599,7 +599,7 @@ Public Sub GLArea1_draw()
 
   Endif
 
-  'Debug "redraw"
+  Debug "redraw"
 
 End
 
