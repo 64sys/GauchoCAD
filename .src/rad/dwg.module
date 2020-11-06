@@ -1,0 +1,291 @@
+' Gambas module file
+
+Export
+
+Public Function info(f As String) As Collection
+
+  Dim cOut As New Collection
+  Dim str As String
+  Dim vrt As Variant[]
+  Dim j As String
+
+  Dim vrx As New Variant[]
+  Dim item As Variant
+  Dim tag1 As String
+  Dim val1 As Variant
+  Dim tag2 As String
+  Dim obx As New String[]           '' Objects type list
+  Dim etx As New String[]           '' Entities type list
+  Dim i As Integer
+  Dim prp As Variant
+
+  Dim cFile As New Collection
+  Dim cVars As New Collection
+  Dim cUnkn As New Collection
+
+  Dim cClas As New Collection
+  Dim vxCls As New Variant[]
+
+  Dim cObjs As New Collection
+  Dim vxObj As New Variant[]
+
+  Dim cLayers As New Collection     ''LAYER
+  Dim cLTypes As New Collection     ''LTYPE (Line types)
+  Dim cBlocks As New Collection     ''BLOCK_HEADER (Atention, are blocks not inserts)
+  Dim cDimstyles As New Collection  ''DIMSTYLE (Dimmension styles)
+  Dim cStyles As New Collection     ''STYLE (Text styles)
+
+  Dim cEnty As New Collection
+  Dim vxEnt As New Variant[]
+  Dim obs As String
+
+  j = User.Home &/ "dwg.json"
+
+  Shell "/usr/local/bin/dwgread -v4 --format JSON '" & f & "' 2>&1 " To str
+
+  str = Replace(str, "\t", " ")
+  str = Replace(str, "\n{\n  \"created_by\": \"", "\t{\n  \"created_by\": \"")
+  str = Split(str, "\t")[1]
+
+  'File.Save(User.Home &/ "dwg.json", str)
+
+  vrt = Json2Csv(str)
+  i = 0
+  For Each item In vrt
+    Select TypeOf(item)
+      Case gb.Object '16
+        If item Is Collection Then
+          If item.Count > 0 Then
+            j = 0
+            For Each prp In item
+              If j = 0 Then
+                tag1 = item.Key
+                val1 = prp
+              Endif
+              If j = 1 Then
+                tag2 = item.Key
+              Endif
+              Inc j
+            Next
+
+            Select tag1
+              Case "version"
+                For Each prp In item
+                  cFile.Add(prp, item.Key)
+                Next
+
+              Case "unknown_0"
+                For Each prp In item
+                  cVars.Add(prp, item.Key)
+                Next
+
+              Case "number"
+                If tag2 = "dxfname" Then
+                  For Each prp In item
+                    cClas.Add(prp, item.Key)
+                  Next
+                Else
+                  Print "number no dxf name"
+                Endif
+
+              Case "object"
+                Select val1
+                    'Case "APPID"
+                    'Case "APPID_CONTROL"
+                    'Case "ASSOCACTION"
+                    'Case "ASSOCDEPENDENCY"
+                    'Case "ASSOCGEOMDEPENDENCY"
+                    'Case "ASSOCNETWORK"
+                    'Case "BLOCK_CONTROL"
+                  Case "BLOCK_HEADER"
+                    'Print val1
+                    cBlocks.Add(item.Copy(), item["handle"][1])
+
+                    'Case "CELLSTYLEMAP"
+                    'Case "DETAILVIEWSTYLE"
+                    'Case "DICTIONARY"
+                    'Case "DICTIONARYVAR"
+                    'Case "DICTIONARYWDFLT"
+                  Case "DIMSTYLE"
+                    cDimstyles.Add(item.Copy(), item["handle"][1])
+
+                    'Case "DIMSTYLE_CONTROL"
+                    'Case "GROUP"
+                  Case "LAYER"
+                    cLayers.Add(item.Copy(), item["handle"][1])
+
+                    'Case "LAYER_CONTROL"
+                    'Case "LAYOUT"
+                  Case "LTYPE"
+                    cLTypes.Add(item.Copy(), item["handle"][1])
+
+                    'Case "LTYPE_CONTROL"
+                    'Case "MATERIAL"
+                    'Case "MLEADERSTYLE"
+                    'Case "MLINESTYLE"
+                    'Case "PLACEHOLDER"
+                    'Case "SCALE"
+                    'Case "SECTIONVIEWSTYLE"
+                    'Case "STYLE"
+                    cStyles.Add(item.Copy(), item["handle"][1])
+                    'Case "STYLE_CONTROL"
+                    'Case "SUN"
+                    'Case "TABLEGEOMETRY"
+                    'Case "TABLESTYLE"
+                    'Case "UCS_CONTROL"
+                    'Case "UNKNOWN_OBJ"
+                    'Case "VIEW"
+                    'Case "VIEW_CONTROL"
+                    'Case "VISUALSTYLE"
+                    'Case "VPORT"
+                    'Case "VPORT_CONTROL"
+                    'Case "VX_CONTROL"
+                    'Case "VX_TABLE_RECORD"
+                    'Case "WIPEOUTVARIABLES"
+                    'Case "XRECORD"
+                  Case Else
+                    cObjs.Add(item.Copy(), item["handle"][1])
+                    'cObjs.Add(prp, item.Key)
+                End Select
+
+              Case "entity"
+                'Select item["entity"]
+                '  item["entity"]
+                'End Select
+
+                etx.Add(item["entity"])
+
+                cEnty.Add(item.Copy(), item["handle"][1])
+
+              Case Else
+                cUnkn.Add(tag1, CStr(i))
+
+            End Select
+          Endif
+        Else
+          If item Is Variant[] Then
+            vrx.Insert(item)
+          Endif
+        Endif
+    End Select
+    Inc i
+  Next
+
+  'Objects
+  cOut.Add(cFile.Copy(), "File")
+  cOut.Add(cVars.Copy(), "Variables")
+  cOut.Add(cLayers.Copy(), "Layers")
+  cOut.Add(cBlocks.Copy(), "Blocks")
+  cOut.Add(cLTypes.Copy(), "Ltypes")
+  cOut.Add(cDimstyles.Copy(), "Dimstyles")
+  cOut.Add(cStyles.Copy(), "Styles")
+  'cOut.Add(cObjs.Copy(), "Objets")
+  cOut.Add(cad.GauchoEntitiesSort(cObjs), "Objects")
+
+  'Entities
+  File.Save(User.Home &/ "entities.txt", etx.Join("\n"))
+  cOut.Add(cad.GauchoEntitiesSort(cEnty), "Entities")
+  cOut.Add(cUnkn.Copy(), "Unknown")
+
+  Return cOut
+
+End
+
+'' Convert a json file to gambas collection
+
+Public Function Json2Csv(strRaw As String) As Variant[]
+
+  Dim vrt As Variant
+  Dim item As Variant
+  Dim vrx As New Variant[]
+
+  vrt = JSON.Decode(File.Load(User.Home &/ "dwg-codebeautify.json"))
+
+  For Each item In vrt
+    Select TypeOf(item)
+      Case gb.Object '16
+        If item Is Collection Then
+          vrx.Add(item)
+        Else
+          If item Is Variant[] Then
+            vrx.Insert(item)
+          Endif
+        Endif
+    End Select
+  Next
+  'Endif
+  Return vrx
+
+End
+
+'' Convert the Entities collection to an csv structure, later it could be save as file
+
+Public Function ObjetsCSV(ctn As Collection) As String
+
+  Dim out As String
+  Dim tmp As New Variant[]
+  Dim p As Variant
+  Dim e As Variant
+  Dim r As Variant
+  Dim sHnd As String
+  Dim sEnt As String
+  Dim sLay As String
+  Dim sLwt As String
+  Dim sLty As String
+  Dim sCor As String
+
+  If ctn.Exist("Entities") Then
+    For Each p In ctn["Entities"]
+      If TypeOf(p) = gb.Object Then
+        For Each e In p
+          If TypeOf(e) = gb.Object Then
+            sLay = CStr(e["layer"][2])
+            If ctn.Exist("Layers") Then
+              If ctn["Layers"].Exist(sLay) Then
+                sLay = ctn["Layers"][sLay]["name"]
+              Endif
+            Endif
+
+            sHnd = e["handle"][1]
+            sEnt = e["entity"]
+            If e.Exist("ltype") Then
+              sLty = e["ltype"][2]
+              If ctn.Exist("Ltypes") Then
+                If ctn["Ltypes"].Exist(sLty) Then
+                  sLty = ctn["Ltypes"][sLty]["name"]
+                Endif
+              Endif
+            Else
+              sLty = "<>"
+            Endif
+
+            sLwt = e["linewt"]
+            sCor = e["color"]
+
+            tmp.add([sHnd, sEnt, sLay, sLty, sLwt, sCor])
+          Endif
+        Next
+      Endif
+    Next
+  Endif
+
+  out = "Handle\tEntity\tLayer\tStyle\tWidth\tColour\n"
+  For Each r In tmp
+    out &= r.Join("\t") & "\n"
+  Next
+
+  Return out
+
+End
+
+Public Function Var2Json(vrt As Variant) As String '' Convierte una coleccion en texto en formato JSON.
+
+  Dim strOut As String
+  Dim item As Variant
+
+  For Each item In vrt
+    strOut &= JSON.Encode(item) & "\n"
+  Next
+  Return strOut
+
+End

@@ -46,7 +46,7 @@ Public Sub Form_Open()
   Dim rw As Integer
 
   s = 20
-  crs = cad.RGBColors()
+  crs = cad.DWGColors()
 
   GridView1.Header = GridView.None
 

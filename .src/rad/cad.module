@@ -1,6 +1,6 @@
 ' Gambas module file
 
-'
+'''Working with cad files.
 ' RADG
 ' Rapid Application Development for Gambas
 '
@@ -22,13 +22,12 @@
 ' Boston, MA  02110-1301  USA
 '
 
-' This modeule contains methods for working with cad files.
 Export
 
 '' This load all the info form a gaucho xml file, then put it in a collection a
 '' nd return it.
 
-Public Function SaveGaucho(sFile As String, cMdl As Collection)
+Public Function GauchoSave(sFile As String, cMdl As Collection)
 
   Dim writer As New XmlWriter
   Dim var As Variant
@@ -42,8 +41,6 @@ Public Function SaveGaucho(sFile As String, cMdl As Collection)
   Dim stx As New String[]
   Dim atr As New Collection
   Dim a As String
-  'Dim pq As Integer
-  'Dim pc As Integer
 
   stx = ["entity", "handle", "layer", "style", "width", "colour", "p", "radius", "ratio", "start_angle", "end_angle", "angle", "scale", "block", "text", "height", "font", "oblique", "just_h", "just_v", "wfactor", "paper", "blkid"]
 
@@ -65,7 +62,7 @@ Public Function SaveGaucho(sFile As String, cMdl As Collection)
 
   For Each var In cMdl
     Select cMdl.Key
-      Case "Layers", "Colors", "Weights", "DimSts", "Fonts", "Vars"
+      Case "Layers", "Colors", "Styles", "Weights", "DimSts", "Fonts"
         For Each att In var
           writer.StartElement("header")
           For Each v In att
@@ -166,7 +163,7 @@ End
 '' This load all the info form a gaucho xml file, then put it in a collection a
 '' nd return it.
 
-Public Function LoadGaucho(sFile As String) As Collection
+Public Function GauchoLoad(sFile As String) As Collection
 
   Dim c As New Collection
   Dim cLayers As New Collection
@@ -207,6 +204,13 @@ Public Function LoadGaucho(sFile As String) As Collection
         c["width"] = CInt(ent.Attributes["width"])
         c["print"] = CBool(ent.Attributes["print"])
         cLayers.Add(c.Copy(), ent.Attributes["id"])
+
+      Case "style"
+        c.Clear
+        c["id"] = ent.Attributes["id"]
+        c["type"] = ent.Attributes["type"]
+        c["name"] = ent.Attributes["name"]
+        cStyles.Add(c.Copy(), ent.Attributes["id"])
 
       Case "width"
         c.Clear
@@ -273,14 +277,14 @@ Public Function LoadGaucho(sFile As String) As Collection
     Select ent.Attributes["entity"]
 
       Case "line", "polyline", "lwpolyline"
-        c["p"] = EncodePoint(ent.Attributes["p"], "p")
+        c["p"] = GauchoEncodePoint(ent.Attributes["p"], "p")
 
       Case "circle"
-        c["p"] = EncodePoint(ent.Attributes["p"], "p")
+        c["p"] = GauchoEncodePoint(ent.Attributes["p"], "p")
         c["radius"] = vag.CFloat(ent.Attributes["radius"]) 'EncodePoint(ent.Attributes["r"], "r")
 
       Case "ellipse"
-        c["p"] = EncodePoint(ent.Attributes["p"], "p")
+        c["p"] = GauchoEncodePoint(ent.Attributes["p"], "p")
         c["ratio"] = vag.CFloat(ent.Attributes["ratio"]) 'EncodePoint(ent.Attributes["r"], "r")
         ' estos angulos vienen en radianes
         c["start_angle"] = vag.CFloat(ent.Attributes["start_angle"]) 'FloatList(ent.Attributes["a"]) 'EncodePoint(ent.Attributes["a"], "a")
@@ -288,24 +292,23 @@ Public Function LoadGaucho(sFile As String) As Collection
         'Print "x"
 
       Case "arc"
-        c["p"] = EncodePoint(ent.Attributes["p"], "p")
+        c["p"] = GauchoEncodePoint(ent.Attributes["p"], "p")
         c["radius"] = vag.CFloat(ent.Attributes["radius"]) 'EncodePoint(ent.Attributes["r"], "r")
         ' estos angulos vienen en GRADOS
         c["start_angle"] = vag.CFloat(ent.Attributes["start_angle"]) 'FloatList(ent.Attributes["a"]) 'EncodePoint(ent.Attributes["a"], "a")
         c["end_angle"] = vag.CFloat(ent.Attributes["end_angle"]) 'FloatList(ent.Attributes["a"]) 'EncodePoint(ent.Attributes["a"], "a")
-        'Print c["a"]
 
       Case "text"
-        c["p"] = EncodePoint(ent.Attributes["p"], "p")
+        c["p"] = GauchoEncodePoint(ent.Attributes["p"], "p")
         c["angle"] = vag.CFloat(ent.Attributes["angle"])        ' grados
         c["text"] = ent.Attributes["text"]
         c["height"] = ent.Attributes["height"]
         c["font"] = ent.Attributes["font"]
 
       Case "insert"
-        c["p"] = EncodePoint(ent.Attributes["p"], "p")
+        c["p"] = GauchoEncodePoint(ent.Attributes["p"], "p")
         c["angle"] = vag.CFloat(ent.Attributes["angle"])            ' grados
-        c["scale"] = FloatList(ent.Attributes["scale"])
+        c["scale"] = GauchoFloatList(ent.Attributes["scale"])
         c["block"] = ent.Attributes["block"]
 
     End Select
@@ -314,7 +317,7 @@ Public Function LoadGaucho(sFile As String) As Collection
 
     If c.Count > 0 Then
       cEntities.Add(c.Copy(), sKey)
-      cSout = EntitiesSort(cEntities)
+      cSout = GauchoEntitiesSort(cEntities)
     Endif
     Inc i
   Next
@@ -433,27 +436,13 @@ Public Function NewWidths() As Collection
   c.Add(["1.75", 7], "7") '7
   c.Add(["2.00", 8], "8") '8
 
-  ' c.Add(["0.1", 1], "1") '1
-  ' c.Add(["0.2", 2], "2")
-  ' c.Add(["0.3", 3], "3")
-  '
-  ' c.Add(["0.4", 4], "4") '2
-  ' c.Add(["0.5", 5], "5")
-  ' c.Add(["0.6", 6], "6")
-  '
-  ' c.Add(["0.7", 7], "7") '3
-  ' c.Add(["0.8", 8], "8")
-  ' c.Add(["0.9", 9], "9")
-  '
-  ' c.Add(["1.0", 10], "10") '4
-  ' c.Add(["1.1", 10], "10")
-  ' c.Add(["1.2", 10], "10")
-
   Return c
 
 End
 
-Private Function FloatList(sList As String) As Float[]
+'' Creates a list of floating point numbers from a colon-delimited text string
+
+Private Function GauchoFloatList(sList As String) As Float[]
 
   Dim stx As New String[]
   Dim flx As New Float[]
@@ -475,7 +464,7 @@ End
 '' This function encode a float list like a point angles etc. from a string in
 '' delimiter char for dimansions is : the for delimitatiosn of groups we use ;
 
-Private Function EncodePoint(sPoint As String, sTag As String) As Collection
+Private Function GauchoEncodePoint(sPoint As String, sTag As String) As Collection
 
   Dim cp As New Collection
   Dim fp As New Float[]
@@ -509,7 +498,9 @@ Private Function EncodePoint(sPoint As String, sTag As String) As Collection
 
 End
 
-Public Function SVGExport(model As Collection) As String
+'' Export the information in cModel collection to an SVG file.
+
+Public Function GauchoExportSVG(model As Collection) As String
 
   Dim ent As Variant
   Dim xsvg As New XmlDocument
@@ -534,6 +525,8 @@ Public Function SVGExport(model As Collection) As String
 
 End
 
+'' Import a DXF file into cModel collection.
+
 Public Function DXFImport(sFile As String) As Collection
 
   Dim sec As New Collection 'String[]
@@ -544,26 +537,17 @@ Public Function DXFImport(sFile As String) As Collection
 
 End
 
+'' Import a DWG file into cModel collection.
+
 Public Function DWGImport(sFile As String) As Collection
 
   Dim sCont As String
   Dim cont As Collection
-  '  Dim enty As Collection
-  ' Dim comm As Collection
-  'Dim spec As Collection
   Dim FileVersion As String       ''2004, 14, 2007 ...
   Dim vent As Collection
-  'Dim v As Variant
-  'Dim ctn As Variant
-  'Dim x As Variant
-  'Dim Ety As Variant
-  'Dim Idx As Variant
-  'Dim set As New Collection         ''Combination of the previous two
-  'Dim entities As New Collection       ''All the entities
   Dim model As New Collection       ''Complete model
   Dim layers As Collection
   Dim AcHeader As Collection
-  'Dim sFDebug As String
 
   layers = DWGLayersList(sFile)
 
@@ -584,7 +568,7 @@ Public Function DWGImport(sFile As String) As Collection
     model.Add(layers, "Layers")
 
     If cont.Exist("Header") Then
-      AcHeader = Header(cont["Header"])
+      AcHeader = DWGHeader(cont["Header"])
       If AcHeader.Count > 0 Then
         model.Add(AcHeader, "Header")
       Endif
@@ -599,6 +583,8 @@ Public Function DWGImport(sFile As String) As Collection
   Return model
 
 End
+
+'' Get the DWG file layers list.
 
 Public Function DWGLayersList(sFile As String) As Collection
 
@@ -643,6 +629,8 @@ Public Function DWGLayersList(sFile As String) As Collection
   Return layers
 
 End
+
+'' Create the stanard entities list.
 
 Public Function DWGEntityList() As Collection
 
@@ -708,6 +696,9 @@ End
 'dwgwrite
 'dxf2dwg
 'dxfwrite
+
+'' Read a DWG file using the dwgread utility from libreDWG library.
+
 Public Function DWGRead(f As String, Optional fmt As String) As String
 
   Dim sOut As String
@@ -726,6 +717,8 @@ Public Function DWGRead(f As String, Optional fmt As String) As String
 
 End
 
+'' Create a list of DWG sections using the previously extracted text with the dwgread function.
+
 Public Function DWGSections(s As String, vsn As String) As Collection
 
   Dim sWrd As String
@@ -737,8 +730,8 @@ Public Function DWGSections(s As String, vsn As String) As Collection
   Dim contx As String[]
   Dim tmx As New String[]
   Dim tm As String
-  Dim sCont As String
-  Dim cCont As New Collection
+  Dim sCont As Variant
+  Dim cCont As Collection
   Dim out As New Collection
 
   Select vsn
@@ -846,6 +839,8 @@ Public Function DWGSections(s As String, vsn As String) As Collection
 
 End
 
+'' Create a list of DWG entities using the previously extracted text with the dwgread function
+
 Public Function DWGEntities(s As String) As Collection
 
   Dim stx As String[]
@@ -855,26 +850,11 @@ Public Function DWGEntities(s As String) As Collection
   Dim tmx As New Collection
   Dim j As Integer
   Dim hdx As New String[]
-  'Dim k As Integer
   Dim sTag As String
   Dim sVal As String
   Dim vVal As Variant
-  'Dim st As String
   Dim out As New Collection
-  'Dim p As Integer
 
-  'Dim sType As String
-  'Dim xVal As New String[]
-  'Dim xType As String
-  'Dim hDXF As String
-  'Dim cProp As Collection
-  'Dim item As String
-  'Dim sData As String
-  'Dim iKey As Integer
-  'Dim tmx2 As New Collection
-  'Dim iDek As Integer
-  'Dim sCut As String
-  'Dim sEnt As String
   Dim sRaw As String
   Dim t As String
   Dim otx As New String[]
@@ -981,7 +961,7 @@ Public Function DWGEntities(s As String) As Collection
     Next
   Endif
 
-  out2 = EntitiesSort(out)
+  out2 = GauchoEntitiesSort(out)
 
   Return out2
 
@@ -989,18 +969,10 @@ End
 
 Public Function DWGDecodeItem(xRaw As String[]) As Variant
 
-  'Dim tmx As New Collection
-  'Dim out As New Collection
   Dim sVal As String
   Dim sTag As String
-  'Dim hDXF As String
-  'Dim xVal As String[]
-  'Dim xType As String
   Dim vVal As Variant
-  'Dim xDat As New Collection
   Dim k As Integer
-  'Dim sName As String
-  'Dim sKey As String
   Dim sDxf As String
   Dim sType As String
   Dim tVal As String
@@ -1051,9 +1023,6 @@ Public Function DWGDecodeItem(xRaw As String[]) As Variant
 
     Case "crc"
       vVal = DWGDecodeCRC(sVal)
-
-      'Case "linewt"
-      '  vVal = DWGDecodeHex(sVal)
 
     Case "color.index"
       vVal = DWGDecodeColor(sVal)
@@ -1163,7 +1132,9 @@ Public Function DWGDecodeItem(xRaw As String[]) As Variant
 
 End
 
-Public Function Header(s As String) As Collection
+'' Create a list of DWG headers using the previously extracted text with the dwgread function
+
+Public Function DWGHeader(s As String) As Collection
 
   Dim stx As String[]
   Dim i As Integer
@@ -1195,7 +1166,7 @@ Public Function Header(s As String) As Collection
 
 End
 
-'' Decode the common fields for any entity
+'' Decode common fields to DWG entities.
 
 Public Function DWGDecodeCommon(c As Collection) As Collection
 
@@ -1273,7 +1244,7 @@ Public Function DWGDecodeCommon(c As Collection) As Collection
 
 End
 
-'' Decode the fields for a specific entity
+'' Decode the specific fields of an entity
 
 Public Function DWGDecodeEntity(c As Collection) As Collection
 
@@ -1806,6 +1777,8 @@ Public Function DWGDecodeEntity(c As Collection) As Collection
 
 End
 
+'' Decode the coordinate fields in a entity from DWG file.
+
 Public Function DWGDecodeCoord(s As String) As Float[]
 
   Dim pt As New Float[]
@@ -1857,6 +1830,8 @@ Public Function DWGDecodeColor(s As String) As Byte
 
 End
 
+'' Decode the Hex fields in a entity from DWG file.
+
 Public Function DWGDecodeHex(s As String) As Integer
 
   Dim out As Integer
@@ -1870,6 +1845,8 @@ Public Function DWGDecodeHex(s As String) As Integer
   Return out
 
 End
+
+'' Decode the Floar fields in a entity from DWG file.
 
 Public Function DWGDecodeFloat(s As String) As Float
 
@@ -1887,6 +1864,8 @@ Public Function DWGDecodeFloat(s As String) As Float
 
 End
 
+'' Decode the Integer fields.
+
 Public Function DWGDecodeInteger(s As String) As Integer
 
   Dim out As Integer
@@ -1903,6 +1882,8 @@ Public Function DWGDecodeInteger(s As String) As Integer
 
 End
 
+'' Decode the layers fields.
+
 Public Function DWGDecodeLayer(s As String) As String
 
   Dim out As String
@@ -1916,6 +1897,8 @@ Public Function DWGDecodeLayer(s As String) As String
   Return out
 
 End
+
+'' Decode the block header.
 
 Public Function DWGDecodeHandle(s As String) As String
 
@@ -1945,6 +1928,8 @@ Public Function DWGDecodeBlockHeader(s As String) As String
 
 End
 
+'' Decode the text style field.
+
 Public Function DWGDecodeTextStyle(s As String) As String
 
   Dim out As String
@@ -1958,6 +1943,8 @@ Public Function DWGDecodeTextStyle(s As String) As String
   Return out
 
 End
+
+'' Decode the text fields.
 
 Public Function DWGDecodeText(s As String) As String
 
@@ -2345,6 +2332,8 @@ Public Function DWGArrangeEnty(c As Collection) As Collection
 
 End
 
+'' creates a list of dimension codes.
+
 Public Function DWGDimCodes() As Collection
 
   Dim d As New Collection
@@ -2423,7 +2412,7 @@ Public Function DWGDimCodes() As Collection
 
 End
 
-'' This return a codes collection for the given entity name
+'' Creates a list with the codes of an entity indicated as a parameter.
 
 Public Function DXFEntityDefaults(Optional ent As String) As Collection
 
@@ -2466,7 +2455,7 @@ Public Function DXFEntityDefaults(Optional ent As String) As Collection
 
 End
 
-'' This return a codes collection for the given entity name
+'' Creates a list with all the codes of an entity indicated as a parameter.
 
 Public Function DXFEntityCodes(Optional ent As String) As Collection
 
@@ -2621,9 +2610,9 @@ Public Function DXFEntityCodes(Optional ent As String) As Collection
 
 End
 
-'' Return a String[] with the form r,g,b where each index is the dxf color number
+'' Return a colors list by the form r,g,b where each index is the DXF color integer number.
 
-Public Function RGBColors() As String[]
+Public Function DWGColors() As String[]
 
   Dim rgbx As New String[]
 
@@ -2890,9 +2879,9 @@ Public Function RGBColors() As String[]
 
 End
 
-'' Input a dxf color return a rgb color
+'' Input a DXF color return a RGB color.
 
-Public Function DecodeColor() As Integer[]
+Public Function GauchoDecodeColor() As Integer[]
 
   Dim rgb As New Integer[]
 
@@ -2903,7 +2892,7 @@ Public Function DecodeColor() As Integer[]
   Dim irgb As Integer
   Dim rgbx As String[]
 
-  rgbx = RGBColors()
+  rgbx = DWGColors()
 
   For Each s In rgbx
     r = Split(s, ",")[0]
@@ -2919,7 +2908,7 @@ End
 
 '' Create a collection whith te program variables needed
 
-Public Function CADConfig() As Collection
+Public Function GauchoConfig() As Collection
 
   Dim ctnOut As New Collection
   Dim ctnTmp As New Collection
@@ -3092,13 +3081,14 @@ End
 
 'DXF ========================================================================
 
+'' Create a list of sections from a DXF file, for this it requires the raw text of the DXF file.
+
 Public Function DXFSections(sFile As String) As Collection
 
   Dim sContent As String
   Dim tmx As New String[]
   Dim sec As String
   Dim sSub As String
-  'Dim i As Integer
   Dim out As New Collection
   Dim sName As String
   Dim sCont As String
@@ -3114,11 +3104,8 @@ Public Function DXFSections(sFile As String) As Collection
 
       sContent = Replace(sContent, "\r\n", "\n")
       sContent = Replace(sContent, "\t", " ")
-      ''sContent = Trim(sContent) ' Testing
       sContent = Replace(sContent, "  0\nSECTION\n  2\n", "\t")
       sContent = Replace(sContent, "  0\nENDSEC\n", "\t")
-      ''sContent = Replace(sContent, "0\nSECTION\n2\n", "\t")
-      ''sContent = Replace(sContent, "0\nENDSEC\n", "\t")
       tmx = Split(sContent, "\t")
 
       If tmx.count > 0 Then
@@ -3128,7 +3115,6 @@ Public Function DXFSections(sFile As String) As Collection
             sName = Split(sec, "\n")[0]
             sCont = String.Mid(sec, String.Len(sName & "\n") + 1)
 
-            'File.Save(User.Home &/ sName & ".txt", sCont)
             Select sName
               Case "HEADER"
                 cCont = DXFHeader(sCont)
@@ -3163,14 +3149,14 @@ Public Function DXFSections(sFile As String) As Collection
 
 End
 
+'' Creates a list of blocks from a DXF file, for this it requires the raw text of the DXF file.
+
 Public Function DXFBlocks(sCont As String) As Collection
 
   Dim stx As New String[]
   Dim out As New Collection
   Dim i As Integer
   Dim cItem As New Collection
-  'Dim e As Variant
-  'Dim sKey As String
 
   sCont = Replace(sCont, "\t", " ")
   sCont = Replace(sCont, "  0\nBLOCK\n", "\t  0\nBLOCK\n")
@@ -3191,6 +3177,8 @@ Public Function DXFBlocks(sCont As String) As Collection
   Return out
 
 End
+
+'' Creates a list of entities from a DXF file, for this it requires the raw text of the DXF file.
 
 Public Function DXFEntities(sCont As String) As Collection
 
@@ -3229,22 +3217,34 @@ Public Function DXFEntities(sCont As String) As Collection
     APPMain.Progress(stx.Count, i)
   Next
 
-  sout = EntitiesSort(out)
+  sout = GauchoEntitiesSort(out)
 
   Return sout
 
 End
 
-Private Function EntitiesSort(c As Collection) As Collection
+'' Sorts the list of entities previously generated that is passed as a parameter.
+
+Public Function GauchoEntitiesSort(c As Collection) As Collection
 
   Dim stx As New String[]
   Dim eName As String
+  Dim eType As String
   Dim tmp As New Collection
   Dim out As New Collection
   Dim ety As Variant
 
   For Each ety In c
-    eName = String.LCase(ety["entity"])
+    If ety.Exist("entity") Then
+      eName = String.LCase(ety["entity"])
+      eType = "entity"
+    Else
+      If ety.Exist("object") Then
+        eName = String.LCase(ety["object"])
+        eType = "object"
+      Endif
+    Endif
+
     If stx.Exist(eName) = False Then
       stx.Add(eName)
     Endif
@@ -3254,8 +3254,17 @@ Private Function EntitiesSort(c As Collection) As Collection
 
   For Each eName In stx
     For Each ety In c
-      If eName = String.LCase(ety["entity"]) Then
-        tmp.Add(ety, ety["handle"])
+      If eName = String.LCase(ety["entity"]) Or eName = String.LCase(ety["object"]) Then
+        If ety.Exist("handle") Then
+          Select TypeOf(ety["handle"])
+            Case gb.Object
+              If ety["handle"] Is Variant[] Then
+                tmp.Add(ety, ety["handle"][1])
+              Endif
+            Case Else
+              tmp.Add(ety, ety["handle"])
+          End Select
+        Endif
       Endif
     Next
     out.Add(tmp.Copy(), eName)
@@ -3265,6 +3274,8 @@ Private Function EntitiesSort(c As Collection) As Collection
   Return out
 
 End
+
+'' Creates a list of headers from a DXF file, for this it requires the raw text of the DXF file.
 
 Public Function DXFHeader(sCont As String) As Collection
 
@@ -3298,6 +3309,8 @@ Public Function DXFHeader(sCont As String) As Collection
   Return out
 
 End
+
+'' Creates a list of tables from a DXF file, for this it requires the raw text of the DXF file.
 
 Public Function DXFTables(sCont As String) As Collection
 
@@ -3339,6 +3352,8 @@ Public Function DXFTables(sCont As String) As Collection
   Return out
 
 End
+
+'' Creates a list of layers from a DXF file, for this it requires the text in the LAYER section in tables.
 
 Private Function DXFLayerList(sItem As String) As Collection
 
@@ -3480,6 +3495,8 @@ Private Function DXFLtypeList(sItem As String) As Collection
 
 End
 
+'' Creates a list of styles from a DXF file, for this it requires the text in the STYLE section in tables.
+
 Private Function DXFStyleList(sItem As String) As Collection
 
   Dim stx As String[]
@@ -3560,6 +3577,8 @@ Private Function DXFStyleList(sItem As String) As Collection
 
 End
 
+'' Creates a list of dimension styles from a DXF file, for this it requires the text in the  DIMSTYLE section in tables.
+
 Private Function DXFDimStyleList(sItem As String) As Collection
 
   Dim stx As String[]
@@ -3609,6 +3628,8 @@ Private Function DXFDimStyleList(sItem As String) As Collection
   Return cDeco
 
 End
+
+'' Creates a list of blocks from a DXF file, for this it requires the text in the BLOCK section in tables.
 
 Private Function DXFBLockList(sItem As String) As Collection
 
@@ -3662,6 +3683,8 @@ Private Function DXFBLockList(sItem As String) As Collection
 
 End
 
+'' Create a list with all the information of a DXF entity.
+
 Private Function DXFDecodeEntity(sItem As String) As Collection
 
   Dim stx As String[]
@@ -3674,21 +3697,15 @@ Private Function DXFDecodeEntity(sItem As String) As Collection
   Dim codes As New Collection
   Dim rep As New Collection
   Dim e As Variant
-  'Dim p As New Float[]
-  'Dim x As Float
-  'Dim y As Float
-  'Dim z As Float
   Dim xTag As String
   Dim xOrd As String
   Dim pt As String
-  'Dim pt2 As String
   Dim spt As New String[]
   Dim cp As New Collection
   Dim a0 As Float
   Dim a1 As Float
   Dim r As Float
   Dim sx As Float
-  'Dim c As Integer
   Dim sy As Float
   Dim sz As Float
   Dim tg As Variant
@@ -3797,7 +3814,7 @@ Private Function DXFDecodeEntity(sItem As String) As Collection
       End Select
 
     Next
-    cp = EncodePoint(spt.Join(";"), "p")
+    cp = GauchoEncodePoint(spt.Join(";"), "p")
     cTmp2.Add(cp.Copy(), "p")
     cp.Clear
 
@@ -3975,17 +3992,7 @@ Private Function DXFDecodeEntity(sItem As String) As Collection
 
 End
 
-'Private Function dxfLine(stx As String[]) As Collection
-
-'End
-
-'' In takes all the raw data in a block item from blocks section, listing each
-'' entity inside the block but also the block inset
-'' This function lists the content of a block, that is, all the entities that
-'' compose it including block itself and endblock. Then it creates a collection
-'' with all the entities that are not a block or endblock and puts it as one
-'' more property of the collection returned by this function that represents th
-'' e block.
+''Creates a collection With the entities that make up a block.
 
 Private Function DXFDecodeBlock(sItem As String) As Collection
 
@@ -4052,6 +4059,8 @@ Private Function DXFDecodeBlock(sItem As String) As Collection
 
 End
 
+'' Create a list with the information it decodes from a DXF entity.
+
 Public Function DXFDecodeItem(sItem As String) As Collection
 
   Dim stx As String[]
@@ -4059,9 +4068,6 @@ Public Function DXFDecodeItem(sItem As String) As Collection
   Dim i As Integer
   Dim vrt As Variant
   Dim sTag As String
-  'Dim x As Float
-  'Dim y As Float
-  'Dim z As Float
   Dim codes As Collection
   Dim sVal As String
   Dim sKey As String
@@ -4165,6 +4171,8 @@ Public Function DXFDecodeItem(sItem As String) As Collection
 
 End
 
+'' Create a list with the coords decodes from a DXF entity.
+
 Private Function DXFDecodeCoords(sItem As String) As Collection
 
   Dim stx As String[]
@@ -4173,9 +4181,6 @@ Private Function DXFDecodeCoords(sItem As String) As Collection
   Dim i As Integer
   Dim vrt As Variant
   Dim sTag As String
-  'Dim x As Float
-  'Dim y As Float
-  'Dim z As Float
   Dim codes As Collection
   Dim sVal As String
   Dim sKey As String
@@ -4280,13 +4285,15 @@ Private Function DXFDecodeCoords(sItem As String) As Collection
         Endif
       Next
     Next
-    cp = EncodePoint(spt.Join(";"), "p")
+    cp = GauchoEncodePoint(spt.Join(";"), "p")
     p.Add(cp.Copy(), "p")
     cp.Clear
   Endif
   Return p
 
 End
+
+'' Create a list with the headers decodes from a DXF entity.
 
 Private Function DXFDecodeHeader(sItem As String) As Collection
 
@@ -4298,7 +4305,6 @@ Private Function DXFDecodeHeader(sItem As String) As Collection
   Dim x As Float
   Dim y As Float
   Dim z As Float
-  'Dim str As String
 
   stx = Split(sItem, "\n")
 

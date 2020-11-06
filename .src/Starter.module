@@ -156,7 +156,7 @@ Public Sub Run()
 
   '' Load the colors list
   'cColors = LoadColors()
-  ColorsRGB = cad.RGBColors()
+  ColorsRGB = cad.DWGColors()
   For i = 0 To ColorsRGB.Max
     cColors.Add([ColorsRGB[i], True], CStr(i))
   Next
@@ -167,7 +167,7 @@ Public Sub Run()
   '' Load the linetypes list
   cWidths = cad.NewWidths()
 
-  gcolor = cad.DecodeColor()
+  gcolor = cad.GauchoDecodeColor()
 
   ' corrijo los colores que no se ven contra el fondo
   gcolor[0] = flgWhiteAndBlack

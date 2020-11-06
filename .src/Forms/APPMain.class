@@ -58,6 +58,9 @@ Public CurrentLtype As Integer
 Public SelectingWidth As Boolean    '' Selecting width
 Public CurrentWidth As Integer
 
+Public EditingText As Boolean       '' Editing Text value
+Public CurrentText As String
+
 'Public SelectedWidth As Boolean
 
 Private PropertiesFlag As Boolean = False
@@ -174,6 +177,7 @@ Public Sub Run(cin As Collection)
   btnLtypes.Reparent(pnlFile)
   btnLayers.Reparent(pnlFile)
   btnWidths.Reparent(pnlFile)
+  Panel6.Reparent(pnlFile)
   'cboLayers.Reparent(pnlFile)
   'tobLayers.Reparent(pnlFile)
   'cboWidths.Reparent(pnlFile)
@@ -938,6 +942,8 @@ Public Sub gTask(sTask As String)
   Dim template As Boolean
   Dim Drawing As ClsDrawing
   Dim NewDrawing As ClsDrawing
+  Dim p As Collection
+
   '' if the drawing is drawingX.xml, drawingX.gcad where X is a integer number then the Ssave is changed to Save As
 
   Select sTask
@@ -1019,6 +1025,10 @@ Public Sub gTask(sTask As String)
             ProgressBar1.Visible = False
 
           Case "dwg"
+            p = dwg.info(FilePath) ' TEST LIBREDWG with Json format
+            s = dwg.ObjetsCSV(p)
+            File.Save(User.Home &/ "dwg.csv", s)
+
             mdl = cad.DWGImport(FilePath)
             ProgressBar1.Value = 1
             If mdl.Count > 0 Then
@@ -1042,12 +1052,12 @@ Public Sub gTask(sTask As String)
       If Exist(FilePath) Then
         Select String.LCase(File.Ext(FilePath))
           Case "gcad"
-            cModel = cad.LoadGaucho(FilePath)
+            cModel = cad.GauchoLoad(FilePath)
             LoadComboboxes(cModel)
 
             wtag = FilePath
             If gcd.Drawings.Count = 0 Or ExistWin(wtag) < 0 Then
-              gcd.CurrentDrawing.cModel = cad.LoadGaucho(FilePath)
+              gcd.CurrentDrawing.cModel = cad.GauchoLoad(FilePath)
               LoadComboboxes(cModel)
               NewDrawing = New ClsDrawing
               GCD.Drawings.Add(NewDrawing)
@@ -1085,7 +1095,7 @@ Public Sub gTask(sTask As String)
       gcd.Drawings.Add(NewDrawing)
       gcd.CurrentDrawing = gcd.Drawings.Last
 
-      gcd.CurrentDrawing.cModel = cad.LoadGaucho(FilePath)
+      gcd.CurrentDrawing.cModel = cad.GauchoLoad(FilePath)
 
       LoadComboboxes(gcd.CurrentDrawing.cModel.Copy())
 
@@ -1487,6 +1497,9 @@ Public Sub SelectionRefresh()
   Dim etype As New String[]
   Dim i As Integer
   Dim j As Integer
+  ' Text Edit
+  Dim ftx As FText
+  Dim te As New Entity                  '' Cloned entity to put in undo collection
 
   ComboBox1.Clear
   ComboBox1.Text = ""
@@ -1502,6 +1515,44 @@ Public Sub SelectionRefresh()
       Endif
     Endif
   Next
+
+  If etype.Count > 0 Then
+    Select e.Gender
+      Case "Text"
+        If EditingText = False Then
+          ' Copying the entity for undo
+          te = clsEntities.ClonEntity(e)
+          te.Handle = e.Handle
+          APPMain.hFCAD.arrUndo.Add(te)
+
+          ftx = New FText([pnlDrawing.ScreenX + 7, pnlDrawing.ScreenY + pnlDrawing.H - 7], e)
+          ftx.Run()
+          Do
+            If EditingText = True Then
+              '              If e.StringData[0] <> CurrentText Then
+              '                te = clsEntities.ClonEntity(e)
+              '                te.Handle = e.Handle
+              '                APPMain.hFCAD.arrUndo.Add(te)
+              '                e.StringData[0] = CurrentText
+              'Endif
+              Break
+            Else
+              Wait 0.1
+            Endif
+          Loop
+          EditingText = False
+          APPMain.hFCAD.Regen
+          'PropSave()
+        Endif
+
+      Case Else
+        pnlProperties.Visible = True
+        PropertiesFlag = True
+    End Select
+  Else
+    pnlProperties.Visible = False
+    PropertiesFlag = False
+  Endif
 
   Select etype.Count
     Case 0
@@ -1617,6 +1668,12 @@ Public Sub PropSave()
                 Break
               Endif
             Next
+
+          Case "Text"
+            If e.StringData[0] <> CurrentText Then
+              e.StringData[0] = CurrentText
+              Changed = True
+            Endif
 
         End Select
       Next
@@ -1766,6 +1823,16 @@ Public Sub TableView1_Data(Row As Integer, Column As Integer)
                         TableView1[Row, Column].Text = vrx[0]
                       Endif
 
+                    Case "Handle"
+                      'If prop.Count = 1 Then
+                      TableView1[Row, Column].Text = prop[0]
+                      ' Else
+                      '   TableView1[Row, Column].Text = "*" & ("varies") & "*"
+                      ' Endif
+
+                    Case "Text"
+                      TableView1[Row, Column].Text = prop[0]
+
                   End Select
 
                 Case Else
@@ -1803,6 +1870,7 @@ Public Sub TableView1_Click()
   Dim wmax As Integer
 
   Dim frm As FWidths
+  Dim ftx As FText
 
   For Each lay In gcd.CurrentDrawing.cModel["Layers"]
     lrx.Add(lay["name"])
@@ -1892,6 +1960,23 @@ Public Sub TableView1_Click()
               TableView1[TableView1.Row, 1].Text = vrx[0]
             Endif
             SelectingWidth = False
+            Break
+          Else
+            Wait 0.1
+          Endif
+        Loop
+        PropSave()
+      Endif
+
+    Case "Text"
+      If EditingText = False Then
+        CurrentText = TableView1[TableView1.Row, 1].Text
+        ftx = New FText([pnlDrawing.ScreenX + 7, pnlDrawing.ScreenY + pnlDrawing.H - 7], Me)
+        ftx.Run()
+        Do
+          If EditingText = True Then
+            TableView1[TableView1.Row, 1].Text = CurrentText
+            EditingText = False
             Break
           Else
             Wait 0.1
