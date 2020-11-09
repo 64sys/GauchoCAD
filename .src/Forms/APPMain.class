@@ -545,6 +545,18 @@ End
 
 Public Sub Form_Activate()
 
+  'GLplus.Init(glarea1)
+
+End
+
+Public Sub Form_Arrange()
+
+  'GLplus.Resize(glarea1)
+
+End
+
+Public Sub glarea1_Resize()
+
   GLplus.Init(glarea1)
 
 End
@@ -2040,6 +2052,7 @@ Public Sub Form_KeyPress()
           Endif
         Endif
       Next
+      Form_Activate()
 
       gcd.clsJob.KeyText(KeysAccumulator)
       KeysAccumulator = ""
