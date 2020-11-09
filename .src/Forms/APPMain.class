@@ -942,7 +942,7 @@ Public Sub gTask(sTask As String)
   Dim template As Boolean
   Dim Drawing As ClsDrawing
   Dim NewDrawing As ClsDrawing
-  Dim p As Collection
+  Dim p As New Collection
 
   '' if the drawing is drawingX.xml, drawingX.gcad where X is a integer number then the Ssave is changed to Save As
 
@@ -1017,7 +1017,7 @@ Public Sub gTask(sTask As String)
               gcd.CurrentDrawing.cImport.Clear    ' libero espacio, limpiando cImport
               gcd.ApplyLayerProperties(1)         ' aplico las propiedades de los layers a las entidades
               'clsMouseTracking.ReBuildPOIPoints   ' construyo los puntos de interes para el tracking del mouse
-              Regen
+              Regen                               ' Genero las listas de OpenGL
               cadZoomE.Start()                    ' Hago un Zoom Extents
 
             Endif
@@ -1025,17 +1025,28 @@ Public Sub gTask(sTask As String)
             ProgressBar1.Visible = False
 
           Case "dwg"
-            p = dwg.info(FilePath) ' TEST LIBREDWG with Json format
+            'p = dwg.info(FilePath) ' TEST LIBREDWG with Json format
             s = dwg.ObjetsCSV(p)
             File.Save(User.Home &/ "dwg.csv", s)
 
             mdl = cad.DWGImport(FilePath)
             ProgressBar1.Value = 1
             If mdl.Count > 0 Then
-              gcd.CurrentDrawing.cImport = mdl
-              gcd.CurrentDrawing.Form_Activate()
+              gcd.CurrentDrawing.cImport = mdl  ' Copio la coleccion de datos a cImport, previo a trnasferir a cModel
+              gcd.EntitiesTransfer2()           ' Transfiero las entidades a cModel
+              gcd.BlocksTransfer()              ' transfiero los bloques
+              gcd.LayersTransfer()              ' transfiero los Layers
+              LoadDrawingMap2()                               ' lleno el TreeView
+              LoadComboboxes(gcd.CurrentDrawing.cModel)       ' recargo los ComboBox
+              gcd.ImportBlocks(gcd.CurrentDrawing.cModel)     ' Importo los Bloques de cModel a formato binario
+              gcd.ImportModel(gcd.CurrentDrawing.cModel["Entities"], gcd.CurrentDrawing.arrEntities)  ' idem entidades
+              gcd.CurrentDrawing.cImport.Clear    ' libero espacio, limpiando cImport
+              gcd.ApplyLayerProperties(1)         ' aplico las propiedades de los layers a las entidades
+              'clsMouseTracking.ReBuildPOIPoints   ' construyo los puntos de interes para el tracking del mouse
+              Regen                               ' Genero las listas de OpenGL
+              cadZoomE.Start()                    ' Hago un Zoom Extents
+
             Endif
-            appmain.regen
             ProgressBar1.Visible = False
 
         End Select
@@ -2172,7 +2183,8 @@ Public Sub Form_KeyPress()
       Endif
 
   End Select
-  ' tmr500_timer
+
+  clsDrawingAids.DibujaHelper
 
 End
 
@@ -2371,5 +2383,12 @@ Public Sub LoadDrawingMap2()
       Endif
     Next
   Next
+
+End
+
+Public Sub tmr500_Timer()
+
+  If clsDrawingAids.PromtSlash = "|" Then clsDrawingAids.PromtSlash = "" Else clsDrawingAids.PromtSlash = "|"
+  clsDrawingAids.DibujaHelper
 
 End
