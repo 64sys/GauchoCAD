@@ -9,7 +9,15 @@ Public degRotation As Float
 Public mirrored As Boolean
 Public BlockName As String
 
-Public Sub form_Open()
+Public Sub form_Activate()
+
+  Me.Center()
+
+End
+
+Public Sub form_Deactivate()
+
+  Me.Close()
 
 End
 
@@ -23,11 +31,15 @@ Public Sub DrawingArea1_Draw()
 
   If entyBlock.Count = 0 Then Return
 
-  Paint.Translate(DrawingArea1.w / 2 + (flxLimits[2] - flxLimits[0]) / 2 / entScale, DrawingArea1.h / 2 + (flxLimits[3] - flxLimits[1]) / 2 / entScale)
+  Paint.Translate(DrawingArea1.w / 2 - (flxLimits[2] + flxLimits[0]) / 2 / entScale, DrawingArea1.h / 2 + (flxLimits[3] + flxLimits[1]) / 2 / entScale)
   'Paint.Translate((flxLimits[2] - flxLimits[0]) / 2 / entScale, (flxLimits[3] - flxLimits[1]) / 2 / entScale)
   Paint.Scale(entScale, -entScale)
 
   For Each entidad In entyBlock
+    entidad.ColorToPaint = Starter.flgWhiteAndBlack
+    entidad.LineWidth = 1 / entscale * DrawingArea1.w / 3
+
+    entidad.LineType = 0
     entidad.ClassHandler.draw2(entidad)
   Next
 
@@ -53,6 +65,8 @@ End
 
 Public Sub ListBox1_Click()
 
+  If listBox1.Text = "" Or ListBox1.Count = 0 Then Return
+
   entyBlock.Clear
 
   cadDxf.arrToFill = entyBlock
@@ -65,11 +79,11 @@ Public Sub ListBox1_Click()
 
   If Abs(flxLimits[2] - flxLimits[0]) > Abs(flxLimits[3] - flxLimits[1]) Then
 
-    entScale = 200 / Abs(flxLimits[2] - flxLimits[0]) / 1.5
+    entScale = DrawingArea1.w / Abs(flxLimits[2] - flxLimits[0]) / 1.5
 
   Else
 
-    entScale = 200 / Abs(flxLimits[3] - flxLimits[1]) / 1.5
+    entScale = DrawingArea1.h / Abs(flxLimits[3] - flxLimits[1]) / 1.5
 
   Endif
 
@@ -79,10 +93,34 @@ End
 
 Public Sub btnOK_Click()
 
-  scaleX = Val(txtScalex.Text)
-  scaley = Val(txtScaley.Text)
-  degRotation = Val(txtRotation.Text)
+  scaleX = CFloat(txtScalex.Text)
+  scaley = CFloat(txtScaley.Text)
+  degRotation = CFloat(txtRotation.Text)
   mirrored = tbnMirrored.Value
   Me.Close(1) ' por ahora , cualquier cosa distinta de cero es una intencion de insercion
+
+End
+
+Public Sub RadioButton4_Click()
+
+  txtRotation.Text = "90"
+
+End
+
+Public Sub RadioButton3_Click()
+
+  txtRotation.Text = "0"
+
+End
+
+Public Sub RadioButton1_Click()
+
+  txtRotation.Text = "270"
+
+End
+
+Public Sub RadioButton2_Click()
+
+  txtRotation.Text = "180"
 
 End

@@ -5,7 +5,7 @@
   Text = ("Block insertion")
   Persistent = True
   Resizable = False
-  Stacking = Window.Above
+  SkipTaskbar = True
   { Label1 Label
     MoveScaled(51,0,25,3)
     Font = Font["Bold,Underline"]

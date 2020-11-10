@@ -545,19 +545,13 @@ End
 
 Public Sub Form_Activate()
 
-  'GLplus.Init(glarea1)
-
-End
-
-Public Sub Form_Arrange()
-
-  'GLplus.Resize(glarea1)
+  GLplus.Init(glarea1)
 
 End
 
 Public Sub glarea1_Resize()
 
-  GLplus.Init(glarea1)
+  GLplus.Resize(glarea1)
 
 End
 

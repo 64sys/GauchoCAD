@@ -535,8 +535,8 @@
         MoveScaled(2,0,92,4)
         #Public = True
         Font = Font["Bold,+1"]
-        Background = Color.TextBackground
-        Foreground = Color.TextForeground
+        Background = Color.Gray
+        Foreground = Color.White
         Text = ("Command")
       }
       { pnlLocks Panel

@@ -44,9 +44,11 @@ Public Function Start(Optional filename As Variant, Optional _mode As Integer = 
   Dim iREt As Integer
 
   eBlock.entities = New Entity[]
-  iRet = FBlock.Showmodal()
+  eBlock.name = ""
+  Me.EntityChecking = True
+  iret = FBlock.ShowPopup()
 
-  If iret = 0 Then Me.Finish
+  'If iret = 0 Then Me.Finish
 
   ' el user eligio un bloque y lo quiere insertar en algun punto
 
@@ -59,12 +61,22 @@ Public Sub Draw()
   If FBlock.entyBlock.Count = 0 Then Return
 
   gl.PushMatrix
-  gl.Translatef(fBlock.x / gcd.CurrentDrawing.ScaleZoom, fBlock.y / gcd.CurrentDrawing.ScaleZoom, 0)
+  gl.Translatef(fBlock.x, fBlock.y, 0)
   gl.Rotatef(FBlock.degRotation, 0, 0, 1)
   gl.Scalef(FBlock.scaleX, fBlock.scaleY, 1)
 
   For Each ET In FBlock.entyBlock
     'et.visible = True
+
+    et.layer = appmain.CurrentLayer
+    et.layerid = gcd.GetLayerID(appmain.CurrentLayer)
+
+    et.colour = appmain.CurrentColor
+    et.ColorToPaint = Starter.gColor[et.colour]
+
+    et.LineType = appmain.CurrentLtype
+
+    et.LineWidth = appmain.CurrentWidth
 
     et.ClassHandler.Draw(et)
   Next
@@ -133,6 +145,11 @@ Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' called by FCAD->
   entInsert.ClassHandler.Finish(entInsert, -1)
 
   clsEntityBuilder.LastEntity = entInsert                                       ' save it to repeat on rigth click
+
+  ' limpio el selector de bloques
+
+  FBlock.entyBlock.Clear
+  FBlock.Name = ""
 
   gcd.clsJobPrevious = Me
   gcd.clsJob = clsDefaultJob

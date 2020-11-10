@@ -164,11 +164,7 @@ Public GLDrwListEditing As New Integer[]                ' all entities on edit b
 Public LineStipples As New Integer[]
 Public LineStippleScales As New Integer[]
 
-Public Sub Resize()
-
-End
-
-Public Sub Init(drwContext As Object) ' only glArea for now
+Public Sub Resize(drwContext As Object) ' only glArea for now
 
   shaVertexShaderSource = "#version 330 core" & gb.cr &
     "layout (location = 0) in vec3 aPos;" & gb.cr &
@@ -188,6 +184,51 @@ Public Sub Init(drwContext As Object) ' only glArea for now
   gl.Viewport(0, 0, drwContext.W, drwContext.h)
   ' le avisamos a GL que queremos usar texturas
   gl.Enable(gl.TEXTURE_2D)
+
+  ' borramos lo que haya dibujado
+  gl.Clear(gl.DEPTH_BUFFER_BIT Or gl.COLOR_BUFFER_BIT)
+
+  ' le decimos que queremos usar cosas 3D y lo que esta mas lejos quede tapado por lo que esta mas cerca, esto en 2D no es necesario
+  gl.Enable(gl.DEPTH_TEST)
+
+  ' no tengo idea, debe ser algo de AntiAlias
+  gl.Enable(gl.SMOOTH)
+  gl.Enable(gl.BLEND)
+  gl.BlendFunc(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA)
+  ' usaremos luces
+  ' Gl.Enable(Gl.LIGHTING)
+  ' Gl.Enable(Gl.LIGHT0)
+  ' esto le dice que las normales las tiene que normalizar a 1
+  Gl.Enable(Gl.NORMALIZE)
+
+  ' las coordenadas que le pasemos deberan estar entre -1 y 1
+  ' todo lo que sea > 1 NO SE MOSTRARA
+
+  gl.MatrixMode(gl.PROJECTION)
+  gl.LoadIdentity
+  Glu.Ortho2D(-drwContext.w / 2, drwContext.w / 2, -drwContext.h / 2, drwContext.h / 2)
+
+  gl.MatrixMode(gl.MODELVIEW)
+  gl.LoadIdentity
+
+End
+
+Public Sub Init(drwContext As Object) ' only glArea for now
+
+  Resize(drwContext)
+
+  shaVertexShaderSource = "#version 330 core" & gb.cr &
+    "layout (location = 0) in vec3 aPos;" & gb.cr &
+    "void main()" & gb.cr &
+    "{" & gb.cr &
+    "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);" & gb.cr &
+    "}"
+  shaFragmentShaderSource = "#version 330 core" & gb.cr &
+    "out vec4 FragColor;" & gb.cr &
+    "void main()" & gb.cr &
+    "{" & gb.cr &
+    "   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);" & gb.cr &
+    "}"
 
   ' con este color limpiamos la pantalla
   If Starter.flgWindowBackColor = 0 Then
@@ -218,32 +259,6 @@ Public Sub Init(drwContext As Object) ' only glArea for now
   ' Divide
   LineStipples.Add(&X00000000000000000011001100111111)
   LineStippleScales.Add(1)
-
-  ' borramos lo que haya dibujado
-  gl.Clear(gl.DEPTH_BUFFER_BIT Or gl.COLOR_BUFFER_BIT)
-
-  ' le decimos que queremos usar cosas 3D y lo que esta mas lejos quede tapado por lo que esta mas cerca, esto en 2D no es necesario
-  gl.Enable(gl.DEPTH_TEST)
-
-  ' no tengo idea, debe ser algo de AntiAlias
-  gl.Enable(gl.SMOOTH)
-  gl.Enable(gl.BLEND)
-  gl.BlendFunc(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA)
-  ' usaremos luces
-  ' Gl.Enable(Gl.LIGHTING)
-  ' Gl.Enable(Gl.LIGHT0)
-  ' esto le dice que las normales las tiene que normalizar a 1
-  Gl.Enable(Gl.NORMALIZE)
-
-  ' las coordenadas que le pasemos deberan estar entre -1 y 1
-  ' todo lo que sea > 1 NO SE MOSTRARA
-
-  gl.MatrixMode(gl.PROJECTION)
-  gl.LoadIdentity
-  Glu.Ortho2D(-drwContext.w / 2, drwContext.w / 2, -drwContext.h / 2, drwContext.h / 2)
-
-  gl.MatrixMode(gl.MODELVIEW)
-  gl.LoadIdentity
 
   'Print GLplus.GetString(gl.SHADING_LANGUAGE_VERSION)
 
