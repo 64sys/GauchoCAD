@@ -39,13 +39,13 @@ Public Function info(f As String) As Collection
   Dim vxEnt As New Variant[]
   Dim obs As String
 
-  j = User.Home &/ "dwg.json"
+  'j = User.Home &/ "dwg.json"
 
   Shell "/usr/local/bin/dwgread -v4 --format JSON '" & f & "' 2>&1 " To str
 
-  str = Replace(str, "\t", " ")
-  str = Replace(str, "\n{\n  \"created_by\": \"", "\t{\n  \"created_by\": \"")
-  str = Split(str, "\t")[1]
+  'str = Replace(str, "\t", " ")
+  'str = Replace(str, "\n{\n  \"created_by\": \"", "\t{\n  \"created_by\": \"")
+  'str = Split(str, "\t")[1]
 
   'File.Save(User.Home &/ "dwg.json", str)
 
@@ -199,7 +199,7 @@ Public Function Json2Csv(strRaw As String) As Variant[]
   Dim item As Variant
   Dim vrx As New Variant[]
 
-  vrt = JSON.Decode(File.Load(User.Home &/ "dwg-codebeautify.json"))
+  vrt = JSON.Decode(File.Load(User.Home &/ "dwg.json"), True)
 
   For Each item In vrt
     Select TypeOf(item)
@@ -213,7 +213,6 @@ Public Function Json2Csv(strRaw As String) As Variant[]
         Endif
     End Select
   Next
-  'Endif
   Return vrx
 
 End
@@ -258,9 +257,18 @@ Public Function ObjetsCSV(ctn As Collection) As String
             Else
               sLty = "<>"
             Endif
-
             sLwt = e["linewt"]
-            sCor = e["color"]
+            Select TypeOf(e["color"])
+              Case gb.Object
+                If e["color"].Exist("index") Then
+                  sCor = e["color"]["index"]
+                Else
+                  sCor = "7"
+                Endif
+
+              Case Else
+                sCor = e["color"]
+            End Select
 
             tmp.add([sHnd, sEnt, sLay, sLty, sLwt, sCor])
           Endif

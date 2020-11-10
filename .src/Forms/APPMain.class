@@ -1003,7 +1003,7 @@ Public Sub gTask(sTask As String)
     Case "import"
       ProgressBar1.Visible = True
       ProgressBar1.Value = 0
-      stx = dsk.FileChooser(User.Home, ["dxf", "dwg"])
+      stx = dsk.FileChooser(User.Home, ["dxf", "dwg", "json"])
       If stx.count > 0 Then
         FilePath = stx[0]
 
@@ -1030,10 +1030,11 @@ Public Sub gTask(sTask As String)
 
             ProgressBar1.Visible = False
 
-          Case "dwg"
+          Case "json"
             'p = dwg.info(FilePath) ' TEST LIBREDWG with Json format
             s = dwg.ObjetsCSV(p)
             File.Save(User.Home &/ "dwg.csv", s)
+          Case "dwg"
 
             mdl = cad.DWGImport(FilePath)
             ProgressBar1.Value = 1
