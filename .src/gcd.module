@@ -365,7 +365,8 @@ Public Function ImportModel(colData As Collection, obxEntities As Entity[], Opti
 
   For Each colGrp In colData
 
-    ImportEntities2(colGrp, obxEntities, BlockName)
+    'ImportEntities2(colGrp, obxEntities, BlockName)
+    ImpEnty3(colGrp, obxEntities, BlockName)
 
   Next
 
@@ -644,6 +645,86 @@ End
 '     Return
 '
 ' End
+
+'' obx = Entity array, sb = BLockname,
+
+Public Function ImpEnty3(colGrp As Collection, obx As Entity[], Optional sb As String) As Integer
+
+  Dim t As Integer                  '' Total number of entities
+  Dim e As Collection               '' Current Entity
+  Dim fxp As New Float[]          '' Center (circle, arc), start & end (line), vertex (lwpolyline)
+  Dim fpt As Float
+  Dim ic As Integer                 '' Color
+  Dim iw As Integer                 '' Lineweight
+  Dim st As String                  '' LinType
+  Dim sy As String                  '' Layer
+  Dim vrt As Variant                '' Radius,
+
+  For Each e In colGrp
+    fxp.Clear
+    ic = 7
+    iw = 2
+    st = "Continous"
+    sy = "0"
+
+    Select LCase$(e["entity"])
+
+        'Case "line"
+        '  AddLine(obx, fxp, ic, iw, st, sy, sb)
+        '  Inc t
+        'Case "spline"
+        '  AddSPLine(obx, fxp, ic, iw, st, sy, sb)
+        '  Inc t
+        'Case "lwpolyline"
+        '  AddPolyLine(obx, fxp, ic, iw, st, sy, sb)
+        '  Inc t
+        'Case "solid"
+        '  AddSolid(obx, fxp, ic, iw, st, sy, sb)
+        '  Inc t
+        'Case "ellipse"
+        '  AddEllipse(obx, fxp, e["ratio"], e["start_angle"], e["end_angle"], ic, iw, st, sy, sb)
+        '  Inc t
+
+      Case "circle"
+        If TypeOf(e["center"]) = gb.Object Then
+          For Each fpt In e["center"]
+            fxp.Add(fpt)
+          Next
+        Endif
+        vrt = e["radius"] ' Radius
+        AddCircle(obx, fxp, vrt, ic, iw, st, sy, sb)
+        Inc t
+
+        'Case "arc"
+        '  AddArc(obx, fxp, e["radius"], e["start_angle"], e["end_angle"], ic, iw, st, sy, sb)
+        '  Inc t
+
+        'Case "insert"
+        '  AddInsert(obx, fxp, e["scalex"], e["scaley"], e["angle"], ic, st, sy, e["block"])
+        '  Inc t
+
+        'Case "text"
+        '  sText = e["text"]
+        '  Try sText = e["text2"] & sText
+        '  AddText(obx, fxp, e["angle"], e["text_height"], sText, ic, iw, st, sy, sb)
+        '  Inc t
+
+        'Case "mtext"
+        '  sText = e["text"]
+        '  Try sText = e["text2"] & sText
+        '  AddMText(obx, fxp, e["angle"], e["text_height"], sText, ic, iw, st, sy, sb)
+        '  Inc t
+
+        'Case "dimmension"
+        '  AddDim(obx, fxp, e["angle"], e["text_height"], e["text"], ic, iw, st, sy, sb)
+        '  Inc t
+
+    End Select
+  Next
+
+  Return t
+
+End
 
 '' Importa la clave entidades de la coleccion y las coloca en el array de objetos
 

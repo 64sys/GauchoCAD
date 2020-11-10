@@ -1016,7 +1016,7 @@ Public Sub gTask(sTask As String)
               gcd.EntitiesTransfer2()           ' Transfiero las entidades a cModel
               gcd.BlocksTransfer()              ' transfiero los bloques
               gcd.LayersTransfer()              ' transfiero los Layers
-              LoadDrawingMap2()                               ' lleno el TreeView
+              'LoadDrawingMap2()                               ' lleno el TreeView
               LoadComboboxes(gcd.CurrentDrawing.cModel)       ' recargo los ComboBox
               gcd.ImportBlocks(gcd.CurrentDrawing.cModel)     ' Importo los Bloques de cModel a formato binario
               gcd.ImportModel(gcd.CurrentDrawing.cModel["Entities"], gcd.CurrentDrawing.arrEntities)  ' idem entidades
@@ -1031,21 +1031,21 @@ Public Sub gTask(sTask As String)
             ProgressBar1.Visible = False
 
           Case "json"
-            'p = dwg.info(FilePath) ' TEST LIBREDWG with Json format
+            p = dwg.info(FilePath) ' TEST LIBREDWG with Json format
             s = dwg.ObjetsCSV(p)
             File.Save(User.Home &/ "dwg.csv", s)
           Case "dwg"
-
-            mdl = cad.DWGImport(FilePath)
+            mdl = dwg.info(FilePath)
+            ' mdl = cad.DWGImport(FilePath)
             ProgressBar1.Value = 1
             If mdl.Count > 0 Then
               gcd.CurrentDrawing.cImport = mdl  ' Copio la coleccion de datos a cImport, previo a trnasferir a cModel
               gcd.EntitiesTransfer2()           ' Transfiero las entidades a cModel
-              gcd.BlocksTransfer()              ' transfiero los bloques
+              'gcd.BlocksTransfer()              ' transfiero los bloques
               gcd.LayersTransfer()              ' transfiero los Layers
-              LoadDrawingMap2()                               ' lleno el TreeView
+              'LoadDrawingMap2()                               ' lleno el TreeView
               LoadComboboxes(gcd.CurrentDrawing.cModel)       ' recargo los ComboBox
-              gcd.ImportBlocks(gcd.CurrentDrawing.cModel)     ' Importo los Bloques de cModel a formato binario
+              'gcd.ImportBlocks(gcd.CurrentDrawing.cModel)     ' Importo los Bloques de cModel a formato binario
               gcd.ImportModel(gcd.CurrentDrawing.cModel["Entities"], gcd.CurrentDrawing.arrEntities)  ' idem entidades
               gcd.CurrentDrawing.cImport.Clear    ' libero espacio, limpiando cImport
               gcd.ApplyLayerProperties(1)         ' aplico las propiedades de los layers a las entidades
