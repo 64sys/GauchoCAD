@@ -126,9 +126,15 @@
     }
     { mnuBlock Menu entity
       Name = "mnuBlock"
-      Text = ("Block")
-      Picture = Picture["svg/entities/insert.svg"]
+      Text = ("Create a block")
+      Picture = Picture["svg/entities/block.svg"]
       Tag = "block"
+    }
+    { mnuInsert Menu entity
+      Name = "mnuInsert"
+      Text = ("Insert")
+      Picture = Picture["svg/entities/insert.svg"]
+      Tag = "insert"
     }
     { mnuDim Menu entity
       Name = "mnuDim"
