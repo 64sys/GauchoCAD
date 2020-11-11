@@ -1032,8 +1032,19 @@ Public Sub gTask(sTask As String)
 
           Case "json"
             p = dwg.info(FilePath) ' TEST LIBREDWG with Json format
-            s = dwg.ObjetsCSV(p)
-            File.Save(User.Home &/ "dwg.csv", s)
+            's = dwg.ObjetsCSV(p)
+            'File.Save(User.Home &/ "dwg.csv", s)
+            ProgressBar1.Value = 1
+            If p.Count > 0 Then
+              gcd.CurrentDrawing.cImport = p
+              gcd.EntitiesTransfer2()
+              gcd.LayersTransfer()
+              'LoadDrawingMap2()
+              LoadComboboxes(gcd.CurrentDrawing.cModel)
+              'gcd.ImportBlocks(gcd.CurrentDrawing.cModel)
+            Endif
+            ProgressBar1.Visible = False
+
           Case "dwg"
             mdl = dwg.info(FilePath)
             ' mdl = cad.DWGImport(FilePath)
@@ -1046,7 +1057,7 @@ Public Sub gTask(sTask As String)
               'LoadDrawingMap2()                               ' lleno el TreeView
               LoadComboboxes(gcd.CurrentDrawing.cModel)       ' recargo los ComboBox
               'gcd.ImportBlocks(gcd.CurrentDrawing.cModel)     ' Importo los Bloques de cModel a formato binario
-              gcd.ImportModel3(gcd.CurrentDrawing.cModel["Entities"], gcd.CurrentDrawing.arrEntities)  ' idem entidades
+              gcd.ImportModel2(gcd.CurrentDrawing.cModel["Entities"], gcd.CurrentDrawing.arrEntities)  ' idem entidades
               gcd.CurrentDrawing.cImport.Clear    ' libero espacio, limpiando cImport
               gcd.ApplyLayerProperties(1)         ' aplico las propiedades de los layers a las entidades
               'clsMouseTracking.ReBuildPOIPoints   ' construyo los puntos de interes para el tracking del mouse
@@ -1541,7 +1552,7 @@ Public Sub SelectionRefresh()
           ' Copying the entity for undo
           te = clsEntities.ClonEntity(e)
           te.Handle = e.Handle
-          APPMain.hFCAD.arrUndo.Add(te)
+          'APPMain.hFCAD.arrUndo.Add(te)
 
           ftx = New FText([pnlDrawing.ScreenX + 7, pnlDrawing.ScreenY + pnlDrawing.H - 7], e)
           ftx.Run()
@@ -1559,7 +1570,7 @@ Public Sub SelectionRefresh()
             Endif
           Loop
           EditingText = False
-          APPMain.hFCAD.Regen
+          'APPMain.hFCAD.Regen
           'PropSave()
         Endif
 

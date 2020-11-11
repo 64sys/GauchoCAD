@@ -41,13 +41,14 @@ Public Function info(f As String) As Collection
 
   'j = User.Home &/ "dwg.json"
 
-  Shell "/usr/local/bin/dwgread -v4 --format JSON '" & f & "' 2>&1 " To str
+  'Shell "/usr/local/bin/dwgread -v4 --format JSON '" & f & "' 2>&1 " To str
+  Shell "/usr/local/bin/dwgread -v4 --format JSON '" & f & "'" To str
 
-  'str = Replace(str, "\t", " ")
+  str = Replace(str, "\t", " ")
   'str = Replace(str, "\n{\n  \"created_by\": \"", "\t{\n  \"created_by\": \"")
   'str = Split(str, "\t")[1]
 
-  'File.Save(User.Home &/ "dwg.json", str)
+  File.Save(User.Home &/ File.BaseName(f) & ".json", str)
 
   vrt = Json2Csv(str)
   i = 0
@@ -193,18 +194,29 @@ End
 
 '' Convert a json file to gambas collection
 
-Public Function Json2Csv(strRaw As String) As Variant[]
+Public Function Json2Csv(sRaw As String) As Variant[]
 
   Dim vrt As Variant
   Dim item As Variant
   Dim vrx As New Variant[]
+  Dim stx As New String[]
+  Dim i As Integer
 
-  vrt = JSON.Decode(File.Load(User.Home &/ "dwg.json"), True)
+  stx = Split(sRaw, gb.Lf, Chr(140), True)
+
+  For i = 0 To stx.Max
+    If String.InStr(stx[i], "\"\": ") > 0 Then
+      stx[i] = Replace(stx[i], "\"\": ", "\"" & CStr(i) & "\": ")
+    Endif
+  Next
+
+  'vrt = JSON.Decode(File.Load(User.Home &/ "dwg.json"), True)
+  vrt = JSON.Decode(stx.Join("\n"), True)
 
   For Each item In vrt
     Select TypeOf(item)
       Case gb.Object '16
-        If item Is Collection Then
+        If item Is Collection Or item Is JSONCollection Then
           vrx.Add(item)
         Else
           If item Is Variant[] Then
