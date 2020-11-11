@@ -76,6 +76,11 @@
   { grpEntities Menu
     Text = ("Entities")
     Tag = "entities"
+    { mnuSelection Menu
+      Text = ("Selection")
+      Picture = Picture["svg/tools/selection.svg"]
+      Tag = "selection"
+    }
     { mnuLine Menu entity
       Name = "mnuLine"
       Text = ("Line")
@@ -106,41 +111,11 @@
       Picture = Picture["svg/entities/ellipse.svg"]
       Tag = "ellipse"
     }
-    { mnuSolid Menu entity
-      Name = "mnuSolid"
-      Text = ("Solid")
-      Picture = Picture["svg/entities/solid.svg"]
-      Tag = "solid"
-    }
     { mnuText Menu entity
       Name = "mnuText"
       Text = ("Text")
       Picture = Picture["svg/entities/text.svg"]
       Tag = "text"
-    }
-    { mnuMText Menu entity
-      Name = "mnuMText"
-      Text = ("Multi Text")
-      Picture = Picture["svg/entities/mtext.svg"]
-      Tag = "mtext"
-    }
-    { mnuBlock Menu entity
-      Name = "mnuBlock"
-      Text = ("Create a block")
-      Picture = Picture["svg/entities/block.svg"]
-      Tag = "block"
-    }
-    { mnuInsert Menu entity
-      Name = "mnuInsert"
-      Text = ("Insert")
-      Picture = Picture["svg/entities/insert.svg"]
-      Tag = "insert"
-    }
-    { mnuDim Menu entity
-      Name = "mnuDim"
-      Text = ("Dimmension")
-      Picture = Picture["svg/entities/dim.svg"]
-      Tag = "dim"
     }
     { mnuLeader Menu entity
       Name = "mnuLeader"
@@ -148,17 +123,41 @@
       Picture = Picture["svg/entities/leader.svg"]
       Tag = "leader"
     }
+    { mnuBlock Menu entity
+      Name = "mnuBlock"
+      Text = ("Create a block")
+      Picture = Picture["svg/entities/block.svg"]
+      Tag = "block"
+    }
+    { mnuMText Menu entity
+      Name = "mnuMText"
+      Text = ("Multi Text")
+      Picture = Picture["svg/entities/mtext.svg"]
+      Tag = "mtext"
+    }
+    { mnuDim Menu entity
+      Name = "mnuDim"
+      Text = ("Dimmension")
+      Picture = Picture["svg/entities/dim.svg"]
+      Tag = "dim"
+    }
+    { mnuInsert Menu entity
+      Name = "mnuInsert"
+      Text = ("Insert")
+      Picture = Picture["svg/entities/insert.svg"]
+      Tag = "insert"
+    }
     { mnuSpline Menu entity
       Name = "mnuSpline"
       Text = ("Spline")
       Picture = Picture["svg/entities/spline.svg"]
       Tag = "spline"
     }
-    { mnuHatch Menu entity
-      Name = "mnuHatch"
-      Text = ("Hatch")
-      Picture = Picture["svg/entities/hatch.svg"]
-      Tag = "hatch"
+    { mnuSolid Menu entity
+      Name = "mnuSolid"
+      Text = ("Solid")
+      Picture = Picture["svg/entities/solid.svg"]
+      Tag = "solid"
     }
     { mnuRectangle Menu entity
       Name = "mnuRectangle"
@@ -170,6 +169,12 @@
       Text = ("Polygon")
       Picture = Picture["svg/entities/polygon.svg"]
       Tag = "polygon"
+    }
+    { mnuHatch Menu entity
+      Name = "mnuHatch"
+      Text = ("Hatch")
+      Picture = Picture["svg/entities/hatch.svg"]
+      Tag = "hatch"
     }
     { mnuPoint Menu entity
       Name = "mnuPoint"

@@ -18,7 +18,7 @@
    xml:space="preserve"
    id="svg116"
    sodipodi:docname="mtext.svg"
-   inkscape:version="0.92.5 (2060ec1f9f, 2020-04-08)"><metadata
+   inkscape:version="1.0.1 (3bc2e813f5, 2020-09-07)"><metadata
    id="metadata120"><rdf:RDF><cc:Work
        rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
          rdf:resource="http://purl.org/dc/dcmitype/StillImage" /></cc:Work></rdf:RDF></metadata><sodipodi:namedview
@@ -30,46 +30,22 @@
    guidetolerance="10"
    inkscape:pageopacity="0"
    inkscape:pageshadow="2"
-   inkscape:window-width="1920"
-   inkscape:window-height="1029"
+   inkscape:window-width="1496"
+   inkscape:window-height="1026"
    id="namedview118"
    showgrid="false"
-   inkscape:zoom="1.1062391"
-   inkscape:cx="9.5284045"
-   inkscape:cy="154.31727"
+   inkscape:zoom="0.55311955"
+   inkscape:cx="81.541311"
+   inkscape:cy="337.22914"
    inkscape:window-x="1366"
-   inkscape:window-y="25"
-   inkscape:window-maximized="1"
-   inkscape:current-layer="g68"
-   inkscape:snap-text-baseline="true" />
+   inkscape:window-y="180"
+   inkscape:window-maximized="0"
+   inkscape:current-layer="g108"
+   inkscape:snap-text-baseline="true"
+   inkscape:document-rotation="0" />
  <defs
    class="ClipPathGroup"
-   id="defs8"><marker
-   inkscape:stockid="Arrow1Lend"
-   orient="auto"
-   refY="0.0"
-   refX="0.0"
-   id="Arrow1Lend"
-   style="overflow:visible;"
-   inkscape:isstock="true"><path
-     id="path842"
-     d="M 0.0,0.0 L 5.0,-5.0 L -12.5,0.0 L 5.0,5.0 L 0.0,0.0 z "
-     style="fill-rule:evenodd;stroke:#0066b3;stroke-width:1pt;stroke-opacity:1;fill:#0066b3;fill-opacity:1"
-     transform="scale(0.8) rotate(180) translate(12.5,0)" /></marker><marker
-   inkscape:stockid="Arrow1Lstart"
-   orient="auto"
-   refY="0.0"
-   refX="0.0"
-   id="Arrow1Lstart"
-   style="overflow:visible"
-   inkscape:isstock="true"><path
-     id="path839"
-     d="M 0.0,0.0 L 5.0,-5.0 L -12.5,0.0 L 5.0,5.0 L 0.0,0.0 z "
-     style="fill-rule:evenodd;stroke:#000000;stroke-width:1.0pt"
-     transform="scale(0.8) translate(12.5,0)" /></marker>
-        
-        
-       </defs>
+   id="defs8" />
  <defs
    class="TextShapeIndex"
    id="defs12" />
@@ -115,98 +91,37 @@
    style="fill:none;stroke:none" />
        </g>
       </g>
-      <g
-   class="com.sun.star.drawing.PolyPolygonShape"
-   id="g61"
-   transform="translate(-524.27622,-372.06699)">
-       <g
-   id="id4">
-        <rect
-   class="BoundingBox"
-   x="2698"
-   y="2698"
-   width="5899"
-   height="5899"
-   id="rect58"
-   style="fill:none;stroke:none" />
-       </g>
-      </g>
-      
-      <g
-   class="com.sun.star.drawing.PolyPolygonShape"
-   id="g73">
-       <g
-   id="id6">
-        <rect
-   class="BoundingBox"
-   x="7937"
-   y="1235"
-   width="2121"
-   height="2121"
-   id="rect70"
-   style="fill:none;stroke:none" />
-       </g>
-      </g>
       
       
-      <g
-   class="com.sun.star.drawing.PolyPolygonShape"
-   id="g92">
-       <g
-   id="id9">
-        <rect
-   class="BoundingBox"
-   x="1235"
-   y="7937"
-   width="2121"
-   height="2121"
-   id="rect89"
-   style="fill:none;stroke:none" />
-       </g>
-      </g>
+      
+      
+      
+      
       
       
      <g
    class="com.sun.star.drawing.LineShape"
    id="g68"
-   transform="translate(-1065.4646,-1285.3223)">
-       <rect
-   style="fill:none;stroke:none"
-   id="rect63"
-   height="5898"
-   width="5898"
-   y="2148.2554"
-   x="2580.1885"
-   class="BoundingBox" />
+   transform="translate(2865.685,5257.9332)">
+       
       
 
 
 
+
+
 <text
-   transform="scale(0.88042507,1.135815)"
-   id="text3261-3"
-   y="5241.4478"
-   x="2414.4795"
-   style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4428.72460938px;line-height:1.25;font-family:Vemana2000;-inkscape-font-specification:Vemana2000;letter-spacing:0px;word-spacing:0px;fill:#0066b3;fill-opacity:1;stroke:#0066b3;stroke-width:0;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+   transform="scale(0.9228673,1.0835794)"
+   id="text3261-3-3"
+   y="4514.5967"
+   x="-2582.8713"
+   style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:13146.6px;line-height:1.25;font-family:'Liberation Mono';-inkscape-font-specification:'Liberation Mono';letter-spacing:0px;word-spacing:0px;fill:#0066b3;fill-opacity:1;stroke:#0066b3;stroke-width:0;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
    xml:space="preserve"><tspan
-     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Vemana2000;-inkscape-font-specification:Vemana2000;fill:#0066b3;fill-opacity:1;stroke:#0066b3;stroke-width:0;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-     y="5241.4478"
-     x="2414.4795"
-     id="tspan3259-6"
-     sodipodi:role="line">Text</tspan></text>
-<text
-   transform="scale(0.88042507,1.135815)"
-   id="text3261-3-5"
-   y="9094.9619"
-   x="2686.1365"
-   style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4428.72460938px;line-height:1.25;font-family:Vemana2000;-inkscape-font-specification:Vemana2000;letter-spacing:0px;word-spacing:0px;fill:#0066b3;fill-opacity:1;stroke:#0066b3;stroke-width:0;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-   xml:space="preserve"><tspan
-     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Vemana2000;-inkscape-font-specification:Vemana2000;fill:#0066b3;fill-opacity:1;stroke:#0066b3;stroke-width:0;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-     y="9094.9619"
-     x="2686.1365"
-     id="tspan3259-6-9"
-     sodipodi:role="line">text</tspan></text>
-</g></g>
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:13146.6px;font-family:TSCu_Comic;-inkscape-font-specification:TSCu_Comic;fill:#0066b3;fill-opacity:1;stroke:#0066b3;stroke-width:0;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+     y="4514.5967"
+     x="-2582.8713"
+     id="tspan3259-6-6"
+     sodipodi:role="line">M</tspan></text></g></g>
    </g>
  </g>
 </svg>
