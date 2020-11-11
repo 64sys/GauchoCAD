@@ -1046,7 +1046,7 @@ Public Sub gTask(sTask As String)
               'LoadDrawingMap2()                               ' lleno el TreeView
               LoadComboboxes(gcd.CurrentDrawing.cModel)       ' recargo los ComboBox
               'gcd.ImportBlocks(gcd.CurrentDrawing.cModel)     ' Importo los Bloques de cModel a formato binario
-              gcd.ImportModel(gcd.CurrentDrawing.cModel["Entities"], gcd.CurrentDrawing.arrEntities)  ' idem entidades
+              gcd.ImportModel3(gcd.CurrentDrawing.cModel["Entities"], gcd.CurrentDrawing.arrEntities)  ' idem entidades
               gcd.CurrentDrawing.cImport.Clear    ' libero espacio, limpiando cImport
               gcd.ApplyLayerProperties(1)         ' aplico las propiedades de los layers a las entidades
               'clsMouseTracking.ReBuildPOIPoints   ' construyo los puntos de interes para el tracking del mouse

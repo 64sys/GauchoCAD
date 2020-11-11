@@ -2338,7 +2338,7 @@ Public Function DWGDimCodes() As Collection
 
   Dim d As New Collection
 
-  d.Add(["DIMPOST", "float"], "3")
+  d.Add(["DIMPOST", "string"], "3")
   d.Add(["DIMAPOST", "float"], "4")
   d.Add(["DIMBLK", "string"], "5")
   d.Add(["DIMBLK1", "string"], "6")

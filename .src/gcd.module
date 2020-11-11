@@ -356,18 +356,28 @@ End
 
 Public Function ImportModel(colData As Collection, obxEntities As Entity[], Optional BlockName As String) As Integer
 
-  Dim i, iTotalEntities As Integer
+  'Dim i, iTotalEntities As Integer
   Dim colGrp As Collection
 
-  Dim flxPoints As New Float[]
-  Dim P As Float[]
-  Dim ratio As Float
+  'Dim flxPoints As New Float[]
+  'Dim P As Float[]
+  'Dim ratio As Float
 
   For Each colGrp In colData
 
-    'ImportEntities2(colGrp, obxEntities, BlockName)
-    ImpEnty3(colGrp, obxEntities, BlockName)
+    ImportEntities2(colGrp, obxEntities, BlockName)
 
+  Next
+
+End
+
+Public Function ImportModel2(colData As Collection, obxEntities As Entity[], Optional BlockName As String) As Integer
+
+  Dim i, iTotalEntities As Integer
+  Dim colGrp As Collection
+
+  For Each colGrp In colData
+    ImpEnty3(colGrp, obxEntities, BlockName)
   Next
 
 End

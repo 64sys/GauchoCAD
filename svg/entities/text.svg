@@ -36,13 +36,14 @@
    showgrid="false"
    inkscape:zoom="0.78222917"
    inkscape:cx="224.72547"
-   inkscape:cy="328.42729"
+   inkscape:cy="327.78809"
    inkscape:window-x="1707"
-   inkscape:window-y="427"
+   inkscape:window-y="37"
    inkscape:window-maximized="0"
    inkscape:current-layer="g68"
    inkscape:snap-text-baseline="true"
-   inkscape:document-rotation="0" />
+   inkscape:document-rotation="0"
+   showguides="false" />
  <defs
    class="ClipPathGroup"
    id="defs8" />
@@ -170,7 +171,7 @@
      y="10637.98"
      x="3165.2046"
      id="tspan3259-6"
-     sodipodi:role="line">A</tspan></text>
+     sodipodi:role="line">T</tspan></text>
 </g></g>
    </g>
  </g>

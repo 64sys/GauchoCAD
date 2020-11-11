@@ -542,21 +542,23 @@
     { Panel4 Panel
       MoveScaled(3,66,129,5)
       Arrangement = Arrange.Horizontal
+      { Panel10 Panel
+        MoveScaled(1,1,1,3)
+      }
       { !lblCommand Label
-        MoveScaled(2,0,92,4)
+        MoveScaled(3,0,92,5)
         #Public = True
         Font = Font["Bold,+1"]
-        Background = Color.Gray
-        Foreground = Color.White
+        Background = Color.Background
+        Expand = True
         Text = ("Command")
       }
       { pnlLocks Panel
-        MoveScaled(95,0,31,5)
-        Expand = True
+        MoveScaled(105,0,23,5)
         Arrangement = Arrange.Horizontal
         Spacing = True
-        { Spring1 Spring
-          MoveScaled(1,1,3,3)
+        { Panel9 Panel
+          MoveScaled(1,1,1,3)
         }
         { btnBounds ToolButton locks
           Name = "btnBounds"
@@ -586,7 +588,7 @@
           Toggle = True
         }
         { Panel5 Panel
-          MoveScaled(28,1,2,3)
+          MoveScaled(21,1,1,3)
         }
       }
     }
