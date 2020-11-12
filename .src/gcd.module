@@ -106,6 +106,9 @@ Public Drawings As New ClsDrawing[]
 Public DrawingReady As Boolean = False
 Public CurrentDrawing As ClsDrawing
 
+' Vars for entities edition
+Public arrUndo As New Entity[]             '' An array to put an unmodified copy of an entity before modifying it and then restoring it to the previous version.
+
 '' This transfer layers from imported file, one collection actually, to the model collection
 
 Public Sub LayersTransfer()
@@ -661,17 +664,39 @@ End
 Public Function ImpEnty3(colGrp As Collection, obx As Entity[], Optional sb As String) As Integer
 
   Dim t As Integer                  '' Total number of entities
+  Dim p As Integer                  '' Coordinate component 0 = x axis, 1 = y axis
+  Dim v As Variant                  '' Coordinate component 0 = x axis, 1 = y axis
   Dim e As Collection               '' Current Entity
-  Dim fxp As New Float[]          '' Center (circle, arc), start & end (line), vertex (lwpolyline)
+  Dim fxp As New Float[]            '' Center (circle, arc), start & end (line), vertex (lwpolyline)
+  Dim tag As String                 '' Variable tag name for data points
   Dim fpt As Float
   Dim ic As Integer                 '' Color
   Dim iw As Integer                 '' Lineweight
   Dim st As String                  '' LinType
   Dim sy As String                  '' Layer
-  Dim vrt As Variant                '' Radius,
+  Dim vrt As Variant                '' Radius, Text[rotation,height,value]
 
   For Each e In colGrp
     fxp.Clear
+    vrt = Null
+    For Each tag In ["center", "start", "end", "ins_pt", "points"]
+      If e.Exist(tag) Then
+        If TypeOf(e[tag]) = gb.Object Then
+          Select tag
+            Case "points"
+              For Each v In e[tag]
+                For p = 0 To 1
+                  fxp.Add(v[p])
+                Next
+              Next
+            Case Else
+              For p = 0 To 1
+                fxp.Add(e[tag][p])
+              Next
+          End Select
+        Endif
+      Endif
+    Next
     ic = 7
     iw = 2
     st = "Continous"
@@ -679,15 +704,25 @@ Public Function ImpEnty3(colGrp As Collection, obx As Entity[], Optional sb As S
 
     Select LCase$(e["entity"])
 
-        'Case "line"
-        '  AddLine(obx, fxp, ic, iw, st, sy, sb)
-        '  Inc t
+      Case "line"
+        AddLine(obx, fxp, ic, iw, st, sy, sb)
+        obx.Last.Handle = IIf(e.Exist("handle"), e["handle"][1], sog.UUIDHandle(4))
+        Inc t
         'Case "spline"
         '  AddSPLine(obx, fxp, ic, iw, st, sy, sb)
         '  Inc t
-        'Case "lwpolyline"
-        '  AddPolyLine(obx, fxp, ic, iw, st, sy, sb)
-        '  Inc t
+      Case "lwpolyline"
+        ic = 4
+        AddPolyLine(obx, fxp, ic, iw, st, sy, sb)
+        obx.Last.Handle = IIf(e.Exist("handle"), e["handle"][1], sog.UUIDHandle(4))
+        obx.Last.fParam.Add(IIf(e.Exist("flag"), CFloat(e["flag"]), 0))
+        If e.Exist("flag") Then
+          If e["flag"] = 1 Then
+            Print "closed"
+          Endif
+        Endif
+        Print "Puntos: " & CStr(e["points"].Count) & " Mode: " & CStr(e["entmode"]) & " Flag: " & CStr(e["flag"])
+        Inc t
         'Case "solid"
         '  AddSolid(obx, fxp, ic, iw, st, sy, sb)
         '  Inc t
@@ -696,13 +731,9 @@ Public Function ImpEnty3(colGrp As Collection, obx As Entity[], Optional sb As S
         '  Inc t
 
       Case "circle"
-        If TypeOf(e["center"]) = gb.Object Then
-          For Each fpt In e["center"]
-            fxp.Add(fpt)
-          Next
-        Endif
         vrt = e["radius"] ' Radius
         AddCircle(obx, fxp, vrt, ic, iw, st, sy, sb)
+        obx.Last.Handle = IIf(e.Exist("handle"), e["handle"][1], sog.UUIDHandle(4))
         Inc t
 
         'Case "arc"
@@ -713,17 +744,16 @@ Public Function ImpEnty3(colGrp As Collection, obx As Entity[], Optional sb As S
         '  AddInsert(obx, fxp, e["scalex"], e["scaley"], e["angle"], ic, st, sy, e["block"])
         '  Inc t
 
-        'Case "text"
-        '  sText = e["text"]
-        '  Try sText = e["text2"] & sText
-        '  AddText(obx, fxp, e["angle"], e["text_height"], sText, ic, iw, st, sy, sb)
-        '  Inc t
+      Case "text"
+        vrt = [IIf(e.Exist("rotation"), e["rotation"], 0), e["height"], e["text_value"]]
+        AddText(obx, fxp, vrt[0], vrt[1], vrt[2], ic, iw, st, sy, sb)
+        Inc t
 
-        'Case "mtext"
-        '  sText = e["text"]
-        '  Try sText = e["text2"] & sText
+      Case "mtext"
+        vrt = [IIf(e.Exist("rotation"), e["rotation"], 0), e["text_height"], e["text"]]
+        AddText(obx, fxp, vrt[0], vrt[1], vrt[2], ic, iw, st, sy, sb)
         '  AddMText(obx, fxp, e["angle"], e["text_height"], sText, ic, iw, st, sy, sb)
-        '  Inc t
+        Inc t
 
         'Case "dimmension"
         '  AddDim(obx, fxp, e["angle"], e["text_height"], e["text"], ic, iw, st, sy, sb)

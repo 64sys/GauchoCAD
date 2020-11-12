@@ -4082,6 +4082,9 @@ Public Function DXFDecodeItem(sItem As String) As Collection
   If stx[0] = "  0" Then
     sTag = "entity"
     sVal = stx[1]
+    If sVal = "LWPOLYLINE" Then
+      Print "x"
+    Endif
     cTmp.Add(sVal, sTag)
     codes = DXFEntityCodes(sVal)
     defaults = DXFEntityDefaults(sVal)
@@ -4101,11 +4104,10 @@ Public Function DXFDecodeItem(sItem As String) As Collection
         If codes.Exist(sKey) Then
           sTag = codes[sKey]
         Endif
-
         str = Replace(stx[i + 1], " ", "")
         vrt = CInt(str)
-
         cTmp.Add(vrt, sTag)
+
       Case "40", "50", "41", "42", "43"
         If codes.Exist(sKey) Then
           sTag = codes[sKey]
@@ -4173,7 +4175,7 @@ End
 
 '' Create a list with the coords decodes from a DXF entity.
 
-Private Function DXFDecodeCoords(sItem As String) As Collection
+Public Function DXFDecodeCoords(sItem As String) As Collection
 
   Dim stx As String[]
   Dim c As New Collection

@@ -209,7 +209,7 @@ Public Function Json2Csv(sRaw As String) As Variant[]
       stx[i] = Replace(stx[i], "\"\": ", "\"" & CStr(i) & "\": ")
     Endif
   Next
-
+  File.Save(User.Home &/ "tmp.json", stx.Join("\n"))
   'vrt = JSON.Decode(File.Load(User.Home &/ "dwg.json"), True)
   vrt = JSON.Decode(stx.Join("\n"), True)
 

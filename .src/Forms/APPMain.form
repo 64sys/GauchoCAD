@@ -498,7 +498,7 @@
         }
       }
       { pnlProperties Panel
-        MoveScaled(75,2,24,50)
+        MoveScaled(75,1,24,50)
         Visible = False
         Arrangement = Arrange.Vertical
         { btnRefresh Button

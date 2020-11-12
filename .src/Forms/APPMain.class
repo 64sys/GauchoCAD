@@ -1546,38 +1546,35 @@ Public Sub SelectionRefresh()
   Next
 
   If etype.Count > 0 Then
-    Select e.Gender
-      Case "Text"
-        If EditingText = False Then
-          ' Copying the entity for undo
-          te = clsEntities.ClonEntity(e)
-          te.Handle = e.Handle
-          'APPMain.hFCAD.arrUndo.Add(te)
-
-          ftx = New FText([pnlDrawing.ScreenX + 7, pnlDrawing.ScreenY + pnlDrawing.H - 7], e)
-          ftx.Run()
-          Do
-            If EditingText = True Then
-              '              If e.StringData[0] <> CurrentText Then
-              '                te = clsEntities.ClonEntity(e)
-              '                te.Handle = e.Handle
-              '                APPMain.hFCAD.arrUndo.Add(te)
-              '                e.StringData[0] = CurrentText
-              'Endif
-              Break
-            Else
-              Wait 0.1
-            Endif
-          Loop
-          EditingText = False
-          'APPMain.hFCAD.Regen
-          'PropSave()
-        Endif
-
-      Case Else
-        pnlProperties.Visible = True
-        PropertiesFlag = True
-    End Select
+    '   Select e.Gender
+    '     Case "Text"
+    '       If EditingText = False Then
+    '         ' Copying the entity for undo
+    '         te = clsEntities.ClonEntity(e)
+    '         te.Handle = e.Handle
+    '
+    '         ftx = New FText([pnlDrawing.ScreenX + 7, pnlDrawing.ScreenY + pnlDrawing.H - 7], e)
+    '         ftx.Run()
+    '         Do
+    '           If EditingText = True Then
+    '             '              If e.StringData[0] <> CurrentText Then
+    '             '                te = clsEntities.ClonEntity(e)
+    '             '                te.Handle = e.Handle
+    '             '                APPMain.hFCAD.arrUndo.Add(te)
+    '             '                e.StringData[0] = CurrentText
+    '             'Endif
+    '             Break
+    '           Else
+    '             Wait 0.1
+    '           Endif
+    '         Loop
+    '         EditingText = False
+    '       Endif
+    '
+    '     Case Else
+    pnlProperties.Visible = True
+    PropertiesFlag = True
+    '   End Select
   Else
     pnlProperties.Visible = False
     PropertiesFlag = False
@@ -1589,9 +1586,32 @@ Public Sub SelectionRefresh()
       'skip
 
     Case 1
-      ComboBox1.Add(etype[0])
-      ComboBox1.Text = etype[0]
-      LoadPropertiesList(etype[0])
+      For i = 0 To gcd.CurrentDrawing.arrEntities.Max
+        e = gcd.CurrentDrawing.arrEntities[i]
+        If e.Selected Then
+          Break
+        Endif
+      Next
+
+      Select e.Gender
+        Case "Text"
+          If EditingText = False Then
+            ' Copying the entity for undo
+            te = clsEntities.ClonEntity(e)
+            te.Handle = e.Handle
+            ftx = New FText([pnlDrawing.ScreenX + 7, pnlDrawing.ScreenY + pnlDrawing.H - 7], e)
+            ftx.Run()
+            While EditingText = False
+              Wait 0.1
+            Wend
+            appmain.regen
+            EditingText = False
+          Endif
+        Case Else
+          ComboBox1.Add(etype[0])
+          ComboBox1.Text = etype[0]
+          LoadPropertiesList(etype[0])
+      End Select
 
     Case Else
       ComboBox1.Add(("All"))
@@ -1731,6 +1751,7 @@ Public Sub LoadPropertiesList(eFilter As String)
   Dim xC As Class
   Dim sym As String
   Dim fym As String
+  Dim v As Variant
 
   cProp.Clear
   cRaw.Clear
@@ -1785,16 +1806,37 @@ Public Sub LoadPropertiesList(eFilter As String)
         Endif
       Endif
 
+      If e.Gender = "Text" Then
+        If cProp.Exist("Text") = False Then
+          cProp.Add([e.StringData[0]], "Text")
+        Else
+          cProp["Text"].Add(e.StringData[0])
+        Endif
+      Endif
+
+      If cProp.Exist("Handle") = False Then
+        cProp.Add([e.Handle], "Handle")
+      Else
+        If cProp["Handle"].Exist(e.Handle) = False Then
+          cProp["Handle"].Add(e.Handle)
+        Endif
+      Endif
+
+      If TypeOf(e.fParam) = gb.Object Then
+        If cProp.Exist("Wildcard") = False Then
+          If e.fParam.Count > 0 Then
+            cProp.Add([e.fParam], "Wildcard")
+          Else
+            cProp.Add([0], "Wildcard")
+          Endif
+        Endif
+      Endif
     Endif
   Next
 
   TableView1.Columns.Count = 2
   TableView1.Rows.Count = 0
   TableView1.Rows.Count = cProp.Count
-
-  ' TableView3.Columns.Count = 2
-  ' TableView3.Rows.Count = 0
-  ' TableView3.Rows.Count = e.
 
 End
 
@@ -1860,6 +1902,9 @@ Public Sub TableView1_Data(Row As Integer, Column As Integer)
                       ' Endif
 
                     Case "Text"
+                      TableView1[Row, Column].Text = prop[0]
+
+                    Case "Wildcard"
                       TableView1[Row, Column].Text = prop[0]
 
                   End Select
