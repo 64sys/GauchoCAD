@@ -23,8 +23,67 @@
 '
 
 Export
+Library "libc:6"
 
+Public Struct stat_
+  st_dev As Long
+  st_ino As Long
+  st_nlink As Long
+  st_mode As Integer
+  st_uid As Integer
+  st_gid As Integer
+  __pad0 As Integer
+  st_rdev As Long
+  st_size As Long
+  st_blksize As Long
+  st_blocks As Long
+  st_atime As Long
+  st_atimensec As Long
+  st_mtime As Long
+  st_mtimensec As Long
+  st_ctime As Long
+  st_ctimensec As Long
+  __glibc_reserved[3] As Long
+End Struct
+
+Private Const _STAT_VER_LINUX As Integer = 1
+Private Extern __xstat(_STAT_VER As Integer, __path As String, __statbuf As Stat_) As Integer
+
+'' Create a file parameters list using the GNU coreutils program stat. Note: the tags for access to the information are:<br>
+'' Dev, Ino, Path, Link, Mode, SetUID, SetGID, Rdev, Size, BlkSize, Blocks, LastAccess, LastModified, LastChange<br>
+'' Original <https://www.gambas-it.org/wiki/index.php?title=Stat_()>
+
+Public Sub Stat(f As String) As Collection
+
+  Dim i As Integer
+  Dim st As New Stat_
+  Dim inf As New Collection
+
+  i = __xstat(_STAT_VER_LINUX, f, st)
+  If i < 0 Then Error.Raise("Function error '__xstat()' !")
+
+  With st
+    inf.Add(.st_dev, "Dev")
+    inf.Add(.st_ino, "Ino")
+    inf.Add(f, "Path")
+    inf.Add(.st_nlink, "Link")
+    inf.Add(.st_mode, "Mode")
+    inf.Add(.st_uid, "SetUID")
+    inf.Add(.st_gid, "SetGID")
+    inf.Add(.st_rdev, "Rdev")
+    inf.Add(.st_size, "Size")
+    inf.Add(.st_blksize, "BlkSize")
+    inf.Add(.st_blocks, "Blocks")
+    inf.Add(.st_atime, "LastAccess")
+    inf.Add(.st_mtime, "LastModified")
+    inf.Add(.st_ctime, "LastChange")
+  End With
+
+  Return inf
+
+End
 ' ###################### Manejo de Archivos
+
 Public Function ScanDir(strDir As String, Optional stxExt As String[]) As String[] ''Escanea un directorio que se pasa como parametro en busca de archivos se puede filtrar con una lista de extensiones separadas por dos puntos ":".
 
   Dim stxFiles As New String[]

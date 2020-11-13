@@ -24,6 +24,161 @@
 
 Export
 
+'' This function transfers the information housed in the temporary file import collection to the active model, another collection.
+Public Function Import(cImp As Collection, cMdl As Collection) As Integer[]
+
+  Dim ix As New Integer[]
+  Dim im As Variant
+
+  Dim xFile As Collection
+  Dim xTextStyles As Collection
+  Dim xVariables As Collection
+  Dim xLayers As Collection
+  Dim xBlocks As Collection
+  Dim xLineTypes As Collection
+  Dim xDimStyles As Collection
+  Dim xObjects As Collection
+  Dim xEntities As Collection
+  Dim x As Variant
+  Dim p As Variant
+
+  Dim Enty As Variant
+  Dim Lay As Variant
+
+  Dim mFile As Collection
+  Dim mTextStyles As Collection
+  Dim mVariables As Collection
+  Dim mLayers As Collection
+  Dim mBlocks As Collection
+  Dim mLineTypes As Collection
+  Dim mDimStyles As Collection
+  Dim mObjects As Collection
+  Dim mEntities As Collection
+  Dim m As Variant
+
+  If cImp.Exist("File") Then
+    xFile = cImp["File"]
+    ix.Add(xFile.Count)
+  Else
+    ix.Add(0)
+  Endif
+
+  If cImp.Exist("Variables") Then
+    xVariables = cImp["Variables"]
+    ix.Add(xVariables.Count)
+  Else
+    ix.Add(0)
+  Endif
+
+  If cImp.Exist("TextStyles") Then
+    xTextStyles = cImp["TextStyles"]
+    ix.Add(xTextStyles.Count)
+  Else
+    ix.Add(0)
+  Endif
+
+  If cImp.Exist("Layers") Then
+    xLayers = cImp["Layers"]
+    ix.Add(xLayers.Count)
+  Else
+    ix.Add(0)
+  Endif
+
+  If cImp.Exist("Blocks") Then
+    xBlocks = cImp["Blocks"]
+    ix.Add(xBlocks.Count)
+  Else
+    ix.Add(0)
+  Endif
+
+  If cImp.Exist("LineTypes") Then
+    xLineTypes = cImp["LineTypes"]
+    ix.Add(xLineTypes.Count)
+  Else
+    ix.Add(0)
+  Endif
+
+  If cImp.Exist("DimStyles") Then
+    xDimStyles = cImp["DimStyles"]
+    ix.Add(xDimStyles.Count)
+  Else
+    ix.Add(0)
+  Endif
+
+  If cImp.Exist("Objects") Then
+    xObjects = cImp["Objects"]
+    ix.Add(xObjects.Count)
+  Else
+    ix.Add(0)
+  Endif
+
+  If cImp.Exist("Entities") Then
+    xEntities = cImp["Entities"]
+    ix.Add(xEntities.Count)
+  Else
+    ix.Add(0)
+  Endif
+
+  If xFile["path"] Like "*.dwg" Or xFile["path"] Like "*.json" Then
+    
+    '---------------------------------------------- Layers --------
+    If cMdl.Exist("Layers") = False Then
+      cMdl.Add(["id": 0, "type": "LAYER", "name": "0", "show": True, "frozen": False, "locked": False, "colour": 7, "style": 1, "width": 17, "print": True, "handle": 1, "ownerhandle": 2, "is_xref_dep": False], "Layers")
+    Endif
+    mLayers = cMdl["Layers"]
+
+    For Each x In xLayers
+      If TypeOf(x) = gb.Object Then
+        For Each m In mLayers
+          If m["name"] = x["name"] Then
+            m["type"] = x["object"]
+            m["handle"] = x["handle"][1]
+            m["print"] = True
+            m["width"] = x["linewt"]
+            m["style"] = 1 'x["ltype"]
+
+            For Each p In x
+              Select x.Key
+                Case "color"
+                  m["show"] = True
+                  m["colour"] = Abs(p["index"])
+                  If p["index"] < 0 Then
+                    m["show"] = False
+                  Endif
+                Case "flag"
+                  Select p
+                    Case 1008
+                      m["frozen"] = False
+                      m["locked"] = False
+                    Case 1017
+                      m["frozen"] = False
+                      m["locked"] = True
+                    Case 992
+                      m["frozen"] = True
+                      m["locked"] = True
+                    Case Else
+                  End Select
+              End Select
+            Next
+          Endif
+        Next
+      Endif
+    Next
+  
+  
+  
+  Else
+    If xFile["path"] Like "*.dxf" Then
+      Print "dxf"
+    Else
+      Print "other"
+    Endif
+  Endif
+
+  Return ix
+
+End
+
 '' This load all the info form a gaucho xml file, then put it in a collection a
 '' nd return it.
 
@@ -62,7 +217,7 @@ Public Function GauchoSave(sFile As String, cMdl As Collection)
 
   For Each var In cMdl
     Select cMdl.Key
-      Case "Layers", "Colors", "Styles", "Weights", "DimSts", "Fonts"
+      Case "Layers", "Colors", "LineTypes", "Weights", "DimStyles", "TextStyles"
         For Each att In var
           writer.StartElement("header")
           For Each v In att
@@ -169,7 +324,7 @@ Public Function GauchoLoad(sFile As String) As Collection
   Dim cLayers As New Collection
   Dim cStyles As New Collection
   Dim cWidths As New Collection
-  Dim cDimSts As New Collection
+  Dim cDimStyles As New Collection
   Dim cFonts As New Collection
   Dim cVars As New Collection
   Dim cEntities As New Collection
@@ -224,7 +379,7 @@ Public Function GauchoLoad(sFile As String) As Collection
         c["id"] = ent.Attributes["id"]
         c["type"] = ent.Attributes["type"]
         c["name"] = ent.Attributes["name"]
-        cDimSts.Add(c.Copy(), ent.Attributes["id"])
+        cDimStyles.Add(c.Copy(), ent.Attributes["id"])
 
       Case "font"
         c.Clear
@@ -233,19 +388,19 @@ Public Function GauchoLoad(sFile As String) As Collection
         c["name"] = ent.Attributes["name"]
         cFonts.Add(c.Copy(), ent.Attributes["id"])
 
-      Case "vars"
+      Case "Variables"
         cVars.Add(ent.Attributes["value"], ent.Attributes["name"])
 
     End Select
   Next
 
   cMdl.Add(cLayers, "Layers")
-  cMdl.Add(cStyles, "Styles")
+  cMdl.Add(cStyles, "LineTypes")
   cMdl.Add(cWidths, "Widths")
-  cMdl.Add(cDimSts, "DimSts")
-  cMdl.Add(cFonts, "Fonts")
+  cMdl.Add(cDimStyles, "DimStyles")
+  cMdl.Add(cFonts, "TextStyles")
   'Flags / Variables
-  cMdl.Add(cVars, "Vars")
+  cMdl.Add(cVars, "Variables")
 
   ''TODO: poner las entidade en el cModel
   For Each ent In hxml.GetElementsByTagName("entity")
@@ -336,8 +491,8 @@ Public Function Skeleton() As Collection
 
   ''
   cMdl.Add(NewLayer(), "Layers")
-  cMdl.Add(NewVars(), "Vars")
-  cMdl.Add(Styles(), "Styles")
+  cMdl.Add(NewVars(), "Variables")
+  cMdl.Add(Styles(), "LineTypes")
 
   Return cMdl
 
@@ -345,8 +500,8 @@ End
 
 Public Function CheckModel(cM As Collection) As Collection
 
-  If cM.Exist("Vars") = False Then
-    cM.Add(NewVars(), "Vars")
+  If cM.Exist("Variables") = False Then
+    cM.Add(NewVars(), "Variables")
   Endif
 
   Return cM

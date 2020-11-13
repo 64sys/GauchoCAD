@@ -750,7 +750,13 @@ Public Function ImpEnty3(colGrp As Collection, obx As Entity[], Optional sb As S
         Inc t
 
       Case "mtext"
-        vrt = [IIf(e.Exist("rotation"), e["rotation"], 0), e["text_height"], e["text"]]
+        vrt = [IIf(e.Exist("rotation"), e["rotation"], 0), e["text_height"], e["text"]] ' dxf 50,40,1
+        'vrt.Add(IIf(e.Exist("attachment"), e["attachment"], 1)) ' dxf 71
+        'vrt.Add(IIf(e.Exist("style"), e["style"], "standar")) ' dxf 7"
+        'vrt.Add("standar") ' dxf 7"
+        'vrt.Add(IIf(e.Exist("flow_dir"), e["flow_dir"], 1)) ' dxf 72
+        'vrt.Add(IIf(e.Exist("extents_height"), e["extents_height"], 1)) ' dxf 42
+        'vrt.Add(IIf(e.Exist("extents_width"), e["extents_width"], 1)) ' dxf 43
         AddText(obx, fxp, vrt[0], vrt[1], vrt[2], ic, iw, st, sy, sb)
         '  AddMText(obx, fxp, e["angle"], e["text_height"], sText, ic, iw, st, sy, sb)
         Inc t

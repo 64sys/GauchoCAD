@@ -20,7 +20,7 @@ Public Function info(f As String) As Collection
   Dim prp As Variant
 
   Dim cFile As New Collection
-  Dim cVars As New Collection
+  Dim cVariables As New Collection
   Dim cUnkn As New Collection
 
   Dim cClas As New Collection
@@ -30,14 +30,16 @@ Public Function info(f As String) As Collection
   Dim vxObj As New Variant[]
 
   Dim cLayers As New Collection     ''LAYER
-  Dim cLTypes As New Collection     ''LTYPE (Line types)
-  Dim cBlocks As New Collection     ''BLOCK_HEADER (Atention, are blocks not inserts)
-  Dim cDimstyles As New Collection  ''DIMSTYLE (Dimmension styles)
-  Dim cStyles As New Collection     ''STYLE (Text styles)
+  Dim cLineTypes As New Collection  ''LTYPE (Line types)
+  Dim cBlocks As New Collection     ''BLOCK_HEADER (Atention, are blocks (objects) not inserts (entities))
+  Dim cDimStyles As New Collection  ''DIMSTYLE (Dimmension styles)
+  Dim cTextStyles As New Collection ''STYLE (Text styles)
 
-  Dim cEnty As New Collection
+  Dim cEntities As New Collection
   Dim vxEnt As New Variant[]
   Dim obs As String
+  Dim cStat As Collection
+  Dim tag As String
 
   'j = User.Home &/ "dwg.json"
 
@@ -50,7 +52,7 @@ Public Function info(f As String) As Collection
 
   File.Save(User.Home &/ File.BaseName(f) & ".json", str)
 
-  vrt = Json2Csv(str)
+  vrt = Json2Gbas(str)
   i = 0
   For Each item In vrt
     Select TypeOf(item)
@@ -73,11 +75,20 @@ Public Function info(f As String) As Collection
               Case "version"
                 For Each prp In item
                   cFile.Add(prp, item.Key)
+                  ' injection of some extra file data
+                  cStat = fil.Stat(f)
+                  If cStat.Count > 0 Then
+                    For Each tag In ["Path", "Ino", "Size", "LastChange"]
+                      If cFile.Exist(Lower(tag)) = False Then
+                        cFile.Add(cStat[tag], Lower(tag))
+                      Endif
+                    Next
+                  Endif
                 Next
 
               Case "unknown_0"
                 For Each prp In item
-                  cVars.Add(prp, item.Key)
+                  cVariables.Add(prp, item.Key)
                 Next
 
               Case "number"
@@ -108,7 +119,7 @@ Public Function info(f As String) As Collection
                     'Case "DICTIONARYVAR"
                     'Case "DICTIONARYWDFLT"
                   Case "DIMSTYLE"
-                    cDimstyles.Add(item.Copy(), item["handle"][1])
+                    cDimStyles.Add(item.Copy(), item["handle"][1])
 
                     'Case "DIMSTYLE_CONTROL"
                     'Case "GROUP"
@@ -118,7 +129,7 @@ Public Function info(f As String) As Collection
                     'Case "LAYER_CONTROL"
                     'Case "LAYOUT"
                   Case "LTYPE"
-                    cLTypes.Add(item.Copy(), item["handle"][1])
+                    cLineTypes.Add(item.Copy(), item["handle"][1])
 
                     'Case "LTYPE_CONTROL"
                     'Case "MATERIAL"
@@ -128,7 +139,7 @@ Public Function info(f As String) As Collection
                     'Case "SCALE"
                     'Case "SECTIONVIEWSTYLE"
                     'Case "STYLE"
-                    cStyles.Add(item.Copy(), item["handle"][1])
+                    cTextStyles.Add(item.Copy(), item["handle"][1])
                     'Case "STYLE_CONTROL"
                     'Case "SUN"
                     'Case "TABLEGEOMETRY"
@@ -156,7 +167,7 @@ Public Function info(f As String) As Collection
 
                 etx.Add(item["entity"])
 
-                cEnty.Add(item.Copy(), item["handle"][1])
+                cEntities.Add(item.Copy(), item["handle"][1])
 
               Case Else
                 cUnkn.Add(tag1, CStr(i))
@@ -174,18 +185,17 @@ Public Function info(f As String) As Collection
 
   'Objects
   cOut.Add(cFile.Copy(), "File")
-  cOut.Add(cVars.Copy(), "Variables")
+  cOut.Add(cVariables.Copy(), "Variables")
   cOut.Add(cLayers.Copy(), "Layers")
   cOut.Add(cBlocks.Copy(), "Blocks")
-  cOut.Add(cLTypes.Copy(), "Ltypes")
-  cOut.Add(cDimstyles.Copy(), "Dimstyles")
-  cOut.Add(cStyles.Copy(), "Styles")
-  'cOut.Add(cObjs.Copy(), "Objets")
+  cOut.Add(cLineTypes.Copy(), "LineTypes")
+  cOut.Add(cDimStyles.Copy(), "DimStyles")
+  cOut.Add(cTextStyles.Copy(), "TextStyles")
   cOut.Add(cad.GauchoEntitiesSort(cObjs), "Objects")
 
   'Entities
   File.Save(User.Home &/ "entities.txt", etx.Join("\n"))
-  cOut.Add(cad.GauchoEntitiesSort(cEnty), "Entities")
+  cOut.Add(cad.GauchoEntitiesSort(cEntities), "Entities")
   cOut.Add(cUnkn.Copy(), "Unknown")
 
   Return cOut
@@ -194,7 +204,7 @@ End
 
 '' Convert a json file to gambas collection
 
-Public Function Json2Csv(sRaw As String) As Variant[]
+Private Function Json2Gbas(sRaw As String) As Variant[]
 
   Dim vrt As Variant
   Dim item As Variant
@@ -231,7 +241,7 @@ End
 
 '' Convert the Entities collection to an csv structure, later it could be save as file
 
-Public Function ObjetsCSV(ctn As Collection) As String
+Private Function ObjetsCSV(ctn As Collection) As String
 
   Dim out As String
   Dim tmp As New Variant[]
@@ -298,14 +308,14 @@ Public Function ObjetsCSV(ctn As Collection) As String
 
 End
 
-Public Function Var2Json(vrt As Variant) As String '' Convierte una coleccion en texto en formato JSON.
-
-  Dim strOut As String
-  Dim item As Variant
-
-  For Each item In vrt
-    strOut &= JSON.Encode(item) & "\n"
-  Next
-  Return strOut
-
-End
+' Public Function Var2Json(vrt As Variant) As String '' Convierte una coleccion en texto en formato JSON.
+'
+'   Dim strOut As String
+'   Dim item As Variant
+'
+'   For Each item In vrt
+'     strOut &= JSON.Encode(item) & "\n"
+'   Next
+'   Return strOut
+'
+' End
