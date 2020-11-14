@@ -58,6 +58,7 @@ Public Function Import(cImp As Collection, cMdl As Collection) As Integer[]
 
   Dim Layexist As Boolean
   Dim nlay As New Collection
+  Dim nsty As New Collection
   Dim qlay As Integer               '' Number of layers
   Dim xWidth As Integer
   Dim xStyle As Integer
@@ -131,7 +132,14 @@ Public Function Import(cImp As Collection, cMdl As Collection) As Integer[]
   Endif
 
   If xFile["path"] Like "*.dwg" Or xFile["path"] Like "*.json" Then
-    '---------------------------------------------- Layers --------
+    '---------------------------------------------- Variables -----1
+    If cMdl.Exist("Variables") = False Then
+
+    Endif
+
+    '---------------------------------------------- LineStyles ----2
+
+    '---------------------------------------------- Layers --------3
     If cMdl.Exist("Layers") = False Then
       qlay = 0
       nlay = ["id": 0, "type": "LAYER", "name": "0", "show": True, "frozen": False, "locked": False, "colour": 7, "style": 1, "width": 17, "print": True, "handle": 1, "ownerhandle": 2, "is_xref_dep": False]
@@ -203,17 +211,33 @@ Public Function Import(cImp As Collection, cMdl As Collection) As Integer[]
       nlay["id"] = qlay + 1
       mLayers.Add(nlay.Copy(), CStr(nlay["id"]))
     Endif
-    '---------------------------------------------- TextStyles
+    '---------------------------------------------- TextStyles ----4
     If cMdl.Exist("TextStyles") = False Then
-      cMdl.Add(["id": 0, "type": "STYLE", "name": "Standard", "fixed": 0, "wfactor": 0.9, "oblique": 0, "last": 100, "font": "txt"], "TextStyles")
+      nsty["id"] = "0"
+      nsty["object"] = "STYLE"
+      nsty["name"] = "Standard"
+      nsty["fixed"] = 0
+      nsty["size"] = 0
+      nsty["wfactor"] = 0.9
+      nsty["oblique"] = 0
+      nsty["last"] = 100
+      nsty["font"] = "txt"
+      nsty["handle"] = 4
+      cMdl.Add(["0": nsty.Copy()], "TextStyles")
     Endif
     mTextStyles = cMdl["TextStyles"]
 
     For Each x In xTextStyles
       If TypeOf(x) = gb.Object Then
         For Each m In mTextStyles
-          If m["name"] = x["name"] Then
-
+          If Lower(m["name"]) = Lower(x["name"]) Then
+            m["fixed"] = x["fixed"]
+            m["size"] = x["text_size"]
+            m["wfactor"] = x["width_factor"]
+            m["oblique"] = x["oblique_angle"]
+            m["last"] = x["last_height"]
+            m["font"] = x["font_file"]
+            m["handle"] = x["handle"][1]
           Endif
         Next
       Endif
@@ -415,7 +439,7 @@ Public Function GauchoLoad(sFile As String) As Collection
       Case "layer"
         c.Clear
         c["id"] = ent.Attributes["id"]
-        c["type"] = ent.Attributes["type"]
+        c["object"] = ent.Attributes["type"]
         c["name"] = ent.Attributes["name"]
         c["show"] = CBool(ent.Attributes["show"])
         c["frozen"] = CBool(ent.Attributes["frozen"])
@@ -429,28 +453,28 @@ Public Function GauchoLoad(sFile As String) As Collection
       Case "style"
         c.Clear
         c["id"] = ent.Attributes["id"]
-        c["type"] = ent.Attributes["type"]
+        c["object"] = ent.Attributes["type"]
         c["name"] = ent.Attributes["name"]
         cStyles.Add(c.Copy(), ent.Attributes["id"])
 
       Case "width"
         c.Clear
         c["id"] = ent.Attributes["id"]
-        c["type"] = ent.Attributes["type"]
+        c["object"] = ent.Attributes["type"]
         c["value"] = ent.Attributes["value"]
         cWidths.Add(c.Copy(), ent.Attributes["id"])
 
       Case "dimst"
         c.Clear
         c["id"] = ent.Attributes["id"]
-        c["type"] = ent.Attributes["type"]
+        c["object"] = ent.Attributes["type"]
         c["name"] = ent.Attributes["name"]
         cDimStyles.Add(c.Copy(), ent.Attributes["id"])
 
       Case "font"
         c.Clear
         c["id"] = ent.Attributes["id"]
-        c["type"] = ent.Attributes["type"]
+        c["object"] = ent.Attributes["type"]
         c["name"] = ent.Attributes["name"]
         cFonts.Add(c.Copy(), ent.Attributes["id"])
 
@@ -583,7 +607,7 @@ Public Function NewLayer() As Collection
 
   c.Clear
   c["id"] = "0"
-  c["type"] = "layer"
+  c["object"] = "layer"
   c["name"] = "0"
   c["show"] = True
   c["frozen"] = False

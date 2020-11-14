@@ -880,9 +880,9 @@ Public Sub LoadComboboxes(cMdl As Collection)
 
   cMod = cMdl
 
-  If cMdl.Exist("Vars") Then
+  If cMdl.Exist("Variables") Then
 
-    cVars = cMdl["Vars"]
+    cVars = cMdl["Variables"]
 
     If cVars.Exist("clayer") Then
       CurrentLayer = cVars["clayer"]
@@ -1134,7 +1134,9 @@ Public Sub gTask(sTask As String)
       gcd.Drawings.Add(NewDrawing)
       gcd.CurrentDrawing = gcd.Drawings.Last
 
-      gcd.CurrentDrawing.cModel = cad.GauchoLoad(FilePath)
+      'gcd.CurrentDrawing.cModel = cad.GauchoLoad(FilePath)
+      'TODO: Improve the creation file way
+      gcd.CurrentDrawing.cModel = cad.Skeleton()
 
       LoadComboboxes(gcd.CurrentDrawing.cModel.Copy())
 
@@ -1494,7 +1496,7 @@ Public Sub btnLayers_MouseDown()
   'FLay = New FLayers1(gcd.CurrentDrawing.cModel["Layers"], [Workspace1.ScreenX, Workspace1.ScreenY])
   FLay = New FLayers1(gcd.CurrentDrawing.cModel, [Me.ScreenX, Me.ScreenY])
 
-  cVars = gcd.CurrentDrawing.cModel["Vars"]
+  cVars = gcd.CurrentDrawing.cModel["Variables"]
 
   If SelectingLayer = False Then
     FLay.Stacking = Window.Above

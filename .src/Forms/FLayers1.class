@@ -63,8 +63,8 @@ Public Sub _new(mdl As Collection, cor As Integer[])
   '  cStyles = mdl["Styles"]
   'Endif
 
-  If mdl.Exist("Vars") Then
-    cVars = mdl["Vars"]
+  If mdl.Exist("Variables") Then
+    cVars = mdl["Variables"]
   Endif
 
   Coords = cor
@@ -202,7 +202,7 @@ Public Sub TableView1_Data(Row As Integer, Column As Integer)
       g = CInt(Split(Starter.ColorsRGB[st], ",")[1])
       b = CInt(Split(Starter.ColorsRGB[st], ",")[2])
 
-      TableView1[TableView1.Row, TableView1.Column].Text = st
+      'TableView1[TableView1.Row, TableView1.Column].Text = st
       If img Then
         img.Clear
         TableView1[Row, Column].Picture.Clear
