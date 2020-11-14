@@ -33,7 +33,7 @@ Public Function Import(cImp As Collection, cMdl As Collection) As Integer[]
   Dim xFile As Collection
   Dim xTextStyles As Collection
   Dim xVariables As Collection
-  Dim xLayers As Collection
+  Dim xLayers As Collection 'ok
   Dim xBlocks As Collection
   Dim xLineTypes As Collection
   Dim xDimStyles As Collection
@@ -55,6 +55,17 @@ Public Function Import(cImp As Collection, cMdl As Collection) As Integer[]
   Dim mObjects As Collection
   Dim mEntities As Collection
   Dim m As Variant
+
+  Dim Layexist As Boolean
+  Dim nlay As New Collection
+  Dim qlay As Integer               '' Number of layers
+  Dim xWidth As Integer
+  Dim xStyle As Integer
+  Dim xColor As Integer
+  Dim xFrozen As Boolean
+  Dim n As Variant
+  Dim xShow As Boolean
+  Dim xLocked As Boolean
 
   If cImp.Exist("File") Then
     xFile = cImp["File"]
@@ -120,53 +131,94 @@ Public Function Import(cImp As Collection, cMdl As Collection) As Integer[]
   Endif
 
   If xFile["path"] Like "*.dwg" Or xFile["path"] Like "*.json" Then
-    
     '---------------------------------------------- Layers --------
     If cMdl.Exist("Layers") = False Then
-      cMdl.Add(["id": 0, "type": "LAYER", "name": "0", "show": True, "frozen": False, "locked": False, "colour": 7, "style": 1, "width": 17, "print": True, "handle": 1, "ownerhandle": 2, "is_xref_dep": False], "Layers")
+      qlay = 0
+      nlay = ["id": 0, "type": "LAYER", "name": "0", "show": True, "frozen": False, "locked": False, "colour": 7, "style": 1, "width": 17, "print": True, "handle": 1, "ownerhandle": 2, "is_xref_dep": False]
+      cMdl.Add([nlay.Copy(), "0"], "Layers")
+      Inc qlay
+      nlay.Clear
+    Else
+      mLayers = cMdl["Layers"]
+      qlay = mLayers.Count
     Endif
-    mLayers = cMdl["Layers"]
 
     For Each x In xLayers
-      If TypeOf(x) = gb.Object Then
-        For Each m In mLayers
-          If m["name"] = x["name"] Then
-            m["type"] = x["object"]
-            m["handle"] = x["handle"][1]
-            m["print"] = True
-            m["width"] = x["linewt"]
-            m["style"] = 1 'x["ltype"]
+      xShow = True
+      xColor = 0
+      If TypeOf(x["color"]) = gb.Object Then
+        If x["color"] Is Collection Then
+          If x["color"].Exist("index") Then
+            xColor = x["color"]["index"] ' Simple color 1-256
+          Endif
+        Else
+          xColor = x["color"]
+        Endif
+      Endif
+      If xColor < 0 Then
+        xShow = False
+      Endif
+      xColor = Abs(xColor)
+      '------------------------------------
+      If DWGFlag(x["flag"], 1) = 0 Then
+        xFrozen = False
+      Else
+        xFrozen = True
+      Endif
 
-            For Each p In x
-              Select x.Key
-                Case "color"
-                  m["show"] = True
-                  m["colour"] = Abs(p["index"])
-                  If p["index"] < 0 Then
-                    m["show"] = False
-                  Endif
-                Case "flag"
-                  Select p
-                    Case 1008
-                      m["frozen"] = False
-                      m["locked"] = False
-                    Case 1017
-                      m["frozen"] = False
-                      m["locked"] = True
-                    Case 992
-                      m["frozen"] = True
-                      m["locked"] = True
-                    Case Else
-                  End Select
-              End Select
-            Next
+      If DWGFlag(x["flag"], 4) = 0 Then
+        xLocked = False
+      Else
+        xLocked = True
+      Endif
+    Next
+
+    nlay.Clear
+    xStyle = 1 'x["ltype"]
+
+    nlay["type"] = "LAYER"
+    nlay["name"] = x["name"]
+    nlay["show"] = xShow
+    nlay["frozen"] = xFrozen
+    nlay["locked"] = xLocked
+    nlay["colour"] = xColor
+    nlay["style"] = 1
+    nlay["width"] = x["linewt"]
+    nlay["print"] = True
+    nlay["handle"] = x["handle"][1]
+    nlay["ownerhandle"] = x["ownerhandle"][1]
+    nlay["is_xref_dep"] = False
+
+    Layexist = False
+    For Each m In mLayers
+      If m["name"] = x["name"] Then
+        Layexist = True
+        For Each n In nlay
+          m[nlay.Key] = n
+        Next
+        Break
+      Endif
+    Next
+    If Layexist = False Then
+      nlay["id"] = qlay + 1
+      mLayers.Add(nlay.Copy(), CStr(nlay["id"]))
+    Endif
+    '---------------------------------------------- TextStyles
+    If cMdl.Exist("TextStyles") = False Then
+      cMdl.Add(["id": 0, "type": "STYLE", "name": "Standard", "fixed": 0, "wfactor": 0.9, "oblique": 0, "last": 100, "font": "txt"], "TextStyles")
+    Endif
+    mTextStyles = cMdl["TextStyles"]
+
+    For Each x In xTextStyles
+      If TypeOf(x) = gb.Object Then
+        For Each m In mTextStyles
+          If m["name"] = x["name"] Then
+
           Endif
         Next
       Endif
     Next
-  
-  
-  
+
   Else
     If xFile["path"] Like "*.dxf" Then
       Print "dxf"
@@ -176,6 +228,20 @@ Public Function Import(cImp As Collection, cMdl As Collection) As Integer[]
   Endif
 
   Return ix
+
+End
+
+Public Function DWGFlag(iFlag As Integer, iPos As Integer) As Byte
+
+  Dim t As String
+  Dim b As Byte
+
+  t = Bin(iFlag, 8)
+  't = "12345678"
+  'Print t
+  b = CByte(Mid(t, 9 - iPos, 1))
+
+  Return b
 
 End
 

@@ -138,7 +138,7 @@ Public Function info(f As String) As Collection
                     'Case "PLACEHOLDER"
                     'Case "SCALE"
                     'Case "SECTIONVIEWSTYLE"
-                    'Case "STYLE"
+                  Case "STYLE"
                     cTextStyles.Add(item.Copy(), item["handle"][1])
                     'Case "STYLE_CONTROL"
                     'Case "SUN"
