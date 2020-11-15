@@ -367,8 +367,9 @@ Public Function ImportModel(colData As Collection, obxEntities As Entity[], Opti
   'Dim ratio As Float
 
   For Each colGrp In colData
-
+    'If colGrp.Exist("entity") Then
     ImportEntities2(colGrp, obxEntities, BlockName)
+    'Endif
 
   Next
 
@@ -786,7 +787,7 @@ Public Function ImportEntities2(colGrp As Collection, obxEntities As Entity[], O
   For Each colEnt In colGrp
     If colEnt.Exist("error") = False Then
       flxPoints.Clear
-      LineWidth = Abs(LineWidth)
+      LineWidth = 2 'colent["width"] 'Abs(LineWidth)
       Select LCase$(colEnt["entity"]) 'colData.Key
 
         Case "line"

@@ -162,7 +162,7 @@ Public Sub Run()
   Next
 
   '' Load the linetypes list
-  cStyles = cad.Styles()
+  cStyles = cad.NewStyles()
 
   '' Load the linetypes list
   cWidths = cad.NewWidths()

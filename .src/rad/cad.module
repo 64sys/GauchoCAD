@@ -34,10 +34,12 @@ Public Function Import(cImp As Collection, cMdl As Collection) As Integer[]
   Dim xTextStyles As Collection
   Dim xVariables As Collection
   Dim xLayers As Collection 'ok
+  Dim auxLayer As New Collection
   Dim xBlocks As Collection
   Dim xLineTypes As Collection
   Dim xDimStyles As Collection
   Dim xObjects As Collection
+  Dim auxWidts As New Collection
   Dim xEntities As Collection
   Dim x As Variant
   Dim p As Variant
@@ -55,6 +57,7 @@ Public Function Import(cImp As Collection, cMdl As Collection) As Integer[]
   Dim mObjects As Collection
   Dim mEntities As Collection
   Dim m As Variant
+  Dim lx As Variant
 
   Dim Layexist As Boolean
   Dim nlay As New Collection
@@ -67,6 +70,16 @@ Public Function Import(cImp As Collection, cMdl As Collection) As Integer[]
   Dim n As Variant
   Dim xShow As Boolean
   Dim xLocked As Boolean
+  Dim e As Variant
+  Dim tEnt As New Collection
+  Dim te As New Collection
+  Dim cmx As New Collection
+  Dim emx As New Collection
+  Dim prp As Variant
+  Dim tmp As New Collection
+  Dim mWidths As Variant
+  Dim sTag As String
+  Dim i As Integer
 
   If cImp.Exist("File") Then
     xFile = cImp["File"]
@@ -92,6 +105,10 @@ Public Function Import(cImp As Collection, cMdl As Collection) As Integer[]
   If cImp.Exist("Layers") Then
     xLayers = cImp["Layers"]
     ix.Add(xLayers.Count)
+    For Each lx In xLayers
+      auxLayer.Add(lx["name"], lx["handle"][1])
+    Next
+
   Else
     ix.Add(0)
   Endif
@@ -131,18 +148,20 @@ Public Function Import(cImp As Collection, cMdl As Collection) As Integer[]
     ix.Add(0)
   Endif
 
+  '-- DWG -------------------------------------------------------
   If xFile["path"] Like "*.dwg" Or xFile["path"] Like "*.json" Then
     '---------------------------------------------- Variables -----1
     If cMdl.Exist("Variables") = False Then
       cMdl.Add(NewVars(), "Variables")
-      'mVariables = cMdl["Variables"]
     Endif
     mVariables = cMdl["Variables"]
     For Each x In xVariables
       mVariables[xVariables.Key] = x
     Next
-
     '---------------------------------------------- LineStyles ----2
+    If cMdl.Exist("LineTypes") = False Then
+      cMdl.Add(NewStyles(), "LineTypes")
+    Endif
 
     '---------------------------------------------- Layers --------3
     If cMdl.Exist("Layers") = False Then
@@ -247,7 +266,86 @@ Public Function Import(cImp As Collection, cMdl As Collection) As Integer[]
         Next
       Endif
     Next
+    '---------------------------------------------- Auxiliars ----#
+    If cMdl.Exist("Widths") = False Then
+      cMdl["Widths"] = cad.NewWidths()
+    Endif
+    mWidths = cMdl["Widths"]
+    For Each lx In mWidths
+      auxWidts.Add(lx, mWidths.Key)
+    Next
+    '---------------------------------------------- Entities -----5
+    cmx = DWGCommonTags()
+    mEntities = cMdl["Entities"]
+    For Each e In xEntities
+      te.Clear
+      '----------------Common Proprties
+      For Each prp In e
+        If cmx.Exist(e.Key) Then
+          sTag = cmx[e.Key]
+          If TypeOf(prp) = gb.Object Then
+            Select e.Key
+              Case "handle"
+                prp = prp[1]
+              Case "layer"
+                If auxLayer.Exist(CStr(prp[2])) Then
+                  prp = auxLayer[CStr(prp[2])]
+                Else
+                  prp = "0"
+                Endif
+              Case "color"
+                prp = prp[0]
+            End Select
+          Else
+            If e.Key = "linewt" Then
+              If auxWidts.Exist(prp) Then
+                prp = auxWidts[prp][0]
+              Else
+                prp = "Default"
+              Endif
+            Endif
+          Endif
+          te.Add(prp, sTag)
+        Endif
+        '---------------- Special Proprties
+        Select e["entity"]
+          Case "LINE"
+            te["p"] = [e["start"]]
+            te["p"].Add(e["end"])
 
+          Case "LWPOLYLINE"
+            te["p"] = e["points"]
+
+          Case "ARC"
+            te["p"] = [e["center"]]
+            te["radius"] = [e["radius"]]
+            te["start_angle"] = [e["start_angle"]]
+            te["end_angle"] = [e["end_angle"]]
+
+          Case "CIRCLE"
+            te["p"] = [e["center"]]
+            te["radius"] = [e["radius"]]
+
+        End Select
+
+      Next
+
+      '---------------- Transfer
+
+      If cMdl.Exist("Entities") = False Then
+        cMdl.Add([e["entity"]: [CStr(te["handle"]): te.Copy()]], "Entities")
+        te.Clear
+      Else
+        If cMdl["Entities"].Exist(e["entity"]) = False Then
+          cMdl["Entities"].Add([CStr(te["handle"]): te.Copy()], e["entity"])
+          te.Clear
+        Else
+          cMdl["Entities"][e["entity"]].Add(te.Copy(), CStr(te["handle"]))
+          te.Clear
+        Endif
+      Endif
+    Next
+    '-- DXF -------------------------------------------------------
   Else
     If xFile["path"] Like "*.dxf" Then
       Print "dxf"
@@ -266,11 +364,40 @@ Public Function DWGFlag(iFlag As Integer, iPos As Integer) As Byte
   Dim b As Byte
 
   t = Bin(iFlag, 8)
-  't = "12345678"
-  'Print t
   b = CByte(Mid(t, 9 - iPos, 1))
 
   Return b
+
+End
+
+Public Function DWGCommonTags(Optional sEntity As String) As Collection
+
+  Dim comm As New Collection
+
+  Select Upper(sEntity)
+    Case "", "COMMON"
+      comm.Add("entity", "entity")
+      comm.Add("index", "index")
+      comm.Add("type", "type")
+      comm.Add("handle", "handle")
+      comm.Add("layer", "layer")
+      comm.Add("colour", "color") '#
+      comm.Add("entmode", "entmode")
+      comm.Add("ownerhandle", "ownerhandle")
+      comm.Add("invisible", "invisible")
+      comm.Add("width", "linewt") '#
+      comm.Add("material", "material")
+      comm.Add("ltype", "ltype")
+      comm.Add("ltype_scale", "ltype_scale")
+      comm.Add("plotstyle", "plotstyle")
+
+    Case "LINE"
+      comm.Add("start", "start")
+      comm.Add("end", "end")
+
+  End Select
+
+  Return comm
 
 End
 
@@ -587,7 +714,7 @@ Public Function Skeleton() As Collection
   ''
   cMdl.Add(NewLayer(), "Layers")
   cMdl.Add(NewVars(), "Variables")
-  cMdl.Add(Styles(), "LineTypes")
+  cMdl.Add(NewStyles(), "LineTypes")
 
   Return cMdl
 
@@ -653,7 +780,7 @@ Public Function NewVars() As Collection
 
 End
 
-Public Function Styles() As Collection
+Public Function NewStyles() As Collection
 
   Dim c As New Collection
 
@@ -677,14 +804,45 @@ Public Function NewWidths() As Collection
 
   Dim c As New Collection
 
-  c.Add(["0.25", 1], "1") '1
-  c.Add(["0.50", 2], "2") '2
-  c.Add(["0.75", 3], "3") '3
-  c.Add(["1.00", 4], "4") '4
-  c.Add(["1.25", 5], "5") '5
-  c.Add(["1.50", 6], "6") '6
-  c.Add(["1.75", 7], "7") '7
-  c.Add(["2.00", 8], "8") '8
+  'c.Add(["0.25", 1], "1") '1
+  'c.Add(["0.50", 2], "2") '2
+  'c.Add(["0.75", 3], "3") '3
+  'c.Add(["1.00", 4], "4") '4
+  'c.Add(["1.25", 5], "5") '5
+  'c.Add(["1.50", 6], "6") '6
+  'c.Add(["1.75", 7], "7") '7
+  'c.Add(["2.00", 8], "8") '8
+
+  c.Add(["0.05", "1"], "1")
+  c.Add(["0.10", "2"], "2")
+  c.Add(["0.12", "3"], "3")
+  c.Add(["0.14", "4"], "4")
+  c.Add(["0.16", "5"], "5")
+  c.Add(["0,18", "6"], "6")
+  c.Add(["0.20", "7"], "7")
+  c.Add(["0.25", "8"], "8")
+  c.Add(["0.30", "9"], "9")
+  c.Add(["0.35", "10"], "10")
+  c.Add(["0.40", "11"], "11")
+  c.Add(["0.45", "12"], "12")
+  c.Add(["0.50", "13"], "13")
+  c.Add(["0.55", "14"], "14")
+  c.Add(["0.60", "15"], "15")
+  c.Add(["0.65", "16"], "16")
+  c.Add(["0.70", "17"], "17")
+  c.Add(["0.80", "18"], "18")
+  c.Add(["0.90", "19"], "19")
+  c.Add(["1.00", "20"], "20")
+  c.Add(["1.25", "21"], "21")
+  c.Add(["1.45", "22"], "22")
+  c.Add(["1.65", "23"], "23")
+  c.Add(["1.85", "24"], "24")
+  c.Add(["2.00", "25"], "25")
+  c.Add(["2.15", "26"], "26")
+
+  c.Add(["ByLayer", "29"], "29")
+  c.Add(["ByBlock", "30"], "30")
+  c.Add(["Default", "31"], "31")
 
   Return c
 

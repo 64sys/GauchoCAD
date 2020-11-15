@@ -1037,6 +1037,23 @@ Public Sub gTask(sTask As String)
               'Import: Move data from cImport to cModel
               If cad.Import(gcd.CurrentDrawing.cImport, gcd.CurrentDrawing.cModel).Count > 0 Then
                 Print "Ok"
+                'If mdl.Count > 0 Then
+                'gcd.CurrentDrawing.cImport = mdl  ' Copio la coleccion de datos a cImport, previo a trnasferir a cModel
+                'gcd.EntitiesTransfer2()           ' Transfiero las entidades a cModel
+                'gcd.BlocksTransfer()              ' transfiero los bloques
+                'gcd.LayersTransfer()              ' transfiero los Layers
+                'LoadDrawingMap2()                               ' lleno el TreeView
+                LoadComboboxes(gcd.CurrentDrawing.cModel)       ' recargo los ComboBox
+                gcd.ImportBlocks(gcd.CurrentDrawing.cModel)     ' Importo los Bloques de cModel a formato binario
+                gcd.ImportModel(gcd.CurrentDrawing.cModel["Entities"], gcd.CurrentDrawing.arrEntities)  ' idem entidades
+                gcd.CurrentDrawing.cImport.Clear    ' libero espacio, limpiando cImport
+                gcd.ApplyLayerProperties(1)         ' aplico las propiedades de los layers a las entidades
+                'clsMouseTracking.ReBuildPOIPoints   ' construyo los puntos de interes para el tracking del mouse
+                Regen                               ' Genero las listas de OpenGL
+                cadZoomE.Start()                    ' Hago un Zoom Extents
+                'Endif
+                ProgressBar1.Visible = False
+
               Else
                 Message.Info(("No information was added to the model"))
               Endif

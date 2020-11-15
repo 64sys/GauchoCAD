@@ -195,7 +195,8 @@ Public Function info(f As String) As Collection
 
   'Entities
   File.Save(User.Home &/ "entities.txt", etx.Join("\n"))
-  cOut.Add(cad.GauchoEntitiesSort(cEntities), "Entities")
+  'cOut.Add(cad.GauchoEntitiesSort(cEntities), "Entities")
+  cOut.Add(cEntities.Copy(), "Entities")
   cOut.Add(cUnkn.Copy(), "Unknown")
 
   Return cOut
