@@ -134,15 +134,20 @@ Public Function Import(cImp As Collection, cMdl As Collection) As Integer[]
   If xFile["path"] Like "*.dwg" Or xFile["path"] Like "*.json" Then
     '---------------------------------------------- Variables -----1
     If cMdl.Exist("Variables") = False Then
-
+      cMdl.Add(NewVars(), "Variables")
+      'mVariables = cMdl["Variables"]
     Endif
+    mVariables = cMdl["Variables"]
+    For Each x In xVariables
+      mVariables[xVariables.Key] = x
+    Next
 
     '---------------------------------------------- LineStyles ----2
 
     '---------------------------------------------- Layers --------3
     If cMdl.Exist("Layers") = False Then
       qlay = 0
-      nlay = ["id": 0, "type": "LAYER", "name": "0", "show": True, "frozen": False, "locked": False, "colour": 7, "style": 1, "width": 17, "print": True, "handle": 1, "ownerhandle": 2, "is_xref_dep": False]
+      nlay = ["id": 0, "object": "LAYER", "name": "0", "show": True, "frozen": False, "locked": False, "colour": 7, "style": 1, "width": 17, "print": True, "handle": 1, "ownerhandle": 2, "is_xref_dep": False]
       cMdl.Add([nlay.Copy(), "0"], "Layers")
       Inc qlay
       nlay.Clear
@@ -184,7 +189,7 @@ Public Function Import(cImp As Collection, cMdl As Collection) As Integer[]
     nlay.Clear
     xStyle = 1 'x["ltype"]
 
-    nlay["type"] = "LAYER"
+    nlay["object"] = "LAYER"
     nlay["name"] = x["name"]
     nlay["show"] = xShow
     nlay["frozen"] = xFrozen
@@ -607,7 +612,7 @@ Public Function NewLayer() As Collection
 
   c.Clear
   c["id"] = "0"
-  c["object"] = "layer"
+  c["object"] = "LAYER"
   c["name"] = "0"
   c["show"] = True
   c["frozen"] = False
@@ -627,22 +632,22 @@ Public Function NewVars() As Collection
 
   Dim c As New Collection
 
-  c.add(1, "ltscale")
-  c.add(0, "attmode")
-  c.add(200, "textsize")
-  c.add("Standard", "textstyle")
-  c.add("0", "clayer")
-  c.add("ByLayer", "celtype")
-  c.add(0, "cecolor")
-  c.add(1, "celtscale")
-  c.add(1, "celweight")
-  c.add("Standard", "dimstyle")
-  c.add(4, "aunits")
-  c.add(10, "chamfera")
-  c.add(10, "chamferb")
-  c.add(0.0, "angbase")
-  c.add("Standard", "cmlstyle")
-  c.add(4, "insunits")
+  c.Add(1, "LTSCALE")
+  c.Add(0, "ATTMODE")
+  c.Add(200, "TEXTSIZE")
+  c.Add("Standard", "TEXTSTYLE")
+  c.Add("0", "CLAYER")
+  c.Add("ByLayer", "CELTYPE")
+  c.Add(0, "CECOLOR")
+  c.Add(1, "CELTSCALE")
+  c.Add(1, "CELWEIGHT")
+  c.Add("Standard", "DIMSTYLE")
+  c.Add(4, "AUNITS")
+  c.Add(10, "CHAMFERA")
+  c.Add(10, "CHAMFERB")
+  c.Add(0.0, "ANGBASE")
+  c.Add("Standard", "CMLSTYLE")
+  c.Add(4, "INSUNITS")
 
   Return c
 

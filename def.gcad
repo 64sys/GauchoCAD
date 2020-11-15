@@ -23,10 +23,10 @@
 <header id="13" type="vars" name="cmlstyle" value="Standard" />
 <header id="14" type="vars" name="insunits" value="4" />
 
-<header id="0" type="layer" name="0" show="T" frozen="" locked="" colour="0" style="1" width="1" print="T" />
-<header id="1" type="layer" name="Format" show="T" frozen="" locked="" colour="2" style="1" width="1" print="T" />
-<header id="2" type="layer" name="Text" show="T" frozen="" locked="" colour="3" style="1" width="1" print="T" />
-<header id="3" type="layer" name="Revision" show="T" frozen="" locked="" colour="4" style="1" width="1" print="T" />
+<header id="0" type="LAYER" name="0" show="T" frozen="" locked="" colour="0" style="1" width="1" print="T" />
+<header id="1" type="LAYER" name="Format" show="T" frozen="" locked="" colour="2" style="1" width="1" print="T" />
+<header id="2" type="LAYER" name="Text" show="T" frozen="" locked="" colour="3" style="1" width="1" print="T" />
+<header id="3" type="LAYER" name="Revision" show="T" frozen="" locked="" colour="4" style="1" width="1" print="T" />
 
 <header id="0" type="style" name="Solid" />
 <header id="1" type="style" name="Dashed" />
