@@ -36,7 +36,9 @@ Public Function Import(cImp As Collection, cMdl As Collection) As Integer[]
   Dim xLayers As Collection 'ok
   Dim auxLayer As New Collection
   Dim xBlocks As Collection
+  Dim auxBlocks As New Collection
   Dim xLineTypes As Collection
+  Dim auxLtypes As New Collection
   Dim xDimStyles As Collection
   Dim xObjects As Collection
   Dim auxWidts As New Collection
@@ -80,6 +82,7 @@ Public Function Import(cImp As Collection, cMdl As Collection) As Integer[]
   Dim mWidths As Variant
   Dim sTag As String
   Dim i As Integer
+  Dim vrt As Variant
 
   If cImp.Exist("File") Then
     xFile = cImp["File"]
@@ -116,6 +119,9 @@ Public Function Import(cImp As Collection, cMdl As Collection) As Integer[]
   If cImp.Exist("Blocks") Then
     xBlocks = cImp["Blocks"]
     ix.Add(xBlocks.Count)
+    For Each lx In xBlocks
+      auxBlocks.Add(lx["name"], lx["handle"][1])
+    Next
   Else
     ix.Add(0)
   Endif
@@ -123,6 +129,9 @@ Public Function Import(cImp As Collection, cMdl As Collection) As Integer[]
   If cImp.Exist("LineTypes") Then
     xLineTypes = cImp["LineTypes"]
     ix.Add(xLineTypes.Count)
+    For Each lx In xBlocks
+      auxLtypes.Add(lx["name"], lx["handle"][1])
+    Next
   Else
     ix.Add(0)
   Endif
@@ -166,7 +175,7 @@ Public Function Import(cImp As Collection, cMdl As Collection) As Integer[]
     '---------------------------------------------- Layers --------3
     If cMdl.Exist("Layers") = False Then
       qlay = 0
-      nlay = ["id": 0, "object": "LAYER", "name": "0", "show": True, "frozen": False, "locked": False, "colour": 7, "style": 1, "width": 17, "print": True, "handle": 1, "ownerhandle": 2, "is_xref_dep": False]
+      nlay = ["id": 0, "object": "LAYER", "name": "0", "show": True, "frozen": False, "locked": False, "color": 7, "ltype": 1, "linewt": 17, "print": True, "handle": 1, "ownerhandle": 2, "is_xref_dep": False]
       cMdl.Add([nlay.Copy(), "0"], "Layers")
       Inc qlay
       nlay.Clear
@@ -179,13 +188,15 @@ Public Function Import(cImp As Collection, cMdl As Collection) As Integer[]
       xShow = True
       xColor = 0
       If TypeOf(x["color"]) = gb.Object Then
-        If x["color"] Is Collection Then
+        If x["color"] Is Collection Or x["color"] Is JSONCollection Then
           If x["color"].Exist("index") Then
             xColor = x["color"]["index"] ' Simple color 1-256
           Endif
         Else
-          xColor = x["color"]
+          xColor = 7
         Endif
+      Else
+        xColor = x["color"]
       Endif
       If xColor < 0 Then
         xShow = False
@@ -213,9 +224,9 @@ Public Function Import(cImp As Collection, cMdl As Collection) As Integer[]
     nlay["show"] = xShow
     nlay["frozen"] = xFrozen
     nlay["locked"] = xLocked
-    nlay["colour"] = xColor
-    nlay["style"] = 1
-    nlay["width"] = x["linewt"]
+    nlay["color"] = xColor
+    nlay["ltype"] = 1
+    nlay["linewt"] = x["linewt"]
     nlay["print"] = True
     nlay["handle"] = x["handle"][1]
     nlay["ownerhandle"] = x["ownerhandle"][1]
@@ -282,30 +293,51 @@ Public Function Import(cImp As Collection, cMdl As Collection) As Integer[]
       '----------------Common Proprties
       For Each prp In e
         If cmx.Exist(e.Key) Then
+          'If cmx.Exist(e.Key) Then
           sTag = cmx[e.Key]
+          vrt = prp
+          'Else
+          '  sTag = e.Key
+          'Endif
+
           If TypeOf(prp) = gb.Object Then
             Select e.Key
               Case "handle"
-                prp = prp[1]
+                vrt = prp[1]
+              Case "ltype"
+                If auxLtypes.Exist(CStr(prp[2])) Then
+                  vrt = auxLtypes[CStr(prp[2])]
+                Else
+                  vrt = "Continous"
+                Endif
+
               Case "layer"
                 If auxLayer.Exist(CStr(prp[2])) Then
-                  prp = auxLayer[CStr(prp[2])]
+                  vrt = auxLayer[CStr(prp[2])]
                 Else
-                  prp = "0"
+                  vrt = "0"
                 Endif
               Case "color"
-                prp = prp[0]
+                If prp.Exist("index") Then
+                  vrt = prp["index"]
+                Else
+                  vrt = 7
+                Endif
+
             End Select
           Else
-            If e.Key = "linewt" Then
-              If auxWidts.Exist(prp) Then
-                prp = auxWidts[prp][0]
-              Else
-                prp = "Default"
-              Endif
-            Endif
+            Select e.Key
+              Case "linewt"
+                If auxWidts.Exist(prp) Then
+                  'vrt = auxWidts[prp][0]
+                  vrt = prp
+                Else
+                  vrt = 31
+                  'vrt = "Default"
+                Endif
+            End Select
           Endif
-          te.Add(prp, sTag)
+          te.Add(vrt, sTag)
         Endif
         '---------------- Special Proprties
         Select e["entity"]
@@ -314,6 +346,13 @@ Public Function Import(cImp As Collection, cMdl As Collection) As Integer[]
             te["p"].Add(e["end"])
 
           Case "LWPOLYLINE"
+            'If DWGFlag(e["flag"], 1) = 0 Then
+            Select e["flag"]
+              Case 512, 1
+                te["closed"] = 1
+              Case Else
+                te["closed"] = 0
+            End Select
             te["p"] = e["points"]
 
           Case "SPLINE"
@@ -338,9 +377,7 @@ Public Function Import(cImp As Collection, cMdl As Collection) As Integer[]
 
           Case "TEXT"
             te["p"] = [e["ins_pt"]]
-
             te["angle"] = ATan2(e["extrusion"][0], e["extrusion"][1])
-
             te["text"] = e["text_value"]
             te["text_height"] = e["height"]
 
@@ -351,11 +388,34 @@ Public Function Import(cImp As Collection, cMdl As Collection) As Integer[]
             te["text_height"] = e["text_height"]
             te["attachment"] = e["attachment"]
 
+          Case "INSERT"
+            te["p"] = [e["ins_pt"]]
+            te["angle"] = e["rotation"]
+            te["scalex"] = e["scale"][0]
+            te["scaley"] = e["scale"][1]
+            te["scalez"] = e["scale"][2]
+            te["block"] = auxBlocks[e["block_header"][2]]
+
+          Case "SOLID"
+            te["p"] = [e["corner1"]]
+            te["p"].Add(e["corner2"])
+            te["p"].Add(e["corner3"])
+            te["p"].Add(e["corner4"])
+
         End Select
 
       Next
 
       '---------------- Transfer
+
+      ' -- Some Checks before
+      If te.Exist("ltype") = False Then
+        te.Add("Continous", "ltype")
+      Endif
+
+      If te.Exist("color") = False Then
+        te.Add(7, "color")
+      Endif
 
       If cMdl.Exist("Entities") = False Then
         cMdl.Add([e["entity"]: [CStr(te["handle"]): te.Copy()]], "Entities")
@@ -406,14 +466,14 @@ Public Function DWGCommonTags(Optional sEntity As String) As Collection
       comm.Add("type", "type")
       comm.Add("handle", "handle")
       comm.Add("layer", "layer")
-      comm.Add("colour", "color") '#
+      comm.Add("color", "color")
       comm.Add("entmode", "entmode")
       comm.Add("ownerhandle", "ownerhandle")
       comm.Add("invisible", "invisible")
-      comm.Add("width", "linewt") '#
+      comm.Add("linewt", "linewt") '#
       comm.Add("material", "material")
-      comm.Add("style", "ltype")
-      comm.Add("ltype_scale", "ltype_scale")
+      comm.Add("ltype", "ltype")
+      comm.Add("ltscale", "ltype_scale")
       comm.Add("plotstyle", "plotstyle")
 
     Case "LINE"
@@ -444,7 +504,7 @@ Public Function GauchoSave(sFile As String, cMdl As Collection)
   Dim atr As New Collection
   Dim a As String
 
-  stx = ["entity", "handle", "layer", "style", "width", "colour", "p", "radius", "ratio", "start_angle", "end_angle", "angle", "scale", "block", "text", "height", "font", "oblique", "just_h", "just_v", "wfactor", "paper", "blkid"]
+  stx = ["entity", "handle", "layer", "style", "linewt", "color", "p", "radius", "ratio", "start_angle", "end_angle", "angle", "scale", "block", "text", "height", "font", "oblique", "just_h", "just_v", "wfactor", "paper", "blkid"]
 
   sErr = ""
   sEfl = User.Home &/ "err.txt"
@@ -603,7 +663,7 @@ Public Function GauchoLoad(sFile As String) As Collection
         c["locked"] = CBool(ent.Attributes["locked"])
         c["colour"] = CInt(ent.Attributes["colour"])
         c["style"] = CInt(ent.Attributes["style"])
-        c["width"] = CInt(ent.Attributes["width"])
+        c["linewt"] = CInt(ent.Attributes["linewt"])
         c["print"] = CBool(ent.Attributes["print"])
         cLayers.Add(c.Copy(), ent.Attributes["id"])
 
@@ -614,7 +674,7 @@ Public Function GauchoLoad(sFile As String) As Collection
         c["name"] = ent.Attributes["name"]
         cStyles.Add(c.Copy(), ent.Attributes["id"])
 
-      Case "width"
+      Case "linewt"
         c.Clear
         c["id"] = ent.Attributes["id"]
         c["object"] = ent.Attributes["type"]
@@ -667,7 +727,7 @@ Public Function GauchoLoad(sFile As String) As Collection
     '-----
     c["layer"] = ent.Attributes["layer"]
     c["style"] = ent.Attributes["style"]
-    c["width"] = ent.Attributes["width"]
+    c["linewt"] = ent.Attributes["linewt"]
     c["colour"] = ent.Attributes["colour"]
     '-----
 
@@ -771,7 +831,7 @@ Public Function NewLayer() As Collection
   c["locked"] = False
   c["colour"] = 0
   c["style"] = 0
-  c["width"] = 0
+  c["linewt"] = 0
   c["print"] = True
   cLy.Add(c.Copy(), "0")
   c.Clear
@@ -1635,7 +1695,7 @@ Public Function DWGDecodeCommon(c As Collection) As Collection
 
         Case "linewt"
           i = DWGDecodeHex(sVal)
-          prp.Add(i, "width")
+          prp.Add(i, "linewt")
 
         Case "ltype_scale"
           f = DWGDecodeFloat(CStr(v))
@@ -2409,7 +2469,7 @@ Public Function DWGAlias() As Collection
 
   Dim d As New Collection
 
-  d.Add("width", "linewt")
+  d.Add("linewt", "linewt")
   d.Add("style", "ltype_flags")
   d.Add("block", "ownerhandle")
 
@@ -2451,7 +2511,7 @@ Public Function DWGArrangeEnty(c As Collection) As Collection
       Endif
     Endif
 
-    For Each tag In ["layer", "style", "width"]
+    For Each tag In ["layer", "style", "linewt"]
       If c.Exist(tag) Then
         o.Add(c[tag], tag)
       Else
@@ -2900,7 +2960,7 @@ Public Function DXFEntityCodes(Optional ent As String) As Collection
   cod.Add("layer", "8") '*
   cod.Add("colour", "62") '*
   cod.Add("material", "347")
-  cod.Add("width", "370") '*
+  cod.Add("linewt", "370") '*
   cod.Add("linetype_scale", "48")
 
   cod.Add("visible", "60") '*
@@ -3850,7 +3910,7 @@ Private Function DXFLayerList(sItem As String) As Collection
             Endif
 
           Case "370"
-            cTmp.Add(CInt(sVal), "width")
+            cTmp.Add(CInt(sVal), "linewt")
 
         End Select
         If cTmp.Exist("print") = False Then
@@ -4198,8 +4258,8 @@ Private Function DXFDecodeEntity(sItem As String) As Collection
     cTmp.Add(0, "style")
   Endif
 
-  If cTmp.Exist("width") = False Then
-    cTmp.Add(0, "width")
+  If cTmp.Exist("linewt") = False Then
+    cTmp.Add(0, "linewt")
   Endif
 
   If cTmp.Exist("colour") = False Then
@@ -4242,7 +4302,7 @@ Private Function DXFDecodeEntity(sItem As String) As Collection
       Endif
 
       Select cTmp.Key
-        Case "entity", "handle", "layer", "style", "width", "colour", "blkid", "visible", "paper", "elev", "thick"
+        Case "entity", "handle", "layer", "style", "linewt", "colour", "blkid", "visible", "paper", "elev", "thick"
           cTmp2.Add(cTmp[cTmp.Key], cTmp.Key)
       End Select
 
@@ -4416,7 +4476,7 @@ Private Function DXFDecodeEntity(sItem As String) As Collection
         Next
     End Select
 
-    cTmp2.Add(0, "width")
+    cTmp2.Add(0, "linewt")
 
     Return cTmp2
   Else
