@@ -316,15 +316,40 @@ Public Function Import(cImp As Collection, cMdl As Collection) As Integer[]
           Case "LWPOLYLINE"
             te["p"] = e["points"]
 
+          Case "SPLINE"
+            te["p"] = e["fit_pts"]
+
           Case "ARC"
             te["p"] = [e["center"]]
-            te["radius"] = [e["radius"]]
-            te["start_angle"] = [e["start_angle"]]
-            te["end_angle"] = [e["end_angle"]]
+            te["radius"] = e["radius"]
+            te["start_angle"] = e["start_angle"]
+            te["end_angle"] = e["end_angle"]
 
           Case "CIRCLE"
             te["p"] = [e["center"]]
-            te["radius"] = [e["radius"]]
+            te["radius"] = e["radius"]
+
+          Case "ELLIPSE"
+            te["p"] = [e["center"]]
+            te["p"].Add(e["sm_axis"])
+            te["ratio"] = e["axis_ratio"]
+            te["start_angle"] = e["start_angle"]
+            te["end_angle"] = e["end_angle"]
+
+          Case "TEXT"
+            te["p"] = [e["ins_pt"]]
+
+            te["angle"] = ATan2(e["extrusion"][0], e["extrusion"][1])
+
+            te["text"] = e["text_value"]
+            te["text_height"] = e["height"]
+
+          Case "MTEXT"
+            te["p"] = [e["ins_pt"]]
+            te["angle"] = e["rotation"]
+            te["text"] = e["text"]
+            te["text_height"] = e["text_height"]
+            te["attachment"] = e["attachment"]
 
         End Select
 
@@ -387,7 +412,7 @@ Public Function DWGCommonTags(Optional sEntity As String) As Collection
       comm.Add("invisible", "invisible")
       comm.Add("width", "linewt") '#
       comm.Add("material", "material")
-      comm.Add("ltype", "ltype")
+      comm.Add("style", "ltype")
       comm.Add("ltype_scale", "ltype_scale")
       comm.Add("plotstyle", "plotstyle")
 
