@@ -89,14 +89,14 @@ Public Sub Draw(oE As Entity)
 
   oE.ColorToPaint = gcd.GetGBColor(oE.colour, oE.Layerid)
 
-  GLplus.PolyLines(oE.p, oE.ColorToPaint, oE.LineWidth, oe.linetype)
+  GLplus.PolyLines(oE.p, oE.ColorToPaint, oE.LineWidth, oe.linetype, oe.fParam[0])
 
 End
 
 Public Sub DrawSelected(oE As Entity)
 
-  GLplus.PolyLines(oE.P, Starter.flgWindowBackColor, oE.LineWidth, gcd.stiDashed)
-  GLplus.PolyLines(oE.P, gcd.ColorForSelected, oE.LineWidth, oE.LineType)
+  GLplus.PolyLines(oE.P, Starter.flgWindowBackColor, oE.LineWidth, gcd.stiDashed, oe.fParam[0])
+  GLplus.PolyLines(oE.P, gcd.ColorForSelected, oE.LineWidth, oE.LineType, oe.fParam[0])
 
 End
 
