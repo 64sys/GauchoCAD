@@ -367,9 +367,8 @@ Public Function ImportModel(colData As Collection, obxEntities As Entity[], Opti
   'Dim ratio As Float
 
   For Each colGrp In colData
-    'If colGrp.Exist("entity") Then
+
     ImportEntities2(colGrp, obxEntities, BlockName)
-    'Endif
 
   Next
 
@@ -751,13 +750,7 @@ Public Function ImpEnty3(colGrp As Collection, obx As Entity[], Optional sb As S
         Inc t
 
       Case "mtext"
-        vrt = [IIf(e.Exist("rotation"), e["rotation"], 0), e["text_height"], e["text"]] ' dxf 50,40,1
-        'vrt.Add(IIf(e.Exist("attachment"), e["attachment"], 1)) ' dxf 71
-        'vrt.Add(IIf(e.Exist("style"), e["style"], "standar")) ' dxf 7"
-        'vrt.Add("standar") ' dxf 7"
-        'vrt.Add(IIf(e.Exist("flow_dir"), e["flow_dir"], 1)) ' dxf 72
-        'vrt.Add(IIf(e.Exist("extents_height"), e["extents_height"], 1)) ' dxf 42
-        'vrt.Add(IIf(e.Exist("extents_width"), e["extents_width"], 1)) ' dxf 43
+        vrt = [IIf(e.Exist("rotation"), e["rotation"], 0), e["text_height"], e["text"]]
         AddText(obx, fxp, vrt[0], vrt[1], vrt[2], ic, iw, st, sy, sb)
         '  AddMText(obx, fxp, e["angle"], e["text_height"], sText, ic, iw, st, sy, sb)
         Inc t
@@ -780,54 +773,46 @@ Public Function ImportEntities2(colGrp As Collection, obxEntities As Entity[], O
   Dim i, iTotalEntities As Integer
   Dim flxPoints As New Float[]
   Dim P As Float[]
-  Dim ratioAs As Float
-  Dim LineWidth As Float
+  Dim ratio, LineWidth As Float
   Dim colEnt As Collection
   Dim sText As String
-  Dim iColor As Integer
-  Dim sStyle As String
-  Dim sLayer As Variant
 
   For Each colEnt In colGrp
     If colEnt.Exist("error") = False Then
       flxPoints.Clear
-      LineWidth = 2 'colent["width"] 'Abs(LineWidth)
-      sLayer = colEnt["layer"]
-      iColor = colEnt["colour"]
-      sStyle = colEnt["style"]
-
+      LineWidth = Abs(LineWidth)
       Select LCase$(colEnt["entity"]) 'colData.Key
 
         Case "line"
           GoSub GetPoints
-          AddLine(obxEntities, flxPoints, iColor, LineWidth, sStyle, sLayer, BlockName)
+          AddLine(obxEntities, flxPoints, colEnt["colour"], LineWidth, colEnt["style"], colEnt["layer"], BlockName)
           Inc iTotalEntities
         Case "spline"
           GoSub GetPoints
-          AddSPLine(obxEntities, flxPoints, iColor, LineWidth, sStyle, sLayer, BlockName)
+          AddSPLine(obxEntities, flxPoints, colEnt["closed"], colEnt["colour"], LineWidth, colEnt["style"], colEnt["layer"], BlockName)
           Inc iTotalEntities
         Case "lwpolyline", "polyline"
           GoSub GetPoints
-          AddPolyLine(obxEntities, flxPoints, iColor, LineWidth, sStyle, sLayer, BlockName)
+          AddPolyLine(obxEntities, flxPoints, colEnt["closed"], colEnt["colour"], LineWidth, colEnt["style"], colEnt["layer"], BlockName)
           Inc iTotalEntities
         Case "solid"
           GoSub GetPoints
-          AddSolid(obxEntities, flxPoints, iColor, LineWidth, sStyle, sLayer, BlockName)
+          AddSolid(obxEntities, flxPoints, colEnt["colour"], LineWidth, colEnt["style"], colEnt["layer"], BlockName)
           Inc iTotalEntities
         Case "ellipse"
           GoSub GetPoints
 
-          AddEllipse(obxEntities, flxPoints, colEnt["ratio"], colEnt["start_angle"], colEnt["end_angle"], iColor, LineWidth, sStyle, sLayer, BlockName)
+          AddEllipse(obxEntities, flxPoints, colEnt["ratio"], colEnt["start_angle"], colEnt["end_angle"], colEnt["colour"], LineWidth, colEnt["style"], colEnt["layer"], BlockName)
           Inc iTotalEntities
 
         Case "circle"
           GoSub GetPoints
-          AddCircle(obxEntities, flxPoints, colEnt["radius"], iColor, LineWidth, sStyle, sLayer, BlockName)
+          AddCircle(obxEntities, flxPoints, colEnt["radius"], colEnt["colour"], LineWidth, colEnt["style"], colEnt["layer"], BlockName)
           Inc iTotalEntities
 
         Case "arc"
           GoSub GetPoints
-          AddArc(obxEntities, flxPoints, colEnt["radius"], colEnt["start_angle"], colEnt["end_angle"], iColor, LineWidth, sStyle, sLayer, BlockName)
+          AddArc(obxEntities, flxPoints, colEnt["radius"], colEnt["start_angle"], colEnt["end_angle"], colEnt["colour"], LineWidth, colEnt["style"], colEnt["layer"], BlockName)
           Inc iTotalEntities
 
         Case "insert"
@@ -836,7 +821,7 @@ Public Function ImportEntities2(colGrp As Collection, obxEntities As Entity[], O
           'flxPoints.Add(colEnt["p"]["p0"][0])
           'flxPoints.Add(colEnt["p"]["p0"][1])
           'If LCase$(colEnt["block"]) = "toma aa" Then Stop
-          AddInsert(obxEntities, flxPoints, colEnt["scalex"], colEnt["scaley"], colEnt["angle"], iColor, sStyle, sLayer, colEnt["block"])
+          AddInsert(obxEntities, flxPoints, colEnt["scalex"], colEnt["scaley"], colEnt["angle"], colEnt["colour"], colEnt["style"], colEnt["layer"], colEnt["block"])
           Inc iTotalEntities
 
         Case "text"
@@ -845,7 +830,7 @@ Public Function ImportEntities2(colGrp As Collection, obxEntities As Entity[], O
           'flxPoints.Add(colEnt["p"]["p0"][1])
           sText = colEnt["text"]
           Try sText = colEnt["text2"] & sText
-          AddText(obxEntities, flxPoints, colEnt["angle"], colEnt["text_height"], sText, iColor, LineWidth, sStyle, sLayer, BlockName)
+          AddText(obxEntities, flxPoints, colEnt["angle"], colEnt["text_height"], sText, colEnt["colour"], LineWidth, colEnt["style"], colEnt["layer"], BlockName)
           Inc iTotalEntities
 
         Case "mtext"
@@ -854,12 +839,12 @@ Public Function ImportEntities2(colGrp As Collection, obxEntities As Entity[], O
           'flxPoints.Add(colEnt["p"]["p0"][1])
           sText = colEnt["text"]
           Try sText = colEnt["text2"] & sText
-          AddMText(obxEntities, flxPoints, IIf(colEnt["angle"], colEnt["angle"], 0), colEnt["text_height"], sText, iColor, LineWidth, sStyle, sLayer, BlockName)
+          AddMText(obxEntities, flxPoints, colEnt["angle"], colEnt["text_height"], sText, colEnt["colour"], LineWidth, colEnt["style"], colEnt["layer"], BlockName)
           Inc iTotalEntities
 
         Case "dimmension"
           GoSub GetPoints
-          AddDim(obxEntities, flxPoints, colEnt["angle"], colEnt["text_height"], colEnt["text"], iColor, LineWidth, sStyle, sLayer, BlockName)
+          AddDim(obxEntities, flxPoints, colEnt["angle"], colEnt["text_height"], colEnt["text"], colEnt["colour"], LineWidth, colEnt["style"], colEnt["layer"], BlockName)
           Inc iTotalEntities
 
       End Select

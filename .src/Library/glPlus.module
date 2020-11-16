@@ -464,9 +464,11 @@ Public Function Arc(Optional radio As Float, start_angle As Float, length As Flo
 End
 '' Dibuja un seria de polilinea
 
-Public Function PolyLines(vertices As Float[], Optional colour As Integer = 0, LineWidth As Float = 1, dashes As Integer)
+Public Function PolyLines(vertices As Float[], Optional colour As Integer = 0, LineWidth As Float = 1, dashes As Integer, Optional iOpen As Boolean = True)
 
-  Dim i As Integer
+  Dim i, iMax As Integer
+
+  If iOpen Then iMax = vertices.Max Else iMax = vertices.Max - 2
 
   'glColorRGB(colour)
   gl.LineWidth(LineWidth) ' obsoleto en WebGL
@@ -501,7 +503,7 @@ Public Function PolyLines(vertices As Float[], Optional colour As Integer = 0, L
   '
   ' End Select
   '
-  For i = 0 To vertices.Max Step 2
+  For i = 0 To iMax Step 2
     glColorRGB(colour)
     gl.Vertex2f(vertices[i], vertices[i + 1])
   Next

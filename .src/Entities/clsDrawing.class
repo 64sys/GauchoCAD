@@ -1,8 +1,6 @@
 ' Gambas class file
 
 ' Tool maintained by Terco
-' PlantDesigner
-' Software para diseño de plantas tipo de hormigon
 '
 ' Copyright (C) Ing Martin P Cristia
 '
@@ -20,14 +18,6 @@
 ' along with this program; if not, write to the Free Software
 ' Foundation, Inc., 51 Franklin St, Fifth Floor,
 ' Boston, MA  02110-1301  USA
-' Gambas class file
-
-' Credits
-' --------
-' Icon design por Trinh Ho ,Good Ware, freepik get them at https://www.flaticon.es
-' Scheme inspired on example called MuchosCirculos by JGuardon y Shell
-' XML Load/Save by Tincho
-' GUI by Postpase/Tincho
 
 Public KeysAccumulator As String
 Public FirstTime As Boolean = True

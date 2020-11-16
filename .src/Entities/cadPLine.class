@@ -93,7 +93,6 @@ Public Sub Draw(oE As Entity)
 
 End
 
-'' A fat version of the entity
 Public Sub DrawSelected(oE As Entity)
 
   GLplus.PolyLines(oE.P, Starter.flgWindowBackColor, oE.LineWidth, gcd.stiDashed)

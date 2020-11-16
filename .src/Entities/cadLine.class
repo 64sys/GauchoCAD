@@ -94,9 +94,13 @@ End
 Public Sub DrawSelected(oE As Entity)
 
   Dim i As Integer
+  Dim iLineType As Integer
 
-  GLplus.Lines(oE.p, Starter.flgWindowBackColor, oE.LineWidth, gcd.stiDashed)
-  GLplus.Lines(oE.p, gcd.ColorForSelected, oE.LineWidth, oE.LineType)
+  If oe.LineType = gcd.stiDashed Then iLineType = 0 Else iLineType = gcd.stiDashed
+
+  GLplus.Lines(oE.p, Starter.flgWindowBackColor, oE.LineWidth, iLineType)
+
+  GLplus.Lines(oE.p, gcd.ColorForSelected, oE.LineWidth, oe.LineType)
 
 End
 '' A fat version of the line
