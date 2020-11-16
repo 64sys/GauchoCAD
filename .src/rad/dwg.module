@@ -14,7 +14,7 @@ Public Function info(f As String) As Collection
   Dim tag1 As String
   Dim val1 As Variant
   Dim tag2 As String
-  Dim obx As New String[]           '' Objects type list
+  '  Dim obx As New String[]           '' Objects type list
   Dim etx As New String[]           '' Entities type list
   Dim i As Integer
   Dim prp As Variant
@@ -24,10 +24,10 @@ Public Function info(f As String) As Collection
   Dim cUnkn As New Collection
 
   Dim cClas As New Collection
-  Dim vxCls As New Variant[]
+  ' Dim vxCls As New Variant[]
 
   Dim cObjs As New Collection
-  Dim vxObj As New Variant[]
+  '  Dim vxObj As New Variant[]
 
   Dim cLayers As New Collection     ''LAYER
   Dim cLineTypes As New Collection  ''LTYPE (Line types)
@@ -36,8 +36,8 @@ Public Function info(f As String) As Collection
   Dim cTextStyles As New Collection ''STYLE (Text styles)
 
   Dim cEntities As New Collection
-  Dim vxEnt As New Variant[]
-  Dim obs As String
+  'Dim vxEnt As New Variant[]
+  'Dim obs As String
   Dim cStat As Collection
   Dim tag As String
 
@@ -203,6 +203,33 @@ Public Function info(f As String) As Collection
 
 End
 
+'' Convert a dwg to dxf
+Public Function Todxf(sFile As String) As String
+
+  Dim dwg As String
+  Dim FileOutput As String
+
+  dwg = "/tmp/tmp.dwg"
+
+  If Exist(sFile) Then
+    If Exist(dwg) Then
+      Shell "rm " & dwg Wait
+    Endif
+
+    If Lower(File.Ext(sFile)) = "dxf" Then
+      Shell "/usr/local/bin/dxf2dwg -y -o '" & dwg & "' '" & sFile & "'" Wait
+      If Exist(dwg) Then
+        FileOutput = dwg
+      Else
+        FileOutput = ""
+      Endif
+    Endif
+  Endif
+
+  Return FileOutput
+
+End
+
 '' Convert a json file to gambas collection
 
 Private Function Json2Gbas(sRaw As String) As Variant[]
@@ -219,8 +246,13 @@ Private Function Json2Gbas(sRaw As String) As Variant[]
     If String.InStr(stx[i], "\"\": ") > 0 Then
       stx[i] = Replace(stx[i], "\"\": ", "\"" & CStr(i) & "\": ")
     Endif
+
+    If String.InStr(stx[i], "-nan") > 0 Then
+      stx[i] = Replace(stx[i], "-nan", "0.0")
+    Endif
+
   Next
-  File.Save(User.Home &/ "tmp.json", stx.Join("\n"))
+  File.Save("/tmp/tmp.json", stx.Join("\n"))
   'vrt = JSON.Decode(File.Load(User.Home &/ "dwg.json"), True)
   vrt = JSON.Decode(stx.Join("\n"), True)
 

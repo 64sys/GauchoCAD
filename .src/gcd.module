@@ -1151,7 +1151,7 @@ End
 Public Function ApplyLayerProperties(Optional mode As Integer = 0)
 
   Dim e As Entity, cLayer As Collection
-  Dim LayerName As String
+  'Dim LayerName As String
 
   Print "Aplicando propiedades del Layers"
 
@@ -1183,7 +1183,7 @@ End
 Public Function ApplyLayerPropertieToEntity(e As Entity)
 
   Dim cLayer As Collection
-  Dim LayerName As String
+  'Dim LayerName As String
 
   ' reconstruyo el ID del layer en la entidad, para ello busco en la lista cual coincide con su nombre
   For Each cLayer In gcd.CurrentDrawing.cModel["Layers"]
