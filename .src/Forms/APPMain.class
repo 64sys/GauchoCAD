@@ -663,6 +663,40 @@ Public Sub GLArea1_MouseDown()
 
 End
 
+Public Sub glarea1_DblClick()
+
+  CursorX = mouse.x
+  CursorY = mouse.y
+
+  Select Case gcd.clsJob.gender
+
+    Case "Default"                                                  ' 1. Seleccionando
+
+      If Not clsMouseTracking.flgSearchingPOI Then
+        gcd.CurrentDrawing.iEntity = clsMouseTracking.CheckPOI(Xreal(mouse.x), Yreal(mouse.Y))
+      Else    ' estoy buscando, pero me movi, asi que me desengancho del POI anterior
+
+        gcd.CurrentDrawing.iEntity[0] = Xreal(mouse.x)
+        gcd.CurrentDrawing.iEntity[1] = Yreal(mouse.y)
+        gcd.CurrentDrawing.iEntity[2] = -1                 ' POI type
+        gcd.CurrentDrawing.iEntity[3] = -1                 ' Hooked entity
+
+      End If
+
+      If gcd.CurrentDrawing.iEntity[3] >= 0 Then
+
+        Stop
+        ' TINCHO aca podes lanzar tu editor de texto u otras propiedades
+
+      Endif
+
+      '======================= otra Tool
+    Case Else
+
+  End Select
+
+End
+
 Public Sub GLArea1_MouseMove()
 
   CursorX = mouse.x

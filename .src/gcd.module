@@ -806,12 +806,12 @@ Public Function ImportEntities2(colGrp As Collection, obxEntities As Entity[], O
           Inc iTotalEntities
         Case "spline"
           GoSub GetPoints
-          iClosed = colEnt["scenario"]
+          Try iClosed = colEnt["scenario"] ' TINCHO reparar esto para los DXF
           AddSPLine(obxEntities, flxPoints, iClosed, iColor, fLinewt, sLtype, sLayer, BlockName)
           Inc iTotalEntities
         Case "lwpolyline", "polyline"
           GoSub GetPoints
-          iClosed = colEnt["closed"]
+          Try iClosed = colEnt["closed"] ' TINCHO reparar esto para los DXF
           AddPolyLine(obxEntities, flxPoints, iClosed, iColor, fLinewt, sLtype, sLayer, BlockName)
           Inc iTotalEntities
         Case "solid"
