@@ -356,10 +356,12 @@ Public Function Import(cImp As Collection, cMdl As Collection) As Integer[]
             te["p"] = e["points"]
 
           Case "SPLINE"
+            te["scenario"] = e["scenario"]
+              te["degree"] = e["degre"]
             te["p"] = e["fit_pts"]
 
-          Case "ARC"
-            te["p"] = [e["center"]]
+        Case "ARC"
+          te["p"] = [e["center"]]
             te["radius"] = e["radius"]
             te["start_angle"] = e["start_angle"]
             te["end_angle"] = e["end_angle"]
@@ -387,6 +389,7 @@ Public Function Import(cImp As Collection, cMdl As Collection) As Integer[]
             te["text"] = e["text"]
             te["text_height"] = e["text_height"]
             te["attachment"] = e["attachment"]
+            te["flow_dir"] = e["flow_dir"]
 
           Case "INSERT"
             te["p"] = [e["ins_pt"]]

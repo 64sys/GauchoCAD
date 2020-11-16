@@ -806,7 +806,8 @@ Public Function ImportEntities2(colGrp As Collection, obxEntities As Entity[], O
           Inc iTotalEntities
         Case "spline"
           GoSub GetPoints
-          AddSPLine(obxEntities, flxPoints, iColor, fLinewt, sLtype, sLayer, BlockName)
+          iClosed = colEnt["scenario"]
+          AddSPLine(obxEntities, flxPoints, iClosed, iColor, fLinewt, sLtype, sLayer, BlockName)
           Inc iTotalEntities
         Case "lwpolyline", "polyline"
           GoSub GetPoints
