@@ -212,7 +212,14 @@ Public Sub Run(cin As Collection)
   btnGrid.Picture = Image.Load("./svg/locks/grid.svg").Stretch(35, 35).Picture
   btnOrtho.Picture = Image.Load("./svg/locks/ortho.svg").Stretch(35, 35).Picture
 
+  btnSelectionMode.Value = True
+  btnSelectionMode.Picture = Image.Load("./svg/locks/tools.svg").Stretch(35, 35).Picture
+
   TableView1.Rows.Height = 35
+
+  SelectionMode()
+  'pnlProperties.Visible = False
+  'pnlIcons.Visible = True
 
   Me.Show()
 
@@ -485,37 +492,38 @@ End
 
 Public Sub locks_Click()
 
-  Dim obj As Object
+  Select Last.Tag
+    Case "selection"
+      If Last.Value Then
+        pnlIcons.Visible = False
+        pnlProperties.Visible = True
+        Last.Picture = Image.Load("./svg/locks/selection.svg").Stretch(35, 35).Picture
+      Else
+        pnlIcons.Visible = True
+        pnlProperties.Visible = False
+        Last.Picture = Image.Load("./svg/locks/tools.svg").Stretch(35, 35).Picture
+      Endif
 
-  obj = Last
-
-  Select obj.Tag
     Case "bounds"
-      Select obj.Value
-        Case True
-          gcd.DrawBounds = True
-        Case Else
-          gcd.DrawBounds = False
-      End Select
-      'gcd.DrawBounds = Not gcd.DrawBounds
+      If Last.Value Then
+        gcd.DrawBounds = True
+      Else
+        gcd.DrawBounds = False
+      Endif
 
     Case "grid"
-      Select obj.Value
-        Case True
-          puntos.Gridactive = True
-        Case Else
-          puntos.Gridactive = False
-      End Select
-
-      'puntos.Gridactive = Not puntos.Gridactive
+      If Last.Value Then
+        puntos.Gridactive = True
+      Else
+        puntos.Gridactive = False
+      Endif
 
     Case "ortho"
-      Select obj.Value
-        Case True
-          gcd.Orthogonal = True
-        Case Else
-          gcd.Orthogonal = False
-      End Select
+      If Last.Value Then
+        gcd.Orthogonal = True
+      Else
+        gcd.Orthogonal = False
+      Endif
 
   End Select
 
@@ -1654,9 +1662,11 @@ Public Sub SelectionRefresh()
   Next
 
   If etype.Count > 0 Then
-    pnlProperties.Visible = True
+    'pnlProperties.Visible = True
+    SelectionMode("selection")
     PropertiesFlag = True
   Else
+    SelectionMode()
     pnlProperties.Visible = False
     PropertiesFlag = False
   Endif
@@ -1673,25 +1683,25 @@ Public Sub SelectionRefresh()
         Endif
       Next
 
-      ' Select e.Gender
-      '   Case "Text"
-      '     If EditingText = False Then
-      '       ' Copying the entity for undo
-      '       te = clsEntities.ClonEntity(e)
-      '       te.Handle = e.Handle
-      '       ftx = New FText([pnlDrawing.ScreenX + 7, pnlDrawing.ScreenY + pnlDrawing.H - 7], e)
-      '       ftx.Run()
-      '       While EditingText = False
-      '         Wait 0.1
-      '       Wend
-      '       appmain.regen
-      '       EditingText = False
-      '     Endif
-      '   Case Else
-      '     ComboBox1.Add(etype[0])
-      '     ComboBox1.Text = etype[0]
-      '     LoadPropertiesList(etype[0])
-      ' End Select
+      Select e.Gender
+        Case "Text"
+          '     If EditingText = False Then
+          '       ' Copying the entity for undo
+          '       te = clsEntities.ClonEntity(e)
+          '       te.Handle = e.Handle
+          '       ftx = New FText([pnlDrawing.ScreenX + 7, pnlDrawing.ScreenY + pnlDrawing.H - 7], e)
+          '       ftx.Run()
+          '       While EditingText = False
+          '         Wait 0.1
+          '       Wend
+          '       appmain.regen
+          '       EditingText = False
+          '     Endif
+        Case Else
+          ComboBox1.Add(etype[0])
+          ComboBox1.Text = etype[0]
+          LoadPropertiesList(etype[0])
+      End Select
 
     Case Else
       ComboBox1.Add(("All"))
@@ -2040,7 +2050,8 @@ Public Sub TableView1_Click()
 
     Case "Color"
       If SelectingColor = False Then
-        FClr = New FColors16([Me.screenx + Me.W - 320 - 5, TableView1.ScreenY - ComboBox1.H + 9], Me)
+        'FClr = New FColors16([Me.screenx + Me.W - 320 - 5, TableView1.ScreenY - ComboBox1.H + 9], Me)
+        FClr = New FColors16([pnlDrawing.ScreenX + 5, pnlDrawing.ScreenY + 5], Me)
         FClr.Border = False
         FClr.Stacking = Window.Above
         FClr.Show()
@@ -2076,7 +2087,8 @@ Public Sub TableView1_Click()
           Endif
         Next
 
-        lst = New FLtypes(Starter.cStyles, [Me.screenx + Me.W - wtmp - 16, TableView1.ScreenY - ComboBox1.H + 9], Me)
+        'lst = New FLtypes(Starter.cStyles, [Me.screenx + Me.W - wtmp - 16, TableView1.ScreenY - ComboBox1.H + 9], Me)
+        lst = New FLtypes(Starter.cStyles, [pnlDrawing.ScreenX + 5, pnlDrawing.Screeny + 5], Me)
         lst.Run()
         Do
           If SelectingLtype = True Then
@@ -2105,7 +2117,8 @@ Public Sub TableView1_Click()
             wmax = wtmp
           Endif
         Next
-        frm = New FWidths(Starter.cWidths, [Me.screenx + Me.W - wtmp - 16, TableView1.ScreenY - ComboBox1.H + 9], Me)
+        'frm = New FWidths(Starter.cWidths, [Me.screenx + Me.W - wtmp - 16, TableView1.ScreenY - ComboBox1.H + 9], Me)
+        frm = New FWidths(Starter.cWidths, [pnlDrawing.ScreenX + 5, pnlDrawing.Screeny + 5], Me)
         frm.Run()
         Do
           If SelectingWidth = True Then
@@ -2248,9 +2261,13 @@ Public Sub Form_KeyPress()
             If PropertiesFlag = False Then
               pnlProperties.Visible = True
               PropertiesFlag = True
+              pnlIcons.Visible = False
+              btnSelectionMode.Value = False
             Else
               pnlProperties.Visible = False
               PropertiesFlag = False
+              pnlIcons.Visible = True
+              btnSelectionMode.Value = True
             Endif
 
           Case Asc("2") ' Layers
@@ -2370,6 +2387,18 @@ End
 Public Sub btnSave_Click()
 
   PropSave()
+
+End
+
+Public Sub SelectionMode(Optional sMode As String)
+
+  If sMode = "selection" Then
+    pnlProperties.Visible = True
+    btnSelectionMode.Value = True
+  Else
+    btnSelectionMode.Value = False
+    pnlProperties.Visible = False
+  Endif
 
 End
 
