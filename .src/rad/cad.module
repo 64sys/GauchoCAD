@@ -28,7 +28,7 @@ Export
 Public Function Import(cImp As Collection, cMdl As Collection) As Integer[]
 
   Dim ix As New Integer[]
-  Dim im As Variant
+  'Dim im As Variant
 
   Dim xFile As Collection
   Dim xTextStyles As Collection
@@ -44,19 +44,19 @@ Public Function Import(cImp As Collection, cMdl As Collection) As Integer[]
   Dim auxWidts As New Collection
   Dim xEntities As Collection
   Dim x As Variant
-  Dim p As Variant
+  'Dim p As Variant
 
-  Dim Enty As Variant
-  Dim Lay As Variant
+  'Dim Enty As Variant
+  'Dim Lay As Variant
 
-  Dim mFile As Collection
+  'Dim mFile As Collection
   Dim mTextStyles As Collection
   Dim mVariables As Collection
   Dim mLayers As Collection
-  Dim mBlocks As Collection
-  Dim mLineTypes As Collection
-  Dim mDimStyles As Collection
-  Dim mObjects As Collection
+  'Dim mBlocks As Collection
+  'Dim mLineTypes As Collection
+  'Dim mDimStyles As Collection
+  'Dim mObjects As Collection
   Dim mEntities As Collection
   Dim m As Variant
   Dim lx As Variant
@@ -65,7 +65,7 @@ Public Function Import(cImp As Collection, cMdl As Collection) As Integer[]
   Dim nlay As New Collection
   Dim nsty As New Collection
   Dim qlay As Integer               '' Number of layers
-  Dim xWidth As Integer
+  'Dim xWidth As Integer
   Dim xStyle As Integer
   Dim xColor As Integer
   Dim xFrozen As Boolean
@@ -73,15 +73,15 @@ Public Function Import(cImp As Collection, cMdl As Collection) As Integer[]
   Dim xShow As Boolean
   Dim xLocked As Boolean
   Dim e As Variant
-  Dim tEnt As New Collection
+  'Dim tEnt As New Collection
   Dim te As New Collection
   Dim cmx As New Collection
-  Dim emx As New Collection
+  'Dim emx As New Collection
   Dim prp As Variant
-  Dim tmp As New Collection
+  'Dim tmp As New Collection
   Dim mWidths As Variant
   Dim sTag As String
-  Dim i As Integer
+  '  Dim i As Integer
   Dim vrt As Variant
 
   If cImp.Exist("File") Then
@@ -312,11 +312,16 @@ Public Function Import(cImp As Collection, cMdl As Collection) As Integer[]
                 Endif
 
               Case "layer"
-                If auxLayer.Exist(CStr(prp[2])) Then
-                  vrt = auxLayer[CStr(prp[2])]
+                If prp.Count > 0 Then
+                  If auxLayer.Exist(CStr(prp[prp.max])) Then
+                    vrt = auxLayer[CStr(prp[prp.max])]
+                  Else
+                    vrt = "0"
+                  Endif
                 Else
                   vrt = "0"
                 Endif
+
               Case "color"
                 If prp.Exist("index") Then
                   vrt = prp["index"]
@@ -329,12 +334,12 @@ Public Function Import(cImp As Collection, cMdl As Collection) As Integer[]
             Select e.Key
               Case "linewt"
                 If auxWidts.Exist(prp) Then
-                  'vrt = auxWidts[prp][0]
                   vrt = prp
                 Else
                   vrt = 31
-                  'vrt = "Default"
                 Endif
+              Case "color"
+                vrt = prp
             End Select
           Endif
           te.Add(vrt, sTag)

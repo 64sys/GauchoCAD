@@ -336,7 +336,7 @@ Public Sub AddLtypesPics()
   Dim dash As Float[]
   Dim img As Image
   Dim hColor As ColorInfo
-  Dim pxl As Integer
+  'Dim pxl As Integer
 
   hColor = Color[Color.ButtonBackground]
 
@@ -643,6 +643,8 @@ Public Sub GLArea1_MouseDown()
 
   If Mouse.Right Then Return  'handled in MouseUp
 
+  If Mouse.Middle Then Return  'handled in MouseUp
+
   Select Case gcd.clsJob.gender
 
     Case "Default"                                                  ' 1. Seleccionando
@@ -663,7 +665,12 @@ Public Sub GLArea1_MouseDown()
 
 End
 
-Public Sub glarea1_DblClick()
+Public Sub GLArea1_DblClick()
+
+  Dim k As Single
+  Dim e As Entity
+  Dim te As Entity
+  Dim ftx As FText
 
   CursorX = mouse.x
   CursorY = mouse.y
@@ -685,11 +692,28 @@ Public Sub glarea1_DblClick()
 
       If gcd.CurrentDrawing.iEntity[3] >= 0 Then
 
-        Stop
+        'Stop
+        ' I comment the abobe line because its stop my tool also. What is the idea whit stop?
         ' TINCHO aca podes lanzar tu editor de texto u otras propiedades
+        k = gcd.CurrentDrawing.iEntity[3]
+        e = gcd.CurrentDrawing.arrEntities[k]
 
+        Select e.Gender
+          Case "Text"
+            If EditingText = False Then
+              ' Copying the entity for undo
+              te = clsEntities.ClonEntity(e)
+              te.Handle = e.Handle
+              ftx = New FText([pnlDrawing.ScreenX + 7, pnlDrawing.ScreenY + pnlDrawing.H - 7], e)
+              ftx.Run()
+              While EditingText = False
+                Wait 0.1
+              Wend
+              APPMain.Regen
+              EditingText = False
+            Endif
+        End Select
       Endif
-
       '======================= otra Tool
     Case Else
 
@@ -789,9 +813,22 @@ Public Sub GLArea1_MouseUp()
       gcd.clsJob.Start()
     Endif
 
-  Else ' Left Click
+  Else If Mouse.Left Then
 
     gcd.clsJob.MouseUp(mouse.x, mouse.y)
+
+  Else If Mouse.Middle Then
+
+    If gcd.clsJob.gender <> "Pan" Then
+      gcd.clsJobPreZoom = gcd.clsJob
+      gcd.clsJob = cadPan
+      gcd.clsJob.Start()
+
+    Else
+
+      gcd.clsJob = gcd.clsJobPreZoom
+
+    End If
 
   End If
 
@@ -971,18 +1008,20 @@ Public Sub gTask(sTask As String)
 
   Dim hFConfig As FConfig                 '' Edit program configuration
   Dim hFAbout As FAbout                  '' Formulario que muestra informacin del programa
-  Dim w As Window
+  'Dim w As Window
   Dim wtag As String
 
   Dim stx As New String[]
   Dim FilePath As String            ''Nombre del archivo que se abrira
+  Dim FileExt As String
   Dim FileDef As String
   Dim i As Integer
-  Dim mdl As New Collection
+  'Dim mdl As New Collection
   Dim template As Boolean
-  Dim Drawing As ClsDrawing
+  'Dim Drawing As ClsDrawing
   Dim NewDrawing As ClsDrawing
-  Dim p As New Collection
+  'Dim p As New Collection
+  Dim FileTmp As String
 
   '' if the drawing is drawingX.xml, drawingX.gcad where X is a integer number then the Ssave is changed to Save As
 
@@ -1040,32 +1079,39 @@ Public Sub gTask(sTask As String)
       stx = dsk.FileChooser(User.Home, ["dxf", "dwg", "json"])
       If stx.count > 0 Then
         FilePath = stx[0]
+        FileExt = String.LCase(File.Ext(FilePath))
 
-        Select String.LCase(File.Ext(FilePath))
-          Case "dxf"
-            mdl = cad.DXFImport(FilePath)       ' esto crea una coleccion con lo importado del DXF
-            ProgressBar1.Value = 1
-            If mdl.Count > 0 Then
-              gcd.CurrentDrawing.cImport = mdl  ' Copio la coleccion de datos a cImport, previo a trnasferir a cModel
-              gcd.EntitiesTransfer2()           ' Transfiero las entidades a cModel
-              gcd.BlocksTransfer()              ' transfiero los bloques
-              gcd.LayersTransfer()              ' transfiero los Layers
-              'LoadDrawingMap2()                               ' lleno el TreeView
-              LoadComboboxes(gcd.CurrentDrawing.cModel)       ' recargo los ComboBox
-              gcd.ImportBlocks(gcd.CurrentDrawing.cModel)     ' Importo los Bloques de cModel a formato binario
-              gcd.ImportModel(gcd.CurrentDrawing.cModel["Entities"], gcd.CurrentDrawing.arrEntities)  ' idem entidades
-              gcd.CurrentDrawing.cImport.Clear    ' libero espacio, limpiando cImport
-              gcd.ApplyLayerProperties(1)         ' aplico las propiedades de los layers a las entidades
-              'clsMouseTracking.ReBuildPOIPoints   ' construyo los puntos de interes para el tracking del mouse
-              Regen                               ' Genero las listas de OpenGL
-              cadZoomE.Start()                    ' Hago un Zoom Extents
+        Select FileExt 'String.LCase(File.Ext(FilePath))
+            'Case "dxf"
+            ' mdl = cad.DXFImport(FilePath)       ' esto crea una coleccion con lo importado del DXF
+            ' ProgressBar1.Value = 1
+            ' If mdl.Count > 0 Then
+            '   gcd.CurrentDrawing.cImport = mdl  ' Copio la coleccion de datos a cImport, previo a trnasferir a cModel
+            '   gcd.EntitiesTransfer2()           ' Transfiero las entidades a cModel
+            '   gcd.BlocksTransfer()              ' transfiero los bloques
+            '   gcd.LayersTransfer()              ' transfiero los Layers
+            '   'LoadDrawingMap2()                               ' lleno el TreeView
+            '   LoadComboboxes(gcd.CurrentDrawing.cModel)       ' recargo los ComboBox
+            '   gcd.ImportBlocks(gcd.CurrentDrawing.cModel)     ' Importo los Bloques de cModel a formato binario
+            '   gcd.ImportModel(gcd.CurrentDrawing.cModel["Entities"], gcd.CurrentDrawing.arrEntities)  ' idem entidades
+            '   gcd.CurrentDrawing.cImport.Clear    ' libero espacio, limpiando cImport
+            '   gcd.ApplyLayerProperties(1)         ' aplico las propiedades de los layers a las entidades
+            '   'clsMouseTracking.ReBuildPOIPoints   ' construyo los puntos de interes para el tracking del mouse
+            '   Regen                               ' Genero las listas de OpenGL
+            '   cadZoomE.Start()                    ' Hago un Zoom Extents
+            '
+            ' Endif
+            '
+            ' ProgressBar1.Visible = False
 
+          Case "json", "dwg", "dxf"
+            If FileExt = "dxf" Then
+              FileTmp = dwg.Todxf(FilePath)
+              gcd.CurrentDrawing.cImport = dwg.info(FileTmp)
+            Else
+              gcd.CurrentDrawing.cImport = dwg.info(FilePath)
             Endif
 
-            ProgressBar1.Visible = False
-
-          Case "json", "dwg"
-            gcd.CurrentDrawing.cImport = dwg.info(FilePath)
             ProgressBar1.Value = 1
             If gcd.CurrentDrawing.cImport.Count > 0 Then
               'Import: Move data from cImport to cModel
@@ -1590,8 +1636,8 @@ Public Sub SelectionRefresh()
   Dim i As Integer
   Dim j As Integer
   ' Text Edit
-  Dim ftx As FText
-  Dim te As New Entity                  '' Cloned entity to put in undo collection
+  'Dim ftx As FText
+  'Dim te As New Entity                  '' Cloned entity to put in undo collection
 
   ComboBox1.Clear
   ComboBox1.Text = ""
@@ -1600,7 +1646,6 @@ Public Sub SelectionRefresh()
 
   For i = 0 To gcd.CurrentDrawing.arrEntities.Max
     e = gcd.CurrentDrawing.arrEntities[i]
-
     If e.Selected Then
       If etype.Exist(e.Gender) = False Then
         etype.Add(e.Gender)
@@ -1609,35 +1654,8 @@ Public Sub SelectionRefresh()
   Next
 
   If etype.Count > 0 Then
-    '   Select e.Gender
-    '     Case "Text"
-    '       If EditingText = False Then
-    '         ' Copying the entity for undo
-    '         te = clsEntities.ClonEntity(e)
-    '         te.Handle = e.Handle
-    '
-    '         ftx = New FText([pnlDrawing.ScreenX + 7, pnlDrawing.ScreenY + pnlDrawing.H - 7], e)
-    '         ftx.Run()
-    '         Do
-    '           If EditingText = True Then
-    '             '              If e.StringData[0] <> CurrentText Then
-    '             '                te = clsEntities.ClonEntity(e)
-    '             '                te.Handle = e.Handle
-    '             '                APPMain.hFCAD.arrUndo.Add(te)
-    '             '                e.StringData[0] = CurrentText
-    '             'Endif
-    '             Break
-    '           Else
-    '             Wait 0.1
-    '           Endif
-    '         Loop
-    '         EditingText = False
-    '       Endif
-    '
-    '     Case Else
     pnlProperties.Visible = True
     PropertiesFlag = True
-    '   End Select
   Else
     pnlProperties.Visible = False
     PropertiesFlag = False
@@ -1647,7 +1665,6 @@ Public Sub SelectionRefresh()
     Case 0
       'Aca se puede poner en off el panel de seleccion ya que no hay entidades seleccionadas
       'skip
-
     Case 1
       For i = 0 To gcd.CurrentDrawing.arrEntities.Max
         e = gcd.CurrentDrawing.arrEntities[i]
@@ -1656,25 +1673,25 @@ Public Sub SelectionRefresh()
         Endif
       Next
 
-      Select e.Gender
-        Case "Text"
-          If EditingText = False Then
-            ' Copying the entity for undo
-            te = clsEntities.ClonEntity(e)
-            te.Handle = e.Handle
-            ftx = New FText([pnlDrawing.ScreenX + 7, pnlDrawing.ScreenY + pnlDrawing.H - 7], e)
-            ftx.Run()
-            While EditingText = False
-              Wait 0.1
-            Wend
-            appmain.regen
-            EditingText = False
-          Endif
-        Case Else
-          ComboBox1.Add(etype[0])
-          ComboBox1.Text = etype[0]
-          LoadPropertiesList(etype[0])
-      End Select
+      ' Select e.Gender
+      '   Case "Text"
+      '     If EditingText = False Then
+      '       ' Copying the entity for undo
+      '       te = clsEntities.ClonEntity(e)
+      '       te.Handle = e.Handle
+      '       ftx = New FText([pnlDrawing.ScreenX + 7, pnlDrawing.ScreenY + pnlDrawing.H - 7], e)
+      '       ftx.Run()
+      '       While EditingText = False
+      '         Wait 0.1
+      '       Wend
+      '       appmain.regen
+      '       EditingText = False
+      '     Endif
+      '   Case Else
+      '     ComboBox1.Add(etype[0])
+      '     ComboBox1.Text = etype[0]
+      '     LoadPropertiesList(etype[0])
+      ' End Select
 
     Case Else
       ComboBox1.Add(("All"))
@@ -1814,7 +1831,7 @@ Public Sub LoadPropertiesList(eFilter As String)
   Dim xC As Class
   Dim sym As String
   Dim fym As String
-  Dim v As Variant
+  'Dim v As Variant
 
   cProp.Clear
   cRaw.Clear
@@ -2002,7 +2019,7 @@ Public Sub TableView1_Click()
   'Linetype
   Dim lst As FLtypes
   Dim vrx As Variant[]
-  Dim img2 As Image
+  'Dim img2 As Image
   Dim wtmp As Integer
   Dim wmax As Integer
 

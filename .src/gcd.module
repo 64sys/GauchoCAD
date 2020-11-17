@@ -50,6 +50,7 @@ Public SnapMode As Integer                      '' Bitwise: -1 Off ; 0 = Nearest
 
 Public clsJob As Object                             '' what I am doing now, thats either selecting or something else
 Public clsJobPrevious As Object                     '' what was doing before
+Public clsJobPreZoom As Object                      '' what was doing before Zooming or Panning
 Public clsJobPreviousParam As Integer               '' a param to pass to clsJob.Start( param )
 
 Public Struct arrBlockSt
@@ -1151,7 +1152,7 @@ End
 Public Function ApplyLayerProperties(Optional mode As Integer = 0)
 
   Dim e As Entity, cLayer As Collection
-  Dim LayerName As String
+  'Dim LayerName As String
 
   Print "Aplicando propiedades del Layers"
 
@@ -1183,7 +1184,7 @@ End
 Public Function ApplyLayerPropertieToEntity(e As Entity)
 
   Dim cLayer As Collection
-  Dim LayerName As String
+  'Dim LayerName As String
 
   ' reconstruyo el ID del layer en la entidad, para ello busco en la lista cual coincide con su nombre
   For Each cLayer In gcd.CurrentDrawing.cModel["Layers"]
