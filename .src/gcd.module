@@ -50,6 +50,7 @@ Public SnapMode As Integer                      '' Bitwise: -1 Off ; 0 = Nearest
 
 Public clsJob As Object                             '' what I am doing now, thats either selecting or something else
 Public clsJobPrevious As Object                     '' what was doing before
+Public clsJobPreZoom As Object                      '' what was doing before Zooming or Panning
 Public clsJobPreviousParam As Integer               '' a param to pass to clsJob.Start( param )
 
 Public Struct arrBlockSt

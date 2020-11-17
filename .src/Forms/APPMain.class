@@ -643,6 +643,8 @@ Public Sub GLArea1_MouseDown()
 
   If Mouse.Right Then Return  'handled in MouseUp
 
+  If Mouse.Middle Then Return  'handled in MouseUp
+
   Select Case gcd.clsJob.gender
 
     Case "Default"                                                  ' 1. Seleccionando
@@ -811,9 +813,22 @@ Public Sub GLArea1_MouseUp()
       gcd.clsJob.Start()
     Endif
 
-  Else ' Left Click
+  Else If Mouse.Left Then
 
     gcd.clsJob.MouseUp(mouse.x, mouse.y)
+
+  Else If Mouse.Middle Then
+
+    If gcd.clsJob.gender <> "Pan" Then
+      gcd.clsJobPreZoom = gcd.clsJob
+      gcd.clsJob = cadPan
+      gcd.clsJob.Start()
+
+    Else
+
+      gcd.clsJob = gcd.clsJobPreZoom
+
+    End If
 
   End If
 
