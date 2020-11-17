@@ -663,7 +663,7 @@ Public Sub GLArea1_MouseDown()
 
 End
 
-Public Sub glarea1_DblClick()
+Public Sub GLArea1_DblClick()
 
   Dim k As Single
   Dim e As Entity
@@ -710,14 +710,8 @@ Public Sub glarea1_DblClick()
               APPMain.Regen
               EditingText = False
             Endif
-            'Case Else
-            'ComboBox1.Add(etype[0])
-            'ComboBox1.Text = etype[0]
-            'LoadPropertiesList(etype[0])
         End Select
-
       Endif
-
       '======================= otra Tool
     Case Else
 
