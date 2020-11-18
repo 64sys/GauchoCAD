@@ -145,18 +145,19 @@ Public Sub Draw(oE As Entity)
 
     Endif
 
-    GL.Begin(gl.LINE_STRIP)
     angle_increment = Pi * 2 / 360
+    oE.polyline.Clear
     For theta = 0 To Me.recorrido Step angle_increment
-      GLplus.Vertex2D(oE.p[0] + oE.fParam[0] * Cos(Me.start + theta), oE.p[1] + oE.fParam[0] * Sin(Me.start + theta), oE.ColorToPaint)
+      ' el punto considerando 0,0 al centro
+      x = oE.p[0] + oE.fParam[0] * Cos(Me.start + theta)
+      y = oE.p[1] + oE.fParam[0] * Sin(Me.start + theta)
+      oE.polyline.Add(x)
+      oE.polyline.Add(y)
     Next
-    gl.End
+    glPlus.Lines(oe.PolyLine, oe.ColorToPaint, oe.LineWidth, oe.LineType)
 
     clsDrawingAids.Helper.texto = Format$(oE.fParam[1], "0.0 deg") & (" to ") & Format$(oE.fParam[2], "0.0 deg")
   Else
-    ' If oE.fParam[1] < 0 Then oE.fParam[1] = 360 + oE.fParam[1]
-    'If oE.fParam[2] < oE.fParam[1] Then oE.fParam[2] = 360 + oE.fParam[2]              ' grados
-    'If oE.fParam[2] < 0 Then oE.fParam[1] = 360 + oE.fParam[1]
 
     If oe.fParam[3] > 0 Then
 
@@ -169,18 +170,18 @@ Public Sub Draw(oE As Entity)
     Endif
 
     oE.polyline.Clear
-    GL.Begin(gl.LINE_STRIP)
     angle_increment = Pi * 2 / 360 * oe.fParam[3]
-    'If Me.recorrido < 0 Then angle_increment *= -1
+
     For theta = oE.fParam[1] / 180 * Pi To oE.fParam[2] / 180 * Pi Step angle_increment
       ' el punto considerando 0,0 al centro
       x = oE.p[0] + oE.fParam[0] * Cos(theta)
       y = oE.p[1] + oE.fParam[0] * Sin(theta)
       oE.polyline.Add(x)
       oE.polyline.Add(y)
-      GLplus.Vertex2D(x, y, oE.ColorToPaint)
+
     Next
-    gl.End
+    glPlus.Lines(oe.PolyLine, oe.ColorToPaint, oe.LineWidth, oe.LineType)
+
   End If
 
 End

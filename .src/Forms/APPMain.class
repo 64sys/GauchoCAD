@@ -617,6 +617,9 @@ Public Sub GLArea1_draw()
     Select Case gcd.CurrentDrawing.iEntity[2]
       Case gcd.poiMidPoint
         glPlus.PolygonFilled([gcd.CurrentDrawing.iEntity[0] - Metros(4), gcd.CurrentDrawing.iEntity[1], gcd.CurrentDrawing.iEntity[0], gcd.CurrentDrawing.iEntity[1] + Metros(4), gcd.CurrentDrawing.iEntity[0] + Metros(4), gcd.CurrentDrawing.iEntity[1], gcd.CurrentDrawing.iEntity[0], gcd.CurrentDrawing.iEntity[1] - Metros(4)], Color.Blue, Color.Green)
+      Case gcd.poiQuadrant
+        glPlus.PolygonFilled([gcd.CurrentDrawing.iEntity[0] - Metros(6), gcd.CurrentDrawing.iEntity[1], gcd.CurrentDrawing.iEntity[0], gcd.CurrentDrawing.iEntity[1] + Metros(6), gcd.CurrentDrawing.iEntity[0] + Metros(6), gcd.CurrentDrawing.iEntity[1], gcd.CurrentDrawing.iEntity[0], gcd.CurrentDrawing.iEntity[1] - Metros(6)], Color.Cyan, Color.Cyan)
+
       Case -1
         ' nada
       Case gcd.poiCenter, gcd.poiBasePoint

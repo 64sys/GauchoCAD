@@ -520,6 +520,16 @@ Public Function Circle(center As Float[], radious As Float, Optional colour As I
 
   Dim x, y, theta, angle_increment As Float
 
+  gl.LineWidth(LineWidth) ' obsoleto en WebGL
+  If dashes > 0 Then
+    gl.LineStipple(LineStippleScales[dashes], LineStipples[dashes])
+    gl.Enable(GL.LINE_STIPPLE)
+  Else
+
+    gl.Disable(GL.LINE_STIPPLE)
+
+  Endif
+
   If filled Then
     GL.Begin(gl.POLYGON)
   Else
@@ -534,6 +544,7 @@ Public Function Circle(center As Float[], radious As Float, Optional colour As I
     GLplus.Vertex2D(x, y, Colour)
   Next
   gl.End
+  If dashes > 0 Then gl.Disable(GL.LINE_STIPPLE)
 
 End
 

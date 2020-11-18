@@ -102,46 +102,31 @@ End
 
 Public Sub Draw(oE As Entity)
 
-  If Not oE.Visible Then Return
-
+  Dim x, y, theta, angle_increment As Float
+  Dim i As Integer
   Dim major, minor, la As Float
+
+  If Not oE.Visible Then Return
 
   major = Sqr((oE.p[2] - oE.p[0]) ^ 2 + (oE.p[3] - oE.p[1]) ^ 2)
   angle = Ang(oE.p[2] - oE.p[0], oE.p[3] - oE.p[1])          ' Los coordenadas del eje mayor son relativas al centro
   If Not oE.Finished Then
+
     If Me.StepsDone < 2 Then
       oE.fParam[0] = 0.5
-      Me.start = 0
-      Me.recorrido = 2 * Pi
-      Minor = major * oE.fParam[0]
+      oE.fParam[1] = 0
+      oE.fParam[2] = 360
+
     Else If Me.StepsDone < 3 Then
-      Minor = major * oE.fParam[0]
-      'If oE.fParam[0] > major Then oE.fParam[0] = major
-      'Minor = oE.fParam[0]
 
     Endif
   Endif
+
   Minor = major * oE.fParam[0]
   If major = 0 Then major = 1
 
-  Dim x, y, theta, angle_increment As Float
-  Dim i As Integer
-
-  ' If oe.fParam[3] > 0 Then
-  '
-  '     If oE.fParam[2] < oE.fParam[1] Then oE.fParam[2] = 360 + oE.fParam[2]              ' grados
-  '
-  ' Else
-  '
-  '     If oE.fParam[2] > oE.fParam[1] Then oE.fParam[2] = oE.fParam[2] - 360              ' grados
-  '
-  ' Endif
-
   oE.PolyLine.Clear
-  GL.Begin(gl.LINE_STRIP)
-
   angle_increment = Pi * 2 / 360 '* oe.fParam[3]
-
   For theta = oE.fParam[1] / 180 * Pi To oE.fParam[2] / 180 * Pi Step angle_increment
     ' el punto considerando 0,0 al centro
     x = major * Cos(theta) * Cos(angle) - minor * Sin(theta) * Sin(angle)
@@ -151,7 +136,6 @@ Public Sub Draw(oE As Entity)
 
   Next
 
-  GL.End
   oE.ColorToPaint = gcd.GetGBColor(oE.colour, oE.Layerid)
   GLplus.PolyLines(oE.PolyLine, oE.ColorToPaint, oe.LineWidth, oe.LineType)
 
