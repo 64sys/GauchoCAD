@@ -614,13 +614,20 @@ Public Sub GLArea1_draw()
   ' POI dinamicos
   If gcd.CurrentDrawing.flgShowPOIinfo Then
 
-    ' Select Case gcd.CurrentDrawing.iEntity[2]
-    '     Case gcd.poimi
-    'glPlus.Rectangle2D(gcd.CurrentDrawing.iEntity[0] - Metros(4), gcd.CurrentDrawing.iEntity[1] - Metros(4), Metros(8), Metros(8), Color.Blue,,,, Color.Blue, 1, 1)
-    ' Case 2
-    '     glPlus.PolygonFilled([iEntity[0] - Metros(4),gcd.CurrentDrawing.iEntity[1],gcd.CurrentDrawing.iEntity[0],gcd.CurrentDrawing.iEntity[1] + Metros(4),gcd.CurrentDrawing.iEntity[0] + Metros(4),gcd.CurrentDrawing.iEntity[1],gcd.CurrentDrawing.iEntity[0],gcd.CurrentDrawing.iEntity[1] - Metros(4)], Color.Blue, Color.Green)
+    Select Case gcd.CurrentDrawing.iEntity[2]
+      Case gcd.poiMidPoint
+        glPlus.PolygonFilled([gcd.CurrentDrawing.iEntity[0] - Metros(4), gcd.CurrentDrawing.iEntity[1], gcd.CurrentDrawing.iEntity[0], gcd.CurrentDrawing.iEntity[1] + Metros(4), gcd.CurrentDrawing.iEntity[0] + Metros(4), gcd.CurrentDrawing.iEntity[1], gcd.CurrentDrawing.iEntity[0], gcd.CurrentDrawing.iEntity[1] - Metros(4)], Color.Blue, Color.Green)
+      Case -1
+        ' nada
+      Case gcd.poiCenter, gcd.poiBasePoint
 
-    'End Select
+        glPlus.Circle([gcd.CurrentDrawing.iEntity[0], gcd.CurrentDrawing.iEntity[1]], Metros(4), Color.Cyan, True, False)
+        'glPlus.Rectangle2D(gcd.CurrentDrawing.iEntity[0] - Metros(4), gcd.CurrentDrawing.iEntity[1] - Metros(4), Metros(8), Metros(8), Color.Blue,,,, Color.Blue, 1, 1)
+
+      Case Else
+        glPlus.Rectangle2D(gcd.CurrentDrawing.iEntity[0] - Metros(4), gcd.CurrentDrawing.iEntity[1] - Metros(4), Metros(8), Metros(8), Color.Blue,,,, Color.Blue, 1, 1)
+
+    End Select
 
   Endif
 
@@ -748,6 +755,7 @@ Public Sub GLArea1_MouseMove()
       If gcd.clsJob.poichecking Then
         If gcd.clsJob.iEntityForEdit < 0 Then
           If Not clsMouseTracking.flgSearchingEntity Then
+            gcd.CurrentDrawing.iEntity[2] = -1
             gcd.CurrentDrawing.iEntity[3] = clsMouseTracking.CheckAboveEntity(Xreal(mouse.x), Yreal(mouse.Y), Metros(16))
           End If
         Else

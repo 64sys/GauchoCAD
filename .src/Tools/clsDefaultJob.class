@@ -111,11 +111,15 @@ End
 
 Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' esta rutina es llamada por FCAD en el evento DrawingArea_MouseUp
 
+  Dim Crossing As Boolean = False
+  Dim tipo As String
+  Dim t As Float = Timer
+
   Me.SelEndX = mousex
   Me.SelEndy = mouseY
   Me.PoiChecking = True
   If Me.Active Then
-    Dim Crossing As Boolean = False
+
     ' corrijo para start<end
     Me.Active = False
 
@@ -127,7 +131,6 @@ Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' esta rutina es l
     End If
     If Me.SelStartY < Me.SelEndy Then Swap Me.SelStartY, Me.SelEndy                     ' this is FLIPPED
 
-    Dim tipo As String
     tipo = "nueva"
     If Mouse.Shift Then tipo = "resta" ' estos elementos de la seleccion anterior
     If Mouse.Control Then tipo = "suma" ' elementos a la seleccion anterior
@@ -141,7 +144,6 @@ Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' esta rutina es l
     ' veo si el rectangulo es suficientemente grande como para representar una seleccion por rectangulo
     If (Me.SelEndX - Me.SelStartX + (-Me.SelEndy + Me.SelStartY)) > 10 Then
 
-      Dim t As Float = Timer
       Me.selectionCount = clsEntities.SelectionSquare(Me.SelStartXr, Me.SelStartYr, Me.SelEndXr, Me.SelEndyr, tipo, crossing)
       Debug "Select parsing time ", Timer - t
 
@@ -176,20 +178,19 @@ Public Function MouseMove(mouseX As Integer, mouseY As Integer) ' esta rutina es
   Me.SelEndy = mouseY
   Me.SelEndXr = appmain.Xreal(Me.SelEndX)
   Me.SelEndyr = appmain.yreal(Me.SelEndy)
-  If (gcd.CurrentDrawing.iEntity[2] >= 0) Then
-
-    Me.SelEndXr = gcd.CurrentDrawing.iEntity[0]
-    Me.SelEndYr = gcd.CurrentDrawing.iEntity[1]
-
-  Else
-    Me.SelEndXr = appmain.Xreal(Me.SelEndX)
-    Me.SelEndyr = appmain.yreal(Me.SelEndy)
-
-  End If
 
   If Me.Active Then
 
     appmain.redraw
+
+  Else
+
+    If (gcd.CurrentDrawing.iEntity[2] >= 0) Then
+
+      Me.SelEndXr = gcd.CurrentDrawing.iEntity[0]
+      Me.SelEndYr = gcd.CurrentDrawing.iEntity[1]
+
+    End If
   End If
 
   If GripPoint >= 0 Then

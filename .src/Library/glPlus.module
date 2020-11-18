@@ -516,14 +516,24 @@ Public Function PolyLines(vertices As Float[], Optional colour As Integer = 0, L
 End
 
 '' Dibuja un circulo
-Public Function Circle(center As Float[], radious As Float, Optional colour As Integer = 0, LineWidth As Float = 1, dashes As Integer)
+Public Function Circle(center As Float[], radious As Float, Optional colour As Integer = 0, Filled As Boolean = False, LineWidth As Float = 1, dashes As Integer = 0)
 
-  Dim i As Integer, q As New GluQuadric
+  Dim x, y, theta, angle_increment As Float
 
-  gl.Translatef(center[0] * gcd.CurrentDrawing.ScaleZoom, center[1] * gcd.CurrentDrawing.ScaleZoom, 0)
-  Glu.Disk(q, radious, radious, 20, 1)
-  q = Null
-  gl.Translatef(-center[0], -center[1], 0)
+  If filled Then
+    GL.Begin(gl.POLYGON)
+  Else
+    GL.Begin(gl.LINE_STRIP)
+  End If
+
+  angle_increment = Pi * 2 / 360
+  For theta = 0 To 2 * Pi Step angle_increment
+    ' el punto considerando 0,0 al centro
+    x = center[0] + radious * Cos(theta)
+    y = center[1] + radious * Sin(theta)
+    GLplus.Vertex2D(x, y, Colour)
+  Next
+  gl.End
 
 End
 
