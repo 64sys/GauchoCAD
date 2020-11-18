@@ -8,48 +8,41 @@ Public Function info(f As String) As Collection
   Dim str As String
   Dim vrt As Variant[]
   Dim j As String
-
   Dim vrx As New Variant[]
   Dim item As Variant
   Dim tag1 As String
   Dim val1 As Variant
   Dim tag2 As String
-  '  Dim obx As New String[]           '' Objects type list
   Dim etx As New String[]           '' Entities type list
   Dim i As Integer
   Dim prp As Variant
-
   Dim cFile As New Collection
   Dim cVariables As New Collection
   Dim cUnkn As New Collection
-
   Dim cClas As New Collection
-  ' Dim vxCls As New Variant[]
-
   Dim cObjs As New Collection
-  '  Dim vxObj As New Variant[]
-
   Dim cLayers As New Collection     ''LAYER
   Dim cLineTypes As New Collection  ''LTYPE (Line types)
   Dim cBlocks As New Collection     ''BLOCK_HEADER (Atention, are blocks (objects) not inserts (entities))
   Dim cDimStyles As New Collection  ''DIMSTYLE (Dimmension styles)
   Dim cTextStyles As New Collection ''STYLE (Text styles)
-
   Dim cEntities As New Collection
-  'Dim vxEnt As New Variant[]
-  'Dim obs As String
   Dim cStat As Collection
   Dim tag As String
 
-  'j = User.Home &/ "dwg.json"
-
-  'Shell "/usr/local/bin/dwgread -v4 --format JSON '" & f & "' 2>&1 " To str
-  'Shell "/usr/local/bin/dwgread -v4 --format JSON '" & f & "'" To str
   Shell "/usr/local/bin/dwgread --format JSON '" & f & "'" To str
 
   str = Replace(str, "\t", " ")
-  'str = Replace(str, "\n{\n  \"created_by\": \"", "\t{\n  \"created_by\": \"")
-  'str = Split(str, "\t")[1]
+
+  cStat = fil.Stat(f)
+
+  If cStat.Count > 0 Then
+    For Each tag In ["Path", "Ino", "Size", "LastChange"]
+      If cFile.Exist(Lower(tag)) = False Then
+        cFile.Add(cStat[tag], Lower(tag))
+      Endif
+    Next
+  Endif
 
   File.Save(User.Home &/ File.BaseName(f) & ".json", str)
 
@@ -58,7 +51,7 @@ Public Function info(f As String) As Collection
   For Each item In vrt
     Select TypeOf(item)
       Case gb.Object '16
-        If item Is Collection Then
+        If item Is Collection Or item Is JSONCollection Then
           If item.Count > 0 Then
             j = 0
             For Each prp In item
@@ -73,35 +66,36 @@ Public Function info(f As String) As Collection
             Next
 
             Select tag1
-              Case "version"
-                For Each prp In item
-                  cFile.Add(prp, item.Key)
-                  ' injection of some extra file data
-                  cStat = fil.Stat(f)
-                  If cStat.Count > 0 Then
-                    For Each tag In ["Path", "Ino", "Size", "LastChange"]
-                      If cFile.Exist(Lower(tag)) = False Then
-                        cFile.Add(cStat[tag], Lower(tag))
-                      Endif
-                    Next
-                  Endif
-                Next
+                ' Case "version"
+                '   For Each prp In item
+                '     cFile.Add(prp, item.Key)
+                '     ' injection of some extra file data
+                '     cStat = fil.Stat(f)
+                '     If cStat.Count > 0 Then
+                '       For Each tag In ["Path", "Ino", "Size", "LastChange"]
+                '         If cFile.Exist(Lower(tag)) = False Then
+                '           cFile.Add(cStat[tag], Lower(tag))
+                '         Endif
+                '       Next
+                '     Endif
+                '   Next
 
               Case "unknown_0"
                 For Each prp In item
                   cVariables.Add(prp, item.Key)
                 Next
 
-              Case "number"
-                If tag2 = "dxfname" Then
-                  For Each prp In item
-                    cClas.Add(prp, item.Key)
-                  Next
-                Else
-                  Print "number no dxf name"
-                Endif
+                ' Case "number"
+                '   If tag2 = "dxfname" Then
+                '     For Each prp In item
+                '       cClas.Add(prp, item.Key)
+                '     Next
+                '   Else
+                '     Print "number no dxf name"
+                '   Endif
 
               Case "object"
+
                 Select val1
                     'Case "APPID"
                     'Case "APPID_CONTROL"
@@ -239,40 +233,157 @@ Private Function Json2Gbas(sRaw As String) As Variant[]
   Dim item As Variant
   Dim vrx As New Variant[]
   Dim stx As New String[]
-  Dim i As Integer
+  Dim etx As New String[]           '' Filtred arrar. It only includes entities that can be handled in the decoder without errors.
+  Dim otx As New String[]           '' Filtred arrar. It only includes objects that can be handled in the decoder without errors.
+  Dim i As Integer                  '' General index for line of text flow
+  Dim IniCut As String              '' Text string that marks the start of the object or entity
+  Dim EndCut As String              '' Text string that marks the end of the object or entity
+  Dim c As Integer                  '' Sub index for line of text flow inside the entity of the object
+  Dim hdx As New Variant[]          '' Header (dwg variables) listed as json text
+  Dim obx As New Variant[]          '' Objects listed as json text
+  Dim enx As New Variant[]          '' Entitites listed as json text
+  Dim e As Integer                  '' Index for entities list
+  Dim str As String
+  Dim enty As Variant
+  Dim k As Integer
+  Dim sType As String
+  Dim EndCut2 As String
+  Dim r As Integer
+  Dim obz As Variant
+  Dim Qkey As Integer
+  Dim uglyx As New String[]
+  Dim u As String
+  Dim BadObjects As New String[]
+  Dim Skiped As String
 
   stx = Split(sRaw, gb.Lf, Chr(140), True)
-
-  For i = 0 To stx.Max
-    If String.InStr(stx[i], "\"\": ") > 0 Then
-      stx[i] = Replace(stx[i], "\"\": ", "\"" & CStr(i) & "\": ")
-    Endif
-
-    If String.InStr(stx[i], "-nan") > 0 Then
-      stx[i] = Replace(stx[i], "-nan", "0.0")
-    Endif
-
-  Next
-  If Exist("/tmp/tmp.json") Then
-    Shell "rm -f /tmp/tmp.json" Wait
-  Endif
   File.Save("/tmp/tmp.json", stx.Join("\n"))
-  'vrt = JSON.Decode(File.Load(User.Home &/ "dwg.json"), True)
-  vrt = JSON.Decode(stx.Join("\n"), True)
-  vrt = JSON.Decod
 
-  For Each item In vrt
-    Select TypeOf(item)
-      Case gb.Object '16
-        If item Is Collection Or item Is JSONCollection Then
-          vrx.Add(item)
-        Else
-          If item Is Variant[] Then
-            vrx.Insert(item)
-          Endif
+  i = 0
+  While i < stx.Max
+    If RegExp.Match(stx[i], "\"HEADER\": {") Then
+      Qkey = 0
+      Repeat
+        If RegExp.Match(stx[i], "{") Then
+          Inc Qkey
         Endif
-    End Select
+
+        If RegExp.Match(stx[i], "}") Then
+          Dec Qkey
+        Endif
+
+        If RegExp.Match(stx[i], "\"HEADER\": {") Then
+          etx.Add(Replace(stx[i], "\"HEADER\": {", " {"))
+        Else
+          etx.Add(stx[i])
+        Endif
+
+        Inc i
+      Until Qkey = 0
+
+      hdx.Add(etx.Copy(), 0)
+      etx.Clear
+      Break
+    Else
+      Inc i
+    Endif
+  Wend
+
+  i = 0
+  While i < stx.Max
+    If RegExp.Match(stx[i], "\"entity\": \"") Or RegExp.Match(stx[i], "\"object\": \"") Then
+      If RegExp.Match(stx[i], "\"entity\": \"") Then
+        sType = "entity"
+      Else
+        sType = "object"
+      Endif
+      'IniCut = stx[i - 1]
+      'EndCut = Replace(IniCut, "{", "}")
+      etx.Add("  {")
+      Print CStr(i)
+      ' While Mid(stx[i], 1, Len(EndCut)) <> EndCut Or i >= stx.Max
+      '   etx.Add(stx[i])
+      '   Inc i
+      ' Wend
+
+      '---------------------
+      Qkey = 1
+      Repeat
+
+        If RegExp.Match(stx[i], "{") Then
+          Inc Qkey
+        Endif
+
+        If RegExp.Match(stx[i], "}") Then
+          Dec Qkey
+        Endif
+
+        etx.Add(stx[i])
+
+        Inc i
+      Until Qkey = 0
+
+      'etx.Add("  }")
+      '---------------------
+      'etx.Add(EndCut)
+      Select sType
+        Case "entity"
+          enx.Add(etx.Copy(), e)
+        Case "object"
+          obx.Add(etx.Copy(), e)
+      End Select
+      etx.Clear
+      Inc e
+    Else
+      Inc i
+    Endif
+  Wend
+
+  uglyx = Ugly()
+
+  k = 0
+  For Each obz In [hdx, obx, enx]
+    For Each enty In obz
+      'Print enty[1] & enty[3]
+      Skiped = ""
+      For Each u In uglyx
+        If RegExp.Match(enty[1] & enty[2] & enty[3], u) Then
+          Skiped = u
+          Break
+        Endif
+      Next
+
+      If Skiped = "" Then
+        For r = 1 To enty.Max
+          If RegExp.Match(enty[r], " \"\": ") Then
+            enty[r] = Replace(enty[r], " \"\": ", " \"" & "empty[" & CStr(r) & "]" & "\": ")
+          Endif
+        Next
+        Try vrt = JSON.Decode(enty.Join("\n"), True)
+        If Error Then
+          BadObjects.Add(enty.Join("\n"))
+        Endif
+        If vrt Then
+          vrx.Add(vrt, k)
+          Inc k
+        Else
+          'Print enty
+        Endif
+
+      Else
+        Print "Skiped" & " " & Skiped
+
+      Endif
+    Next
   Next
+
+  If BadObjects.Count > 0 Then
+    File.Save("/tmp/tmp.err", BadObjects.Join("\n\n"))
+    If Exist("/tmp/tmp.err") Then
+      Shell "gedit /tmp/tmp.err"
+    Endif
+  Endif
+
   Return vrx
 
 End
@@ -337,12 +448,26 @@ Private Function ObjetsCSV(ctn As Collection) As String
     Next
   Endif
 
-  out = "Handle\tEntity\tLayer\tStyle\tWidth\tColour\n"
+  out = "Handle\tEntity\tLayer\tStyle\tWidth\tColor\n"
   For Each r In tmp
     out &= r.Join("\t") & "\n"
   Next
 
   Return out
+
+End
+
+'' Objects or entities bad for import
+
+Public Function Ugly(Optional sType As String) As String[]
+
+  Dim stx As New String[]
+
+  stx.Add("MENTALRAYRENDERSETTINGS")
+  stx.Add("FIELD")
+  stx.Add("BLOCKROTATIONPARAMETER")
+
+  Return stx
 
 End
 

@@ -83,6 +83,7 @@ Public Function Import(cImp As Collection, cMdl As Collection) As Integer[]
   Dim sTag As String
   '  Dim i As Integer
   Dim vrt As Variant
+  Dim tg As Variant
 
   If cImp.Exist("File") Then
     xFile = cImp["File"]
@@ -425,6 +426,28 @@ Public Function Import(cImp As Collection, cMdl As Collection) As Integer[]
         te.Add(7, "color")
       Endif
 
+      ' Commons check
+      For Each tg In ["entity", "layer", "handle", "color", "ltscale", "linewt", "ltype"]
+        If te.Exist(tg) = False Then
+          If te.Exist("error") = False Then
+            te["error"] = [tg]
+          Else
+            te["error"].Add(tg)
+          Endif
+        Endif
+      Next
+
+      Select te["entity"]
+        Case "LINE", "LWPOLYLINE", "SPLINE", "ARC", "CIRCLE", "ELLIPSE", "TEXT", "MTEXT", "INSERT", "SOLID"
+          If te.Exist("p") = False Then
+            If te.Exist("error") = False Then
+              te["error"] = ["p"]
+            Else
+              te["error"].Add("p")
+            Endif
+          Endif
+      End Select
+
       If cMdl.Exist("Entities") = False Then
         cMdl.Add([e["entity"]: [CStr(te["handle"]): te.Copy()]], "Entities")
         te.Clear
@@ -437,6 +460,7 @@ Public Function Import(cImp As Collection, cMdl As Collection) As Integer[]
           te.Clear
         Endif
       Endif
+
     Next
     '-- DXF -------------------------------------------------------
   Else
@@ -669,7 +693,7 @@ Public Function GauchoLoad(sFile As String) As Collection
         c["show"] = CBool(ent.Attributes["show"])
         c["frozen"] = CBool(ent.Attributes["frozen"])
         c["locked"] = CBool(ent.Attributes["locked"])
-        c["colour"] = CInt(ent.Attributes["colour"])
+        c["color"] = CInt(ent.Attributes["color"])
         c["style"] = CInt(ent.Attributes["style"])
         c["linewt"] = CInt(ent.Attributes["linewt"])
         c["print"] = CBool(ent.Attributes["print"])
@@ -736,7 +760,7 @@ Public Function GauchoLoad(sFile As String) As Collection
     c["layer"] = ent.Attributes["layer"]
     c["style"] = ent.Attributes["style"]
     c["linewt"] = ent.Attributes["linewt"]
-    c["colour"] = ent.Attributes["colour"]
+    c["color"] = ent.Attributes["color"]
     '-----
 
     ' aca hay un problema: si gcad guarda los puntos p0="1:2"  p1="1:1" etc, entoces cModel queda igual que como cuando lees cImport
@@ -837,7 +861,7 @@ Public Function NewLayer() As Collection
   c["show"] = True
   c["frozen"] = False
   c["locked"] = False
-  c["colour"] = 0
+  c["color"] = 0
   c["style"] = 0
   c["linewt"] = 0
   c["print"] = True
@@ -1733,9 +1757,9 @@ Public Function DWGDecodeCommon(c As Collection) As Collection
       Endif
 
       If i >= 0 And i <= 256 Then
-        prp.Add(i, "colour")
+        prp.Add(i, "color")
       Else
-        prp.Add(0, "colour")
+        prp.Add(0, "color")
       Endif
 
     Next
@@ -2540,12 +2564,12 @@ Public Function DWGArrangeEnty(c As Collection) As Collection
     Endif
 
     If c.Exist("color.index") Then
-      o.Add(c["color.index"], "colour")
+      o.Add(c["color.index"], "color")
     Else
       If c.Exist("color.raw") Then
-        o.Add(c["color.raw"], "colour")
+        o.Add(c["color.raw"], "color")
       Else
-        o.Add(0, "colour")
+        o.Add(0, "color")
       Endif
     Endif
 
@@ -2966,7 +2990,7 @@ Public Function DXFEntityCodes(Optional ent As String) As Collection
   cod.Add("handle", "5") '*
   cod.Add("style", "6") '*
   cod.Add("layer", "8") '*
-  cod.Add("colour", "62") '*
+  cod.Add("color", "62") '*
   cod.Add("material", "347")
   cod.Add("linewt", "370") '*
   cod.Add("linetype_scale", "48")
@@ -3901,10 +3925,10 @@ Private Function DXFLayerList(sItem As String) As Collection
           Case "62"
             If InStr(sVal, "-") = 0 Then
               cTmp.Add(True, "show")
-              cTmp.Add(CInt(sVal), "colour")
+              cTmp.Add(CInt(sVal), "color")
             Else
               cTmp.Add(False, "show")
-              cTmp.Add(CInt(Replace(sVal, "-", "")), "colour")
+              cTmp.Add(CInt(Replace(sVal, "-", "")), "color")
             Endif
 
           Case "6"
@@ -4270,8 +4294,8 @@ Private Function DXFDecodeEntity(sItem As String) As Collection
     cTmp.Add(0, "linewt")
   Endif
 
-  If cTmp.Exist("colour") = False Then
-    cTmp.Add(0, "colour")
+  If cTmp.Exist("color") = False Then
+    cTmp.Add(0, "color")
   Endif
 
   If cTmp.Exist("x0") Or cTmp.Exist("x0.1") Then
@@ -4310,7 +4334,7 @@ Private Function DXFDecodeEntity(sItem As String) As Collection
       Endif
 
       Select cTmp.Key
-        Case "entity", "handle", "layer", "style", "linewt", "colour", "blkid", "visible", "paper", "elev", "thick"
+        Case "entity", "handle", "layer", "style", "linewt", "color", "blkid", "visible", "paper", "elev", "thick"
           cTmp2.Add(cTmp[cTmp.Key], cTmp.Key)
       End Select
 

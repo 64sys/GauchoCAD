@@ -143,7 +143,7 @@ Public Sub LayersTransfer()
           If r > -1 Then
             tLay.Add(Format(r, "0"), "id")
             tLay.Add("layer", "type")
-            For Each prop In ["name", "show", "frozen", "locked", "colour", "style", "width", "print"]
+            For Each prop In ["name", "show", "frozen", "locked", "color", "style", "width", "print"]
               tLay.Add(il[prop], prop)
             Next
             mLay.Add(tLay.copy(), Format(r, "0"))
@@ -156,7 +156,7 @@ Public Sub LayersTransfer()
           tLay.Add(Format(i, "0"), "id")
           tLay.Add("layer", "type")
 
-          For Each prop In ["name", "show", "frozen", "locked", "colour", "style", "width", "print"]
+          For Each prop In ["name", "show", "frozen", "locked", "color", "style", "width", "print"]
             tLay.Add(iLay[prop], prop)
           Next
 
@@ -1217,15 +1217,15 @@ Public Function GetGBColor(CADcolor As Integer, layerID As String) As Integer
   ' color
   If CADcolor = 256 Then          ' buscar color del layer
 
-    Return Starter.gColor[gcd.CurrentDrawing.cModel["Layers"][layerID]["colour"]]
+    Return Starter.gColor[gcd.CurrentDrawing.cModel["Layers"][layerID]["color"]]
 
   Else If CADcolor = 257 Then     ' buscar color del objeto
 
-    Return Starter.gColor[gcd.CurrentDrawing.cModel["Layers"][layerID]["colour"]]     ' FIXME: cambiar esto
+    Return Starter.gColor[gcd.CurrentDrawing.cModel["Layers"][layerID]["color"]]     ' FIXME: cambiar esto
 
   Else If CADcolor = 0 Then       ' buscar color del bloque
 
-    Return Starter.gColor[gcd.CurrentDrawing.cModel["Layers"][layerID]["colour"]]     ' FIXME: cambiar esto
+    Return Starter.gColor[gcd.CurrentDrawing.cModel["Layers"][layerID]["color"]]     ' FIXME: cambiar esto
 
   Else
 
