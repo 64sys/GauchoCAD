@@ -44,7 +44,8 @@ Public Function info(f As String) As Collection
   'j = User.Home &/ "dwg.json"
 
   'Shell "/usr/local/bin/dwgread -v4 --format JSON '" & f & "' 2>&1 " To str
-  Shell "/usr/local/bin/dwgread -v4 --format JSON '" & f & "'" To str
+  'Shell "/usr/local/bin/dwgread -v4 --format JSON '" & f & "'" To str
+  Shell "/usr/local/bin/dwgread --format JSON '" & f & "'" To str
 
   str = Replace(str, "\t", " ")
   'str = Replace(str, "\n{\n  \"created_by\": \"", "\t{\n  \"created_by\": \"")
@@ -252,9 +253,13 @@ Private Function Json2Gbas(sRaw As String) As Variant[]
     Endif
 
   Next
+  If Exist("/tmp/tmp.json") Then
+    Shell "rm -f /tmp/tmp.json" Wait
+  Endif
   File.Save("/tmp/tmp.json", stx.Join("\n"))
   'vrt = JSON.Decode(File.Load(User.Home &/ "dwg.json"), True)
   vrt = JSON.Decode(stx.Join("\n"), True)
+  vrt = JSON.Decod
 
   For Each item In vrt
     Select TypeOf(item)

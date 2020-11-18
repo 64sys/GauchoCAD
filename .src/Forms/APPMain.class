@@ -405,29 +405,36 @@ Public Sub AddWidthsPics()
   iTheme = hColor.Luminance
 
   For Each wt In Starter.cWidths
-
-    img = New Image(btnLtypes.Width, 8, btnLtypes.Background)
+    mm = wt[0]
+    If CInt(Starter.cWidths.Key) > 0 And CInt(Starter.cWidths.Key) < 27 Then
+      img = New Image(btnLtypes.Width, 8, btnLtypes.Background)
+      px = Starter.cWidths.Key
+    Else
+      img = New Image(btnLtypes.Width / 2, 8, btnLtypes.Background)
+      px = 1
+    Endif
 
     Paint.Begin(img)
-    Paint.NewPath
-
-    hColor = Color[Color.ButtonBackground]
-
     If hColor.Luminance > 160 Then
       Paint.Brush = Paint.Color(Color.Black)
     Else
       Paint.Brush = Paint.Color(Color.White)
     Endif
 
-    mm = wt[0]
-    px = wt[1]
-
+    Paint.NewPath
     Paint.LineWidth = px ' CFloat(wt) * 3
     Paint.MoveTo(4, 4)
+
+    'If CInt(Starter.cWidths.Key) > 0 And CInt(Starter.cWidths.Key) < 27 Then
     Paint.LineTo(btnLtypes.Width - 4, 4)
+    'Else
+    '  Paint.LineTo(CInt(btnLtypes.Width / 2), 4)
+    'Endif
+
     Paint.Stroke
     Paint.End
     Starter.cWidths[Starter.cWidths.Key] = [mm, px, img]
+
   Next
 
 End
@@ -1434,6 +1441,7 @@ Public Sub btnWidths_MouseDown()
   Dim frm As FWidths
   Dim vrx As Variant[]
   Dim img2 As Image
+  Dim wtx As Integer
 
   If SelectingWidth = False Then
     frm = New FWidths(Starter.cWidths, [btnWidths.ScreenX, btnWidths.ScreenY + btnWidths.H], Me)
@@ -1443,9 +1451,20 @@ Public Sub btnWidths_MouseDown()
         vrx = Starter.cWidths[CStr(CurrentWidth)]
         If vrx.Count > 1 Then
           If Object.Type(vrx[2]) = "Image" Then
-            img2 = vrx[2]
-            btnWidths.Picture = img2.Picture
-            btnWidths.Tooltip = ("Width") & " " & CStr(vrx[0]) & " mm"
+            If CInt(CurrentWidth) > 0 And CInt(CurrentWidth) < 27 Then
+              img2 = vrx[2]
+
+              wtx = dsk.TextWidth(CStr(vrx[0]) & " mm", btnWidths.Font.Name, btnWidths.Font.Size)
+
+              btnWidths.Text = " " & CStr(vrx[0]) & " mm"
+              btnWidths.Picture = img2.Stretch(btnWidths.W - wtx - 24, img2.H).Picture
+              btnWidths.Tooltip = ("Width") & " " & CStr(vrx[0]) & " mm"
+            Else
+              btnWidths.Picture = Null
+              btnWidths.Text = vrx[0]
+              btnWidths.Tooltip = ("Width") & " " & vrx[0]
+            Endif
+
           Endif
         Endif
         SelectingWidth = False
