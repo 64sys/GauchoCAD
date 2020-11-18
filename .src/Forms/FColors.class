@@ -64,7 +64,7 @@ Public Sub Form_Open()
     b = CInt(Split(crs[i], ",")[2])
     img = New Image(s, s, Color.RGB(r, g, b), 0)
 
-    btn = New ToolButton(pnlPrimary) As "Colour"
+    btn = New ToolButton(pnlPrimary) As "Color"
     With btn
       .H = pnlPrimary.H
       .W = pnlPrimary.H
@@ -81,7 +81,7 @@ Public Sub Form_Open()
     b = CInt(Split(crs[i], ",")[2])
     img = New Image(s, s, Color.RGB(r, g, b), 0)
 
-    btn = New ToolButton(pnlGray) As "Colour"
+    btn = New ToolButton(pnlGray) As "Color"
     With btn
       .H = pnlGray.H
       .W = pnlGray.H
@@ -102,7 +102,7 @@ Public Sub Form_Open()
       b = CInt(Split(crs[i + j], ",")[2])
       img = New Image(s, s, Color.RGB(r, g, b), 0)
 
-      btn = New ToolButton(xPanel) As "Colour"
+      btn = New ToolButton(xPanel) As "Color"
       With btn
         .H = xPanel.H
         .W = xPanel.H
@@ -120,7 +120,7 @@ Public Sub Form_Open()
 
 End
 
-Public Sub Colour_Click()
+Public Sub Color_Click()
 
   Dim obj As Object
 

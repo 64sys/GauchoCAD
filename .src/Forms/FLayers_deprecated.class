@@ -62,7 +62,7 @@ Public Sub Run(cMod As Collection)
   'draft = gcd.cLayers.Copy()
 
   stx = [("id"), ("Name"), ("Show"), ("Frozen"), ("Lock"), ("Color"), ("Style"), ("Width"), ("Print")]
-  lbx = ["id", "name", "show", "frozen", "locked", "colour", "style", "width", "print"]
+  lbx = ["id", "name", "show", "frozen", "locked", "color", "style", "width", "print"]
 
   TableView1.Columns.Count = stx.Count
 
@@ -75,7 +75,7 @@ Public Sub Run(cMod As Collection)
       TableView1.Columns[i].Title = col
     Endif
     Select lbl
-      Case "show", "frozen", "locked", "colour", "style", "width", "print"
+      Case "show", "frozen", "locked", "color", "style", "width", "print"
         TableView1.Columns[i].Alignment = Align.Center
         TableView1.Columns[i].Width = 75
         TableView1.Columns[i].Title = col
@@ -150,7 +150,7 @@ Public Sub TableView1_Data(Row As Integer, Column As Integer)
             TableView1[row, Column].WordWrap = False
           Endif
 
-        Case "colour"
+        Case "color"
           TableView1[row, Column].Text = st
 
         Case "style"
@@ -317,7 +317,7 @@ Public Sub TableView1_Click()
     Case "name"
       TableView1.Edit
 
-    Case "colour"
+    Case "color"
       TableView1.Edit(xColors, True)
     Case "style"
       TableView1.Edit(xStyles, True)
@@ -334,7 +334,7 @@ Public Sub TableView1_Click()
         Case "show", "frozen", "locked", "print"
           pval = TableView1[TableView1.Row, TableView1.Column].WordWrap
           v[pdat] = pval
-        Case "colour", "style", "width"
+        Case "color", "style", "width"
           pval = Val(TableView1[TableView1.Row, TableView1.Column].Text)
           'Case "label"
           '    pval = TableView1[TableView1.Row, TableView1.Column].Text
@@ -364,7 +364,7 @@ Public Sub TableView1_Save(Row As Integer, Column As Integer, Value As String)
           v[pdat] = Value
         Endif
       Next
-    Case "colour", "width", "style"
+    Case "color", "width", "style"
       For Each v In draft
         If v["id"] = CInt(pkey) Then
           v[pdat] = Value

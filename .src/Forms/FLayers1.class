@@ -85,7 +85,7 @@ Public Sub Run()
   Next
 
   stx = [("id"), ("State"), ("Name"), ("Show"), ("Frozen"), ("Lock"), ("Color"), ("Style"), ("Width"), ("Print")]
-  lbx = ["id", "state", "name", "show", "frozen", "locked", "colour", "style", "width", "print"]
+  lbx = ["id", "state", "name", "show", "frozen", "locked", "color", "style", "width", "print"]
 
   TableView1.Columns.Count = stx.Count
 
@@ -98,7 +98,7 @@ Public Sub Run()
       TableView1.Columns[i].Title = col
     Endif
     Select lbl
-      Case "show", "frozen", "locked", "colour", "style", "width", "print"
+      Case "show", "frozen", "locked", "color", "style", "width", "print"
         TableView1.Columns[i].Alignment = Align.Center
         TableView1.Columns[i].Width = 75
         TableView1.Columns[i].Title = col
@@ -196,7 +196,7 @@ Public Sub TableView1_Data(Row As Integer, Column As Integer)
         TableView1[row, Column].WordWrap = False
       Endif
 
-    Case "colour"
+    Case "color"
       TableView1[Row, Column].Text = st
       r = CInt(Split(Starter.ColorsRGB[st], ",")[0])
       g = CInt(Split(Starter.ColorsRGB[st], ",")[1])
@@ -360,7 +360,7 @@ Public Sub LTask(lTask As String)
                   '   xlay[lbx[i]] = 0
                   ' Endif
 
-                Case "colour"
+                Case "color"
                   xlay[lbx[i]] = CInt(TableView1[r, i].Text)
 
                 Case "name"
@@ -468,7 +468,7 @@ Public Sub TableView1_Click()
     Case "name"
       TableView1.Edit
 
-    Case "colour"
+    Case "color"
 
       If SelectingColor = False Then
         FClr = New FColors16([Me.ScreenX + TableView1.Current.X, Me.ScreenY], Me)
@@ -567,7 +567,7 @@ Public Sub TableView1_Click()
         Case "show", "frozen", "locked", "print"
           pval = TableView1[TableView1.Row, TableView1.Column].WordWrap
           v[pdat] = pval
-        Case "colour", "style", "width"
+        Case "colur", "style", "width"
           pval = Val(TableView1[TableView1.Row, TableView1.Column].Text)
           v[pdat] = pval
       End Select
@@ -604,7 +604,7 @@ Public Sub TableView1_Save(Row As Integer, Column As Integer, Value As String)
           v[pdat] = Value
         Endif
       Next
-    Case "colour"
+    Case "color"
       For Each v In cLayers 'draft
         If v["id"] = pkey Then
           For Each lt In Starter.cColors
