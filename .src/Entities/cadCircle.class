@@ -92,7 +92,7 @@ Public Sub Draw(oE As Entity)
   If Not oE.Visible Then Return
 
   oE.polyline.Clear
-  GL.Begin(gl.LINE_STRIP)
+  'GL.Begin(gl.LINE_STRIP)
   angle_increment = Pi * 2 / 360
   For theta = 0 To 2 * Pi Step angle_increment
     ' el punto considerando 0,0 al centro
@@ -100,9 +100,11 @@ Public Sub Draw(oE As Entity)
     y = oE.p[1] + oE.fParam[0] * Sin(theta)
     oE.polyline.Add(x)
     oE.polyline.Add(y)
-    GLplus.Vertex2D(x, y, oE.ColorToPaint)
+    'GLplus.Vertex2D(x, y, oE.ColorToPaint)
   Next
-  gl.End
+  'gl.End
+
+  glPlus.Circle(oE.p, oe.fParam[0], oe.ColorToPaint, False, oe.LineWidth, oe.LineType)
 
 End
 
