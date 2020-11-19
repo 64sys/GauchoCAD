@@ -112,12 +112,20 @@ Public Sub Draw(oE As Entity)
   angle = Ang(oE.p[2] - oE.p[0], oE.p[3] - oE.p[1])          ' Los coordenadas del eje mayor son relativas al centro
   If Not oE.Finished Then
 
-    If Me.StepsDone < 2 Then
+    If Me.StepsDone = 1 Then
       oE.fParam[0] = 0.5
       oE.fParam[1] = 0
       oE.fParam[2] = 360
 
-    Else If Me.StepsDone < 3 Then
+    Else If Me.StepsDone = 2 Then
+      ' despues de definir el eje mayor
+
+    Else If Me.StepsDone = 3 Then
+      ' defino la relacion entre ejes
+
+    Else If Me.StepsDone = 4 Then
+
+    Else If Me.StepsDone = 5 Then
 
     Endif
   Endif

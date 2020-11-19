@@ -811,7 +811,7 @@ Public Function SelectFont(FontName As String) As Boolean
   Dim f As FontSt
 
   For Each f In glFont
-    If f.FontName = FontName Then
+    If LCase(f.FontName) = LCase(FontName) Then
       ActualFont = f
       Break
 
@@ -999,7 +999,7 @@ Public Function DrawMultilineText(UTFMultiString As String, posX As Float, posY 
 End
 
 '' devuelve un rectangulo que contiene al texto
-'' [x,y,ancho,alto]
+'' [ancho,alto]
 Public Function TextExtends(UTFstring As String, textH As Float) As Float[]
 
   Dim i, iii, UTFcode, LetterIndex As Integer, Xadvance As Float

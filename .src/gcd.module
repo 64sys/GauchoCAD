@@ -858,6 +858,7 @@ Public Function ImportEntities2(colGrp As Collection, obxEntities As Entity[], O
           'flxPoints.Add(colEnt["p"]["p0"][0])
           'flxPoints.Add(colEnt["p"]["p0"][1])
           sText = colEnt["text"]
+          If InStr(stext, "{") > 0 Then Debug sText
           Try sText = colEnt["text2"] & sText
           AddMText(obxEntities, flxPoints, IIf(colEnt["angle"], colEnt["angle"], 0), colEnt["text_height"], sText, iColor, fLinewt, sLtype, sLayer, BlockName)
           Inc iTotalEntities
