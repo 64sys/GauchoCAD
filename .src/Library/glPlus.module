@@ -813,10 +813,11 @@ Public Function SelectFont(FontName As String) As Boolean
   For Each f In glFont
     If LCase(f.FontName) = LCase(FontName) Then
       ActualFont = f
-      Break
+      Return True ' fuente encontrada
 
     Endif
   Next
+  Return False  ' fuente no encontrada
 
 End
 

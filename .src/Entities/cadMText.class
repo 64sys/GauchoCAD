@@ -308,45 +308,56 @@ Public Sub ProcessPart(s As String)
   Dim p1, p2, p3, p4 As Integer
 
   s2 = s
+  If Left$(s2, 1) = "\\" Then
+    s2 = Mid(s2, 2)
+    Select Case Mid$(s2, 1, 1)
+      Case "f"            ' esta indicado un cambio en la fuente
+        '  \fVerdana|b0|i0|c0|p34;
+        p1 = InStr(s2, "|")
+        CurrentTextFont = Mid$(s2, 2, p1 - 2)
+        CurrentTextBold = Mid$(s2, p1 + 2, 1) = "1"
+        CurrentTextItalic = Mid$(s2, p1 + 5, 1) = "1"
+        CurrentTextCrossed = Mid$(s2, p1 + 8, 1) = "1"
+        p2 = InStr(s2, ";", p1)
+        CurrentTextHeigth = CFloat(Mid$(s2, p1 + 11, p2 - p1 - 11)) / 100
+        s2 = Mid(s2, p2 + 1)
 
-  Select Case Left$(s2, 2)
-    Case "\\f"            ' esta indicado un cambio en la fuente
-      '  \fVerdana|b0|i0|c0|p34;
-      p1 = InStr(s2, "|")
-      CurrentTextFont = Mid$(s2, 3, p1 - 3)
-      CurrentTextBold = Mid$(s2, p1 + 2, 1) = "1"
-      CurrentTextItalic = Mid$(s2, p1 + 5, 1) = "1"
-      CurrentTextCrossed = Mid$(s2, p1 + 8, 1) = "1"
-      p2 = InStr(s2, ";", p1)
-      CurrentTextHeigth = CFloat(Mid$(s2, p1 + 11, p2 - p1 - 11))
-      s2 = Mid(s, p2 + 1)
+        If Len(s2) > 0 Then ProcessPart(s2)
 
-      If Len(s2) > 0 Then ProcessPart(s2)
+      Case "P"            ' esta indicado un cambio en la fuente
+        CurrentTextPosY -= glPlus.TextExtends("XXX", CurrentTextHeigth)[1] * 1.2
+        s2 = Mid(s2, 2)
+        If Len(s2) > 0 Then ProcessPart(s2)
 
-    Case "\\P"            ' esta indicado un cambio en la fuente
-      CurrentTextPosY -= glPlus.TextExtends("XXX", CurrentTextHeigth)[1] * 1.2
-      s2 = Mid(s, 3)
-      If Len(s2) > 0 Then ProcessPart(s2)
+      Case "p"            ' no se que significa esto, suele venir \p12.55;
+        p2 = InStr(s2, ";", p1)
+        s2 = Mid(s2, p2 + 1)
+        If Len(s2) > 0 Then ProcessPart(s2)
 
-    Case "\\p"            ' no se que significa esto, suele venir \p12.55;
-      p2 = InStr(s2, ";", p1)
-      s2 = Mid(s, p2 + 1)
-      If Len(s2) > 0 Then ProcessPart(s2)
+      Case "W"            ' no se que significa esto, suele venir \W12.55;
+        p2 = InStr(s2, ";", p1)
+        CurrentTextPosX += CFloat(Mid(s2, 2, p2 - 2))
+        s2 = Mid(s2, p2 + 1)
+        If Len(s2) > 0 Then ProcessPart(s2)
 
-    Case Else     ' es un texto, pero puede terminar en un scape
-      p2 = InStr(s2, "\\")
-      If p2 > 0 Then
+    End Select
+  Else     ' es un texto, pero puede terminar en un scape
+    p2 = InStr(s2, "\\")
+    If p2 > 0 Then
 
-        glPlus.DrawText(Mid(s2, 1, p2 - 1), CurrentTextPosX, CurrentTextPosY, CurrentTextangle, CurrentTextHeigth, CurrentTextColor)
+      If CurrentTextFont <> "" Then glPlus.SelectFont(CurrentTextFont)
 
-        ProcessPart(Mid(s2, p2))
-      Else
-        glPlus.DrawText(s2, CurrentTextPosX, CurrentTextPosY, CurrentTextAngle, CurrentTextHeigth, CurrentTextColor)
+      glPlus.DrawText(Mid(s2, 1, p2 - 1), CurrentTextPosX, CurrentTextPosY, CurrentTextangle, CurrentTextHeigth, CurrentTextColor)
 
-      Endif
+      ProcessPart(Mid(s2, p2))
+    Else
 
-  End Select
+      If CurrentTextFont <> "" Then glPlus.SelectFont(CurrentTextFont)
+      glPlus.DrawText(s2, CurrentTextPosX, CurrentTextPosY, CurrentTextAngle, CurrentTextHeigth, CurrentTextColor)
 
+    Endif
+
+  End If
   ' primero separo en diferentes partes
 
 End
