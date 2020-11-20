@@ -103,6 +103,17 @@ Public Const dimOrdinate As Integer = 6
 Public Const dimHorizontal As Integer = 7
 Public Const dimVertical As Integer = 8
 
+' Entity Flags
+Public Const flgDWG_Changed As Integer = 1
+Public Const flgDWG_UnChanged As Integer = 2
+Public Const flgDWG_Deleted As Integer = 4
+Public Const flgGCD_New As Integer = 8
+'Public Const flg5 As Integer = 16
+'Public Const flg6 As Integer = 32
+'Public Const flg7 As Integer = 64
+'Public Const flg8 As Integer = 128
+'Public Const flg9 As Integer = 256
+
 Public Drawings As New ClsDrawing[]
 Public DrawingReady As Boolean = False
 Public CurrentDrawing As ClsDrawing

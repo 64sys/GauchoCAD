@@ -426,6 +426,8 @@ End
 
 Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' esta rutina es llamada por FCAD en el evento DrawingArea_MouseUp
 
+  'Debug elem.P.Count
+
 End
 
 Public Sub CancelarConstruccion()
