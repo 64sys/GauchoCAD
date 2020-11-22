@@ -231,7 +231,7 @@ Private Sub ReadValue(i As Integer) As Variant ' Tincho
   sCar = ReadToken()
 
   If sCar = "{" Then
-    Print CStr(i)                           ' Tincho
+    'Print CStr(i)                           ' Tincho
     Return ReadObject()
   Else If sCar = "[" Then
     Return ReadArray()
