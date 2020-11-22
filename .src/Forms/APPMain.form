@@ -9,37 +9,37 @@
     Text = ("File")
     { mnuNew Menu menuapp
       Name = "mnuNew"
-      Text = ("New")
+      Text = ("New file")
       Picture = Picture["icon:/32/new"]
       Tag = "new"
     }
     { mnuOpen Menu menuapp
       Name = "mnuOpen"
-      Text = ("Open")
+      Text = ("Open file")
       Picture = Picture["icon:/22/open"]
       Tag = "open"
     }
     { mnuSave Menu menuapp
       Name = "mnuSave"
-      Text = ("Save")
+      Text = ("Save file")
       Picture = Picture["icon:/22/save"]
       Tag = "save"
     }
     { mnuSaveAs Menu menuapp
       Name = "mnuSaveAs"
-      Text = ("Save as")
+      Text = ("Save file as")
       Picture = Picture["icon:/22/save-as"]
       Tag = "saveas"
     }
     { mnuImport Menu menuapp
       Name = "mnuImport"
-      Text = ("Import")
+      Text = ("Import file")
       Picture = Picture["icon:/32/download"]
       Tag = "import"
     }
     { mnuExport Menu menuapp
       Name = "mnuExport"
-      Text = ("Export")
+      Text = ("Export file")
       Picture = Picture["icon:/32/upload"]
       Tag = "export"
     }
@@ -327,6 +327,9 @@
       Tag = "zoome"
     }
   }
+  { grpDrawings Menu
+    Text = ("Drawings")
+  }
   { grpHelp Menu
     #Translate = False
     Text = "?"
@@ -371,7 +374,7 @@
         MoveScaled(49,0,15,5)
       }
       { Panel6 Panel
-        MoveScaled(100,0,25,5)
+        MoveScaled(88,0,25,5)
         Arrangement = Arrange.Horizontal
         Margin = True
         { ProgressBar1 ProgressBar
@@ -379,6 +382,11 @@
           Visible = False
           Expand = True
         }
+      }
+      { cboDrawing ComboBox
+        MoveScaled(115,0,17,5)
+        Expand = True
+        ReadOnly = True
       }
     }
     { PanEdit1 Panel

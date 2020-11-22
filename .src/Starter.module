@@ -47,16 +47,15 @@ Public flgWindowMode As Integer
 Public flgWindowInfoColor As Integer           ' habria que agrupar todas las vars de ambiente, hay dos opciones simples
 
 '----------------------
-Public cCommands As New Collection   '' Commands list
+Public cCommandsList As New Collection   '' Commands list
 Public cColors As New Collection     '' Colors list
 Public ColorsRGB As New String[]     '' Colors lists each item as r,g,b string
-'Public cLtypes As New Collection     '' Linetypes list
 Public cStyles As New Collection     '' Linetypes list
 Public cWidths As New Collection     '' Widths list
 Public sDecimal As String            '' Character used in system for separation decimal
 
 ' Variables de un solo uso
-Private ldd As Boolean              '' Testigo de finalización de carga.
+'Private ldd As Boolean              '' Testigo de finalización de carga.
 
 Public Sub Main()
 
@@ -69,9 +68,52 @@ End
 Public Sub Run()
 
   Dim cex As New Collection         '' Colección con variables para pasar al siguiente módulo o formulario
-  Dim thx As New String[]           '' Lista d etemas del editor interno
-  Dim i As Integer
   Dim CADConfigData As New Collection
+
+  SetDirsAndFiles()
+  SetAppEventsLog()
+  SetEnvironmentVars()
+  SetExternalApps()
+  SetCommandsList()
+
+  '' Bandera de indicacion de formulario cargado
+  'ldd = True
+
+  '' Abrir el formulario principal del programa
+  cex = ["AppDir": adi, "AppCfg": apc, "CADCfg": CADConfig, "AppEdi": etx, "AppLog": lgg]
+  APPMain.Run(cex)
+
+End
+
+'' Setting the external applications
+
+Private Sub SetExternalApps()
+
+  '' Setting the default plain text editor in the system
+  If sog.MimeDefaultApp("text/plain").Count > 0 Then
+    etx = sog.MimeDefaultApp("text/plain")[0]
+  Else
+    etx = ""
+  Endif
+
+End
+
+'' Activation of the event log system
+
+Private Sub SetAppEventsLog()
+
+  If Exist(lgf) = False Then
+    Shell "touch " & lgf Wait
+  Endif
+  lgg = New Logger(Logger.Info, Logger.DefaultFormat, lgf)
+  lgg.Begin
+
+End
+
+Private Sub SetDirsAndFiles()
+
+  Dim i As Integer
+  Dim thx As New String[]           '' Lista de temas del editor interno
 
   sDecimal = sog.GetLcNumeric()[0]
 
@@ -121,90 +163,13 @@ Public Sub Run()
     Next
   Endif
 
-  '' Estableciendo las variables de entorno especiales con un archivo XML
-  CADConfig = adi &/ "cad.xml"
-  ' If Exist(File.Dir(CADConfig)) = False Then
-  '     Mkdir File.Dir(CADConfig)
-  ' Endif
-  ' If Exist(CADConfig) = False Then
-  '     CADConfigData = cad.CADConfig()
-  '     xmg.XmlConfMaker(CADConfig, CADConfigData, Application.Title & " " & Application.Version)
-  ' Endif
-
-  '' Arrancando el sistema de
-  If Exist(lgf) = False Then
-    Shell "touch " & lgf Wait
-  Endif
-  lgg = New Logger(Logger.Info, Logger.DefaultFormat, lgf)
-  lgg.Begin
-
-  '' Verificación del editor de texto plano por defecto en el sistema
-  If sog.MimeDefaultApp("text/plain").Count > 0 Then
-    etx = sog.MimeDefaultApp("text/plain")[0]
-  Else
-    etx = ""
-  Endif
-
-  '' Bandera de indicacion de formulario cargado
-  ldd = True
-
-  '' Applying the environments vars
-  SetEnvironmentVars()
-
-  '' Load the commands list
-  cCommands = LoadCommandsList()
-
-  '' Load the colors list
-  'cColors = LoadColors()
-  ColorsRGB = cad.DWGColors()
-  For i = 0 To ColorsRGB.Max
-    cColors.Add([ColorsRGB[i], True], CStr(i))
-  Next
-
-  '' Load the linetypes list
-  cStyles = cad.NewStyles()
-
-  '' Load the linetypes list
-  cWidths = cad.NewWidths()
-
-  gcolor = cad.GauchoDecodeColor()
-
-  ' corrijo los colores que no se ven contra el fondo
-  gcolor[0] = flgWhiteAndBlack
-  gcolor[7] = flgWhiteAndBlack
-  gcolor[255] = flgWhiteAndBlack
-
-  '' Abrir el formulario principal del programa
-  cex.Add(adi, "AppDir")
-  cex.Add(apc, "AppCfg")
-  cex.Add(CADConfig, "CADCfg")
-  cex.Add(etx, "AppEdi")
-  cex.Add(lgg, "AppLog")
-
-  APPMain.Run(cex)
-  'FCAD.Run(cex)
-
 End
 
 Private Sub SetEnvironmentVars()
 
-  ' '' Vars for form interface
-  ' Select xmg.GetVar("Application.window-background-color", apc)
-  '         ''DEPRECATED: Cambiar en la proxima version de gambas para usar la propiedad .DarkTheme
-  '
-  '     Case "Light"
-  '         flgWindowBackColor = Color.White
-  '         flgWindowInfoColor = &HFFFF00
-  '         flgWindowTextColor = Color.Blue
-  '         flgWindowCursorColor = Color.Black
-  '     Case Else
-  '         flgWindowBackColor = Color.Black
-  '         flgWindowInfoColor = &HA0A000
-  '         flgWindowTextColor = Color.Yellow
-  '         flgWindowCursorColor = Color.White
-  ' End Select
-
   ''Vars for OpenGL window
+  Dim i As Integer
+
   Select xmg.GetVar("CAD.Background-Dark", apc)
 
     Case True
@@ -223,55 +188,112 @@ Private Sub SetEnvironmentVars()
 
   End Select
 
-End
+  '' Setting the special environment variables from XML file
+  ''TODO: Change to a json text file
+  CADConfig = adi &/ "cad.xml"
 
-Private Function LoadCommandsList() As Collection
+  '' Load the colors list
+  ColorsRGB = cad.DWGColors()
+  For i = 0 To ColorsRGB.Max
+    cColors.Add([ColorsRGB[i], True], CStr(i))
+  Next
 
-  Dim cComm As New Collection
+  '' Load the linetypes list
+  cStyles = dwg.NewStyles()
 
-  cComm.Add(["chamfer", "cd"], "chamfer")
-  cComm.Add(["copy", "c"], "copy")
-  cComm.Add(["divide", "dx"], "divide")
-  cComm.Add(["erase", "de"], "erase")
-  cComm.Add(["extend", "e"], "extend")
-  cComm.Add(["fillet", "f"], "fillet")
-  cComm.Add(["mirror", "mn"], "mirror")
-  cComm.Add(["move", "m"], "move")
-  cComm.Add(["offset", "fg"], "offset")
-  cComm.Add(["pan", "zc"], "pan")
-  cComm.Add(["rotate", "rt"], "rotate")
-  cComm.Add(["scale", "sc"], "scale")
-  cComm.Add(["stretch", "s"], "stretch")
-  cComm.Add(["trim", "tr"], "trim")
-  cComm.Add(["zoome", "zx"], "zoome")
-  cComm.Add(["zoomw", "z"], "zoomw")
+  '' Load the linetypes list
+  cWidths = dwg.NewWidths()
 
-  cComm.Add(["arc", "a"], "arc")
-  cComm.Add(["circle", "cv"], "circle")
-  cComm.Add(["dim", "dw"], "dim")
-  cComm.Add(["ellipse", "ew"], "ellipse")
-  cComm.Add(["hatch", "ht"], "hatch")
-  cComm.Add(["insert", "b"], "insert")
-  cComm.Add(["leader", "li"], "leader")
-  cComm.Add(["line", "l"], "line")
-  cComm.Add(["mtext", "tt"], "mtext")
-  cComm.Add(["pline", "po"], "pline")
-  cComm.Add(["rectangle", "re"], "rectangle")
-  cComm.Add(["solid", "sa"], "solid")
-  cComm.Add(["spline", "sq"], "spline")
-  cComm.Add(["text", "t"], "text")
+  gcolor = cad.GauchoDecodeColor()
 
-  cComm.Add(["beam", "w1"], "beam")
-  cComm.Add(["column", "w2"], "column")
-  cComm.Add(["slab3p", "w3"], "slab3p")
-  cComm.Add(["slab4p", "w4"], "slab4p")
-  cComm.Add(["wallcolumn", "w5"], "wallcolumn")
-
-  cComm.Add(["layers", "lk"], "layers")
-
-  Return cComm
+  ' corrijo los colores que no se ven contra el fondo
+  gcolor[0] = flgWhiteAndBlack
+  gcolor[7] = flgWhiteAndBlack
+  gcolor[255] = flgWhiteAndBlack
 
 End
+
+Private Sub SetCommandsList()
+
+  cCommandsList.Add(["chamfer", "cd"], "chamfer")
+  cCommandsList.Add(["copy", "c"], "copy")
+  cCommandsList.Add(["divide", "dx"], "divide")
+  cCommandsList.Add(["erase", "de"], "erase")
+  cCommandsList.Add(["extend", "e"], "extend")
+  cCommandsList.Add(["fillet", "f"], "fillet")
+  cCommandsList.Add(["mirror", "mn"], "mirror")
+  cCommandsList.Add(["move", "m"], "move")
+  cCommandsList.Add(["offset", "fg"], "offset")
+  cCommandsList.Add(["pan", "zc"], "pan")
+  cCommandsList.Add(["rotate", "rt"], "rotate")
+  cCommandsList.Add(["scale", "sc"], "scale")
+  cCommandsList.Add(["stretch", "s"], "stretch")
+  cCommandsList.Add(["trim", "tr"], "trim")
+  cCommandsList.Add(["zoome", "zx"], "zoome")
+  cCommandsList.Add(["zoomw", "z"], "zoomw")
+
+  cCommandsList.Add(["arc", "a"], "arc")
+  cCommandsList.Add(["circle", "cv"], "circle")
+  cCommandsList.Add(["dim", "dw"], "dim")
+  cCommandsList.Add(["ellipse", "ew"], "ellipse")
+  cCommandsList.Add(["hatch", "ht"], "hatch")
+  cCommandsList.Add(["insert", "b"], "insert")
+  cCommandsList.Add(["leader", "li"], "leader")
+  cCommandsList.Add(["line", "l"], "line")
+  cCommandsList.Add(["mtext", "tt"], "mtext")
+  cCommandsList.Add(["pline", "po"], "pline")
+  cCommandsList.Add(["rectangle", "re"], "rectangle")
+  cCommandsList.Add(["solid", "sa"], "solid")
+  cCommandsList.Add(["spline", "sq"], "spline")
+  cCommandsList.Add(["text", "t"], "text")
+
+  cCommandsList.Add(["beam", "w1"], "beam")
+  cCommandsList.Add(["column", "w2"], "column")
+  cCommandsList.Add(["slab3p", "w3"], "slab3p")
+  cCommandsList.Add(["slab4p", "w4"], "slab4p")
+  cCommandsList.Add(["wallcolumn", "w5"], "wallcolumn")
+
+  cCommandsList.Add(["layers", "lk"], "layers")
+
+End
+
+' Private Function LoadColors() As Collection
+'
+'   Dim cColor As New Collection
+'
+'   cColor.Add(["ByBlock", 0], "0")
+'   cColor.Add(["ByLayer", 256], "256")
+'   cColor.Add([("Red"), 1], "1")
+'   cColor.Add([("Yellow"), 2], "2")
+'   cColor.Add([("Green"), 3], "3")
+'   cColor.Add([("Cyan"), 4], "4")
+'   cColor.Add([("Blue"), 5], "5")
+'   cColor.Add([("Magenta"), 6], "6")
+'   cColor.Add([("White"), 7], "7")
+'
+'   Return cColor
+'
+' End
+'
+' Public Function LoadLtypes() As Collection
+'
+'   Dim lty As New Collection
+'
+'   lty.Add([[3], "Continous"], "0") '1
+'   lty.Add([[14, 4, 4, 4], "Center"], "1") '1
+'   lty.Add([[10, 6, 3, 6], "Dashdot"], "2") '2
+'   lty.Add([[10, 6], "Dashed"], "3") '3
+'   lty.Add([[6, 4, 3, 4, 3, 4], "Divide"], "4") '4
+'   lty.Add([[3, 4], "Dot"], "5") '6
+'   lty.Add([[6, 4], "Hidden"], "6") '7
+'   lty.Add([[4, 3], "Hidden2"], "7") '8
+'   lty.Add([[12, 4, 4, 4, 4, 4], "Phantom"], "8") '9
+'   lty.Add([[3], "ByBLock"], "9") '1
+'   lty.Add([[3], "ByLayer"], "10") '1
+'
+'   Return lty
+'
+' End
 
 ' Private Function LoadColors() As Collection
 '

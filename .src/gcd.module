@@ -675,7 +675,7 @@ End
 
 '' obx = Entity array, sb = BLockname,
 
-Public Function ImpEnty3(colGrp As Collection, obx As Entity[], Optional sb As String) As Integer
+Public Sub ImpEnty3(vrx As Variant[], obx As Entity[])
 
   Dim t As Integer                  '' Total number of entities
   Dim p As Integer                  '' Coordinate component 0 = x axis, 1 = y axis
@@ -689,100 +689,83 @@ Public Function ImpEnty3(colGrp As Collection, obx As Entity[], Optional sb As S
   Dim st As String                  '' LinType
   Dim sy As String                  '' Layer
   Dim vrt As Variant                '' Radius, Text[rotation,height,value]
+  Dim io As Integer                 '' Closed or Open
+  Dim sb As String
 
-  For Each e In colGrp
+  For Each e In vrx
     fxp.Clear
-    vrt = Null
-    For Each tag In ["center", "start", "end", "ins_pt", "points"]
-      If e.Exist(tag) Then
-        If TypeOf(e[tag]) = gb.Object Then
-          Select tag
-            Case "points"
-              For Each v In e[tag]
-                For p = 0 To 1
-                  fxp.Add(v[p])
+    'vrt = Null
+    If e.Exist("entity") Then
+      For Each tag In ["center", "start", "end", "ins_pt", "points"]
+        If e.Exist(tag) Then
+          If TypeOf(e[tag]) = gb.Object Then
+            Select tag
+              Case "points"
+                For Each v In e[tag]
+                  For p = 0 To 1
+                    fxp.Add(v[p])
+                  Next
                 Next
-              Next
-            Case Else
-              For p = 0 To 1
-                fxp.Add(e[tag][p])
-              Next
-          End Select
-        Endif
-      Endif
-    Next
-    ic = 7
-    iw = 2
-    st = "Continous"
-    sy = "0"
-
-    Select LCase$(e["entity"])
-
-      Case "line"
-        AddLine(obx, fxp, ic, iw, st, sy, sb)
-        obx.Last.Handle = IIf(e.Exist("handle"), e["handle"][1], sog.UUIDHandle(4))
-        Inc t
-        'Case "spline"
-        '  AddSPLine(obx, fxp, ic, iw, st, sy, sb)
-        '  Inc t
-      Case "lwpolyline"
-        ic = 4
-        AddPolyLine(obx, fxp, ic, iw, st, sy, sb)
-        obx.Last.Handle = IIf(e.Exist("handle"), e["handle"][1], sog.UUIDHandle(4))
-        obx.Last.fParam.Add(IIf(e.Exist("flag"), CFloat(e["flag"]), 0))
-        If e.Exist("flag") Then
-          If e["flag"] = 1 Then
-            Print "closed"
+              Case Else
+                For p = 0 To 1
+                  fxp.Add(e[tag][p])
+                Next
+            End Select
           Endif
         Endif
-        Print "Puntos: " & CStr(e["points"].Count) & " Mode: " & CStr(e["entmode"]) & " Flag: " & CStr(e["flag"])
-        Inc t
-        'Case "solid"
-        '  AddSolid(obx, fxp, ic, iw, st, sy, sb)
-        '  Inc t
-        'Case "ellipse"
-        '  AddEllipse(obx, fxp, e["ratio"], e["start_angle"], e["end_angle"], ic, iw, st, sy, sb)
-        '  Inc t
+      Next
+      ic = 7
+      iw = 2
+      st = "Continous"
+      sy = "0"
+      sb = "" ' temp like ""
 
-      Case "circle"
-        vrt = e["radius"] ' Radius
-        AddCircle(obx, fxp, vrt, ic, iw, st, sy, sb)
-        obx.Last.Handle = IIf(e.Exist("handle"), e["handle"][1], sog.UUIDHandle(4))
-        Inc t
+      Select LCase$(e["entity"])
 
-        'Case "arc"
-        '  AddArc(obx, fxp, e["radius"], e["start_angle"], e["end_angle"], ic, iw, st, sy, sb)
-        '  Inc t
+        Case "line"
+          AddLine(obx, fxp, ic, iw, st, sy, sb)
+          obx.Last.Handle = IIf(e.Exist("handle"), e["handle"][1], sog.UUIDHandle(4))
+          Inc t
+        Case "lwpolyline"
+          ic = 4
+          If e.Exist("flag") Then
+            Print e["flag"] & " : " & CStr(Bin(e["flag"], 8))
+            io = CByte(Mid(Bin(e["flag"], 8), 1, 1))
+          Endif
+          AddPolyLine(obx, fxp, io, ic, iw, st, sy, sb)
+          'obx.Last.Handle = IIf(e.Exist("handle"), e["handle"][1], sog.UUIDHandle(4))
+          'obx.Last.fParam.Add(IIf(e.Exist("flag"), CFloat(e["flag"]), 0))
+          'If e.Exist("flag") Then
+          '  If e["flag"] = 1 Then
+          '    Print "closed"
+          '  Endif
+          'Endif
+          'Print "Puntos: " & CStr(e["points"].Count) & " Mode: " & CStr(e["entmode"]) & " Flag: " & CStr(e["flag"])
+          Inc t
 
-        'Case "insert"
-        '  AddInsert(obx, fxp, e["scalex"], e["scaley"], e["angle"], ic, st, sy, e["block"])
-        '  Inc t
+        Case "circle"
+          vrt = e["radius"] ' Radius
+          AddCircle(obx, fxp, vrt, ic, iw, st, sy, sb)
+          obx.Last.Handle = IIf(e.Exist("handle"), e["handle"][1], sog.UUIDHandle(4))
+          Inc t
 
-      Case "text"
-        vrt = [IIf(e.Exist("rotation"), e["rotation"], 0), e["height"], e["text_value"]]
-        AddText(obx, fxp, vrt[0], vrt[1], vrt[2], ic, iw, st, sy, sb)
-        Inc t
+        Case "text"
+          vrt = [IIf(e.Exist("rotation"), e["rotation"], 0), e["height"], e["text_value"]]
+          AddText(obx, fxp, vrt[0], vrt[1], vrt[2], ic, iw, st, sy, sb)
+          Inc t
 
-      Case "mtext"
-        vrt = [IIf(e.Exist("rotation"), e["rotation"], 0), e["text_height"], e["text"]] ' dxf 50,40,1
-        'vrt.Add(IIf(e.Exist("attachment"), e["attachment"], 1)) ' dxf 71
-        'vrt.Add(IIf(e.Exist("style"), e["style"], "standar")) ' dxf 7"
-        'vrt.Add("standar") ' dxf 7"
-        'vrt.Add(IIf(e.Exist("flow_dir"), e["flow_dir"], 1)) ' dxf 72
-        'vrt.Add(IIf(e.Exist("extents_height"), e["extents_height"], 1)) ' dxf 42
-        'vrt.Add(IIf(e.Exist("extents_width"), e["extents_width"], 1)) ' dxf 43
-        AddText(obx, fxp, vrt[0], vrt[1], vrt[2], ic, iw, st, sy, sb)
-        '  AddMText(obx, fxp, e["angle"], e["text_height"], sText, ic, iw, st, sy, sb)
-        Inc t
+        Case "mtext"
+          vrt = [IIf(e.Exist("rotation"), e["rotation"], 0), e["text_height"], e["text"]] ' dxf 50,40,1
+          AddText(obx, fxp, vrt[0], vrt[1], vrt[2], ic, iw, st, sy, sb)
+          Inc t
 
-        'Case "dimmension"
-        '  AddDim(obx, fxp, e["angle"], e["text_height"], e["text"], ic, iw, st, sy, sb)
-        '  Inc t
+      End Select
 
-    End Select
+    Endif
+
   Next
 
-  Return t
+  'Return t
 
 End
 
