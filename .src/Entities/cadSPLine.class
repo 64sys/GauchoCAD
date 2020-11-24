@@ -215,126 +215,100 @@ Public Function calculateDrawingPoints(points As Float[]) ' points es una copia 
       t += interval
     Next
     Return
+  Else If points.Count / 2 = 4 Then
 
-  Else
-    i2 = points.Count Mod 8
-    If i2 / 2 = 1 Then
-
-      ' La curva necesita  Fit-Control-Control-Fit
-      ' Casos mas complejos
-      ' A - Si tengo 4 puntos, tengo la curva cubica perfecta.
-      ' B - Si tengo 5 puntos, estiro la curva moviendo el ultimo fit al ultimo control:
-      '       Fit - Control - Control - Fit - > Control
-      ' C - Si tengo 6 puntos, creo un Control q me de la misma tangente al 4to Fit, y agrego otro Fit en el ultimo Control:
-      '       Fit0 - Control1 - Control2- Fit3- Control4 (creado, tang al 2) - Control5 (marcado) - Fit6 (creado = 5)
-
-      ' el primer punto de control lo espejo del segmento anterior
-      ' y lo inserto directamente en el array de los puntos
-      ' pero en la anteultima posicion
-      '   0123456789  Max = 9
-      '    1 2 3 4 5
-
-      p1.add(points[points.Max - 3] + points[points.Max - 3] - points[points.Max - 5])
-      p1.add(points[points.Max - 2] + points[points.Max - 2] - points[points.Max - 4])
-      points.Insert(p1.Copy(), points.Max - 1)
-      p1.Clear
-
-    End If
-  End If
-
-  For i = 0 To points.count - 8 Step 6
-
-    If points.count - i - 8 = 0 Then  ' caso A -> mando a dibujar
-      p0.Insert(points.Copy(i, 2))
-      p1.Insert(points.Copy(i + 2, 2))
-      p2.Insert(points.Copy(i + 4, 2))
-      p3.Insert(points.Copy(i + 6, 2))
-
-    Else If points.max - i = 6 Then  ' caso B
-
-      p0.Insert(points.Copy(i, 2))
-      p1.Insert(points.Copy(i + 2, 2))
-      p2.Insert(points.Copy(i + 4, 2))
-      p3.Insert(points.Copy(i + 4, 2))
-
-    End If
-
+    p0.Insert(points.Copy(i, 2))
+    p1.Insert(points.Copy(i + 2, 2))
+    p2.Insert(points.Copy(i + 4, 2))
+    p3.Insert(points.Copy(i + 6, 2))
     For iPoints = 0 To numDrawingPoints - 1
       drawingPoints.insert(CalculateBezierPoint2D(t, p0, p1, p2, p3))
       t += interval
     Next
-  Next
+    Return
 
-End
+  Else ' tengo 4 o mas puntos, voy a dibujar lo que pueda
+    ' La curva necesita  Fit-Control-Control-Fit
+    ' Casos mas complejos
+    ' A - Si tengo 4 puntos, tengo la curva cubica perfecta.
+    ' B - Si tengo 5 puntos, estiro la curva moviendo el ultimo fit al ultimo control:
+    '       Fit - Control - Control - Fit - > Control
+    ' C - Si tengo 6 puntos, creo un Control q me de la misma tangente al 4to Fit, y agrego otro Fit en el ultimo Control:
+    '       Fit0 - Control1 - Control2- Fit3- Control4 (creado, tang al 2) - Control5 (marcado) - Fit6 (creado = 5)
 
-' Public Function calculateDrawingPoints(points As Float[]) ' points es una copia de P
-'
-'   Dim interval As Float = 1 / numDrawingPoints
-'   Dim t As Float = interval
-'   Dim i As Integer
-'
-'   ' Tengo que ver cuantos puntos tengo, casos basicos
-'   If points.Count / 2 = 2 Then ' es una recta
-'
-'     drawingPoints.Insert(points.Copy())
-'     Return
-'
-'   Else If points.Count / 2 = 3 Then
-'     ' es una curva quadratica
-'     ' para no generar otra formula, puedo engañarme generando un nuevo punto tangente igual al unico que tengo
-'     ' con esto, transformo la curva en cubica, que es la curva que siempre tendre
-'     points.Insert([points[2], points[3]], 2)
-'
-'   End If
-'
-'   If points.Count / 2 > 3 Then
-'
-'     drawingPoints.insert(calculateNewPoint(points, 0))
-'     For i = 0 To numDrawingPoints - 1
-'       drawingPoints.insert(calculateNewPoint(points, t))
-'       t += interval
-'     Next
-'   End If
-'
-' End
-'
+    ' el primer punto de control lo espejo del segmento anterior
+    ' y lo inserto directamente en el array de los puntos
+    ' pero en la anteultima posicion
 
-Public Function calculateNewPoint(points As Float[], t As Float) As Float[]
-  ' Coordinates calculated using the general formula are relative To
-  ' origin at bottom left.
+    '   01 23 45 67 89 1011 1213 1415 1617 1819 Max = 19 Count=20
+    '    1  2  3  4  5    6    7    8    9   10
 
-  Dim x As Float = 0
-  Dim y As Float = 0
-  Dim n As Integer = points.Count / 2 - 1
-  Dim i As Integer
-  Dim bin As Float
+    For i = 0 To points.max Step 6
+      If points.count - i >= 8 Then  ' caso A -> mando a dibujar
+        p0.Insert(points.Copy(i, 2))
+        p1.Insert(points.Copy(i + 2, 2))
+        p2.Insert(points.Copy(i + 4, 2))
+        p3.Insert(points.Copy(i + 6, 2))
 
-  For i = 0 To n
-    bin = C(n, i) * (1 - t) ^ (n - i) * t ^ i
-    Debug i, bin
+      Else If points.count - i = 6 Then  ' caso B: Tengo Fit+Control+Control
 
-    x += bin * points[i * 2]
-    y += bin * points[i * 2 + 1]
-  Next
-  Return [x, y]
+        p0.Insert(points.Copy(i, 2))
+        p1.Insert(points.Copy(i + 2, 2))
+        p2.Insert(points.Copy(i + 4, 2))
+        p3.Insert(points.Copy(i + 4, 2))
 
-End
+      Else If points.count - i = 4 Then  ' caso C: Tengo Fit+Control (nuevo)
 
-Public Function C(n As Integer, k As Integer) As Float
+        '   01 23 45 67 89  Max = 9 Count=10
+        '    1  2  3  4  5
+        '    F  C  C  F  C
 
-  Dim coeff As Float = 1
-  Dim x As Float
+        ' duplico el ultimo Control point
+        points.Add(0)
+        points.Add(0)
+        points[points.max - 1] = points[points.max - 3]
+        points[points.max] = points[points.max - 2]
 
-  For x = n - k + 1 To n
-    coeff *= x
+        '   01 23 45 67 89 1011 Max = 11 Count=12
+        '    1  2  3  4  5    6
+        '    F  C  C  F  C    C
+        '          ^-----|
+        ' el control point agregado es correlativo al de la curva anterior
+        points[points.max - 3] = 2 * points[points.max - 5] - points[points.Max - 7]
+        points[points.max - 2] = 2 * points[points.max - 4] - points[points.Max - 6]
 
-  Next
-  For x = 1 To k
-    coeff /= x
-  Next
+        ' ahora la tomo como un tipo B
 
-  'Debug coeff
-  Return coeff
+        p0.Insert(points.Copy(i, 2))
+        p1.Insert(points.Copy(i + 2, 2))
+        p2.Insert(points.Copy(i + 4, 2))
+        p3.Insert(points.Copy(i + 4, 2))
+
+      Else If points.count - i = 2 Then  ' no hay nada q dibujar
+        p0.Insert(points.Copy(i, 2))
+        p1.Insert(points.Copy(i, 2))
+        p2.Insert(points.Copy(i, 2))
+        p3.Insert(points.Copy(i, 2))
+
+      End If
+      'modUtils.DebugMatrix(points, 20)
+
+      'Debug Format(p0[0], "0.00"), Format(p0[1], "0.00"), Format(p1[0], "0.00"), Format(p1[1], "0.00"), Format(p2[0], "0.00"), Format(p2[1], "0.00"), Format(p3[0], "0.00"), Format(p3[1], "0.00")
+
+      t = 0
+      For iPoints = 0 To numDrawingPoints - 1
+
+        drawingPoints.insert(CalculateBezierPoint2D(t, p0, p1, p2, p3))
+        t += interval
+      Next
+
+      p0.Clear
+      p1.Clear
+      p2.Clear
+      p3.Clear
+
+    Next
+  End If
 
 End
 
@@ -342,6 +316,8 @@ End
 ' Nuevo metodo
 '=======================================================================================================
 
+'' Calculates a point in a Cubic Bezier curve
+'' if P1=P2 this turn into a Quadratic curve
 Public Function CalculateBezierPoint2D(t As Float, p0 As Float[], p1 As Float[], p2 As Float[], p3 As Float[]) As Float[]
 
   Dim u As Float = 1 - t    ' t va de 0 a 1

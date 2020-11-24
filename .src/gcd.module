@@ -1201,6 +1201,8 @@ Public Function GetLayerID(LayerName As String) As String
 
   Dim cLayer As Collection
 
+  Return "1"
+
   For Each cLayer In gcd.CurrentDrawing.cModel["Layers"]
     If cLayer["name"] = LayerName Then Return cLayer["id"]
   Next
