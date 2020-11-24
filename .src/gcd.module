@@ -769,6 +769,31 @@ Public Sub ImpEnty3(vrx As Variant[], obx As Entity[])
 
 End
 
+'' Importa las cosas de manera descentralizada
+Public Sub ImpEnty4(vrx As Variant[], obx As Entity[])
+
+  Dim e As Collection               ' Current Entity
+  Dim clsHandler As Object
+  Dim entNueva As Entity
+
+  For Each e In vrx  ' Para cada Coleccion de datos de vrx
+
+    If e.Exist("entity") Then ' llamo a la clase que maneja dicha entidad
+
+      clsHandler = Object.New("cad" & e["entity"])  ' obtenemos el tipo de entidad y buscamos su clase. Si no manjemos esa entidad, esto de error.
+
+      entNueva = clsHandler.Import(e)               ' le pedimo a la clase que arme un objeto Entity para agregar al Drawing actual
+
+      obx.Add(entNueva)                             ' lo agregamos
+
+      entNueva = Null                               ' Limpiamos
+
+    Endif
+
+  Next
+
+End
+
 '' Importa la clave entidades de la coleccion y las coloca en el array de objetos
 
 Public Function ImportEntities2(colGrp As Collection, obxEntities As Entity[], Optional BlockName As String) As Integer

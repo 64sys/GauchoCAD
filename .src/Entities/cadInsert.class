@@ -234,3 +234,30 @@ Public Sub Finish(oE As Entity, Optional ParamsDone As Integer = -1) As Boolean
   End If
 
 End
+
+'   "entity": "INSERT",
+'   "index": 2370,
+'   "type": 7,
+'   "handle": [0, 1182141],
+'   "size": 64,
+'   "bitsize": 437,
+'   "ownerhandle": [12, 1, 27, 1182114],
+'   "_subclass": "AcDbEntity",
+'   "layer": [5, 2, 16840, 16840],
+'   "preview_exists": 0,
+'   "entmode": 0,
+'   "nolinks": 1,
+'   "color": 0,
+'   "ltype_scale": 0.2,
+'   "ltype_flags": 0,
+'   "plotstyle_flags": 0,
+'   "invisible": 0,
+'   "linewt": 30,
+'   "_subclass": "AcDbBlockReference",
+'   "ins_pt": [2897.47088581027083, 1635.43128744943124, 0.0],
+'   "scale_flag": 2,
+'   "scale": [0.1, 0.1, 0.1],
+'   "rotation": 1.5707963267949,
+'   "extrusion": [0.0, 0.0, 1.0],
+'   "has_attribs": 0,
+'   "block_header": [5, 2, 606, 606]
