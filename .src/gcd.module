@@ -780,9 +780,11 @@ Public Sub ImpEnty4(vrx As Variant[], obx As Entity[])
 
     If e.Exist("entity") Then ' llamo a la clase que maneja dicha entidad
 
-      clsHandler = Object.New("cad" & e["entity"])  ' obtenemos el tipo de entidad y buscamos su clase. Si no manjemos esa entidad, esto de error.
+      Try clsHandler = Object.New("cad" & e["entity"])  ' obtenemos el tipo de entidad y buscamos su clase. Si no manjemos esa entidad, esto de error.
 
-      entNueva = clsHandler.Import(e)               ' le pedimo a la clase que arme un objeto Entity para agregar al Drawing actual
+      Try entNueva = clsHandler.ImportJSONCol(e)    ' le pedimos a la clase que arme un objeto Entity para agregar al Drawing actual
+
+      If IsNull(entNueva) Then Continue             ' esta implementada?
 
       obx.Add(entNueva)                             ' lo agregamos
 
@@ -1235,6 +1237,9 @@ Public Function GetLayerID(LayerName As String) As String
 End
 
 Public Function GetGBColor(CADcolor As Integer, layerID As String) As Integer
+  ' FIXME: reparr esto
+
+  Return Starter.flgWhiteAndBlack
 
   ' color
   If CADcolor = 256 Then          ' buscar color del layer

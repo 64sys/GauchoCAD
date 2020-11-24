@@ -1083,7 +1083,7 @@ Public Sub gTask(sTask As String)
               gcd.CurrentDrawing.FileName = f
               'gcd.CurrentDrawing.cModel = dwg.Read(f)
               gcd.CurrentDrawing.vrxMod = dwg.Raw(f)
-              gcd.ImpEnty3(gcd.CurrentDrawing.vrxMod, gcd.CurrentDrawing.arrEntities)
+              gcd.ImpEnty4(gcd.CurrentDrawing.vrxMod, gcd.CurrentDrawing.arrEntities)
 
               Me.Text = f
               LoadMenu()

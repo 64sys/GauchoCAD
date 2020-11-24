@@ -202,7 +202,7 @@ Public Function ImportJsonCol(c As Collection) As Entity
   n.P.Add(c["end"][0])
   n.P.Add(c["end"][1])
   n.colour = c["color"]
-  n.LineWidth = c["linewt"]
+  n.LineWidth = c["linewt"] / 100
 
   Return n
 
@@ -226,7 +226,7 @@ Public Function ExportJsonCol(e As Entity) As Collection
   n.Add(flxStart, "start")
   n.Add(flxEnd, "end")
 
-  n.add(e.LineWidth, "linewt")
+  n.add(e.LineWidth * 100, "linewt")
 
   ' etc
   Return n
