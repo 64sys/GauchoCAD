@@ -41,6 +41,31 @@ Public Visible As Boolean = True            ' si esta entidad puede ser mostrada
 Public Finished As Boolean = False          ' colocar en true cuando se llegue a completar
 Public StepsDone As Integer                 ' esto lo cambia cls ElementBuilder durante la construccion
 
+' esto es para texto RTF o complejos
+Private TextLines As New String[]
+Private TextHeigth As New Float[]
+Private TextPosX As New Float[]
+Private TextBoxWidth As New Float[]
+Private TextPosY As New Float[]
+Private TextBoxHeight As New Float[]
+Private TextAlignment As New Integer[]
+Private TextFont As New String[]
+Private TextBold As New Boolean[]
+
+Private CurrentTextLines As String
+Private CurrentTextHeigth As Float
+Private CurrentTextPosX As Float
+Private CurrentTextBoxWidth As Float
+Private CurrentTextPosY As Float
+Private CurrentTextBoxHeight As Float
+Private CurrentTextAlignment As Integer
+Private CurrentTextFont As String
+Private CurrentTextBold As Boolean
+Private CurrentTextItalic As Boolean
+Private CurrentTextCrossed As Boolean
+Private CurrentTextAngle As Float
+Private CurrentTextColor As Integer
+
 Public Sub Translate(e As Entity, dX As Float, dY As Float, Optional OnlySelected As Boolean = False)
 
   Dim i As Integer
@@ -92,17 +117,6 @@ Public Sub Scale(e As Entity, sX As Float, sY As Float)
 
   CreatePolygon(e)
   BuildPOI(e)
-
-End
-
-Public Sub Draw(oE As Entity)
-
-  If Not oE.Visible Then Return
-  oE.ColorToPaint = gcd.GetGBColor(oE.colour, oE.Layerid)
-
-  glPlus.DrawMultilineText(oE.stringdata[0], oE.p[0], oE.p[1], oE.fParam[0], oE.fParam[1], oE.ColorToPaint)
-
-  If oE.stringdata[0] <> "" Then CreatePolygon(oe)
 
 End
 
@@ -247,3 +261,205 @@ Public Sub Finish(oE As Entity, Optional ParamsDone As Integer = -1) As Boolean
   End If
 
 End
+
+Public Sub Draw(oE As Entity)
+
+  If Not oE.Visible Then Return
+  oE.ColorToPaint = gcd.GetGBColor(oE.colour, oE.Layerid)
+
+  ' voy a procesar texto
+  CurrentTextPosX = oE.p[0]
+  CurrentTextPosY = oE.p[1]
+  CurrentTextHeigth = oE.fParam[1]
+  CurrentTextAngle = oE.fParam[0]
+  CurrentTextColor = oE.ColorToPaint
+  ProcessText(oE.stringdata[0])
+
+  'glPlus.DrawMultilineText(oE.stringdata[0], oE.p[0], oE.p[1], oE.fParam[0], oE.fParam[1], oE.ColorToPaint)
+
+  'If oE.stringdata[0] <> "" Then CreatePolygon(oe)
+
+End
+
+Public Sub ProcessText(RTF As String)
+
+  ' hay 3 posibilidades , empieza con:
+  ' {
+  ' \
+  ' TEXTO cualquiera
+
+  ' busco lo que esta entre {}
+  Dim p1, p2 As Integer
+
+  Debug rtf
+
+  p1 = InStr(rtf, "{")
+  If p1 > 0 Then
+    p2 = InStr(rtf, "}")
+    ProcessPart(Mid(rtf, p1 + 1, p2 - p1 - 1))
+  Else
+    ProcessPart(rtf)
+  Endif
+
+End
+
+Public Sub ProcessPart(s As String)
+  ' aca viene lo que esta ente {}, sin esos simbolos
+
+  Dim s2, sFont, s3, s4 As String
+  Dim p1, p2, p3, p4 As Integer
+
+  s2 = s
+  If Left$(s2, 1) = "\\" Then
+    s2 = Mid(s2, 2)
+    Select Case Mid$(s2, 1, 1)
+      Case "f"            ' esta indicado un cambio en la fuente
+        '  \fVerdana|b0|i0|c0|p34;
+        p1 = InStr(s2, "|")
+        CurrentTextFont = Mid$(s2, 2, p1 - 2)
+        CurrentTextBold = Mid$(s2, p1 + 2, 1) = "1"
+        CurrentTextItalic = Mid$(s2, p1 + 5, 1) = "1"
+        CurrentTextCrossed = Mid$(s2, p1 + 8, 1) = "1"
+        p2 = InStr(s2, ";", p1)
+        CurrentTextHeigth = CFloat(Mid$(s2, p1 + 11, p2 - p1 - 11)) / 100
+        s2 = Mid(s2, p2 + 1)
+
+        If Len(s2) > 0 Then ProcessPart(s2)
+
+      Case "P"            ' esta indicado un cambio en la fuente
+        CurrentTextPosY -= glPlus.TextExtends("XXX", CurrentTextHeigth)[1] * 1.2
+        s2 = Mid(s2, 2)
+        If Len(s2) > 0 Then ProcessPart(s2)
+
+      Case "p"            ' no se que significa esto, suele venir \p12.55;
+        p2 = InStr(s2, ";", p1)
+        s2 = Mid(s2, p2 + 1)
+        If Len(s2) > 0 Then ProcessPart(s2)
+
+      Case "W"            ' no se que significa esto, suele venir \W12.55;
+        p2 = InStr(s2, ";", p1)
+        CurrentTextPosX += CFloat(Mid(s2, 2, p2 - 2))
+        s2 = Mid(s2, p2 + 1)
+        If Len(s2) > 0 Then ProcessPart(s2)
+
+    End Select
+  Else     ' es un texto, pero puede terminar en un scape
+    p2 = InStr(s2, "\\")
+    If p2 > 0 Then
+
+      If CurrentTextFont <> "" Then glPlus.SelectFont(CurrentTextFont)
+
+      glPlus.DrawText(Mid(s2, 1, p2 - 1), CurrentTextPosX, CurrentTextPosY, CurrentTextangle, CurrentTextHeigth, CurrentTextColor)
+
+      ProcessPart(Mid(s2, p2))
+    Else
+
+      If CurrentTextFont <> "" Then glPlus.SelectFont(CurrentTextFont)
+      glPlus.DrawText(s2, CurrentTextPosX, CurrentTextPosY, CurrentTextAngle, CurrentTextHeigth, CurrentTextColor)
+
+    Endif
+
+  End If
+  ' primero separo en diferentes partes
+
+End
+
+'
+'  {\fVerdana|b0|i0|c0|p34;Firma:}
+'  {\fVerdana|b0|i0|c0|p34;Ing. Marcos Kupervaser }
+'  {\fVerdana|b0|i0|c0|p34;Domicilio:}
+'  {\fVerdana|b0|i0|c0|p34;Firma:}
+'  {\fVerdana|b0|i0|c0|p34;Domicilio: C. Pellegrini 627}
+'  {\fVerdana|b0|i0|c0|p34;Firma:}
+'  {\fVerdana|b0|i0|c0|p34;Domicilio:      Perú 1015}
+'  {\fVerdana|b0|i0|c0|p34;Ing. Marcos Kupervaser\P }
+'  {\fVerdana|b0|i0|c0|p34; Construquen SRL}
+'  {\fVerdana|b0|i0|c0|p34;Ing. Martín Cristia}
+'  {\fVerdana|b0|i0|c0|p34;MMN°:3549  MCPN°:2207 }
+'  {\fVerdana|b0|i0|c0|p34;MMN°:3549  MCPN°:2207 }
+'  {\fVerdana|b0|i0|c0|p34;Firma:}
+'  {\fVerdana|b0|i0|c0|p34;Domicilio:}
+'  {\fVerdana|b0|i0|c0|p34;Firma:}
+'  {\fVerdana|b0|i0|c0|p34;Domicilio:}
+'  {\fVerdana|b0|i0|c0|p34;Expte N°: 77}
+'  {\fVerdana|b0|i0|c0|p34;\W2.0681; \W1;Letra: "T"}
+'  {\fVerdana|b0|i0|c0|p34;Año: 2014}
+'  {\fVerdana|b0|i0|c0|p34;Dígito}
+'  {\fVerdana|b0|i0|c0|p34;Folio}
+'  \pt14.35; {\fVerdana|b0|i0|c0|p34;Destino: \fVerdana|b1|i0|c0|p34;Viviendas Colectivas, Oficinas y Local Comercial}
+'  {\fVerdana|b0|i0|c0|p34;Propietario: \fVerdana|b1|i0|c0|p34; Valeria Sara Titioski, Pablo Andrés Titiosky y Rolando Simón Titioski.}
+'  \pt2.45; {\fVerdana|b0|i0|c0|p34;Calle: \fVerdana|b1|i0|c0|p34;Paraguay 940}
+'  {\fVerdana|b0|i0|c0|p34;Entre: \fVerdana|b1|i0|c0|p34;Junin e H. Irigoyen}
+'  {\fVerdana|b0|i0|c0|p34;Barrio: \fVerdana|b1|i0|c0|p34;Libertad}
+'  {\fVerdana|b0|i0|c0|p34;Escala: \fVerdana|b1|i0|c0|p34;1:100}
+'  {\fVerdana|b0|i0|c0|p34;\LPROPIETARIO\l:  }
+
+' "entity": "MTEXT",
+' "index": 2371,
+' "type": 44,
+' "handle": [0, 1182142],
+' "size": 148,
+' "bitsize": 1115,
+' "eed": [
+'   {
+'     "size": 50,
+'     "handle": [5, 18],
+'     "code": 0,
+'     "value": "MTEXTBEGIN"
+'   },
+'   {
+'     "code": 70,
+'     "value": 73
+'   },
+'   {
+'     "code": 70,
+'     "value": 1
+'   },
+'   {
+'     "code": 70,
+'     "value": 44
+'   },
+'   {
+'     "code": 40,
+'     "value": 1.0
+'   },
+'   {
+'     "code": 70,
+'     "value": 74
+'   },
+'   {
+'     "code": 70,
+'     "value": 0
+'   },
+'   {
+'     "code": 0,
+'     "value": "MTEXTEND"
+'   }
+' ],
+' "ownerhandle": [12, 1, 28, 1182114],
+' "_subclass": "AcDbEntity",
+' "layer": [5, 2, 16840, 16840],
+' "preview_exists": 0,
+' "entmode": 0,
+' "nolinks": 1,
+' "color": 256,
+' "ltype_scale": 0.2,
+' "ltype_flags": 0,
+' "plotstyle_flags": 0,
+' "invisible": 0,
+' "linewt": 29,
+' "_subclass": "AcDbMText",
+' "ins_pt": [2897.30935784301255, 1634.78046156619598, 0.0],
+' "extrusion": [0.0, 0.0, 1.0],
+' "x_axis_dir": [0.0, 1.0, 0.0],
+' "rect_width": 0.0,
+' "text_height": 0.14,
+' "attachment": 5,
+' "flow_dir": 1,
+' "extents_height": 0.14305593451569,
+' "extents_width": 0.35,
+' "text": "\\A1;1.30",
+' "style": [5, 1, 17, 17],
+' "linespace_style": 1,
+' "linespace_factor": 1.0,
+' "unknown_b0": 0

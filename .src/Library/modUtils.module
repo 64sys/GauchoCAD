@@ -62,7 +62,9 @@ Public Sub DebugMatrix(mf As Float[], filas As Integer, Optional columnas As Int
   If columnas = 1 Then
     For f = 0 To filas - 1
 
-      stmat &= Format$(mf[f], "0.000000") & " "
+      If f > mf.Max Then Break
+
+      stmat &= Format$(mf[f], "0.00") & " "
 
     Next
     Debug stmat

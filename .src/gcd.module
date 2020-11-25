@@ -103,6 +103,17 @@ Public Const dimOrdinate As Integer = 6
 Public Const dimHorizontal As Integer = 7
 Public Const dimVertical As Integer = 8
 
+' Entity Flags
+Public Const flgDWG_Changed As Integer = 1
+Public Const flgDWG_UnChanged As Integer = 2
+Public Const flgDWG_Deleted As Integer = 4
+Public Const flgGCD_New As Integer = 8
+'Public Const flg5 As Integer = 16
+'Public Const flg6 As Integer = 32
+'Public Const flg7 As Integer = 64
+'Public Const flg8 As Integer = 128
+'Public Const flg9 As Integer = 256
+
 Public Drawings As New ClsDrawing[]
 Public DrawingReady As Boolean = False
 Public CurrentDrawing As ClsDrawing
@@ -290,7 +301,7 @@ Public Sub Main()
 
   'FontList = glPlus.LoadFonts(Application.Path &/ "Fonts/LFF")
   FontList = glPlus.LoadFonts(Starter.sFonts)
-  glPlus.SelectFont("romanc")
+  glPlus.SelectFont("romand")
 
   'texturelist = glPlus.LoadTextures(Application.Path &/ "Textures")
   texturelist = glPlus.LoadTextures(Starter.sTextures)
@@ -840,6 +851,33 @@ Public Sub ImpEnty3()
 
 End
 
+'' Importa las cosas de manera descentralizada
+Public Sub ImpEnty4(vrx As Variant[], obx As Entity[])
+
+  Dim e As Collection               ' Current Entity
+  Dim clsHandler As Object
+  Dim entNueva As Entity
+
+  For Each e In vrx  ' Para cada Coleccion de datos de vrx
+
+    If e.Exist("entity") Then ' llamo a la clase que maneja dicha entidad
+
+      Try clsHandler = Object.New("cad" & e["entity"])  ' obtenemos el tipo de entidad y buscamos su clase. Si no manjemos esa entidad, esto de error.
+
+      Try entNueva = clsHandler.ImportJSONCol(e)    ' le pedimos a la clase que arme un objeto Entity para agregar al Drawing actual
+
+      If IsNull(entNueva) Then Continue             ' esta implementada?
+
+      obx.Add(entNueva)                             ' lo agregamos
+
+      entNueva = Null                               ' Limpiamos
+
+    Endif
+
+  Next
+
+End
+
 '' Importa la clave entidades de la coleccion y las coloca en el array de objetos
 
 Public Function ImportEntities2(colGrp As Collection, obxEntities As Entity[], Optional BlockName As String) As Integer
@@ -923,6 +961,7 @@ Public Function ImportEntities2(colGrp As Collection, obxEntities As Entity[], O
           'flxPoints.Add(colEnt["p"]["p0"][0])
           'flxPoints.Add(colEnt["p"]["p0"][1])
           sText = colEnt["text"]
+          'If InStr(stext, "\\") > 0 Then Stop
           Try sText = colEnt["text2"] & sText
           AddMText(obxEntities, flxPoints, IIf(colEnt["angle"], colEnt["angle"], 0), colEnt["text_height"], sText, iColor, fLinewt, sLtype, sLayer, BlockName)
           Inc iTotalEntities
@@ -1271,6 +1310,8 @@ Public Function GetLayerID(LayerName As String) As String
 
   Dim cLayer As Collection
 
+  Return "1"
+
   For Each cLayer In gcd.CurrentDrawing.cModel["Layers"]
     If cLayer["name"] = LayerName Then Return cLayer["id"]
   Next
@@ -1278,6 +1319,9 @@ Public Function GetLayerID(LayerName As String) As String
 End
 
 Public Function GetGBColor(CADcolor As Integer, layerID As String) As Integer
+  ' FIXME: reparr esto
+
+  Return Starter.flgWhiteAndBlack
 
   ' color
   If CADcolor = 256 Then          ' buscar color del layer

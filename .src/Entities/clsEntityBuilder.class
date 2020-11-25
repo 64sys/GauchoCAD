@@ -178,8 +178,8 @@ Public Function KeyText(EnteredText As String) ' esta rutina es llamada por FCAD
 
       If Left(EnteredText, 1) = "C" Then          ' close the element
         ' got othe first point and exit
-        elem.P[iPoints * 2] = elem.P[0]
-        elem.P[iPoints * 2 + 1] = elem.P[1]
+        elem.P[elem.p.max - 1] = elem.P[0]
+        elem.P[elem.p.max] = elem.P[1]
         Me.Finish
 
       Else If Left(EnteredText, 1) = "U" Then     ' undo last command and go
@@ -197,12 +197,12 @@ Public Function KeyText(EnteredText As String) ' esta rutina es llamada por FCAD
         Zt = CFloat(Split(EnteredText, ",")[1])
 
         ' if we are stll here, input was good
-        elem.P[iPoints * 2] = Xt
-        elem.P[iPoints * 2 + 1] = Zt
+        elem.P[elem.P.max - 1] = Xt
+        elem.P[elem.P.max] = Zt
 
         If Relative And (elem.P.count > 2) Then
-          elem.P[iPoints * 2] += elem.P[(iPoints - 1) * 2]
-          elem.P[iPoints * 2 + 1] += elem.P[(iPoints - 1) * 2 + 1]
+          elem.P[elem.P.max - 1] += elem.P[(iPoints - 1) * 2]
+          elem.P[elem.P.max] += elem.P[(iPoints - 1) * 2 + 1]
 
         Endif
         Inc iPoints
@@ -295,11 +295,11 @@ Public Sub AdvanceStep()
 
     ' last point
     gcd.CurrentDrawing.LastPoint.Clear
-    Try gcd.CurrentDrawing.LastPoint.Insert([elem.P[(iPoints - 1) * 2], elem.P[(iPoints - 1) * 2 + 1]])
+    Try gcd.CurrentDrawing.LastPoint.Insert([elem.P[elem.P.max - 3], elem.P[elem.P.max - 2]])
 
     ' we set the next point in the same position of this
-    Try elem.P[iPoints * 2] = elem.P[(iPoints - 1) * 2]
-    Try elem.P[iPoints * 2 + 1] = elem.P[(iPoints - 1) * 2 + 1]
+    Try elem.P[elem.P.max - 1] = elem.P[elem.P.max - 3]
+    Try elem.P[elem.P.max] = elem.P[elem.P.max - 2]
 
   Endif
 
@@ -330,10 +330,10 @@ Public Function MouseMove(mouseX As Integer, mouseY As Integer) ' esta rutina es
     Return              ' nothing more to do here
   End If
 
-  If Me.iPoints >= elem.P.Count / 2 Then Return
+  ' If Me.iPoints >= elem.P.Count / 2 Then Return
 
-  elem.P[iPoints * 2] = puntos.Near(appmain.Xreal(mouseX))
-  elem.P[iPoints * 2 + 1] = puntos.Near(appmain.Yreal(mouseY))
+  elem.P[elem.P.max - 1] = puntos.Near(appmain.Xreal(mouseX))
+  elem.P[elem.P.max] = puntos.Near(appmain.Yreal(mouseY))
 
   ' y si tengo enganche?
 
@@ -341,18 +341,18 @@ Public Function MouseMove(mouseX As Integer, mouseY As Integer) ' esta rutina es
 
     ' esto re enganchado
 
-    elem.p[iPoints * 2] = gcd.CurrentDrawing.iEntity[0]
-    elem.p[iPoints * 2 + 1] = gcd.CurrentDrawing.iEntity[1]
+    elem.p[elem.P.max - 1] = gcd.CurrentDrawing.iEntity[0]
+    elem.p[elem.P.max] = gcd.CurrentDrawing.iEntity[1]
 
     ' aca tengo que verificar el ortogonal
 
   Else If Me.iPoints > 0 Then                                                                          ' puedo hacer ortogonal
     If gcd.OrthogonalForced Or (Not gcd.OrthogonalIgnored And gcd.Orthogonal) Then          ' hablame de operadores logicos
 
-      If Abs(elem.p[iPoints * 2] - elem.P[(iPoints - 1) * 2]) > Abs(elem.p[iPoints * 2 + 1] - elem.P[(iPoints - 1) * 2 + 1]) Then ' prevalece X
-        elem.p[iPoints * 2 + 1] = elem.P[(iPoints - 1) * 2 + 1]
+      If Abs(elem.p[elem.p.max - 1] - elem.P[elem.P.max - 3]) > Abs(elem.p[elem.p.max] - elem.P[elem.P.max - 2]) Then ' prevalece X
+        elem.p[elem.p.max] = elem.P[elem.P.max - 2]
       Else
-        elem.p[iPoints * 2] = elem.P[(iPoints - 1) * 2]
+        elem.p[elem.p.max - 1] = elem.P[elem.P.max - 3]
       Endif
 
     End If
@@ -393,8 +393,8 @@ Public Function MouseDown(mouseX As Integer, mouseY As Integer) ' esta rutina es
 
   ' we are waiting for a point
 
-  elem.P[iPoints * 2] = puntos.Near(appmain.Xreal(mouseX))
-  elem.P[iPoints * 2 + 1] = puntos.Near(appmain.Yreal(mouseY))
+  elem.P[elem.p.max - 1] = puntos.Near(appmain.Xreal(mouseX))
+  elem.P[elem.p.max] = puntos.Near(appmain.Yreal(mouseY))
 
   ' y si tengo enganche?
 
@@ -402,18 +402,18 @@ Public Function MouseDown(mouseX As Integer, mouseY As Integer) ' esta rutina es
 
     ' esto re enganchado
 
-    elem.p[iPoints * 2] = gcd.CurrentDrawing.iEntity[0]
-    elem.p[iPoints * 2 + 1] = gcd.CurrentDrawing.iEntity[1]
+    elem.p[elem.p.max - 1] = gcd.CurrentDrawing.iEntity[0]
+    elem.p[elem.p.max] = gcd.CurrentDrawing.iEntity[1]
 
     ' aca tengo que verificar el ortogonal
 
   Else If Me.iPoints > 0 Then                                                                          ' puedo hacer ortogonal
     If gcd.OrthogonalForced Or (Not gcd.OrthogonalIgnored And gcd.Orthogonal) Then          ' hablame de operadores logicos
 
-      If Abs(elem.p[iPoints * 2] - elem.P[(iPoints - 1) * 2]) > Abs(elem.p[iPoints * 2 + 1] - elem.P[(iPoints - 1) * 2 + 1]) Then ' prevalece X
-        elem.p[iPoints * 2 + 1] = elem.P[(iPoints - 1) * 2 + 1]
+      If Abs(elem.p[elem.p.max - 1] - elem.P[elem.P.max - 3]) > Abs(elem.p[elem.p.max] - elem.P[elem.P.max - 2]) Then ' prevalece X
+        elem.p[elem.p.max] = elem.P[elem.P.max - 2]
       Else
-        elem.p[iPoints * 2] = elem.P[(iPoints - 1) * 2]
+        elem.p[elem.p.max - 1] = elem.P[elem.P.max - 3]
       Endif
 
     End If
@@ -425,6 +425,8 @@ Public Function MouseDown(mouseX As Integer, mouseY As Integer) ' esta rutina es
 End
 
 Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' esta rutina es llamada por FCAD en el evento DrawingArea_MouseUp
+
+  'Debug elem.P.Count
 
 End
 

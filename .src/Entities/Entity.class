@@ -49,6 +49,8 @@ Public ForDeletion As Boolean = True        '' This must be falsed in Finish
 Public DrawAble As Boolean = False          '' True si durante la construccion ya tiene suficientes elementos para poder hacer una representacion digna
 Public Visible As Boolean = True            '' Si esta entidad puede ser mostrada independientmente
 Public Finished As Boolean = False          '' Colocar en true cuando se llegue a completar
+Public Flags As Integer = 0                 '' Flags de estado, bit wise
+
 Public Changed As Boolean
 Public Handle As String
 Public Group As Integer = 0                 '' Pertenecemos a un grupo?

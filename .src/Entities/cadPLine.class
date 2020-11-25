@@ -201,3 +201,30 @@ Public Sub Finish(oE As Entity, Optional ParamsDone As Integer = -1) As Boolean
   End If
 
 End
+
+' "entity": "LWPOLYLINE",
+' "index": 400,
+' "type": 77,
+' "handle": [0, 254701],
+' "size": 58,
+' "bitsize": 414,
+' "ownerhandle": [12, 1, 8, 254693],
+' "_subclass": "AcDbEntity",
+' "layer": [5, 2, 16846, 16846],
+' "preview_exists": 0,
+' "entmode": 0,
+' "nolinks": 1,
+' "color": 256,
+' "ltype_scale": 1.0,
+' "ltype_flags": 0,
+' "plotstyle_flags": 0,
+' "invisible": 0,
+' "linewt": 29,
+' "_subclass": "AcDbPolyline",
+' "flag": 4,
+' "const_width": 0.00545454545455,
+' "points": [
+'   [2914.77910786460507, 1640.5656862246592],
+'   [2914.81866147450319, 1640.5261326147629]
+' ],
+' "bulges": [

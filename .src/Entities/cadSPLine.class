@@ -2,7 +2,10 @@
 
 ' Represents a poli line
 ' Element maintained by Terco
-' V2
+
+' Usando partes de la informacion de
+' http://devmag.org.za/2011/04/05/bzier-curves-a-tutorial/
+
 Create Static
 
 Public Const Gender As String = "SPLine"
@@ -186,51 +189,286 @@ Public Sub Finish(oE As Entity, Optional ParamsDone As Integer = -1) As Boolean
 
 End
 
-Public Function calculateNewPoint(points As Float[], t As Float) As Float[]
-  ' Coordinates calculated using the general formula are relative To
-  ' origin at bottom left.
-
-  Dim x As Float = 0
-  Dim y As Float = 0
-  Dim n As Integer = points.Count / 2 - 1
-  Dim i As Integer
-  Dim bin As Float
-
-  For i = 0 To n
-    bin = C(n, i) * (1 - t) ^ (n - i) * t ^ i
-    x += bin * points[i * 2]
-    y += bin * points[i * 2 + 1]
-  Next
-  Return [x, y]
-
-End
-
-Public Function calculateDrawingPoints(points As Float[])
+Public Function calculateDrawingPoints(points As Float[]) ' points es una copia de P
 
   Dim interval As Float = 1 / numDrawingPoints
   Dim t As Float = interval
-  Dim i As Integer
+  Dim i, segments, iPoints, sobran, i2, faltan As Integer
+  Dim p0, p1, p2, p3 As New Float[]
 
-  drawingPoints.insert(calculateNewPoint(points, 0))
-  For i = 0 To numDrawingPoints - 1
-    drawingPoints.insert(calculateNewPoint(points, t))
-    t += interval
-  Next
+  ' Tengo que ver cuantos puntos tengo, casos basicos
+  If points.Count / 2 <= 2 Then ' es una recta
+
+    drawingPoints.Insert(points.Copy())
+    Return
+
+  Else If points.Count / 2 = 3 Then
+    ' es una curva quadratica
+    ' para no generar otra formula, puedo engañarme generando un nuevo punto tangente igual al unico que tengo
+    ' con esto, transformo la curva en cubica, que es la curva que siempre tendre
+    p0.Insert(points.Copy(i, 2))
+    p1.Insert(points.Copy(i + 2, 2))
+    p2.Insert(points.Copy(i + 4, 2))
+    p3.Insert(points.Copy(i + 4, 2))
+    For iPoints = 0 To numDrawingPoints - 1
+      drawingPoints.insert(CalculateBezierPoint2D(t, p0, p1, p2, p3))
+      t += interval
+    Next
+    Return
+  Else If points.Count / 2 = 4 Then
+
+    p0.Insert(points.Copy(i, 2))
+    p1.Insert(points.Copy(i + 2, 2))
+    p2.Insert(points.Copy(i + 4, 2))
+    p3.Insert(points.Copy(i + 6, 2))
+    For iPoints = 0 To numDrawingPoints - 1
+      drawingPoints.insert(CalculateBezierPoint2D(t, p0, p1, p2, p3))
+      t += interval
+    Next
+    Return
+
+  Else ' tengo 4 o mas puntos, voy a dibujar lo que pueda
+    ' La curva necesita  Fit-Control-Control-Fit
+    ' Casos mas complejos
+    ' A - Si tengo 4 puntos, tengo la curva cubica perfecta.
+    ' B - Si tengo 5 puntos, estiro la curva moviendo el ultimo fit al ultimo control:
+    '       Fit - Control - Control - Fit - > Control
+    ' C - Si tengo 6 puntos, creo un Control q me de la misma tangente al 4to Fit, y agrego otro Fit en el ultimo Control:
+    '       Fit0 - Control1 - Control2- Fit3- Control4 (creado, tang al 2) - Control5 (marcado) - Fit6 (creado = 5)
+
+    ' el primer punto de control lo espejo del segmento anterior
+    ' y lo inserto directamente en el array de los puntos
+    ' pero en la anteultima posicion
+
+    '   01 23 45 67 89 1011 1213 1415 1617 1819 Max = 19 Count=20
+    '    1  2  3  4  5    6    7    8    9   10
+
+    For i = 0 To points.max Step 6
+      If points.count - i >= 8 Then  ' caso A -> mando a dibujar
+        p0.Insert(points.Copy(i, 2))
+        p1.Insert(points.Copy(i + 2, 2))
+        p2.Insert(points.Copy(i + 4, 2))
+        p3.Insert(points.Copy(i + 6, 2))
+
+      Else If points.count - i = 6 Then  ' caso B: Tengo Fit+Control+Control
+
+        p0.Insert(points.Copy(i, 2))
+        p1.Insert(points.Copy(i + 2, 2))
+        p2.Insert(points.Copy(i + 4, 2))
+        p3.Insert(points.Copy(i + 4, 2))
+
+      Else If points.count - i = 4 Then  ' caso C: Tengo Fit+Control (nuevo)
+
+        '   01 23 45 67 89  Max = 9 Count=10
+        '    1  2  3  4  5
+        '    F  C  C  F  C
+
+        ' duplico el ultimo Control point
+        points.Add(0)
+        points.Add(0)
+        points[points.max - 1] = points[points.max - 3]
+        points[points.max] = points[points.max - 2]
+
+        '   01 23 45 67 89 1011 Max = 11 Count=12
+        '    1  2  3  4  5    6
+        '    F  C  C  F  C    C
+        '          ^-----|
+        ' el control point agregado es correlativo al de la curva anterior
+        points[points.max - 3] = 2 * points[points.max - 5] - points[points.Max - 7]
+        points[points.max - 2] = 2 * points[points.max - 4] - points[points.Max - 6]
+
+        ' ahora la tomo como un tipo B
+
+        p0.Insert(points.Copy(i, 2))
+        p1.Insert(points.Copy(i + 2, 2))
+        p2.Insert(points.Copy(i + 4, 2))
+        p3.Insert(points.Copy(i + 4, 2))
+
+      Else If points.count - i = 2 Then  ' no hay nada q dibujar
+        p0.Insert(points.Copy(i, 2))
+        p1.Insert(points.Copy(i, 2))
+        p2.Insert(points.Copy(i, 2))
+        p3.Insert(points.Copy(i, 2))
+
+      End If
+      'modUtils.DebugMatrix(points, 20)
+
+      'Debug Format(p0[0], "0.00"), Format(p0[1], "0.00"), Format(p1[0], "0.00"), Format(p1[1], "0.00"), Format(p2[0], "0.00"), Format(p2[1], "0.00"), Format(p3[0], "0.00"), Format(p3[1], "0.00")
+
+      t = 0
+      For iPoints = 0 To numDrawingPoints - 1
+
+        drawingPoints.insert(CalculateBezierPoint2D(t, p0, p1, p2, p3))
+        t += interval
+      Next
+
+      p0.Clear
+      p1.Clear
+      p2.Clear
+      p3.Clear
+
+    Next
+  End If
 
 End
 
-Public Function C(n As Integer, k As Integer) As Float
+'=======================================================================================================
+' Nuevo metodo
+'=======================================================================================================
 
-  Dim coeff As Float = 1
-  Dim x As Float
+'' Calculates a point in a Cubic Bezier curve
+'' if P1=P2 this turn into a Quadratic curve
+Public Function CalculateBezierPoint2D(t As Float, p0 As Float[], p1 As Float[], p2 As Float[], p3 As Float[]) As Float[]
 
-  For x = n - k + 1 To n
-    coeff *= x
+  Dim u As Float = 1 - t    ' t va de 0 a 1
+  Dim tt As Float = t * t
+  Dim uu As Float = u * u
+  Dim uuu As Float = uu * u
+  Dim ttt As Float = tt * t
+  Dim pr As New Float[]
 
-  Next
-  For x = 1 To k
-    coeff /= x
-  Next
-  Return coeff
+  pr.Insert([0, 0])
+
+  pr[0] = uuu * p0[0]            ' first term
+  pr[0] += 3 * uu * t * p1[0]    ' second term
+  pr[0] += 3 * u * tt * p2[0]    ' third term
+  pr[0] += ttt * p3[0]           ' fourth term
+
+  pr[1] = uuu * p0[1]            ' first term
+  pr[1] += 3 * uu * t * p1[1]    ' second term
+  pr[1] += 3 * u * tt * p2[1]    ' third term
+  pr[1] += ttt * p3[1]           ' fourth term
+
+  ' para 3D agregar [2]
+
+  Return pr
 
 End
+
+'      "entity": "SPLINE",
+'      "index": 3357,
+'      "type": 36,
+'      "handle": [0, 1249847],
+'      "size": 418,
+'      "bitsize": 3284,
+'      "ownerhandle": [12, 1, 2, 1249845],
+'      "_subclass": "AcDbEntity",
+'      "prev_entity": [4, 0, 0, 0],
+'      "next_entity": [6, 0, 0, 1249848],
+'      "layer": [5, 1, 16, 16],
+'      "preview_exists": 0,
+'      "entmode": 0,
+'      "nolinks": 0,
+'      "color": 256,
+'      "ltype_scale": 1.0,
+'      "ltype_flags": 0,
+'      "plotstyle_flags": 0,
+'      "invisible": 0,
+'      "linewt": 29,
+'      "_subclass": "AcDbSpline",
+'      "scenario": 1,
+'      "degree": 3,
+'      "rational": 0,
+'      "closed_b": 0,
+'      "periodic": 0,
+'      "knot_tol": 0.0000000001,
+'      "ctrl_tol": 0.0000000001,
+'      "weighted": 0,
+'      "knots": [
+'        0.00000000000000,
+'        0.00000000000000,
+'        0.00000000000000,
+'        0.00000000000000,
+'        0.11913126411571,
+'        0.23975678553509,
+'        0.49083550137789,
+'        1.04447328364244,
+'        1.44003107270299,
+'        1.55491017607702,
+'        1.92016945852300,
+'        2.22324540117473,
+'        2.48758013168516,
+'        2.82200084095037,
+'        3.00883554387170,
+'        3.16218973969312,
+'        3.16218973969312,
+'        3.16218973969312,
+'        3.16218973969312
+'      ],
+'      "ctrl_pts": [
+'        {
+'          "x": -0.21323049241494,
+'          "y": 0.84482240616663,
+'          "z": 0.0
+'        },
+'        {
+'          "x": -0.1847166715454,
+'          "y": 0.87190801033913,
+'          "z": 0.0
+'        },
+'        {
+'          "x": -0.1228526953775,
+'          "y": 0.922359536827,
+'          "z": 0.0
+'        },
+'        {
+'          "x": 0.02043360444333,
+'          "y": 1.00035857198183,
+'          "z": 0.0
+'        },
+'        {
+'          "x": 0.27257295630051,
+'          "y": 1.1752608208499,
+'          "z": 0.0
+'        },
+'        {
+'          "x": 0.61052372379078,
+'          "y": 1.38248143619054,
+'          "z": 0.0
+'        },
+'        {
+'          "x": 0.92880308857434,
+'          "y": 1.54637696665506,
+'          "z": 0.0
+'        },
+'        {
+'          "x": 1.21565315275478,
+'          "y": 1.6043944582336,
+'          "z": 0.0
+'        },
+'        {
+'          "x": 1.47769680033207,
+'          "y": 1.61054542981341,
+'          "z": 0.0
+'        },
+'        {
+'          "x": 1.78840999609696,
+'          "y": 1.61736294507911,
+'          "z": 0.0
+'        },
+'        {
+'          "x": 2.08859470791577,
+'          "y": 1.60619051383182,
+'          "z": 0.0
+'        },
+'        {
+'          "x": 2.35172325891301,
+'          "y": 1.59913454504708,
+'          "z": 0.0
+'        },
+'        {
+'          "x": 2.57162173748583,
+'          "y": 1.55677519634268,
+'          "z": 0.0
+'        },
+'        {
+'          "x": 2.68480471484867,
+'          "y": 1.53475995596965,
+'          "z": 0.0
+'        },
+'        {
+'          "x": 2.73031030857453,
+'          "y": 1.51193841889326,
+'          "z": 0.0
+'        }
+'      ]

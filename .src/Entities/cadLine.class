@@ -190,3 +190,70 @@ Public Sub Finish(oE As Entity, Optional ParamsDone As Integer = -1) As Boolean
   End If
 
 End
+
+' Importo los datos que puedo procesar de una coleccion y genero un Entity para ser agregado a un array
+Public Function ImportJsonCol(c As Collection) As Entity
+
+  Dim n As New Entity
+
+  n.ClassHandler = Me
+  n.P.Add(c["start"][0])
+  n.P.Add(c["start"][1])
+  n.P.Add(c["end"][0])
+  n.P.Add(c["end"][1])
+  n.colour = c["color"]
+  n.LineWidth = c["linewt"] / 100
+
+  Return n
+
+End
+
+' Exporto los datos de una Entity a una coleccion para ser guardados
+Public Function ExportJsonCol(e As Entity) As Collection
+
+  Dim n As New Collection
+
+  n.add("LINE", "entity")
+  n.Add(e.colour, "color")
+
+  ' puntos
+  Dim flxStart, flxEnd As New Float[]
+  flxStart.Add(e.P[0])
+  flxStart.Add(e.P[1])
+  flxEnd.Add(e.P[2])
+  flxEnd.Add(e.P[3])
+
+  n.Add(flxStart, "start")
+  n.Add(flxEnd, "end")
+
+  n.add(e.LineWidth * 100, "linewt")
+
+  ' etc
+  Return n
+
+End
+
+'      "entity": "LINE",
+'      "index": 399,
+'      "type": 19,
+'      "handle": [0, 254700],
+'      "size": 42,
+'      "bitsize": 283,
+'      "ownerhandle": [12, 1, 7, 254693],
+'      "_subclass": "AcDbEntity",
+'      "layer": [5, 2, 16846, 16846],
+'      "preview_exists": 0,
+'      "entmode": 0,
+'      "nolinks": 1,
+'      "color": 256,
+'      "ltype_scale": 1.0,
+'      "ltype_flags": 0,
+'      "plotstyle_flags": 0,
+'      "invisible": 0,
+'      "linewt": 29,
+'      "_subclass": "AcDbLine",
+'      "z_is_zero": 1,
+'      "start": [2914.34678481761921, 1641.03048722972585, 0.0],
+'      "end": [2914.3721519990504, 1641.03048722972585, 0.0],
+'      "thickness": 0.000000,
+'      "extrusion": [0.0, 0.0, 1.0]
