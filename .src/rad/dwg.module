@@ -24,7 +24,40 @@
 
 Export
 
-Public Function Write(cOut As Collection) As String
+Public Function Encode(vrx As Variant[]) As String
+
+  Dim ox As Variant
+  Dim t As String
+  Dim s As String
+
+  For Each ox In vrx
+    t = ""
+    Try t = JSON.Encode(ox)
+    If t <> "" Then
+      s &= "  " & t & ",\n"
+    Else
+      Print "Error " & ox
+    Endif
+
+  Next
+
+  Return s
+
+End
+
+Public Function Write(json As String, dwg As String) As Boolean
+
+  Shell "dwgwrite -y -I JSON -o " & dwg & " " & json Wait
+
+  If Exist(dwg) Then
+    Return True
+  Else
+    Return False
+  Endif
+
+End
+
+Public Function Rewrite(cOut As Collection) As String
 
   Dim s As String
   Dim oType As String
@@ -48,7 +81,6 @@ Public Function Write(cOut As Collection) As String
         If t <> "" Then
           s &= "  " & t & ",\n"
           Inc i
-
         Endif
       Endif
     Next
@@ -85,10 +117,21 @@ Private Function libredwgread(f As String) As String
 
 End
 
-Public Function Raw(f As String) As Variant[]
+Public Function Raw(f As String) As Collection
 
   Dim str As String
-  Dim vrt As Variant[]
+  Dim vrt As Variant
+  Dim jcn As New JSONCollection
+  Dim stx As New String[]
+  Dim inx As New Integer[]
+  Dim aux As New String[]
+  Dim r As Integer
+  Dim s As String
+  Dim i As Integer
+  Dim j As Integer
+  Dim out As New Collection
+  Dim tmp As String
+  Dim sUgly As String
 
   If Exist(f) Then
     If Lower(File.Ext(f)) = "dwg" Then
@@ -100,9 +143,56 @@ Public Function Raw(f As String) As Variant[]
     Endif
   Endif
 
-  vrt = Json2Gbas(str)
+  'stx = Split(str, gb.Lf, Chr(140), True)
+  stx = Split(str, gb.Lf, Chr(140))
 
-  Return vrt
+  For r = 0 To stx.Max
+    If Len(stx[r]) > 6 Then
+      If Left(stx[r], 6) = "  \"FIL" Or Left(stx[r], 6) = "  \"HEA" Or Left(stx[r], 6) = "  \"CLA" Or Left(stx[r], 6) = "  \"OBJ" Or Left(stx[r], 6) = "  \"Tem" Or Left(stx[r], 6) = "  \"Aux" Then
+        inx.Add(r)
+        aux.Add(IIf(InStr(stx[r], "\""), Split(stx[r], "\"")[1], "error"))
+      Endif
+    Endif
+  Next
+
+  For i = 0 To inx.Max
+    tmp = ""
+    If i <> inx.max Then
+      For j = inx[i] To inx[i + 1] - 1
+        If aux[i] = "OBJECTS" Then
+          If RegExp.Match(stx[j], "[^[:ascii:]]") Then
+            sUgly = DWGDecodeText(stx[j])
+            tmp &= sUgly & "\n"
+          Else
+            tmp &= stx[j] & "\n"
+          Endif
+        Else
+          tmp &= stx[j] & "\n"
+        Endif
+      Next
+    Else
+      For j = inx[i] To stx.Max
+        tmp &= stx[j] & "\n"
+      Next
+    Endif
+    tmp = Replace(tmp, "  \"" & aux[i] & "\": {", "{")
+    tmp = Replace(tmp, "  \"" & aux[i] & "\": [", "[")
+    jcn.Clear
+    Try vrt = JSON.Decode(tmp, True)
+    If TypeOf(vrt) = gb.Object Then
+      If vrt Is Collection Or vrt Is JSONCollection Then
+        out.Add(vrt.Copy(), aux[i])
+      Else
+        If vrt Is Variant[] Then
+          out.Add(vrt, aux[i])
+        Endif
+      Endif
+    Else
+      Starter.lgg(aux[i], Logger.Error)
+    Endif
+  Next
+
+  Return out
 
 End
 
@@ -1178,5 +1268,33 @@ Public Function DWGCommonTags(Optional sEntity As String) As Collection
   End Select
 
   Return comm
+
+End
+
+'' Decode the text fields.
+
+Public Function DWGDecodeText(s As String) As String
+
+  Dim out As String
+
+  s = Conv$(s, "ISO-8859-1", "UTF-8")
+  If InStr(s, "\\U+") > 0 Then
+    s = String2.Flat(s)
+  Endif
+
+  If InStr(s, " [") > 0 Then
+    out = Split(Replace(s, " [", "\t"), "\t")[0]
+    If String.Left(out) = Chr(34) Then
+      out = String.Mid(out, 2)
+    Endif
+    If String.Right(out) = Chr(34) Then
+      out = String.Mid(out, 1, String.Len(out) - 1)
+
+    Endif
+  Else
+    out = s
+  Endif
+
+  Return out
 
 End

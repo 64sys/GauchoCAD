@@ -36,8 +36,11 @@ Public PanY As Integer = 0              '' in pixels
 Public ScaleZoom As Float
 Public Propiedadtest As String
 '-----------------------------------
-Public vrxMod As New Variant[]      '' All raw data from a dwg>json file without altering or ordering used as data input or output
-Public cModel As New Collection     '' ALl data from a GauchoCAD xml file is loaded here
+Public cModel As New Collection     '' All data from a dwg file is loaded here
+Public cLayers As New Collection    '' All layers data from dwg is listed here
+Public cLtypes As New Collection    '' All linetypes data from dwg is listed here
+Public cBlocks As New Collection    '' All Blocks data from dwg is listed here
+
 Public cImport As New Collection    '' Impor data from dxf, dwg is loaded here
 
 Public Struct arrBlockSt
