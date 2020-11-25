@@ -1,0 +1,1302 @@
+' Gambas module file
+
+''' This module provides methods to read and write json text format. This information has origin and destination in the DWG files that are read and written using the LibreDWG library. So in summary this module reads and writes dwg through said library.
+' GauchoCAD
+' GauchoCAD is a free CAD program written in the Gambas language
+'
+' Copyright (C) Terco, Tincho
+'
+' This program is free software; you can redistribute it and/or modify
+' it under the terms of the GNU General Public License as published by
+' the Free Software Foundation; either version 2 of the License, or
+' (at your option) any later version.
+'
+' This program is distributed in the hope that it will be useful,
+' but WITHOUT ANY WARRANTY; without even the implied warranty of
+' MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+' GNU General Public License for more details.
+'
+' You should have received a copy of the GNU General Public License
+' along with this program; if not, write to the Free Software
+' Foundation, Inc., 51 Franklin St, Fifth Floor,
+' Boston, MA  02110-1301  USA
+'
+
+Export
+
+Public Function Encode(vrx As Variant[]) As String
+
+  Dim ox As Variant
+  Dim t As String
+  Dim s As String
+
+  For Each ox In vrx
+    t = ""
+    Try t = JSON.Encode(ox)
+    If t <> "" Then
+      s &= "  " & t & ",\n"
+    Else
+      Print "Error " & ox
+    Endif
+
+  Next
+
+  Return s
+
+End
+
+Public Function Write(json As String, dwg As String) As Boolean
+
+  Shell "dwgwrite -y -I JSON -o " & dwg & " " & json Wait
+
+  If Exist(dwg) Then
+    Return True
+  Else
+    Return False
+  Endif
+
+End
+
+Public Function Rewrite(cOut As Collection) As String
+
+  Dim s As String
+  Dim oType As String
+  Dim ox As Variant
+  Dim t As String
+  Dim i As Long
+
+  s = "{\n  \"created_by\": \"GauchoCAD " & Application.Version & "\",\n"
+  s &= "  \"FILEHEADER\":" & File.Load("./minimal/fileheader.json") & "\n"
+  s &= "  \"HEADER\":" & File.Load("./minimal/header.json") & "\n"
+  s &= "  \"CLASSES\": [\n\n  ],\n"
+  s &= "  \"OBJECTS\":  [\n"
+  'objects
+  i = 0
+  For Each oType In ["object", "entity"]
+    For Each ox In cOut
+      t = ""
+      If ox.Exist(oType) Then
+        ox["index"] = i
+        Try t = JSON.Encode(ox)
+        If t <> "" Then
+          s &= "  " & t & ",\n"
+          Inc i
+        Endif
+      Endif
+    Next
+  Next
+  '"LAYER_CONTROL"
+  '"LAYER"
+  'entities
+  '"LINE"
+  '"ARC"
+  '------ el resto de entidades segun necesidad
+  'objects otra vez
+  '"BLOCK_HEADER"
+  '...
+
+  s &= "  ],\n" ' Closing the objects list
+
+  s &= "  \"Template\":  " & File.Load("./minimal/template.json") & ",\n"
+  s &= "  \"AuxHeader\":  " & File.Load("./minimal/auxheader.json") & ",\n"
+  s &= "}"
+  Shell "c"
+  Return s
+
+End
+
+Private Function libredwgread(f As String) As String
+
+  Dim str As String
+
+  Shell "/usr/local/bin/dwgread --format JSON '" & f & "'" To str
+  str = Replace(str, "\t", " ")
+  'File.Save(File.Dir(f) &/ File.BaseName(f) & ".json", str)
+
+  Return str
+
+End
+
+Public Function Raw(f As String) As Collection
+
+  Dim str As String
+  Dim vrt As Variant
+  Dim jcn As New JSONCollection
+  Dim stx As New String[]
+  Dim inx As New Integer[]
+  Dim aux As New String[]
+  Dim r As Integer
+  Dim s As String
+  Dim i As Integer
+  Dim j As Integer
+  Dim out As New Collection
+  Dim tmp As String
+  Dim sUgly As String
+
+  If Exist(f) Then
+    If Lower(File.Ext(f)) = "dwg" Then
+      str = libredwgread(f)
+    Else
+      If Lower(File.Ext(f)) = "json" Then
+        str = File.Load(f)
+      Endif
+    Endif
+  Endif
+
+  'stx = Split(str, gb.Lf, Chr(140), True)
+  stx = Split(str, gb.Lf, Chr(140))
+
+  For r = 0 To stx.Max
+    If Len(stx[r]) > 6 Then
+      If Left(stx[r], 6) = "  \"FIL" Or Left(stx[r], 6) = "  \"HEA" Or Left(stx[r], 6) = "  \"CLA" Or Left(stx[r], 6) = "  \"OBJ" Or Left(stx[r], 6) = "  \"Tem" Or Left(stx[r], 6) = "  \"Aux" Then
+        inx.Add(r)
+        aux.Add(IIf(InStr(stx[r], "\""), Split(stx[r], "\"")[1], "error"))
+      Endif
+    Endif
+  Next
+
+  For i = 0 To inx.Max
+    tmp = ""
+    If i <> inx.max Then
+      For j = inx[i] To inx[i + 1] - 1
+        If aux[i] = "OBJECTS" Then
+          If RegExp.Match(stx[j], "[^[:ascii:]]") Then
+            sUgly = DWGDecodeText(stx[j])
+            tmp &= sUgly & "\n"
+          Else
+            tmp &= stx[j] & "\n"
+          Endif
+        Else
+          tmp &= stx[j] & "\n"
+        Endif
+      Next
+    Else
+      For j = inx[i] To stx.Max
+        tmp &= stx[j] & "\n"
+      Next
+    Endif
+    tmp = Replace(tmp, "  \"" & aux[i] & "\": {", "{")
+    tmp = Replace(tmp, "  \"" & aux[i] & "\": [", "[")
+    jcn.Clear
+    Try vrt = JSON.Decode(tmp, True)
+    If TypeOf(vrt) = gb.Object Then
+      If vrt Is Collection Or vrt Is JSONCollection Then
+        out.Add(vrt.Copy(), aux[i])
+      Else
+        If vrt Is Variant[] Then
+          out.Add(vrt, aux[i])
+        Endif
+      Endif
+    Else
+      Starter.lgg(aux[i], Logger.Error)
+    Endif
+  Next
+
+  'vrt = Json2Gbas(str)
+
+  Return out
+
+End
+
+Public Function Read(f As String) As Collection
+
+  Dim cOut As New Collection
+  Dim str As String
+  Dim vrt As Variant[]
+  Dim j As String
+  Dim vrx As New Variant[]
+  Dim item As Variant
+  Dim tag1 As String
+  Dim val1 As Variant
+  Dim tag2 As String
+  Dim etx As New String[]           '' Entities type list
+  Dim i As Integer
+  Dim prp As Variant
+  Dim cFile As New Collection
+  Dim cVariables As New Collection
+  Dim cUnkn As New Collection
+  Dim cClas As New Collection
+  Dim cObjs As New Collection
+  Dim cLayers As New Collection     ''LAYER
+  Dim cLineTypes As New Collection  ''LTYPE (Line types)
+  Dim cBlocks As New Collection     ''BLOCK_HEADER (Atention, are blocks (objects) not inserts (entities))
+  Dim cDimStyles As New Collection  ''DIMSTYLE (Dimmension styles)
+  Dim cTextStyles As New Collection ''STYLE (Text styles)
+  Dim cEntities As New Collection
+  Dim cStat As Collection
+  Dim tag As String
+
+  If Exist(f) Then
+    If Lower(File.Ext(f)) = "dwg" Then
+      str = libredwgread(f)
+    Else
+      If Lower(File.Ext(f)) = "json" Then
+        str = File.Load(f)
+      Endif
+    Endif
+  Endif
+
+  cStat = fil.Stat(f)
+
+  If cStat.Count > 0 Then
+    For Each tag In ["Path", "Ino", "Size", "LastChange"]
+      If cFile.Exist(Lower(tag)) = False Then
+        cFile.Add(cStat[tag], Lower(tag))
+      Endif
+    Next
+  Endif
+
+  vrt = Json2Gbas(str)
+
+  i = 0
+  For Each item In vrt
+    Select TypeOf(item)
+      Case gb.Object '16
+        If item Is Collection Or item Is JSONCollection Then
+          If item.Count > 0 Then
+            j = 0
+            For Each prp In item
+              If j = 0 Then
+                tag1 = item.Key
+                val1 = prp
+              Endif
+              If j = 1 Then
+                tag2 = item.Key
+              Endif
+              Inc j
+            Next
+
+            Select tag1
+
+              Case "unknown_0"
+                For Each prp In item
+                  cVariables.Add(prp, item.Key)
+                Next
+
+                ' Case "number"
+                '   If tag2 = "dxfname" Then
+                '     For Each prp In item
+                '       cClas.Add(prp, item.Key)
+                '     Next
+                '   Else
+                '     Print "number no dxf name"
+                '   Endif
+
+              Case "object"
+
+                Select val1
+                    'Case "APPID"
+                    'Case "APPID_CONTROL"
+                    'Case "ASSOCACTION"
+                    'Case "ASSOCDEPENDENCY"
+                    'Case "ASSOCGEOMDEPENDENCY"
+                    'Case "ASSOCNETWORK"
+                    'Case "BLOCK_CONTROL"
+                  Case "BLOCK_HEADER"
+                    'Print val1
+                    cBlocks.Add(item.Copy(), item["handle"][1])
+
+                    'Case "CELLSTYLEMAP"
+                    'Case "DETAILVIEWSTYLE"
+                    'Case "DICTIONARY"
+                    'Case "DICTIONARYVAR"
+                    'Case "DICTIONARYWDFLT"
+                  Case "DIMSTYLE"
+                    cDimStyles.Add(item.Copy(), item["handle"][1])
+
+                    'Case "DIMSTYLE_CONTROL"
+                    'Case "GROUP"
+                  Case "LAYER"
+                    cLayers.Add(item.Copy(), item["handle"][1])
+
+                    'Case "LAYER_CONTROL"
+                    'Case "LAYOUT"
+                  Case "LTYPE"
+                    cLineTypes.Add(item.Copy(), item["handle"][1])
+
+                    'Case "LTYPE_CONTROL"
+                    'Case "MATERIAL"
+                    'Case "MLEADERSTYLE"
+                    'Case "MLINESTYLE"
+                    'Case "PLACEHOLDER"
+                    'Case "SCALE"
+                    'Case "SECTIONVIEWSTYLE"
+                  Case "STYLE"
+                    cTextStyles.Add(item.Copy(), item["handle"][1])
+                    'Case "STYLE_CONTROL"
+                    'Case "SUN"
+                    'Case "TABLEGEOMETRY"
+                    'Case "TABLESTYLE"
+                    'Case "UCS_CONTROL"
+                    'Case "UNKNOWN_OBJ"
+                    'Case "VIEW"
+                    'Case "VIEW_CONTROL"
+                    'Case "VISUALSTYLE"
+                    'Case "VPORT"
+                    'Case "VPORT_CONTROL"
+                    'Case "VX_CONTROL"
+                    'Case "VX_TABLE_RECORD"
+                    'Case "WIPEOUTVARIABLES"
+                    'Case "XRECORD"
+                    'Case Else
+                    cObjs.Add(item.Copy(), item["handle"][1])
+                    'cObjs.Add(prp, item.Key)
+                End Select
+
+              Case "entity"
+                'cObjs.Add(item.Copy(), item["handle"][1])
+                ' Select item["entity"]
+                '   item["entity"]
+                ' End Select
+
+                etx.Add(item["entity"])
+
+                cEntities.Add(item.Copy(), item["handle"][1])
+
+              Case Else
+                cUnkn.Add(tag1, CStr(i))
+
+            End Select
+          Endif
+        Else
+          If item Is Variant[] Then
+            vrx.Insert(item)
+          Endif
+        Endif
+    End Select
+    Inc i
+  Next
+
+  'Objects
+  cOut.Add(cFile.Copy(), "File")
+  cOut.Add(cVariables.Copy(), "Variables")
+  cOut.Add(cLayers.Copy(), "Layers")
+  cOut.Add(cBlocks.Copy(), "Blocks")
+  cOut.Add(cLineTypes.Copy(), "LineTypes")
+  cOut.Add(cDimStyles.Copy(), "DimStyles")
+  cOut.Add(cTextStyles.Copy(), "TextStyles")
+  cOut.Add(cad.GauchoEntitiesSort(cObjs), "Objects")
+
+  'Entities
+  'File.Save(User.Home &/ "entities.txt", etx.Join("\n"))
+  cOut.Add(cad.GauchoEntitiesSort(cEntities), "Entities")
+  'cOut.Add(cEntities.Copy(), "Entities")
+  cOut.Add(cUnkn.Copy(), "Unknown")
+
+  Return cOut
+  'Return cObjs
+
+End
+
+'' Convert a dwg to dxf
+Public Function Todxf(sFile As String) As String
+
+  Dim dwg As String
+  Dim FileOutput As String
+
+  dwg = "/tmp/tmp.dwg"
+
+  If Exist(sFile) Then
+    If Exist(dwg) Then
+      Shell "rm " & dwg Wait
+    Endif
+
+    If Lower(File.Ext(sFile)) = "dxf" Then
+      Shell "/usr/local/bin/dxf2dwg -y -o '" & dwg & "' '" & sFile & "'" Wait
+      If Exist(dwg) Then
+        FileOutput = dwg
+      Else
+        FileOutput = ""
+      Endif
+    Endif
+  Endif
+
+  Return FileOutput
+
+End
+
+'' Convert a json file to gambas collection
+
+Private Function Json2Gbas(sRaw As String) As Variant[]
+
+  Dim vrt As Variant
+  Dim item As Variant
+  Dim vrx As New Variant[]
+  Dim stx As New String[]
+  Dim etx As New String[]           '' Filtred arrar. It only includes entities that can be handled in the decoder without errors.
+  Dim otx As New String[]           '' Filtred arrar. It only includes objects that can be handled in the decoder without errors.
+  Dim i As Integer                  '' General index for line of text flow
+  Dim IniCut As String              '' Text string that marks the start of the object or entity
+  Dim EndCut As String              '' Text string that marks the end of the object or entity
+  Dim c As Integer                  '' Sub index for line of text flow inside the entity of the object
+  Dim hdx As New Variant[]          '' Header (dwg variables) listed as json text
+  Dim obx As New Variant[]          '' Objects listed as json text
+  Dim enx As New Variant[]          '' Entitites listed as json text
+  Dim e As Integer                  '' Index for entities list
+  Dim str As String
+  Dim enty As Variant
+  Dim k As Integer
+  Dim sType As String
+  Dim EndCut2 As String
+  Dim r As Integer
+  Dim obz As Variant
+  Dim Qkey As Integer
+  Dim uglyx As New String[]
+  Dim u As String
+  Dim BadObjects As New String[]
+  Dim Skiped As String
+
+  stx = Split(sRaw, gb.Lf, Chr(140), True)
+  File.Save("/tmp/tmp.json", stx.Join("\n"))
+
+  i = 0
+  While i < stx.Max
+    If RegExp.Match(stx[i], "\"HEADER\": {") Then
+      Qkey = 0
+      Repeat
+        If RegExp.Match(stx[i], "{") Then
+          Inc Qkey
+        Endif
+
+        If RegExp.Match(stx[i], "}") Then
+          Dec Qkey
+        Endif
+
+        If RegExp.Match(stx[i], "\"HEADER\": {") Then
+          etx.Add(Replace(stx[i], "\"HEADER\": {", " {"))
+        Else
+          etx.Add(stx[i])
+        Endif
+
+        Inc i
+      Until Qkey = 0
+
+      hdx.Add(etx.Copy(), 0)
+      etx.Clear
+      Break
+    Else
+      Inc i
+    Endif
+  Wend
+
+  i = 0
+  While i < stx.Max
+    If RegExp.Match(stx[i], "\"entity\": \"") Or RegExp.Match(stx[i], "\"object\": \"") Then
+      If RegExp.Match(stx[i], "\"entity\": \"") Then
+        sType = "entity"
+      Else
+        sType = "object"
+      Endif
+      'IniCut = stx[i - 1]
+      'EndCut = Replace(IniCut, "{", "}")
+      etx.Add("  {")
+      'Print CStr(i)
+      ' While Mid(stx[i], 1, Len(EndCut)) <> EndCut Or i >= stx.Max
+      '   etx.Add(stx[i])
+      '   Inc i
+      ' Wend
+
+      '---------------------
+      Qkey = 1
+      Repeat
+
+        If RegExp.Match(stx[i], "{") Then
+          Inc Qkey
+        Endif
+
+        If RegExp.Match(stx[i], "}") Then
+          Dec Qkey
+        Endif
+
+        etx.Add(stx[i])
+
+        Inc i
+      Until Qkey = 0
+
+      'etx.Add("  }")
+      '---------------------
+      'etx.Add(EndCut)
+      Select sType
+        Case "entity"
+          enx.Add(etx.Copy(), e)
+        Case "object"
+          obx.Add(etx.Copy(), e)
+      End Select
+      etx.Clear
+      Inc e
+    Else
+      Inc i
+    Endif
+  Wend
+
+  uglyx = Ugly()
+
+  k = 0
+  For Each obz In [hdx, obx, enx]
+    For Each enty In obz
+      'Print enty[1] & enty[3]
+      Skiped = ""
+      For Each u In uglyx
+        If RegExp.Match(enty[1] & enty[2] & enty[3], u) Then
+          Skiped = u
+          Break
+        Endif
+      Next
+
+      If Skiped = "" Then
+        For r = 1 To enty.Max
+          If RegExp.Match(enty[r], " \"\": ") Then
+            enty[r] = Replace(enty[r], " \"\": ", " \"" & "empty[" & CStr(r) & "]" & "\": ")
+          Endif
+        Next
+        Try vrt = JSON.Decode(enty.Join("\n"), True)
+        If Error Then
+          BadObjects.Add(enty.Join("\n"))
+        Endif
+        If vrt Then
+          vrx.Add(vrt, k)
+          Inc k
+        Else
+          'Print enty
+        Endif
+
+      Else
+        'Print "Skiped" & " " & Skiped
+
+      Endif
+    Next
+  Next
+
+  If BadObjects.Count > 0 Then
+    File.Save("/tmp/tmp.err", BadObjects.Join("\n\n"))
+    If Exist("/tmp/tmp.err") Then
+      Shell "gedit /tmp/tmp.err"
+    Endif
+  Endif
+
+  Return vrx
+
+End
+
+'' Convert the Entities collection to an csv structure, later it could be save as file
+
+Private Function ObjetsCSV(ctn As Collection) As String
+
+  Dim out As String
+  Dim tmp As New Variant[]
+  Dim p As Variant
+  Dim e As Variant
+  Dim r As Variant
+  Dim sHnd As String
+  Dim sEnt As String
+  Dim sLay As String
+  Dim sLwt As String
+  Dim sLty As String
+  Dim sCor As String
+
+  If ctn.Exist("Entities") Then
+    For Each p In ctn["Entities"]
+      If TypeOf(p) = gb.Object Then
+        For Each e In p
+          If TypeOf(e) = gb.Object Then
+            sLay = CStr(e["layer"][2])
+            If ctn.Exist("Layers") Then
+              If ctn["Layers"].Exist(sLay) Then
+                sLay = ctn["Layers"][sLay]["name"]
+              Endif
+            Endif
+
+            sHnd = e["handle"][1]
+            sEnt = e["entity"]
+            If e.Exist("ltype") Then
+              sLty = e["ltype"][2]
+              If ctn.Exist("Ltypes") Then
+                If ctn["Ltypes"].Exist(sLty) Then
+                  sLty = ctn["Ltypes"][sLty]["name"]
+                Endif
+              Endif
+            Else
+              sLty = "<>"
+            Endif
+            sLwt = e["linewt"]
+            Select TypeOf(e["color"])
+              Case gb.Object
+                If e["color"].Exist("index") Then
+                  sCor = e["color"]["index"]
+                Else
+                  sCor = "7"
+                Endif
+
+              Case Else
+                sCor = e["color"]
+            End Select
+
+            tmp.add([sHnd, sEnt, sLay, sLty, sLwt, sCor])
+          Endif
+        Next
+      Endif
+    Next
+  Endif
+
+  out = "Handle\tEntity\tLayer\tStyle\tWidth\tColor\n"
+  For Each r In tmp
+    out &= r.Join("\t") & "\n"
+  Next
+
+  Return out
+
+End
+
+'' Objects or entities bad for import
+
+Public Function Ugly(Optional sType As String) As String[]
+
+  Dim stx As New String[]
+
+  stx.Add("MENTALRAYRENDERSETTINGS")
+  stx.Add("FIELD")
+  stx.Add("BLOCKROTATIONPARAMETER")
+
+  Return stx
+
+End
+
+'' Convert a gambas objects collection in JSON text code
+
+Public Function JSONEncode(drawing As Collection) As String
+
+  Dim s As String
+
+  If drawing.Count > 0 Then
+    Try s = JSON.Encode(drawing)
+  Endif
+  Return s 'stx
+
+End
+
+'' This function transfers the information housed in the temporary file import collection to the active model, another collection.
+
+Public Function Import(cImp As Collection, cMdl As Collection) As Integer[]
+
+  Dim ix As New Integer[]
+
+  Dim xFile As Collection
+  Dim xTextStyles As Collection
+  Dim xVariables As Collection
+  Dim xLayers As Collection 'ok
+  Dim auxLayer As New Collection
+  Dim xBlocks As Collection
+  Dim auxBlocks As New Collection
+  Dim xLineTypes As Collection
+  Dim auxLtypes As New Collection
+  Dim xDimStyles As Collection
+  Dim xObjects As Collection
+  Dim auxWidts As New Collection
+  Dim xEntities As Collection
+  Dim x As Variant
+  Dim mTextStyles As Collection
+  Dim mVariables As Collection
+  Dim mLayers As Collection
+  Dim mEntities As Collection
+  Dim m As Variant
+  Dim lx As Variant
+  Dim Layexist As Boolean
+  Dim nlay As New Collection
+  Dim nsty As New Collection
+  Dim qlay As Integer               '' Number of layers
+  Dim xStyle As Integer
+  Dim xColor As Integer
+  Dim xFrozen As Boolean
+  Dim n As Variant
+  Dim xShow As Boolean
+  Dim xLocked As Boolean
+  Dim e As Variant
+  Dim te As New Collection
+  Dim cmx As New Collection
+  Dim prp As Variant
+  Dim mWidths As Variant
+  Dim sTag As String
+  Dim vrt As Variant
+  Dim tg As Variant
+
+  If cImp.Exist("File") Then
+    xFile = cImp["File"]
+    ix.Add(xFile.Count)
+  Else
+    ix.Add(0)
+  Endif
+
+  If cImp.Exist("Variables") Then
+    xVariables = cImp["Variables"]
+    ix.Add(xVariables.Count)
+  Else
+    ix.Add(0)
+  Endif
+
+  If cImp.Exist("TextStyles") Then
+    xTextStyles = cImp["TextStyles"]
+    ix.Add(xTextStyles.Count)
+  Else
+    ix.Add(0)
+  Endif
+
+  If cImp.Exist("Layers") Then
+    xLayers = cImp["Layers"]
+    ix.Add(xLayers.Count)
+    For Each lx In xLayers
+      auxLayer.Add(lx["name"], lx["handle"][1])
+    Next
+
+  Else
+    ix.Add(0)
+  Endif
+
+  If cImp.Exist("Blocks") Then
+    xBlocks = cImp["Blocks"]
+    ix.Add(xBlocks.Count)
+    For Each lx In xBlocks
+      auxBlocks.Add(lx["name"], lx["handle"][1])
+    Next
+  Else
+    ix.Add(0)
+  Endif
+
+  If cImp.Exist("LineTypes") Then
+    xLineTypes = cImp["LineTypes"]
+    ix.Add(xLineTypes.Count)
+    For Each lx In xBlocks
+      auxLtypes.Add(lx["name"], lx["handle"][1])
+    Next
+  Else
+    ix.Add(0)
+  Endif
+
+  If cImp.Exist("DimStyles") Then
+    xDimStyles = cImp["DimStyles"]
+    ix.Add(xDimStyles.Count)
+  Else
+    ix.Add(0)
+  Endif
+
+  If cImp.Exist("Objects") Then
+    xObjects = cImp["Objects"]
+    ix.Add(xObjects.Count)
+  Else
+    ix.Add(0)
+  Endif
+
+  If cImp.Exist("Entities") Then
+    xEntities = cImp["Entities"]
+    ix.Add(xEntities.Count)
+  Else
+    ix.Add(0)
+  Endif
+
+  '-- DWG -------------------------------------------------------
+  If xFile["path"] Like "*.dwg" Or xFile["path"] Like "*.json" Then
+    '---------------------------------------------- Variables -----1
+    If cMdl.Exist("Variables") = False Then
+      cMdl.Add(NewVars(), "Variables")
+    Endif
+    mVariables = cMdl["Variables"]
+    For Each x In xVariables
+      mVariables[xVariables.Key] = x
+    Next
+    '---------------------------------------------- LineStyles ----2
+    If cMdl.Exist("LineTypes") = False Then
+      cMdl.Add(NewStyles(), "LineTypes")
+    Endif
+
+    '---------------------------------------------- Layers --------3
+    If cMdl.Exist("Layers") = False Then
+      qlay = 0
+      nlay = ["id": 0, "object": "LAYER", "name": "0", "show": True, "frozen": False, "locked": False, "color": 7, "ltype": 1, "linewt": 17, "print": True, "handle": 1, "ownerhandle": 2, "is_xref_dep": False]
+      cMdl.Add([nlay.Copy(), "0"], "Layers")
+      Inc qlay
+      nlay.Clear
+    Else
+      mLayers = cMdl["Layers"]
+      qlay = mLayers.Count
+    Endif
+
+    For Each x In xLayers
+      xShow = True
+      xColor = 0
+      If TypeOf(x["color"]) = gb.Object Then
+        If x["color"] Is Collection Or x["color"] Is JSONCollection Then
+          If x["color"].Exist("index") Then
+            xColor = x["color"]["index"] ' Simple color 1-256
+          Endif
+        Else
+          xColor = 7
+        Endif
+      Else
+        xColor = x["color"]
+      Endif
+      If xColor < 0 Then
+        xShow = False
+      Endif
+      xColor = Abs(xColor)
+      '------------------------------------
+      If DWGFlag(x["flag"], 1) = 0 Then
+        xFrozen = False
+      Else
+        xFrozen = True
+      Endif
+
+      If DWGFlag(x["flag"], 4) = 0 Then
+        xLocked = False
+      Else
+        xLocked = True
+      Endif
+    Next
+
+    nlay.Clear
+    xStyle = 1 'x["ltype"]
+
+    nlay["object"] = "LAYER"
+    nlay["name"] = x["name"]
+    nlay["show"] = xShow
+    nlay["frozen"] = xFrozen
+    nlay["locked"] = xLocked
+    nlay["color"] = xColor
+    nlay["ltype"] = 1
+    nlay["linewt"] = x["linewt"]
+    nlay["print"] = True
+    nlay["handle"] = x["handle"][1]
+    nlay["ownerhandle"] = x["ownerhandle"][1]
+    nlay["is_xref_dep"] = False
+
+    Layexist = False
+    For Each m In mLayers
+      If m["name"] = x["name"] Then
+        Layexist = True
+        For Each n In nlay
+          m[nlay.Key] = n
+        Next
+        Break
+      Endif
+    Next
+    If Layexist = False Then
+      nlay["id"] = qlay + 1
+      mLayers.Add(nlay.Copy(), CStr(nlay["id"]))
+    Endif
+    '---------------------------------------------- TextStyles ----4
+    If cMdl.Exist("TextStyles") = False Then
+      nsty["id"] = "0"
+      nsty["object"] = "STYLE"
+      nsty["name"] = "Standard"
+      nsty["fixed"] = 0
+      nsty["size"] = 0
+      nsty["wfactor"] = 0.9
+      nsty["oblique"] = 0
+      nsty["last"] = 100
+      nsty["font"] = "txt"
+      nsty["handle"] = 4
+      cMdl.Add(["0": nsty.Copy()], "TextStyles")
+    Endif
+    mTextStyles = cMdl["TextStyles"]
+
+    For Each x In xTextStyles
+      If TypeOf(x) = gb.Object Then
+        For Each m In mTextStyles
+          If Lower(m["name"]) = Lower(x["name"]) Then
+            m["fixed"] = x["fixed"]
+            m["size"] = x["text_size"]
+            m["wfactor"] = x["width_factor"]
+            m["oblique"] = x["oblique_angle"]
+            m["last"] = x["last_height"]
+            m["font"] = x["font_file"]
+            m["handle"] = x["handle"][1]
+          Endif
+        Next
+      Endif
+    Next
+    '---------------------------------------------- Auxiliars ----#
+    If cMdl.Exist("Widths") = False Then
+      cMdl["Widths"] = cad.NewWidths()
+    Endif
+    mWidths = cMdl["Widths"]
+    For Each lx In mWidths
+      auxWidts.Add(lx, mWidths.Key)
+    Next
+    '---------------------------------------------- Entities -----5
+    cmx = DWGCommonTags()
+    mEntities = cMdl["Entities"]
+    For Each e In xEntities
+      te.Clear
+      '----------------Common Proprties
+      For Each prp In e
+        If cmx.Exist(e.Key) Then
+          'If cmx.Exist(e.Key) Then
+          sTag = cmx[e.Key]
+          vrt = prp
+          'Else
+          '  sTag = e.Key
+          'Endif
+
+          If TypeOf(prp) = gb.Object Then
+            Select e.Key
+              Case "handle"
+                vrt = prp[1]
+              Case "ltype"
+                If auxLtypes.Exist(CStr(prp[2])) Then
+                  vrt = auxLtypes[CStr(prp[2])]
+                Else
+                  vrt = "Continous"
+                Endif
+
+              Case "layer"
+                If prp.Count > 0 Then
+                  If auxLayer.Exist(CStr(prp[prp.max])) Then
+                    vrt = auxLayer[CStr(prp[prp.max])]
+                  Else
+                    vrt = "0"
+                  Endif
+                Else
+                  vrt = "0"
+                Endif
+
+              Case "color"
+                If prp.Exist("index") Then
+                  vrt = prp["index"]
+                Else
+                  vrt = 7
+                Endif
+
+            End Select
+          Else
+            Select e.Key
+              Case "linewt"
+                If auxWidts.Exist(prp) Then
+                  vrt = prp
+                Else
+                  vrt = 31
+                Endif
+              Case "color"
+                vrt = prp
+            End Select
+          Endif
+          te.Add(vrt, sTag)
+        Endif
+        '---------------- Special Proprties
+        Select e["entity"]
+          Case "LINE"
+            te["p"] = [e["start"]]
+            te["p"].Add(e["end"])
+
+          Case "LWPOLYLINE"
+            'If DWGFlag(e["flag"], 1) = 0 Then
+            Select e["flag"]
+              Case 512, 1
+                te["closed"] = 1
+              Case Else
+                te["closed"] = 0
+            End Select
+            te["p"] = e["points"]
+
+          Case "SPLINE"
+            te["scenario"] = e["scenario"]
+            te["degree"] = e["degre"]
+            te["p"] = e["fit_pts"]
+
+          Case "ARC"
+            te["p"] = [e["center"]]
+            te["radius"] = e["radius"]
+            te["start_angle"] = e["start_angle"]
+            te["end_angle"] = e["end_angle"]
+
+          Case "CIRCLE"
+            te["p"] = [e["center"]]
+            te["radius"] = e["radius"]
+
+          Case "ELLIPSE"
+            te["p"] = [e["center"]]
+            te["p"].Add(e["sm_axis"])
+            te["ratio"] = e["axis_ratio"]
+            te["start_angle"] = e["start_angle"]
+            te["end_angle"] = e["end_angle"]
+
+          Case "TEXT"
+            te["p"] = [e["ins_pt"]]
+            te["angle"] = ATan2(e["extrusion"][0], e["extrusion"][1])
+            te["text"] = e["text_value"]
+            te["text_height"] = e["height"]
+
+          Case "MTEXT"
+            te["p"] = [e["ins_pt"]]
+            te["angle"] = e["rotation"]
+            te["text"] = e["text"]
+            te["text_height"] = e["text_height"]
+            te["attachment"] = e["attachment"]
+            te["flow_dir"] = e["flow_dir"]
+
+          Case "INSERT"
+            te["p"] = [e["ins_pt"]]
+            te["angle"] = e["rotation"]
+            te["scalex"] = e["scale"][0]
+            te["scaley"] = e["scale"][1]
+            te["scalez"] = e["scale"][2]
+            te["block"] = auxBlocks[e["block_header"][2]]
+
+          Case "SOLID"
+            te["p"] = [e["corner1"]]
+            te["p"].Add(e["corner2"])
+            te["p"].Add(e["corner3"])
+            te["p"].Add(e["corner4"])
+
+        End Select
+
+      Next
+
+      '---------------- Transfer
+
+      ' -- Some Checks before
+      If te.Exist("ltype") = False Then
+        te.Add("Continous", "ltype")
+      Endif
+
+      If te.Exist("color") = False Then
+        te.Add(7, "color")
+      Endif
+
+      ' Commons check
+      For Each tg In ["entity", "layer", "handle", "color", "ltscale", "linewt", "ltype"]
+        If te.Exist(tg) = False Then
+          If te.Exist("error") = False Then
+            te["error"] = [tg]
+          Else
+            te["error"].Add(tg)
+          Endif
+        Endif
+      Next
+
+      Select te["entity"]
+        Case "LINE", "LWPOLYLINE", "SPLINE", "ARC", "CIRCLE", "ELLIPSE", "TEXT", "MTEXT", "INSERT", "SOLID"
+          If te.Exist("p") = False Then
+            If te.Exist("error") = False Then
+              te["error"] = ["p"]
+            Else
+              te["error"].Add("p")
+            Endif
+          Endif
+
+      End Select
+
+      If te.Exist("error") = False Then
+        If cMdl.Exist("Entities") = False Then
+          cMdl.Add([e["entity"]: [CStr(te["handle"]): te.Copy()]], "Entities")
+          te.Clear
+        Else
+          If cMdl["Entities"].Exist(e["entity"]) = False Then
+            cMdl["Entities"].Add([CStr(te["handle"]): te.Copy()], e["entity"])
+            te.Clear
+          Else
+            cMdl["Entities"][e["entity"]].Add(te.Copy(), CStr(te["handle"]))
+            te.Clear
+          Endif
+        Endif
+      Endif
+
+    Next
+    '-- DXF -------------------------------------------------------
+  Else
+    If xFile["path"] Like "*.dxf" Then
+      Print "dxf"
+    Else
+      Print "other"
+    Endif
+  Endif
+
+  Return ix
+
+End
+
+'' This give the layer 0 and its information
+
+Public Function NewLayer() As Collection
+
+  Dim c As New Collection
+  Dim cLy As New Collection
+
+  c.Clear
+  c["id"] = "0"
+  c["object"] = "LAYER"
+  c["name"] = "0"
+  c["show"] = True
+  c["frozen"] = False
+  c["locked"] = False
+  c["color"] = 0
+  c["style"] = 0
+  c["linewt"] = 0
+  c["print"] = True
+  cLy.Add(c.Copy(), "0")
+  c.Clear
+
+  Return cLy
+
+End
+
+Public Function NewVars() As Collection
+
+  Dim c As New Collection
+
+  c.Add(1, "LTSCALE")
+  c.Add(0, "ATTMODE")
+  c.Add(200, "TEXTSIZE")
+  c.Add("Standard", "TEXTSTYLE")
+  c.Add("0", "CLAYER")
+  c.Add("ByLayer", "CELTYPE")
+  c.Add(0, "CECOLOR")
+  c.Add(1, "CELTSCALE")
+  c.Add(1, "CELWEIGHT")
+  c.Add("Standard", "DIMSTYLE")
+  c.Add(4, "AUNITS")
+  c.Add(10, "CHAMFERA")
+  c.Add(10, "CHAMFERB")
+  c.Add(0.0, "ANGBASE")
+  c.Add("Standard", "CMLSTYLE")
+  c.Add(4, "INSUNITS")
+
+  Return c
+
+End
+
+Public Function NewStyles() As Collection
+
+  Dim c As New Collection
+
+  c.Add([[3], &X00000000000000001111111111111111, "Continous"], "0")
+  c.Add([[14, 4, 4, 4], &X00000000000000001111111111111111, "Center"], "1") ' the second parameter here is fake
+  c.Add([[10, 6, 3, 6], &X00000000000000000001100011111111, "Dashdot"], "2")
+  c.Add([[10, 6], &X00000000000000000000111100001111, "Dashed"], "3")
+  c.Add([[6, 4, 3, 4, 3, 4], &X00000000000000000011001100111111, "Divide"], "4")
+  c.Add([[3, 4], &X00000000000000000001000100010001, "Dot"], "5")
+  c.Add([[6, 4], &X00000000000000001111111111111111, "Hidden"], "6") ' the second parameter here is fake
+  c.Add([[4, 3], &X00000000000000001111111111111111, "Hidden2"], "7") ' the second parameter here is fake
+  c.Add([[12, 4, 4, 4, 4, 4], &X00000000000000001111111111111111, "Phantom"], "8") ' the second parameter here is fake
+  c.Add([[3], &X00000000000000001111111111111111, "ByBLock"], "9")
+  c.Add([[3], &X00000000000000001111111111111111, "ByLayer"], "10")
+
+  Return c
+
+End
+
+Public Function NewWidths() As Collection
+
+  Dim c As New Collection
+
+  'c.Add(["0.25", 1], "1") '1
+  'c.Add(["0.50", 2], "2") '2
+  'c.Add(["0.75", 3], "3") '3
+  'c.Add(["1.00", 4], "4") '4
+  'c.Add(["1.25", 5], "5") '5
+  'c.Add(["1.50", 6], "6") '6
+  'c.Add(["1.75", 7], "7") '7
+  'c.Add(["2.00", 8], "8") '8
+
+  c.Add(["0.05", "1"], "1")
+  c.Add(["0.10", "2"], "2")
+  c.Add(["0.12", "3"], "3")
+  c.Add(["0.14", "4"], "4")
+  c.Add(["0.16", "5"], "5")
+  c.Add(["0,18", "6"], "6")
+  c.Add(["0.20", "7"], "7")
+  c.Add(["0.25", "8"], "8")
+  c.Add(["0.30", "9"], "9")
+  c.Add(["0.35", "10"], "10")
+  c.Add(["0.40", "11"], "11")
+  c.Add(["0.45", "12"], "12")
+  c.Add(["0.50", "13"], "13")
+  c.Add(["0.55", "14"], "14")
+  c.Add(["0.60", "15"], "15")
+  c.Add(["0.65", "16"], "16")
+  c.Add(["0.70", "17"], "17")
+  c.Add(["0.80", "18"], "18")
+  c.Add(["0.90", "19"], "19")
+  c.Add(["1.00", "20"], "20")
+  c.Add(["1.25", "21"], "21")
+  c.Add(["1.45", "22"], "22")
+  c.Add(["1.65", "23"], "23")
+  c.Add(["1.85", "24"], "24")
+  c.Add(["2.00", "25"], "25")
+  c.Add(["2.15", "26"], "26")
+
+  c.Add(["ByLayer", "29"], "29")
+  c.Add(["ByBlock", "30"], "30")
+  c.Add(["Default", "31"], "31")
+
+  Return c
+
+End
+
+Public Function DWGFlag(iFlag As Integer, iPos As Integer) As Byte
+
+  Dim t As String
+  Dim b As Byte
+
+  t = Bin(iFlag, 8)
+  b = CByte(Mid(t, 9 - iPos, 1))
+
+  Return b
+
+End
+
+Public Function DWGCommonTags(Optional sEntity As String) As Collection
+
+  Dim comm As New Collection
+
+  Select Upper(sEntity)
+    Case "", "COMMON"
+      comm.Add("entity", "entity")
+      comm.Add("index", "index")
+      comm.Add("type", "type")
+      comm.Add("handle", "handle")
+      comm.Add("layer", "layer")
+      comm.Add("color", "color")
+      comm.Add("entmode", "entmode")
+      comm.Add("ownerhandle", "ownerhandle")
+      comm.Add("invisible", "invisible")
+      comm.Add("linewt", "linewt") '#
+      comm.Add("material", "material")
+      comm.Add("ltype", "ltype")
+      comm.Add("ltscale", "ltype_scale")
+      comm.Add("plotstyle", "plotstyle")
+
+    Case "LINE"
+      comm.Add("start", "start")
+      comm.Add("end", "end")
+
+  End Select
+
+  Return comm
+
+End
+
+'' Decode the text fields.
+
+Public Function DWGDecodeText(s As String) As String
+
+  Dim out As String
+
+  s = Conv$(s, "ISO-8859-1", "UTF-8")
+  If InStr(s, "\\U+") > 0 Then
+    s = String2.Flat(s)
+  Endif
+
+  If InStr(s, " [") > 0 Then
+    out = Split(Replace(s, " [", "\t"), "\t")[0]
+    If String.Left(out) = Chr(34) Then
+      out = String.Mid(out, 2)
+    Endif
+    If String.Right(out) = Chr(34) Then
+      out = String.Mid(out, 1, String.Len(out) - 1)
+
+    Endif
+  Else
+    out = s
+  Endif
+
+  Return out
+
+End

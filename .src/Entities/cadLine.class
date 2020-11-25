@@ -201,7 +201,7 @@ Public Function ImportJsonCol(c As Collection) As Entity
   n.P.Add(c["start"][1])
   n.P.Add(c["end"][0])
   n.P.Add(c["end"][1])
-  n.colour = c["color"]
+  n.colour = c["color"] ' Aca es donde falla este metodo, porque color no siempre es el numero 0-256 a veces es un array de valores. inclusive obteniendo el numero de color si este es 0 (ByBlock) o 256 (ByLayer) hay que investigar en otras entidades u objetos, por ejemplo con layer para averiguar el color de este hay que ir a CurrentDrawing.cModel["OBJECTS"] y recorrerla hast aencontrar el layer con el handle adecuado.
   n.LineWidth = c["linewt"] / 100
 
   Return n
