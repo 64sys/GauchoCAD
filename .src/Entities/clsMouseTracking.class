@@ -121,7 +121,7 @@ Public Sub ReBuildPOI()
         gcd.CurrentDrawing.poiLines.insert([gcd.CurrentDrawing.arrEntities[e].p[0], gcd.CurrentDrawing.arrEntities[e].p[1], gcd.CurrentDrawing.arrEntities[e].p[2], gcd.CurrentDrawing.arrEntities[e].p[3]])
         gcd.CurrentDrawing.poiLinesEntities.Add(e)
 
-      Case "PLine"
+      Case "LWPolyline"
         For i = 0 To gcd.CurrentDrawing.arrEntities[e].P.count - 4 Step 2
           gcd.CurrentDrawing.poiLines.insert([gcd.CurrentDrawing.arrEntities[e].p[i], gcd.CurrentDrawing.arrEntities[e].p[i + 1], gcd.CurrentDrawing.arrEntities[e].p[i + 2], gcd.CurrentDrawing.arrEntities[e].p[i + 3]])
         Next
@@ -170,7 +170,7 @@ Public Function CheckAboveEntity(xr As Float, Yr As Float, tolerance As Float) A
 
         If puntos.doIntersect(xr - tolerance, yr, xr + tolerance, yr, gcd.CurrentDrawing.arrEntities[e].P[0], gcd.CurrentDrawing.arrEntities[e].P[1], gcd.CurrentDrawing.arrEntities[e].P[2], gcd.CurrentDrawing.arrEntities[e].P[3]) Or puntos.doIntersect(xr, yr - tolerance, xr, yr + tolerance, gcd.CurrentDrawing.arrEntities[e].P[0], gcd.CurrentDrawing.arrEntities[e].P[1], gcd.CurrentDrawing.arrEntities[e].P[2], gcd.CurrentDrawing.arrEntities[e].P[3]) Then Break
 
-      Case "PLine"
+      Case "LWPolyline"
 
         For i = 0 To gcd.CurrentDrawing.arrEntities[e].P.count - 4 Step 2
           If puntos.doIntersect(xr - tolerance, Yr, Xr + tolerance, Yr, gcd.CurrentDrawing.arrEntities[e].P[i + 0], gcd.CurrentDrawing.arrEntities[e].P[i + 1], gcd.CurrentDrawing.arrEntities[e].P[i + 2], gcd.CurrentDrawing.arrEntities[e].P[i + 3]) Or puntos.doIntersect(xr, Yr - tolerance, Xr, Yr + tolerance, gcd.CurrentDrawing.arrEntities[e].P[i + 0], gcd.CurrentDrawing.arrEntities[e].P[i + 1], gcd.CurrentDrawing.arrEntities[e].P[i + 2], gcd.CurrentDrawing.arrEntities[e].P[i + 3]) Then Goto ExitSearch
@@ -401,7 +401,7 @@ Public Sub CheckPOI(xr As Float, Yr As Float) As Float[]
 
                 Endif
 
-              Case "PLine"
+              Case "LWPolyline"
 
             End Select
           Next
@@ -507,7 +507,7 @@ Public Sub CheckPOI(xr As Float, Yr As Float) As Float[]
 
         DistCenter = puntos.distancia(e.P[0], e.P[1], xr, yr)
 
-      Case "PLine"
+      Case "LWPolyline"
         ' tengo que ver cual es el mas cercano
 
         For i = 0 To e.P.count - 4 Step 2

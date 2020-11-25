@@ -71,8 +71,10 @@ End
 Public Sub Finish(oE As Entity, Optional ParamsDone As Integer = -1) As Boolean
 
   ' aca vamos a trasnformar la entidad en una polilinea
-  oe.gender = "PLine"
-  oe.ClassHandler = cadPLine
+
+  oe.ClassHandler = cadLWPolyline
+  oe.gender = oe.ClassHandler.Gender
+
   Dim w, h As Float
   Dim i As Integer
   oe.P.Clear
@@ -80,7 +82,7 @@ Public Sub Finish(oE As Entity, Optional ParamsDone As Integer = -1) As Boolean
     oe.P.Add(oe.Polygon[i])
   Next
 
-  cadPLine.BuildPOI(oe)
+  cadLWPolyline.BuildPOI(oe)
 
   ' busco el tipo de linea, si hace falta
   If oE.LineTypeName = "Dashed" Then oE.LineType = 1

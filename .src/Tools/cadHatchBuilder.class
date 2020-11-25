@@ -68,7 +68,7 @@ Public Function Start(Optional filename As Variant, Optional _mode As Integer = 
 
       nSel = clsEntities.GetSelectionCount()
 
-      If (gcd.CurrentDrawing.arrEntities[gcd.CurrentDrawing.arrSelecIndex[0]].Gender <> "PLine") And (gcd.CurrentDrawing.arrEntities[gcd.CurrentDrawing.arrSelecIndex[0]].PolyLine.Count < 6) Then
+      If (gcd.CurrentDrawing.arrEntities[gcd.CurrentDrawing.arrSelecIndex[0]].Gender <> "LWPolyline") And (gcd.CurrentDrawing.arrEntities[gcd.CurrentDrawing.arrSelecIndex[0]].PolyLine.Count < 6) Then
         Message("El contorno esta mal definido")
 
       Else
@@ -193,7 +193,7 @@ Public Sub FillEntityWithHatch()
   For Each e In enxPatternTotal
 
     Select Case e.Gender
-      Case "Line", "PLine"
+      Case "Line", "LWPolyline"
         entHatch.PolyLine.Insert(puntos.PolyPolyIntersection(e.p, entHatch.p))
       Case "Circle", "Arc", "Ellipse"
         entHatch.PolyLine.Insert(puntos.PolyPolyIntersection(e.PolyLine, entHatch.p))

@@ -394,6 +394,23 @@ End
 '  {\fVerdana|b0|i0|c0|p34;Escala: \fVerdana|b1|i0|c0|p34;1:100}
 '  {\fVerdana|b0|i0|c0|p34;\LPROPIETARIO\l:  }
 
+' Importo los datos que puedo procesar de una coleccion y genero un Entity para ser agregado a un array
+Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
+
+  e.ClassHandler = Me
+  e.P.Add(c["ins_pt"][0])
+  e.P.Add(c["ins_pt"][1])
+  e.StringData.Add(c["text"])
+
+  ' FIXME: reparar esto
+  e.fParam.Add(0) ' Angulo en grados
+
+  e.fParam.Add(c["text_height"])
+
+  Return True
+
+End
+
 ' "entity": "MTEXT",
 ' "index": 2371,
 ' "type": 44,

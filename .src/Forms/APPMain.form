@@ -92,7 +92,7 @@
       Name = "mnuPolyline"
       Text = ("Polyline")
       Picture = Picture["svg/entities/polyline.svg"]
-      Tag = "pline"
+      Tag = "lwpolyline"
     }
     { mnuCircle Menu entity
       Name = "mnuCircle"
