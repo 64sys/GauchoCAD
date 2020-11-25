@@ -121,25 +121,17 @@ Public Function Raw(f As String) As Collection
 
   Dim str As String
   Dim vrt As Variant
-  Dim ncn As New Collection
   Dim jcn As New JSONCollection
   Dim stx As New String[]
   Dim inx As New Integer[]
   Dim aux As New String[]
-  Dim r As Long 'Integer
+  Dim r As Integer
   Dim s As String
   Dim i As Integer
-  Dim j As Long 'Integer
+  Dim j As Integer
   Dim out As New Collection
   Dim tmp As String
   Dim sUgly As String
-  Dim tmx As New String[]           ''Entities or objects
-  Dim ugx As New String[]           ''Ugly entities or objects
-  Dim sec As String
-  Dim mx As Long
-  Dim o As Integer
-  Dim x As Integer
-  Dim obx As New Variant[]
 
   If Exist(f) Then
     If Lower(File.Ext(f)) = "dwg" Then
@@ -156,83 +148,51 @@ Public Function Raw(f As String) As Collection
 
   For r = 0 To stx.Max
     If Len(stx[r]) > 6 Then
-      If Left(stx[r], 6) = "  \"FIL" Or Left(stx[r], 6) = "  \"HEA" Or Left(stx[r], 6) = "  \"CLA" Or Left(stx[r], 6) = "  \"OBJ" Or Left(stx[r], 6) = "  \"THU" Or Left(stx[r], 6) = "  \"Tem" Or Left(stx[r], 6) = "  \"Aux" Then
+      If Left(stx[r], 6) = "  \"FIL" Or Left(stx[r], 6) = "  \"HEA" Or Left(stx[r], 6) = "  \"CLA" Or Left(stx[r], 6) = "  \"OBJ" Or Left(stx[r], 6) = "  \"Tem" Or Left(stx[r], 6) = "  \"Aux" Then
         inx.Add(r)
         aux.Add(IIf(InStr(stx[r], "\""), Split(stx[r], "\"")[1], "error"))
-      Else
-        'If InStr(stx[r], "\": ") > 0 Then
-        If RegExp.Match(stx[r], "  \"[aA-zZ] \": ") Then
-          'If RegExp.Match(stx[i], "\"HEADER\": {") Then
-          inx.Add(r)
-          aux.Add(Split(Replace(Replace(stx[r], "\": ", "#"), "  \"", ""), "#")[0])
-          'Else
-          '  inx.Add(r)
-          '  aux.Add(IIf(InStr(stx[r], "\""), Split(stx[r], "\"")[1], "error"))
-        Endif
       Endif
     Endif
   Next
 
   For i = 0 To inx.Max
     tmp = ""
-    If i < inx.Max Then
-      mx = inx[i + 1] - 1
-    Else
-      mx = stx.Max
-    Endif
-
-    Select aux[i]
-      Case "FILEHEADER", "HEADER", "THUMBNAILIMAGE", "Template", "AuxHeader"
-        For j = inx[i] To mx
-          tmp &= stx[j] & "\n"
-        Next
-        tmp = Replace(tmp, "  \"" & aux[i] & "\": {", "{")
-        vrt = Null
-        Try vrt = JSON.Decode(tmx[x], True)
-        If vrt Is Variant[] Then
-          out.Add(vrt.Copy(), aux[i])
-        Endif
-
-      Case "CLASSES", "OBJECTS"
-        tmx.Clear
-        ugx.Clear
-        tmp = ""
-        For j = inx[i] + 1 To mx - 1
-          If aux[i] = "OBJECTS" Then
-            tmp &= IIf(RegExp.Match(stx[j], "[^[:ascii:]]"), DWGDecodeText(stx[j]) & "\n", stx[j] & "\n")
+    If i <> inx.max Then
+      For j = inx[i] To inx[i + 1] - 1
+        If aux[i] = "OBJECTS" Then
+          If RegExp.Match(stx[j], "[^[:ascii:]]") Then
+            sUgly = DWGDecodeText(stx[j])
+            tmp &= sUgly & "\n"
           Else
             tmp &= stx[j] & "\n"
           Endif
-
-          If stx[j] = "    }," And stx[j + 1] = "    {" Then
-            tmx.Add(tmp)
-            tmp = ""
-          Endif
-        Next
-        obx.Clear
-        For x = 0 To tmx.max
-          vrt = Null
-          Try vrt = JSON.Decode(tmx[x], True)
-          If vrt Then
-            obx.Add(vrt.Copy())
-
-          Endif
-          If Error Then
-            ugx.Add(tmx[x])
-          Endif
-        Next
-        out.Add(obx.Copy(), aux[i])
-
-      Case Else
-        Print aux[i] & " " & ("is not contemplated")
-        'Starter.lgg(aux[i] & " " & ("is not contemplated"), Logger.Error)
-    End Select
+        Else
+          tmp &= stx[j] & "\n"
+        Endif
+      Next
+    Else
+      For j = inx[i] To stx.Max
+        tmp &= stx[j] & "\n"
+      Next
+    Endif
+    tmp = Replace(tmp, "  \"" & aux[i] & "\": {", "{")
+    tmp = Replace(tmp, "  \"" & aux[i] & "\": [", "[")
+    jcn.Clear
+    Try vrt = JSON.Decode(tmp, True)
+    If TypeOf(vrt) = gb.Object Then
+      If vrt Is Collection Or vrt Is JSONCollection Then
+        out.Add(vrt.Copy(), aux[i])
+      Else
+        If vrt Is Variant[] Then
+          out.Add(vrt, aux[i])
+        Endif
+      Endif
+    Else
+      Starter.lgg(aux[i], Logger.Error)
+    Endif
   Next
 
-  If ugx.Count > 0 Then
-    File.Save("/tmp/ugly.txt", ugx.Join("\n"))
-    Shell "gedit /tmp/ugly.txt"
-  Endif
+  'vrt = Json2Gbas(str)
 
   Return out
 
