@@ -214,7 +214,7 @@ Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
   Next
 
   ' FIXME: esto indica si es abierta o cerrada
-  e.fParam.Add(0)
+  If c["flag"] > 0 Then e.fParam.Add(1) Else e.fParam.Add(0)
 
   Return True
 

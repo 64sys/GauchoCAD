@@ -1087,7 +1087,7 @@ Public Sub gTask(sTask As String)
               gcd.CurrentDrawing.FileName = f
               'gcd.CurrentDrawing.cModel = dwg.Read(f)
               gcd.CurrentDrawing.cModel = dwg.Raw(f)
-              gcd.ImpEnty4(gcd.CurrentDrawing.cModel, gcd.CurrentDrawing.arrEntities)
+              gcd.ImpEnty4(gcd.CurrentDrawing.cModel["OBJECTS"], gcd.CurrentDrawing.arrEntities)
               Me.Text = f
               LoadMenu()
             Endif
