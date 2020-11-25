@@ -855,22 +855,26 @@ End
 Public Sub ImpEnty4(vrx As Variant[], obx As Entity[])
 
   Dim e As Collection               ' Current Entity
-  Dim clsHandler As Object
+
   Dim entNueva As Entity
 
-  For Each e In vrx  ' Para cada Coleccion de datos de vrx
+  For Each e In vrx                                         ' Para cada Coleccion de datos de vrx
 
-    If e.Exist("entity") Then ' llamo a la clase que maneja dicha entidad
+    If e.Exist("entity") Then                               ' es una entidad?
 
-      Try clsHandler = Object.New("cad" & e["entity"])  ' obtenemos el tipo de entidad y buscamos su clase. Si no manjemos esa entidad, esto de error.
+      entNueva = New Entity                                 ' entonces, creamos una nueva
 
-      Try entNueva = clsHandler.ImportJSONCol(e)    ' le pedimos a la clase que arme un objeto Entity para agregar al Drawing actual
+      If clsEntities.ImportJsonToEntity(e, entNueva) Then   ' si esta implementada, llenamos los datos
 
-      If IsNull(entNueva) Then Continue             ' esta implementada?
+        obx.Add(entNueva)                                   ' lo agregamos al array
 
-      obx.Add(entNueva)                             ' lo agregamos
+        entNueva = Null                                     ' limpiamos
 
-      entNueva = Null                               ' Limpiamos
+      Else                                                  ' no esta implementada
+
+        Debug "Entidad no implementada:", e["entity"]
+
+      Endif
 
     Endif
 
@@ -1020,7 +1024,7 @@ Public Function AddPolyLine(obxContainer As Entity[], Points As Float[], Optiona
 
   Dim oEntity As New Entity
 
-  oEntity.ClassHandler = cadPLine
+  oEntity.ClassHandler = cadLWPolyline
   oEntity.Gender = oEntity.ClassHandler.gender
   oEntity.P.insert(points)                    ' recibimos los dos vertices de la linea x1,y1,x2,y2
   oEntity.fParam.Add(iClosed)                 ' cerrada o abierta

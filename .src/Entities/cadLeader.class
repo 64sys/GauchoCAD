@@ -152,7 +152,7 @@ End
 
 Public Function BuildPOI(oE As Entity, Optional arrIndex As Integer = -1) As Integer
 
-  cadPLine.BuildPOI(oe)
+  cadLWPolyline.BuildPOI(oe)
 
   ' points
   oe.poiPoints.insert([oE.p[0], oE.p[1]])

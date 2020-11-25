@@ -158,7 +158,7 @@ End
 
 Public Function BuildPOI(oE As Entity, Optional arrIndex As Integer = -1) As Integer
 
-  cadPLine.BuildPOI(oe)
+  cadLWPolyline.BuildPOI(oe)
 
 End
 
@@ -342,6 +342,24 @@ Public Function CalculateBezierPoint2D(t As Float, p0 As Float[], p1 As Float[],
   ' para 3D agregar [2]
 
   Return pr
+
+End
+
+' Importo los datos que puedo procesar de una coleccion y genero un Entity para ser agregado a un array
+Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
+
+  Dim i As Integer
+
+  e.ClassHandler = Me
+  For i = 0 To c["ctrl_pts"].Max
+    e.P.Add(c["ctrl_pts"][i]["x"])
+    e.P.Add(c["ctrl_pts"][i]["y"])
+  Next
+
+  ' FIXME: esto indica si es abierta o cerrada
+  e.fParam.Add(0)
+
+  Return True
 
 End
 

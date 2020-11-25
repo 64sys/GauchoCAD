@@ -246,6 +246,20 @@ Public Sub Finish(oE As Entity, Optional ParamsDone As Integer = -1) As Boolean
 
 End
 
+' Importo los datos que puedo procesar de una coleccion y genero un Entity para ser agregado a un array
+Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
+
+  e.ClassHandler = Me
+  e.P.Add(c["center"][0])
+  e.P.Add(c["center"][1])
+  e.fParam.Add(c["radius"])
+  e.fParam.Add(c["start_angle"])
+  e.fParam.Add(c["end_angle"])
+
+  Return True
+
+End
+
 ' "entity": "ARC",
 ' "index": 402,
 ' "type": 17,

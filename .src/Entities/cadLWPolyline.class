@@ -202,6 +202,23 @@ Public Sub Finish(oE As Entity, Optional ParamsDone As Integer = -1) As Boolean
 
 End
 
+' Importo los datos que puedo procesar de una coleccion y genero un Entity para ser agregado a un array
+Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
+
+  Dim i As Integer
+
+  e.ClassHandler = Me
+  For i = 0 To c["points"].Max
+    e.P.Add(c["points"][i][0])
+    e.P.Add(c["points"][i][1])
+  Next
+
+  ' FIXME: esto indica si es abierta o cerrada
+  e.fParam.Add(0)
+
+  Return True
+
+End
 ' "entity": "LWPOLYLINE",
 ' "index": 400,
 ' "type": 77,
