@@ -192,19 +192,15 @@ Public Sub Finish(oE As Entity, Optional ParamsDone As Integer = -1) As Boolean
 End
 
 ' Importo los datos que puedo procesar de una coleccion y genero un Entity para ser agregado a un array
-Public Function ImportJsonCol(c As Collection) As Entity
+Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
 
-  Dim n As New Entity
+  e.ClassHandler = Me
+  e.P.Add(c["start"][0])
+  e.P.Add(c["start"][1])
+  e.P.Add(c["end"][0])
+  e.P.Add(c["end"][1])
 
-  n.ClassHandler = Me
-  n.P.Add(c["start"][0])
-  n.P.Add(c["start"][1])
-  n.P.Add(c["end"][0])
-  n.P.Add(c["end"][1])
-  n.colour = c["color"]
-  n.LineWidth = c["linewt"] / 100
-
-  Return n
+  Return True
 
 End
 

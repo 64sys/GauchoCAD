@@ -22,9 +22,9 @@
 Create Static
 ' Fast
 
-Public Const Gender As String = "PLine"
+Public Const Gender As String = "LWPolyline"
 Public Const PointsToDraw As Integer = 0             ' minimal point requered for drawing something usefull
-Public Const HelperTrabajo As String = ("Polyline")
+Public Const HelperTrabajo As String = ("LWPolyline")
 Public Const ParamType As String = "P+F"                             ' that is Point, Point, Float; could be Color Text, etc
 Public Const ParamHelper As String = ("Next Point")      ' a little text that is shown at the prompt waiting for user input during build
 Public Const ParamDefault As String = "Close/Undo"
@@ -202,6 +202,23 @@ Public Sub Finish(oE As Entity, Optional ParamsDone As Integer = -1) As Boolean
 
 End
 
+' Importo los datos que puedo procesar de una coleccion y genero un Entity para ser agregado a un array
+Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
+
+  Dim i As Integer
+
+  e.ClassHandler = Me
+  For i = 0 To c["points"].Max
+    e.P.Add(c["points"][i][0])
+    e.P.Add(c["points"][i][1])
+  Next
+
+  ' FIXME: esto indica si es abierta o cerrada
+  If c["flag"] > 0 Then e.fParam.Add(1) Else e.fParam.Add(0)
+
+  Return True
+
+End
 ' "entity": "LWPOLYLINE",
 ' "index": 400,
 ' "type": 77,

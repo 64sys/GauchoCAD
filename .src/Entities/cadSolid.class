@@ -165,7 +165,7 @@ End
 
 Public Function BuildPOI(oE As Entity, Optional arrIndex As Integer = -1) As Integer
 
-  cadPLine.BuildPOI(oe)
+  cadLWPolyline.BuildPOI(oe)
 
 End
 ' This function will return False if the element couldn't be created for some reason: bad or incomple user input
@@ -194,6 +194,23 @@ Public Sub Finish(oE As Entity, Optional ParamsDone As Integer = -1) As Boolean
     oE.DrawAble = False
 
   End If
+
+End
+
+' Importo los datos que puedo procesar de una coleccion y genero un Entity para ser agregado a un array
+Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
+
+  e.ClassHandler = Me
+  e.P.Add(c["corner1"][0])
+  e.P.Add(c["corner1"][1])
+  e.P.Add(c["corner2"][0])
+  e.P.Add(c["corner2"][1])
+  e.P.Add(c["corner3"][0])
+  e.P.Add(c["corner3"][1])
+  e.P.Add(c["corner4"][0])
+  e.P.Add(c["corner4"][1])
+
+  Return True
 
 End
 

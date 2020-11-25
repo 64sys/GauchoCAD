@@ -64,7 +64,7 @@ Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' called by FCAD->
 
     If gcd.CurrentDrawing.iEntity[3] >= 0 Then
       Select Case gcd.CurrentDrawing.arrEntities[gcd.CurrentDrawing.iEntity[3]].Gender
-        Case "Line", "Pline", "Circle", "Arc", "Ellipse", "Spline"
+        Case "Line", "LWPolyline", "Circle", "Arc", "Ellipse", "Spline"
           Me.iEntitySelected = gcd.CurrentDrawing.iEntity[3]
           clsEntities.SelectElem(Me.iEntitySelected)
           clsDrawingAids.Helper.texto = ("Side to offset")
@@ -90,7 +90,7 @@ Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' called by FCAD->
     e.ClassHandler.Finish(e, -1)
 
     Select Case e.Gender
-      Case "Spline", "Pline"
+      Case "Spline", "LWPolyline"
         ' voy a aplicar una logica basica: veo cual es mayor dx, dy diferencia de clicks
         If (Me.SelEndXr - Me.SelStartXr) > (Me.SelEndYr - Me.SelStartYr) Then ' X prevalece
           If (Me.SelEndXr > Me.SelStartXr) Then dx = offset Else dx = -offset

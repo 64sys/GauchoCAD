@@ -169,21 +169,21 @@ End
 
 Public Sub Translate(e As Entity, dX As Float, dY As Float, Optional OnlySelected As Boolean = False)
 
-  cadPLine.Translate(e, dX, dY, OnlySelected)
+  cadLWPolyline.Translate(e, dX, dY, OnlySelected)
   puntos.Translate(e.PolyLine, dx, dy)
 
 End
 
 Public Sub Rotate(e As Entity, radians As Float)
 
-  cadPLine.Rotate(e, radians)
+  cadLWPolyline.Rotate(e, radians)
   puntos.Rotate(e.PolyLine, radians)
 
 End
 
 Public Sub Scale(e As Entity, sX As Float, sY As Float)
 
-  cadPLine.Scale(e, sx, sy)
+  cadLWPolyline.Scale(e, sx, sy)
   puntos.Scale(e.PolyLine, sx, sy)
 
 End

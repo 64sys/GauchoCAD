@@ -89,7 +89,7 @@ Public Sub DoTrim()
   Select Case eRecortar.Gender
     Case "Line"
       DoTrimLine
-    Case "PLine"
+    Case "LWPolyline"
       DoTrimPline
     Case "Circle"
       DoTrimCircle
@@ -219,7 +219,7 @@ Public Sub DoTrimLine()
           Endif
 
         Endif
-      Case "PLine"
+      Case "LWPolyline"
 
         For i = 0 To eTijera.p.count - 4 Step 2         ' Idem linea, pero  para todos los tramos de la polilinea
 
@@ -432,7 +432,7 @@ Public Sub DoTrimPline()
             End If
 
           Endif
-        Case "PLine"
+        Case "LWPolyline"
 
           For i = 0 To eTijera.p.count - 4 Step 2         ' Idem linea, pero  para todos los tramos de la polilinea
 
@@ -766,7 +766,7 @@ Public Sub DoTrimArc()
             If theta < C2 And theta > AngCorte Then C2 = theta
 
           Endif
-        Case "PLine"
+        Case "LWPolyline"
 
           For i = 0 To eTijera.p.count - 4 Step 2         ' Idem linea, pero  para todos los tramos de la polilinea
 

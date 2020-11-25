@@ -45,7 +45,7 @@ Public Function Start(Optional Mode_ As Integer = 0) As Boolean
   tmp.Clear
   tmp.Add("L", "LINE")
   tmp.Add("C", "CIRCLE")
-  tmp.Add("P", "PLINE")
+  tmp.Add("P", "lwpolyline")
   tmp.Add("R", "RECTANGLE")
 
   cax.Sort

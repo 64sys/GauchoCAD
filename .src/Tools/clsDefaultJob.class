@@ -201,7 +201,7 @@ Public Function MouseMove(mouseX As Integer, mouseY As Integer) ' esta rutina es
         dY = Me.SelEndYr
       Case gcd.poiEndPoint
         Select Case EntityForEdit.Gender
-          Case "Line", "PLine", "SPline"
+        Case "Line", "LWPolyline", "SPline"
             If GripPoint > 0 Then ' tengo que descontar los midPoints o me dara error de desborde
 
               EntityForEdit.p[GripPoint] += Me.SelEndXr - dx
