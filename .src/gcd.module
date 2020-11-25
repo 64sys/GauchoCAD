@@ -429,7 +429,7 @@ Public Function ExportEntities(colGrp As Collection, obxEntities As Entity[], Op
         flxPoints.Add(e.P[3])                   ' Y
         flxPoints.Add(0)                        ' Z
         colEnt["p"].Add(flxPoints, "p1")
-      Case "PLine"
+      Case "LWPolyline"
         If Not colgrp.Exist("polyline") Then colgrp.Add(colPolylines, "polyline")
         colPolylines.Add(colEnt, Str$(eCount))
         colEnt.Add("polyline", "entity")
@@ -1013,7 +1013,6 @@ Public Function AddLine(obxContainer As Entity[], Points As Float[], Optional co
   If oEntity.Block <> "" Then oEntity.visible = False
   obxContainer.Add(oEntity)
   oEntity.ClassHandler.finish(oEntity, -1)
-  'cadLine.finish(oEntity, -1)
   oEntity = Null                  ' free entity
 
 End

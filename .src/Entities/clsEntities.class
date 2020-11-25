@@ -1067,6 +1067,8 @@ Public Function ImportJsonToEntity(c As Collection, e As Entity) As Boolean
 
     e.LineWidth = c["linewt"] / 100
 
+    e.Gender = clsHandler.Gender
+
     clsHandler.Finish(e)
 
     Return True

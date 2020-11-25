@@ -3533,7 +3533,7 @@ Private Function dxfSave51Entity(e As Entity)
   Select Case e.Gender
     Case "Line"
       dxfSaveLine(e.p, e.Layer, e.colour,, e.LineWidth)
-    Case "PLine"
+    Case "LWPolyline"
       dxfSavePLine(e.p, e.Layer, e.colour,, e.LineWidth)
     Case "SPLine"
       dxfSaveSPLine(e.p, e.Layer, e.colour,, e.LineWidth)

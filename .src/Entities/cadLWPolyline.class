@@ -22,9 +22,9 @@
 Create Static
 ' Fast
 
-Public Const Gender As String = "PLine"
+Public Const Gender As String = "LWPolyline"
 Public Const PointsToDraw As Integer = 0             ' minimal point requered for drawing something usefull
-Public Const HelperTrabajo As String = ("Polyline")
+Public Const HelperTrabajo As String = ("LWPolyline")
 Public Const ParamType As String = "P+F"                             ' that is Point, Point, Float; could be Color Text, etc
 Public Const ParamHelper As String = ("Next Point")      ' a little text that is shown at the prompt waiting for user input during build
 Public Const ParamDefault As String = "Close/Undo"
