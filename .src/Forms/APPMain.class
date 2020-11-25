@@ -2064,7 +2064,7 @@ Public Sub Form_KeyPress()
     Case Key.Enter, Key.Return
       Debug KeysAccumulator
 
-      For Each com In Starter.cCommands
+      For Each com In Starter.cCommandsList
         If com.count = 2 Then
           If com[1] = KeysAccumulator Then
             KeysAccumulator = com[0]
