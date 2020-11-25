@@ -1054,6 +1054,8 @@ Public Sub gTask(sTask As String)
   Dim grp As Menu
   Dim mdwg As Menu
   Dim fx As String[]
+  Dim fbas As String
+  Dim t As String
 
   '' if the drawing is drawingX.xml, drawingX.gcad where X is a integer number then the Ssave is changed to Save As
 
@@ -1065,8 +1067,10 @@ Public Sub gTask(sTask As String)
       gcd.Drawings.Add(NewDrawing)
       gcd.CurrentDrawing = gcd.Drawings.Last
       gcd.CurrentDrawing.FileName = f
-      gcd.CurrentDrawing.vrxMod = dwg.Raw(f)
-      gcd.ImpEnty3(gcd.CurrentDrawing.vrxMod, gcd.CurrentDrawing.arrEntities)
+      gcd.CurrentDrawing.cModel = dwg.Raw(f)
+      gcd.ImpEnty3()
+      'gcd.CurrentDrawing.vrxMod = dwg.Raw(f)
+      'gcd.ImpEnty3(gcd.CurrentDrawing.cModel["OBJECTS"], gcd.CurrentDrawing.arrEntities)
       Me.Text = f
       LoadMenu()
 
@@ -1082,14 +1086,33 @@ Public Sub gTask(sTask As String)
             If Lower(File.Ext(f)) = "dwg" Or Lower(File.Ext(f)) = "json" Then
               gcd.CurrentDrawing.FileName = f
               'gcd.CurrentDrawing.cModel = dwg.Read(f)
-              gcd.CurrentDrawing.vrxMod = dwg.Raw(f)
-              gcd.ImpEnty3(gcd.CurrentDrawing.vrxMod, gcd.CurrentDrawing.arrEntities)
+              gcd.CurrentDrawing.cModel = dwg.Raw(f)
+              gcd.ImpEnty3()
+              'gcd.ImpEnty3(gcd.CurrentDrawing.cModel["OBJECTS"], gcd.CurrentDrawing.arrEntities)
 
               Me.Text = f
               LoadMenu()
             Endif
           Endif
         Endif
+      Endif
+
+    Case "save"
+      s = dwg.Encode(gcd.CurrentDrawing.vrxMod)
+      f = gcd.CurrentDrawing.FileName
+      t = "/tmp/tmp.json"
+      fbas = File.Dir(f) &/ File.BaseName(f)
+      If File.Ext(f) = "dwg" Then
+        If Exist(f) Then
+          Shell "mv " & f & " " & fbas & ".bak" Wait
+          If Exist(t) Then
+            Shell "rm " & t Wait
+          Endif
+        Endif
+      Endif
+      File.Save(t, s)
+      If dwg.Write(t, f) Then
+        Print "ok"
       Endif
 
     Case "info"

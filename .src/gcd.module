@@ -664,7 +664,11 @@ End
 
 '' obx = Entity array, sb = BLockname,
 
-Public Sub ImpEnty3(vrx As Variant[], obx As Entity[])
+'Public Sub ImpEnty3(vrx As Variant[], obx As Entity[])
+Public Sub ImpEnty3()
+
+  Dim vrx As Variant
+  Dim obx As Entity[]
 
   Dim t As Integer                  '' Total number of entities
   Dim p As Integer                  '' Coordinate component 0 = x axis, 1 = y axis
@@ -675,15 +679,61 @@ Public Sub ImpEnty3(vrx As Variant[], obx As Entity[])
   Dim fpt As Float
   Dim ic As Integer                 '' Color
   Dim iw As Integer                 '' Lineweight
-  Dim st As String                  '' LinType
+  Dim st As String                  '' Line Type
+  Dim cLty As Collection            '' Line Type list Key:Name
   Dim sy As String                  '' Layer
+  Dim cLay As Collection            '' Layer list Key:Name
   Dim vrt As Variant                '' Radius, Text[rotation,height,value]
   Dim io As Integer                 '' Closed or Open
   Dim sb As String
+  Dim cBlk As Collection            '' Block list Key:Name
+
+  If CurrentDrawing.cModel.Exist("OBJECTS") Then
+    vrx = CurrentDrawing.cModel["OBJECTS"]
+  Endif
+
+  obx = CurrentDrawing.arrEntities
+  cLty = CurrentDrawing.cLtypes
+  cLay = CurrentDrawing.cLayers
+  cBlk = CurrentDrawing.cBlocks
+
+  For Each e In vrx
+    If e.Exist("object") Then
+      If e["object"] = "LAYER" Then
+        If TypeOf(e["handle"]) = gb.Object Then
+          If cLay.Exist(CStr(e["handle"][1])) = False Then
+            cLay.Add([e["name"], e["color"], e["ltype"], e["linewt"]], CStr(e["handle"][1]))
+          Else
+            cLay[CStr(e["handle"][1])] = [e["name"], e["color"], e["ltype"], e["linewt"]]
+          Endif
+        Endif
+      Endif
+
+      If e["object"] = "LTYPE" Then
+        If TypeOf(e["handle"]) = gb.Object Then
+          If cLty.Exist(CStr(e["handle"][1])) = False Then
+            cLty.Add([e["name"], e["description"]], CStr(e["handle"][1]))
+          Else
+            cLty[CStr(e["handle"][1])] = [e["name"], e["description"]]
+          Endif
+        Endif
+      Endif
+
+      If e["object"] = "BLOCK_HEADER" Then
+        If TypeOf(e["handle"]) = gb.Object Then
+          If cBlk.Exist(CStr(e["handle"][1])) = False Then
+            cBlk.Add([e["name"], e["hasattrs"]], CStr(e["handle"][1]))
+          Else
+            cBlk[CStr(e["handle"][1])] = [e["name"], e["hasattrs"]]
+          Endif
+        Endif
+      Endif
+
+    Endif
+  Next
 
   For Each e In vrx
     fxp.Clear
-    'vrt = Null
     If e.Exist("entity") Then
       For Each tag In ["center", "start", "end", "ins_pt", "points"]
         If e.Exist(tag) Then
@@ -703,9 +753,41 @@ Public Sub ImpEnty3(vrx As Variant[], obx As Entity[])
           Endif
         Endif
       Next
+
       ic = 7
-      iw = 2
+      If e.Exist("color") Then
+        If TypeOf(e["color"]) = gb.Object Then
+          If e["color"] Is Collection Or e["color"] Is JSONCollection Then
+            If e["color"].Exist("index") Then
+              ic = e["color"]["index"]
+            Else
+              ic = e["color"]
+            Endif
+          Endif
+        Else
+          ic = e["color"]
+        Endif
+      Endif
+
+      iw = 1
+      If e.Exist("linewt") Then
+        iw = e["linewt"]
+      Endif
+
       st = "Continous"
+
+      If e.Exist("ltype_flags") Then
+        If TypeOf(e["ltype_flags"]) = gb.Object Then
+          cLty.Exist("0")
+          'st = e["ltype"]
+        Else
+          If cLty.Exist(CStr(e["ltype_flags"])) Then
+            st = cLty[CStr(e["ltype_flags"])]["name"]
+          Endif
+        Endif
+      Endif
+
+      'st = "Continous"
       sy = "0"
       sb = "" ' temp like ""
 
@@ -716,7 +798,7 @@ Public Sub ImpEnty3(vrx As Variant[], obx As Entity[])
           obx.Last.Handle = IIf(e.Exist("handle"), e["handle"][1], sog.UUIDHandle(4))
           Inc t
         Case "lwpolyline"
-          ic = 4
+          'ic = 4
           If e.Exist("flag") Then
             Print e["flag"] & " : " & CStr(Bin(e["flag"], 8))
             io = CByte(Mid(Bin(e["flag"], 8), 1, 1))
@@ -1200,15 +1282,18 @@ Public Function GetGBColor(CADcolor As Integer, layerID As String) As Integer
   ' color
   If CADcolor = 256 Then          ' buscar color del layer
 
-    Return Starter.gColor[gcd.CurrentDrawing.cModel["Layers"][layerID]["color"]]
+    'Return Starter.gColor[gcd.CurrentDrawing.cModel["Layers"][layerID]["color"]]
+    Return 11
 
   Else If CADcolor = 257 Then     ' buscar color del objeto
 
-    Return Starter.gColor[gcd.CurrentDrawing.cModel["Layers"][layerID]["color"]]     ' FIXME: cambiar esto
+    'Return Starter.gColor[gcd.CurrentDrawing.cModel["Layers"][layerID]["color"]]     ' FIXME: cambiar esto
+    Return 12
 
   Else If CADcolor = 0 Then       ' buscar color del bloque
 
-    Return Starter.gColor[gcd.CurrentDrawing.cModel["Layers"][layerID]["color"]]     ' FIXME: cambiar esto
+    Return 13
+    'Return Starter.gColor[gcd.CurrentDrawing.cModel["Layers"][layerID]["color"]]     ' FIXME: cambiar esto
 
   Else
 

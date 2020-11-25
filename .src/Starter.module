@@ -29,7 +29,7 @@ Private etx As String               '' Editor de texto plano por defecto
 Private lgf As String               '' Archivo de registro de incidencias
 'Private dbn As String               '' Nombre de la base de datos
 'Private sql As String               '' Sentencia SQL de creacion de la base de datos varia segun el tipo de base de datos.
-Private lgg As Logger               '' Registro de eventos de la aplicación.
+Public lgg As Logger               '' Registro de eventos de la aplicación.
 
 ' Global vars
 Public sFonts As String             '' Fonts directory
