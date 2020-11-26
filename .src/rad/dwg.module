@@ -24,22 +24,43 @@
 
 Export
 
-Public Function Encode(vrx As Variant[]) As String
+Public Function Encode(cMdl As Collection) As String
 
   Dim ox As Variant
   Dim t As String
   Dim s As String
+  Dim vrt As Variant
+  Dim xSec As New String[]          ''DWG Sections
+  Dim zSec As New String[]          ''Sections in dwg not contemplated
+  Dim sec As String
+  'Dim foot As String
 
-  For Each ox In vrx
-    t = ""
-    Try t = JSON.Encode(ox)
-    If t <> "" Then
-      s &= "  " & t & ",\n"
-    Else
-      Print "Error " & ox
+  xSec = ["FILEHEADER", "HEADER", "CLASSES", "OBJECTS", "THUMBNAILIMAGE", "Template", "AuxHeader"]
+
+  s = "{\n  \"created_by\": \"GauchoCAD 0.0.88\",\n"
+
+  For Each sec In xSec
+    If cMdl.Exist(sec) Then
+      s &= "  \"" & sec & "\":"
+      If sec = "CLASSES" Or sec = "OBJECTS" Then
+        s &= "  \n"
+        'foot = "\n"
+        'Else
+        '  foot = ""
+      Endif
+      vrt = cMdl[sec]
+      t = ""
+      Try t = JSON.Encode(vrt)
+      If t <> "" Then
+        s &= "  " & t & ",\n"
+      Else
+        Print "Error " & ox
+      Endif
     Endif
-
+    's &= foot
   Next
+
+  s &= "\n}"
 
   Return s
 
@@ -183,13 +204,14 @@ Public Function Raw(f As String) As Collection
 
     Select aux[i]
       Case "FILEHEADER", "HEADER", "THUMBNAILIMAGE", "Template", "AuxHeader"
+        tmp = ""
         For j = inx[i] To mx
           tmp &= stx[j] & "\n"
         Next
-        tmp = Replace(tmp, "  \"" & aux[i] & "\": {", "{")
+        tmp = Replace(tmp, "  \"" & aux[i] & "\": {", " {")
         vrt = Null
-        Try vrt = JSON.Decode(tmx[x], True)
-        If vrt Is Variant[] Then
+        Try vrt = JSON.Decode(tmp, True)
+        If vrt Then
           out.Add(vrt.Copy(), aux[i])
         Endif
 
