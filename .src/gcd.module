@@ -883,6 +883,37 @@ Public Sub ImpEnty4(vrx As Variant[], obx As Entity[])
 
 End
 
+'' Importa las cosas de manera descentralizada
+Public Sub ImpEnty5(vrx As Variant[], obx As Collection)
+
+  Dim e As Collection               ' Current Entity
+
+  Dim entNueva As Entity
+
+  For Each e In vrx                                         ' Para cada Coleccion de datos de vrx
+
+    If e.Exist("entity") Then                               ' es una entidad?
+
+      entNueva = New Entity                                 ' entonces, creamos una nueva
+
+      If clsEntities.ImportJsonToEntity(e, entNueva) Then   ' si esta implementada, llenamos los datos
+
+        obx.Add(entNueva, gcd.UUHandleUnique(gcd.CurrentDrawing)) ' lo agregamos al la coleccion
+
+        entNueva = Null                                     ' limpiamos
+
+      Else                                                  ' no esta implementada
+
+        Debug "Entidad no implementada:", e["entity"]
+
+      Endif
+
+    Endif
+
+  Next
+
+End
+
 '' Importa la clave entidades de la coleccion y las coloca en el array de objetos
 
 Public Function ImportEntities2(colGrp As Collection, obxEntities As Entity[], Optional BlockName As String) As Integer
@@ -1349,5 +1380,13 @@ Public Function GetGBColor(CADcolor As Integer, layerID As String) As Integer
     Return Starter.gColor[CADcolor]
 
   Endif
+
+End
+
+Public Function UUHandleUnique(d As ClsDrawing) As String
+
+  '5 Entity handle; text string Of up To 16 hexadecimal digits(fixed)
+  Inc d.LastHandle
+  Return Hex(d.LastHandle, 6)
 
 End

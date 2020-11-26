@@ -54,7 +54,7 @@ Public Function Start(Optional ElemToBuild As Variant, Optional _Mode As Integer
     Me.iEntitySelected = gcd.CurrentDrawing.arrSelecIndex[0]
 
     Select Case gcd.CurrentDrawing.arrEntities[Me.iEntitySelected].Gender
-    Case "Line", "LWPolyline", "Circle", "Arc", "Ellipse", "Spline"
+      Case "Line", "LWPolyline", "Circle", "Arc", "Ellipse", "Spline"
         clsEntities.SelectElem(Me.iEntitySelected)
         clsDrawingAids.Helper.texto = ("Breakpoint of entity")
         Me.PointsDone = 1

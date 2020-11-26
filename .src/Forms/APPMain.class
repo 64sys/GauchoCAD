@@ -943,6 +943,7 @@ End
 Public Sub Regen()
 
   clsEntities.GLGenDrawList
+  clsEntities.glGenDrawList2
   clsEntities.glGenDrawListSel
   redraw
 
@@ -1087,6 +1088,7 @@ Public Sub gTask(sTask As String)
               gcd.CurrentDrawing.FileName = f
               gcd.CurrentDrawing.cModel = dwg.Raw(f)
               gcd.ImpEnty4(gcd.CurrentDrawing.cModel["OBJECTS"], gcd.CurrentDrawing.arrEntities)
+              gcd.ImpEnty5(gcd.CurrentDrawing.cModel["OBJECTS"], gcd.CurrentDrawing.cEntities)
               Me.Text = f
               LoadMenu()
             Endif

@@ -19,6 +19,7 @@
 ' Foundation, Inc., 51 Franklin St, Fifth Floor,
 ' Boston, MA  02110-1301  USA
 
+' Vars del drawing
 Public KeysAccumulator As String
 Public FirstTime As Boolean = True
 Public DrawingReady As Boolean = False
@@ -27,6 +28,7 @@ Public TimerTic As Integer = 0                      '' this reaches 1024 and the
 Public nDraws As Integer
 Public nDrawsRequired As Integer
 Public idDrawing As Integer
+Public LastHandle As Integer
 
 ' vars particulares de cada dibujo
 
@@ -37,10 +39,11 @@ Public ScaleZoom As Float
 Public Propiedadtest As String
 '-----------------------------------
 Public cModel As New Collection     '' All data from a dwg file is loaded here
+
 Public cLayers As New Collection    '' All layers data from dwg is listed here
 Public cLtypes As New Collection    '' All linetypes data from dwg is listed here
 Public cBlocks As New Collection    '' All Blocks data from dwg is listed here
-
+Public cEntities As New Collection  '' All Entity are here if form cEntities[handle] as Entity
 Public cImport As New Collection    '' Impor data from dxf, dwg is loaded here
 
 Public Struct arrBlockSt
