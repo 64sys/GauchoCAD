@@ -136,7 +136,9 @@ End
 Public Sub Finish(oE As Entity, Optional ParamsDone As Integer = -1) As Boolean
 
   'Print "Finish en EntityBase"
+
   'CreatePolygon(oe)
+
   BuildPOI(oe)
 
   ' busco el tipo de linea, si hace falta

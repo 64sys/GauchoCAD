@@ -67,6 +67,8 @@ Public arrEntities As New Entity[]          '' were al elements live
 Public arrTmp As New Entity[]               '' Temporal array to put a copy of an entity before change something in it
 Public arrUndo As New Entity[]              '' An array to put an unmodified copy of an entity before modifying it and then restoring it to the previous version.
 
+Public Layers As New CadLayer[]             ' esto puede ser un array o una coleccion
+
 Public arrSelecIndex As New Integer[]       '' indice en el array de entidades
 
 Public Xmenor As Float = 1E100

@@ -1314,6 +1314,7 @@ Public Function GetLayerID(LayerName As String) As String
 
   Dim cLayer As Collection
 
+  ' FIXME: reparar post layers
   Return "1"
 
   For Each cLayer In gcd.CurrentDrawing.cModel["Layers"]
@@ -1323,8 +1324,8 @@ Public Function GetLayerID(LayerName As String) As String
 End
 
 Public Function GetGBColor(CADcolor As Integer, layerID As String) As Integer
-  ' FIXME: reparr esto
 
+  ' FIXME: reparar post layers
   Return Starter.flgWhiteAndBlack
 
   ' color
