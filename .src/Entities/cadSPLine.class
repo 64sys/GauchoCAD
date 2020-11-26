@@ -269,6 +269,10 @@ Public Function calculateDrawingPoints(points As Float[]) ' points es una copia 
         points[points.max - 1] = points[points.max - 3]
         points[points.max] = points[points.max - 2]
 
+        ' tengo q engañar a clsEntityBuilder
+        'clsEntityBuilder.iPoints = points.Count / 2
+        clsEntityBuilder.MoveOn()
+
         '   01 23 45 67 89 1011 Max = 11 Count=12
         '    1  2  3  4  5    6
         '    F  C  C  F  C    C

@@ -1995,7 +1995,7 @@ Public Sub TableView1_Click()
         PropSave()
       Endif
 
-      'gcd.CurrentDrawing.cModel["OBJECTS"] = "x"
+      'gcd.CurrentDrawing.cModel["OBJECTS"] = cObjects
 
     Case "LType"
       If SelectingLtype = False Then
