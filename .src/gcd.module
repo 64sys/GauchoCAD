@@ -295,6 +295,7 @@ Public Sub Main()
   clsJob = clsDefaultJob
   clsJob.start()
   clsJobPrevious = clsDefaultJob
+  clsJobPreZoom = clsDefaultJob
   clsJobPreviousParam = 0
 
   'FileName = User.Home &/ "autosaveV5.xml"

@@ -279,7 +279,7 @@ Public Sub FinishDXFRead()
 
 End
 
-Public Procedure LoadFile(stn As String)
+Public Procedure LoadFile(stn As String, Optional IgnoreLayers As Boolean = False, IgnoreBlocks As Boolean = False, IgnoreData As Boolean = False)
 
   Dim i As Integer
   Dim mLoadStatus As Boolean
@@ -403,7 +403,7 @@ Public Procedure LoadFile(stn As String)
       '-----------------------------------------------------------
       ' LAYER
       '-----------------------------------------------------------
-    Else If (lpcode = "0") And (lpvalue = "LAYER") Then
+    Else If (lpcode = "0") And (lpvalue = "LAYER") And Not IgnoreLayers Then
       Dim newLayer As New Collection
       Inc mLayerCount
       gcd.CurrentDrawing.cModel["Layers"].Add(newlayer, Format(mLayerCount, "0"))
@@ -646,7 +646,7 @@ Public Procedure LoadFile(stn As String)
       ' BLOCK
       '-----------------------------------------------------------
       '
-    Else If (lpcode = "0") And (lpvalue = "BLOCK") Then
+    Else If (lpcode = "0") And (lpvalue = "BLOCK") And Not IgnoreBlocks Then
       ReadData
       FlgReadingBlock = True
       While (lpcode <> "0") And Not Eof(fp)
@@ -667,7 +667,7 @@ Public Procedure LoadFile(stn As String)
 
       Inc mBlockCount
 
-    Else If (lpcode = "0") And (lpvalue = "ENDBLK") Then
+    Else If (lpcode = "0") And (lpvalue = "ENDBLK") And Not IgnoreBlocks Then
       ReadData
       flgReadingBlock = False
       mBlock.block_name = ""
