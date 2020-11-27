@@ -24,22 +24,42 @@
 
 Export
 
-Public Function Encode(vrx As Variant[]) As String
+Public Function Encode(cMdl As Collection) As String
 
   Dim ox As Variant
   Dim t As String
   Dim s As String
+  Dim vrt As Variant
+  Dim xSec As New String[]          ''DWG Sections
+  Dim zSec As New String[]          ''Sections in dwg not contemplated
+  Dim sec As String
+  'Dim foot As String
 
-  For Each ox In vrx
-    t = ""
-    Try t = JSON.Encode(ox)
-    If t <> "" Then
-      s &= "  " & t & ",\n"
-    Else
-      Print "Error " & ox
+  xSec = ["FILEHEADER", "HEADER", "CLASSES", "OBJECTS", "THUMBNAILIMAGE", "Template", "AuxHeader"]
+
+  s = "{\n  \"created_by\": \"GauchoCAD 0.0.88\",\n"
+
+  For Each sec In xSec
+    If cMdl.Exist(sec) Then
+      s &= "  \"" & sec & "\":"
+
+      If sec = "CLASSES" Or sec = "OBJECTS" Then
+        s &= "  \n"
+      Endif
+
+      vrt = cMdl[sec]
+      t = ""
+      Try t = JSON.Encode(vrt)
+      If t <> "" Then
+        s &= "  " & t & ",\n"
+      Else
+        Print "Error " & ox
+      Endif
     Endif
-
+    's &= foot
   Next
+
+  s &= "\n}"
 
   Return s
 
@@ -111,7 +131,7 @@ Private Function libredwgread(f As String) As String
 
   Shell "/usr/local/bin/dwgread --format JSON '" & f & "'" To str
   str = Replace(str, "\t", " ")
-  'File.Save(File.Dir(f) &/ File.BaseName(f) & ".json", str)
+  File.Save(File.Dir(f) &/ File.BaseName(f) & ".json", str)
 
   Return str
 
@@ -151,7 +171,6 @@ Public Function Raw(f As String) As Collection
     Endif
   Endif
 
-  'stx = Split(str, gb.Lf, Chr(140), True)
   stx = Split(str, gb.Lf, Chr(140))
 
   For r = 0 To stx.Max
@@ -160,14 +179,9 @@ Public Function Raw(f As String) As Collection
         inx.Add(r)
         aux.Add(IIf(InStr(stx[r], "\""), Split(stx[r], "\"")[1], "error"))
       Else
-        'If InStr(stx[r], "\": ") > 0 Then
         If RegExp.Match(stx[r], "  \"[aA-zZ] \": ") Then
-          'If RegExp.Match(stx[i], "\"HEADER\": {") Then
           inx.Add(r)
           aux.Add(Split(Replace(Replace(stx[r], "\": ", "#"), "  \"", ""), "#")[0])
-          'Else
-          '  inx.Add(r)
-          '  aux.Add(IIf(InStr(stx[r], "\""), Split(stx[r], "\"")[1], "error"))
         Endif
       Endif
     Endif
@@ -183,13 +197,14 @@ Public Function Raw(f As String) As Collection
 
     Select aux[i]
       Case "FILEHEADER", "HEADER", "THUMBNAILIMAGE", "Template", "AuxHeader"
+        tmp = ""
         For j = inx[i] To mx
           tmp &= stx[j] & "\n"
         Next
-        tmp = Replace(tmp, "  \"" & aux[i] & "\": {", "{")
+        tmp = Replace(tmp, "  \"" & aux[i] & "\": {", " {")
         vrt = Null
-        Try vrt = JSON.Decode(tmx[x], True)
-        If vrt Is Variant[] Then
+        Try vrt = JSON.Decode(tmp, True)
+        If vrt Then
           out.Add(vrt.Copy(), aux[i])
         Endif
 
@@ -225,7 +240,6 @@ Public Function Raw(f As String) As Collection
 
       Case Else
         Print aux[i] & " " & ("is not contemplated")
-        'Starter.lgg(aux[i] & " " & ("is not contemplated"), Logger.Error)
     End Select
   Next
 
@@ -234,7 +248,64 @@ Public Function Raw(f As String) As Collection
     Shell "gedit /tmp/ugly.txt"
   Endif
 
+  out = Dogged(out.Copy())
+
   Return out
+
+End
+
+Private Function Dogged(cMdl As Collection) As Collection
+
+  Dim ob As Variant
+  Dim cBlocks As New Collection
+  Dim cLayers As New Collection
+  Dim cLtypes As New Collection
+  Dim cObjects As New Collection
+  Dim cEntities As New Collection
+
+  Dim cDogged As New Collection
+  Dim vr As Variant
+
+  For Each vr In cMdl
+    Select cMdl.Key
+      Case "FILEHEADER", "HEADER", "THUMBNAILIMAGE", "Template", "AuxHeader", "CLASSES"
+        cDogged.Add(vr, cMdl.Key)
+
+      Case "OBJECTS"
+        For Each ob In cMdl["OBJECTS"]
+
+          If ob.Exist("object") Then
+            Select ob["object"]
+              Case "BLOCK_HEADER"
+                cBlocks.Add(ob, ob["handle"][ob["handle"].Max])
+              Case "LAYER"
+                cLayers.Add(ob, ob["handle"][ob["handle"].Max])
+
+              Case Else
+                cObjects.Add(ob, ob["handle"][ob["handle"].Max])
+            End Select
+
+          Else
+            If ob.Exist("entity") Then
+              cEntities.Add(ob, ob["handle"][ob["handle"].Max])
+            Endif
+
+          Endif
+
+        Next
+
+        cDogged.Add(cBlocks, "BLOCKS")
+        cDogged.Add(cLayers, "LAYERS")
+        cDogged.Add(cLtypes, "LTYPES")
+        cDogged.Add(cEntities, "ENTITIES")
+
+      Case Else
+
+    End Select
+
+  Next
+
+  Return cDogged
 
 End
 

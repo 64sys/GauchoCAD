@@ -852,7 +852,12 @@ Public Sub ImpEnty3()
 
 End
 
+Public Sub ImpEnty5()
+
+End
+
 '' Importa las cosas de manera descentralizada
+
 Public Sub ImpEnty4(vrx As Variant[], obx As Entity[])
 
   Dim e As Collection               ' Current Entity
