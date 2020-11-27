@@ -192,42 +192,86 @@ Public Sub Finish(oE As Entity, Optional ParamsDone As Integer = -1) As Boolean
 End
 
 ' Importo los datos que puedo procesar de una coleccion y genero un Entity para ser agregado a un array
-Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
+' Public Function ImportJsonCol(c As JSONCollection, e As Entity) As Boolean
+'
+'   'Common Pack
+'   e.dwg = c
+' e.dwg["index"] = c["index"]
+' e.dwg["type"] = c["type"]
+' e.dwg["handle"] = c["handle"]
+' e.dwg["size"] = c["size"]
+' e.dwg["bitsize"] = c["bitsize"]
+' If c.Exist("ownerhandle") Then
+'   e.dwg["ownerhandle"] = c["ownerhandle"]
+' Endif
+' e.dwg["_subclass"] = c["_subclass"]
+' e.dwg["prev_entity"] = c["prev_entity"]
+' e.dwg["next_entity"] = c["next_entity"]
+' e.dwg["layer"] = c["layer"]
+' e.dwg["preview_exists"] = c["preview_exists"]
+' e.dwg["entmode"] = c["entmode"]
+' e.dwg["nolinks"] = c["nolinks"]
+' e.dwg["color"] = 0
+' e.dwg["ltype_scale"] = 1.0
+' e.dwg["ltype_flags"] = 1
+' e.dwg["plotstyle_flags"] = 0
+' e.dwg["invisible"] = 0
+' e.dwg["linewt"] = 30
+'
+' e.ClassHandler = Me
+' e.P.Add(c["start"][0])
+' e.P.Add(c["start"][1])
+' e.P.Add(c["end"][0])
+' e.P.Add(c["end"][1])
 
-  e.ClassHandler = Me
-  e.P.Add(c["start"][0])
-  e.P.Add(c["start"][1])
-  e.P.Add(c["end"][0])
-  e.P.Add(c["end"][1])
-
-  Return True
-
-End
+'   Return True
+'
+' End
 
 ' Exporto los datos de una Entity a una coleccion para ser guardados
-Public Function ExportJsonCol(e As Entity) As Collection
-
-  Dim n As New Collection
-
-  n.add("LINE", "entity")
-  n.Add(e.colour, "color")
-
-  ' puntos
-  Dim flxStart, flxEnd As New Float[]
-  flxStart.Add(e.P[0])
-  flxStart.Add(e.P[1])
-  flxEnd.Add(e.P[2])
-  flxEnd.Add(e.P[3])
-
-  n.Add(flxStart, "start")
-  n.Add(flxEnd, "end")
-
-  n.add(e.LineWidth * 100, "linewt")
-
-  ' etc
-  Return n
-
-End
+'Public Function ExportJsonCol(e As Entity) As Collection
+' Public Function dwg(e As Entity) As JSONCollection
+'
+'   Dim n As New JSONCollection
+'   'Common fields
+'   n["entity"] = "LINE"
+'   n["index"] = 44
+'   n["type"] = 19
+'   n["handle"] = [0, e.Handle]
+'   n["size"] = 43
+'   n["bitsize"] = 283
+'   n["ownerhandle"] = [12, 1, 3, 48]
+'   n["_subclass"] = "AcDbEntity"
+'   n["prev_entity"] = [8, 0, 0, 50]
+'   n["next_entity"] = [4, 0, 0, 0]
+'   n["layer"] = [5, 1, 6, 6]
+'   n["preview_exists"] = 0
+'   n["entmode"] = 0
+'   n["nolinks"] = 0
+'   n["color"] = e.colour
+'   n["ltype_scale"] = 1.0
+'   n["ltype_flags"] = 1
+'   n["plotstyle_flags"] = 0
+'   n["invisible"] = 0
+'   n["linewt"] = 30
+'   n["_subclass"] = "AcDbLine"
+'   n["z_is_zero"] = 1
+'   n["start"] = [-0.5, 0.0, 0.0]
+'   n["end"] = [-1.0, 0.0, 0.0]
+'   n["thickness"] = 0.000000
+'   n["extrusion"] = [0.0, 0.0, 1.0]
+'
+'   n.Add(e.colour, "color")
+'   'puntos
+'   n["start"] = [e.P[0], e.P[1]]
+'   n["end"] = [e.P[2], e.P[3]]
+'
+'   n.add(e.LineWidth * 100, "linewt")
+'
+'   ' etc
+'   Return n
+'
+' End
 
 '      "entity": "LINE",
 '      "index": 399,

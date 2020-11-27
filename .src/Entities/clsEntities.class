@@ -48,7 +48,6 @@ End
 Public Function ReconstruirBloques() As Boolean
 
   ' busco bloques y coloco puntos de referencias
-
   ' Armamos los bolques, que extraemos de las entidades
   Dim i, i2 As Integer, PartesEncontradas As Boolean, iStart As Integer
   Dim t As Float = Timer
@@ -1158,22 +1157,19 @@ End
 
 '' Imports data from a collection to an entity. True if the entity is handled by GauchoCAD at this version,
 '' False if entity couldn't be created for some reason.
-Public Function ImportJsonToEntity(c As Collection, e As Entity) As Boolean
+Public Function ImportJsonToEntity(c As JSONCollection, e As Entity) As Boolean
 
   Dim clsHandler As Object
 
-  If Not c.Exist("entity") Then Return False Else Stop
+  If Not c.Exist("entity") Then Return False
 
   clsHandler = Object.New("cad" & c["entity"])  ' obtenemos el tipo de entidad y buscamos su clase. Si no manjemos esa entidad, esto de error.
 
   If clsHandler.ImportJSONCol(c, e) Then      ' le pedimos a la clase que arme un objeto Entity para agregar al Drawing actual
     ' llenamos Common data:
     e.colour = c["color"]
-
     e.LineWidth = c["linewt"] / 100
-
     e.Gender = clsHandler.Gender
-
     clsHandler.Finish(e)
 
     Return True

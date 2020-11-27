@@ -22,6 +22,9 @@
 
 ' SAVE from this vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 ' IMPORTANT: ALL CHANGES HERE MUST BE TRANSLATED TO cadLoad/Save and clsEntities.CopyElementData()                                                                                    |
+' -----------------------------------------------------------------------------
+Public dwg As New JSONCollection            '' All the entity info extracted fron a dwg
+' -----------------------------------------------------------------------------
 Public Gender As String = ""
 Public P As New Float[]                     '' X,Y pairs
 Public Level As New Float[]                 '' The future Z or elevation
