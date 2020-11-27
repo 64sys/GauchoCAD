@@ -1058,6 +1058,10 @@ Public Sub gTask(sTask As String)
   Dim fx As String[]
   Dim fbas As String
   Dim t As String
+  Dim cObjects As Variant
+  Dim ob As Variant
+  Dim et As Variant
+  Dim iColor As Variant
 
   '' if the drawing is drawingX.xml, drawingX.gcad where X is a integer number then the Ssave is changed to Save As
 
@@ -1070,7 +1074,8 @@ Public Sub gTask(sTask As String)
       gcd.CurrentDrawing = gcd.Drawings.Last
       gcd.CurrentDrawing.FileName = f
       gcd.CurrentDrawing.cModel = dwg.Raw(f)
-      gcd.ImpEnty3()
+      'gcd.ImpEnty4(gcd.CurrentDrawing.cModel["OBJECTS"], gcd.CurrentDrawing.arrEntities)
+      'gcd.ImpEnty5(gcd.CurrentDrawing.cEntities, gcd.CurrentDrawing.arrEntities)
       'gcd.CurrentDrawing.vrxMod = dwg.Raw(f)
       'gcd.ImpEnty3(gcd.CurrentDrawing.cModel["OBJECTS"], gcd.CurrentDrawing.arrEntities)
       Me.Text = f
@@ -1088,8 +1093,13 @@ Public Sub gTask(sTask As String)
             If Lower(File.Ext(f)) = "dwg" Or Lower(File.Ext(f)) = "json" Then
               gcd.CurrentDrawing.FileName = f
               gcd.CurrentDrawing.cModel = dwg.Raw(f)
+<<<<<<< HEAD
               gcd.ImpEnty4(gcd.CurrentDrawing.cModel["OBJECTS"], gcd.CurrentDrawing.arrEntities)
               gcd.ImpEnty5(gcd.CurrentDrawing.cModel["OBJECTS"], gcd.CurrentDrawing.cEntities)
+=======
+              'gcd.ImpEnty4(gcd.CurrentDrawing.cModel["OBJECTS"], gcd.CurrentDrawing.arrEntities)
+              'gcd.ImpEnty5(gcd.CurrentDrawing.cEntities, gcd.CurrentDrawing.arrEntities)
+>>>>>>> 0c7ae6007c5f51808fcf903f88277d04ccfb4cfb
               Me.Text = f
               regen
               LoadMenu()
@@ -1098,22 +1108,60 @@ Public Sub gTask(sTask As String)
         Endif
       Endif
 
-    Case "save"
-      s = dwg.Encode(gcd.CurrentDrawing.vrxMod)
+      ' Case "save"
+      '   s = dwg.Encode(gcd.CurrentDrawing.vrxMod)
+      '   f = gcd.CurrentDrawing.FileName
+      '   t = "/tmp/tmp.json"
+      '   fbas = File.Dir(f) &/ File.BaseName(f)
+      '   If File.Ext(f) = "dwg" Then
+      '     If Exist(f) Then
+      '       Shell "mv " & f & " " & fbas & ".bak" Wait
+      '       If Exist(t) Then
+      '         Shell "rm " & t Wait
+      '       Endif
+      '     Endif
+      '   Endif
+      '   File.Save(t, s)
+      '   If dwg.Write(t, f) Then
+      '     Print "ok"
+      '   Endif
+
+    Case "saveas"
+      s = dwg.Encode(gcd.CurrentDrawing.cModel)
       f = gcd.CurrentDrawing.FileName
-      t = "/tmp/tmp.json"
-      fbas = File.Dir(f) &/ File.BaseName(f)
-      If File.Ext(f) = "dwg" Then
+
+      'fx = dsk.FileChooser(Settings["LastDir", User.Home], ["dwg"])
+      Dialog.Filter = ["*.dwg", "Drawing LibreDWG"]
+      Dialog.SaveFile()
+      If Dialog.Path Then
+        f = Dialog.Path
         If Exist(f) Then
-          Shell "mv " & f & " " & fbas & ".bak" Wait
-          If Exist(t) Then
-            Shell "rm " & t Wait
+          If Message.Question(("The file exist"), ("Replace"), ("Cancel")) = 2 Then
+            f = ""
           Endif
         Endif
+      Else
+        f = ""
       Endif
+
+      t = "/tmp/tmp.json"
       File.Save(t, s)
-      If dwg.Write(t, f) Then
-        Print "ok"
+      If f = "" Then
+        Print "Cancel"
+      Else
+        fbas = File.Dir(f) &/ File.BaseName(f)
+        If File.Ext(f) = "dwg" Then
+          If Exist(f) Then
+            Shell "mv " & f & " " & fbas & ".bak" Wait
+            If Exist(t) Then
+              Shell "rm " & t Wait
+            Endif
+          Endif
+        Endif
+
+        If dwg.Write(t, f) Then
+          Print "ok"
+        Endif
       Endif
 
     Case "info"
@@ -1915,8 +1963,12 @@ Public Sub TableView1_Click()
   Dim frm As FWidths
   Dim ftx As FText
 
-  For Each lay In gcd.CurrentDrawing.cModel["Layers"]
-    lrx.Add(lay["name"])
+  For Each lay In gcd.CurrentDrawing.cLayers
+    If lay[0] Then
+      lrx.Add(lay[0])
+    Endif
+
+    'lrx.Add(lay["name"])
   Next
 
   lrx.Add("*" & ("varies") & "*")
@@ -1956,6 +2008,9 @@ Public Sub TableView1_Click()
         Loop
         PropSave()
       Endif
+
+      'gcd.CurrentDrawing.cModel["OBJECTS"] = cObjects
+
     Case "LType"
       If SelectingLtype = False Then
 
