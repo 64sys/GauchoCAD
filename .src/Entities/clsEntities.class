@@ -245,7 +245,7 @@ End
 Public Sub glGenDrawList3(Optional hEntity As String = "")
 
   Dim idDrawing As Integer ' la instancia de dibujo en la que estamos
-  Dim i As Integer, e As Entity, c As Collection
+  Dim i As Integer, e As New Entity, c As Collection
 
   If hEntity <> "" Then
     e = gcd.CurrentDrawing.cEntities[hEntity]
@@ -262,33 +262,41 @@ Public Sub glGenDrawList3(Optional hEntity As String = "")
   Else
 
     If Not gl.islist(gcd.CurrentDrawing.GlListAllEntities) Then gcd.CurrentDrawing.GlListAllEntities = gl.GenLists(1)
+    gl.NewList(gcd.CurrentDrawing.GlListAllEntities, gl.COMPILE)
+
     Dim t As Float = Timer
     ' listas de entidades
     For Each c In gcd.CurrentDrawing.cModel["OBJECTS"]
+      e = New Entity
       If ImportJsonToEntity(c, e) Then
         If Not gl.islist(e.glDrwList) Then e.glDrwList = gl.GenLists(1)
-        gl.NewList(e.glDrwList, gl.COMPILE)
+        'gl.NewList(e.glDrwList, gl.COMPILE)
         e.ClassHandler.Draw(e)
-        gl.EndList
+        Inc i
+        'gl.EndList
       End If
+      e = Null
     Next
 
     ' lista de entidaes seleccionadas
     For Each c In gcd.CurrentDrawing.cModel["OBJECTS"]
+      e = New Entity
       If ImportJsonToEntity(c, e) Then
 
         If Not gl.islist(e.glDrwListSel) Then e.glDrwListSel = gl.GenLists(1)
-        gl.NewList(e.glDrwListSel, gl.COMPILE)
+        'gl.NewList(e.glDrwListSel, gl.COMPILE)
         e.ClassHandler.DrawSelected(e)
-        gl.EndList
+        Inc i
+        'gl.EndList
       End If
+      e = Null
     Next
 
     ' lista de todas las entidades
-    t = Timer
-    GLGenDrawListAll
 
-    Debug "GLlista de todas CON HANDLE desde la JSON generada en  ", Timer - t
+    gl.EndList
+
+    Debug "GLlista de ", i, " entidades CON HANDLE desde la JSON generada en  ", Timer - t
   End If
 
 End
@@ -1162,9 +1170,11 @@ Public Function ImportJsonToEntity(c As Collection, e As Entity) As Boolean
 
   Dim clsHandler As Object
 
-  If Not c.Exist("entity") Then Return False Else Stop
+  If Not c.Exist("entity") Then Return False
 
-  clsHandler = Object.New("cad" & c["entity"])  ' obtenemos el tipo de entidad y buscamos su clase. Si no manjemos esa entidad, esto de error.
+  Try clsHandler = Object.New("cad" & c["entity"])  ' obtenemos el tipo de entidad y buscamos su clase. Si no manjemos esa entidad, esto de error.
+
+  If IsNull(clsHandler) Then Return False
 
   If clsHandler.ImportJSONCol(c, e) Then      ' le pedimos a la clase que arme un objeto Entity para agregar al Drawing actual
     ' llenamos Common data:
@@ -1183,9 +1193,5 @@ Public Function ImportJsonToEntity(c As Collection, e As Entity) As Boolean
     Return False
 
   End If
-
-Catch
-
-  Return False
 
 End
