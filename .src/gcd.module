@@ -852,10 +852,6 @@ Public Sub ImpEnty3()
 
 End
 
-Public Sub ImpEnty5()
-
-End
-
 '' Importa las cosas de manera descentralizada
 
 Public Sub ImpEnty4(vrx As Variant[], obx As Entity[])
@@ -889,13 +885,14 @@ Public Sub ImpEnty4(vrx As Variant[], obx As Entity[])
 End
 
 '' Importa las cosas de manera descentralizada
-Public Sub ImpEnty5(vrx As Variant[], obx As Collection)
+'Public Sub ImpEnty5(vrx As Variant[], obx As Collection)
+Public Sub ImpEnty5(cEny As Collection, obx As Collection)
 
   Dim e As Collection               ' Current Entity
 
   Dim entNueva As Entity
 
-  For Each e In vrx                                         ' Para cada Coleccion de datos de vrx
+  For Each e In cEny                                         ' Para cada Coleccion de datos de vrx
 
     If e.Exist("entity") Then                               ' es una entidad?
 

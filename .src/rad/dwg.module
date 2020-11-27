@@ -265,6 +265,7 @@ Private Function Dogged(cMdl As Collection) As Collection
 
   Dim cDogged As New Collection
   Dim vr As Variant
+  Dim e As Entity
 
   For Each vr In cMdl
     Select cMdl.Key
@@ -273,7 +274,6 @@ Private Function Dogged(cMdl As Collection) As Collection
 
       Case "OBJECTS"
         For Each ob In cMdl["OBJECTS"]
-
           If ob.Exist("object") Then
             Select ob["object"]
               Case "BLOCK_HEADER"
@@ -281,23 +281,34 @@ Private Function Dogged(cMdl As Collection) As Collection
               Case "LAYER"
                 cLayers.Add(ob, ob["handle"][ob["handle"].Max])
 
+              Case "LTYPE"
+                cLtypes.Add(ob, ob["handle"][ob["handle"].Max])
+
               Case Else
                 cObjects.Add(ob, ob["handle"][ob["handle"].Max])
             End Select
 
           Else
             If ob.Exist("entity") Then
-              cEntities.Add(ob, ob["handle"][ob["handle"].Max])
+              'If ob["entity"] = "LINE" Then
+              e = New Entity
+              e.dwg = ob
+
+              'If clsEntities.ImportJsonToEntity(ob, e) Then
+              cEntities.Add(e, ob["handle"][ob["handle"].Max])
+              'Else
+              'e = Null
+              'cEntities.Add(ob, ob["handle"][ob["handle"].Max])
             Endif
-
           Endif
-
+          'Endif
         Next
 
         cDogged.Add(cBlocks, "BLOCKS")
         cDogged.Add(cLayers, "LAYERS")
         cDogged.Add(cLtypes, "LTYPES")
         cDogged.Add(cEntities, "ENTITIES")
+        cDogged.Add(cObjects, "OBJECTS")
 
       Case Else
 
