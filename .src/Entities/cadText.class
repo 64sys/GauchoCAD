@@ -101,7 +101,7 @@ Public Sub Draw(oE As Entity)
 
   oE.ColorToPaint = gcd.GetGBColor(oE.colour, oE.Layerid)
 
-  Debug oE.stringdata[0]
+  ' Debug oE.stringdata[0]
 
   glPlus.DrawText(oE.stringdata[0], oE.p[0], oE.p[1], oE.fParam[0], oE.fParam[1], oE.ColorToPaint)
 
