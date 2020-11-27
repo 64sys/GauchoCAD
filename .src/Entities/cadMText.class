@@ -291,7 +291,7 @@ Public Sub ProcessText(RTF As String)
   ' busco lo que esta entre {}
   Dim p1, p2 As Integer
 
-  Debug rtf
+  'Debug rtf
 
   p1 = InStr(rtf, "{")
   If p1 > 0 Then

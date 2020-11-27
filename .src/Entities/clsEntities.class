@@ -172,7 +172,7 @@ Public Sub glGenDrawList(Optional iEntity As Integer = -1)
       gl.EndList
 
     Next
-    Debug "GLlista de entidades generada en  ", Timer - t
+
     ' lista de entidaes seleccionadas
     For i = 0 To gcd.CurrentDrawing.arrEntities.Max
       If Not gl.islist(gcd.CurrentDrawing.arrEntities[i].glDrwListSel) Then gcd.CurrentDrawing.arrEntities[i].glDrwListSel = gl.GenLists(1)
@@ -186,6 +186,109 @@ Public Sub glGenDrawList(Optional iEntity As Integer = -1)
     GLGenDrawListAll
 
     Debug "GLlista de todas generada en  ", Timer - t
+  End If
+
+End
+
+'' Genera las listas GL de cada entidad individual, y la version seleccionada
+'' Borra la lista anterior y genera una nueva
+Public Sub glGenDrawList2(Optional hEntity As String = "")
+
+  Dim idDrawing As Integer ' la instancia de dibujo en la que estamos
+  Dim i As Integer, e As Entity
+
+  If hEntity <> "" Then
+    e = gcd.CurrentDrawing.cEntities[hEntity]
+    If Not gl.islist(e.glDrwList) Then e.glDrwList = gl.GenLists(1)
+    gl.NewList(e.glDrwList, gl.COMPILE)
+    e.ClassHandler.Draw(e)
+    gl.EndList
+
+    If Not gl.islist(e.glDrwListSel) Then e.glDrwListSel = gl.GenLists(1)
+    gl.NewList(e.glDrwListSel, gl.COMPILE)
+    e.ClassHandler.DrawSelected(e)
+    gl.EndList
+
+  Else
+
+    If Not gl.islist(gcd.CurrentDrawing.GlListAllEntities) Then gcd.CurrentDrawing.GlListAllEntities = gl.GenLists(1)
+    Dim t As Float = Timer
+    ' listas de entidades
+    For Each e In gcd.CurrentDrawing.cEntities
+
+      If Not gl.islist(e.glDrwList) Then e.glDrwList = gl.GenLists(1)
+      gl.NewList(e.glDrwList, gl.COMPILE)
+      e.ClassHandler.Draw(e)
+      gl.EndList
+
+    Next
+
+    ' lista de entidaes seleccionadas
+    For Each e In gcd.CurrentDrawing.cEntities
+      If Not gl.islist(e.glDrwListSel) Then e.glDrwListSel = gl.GenLists(1)
+      gl.NewList(e.glDrwListSel, gl.COMPILE)
+      e.ClassHandler.DrawSelected(e)
+      gl.EndList
+    Next
+
+    ' lista de todas las entidades
+    t = Timer
+    GLGenDrawListAll
+
+    Debug "GLlista de todas CON HANDLE generada en  ", Timer - t
+  End If
+
+End
+
+'' Genera las listas GL de cada entidad individual, y la version seleccionada. Directo dese la JSON.
+'' Borra la lista anterior y genera una nueva
+Public Sub glGenDrawList3(Optional hEntity As String = "")
+
+  Dim idDrawing As Integer ' la instancia de dibujo en la que estamos
+  Dim i As Integer, e As Entity, c As Collection
+
+  If hEntity <> "" Then
+    e = gcd.CurrentDrawing.cEntities[hEntity]
+    If Not gl.islist(e.glDrwList) Then e.glDrwList = gl.GenLists(1)
+    gl.NewList(e.glDrwList, gl.COMPILE)
+    e.ClassHandler.Draw(e)
+    gl.EndList
+
+    If Not gl.islist(e.glDrwListSel) Then e.glDrwListSel = gl.GenLists(1)
+    gl.NewList(e.glDrwListSel, gl.COMPILE)
+    e.ClassHandler.DrawSelected(e)
+    gl.EndList
+
+  Else
+
+    If Not gl.islist(gcd.CurrentDrawing.GlListAllEntities) Then gcd.CurrentDrawing.GlListAllEntities = gl.GenLists(1)
+    Dim t As Float = Timer
+    ' listas de entidades
+    For Each c In gcd.CurrentDrawing.cModel["OBJECTS"]
+      If ImportJsonToEntity(c, e) Then
+        If Not gl.islist(e.glDrwList) Then e.glDrwList = gl.GenLists(1)
+        gl.NewList(e.glDrwList, gl.COMPILE)
+        e.ClassHandler.Draw(e)
+        gl.EndList
+      End If
+    Next
+
+    ' lista de entidaes seleccionadas
+    For Each c In gcd.CurrentDrawing.cModel["OBJECTS"]
+      If ImportJsonToEntity(c, e) Then
+
+        If Not gl.islist(e.glDrwListSel) Then e.glDrwListSel = gl.GenLists(1)
+        gl.NewList(e.glDrwListSel, gl.COMPILE)
+        e.ClassHandler.DrawSelected(e)
+        gl.EndList
+      End If
+    Next
+
+    ' lista de todas las entidades
+    t = Timer
+    GLGenDrawListAll
+
+    Debug "GLlista de todas CON HANDLE desde la JSON generada en  ", Timer - t
   End If
 
 End
@@ -1058,6 +1161,8 @@ End
 Public Function ImportJsonToEntity(c As Collection, e As Entity) As Boolean
 
   Dim clsHandler As Object
+
+  If Not c.Exist("entity") Then Return False Else Stop
 
   clsHandler = Object.New("cad" & c["entity"])  ' obtenemos el tipo de entidad y buscamos su clase. Si no manjemos esa entidad, esto de error.
 

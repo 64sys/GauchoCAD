@@ -101,7 +101,7 @@ Public Sub Draw(oE As Entity)
 
   oE.ColorToPaint = gcd.GetGBColor(oE.colour, oE.Layerid)
 
-  Debug oE.stringdata[0]
+  ' Debug oE.stringdata[0]
 
   glPlus.DrawText(oE.stringdata[0], oE.p[0], oE.p[1], oE.fParam[0], oE.fParam[1], oE.ColorToPaint)
 
@@ -160,7 +160,7 @@ Public Function Draw2(oE As Entity)
 
     If oE.fParam[1] <= 0 Then
       paint.Font.Size = 10
-    Else ' FIXME: hay problemas con el ancho del total del texto que no acompaña el zooming
+    Else
       paint.Font.Size = oE.fParam[1]
     End If
 
@@ -253,13 +253,68 @@ Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
   e.ClassHandler = Me
   e.P.Add(c["ins_pt"][0])
   e.P.Add(c["ins_pt"][1])
-  e.StringData.Add(c["text"])
-  
+  e.StringData.Add(c["text_value"])
+
   ' FIXME: reparar esto
   e.fParam.Add(0) ' Angulo en grados
-  
-  e.fParam.Add(c["text_height"])
+
+  e.fParam.Add(c["height"])
 
   Return True
 
 End
+
+' "entity": "TEXT",
+'   "index": 4952,
+'   "type": 1,
+'   "handle": [0, 1732338],
+'   "size": 105,
+'   "bitsize": 747,
+'   "eed": [
+'     {
+'       "size": 17,
+'       "handle": [5, 165032],
+'       "code": 70,
+'       "value": 1
+'     },
+'     {
+'       "code": 71,
+'       "value": 3
+'     },
+'     {
+'       "code": 5,
+'       "value": [5, 0]
+'     }
+'   ],
+'   "ownerhandle": [4, 3, 302561, 302561],
+'   "_subclass": "AcDbEntity",
+'   "layer": [5, 3, 302596, 302596],
+'   "preview_exists": 0,
+'   "entmode": 0,
+'   "is_xdic_missing": 1,
+'   "has_ds_data": 0,
+'   "color": {
+'     "index": 8,
+'     "rgb": "c2828282",
+'     "flag": 128
+'   },
+'   "ltype_scale": 1.0,
+'   "ltype_flags": 0,
+'   "plotstyle_flags": 0,
+'   "material_flags": 0,
+'   "shadow_flags": 0,
+'   "has_full_visualstyle": 0,
+'   "has_face_visualstyle": 0,
+'   "has_edge_visualstyle": 0,
+'   "invisible": 0,
+'   "linewt": 4,
+'   "_subclass": "AcDbText",
+'   "dataflags": 238,
+'   "elevation": 0.00000000037563,
+'   "ins_pt": [1214.16570189001459, -1542.31558282515834],
+'   "extrusion": [0.0, 0.0, 1.0],
+'   "thickness": 0.000000,
+'   "height": 1.01828571428571,
+'   "width_factor": 0.8,
+'   "text_value": "FECHA",
+'   "style": [5, 2, 1466, 1466]

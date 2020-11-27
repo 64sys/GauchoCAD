@@ -942,7 +942,9 @@ End
 '' Regenera las listas de OpenGL
 Public Sub Regen()
 
-  clsEntities.GLGenDrawList
+  'clsEntities.GLGenDrawList
+  'clsEntities.glGenDrawList2
+  clsEntities.glGenDrawList3
   clsEntities.glGenDrawListSel
   redraw
 
@@ -1090,47 +1092,6 @@ Public Sub gTask(sTask As String)
             If Lower(File.Ext(f)) = "dwg" Or Lower(File.Ext(f)) = "json" Then
               gcd.CurrentDrawing.FileName = f
               gcd.CurrentDrawing.cModel = dwg.Raw(f)
-
-              'Color de un Layer
-              cObjects = gcd.CurrentDrawing.cModel["OBJECTS"]
-              For Each ob In cObjects
-                If ob.exist("object") Then
-                  If ob["object"] = "LAYER" Then
-                    If ob["handle"][ob["handle"].Max] = 4 Then ' Aca 4 es el handle del layer que lo sacas de la entidad
-                      If TypeOf(ob["color"]) = gb.Object Then
-                        If ob["color"].Exist("index") Then
-                          iColor = ob["color"]["index"]
-                        Endif
-                        iColor = ob["color"]
-                      Else
-                        iColor = ob["color"]
-                      Endif
-                    Endif
-                  Endif
-                Endif
-              Next
-
-              ' Entidades que conforman un bloque
-              For Each ob In cObjects
-                If ob.exist("object") Then
-                  If ob["object"] = "BLOCK_HEADER" Then
-                    If ob["name"] = "A" Then ' Este es un nombre de bloque conocido es el rótulo de atributos
-                      For Each et In cObjects
-                        If et.exist("entity") Then
-                          If et.exist("ownerhandle") Then
-                            If et["ownerhandle"][et["ownerhandle"].Max] = ob["handle"][ob["handle"].Max] Then
-                              Print et["handle"][1] & " " & et["entity"]
-                            Endif
-                          Endif
-                        Endif
-                      Next
-                    Endif
-                  Endif
-                Endif
-              Next
-
-              'cObjects = gcd.CurrentDrawing.cModel[""]
-
               gcd.ImpEnty4(gcd.CurrentDrawing.cModel["OBJECTS"], gcd.CurrentDrawing.arrEntities)
               Me.Text = f
               LoadMenu()

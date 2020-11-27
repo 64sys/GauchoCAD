@@ -19,6 +19,7 @@
 ' Foundation, Inc., 51 Franklin St, Fifth Floor,
 ' Boston, MA  02110-1301  USA
 
+' Vars del drawing
 Public KeysAccumulator As String
 Public FirstTime As Boolean = True
 Public DrawingReady As Boolean = False
@@ -27,6 +28,7 @@ Public TimerTic As Integer = 0                      '' this reaches 1024 and the
 Public nDraws As Integer
 Public nDrawsRequired As Integer
 Public idDrawing As Integer
+Public LastHandle As Integer
 
 ' vars particulares de cada dibujo
 
@@ -37,10 +39,11 @@ Public ScaleZoom As Float
 Public Propiedadtest As String
 '-----------------------------------
 Public cModel As New Collection     '' All data from a dwg file is loaded here
+
 Public cLayers As New Collection    '' All layers data from dwg is listed here
 Public cLtypes As New Collection    '' All linetypes data from dwg is listed here
 Public cBlocks As New Collection    '' All Blocks data from dwg is listed here
-
+Public cEntities As New Collection  '' All Entity are here if form cEntities[handle] as Entity
 Public cImport As New Collection    '' Impor data from dxf, dwg is loaded here
 
 Public Struct arrBlockSt
@@ -63,11 +66,13 @@ Public LastAngle As Float
 
 Public arrExtras As New Entity[]          ' For entities
 Public arrBlocks As New ArrBlockSt[]
-Public arrEntities As New Entity[]             '' were al elements live
-Public arrTmp As New Entity[]             '' Temporal array to put a copy of an entity before change something in it
-Public arrUndo As New Entity[]             '' An array to put an unmodified copy of an entity before modifying it and then restoring it to the previous version.
+Public arrEntities As New Entity[]          '' were al elements live
+Public arrTmp As New Entity[]               '' Temporal array to put a copy of an entity before change something in it
+Public arrUndo As New Entity[]              '' An array to put an unmodified copy of an entity before modifying it and then restoring it to the previous version.
 
-Public arrSelecIndex As New Integer[]          '' indice en el array de entidades
+Public Layers As New CadLayer[]             ' esto puede ser un array o una coleccion
+
+Public arrSelecIndex As New Integer[]       '' indice en el array de entidades
 
 Public Xmenor As Float = 1E100
 Public Xmayor As Float = -1E100
@@ -88,8 +93,8 @@ Public poiPoligonElements As New Integer[]
 Public poiPoligonEntities As New Integer[]      '' related entity
 
 ' interaccion del mouse en pantalla
-Public LastPoint As New Float[]                '' ultimo punto marcado o null si no existe
-Public iEntity As New Single[]             '' las coordenadas del punto encontrado y el tipo de punto
+Public LastPoint As New Float[]                 '' ultimo punto marcado o null si no existe
+Public iEntity As New Single[]                  '' las coordenadas del punto encontrado y el tipo de punto
 Public flgShowPOIinfo As Boolean = True
 Public EntitySearchMode As Integer = 0  ' 0 = no search; 1 = search entity ; 2 = search POI
 

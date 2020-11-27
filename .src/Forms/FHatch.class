@@ -27,7 +27,7 @@ Public Sub ComboBox1_Click()
 
   cadDxf.arrToFill = entyHatch
 
-  cadDxf.LoadFile(Application.Path &/ "patterns" &/ ComboBox1.Text & ".dxf")
+  cadDxf.LoadFile(Application.Path &/ "patterns" &/ ComboBox1.Text & ".dxf", True,, True)
 
   DrawingArea1.Refresh
 
