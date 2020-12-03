@@ -889,29 +889,18 @@ End
 Public Sub ImpEnty5(cEny As Collection, obx As Collection)
 
   Dim e As Collection               ' Current Entity
-
   Dim entNueva As Entity
 
-  For Each e In cEny                                         ' Para cada Coleccion de datos de vrx
-
-    If e.Exist("entity") Then                               ' es una entidad?
-
-      entNueva = New Entity                                 ' entonces, creamos una nueva
-
-      If clsEntities.ImportJsonToEntity(e, entNueva) Then   ' si esta implementada, llenamos los datos
-
+  For Each e In cEny                                              ' Para cada Coleccion de datos de vrx
+    If e.Exist("entity") Then                                     ' es una entidad?
+      entNueva = New Entity                                       ' entonces, creamos una nueva
+      If clsEntities.ImportJsonToEntity(e, entNueva) Then         ' si esta implementada, llenamos los datos
         obx.Add(entNueva, gcd.UUHandleUnique(gcd.CurrentDrawing)) ' lo agregamos al la coleccion
-
-        entNueva = Null                                     ' limpiamos
-
-      Else                                                  ' no esta implementada
-
+        entNueva = Null                                           ' limpiamos
+      Else                                                        ' no esta implementada
         Debug "Entidad no implementada:", e["entity"]
-
       Endif
-
     Endif
-
   Next
 
 End

@@ -58,7 +58,7 @@ Public Sub Draw(oE As Entity)
 
   ' nothing
   Dim n As Integer
-  n = clsEntities.GetSelectionCount()
+  '''n = clsEntities.GetSelectionCount()
   ' en este caso necesitamos que esten seleccionadas dos o mas entidades
   If n < 2 Then
 
@@ -96,7 +96,7 @@ Public Sub Finish(oE As Entity, Optional ParamsDone As Integer = -1) As Boolean
   ' if an entitty is part of other block, we look for that block
   Dim e As Entity, iBlock As Integer
 
-  iBlock = clsEntities.GetFreeBlockNumber()
+  '''iBlock = clsEntities.GetFreeBlockNumber()
   oE.fParam.add(iBlock)
   oE.Finished = True
 

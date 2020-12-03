@@ -165,7 +165,7 @@ Public Sub Cancel()
   gcd.clsJobPrevious = Me
   gcd.clsJob = clsDefaultJob
   clsDrawingAids.CleanTexts
-  appmain.redraw
+  '''appmain.redraw
 
 End
 
