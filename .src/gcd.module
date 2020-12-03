@@ -258,8 +258,8 @@ End
 
 Public Sub Regen()
 
-  clsEntities.GLGenDrawList3
-  clsEntities.glGenDrawListSel
+  clsEntities.GLGenDrawList2
+  '  clsEntities.glGenDrawListSel
   redraw
 
 End

@@ -192,9 +192,9 @@ Public Sub Finish(oE As Entity, Optional ParamsDone As Integer = -1) As Boolean
 End
 
 ' Importo los datos que puedo procesar de una coleccion y genero un Entity para ser agregado a un array
-' Public Function ImportJsonCol(c As JSONCollection, e As Entity) As Boolean
-'
-'   'Common Pack
+Public Function ImportJsonCol(c As JSONCollection, e As Entity) As Boolean
+
+  'Common Pack
 '   e.dwg = c
 ' e.dwg["index"] = c["index"]
 ' e.dwg["type"] = c["type"]
@@ -217,16 +217,16 @@ End
 ' e.dwg["plotstyle_flags"] = 0
 ' e.dwg["invisible"] = 0
 ' e.dwg["linewt"] = 30
-'
-' e.ClassHandler = Me
-' e.P.Add(c["start"][0])
-' e.P.Add(c["start"][1])
-' e.P.Add(c["end"][0])
-' e.P.Add(c["end"][1])
 
-'   Return True
-'
-' End
+e.ClassHandler = Me
+e.P.Add(c["start"][0])
+e.P.Add(c["start"][1])
+e.P.Add(c["end"][0])
+e.P.Add(c["end"][1])
+
+  Return True
+
+End
 
 ' Exporto los datos de una Entity a una coleccion para ser guardados
 'Public Function ExportJsonCol(e As Entity) As Collection

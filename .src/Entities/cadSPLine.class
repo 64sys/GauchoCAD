@@ -355,10 +355,22 @@ Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
   Dim i As Integer
 
   e.ClassHandler = Me
-  For i = 0 To c["ctrl_pts"].Max
-    e.P.Add(c["ctrl_pts"][i]["x"])
-    e.P.Add(c["ctrl_pts"][i]["y"])
-  Next
+
+  If c.Exist("ctrl_pts") Then
+    For i = 0 To c["ctrl_pts"].Max
+      e.P.Add(c["ctrl_pts"][i]["x"])
+      e.P.Add(c["ctrl_pts"][i]["y"])
+    Next
+  End If
+
+  If c.Exist("ctrl_pts") Then
+    For i = 0 To c["ctrl_pts"].Max
+      e.P.Add(c["ctrl_pts"][i]["x"])
+      e.P.Add(c["ctrl_pts"][i]["y"])
+    Next
+  End If
+
+  If e.P.Count = 0 Then e.P.Insert([0, 0, 0, 0, 0, 0, 0, 0])
 
   ' FIXME: esto indica si es abierta o cerrada
   e.fParam.Add(0)

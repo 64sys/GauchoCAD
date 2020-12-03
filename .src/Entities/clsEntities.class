@@ -213,7 +213,7 @@ Public Sub glGenDrawList2(Optional hEntity As String = "")
     If Not gl.islist(gcd.CurrentDrawing.GlListAllEntities) Then gcd.CurrentDrawing.GlListAllEntities = gl.GenLists(1)
     Dim t As Float = Timer
     ' listas de entidades
-    For Each e In gcd.CurrentDrawing.cEntities
+    For Each e In gcd.CurrentDrawing.cModel["ENTITIES"]
 
       If Not gl.islist(e.glDrwList) Then e.glDrwList = gl.GenLists(1)
       gl.NewList(e.glDrwList, gl.COMPILE)
@@ -223,7 +223,7 @@ Public Sub glGenDrawList2(Optional hEntity As String = "")
     Next
 
     ' lista de entidaes seleccionadas
-    For Each e In gcd.CurrentDrawing.cEntities
+    For Each e In gcd.CurrentDrawing.cModel["ENTITIES"]
       If Not gl.islist(e.glDrwListSel) Then e.glDrwListSel = gl.GenLists(1)
       gl.NewList(e.glDrwListSel, gl.COMPILE)
       e.ClassHandler.DrawSelected(e)
@@ -1163,19 +1163,34 @@ Public Function GetParentBlock(iEntity As Integer) As Integer
 
 End
 
+Public Function UpdateEntitiesFromDWG(cEnty As Collection) As Integer
+
+  Dim e As Entity
+  Dim eTotal As Integer
+
+  For Each e In cEnty
+    If ImportJsonToEntity(e.dwg, e) Then Inc eTotal
+  Next
+
+  Return eTotal
+
+End
+
 '' Imports data from a collection to an entity. True if the entity is handled by GauchoCAD at this version,
 '' False if entity couldn't be created for some reason.
 Public Function ImportJsonToEntity(c As JSONCollection, e As Entity) As Boolean
 
   Dim clsHandler As Object
 
-  If Not c.Exist("entity") Then Return False
+  ' If Not c.Exist("entity") Then Return False
 
-  Try clsHandler = Object.New("cad" & c["entity"])  ' obtenemos el tipo de entidad y buscamos su clase. Si no manjemos esa entidad, esto de error.
+  clsHandler = Object.New("cad" & c["entity"])  ' obtenemos el tipo de entidad y buscamos su clase. Si no manjemos esa entidad, esto de error.
 
-  If IsNull(clsHandler) Then Return False
+  If IsNull(clsHandler) Then
+    e.ClassHandler = cadDummy
+    Return False
 
-  If clsHandler.ImportJSONCol(c, e) Then      ' le pedimos a la clase que arme un objeto Entity para agregar al Drawing actual
+  Else If clsHandler.ImportJSONCol(c, e) Then      ' le pedimos a la clase que arme un objeto Entity para agregar al Drawing actual
     ' llenamos Common data:
     e.colour = c["color"]
     e.LineWidth = c["linewt"] / 100
@@ -1184,10 +1199,10 @@ Public Function ImportJsonToEntity(c As JSONCollection, e As Entity) As Boolean
 
     Return True
 
-  Else
-
-    Return False
-
   End If
+
+Catch
+  e.ClassHandler = cadDummy
+  Return False
 
 End
