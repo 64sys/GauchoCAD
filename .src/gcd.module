@@ -883,33 +883,26 @@ Public Sub ImpEnty4(vrx As Collection, obx As Entity[])
 End
 
 '' Importa las cosas de manera descentralizada
-'Public Sub ImpEnty5(vrx As Variant[], obx As Collection)
-Public Sub ImpEnty5(cEny As Collection, obx As Collection)
+'Public Sub ImpEnty5(vrx As Variant[], obx As Entity[])
+Public Sub ImpEnty5(cEny As Collection, obx As Entity[])
 
   Dim e As Collection               ' Current Entity
-
   Dim entNueva As Entity
 
-  For Each e In cEny                                         ' Para cada Coleccion de datos de vrx
+  For Each e In cEny                                              ' Para cada Coleccion de datos de vrx
+    If e.Exist("entity") Then                                     ' es una entidad?
+      If e.Exist("handle") Then
 
-    If e.Exist("entity") Then                               ' es una entidad?
-
-      entNueva = New Entity                                 ' entonces, creamos una nueva
-
-      If clsEntities.ImportJsonToEntity(e, entNueva) Then   ' si esta implementada, llenamos los datos
-
-        obx.Add(entNueva, gcd.UUHandleUnique(gcd.CurrentDrawing)) ' lo agregamos al la coleccion
-
-        entNueva = Null                                     ' limpiamos
-
-      Else                                                  ' no esta implementada
-
-        Debug "Entidad no implementada:", e["entity"]
-
+        entNueva = New Entity                                       ' entonces, creamos una nueva
+        If clsEntities.ImportJsonToEntity(e, entNueva) Then         ' si esta implementada, llenamos los datos
+          'obx.Add(entNueva, gcd.UUHandleUnique(gcd.CurrentDrawing)) ' lo agregamos al la coleccion
+          obx.Add(entNueva, e["handle"][e["handle"].Max])
+          entNueva = Null                                           ' limpiamos
+        Else                                                        ' no esta implementada
+          Debug "Entidad no implementada:", e["entity"]
+        Endif
       Endif
-
     Endif
-
   Next
 
 End

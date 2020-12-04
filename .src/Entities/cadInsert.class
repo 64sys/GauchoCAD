@@ -94,7 +94,7 @@ Public Sub Draw(oE As Entity)
   If i < 0 Then Return
 
   gl.PushMatrix
-  gl.Translatef(appmain.pixels(oE.p[0]) / gcd.CurrentDrawing.ScaleZoom, appmain.pixels(oE.p[1]) / gcd.CurrentDrawing.ScaleZoom, 0)
+  gl.Translatef(APPMain.pixels(oE.p[0]) / gcd.CurrentDrawing.ScaleZoom, APPMain.pixels(oE.p[1]) / gcd.CurrentDrawing.ScaleZoom, 0)
   gl.Rotatef(oE.fParam[2], 0, 0, 1)
   gl.Scalef(oE.fParam[0], oE.fParam[1], 1)
 

@@ -262,6 +262,7 @@ Private Function Dogged(cMdl As Collection) As Collection
   Dim cLtypes As New Collection
   Dim cObjects As New Collection
   Dim cEntities As New Collection
+  Dim cNested As New Collection
 
   Dim cDogged As New Collection
   Dim vr As Variant
@@ -291,11 +292,21 @@ Private Function Dogged(cMdl As Collection) As Collection
           Else
             If ob.Exist("entity") Then
               'If ob["entity"] = "LINE" Then
-              e = New Entity
-              e.dwg = ob
+              'e = New Entity
+              'e.dwg = ob
 
               'If clsEntities.ImportJsonToEntity(ob, e) Then
-              cEntities.Add(e, ob["handle"][ob["handle"].Max])
+              If ob.Exist("ownerhandle") Then
+                If cBlocks.Exist(ob["ownerhandle"][ob["ownerhandle"].Max]) Then
+                  cNested.Add(ob, ob["handle"][ob["handle"].Max])
+                Else
+                  cEntities.Add(ob, ob["handle"][ob["handle"].Max])
+                Endif
+
+              Else
+                cEntities.Add(ob, ob["handle"][ob["handle"].Max])
+              Endif
+
               'Else
               'e = Null
               'cEntities.Add(ob, ob["handle"][ob["handle"].Max])
@@ -307,6 +318,7 @@ Private Function Dogged(cMdl As Collection) As Collection
         cDogged.Add(cBlocks, "BLOCKS")
         cDogged.Add(cLayers, "LAYERS")
         cDogged.Add(cLtypes, "LTYPES")
+        cDogged.Add(cNested, "NESTED")
         cDogged.Add(cEntities, "ENTITIES")
         cDogged.Add(cObjects, "OBJECTS")
 
