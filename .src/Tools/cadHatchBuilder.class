@@ -67,7 +67,7 @@ Public Function Start(Optional filename As Variant, Optional _mode As Integer = 
     Case 1 ' vengo de seleccionar el contorno
 
       nSel = clsEntities.GetSelectionCount()
-
+      If nsel = 0 Then Return
       If (gcd.CurrentDrawing.arrEntities[gcd.CurrentDrawing.arrSelecIndex[0]].Gender <> "LWPolyline") And (gcd.CurrentDrawing.arrEntities[gcd.CurrentDrawing.arrSelecIndex[0]].PolyLine.Count < 6) Then
         Message("El contorno esta mal definido")
 

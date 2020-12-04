@@ -258,9 +258,7 @@ End
 
 Public Sub Regen()
 
-  clsEntities.GLGenDrawList3
-  clsEntities.glGenDrawListSel
-  redraw
+  appmain.Regen
 
 End
 
@@ -854,19 +852,19 @@ End
 
 '' Importa las cosas de manera descentralizada
 
-Public Sub ImpEnty4(vrx As Variant[], obx As Entity[])
+Public Sub ImpEnty4(vrx As Collection, obx As Entity[])
 
-  Dim e As Collection               ' Current Entity
+  Dim e As Entity               ' Current Entity
 
   Dim entNueva As Entity
 
   For Each e In vrx                                         ' Para cada Coleccion de datos de vrx
 
-    If e.Exist("entity") Then                               ' es una entidad?
+    If e.dwg.Exist("entity") Then                               ' es una entidad?
 
       entNueva = New Entity                                 ' entonces, creamos una nueva
 
-      If clsEntities.ImportJsonToEntity(e, entNueva) Then   ' si esta implementada, llenamos los datos
+      If clsEntities.ImportJsonToEntity(e.dwg, entNueva) Then   ' si esta implementada, llenamos los datos
 
         obx.Add(entNueva)                                   ' lo agregamos al array
 
@@ -874,7 +872,7 @@ Public Sub ImpEnty4(vrx As Variant[], obx As Entity[])
 
       Else                                                  ' no esta implementada
 
-        Debug "Entidad no implementada:", e["entity"]
+        Debug "Entidad no implementada:", e.dwg["entity"]
 
       Endif
 
