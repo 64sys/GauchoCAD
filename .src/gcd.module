@@ -883,7 +883,7 @@ Public Sub ImpEnty4(vrx As Collection, obx As Entity[])
 End
 
 '' Importa las cosas de manera descentralizada
-'Public Sub ImpEnty5(vrx As Variant[], obx As Entity[])
+
 Public Sub ImpEnty5(cEny As Collection, obx As Entity[])
 
   Dim e As Collection               ' Current Entity
@@ -896,7 +896,7 @@ Public Sub ImpEnty5(cEny As Collection, obx As Entity[])
         entNueva = New Entity                                       ' entonces, creamos una nueva
         If clsEntities.ImportJsonToEntity(e, entNueva) Then         ' si esta implementada, llenamos los datos
           'obx.Add(entNueva, gcd.UUHandleUnique(gcd.CurrentDrawing)) ' lo agregamos al la coleccion
-          obx.Add(entNueva, e["handle"][e["handle"].Max])
+          obx.Add(entNueva)
           entNueva = Null                                           ' limpiamos
         Else                                                        ' no esta implementada
           Debug "Entidad no implementada:", e["entity"]
@@ -1350,23 +1350,23 @@ End
 Public Function GetGBColor(CADcolor As Integer, layerID As String) As Integer
 
   ' FIXME: reparar post layers
-  Return Starter.flgWhiteAndBlack
+  'Return Starter.flgWhiteAndBlack
 
   ' color
   If CADcolor = 256 Then          ' buscar color del layer
 
-    'Return Starter.gColor[gcd.CurrentDrawing.cModel["Layers"][layerID]["color"]]
-    Return 11
+    Return Starter.gColor[gcd.CurrentDrawing.cModel["LAYERS"][layerID]["color"]]
+    'Return Starter.gColor[11]
 
   Else If CADcolor = 257 Then     ' buscar color del objeto
 
-    'Return Starter.gColor[gcd.CurrentDrawing.cModel["Layers"][layerID]["color"]]     ' FIXME: cambiar esto
-    Return 12
+    Return Starter.gColor[gcd.CurrentDrawing.cModel["LAYERS"][layerID]["color"]]     ' FIXME: cambiar esto
+    'Return Starter.gColor[12]
 
   Else If CADcolor = 0 Then       ' buscar color del bloque
 
-    Return 13
-    'Return Starter.gColor[gcd.CurrentDrawing.cModel["Layers"][layerID]["color"]]     ' FIXME: cambiar esto
+    'Return Starter.gColor[13]
+    Return Starter.gColor[gcd.CurrentDrawing.cModel["LAYERS"][layerID]["color"]]     ' FIXME: cambiar esto
 
   Else
 

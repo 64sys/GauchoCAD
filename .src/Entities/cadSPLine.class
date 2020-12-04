@@ -354,7 +354,6 @@ Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
 
   Dim i As Integer
 
-  e.ClassHandler = Me
 
   If c.Exist("ctrl_pts") Then
     For i = 0 To c["ctrl_pts"].Max
@@ -363,10 +362,10 @@ Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
     Next
   End If
 
-  If c.Exist("ctrl_pts") Then
-    For i = 0 To c["ctrl_pts"].Max
-      e.P.Add(c["ctrl_pts"][i]["x"])
-      e.P.Add(c["ctrl_pts"][i]["y"])
+  If c.Exist("fit_pts") Then
+    For i = 0 To c["fit_pts"].Max
+      e.P.Add(c["fit_pts"][i][0])
+      e.P.Add(c["fit_pts"][i][0])
     Next
   End If
 

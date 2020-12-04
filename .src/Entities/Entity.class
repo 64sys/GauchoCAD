@@ -20,11 +20,6 @@
 ' Foundation, Inc., 51 Franklin St, Fifth Floor,
 ' Boston, MA  02110-1301  USA
 
-' SAVE from this vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-' IMPORTANT: ALL CHANGES HERE MUST BE TRANSLATED TO cadLoad/Save and clsEntities.CopyElementData()                                                                                    |
-' -----------------------------------------------------------------------------
-Public dwg As New JSONCollection            '' All the entity info extracted fron a dwg
-' -----------------------------------------------------------------------------
 Public Gender As String = ""
 Public P As New Float[]                     '' X,Y pairs
 Public Level As New Float[]                 '' The future Z or elevation
@@ -33,11 +28,7 @@ Public fParam As New Float[]                '' Array of floats
 Public Layer As String = "0"                '' Capa o Layer que se guarda en el archivo
 Public colour As Integer                    '' 0=by layer, 1=by block, 10+=16 bit color code  ;  ths is not the color to be draw, ColorToPaint is, set in Finish()
 Public LineTypeName As String               '' Continuous, dashed , etc
-Public LineWidth As Integer = 1             '' This is it
-' SAVE to here  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-' NOT SAVED
-' construction and usage vars
+Public LineWidth As Float = 1               '' This is it
 Public Block As String                      '' Para tener la posibilidade de juntar cosas en un block
 Public RefPointX As Float                   '' New
 Public RefPointY As Float

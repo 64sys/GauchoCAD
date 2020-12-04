@@ -120,6 +120,7 @@ Public Sub Draw(oE As Entity)
   Dim major, minor, angle, la As Float
 
   If Not oE.Visible Then Return
+  oE.ColorToPaint = gcd.GetGBColor(oE.colour, oE.Layerid)
 
   If Me.StepsDone = 1 Then
 
@@ -180,6 +181,8 @@ Public Sub Draw(oE As Entity)
       oE.polyline.Add(y)
 
     Next
+
+
     glPlus.Lines(oe.PolyLine, oe.ColorToPaint, oe.LineWidth, oe.LineType)
 
   End If
@@ -249,12 +252,12 @@ End
 ' Importo los datos que puedo procesar de una coleccion y genero un Entity para ser agregado a un array
 Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
 
-  e.ClassHandler = Me
+
   e.P.Add(c["center"][0])
   e.P.Add(c["center"][1])
   e.fParam.Add(c["radius"])
-  e.fParam.Add(c["start_angle"])
-  e.fParam.Add(c["end_angle"])
+  e.fParam.Add(c["start_angle"] * 180 / Pi)
+  e.fParam.Add(c["end_angle"] * 180 / Pi)
 
   Return True
 

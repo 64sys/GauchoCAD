@@ -100,9 +100,11 @@ Public Sub Draw(oE As Entity)
     y = oE.p[1] + oE.fParam[0] * Sin(theta)
     oE.polyline.Add(x)
     oE.polyline.Add(y)
-    'GLplus.Vertex2D(x, y, oE.ColorToPaint)
+
   Next
   'gl.End
+
+  oE.ColorToPaint = gcd.GetGBColor(oE.colour, oE.Layerid)
 
   glPlus.Circle(oE.p, oe.fParam[0], oe.ColorToPaint, False, oe.LineWidth, oe.LineType)
 
@@ -202,7 +204,7 @@ End
 ' Importo los datos que puedo procesar de una coleccion y genero un Entity para ser agregado a un array
 Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
 
-  e.ClassHandler = Me
+
   e.P.Add(c["center"][0])
   e.P.Add(c["center"][1])
   e.fParam.Add(c["radius"])
