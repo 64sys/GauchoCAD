@@ -943,7 +943,6 @@ End
 Public Sub Regen()
 
   clsEntities.glGenDrawList
-
   clsEntities.glGenDrawListSel
   redraw
 

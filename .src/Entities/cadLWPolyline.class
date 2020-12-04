@@ -207,7 +207,7 @@ Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
 
   Dim i As Integer
 
-  e.ClassHandler = Me
+
   For i = 0 To c["points"].Max
     e.P.Add(c["points"][i][0])
     e.P.Add(c["points"][i][1])
