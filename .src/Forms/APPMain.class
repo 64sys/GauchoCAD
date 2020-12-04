@@ -1093,8 +1093,8 @@ Public Sub gTask(sTask As String)
               gcd.CurrentDrawing.FileName = f
               gcd.CurrentDrawing.cModel = dwg.Raw(f)
               'clsEntities.UpdateEntitiesFromDWG(gcd.CurrentDrawing.cModel["ENTITIES"])
-              gcd.ImpEnty4(gcd.CurrentDrawing.cModel["ENTITIES"], gcd.CurrentDrawing.arrEntities)
-              'gcd.ImpEnty5(gcd.CurrentDrawing.cEntities, gcd.CurrentDrawing.arrEntities)
+              'gcd.ImpEnty4(gcd.CurrentDrawing.cModel["ENTITIES"], gcd.CurrentDrawing.arrEntities)
+              gcd.ImpEnty5(gcd.CurrentDrawing.cModel["ENTITIES"], gcd.CurrentDrawing.arrEntities)
 
               Me.Text = f
               regen
