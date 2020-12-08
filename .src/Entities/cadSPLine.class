@@ -354,7 +354,6 @@ Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
 
   Dim i As Integer
 
-
   If c.Exist("ctrl_pts") Then
     For i = 0 To c["ctrl_pts"].Max
       e.P.Add(c["ctrl_pts"][i]["x"])
