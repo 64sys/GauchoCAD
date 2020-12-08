@@ -890,7 +890,10 @@ Public Sub ImpEnty5(cEny As Collection, obx As Entity[])
   Dim entNueva As Entity
 
   For Each e In cEny                                              ' Para cada Coleccion de datos de vrx
-    If e.Exist("entity") Then                                     ' es una entidad?
+    If e.Exist("entity") Then                                        ' es una entidad?
+      ' If e["entity"] = "ATTDEF" Then Stop
+      If InStr("ATTDEFATTRIBLINELWPOLYLINECIRCLEELLIPSEARCTEXTMTEXTSPLINESOLIDLEADER", e["entity"]) = 0 Then Continue
+
       If e.Exist("handle") Then
 
         entNueva = New Entity                                       ' entonces, creamos una nueva
