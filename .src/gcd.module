@@ -138,7 +138,7 @@ Public Sub LayersTransfer()
     If CurrentDrawing.cImport.Exist("Layers") Then
       iLay = CurrentDrawing.cImport["Layers"]
       If CurrentDrawing.cModel.Exist("Layers") Then
-        mLay = CurrentDrawing.cModel["Layers"]
+        mLay = CurrentDrawing.cModel["LAYERS"]
 
         For Each il In iLay
           r = 0
@@ -345,57 +345,12 @@ Public Sub ImportBlocks(colData As Collection) ', obxEntities As Entity[]) As In
     newBlock.entities = New Entity[]
     newBlock.name = colBlk["block"]
     gcd.CurrentDrawing.arrBlocks.Add(newBlock)
-    ImportEntities2(colBlk["Entities"], newBlock.entities, newBlock.name)
+    'ImportEntities2(colBlk["Entities"], newBlock.entities, newBlock.name)
 
   Next
 
 End
 
-Public Function ExportModel(colData As Collection, obxEntities As Entity[], Optional BlockName As String) As Integer
-
-  Dim i, iTotalEntities As Integer
-  Dim colGrp As Collection
-
-  Dim flxPoints As New Float[]
-  Dim P As Float[]
-  Dim ratio As Float
-
-  For Each colGrp In colData
-
-    ImportEntities2(colGrp, obxEntities, BlockName)
-
-  Next
-
-End
-
-Public Function ImportModel(colData As Collection, obxEntities As Entity[], Optional BlockName As String) As Integer
-
-  'Dim i, iTotalEntities As Integer
-  Dim colGrp As Collection
-
-  'Dim flxPoints As New Float[]
-  'Dim P As Float[]
-  'Dim ratio As Float
-
-  For Each colGrp In colData
-    'If colGrp.Exist("entity") Then
-    ImportEntities2(colGrp, obxEntities, BlockName)
-    'Endif
-
-  Next
-
-End
-
-Public Function ImportModel2(colData As Collection, obxEntities As Entity[], Optional BlockName As String) As Integer
-
-  Dim i, iTotalEntities As Integer
-  Dim colGrp As Collection
-
-  For Each colGrp In colData
-    ImpEnty3(colGrp, obxEntities, BlockName)
-  Next
-
-End
 
 '' Pasa del arrEntities a la coleccion cModel
 Public Function ExportEntities(colGrp As Collection, obxEntities As Entity[], Optional BlockName As String) As Integer
@@ -544,484 +499,36 @@ Common:
   Return
 
 End
-'' Pasa del arrEntities a la coleccion cModel
 
-' Public Function ExportEntities2(colGrp As Collection, obxEntities As Entity[], Optional BlockName As String) As Integer
-'
-'     Dim i, eCount As Integer
-'     Dim flxPoints As Float[]
-'     Dim P, Pn As New Collection
-'     Dim ratio As Float
-'     Dim colEnt As New Collection
-'     Dim e As Entity
-'     Dim colLines, conCircles, colPolylines, colArcs, colEllipses As New Collection
-'
-'     For Each e In obxEntities
-'         flxPoints = New Float[]
-'         colGrp.Add(colEnt, Str$(eCount))
-'         Select Case e.Gender
-'             Case "Line"
-'                 colgrp[Str$(eCount)].Add("line", "entity")
-'                 GoSub Common
-'                 colgrp[Str$(eCount)].Add(p, "p")
-'                 flxPoints.Add(e.P[0])                   ' X
-'                 flxPoints.Add(e.P[1])                   ' Y
-'                 flxPoints.Add(0)                        ' Z
-'                 colgrp[Str$(eCount)]["p"].Add(flxPoints, "p0")
-'                 flxPoints = New Float[]
-'                 flxPoints.Add(e.P[2])                   ' X
-'                 flxPoints.Add(e.P[3])                   ' Y
-'                 flxPoints.Add(0)                        ' Z
-'                 colgrp[Str$(eCount)]["p"].Add(flxPoints, "p1")
-'             Case "PLine"
-'                 colgrp[Str$(eCount)].Add("lwpolyline", "entity")
-'                 GoSub Common
-'                 colgrp[Str$(eCount)].Add(p, "p")
-'                 For i = 0 To e.P.Max Step 2
-'                     flxPoints = New Float[]
-'                     flxPoints.Add(e.P[i])                   ' X
-'                     flxPoints.Add(e.P[i + 1])               ' Y
-'                     flxPoints.Add(0)                        ' Z
-'                     colgrp[Str$(eCount)]["p"].Add(flxPoints, "p" & Trim(Str(i / 2)))
-'                 Next
-'             Case "Ellipse"
-'                 colgrp[Str$(eCount)].Add("ellipse", "entity")
-'                 GoSub Common
-'                 colgrp[Str$(eCount)].Add(p, "p")
-'                 flxPoints.Add(e.P[0])                   ' X
-'                 flxPoints.Add(e.P[1])                   ' Y
-'                 flxPoints.Add(0)                        ' Z
-'                 colgrp[Str$(eCount)]["p"].Add(flxPoints, "p0")
-'                 flxPoints = New Float[]
-'                 flxPoints.Add(e.P[2])                   ' X
-'                 flxPoints.Add(e.P[3])                   ' Y
-'                 flxPoints.Add(0)                        ' Z
-'                 colgrp[Str$(eCount)]["p"].Add(flxPoints, "p1")
-'                 colgrp[Str$(eCount)].Add(e.fParam[0], "ratio")
-'                 colgrp[Str$(eCount)].Add(e.fParam[1], "start_angle")
-'                 colgrp[Str$(eCount)].Add(e.fParam[2], "end_angle")
-'             Case "Arc"
-'                 colgrp[Str$(eCount)].Add("arc", "entity")
-'                 GoSub Common
-'                 colgrp[Str$(eCount)].Add(p, "p")
-'                 flxPoints.Add(e.P[0])                   ' X
-'                 flxPoints.Add(e.P[1])                   ' Y
-'                 flxPoints.Add(0)                        ' Z
-'                 colgrp[Str$(eCount)]["p"].Add(flxPoints, "p0")
-'                 colgrp[Str$(eCount)].Add(e.fParam[0], "radius")
-'                 colgrp[Str$(eCount)].Add(e.fParam[1], "start_angle")
-'                 colgrp[Str$(eCount)].Add(e.fParam[2], "end_angle")
-'             Case "Circle"
-'                 colgrp[Str$(eCount)].Add("circle", "entity")
-'                 GoSub Common
-'                 colgrp[Str$(eCount)].Add(p, "p")
-'                 flxPoints.Add(e.P[0])                   ' X
-'                 flxPoints.Add(e.P[1])                   ' Y
-'                 flxPoints.Add(0)                        ' Z
-'                 colgrp[Str$(eCount)]["p"].Add(flxPoints, "p0")
-'                 colgrp[Str$(eCount)].Add(e.fParam[0], "radius")
-'             Case "Insert"
-'                 colgrp[Str$(eCount)].Add("insert", "entity")
-'                 GoSub Common
-'                 colgrp[Str$(eCount)].Add(p, "p")
-'                 flxPoints.Add(e.P[0])                   ' X
-'                 flxPoints.Add(e.P[1])                   ' Y
-'                 flxPoints.Add(0)                        ' Z
-'                 colgrp[Str$(eCount)]["p"].Add(flxPoints, "p0")
-'                 colgrp[Str$(eCount)].Add(e.fParam[0], "scalex")
-'                 colgrp[Str$(eCount)].Add(e.fParam[1], "scalex")
-'                 colgrp[Str$(eCount)].Add(1, "scalez")
-'                 colgrp[Str$(eCount)].Add(e.fParam[2], "angle")
-'                 colgrp[Str$(eCount)].Add(e.Block, "block")
-'
-'             Case "Text"
-'                 colgrp[Str$(eCount)].Add("text", "entity")
-'                 GoSub Common
-'                 colgrp[Str$(eCount)].Add(p, "p")
-'                 flxPoints.Add(e.P[0])                   ' X
-'                 flxPoints.Add(e.P[1])                   ' Y
-'                 flxPoints.Add(0)                        ' Z
-'                 colgrp[Str$(eCount)]["p"].Add(flxPoints, "p0")
-'                 colgrp[Str$(eCount)].Add(e.stringdata[0], "text")
-'                 colgrp[Str$(eCount)].Add(e.fParam[0], "angle")
-'                 colgrp[Str$(eCount)].Add(e.fParam[1], "text_height")
-'             Case "MText"
-'                 colgrp[Str$(eCount)].Add("mtext", "entity")
-'                 GoSub Common
-'                 colgrp[Str$(eCount)].Add(p, "p")
-'                 flxPoints.Add(e.P[0])                   ' X
-'                 flxPoints.Add(e.P[1])                   ' Y
-'                 flxPoints.Add(0)                        ' Z
-'                 colgrp[Str$(eCount)]["p"].Add(flxPoints, "p0")
-'                 colgrp[Str$(eCount)].Add(e.stringdata[0], "text")
-'                 colgrp[Str$(eCount)].Add(e.fParam[0], "angle")
-'                 colgrp[Str$(eCount)].Add(e.fParam[1], "text_height")
-'
-'         End Select
-'         Inc eCount
-'     Next
-'
-'     Return eCount
-'
-' Common:
-'     colgrp[Str$(eCount)].Add(e.Layer, "layer")
-'     colgrp[Str$(eCount)].Add(e.LineTypeName, "style")
-'     colgrp[Str$(eCount)].Add(e.colour, "colour")
-'     colgrp[Str$(eCount)].Add(e.LineWidth, "width")
-'     Return
-'
-' End
 
-'' obx = Entity array, sb = BLockname,
-
-'Public Sub ImpEnty3(vrx As Variant[], obx As Entity[])
-Public Sub ImpEnty3()
-
-  Dim vrx As Variant
-  Dim obx As Entity[]
-
-  Dim t As Integer                  '' Total number of entities
-  Dim p As Integer                  '' Coordinate component 0 = x axis, 1 = y axis
-  Dim v As Variant                  '' Coordinate component 0 = x axis, 1 = y axis
-  Dim e As Collection               '' Current Entity
-  Dim fxp As New Float[]            '' Center (circle, arc), start & end (line), vertex (lwpolyline)
-  Dim tag As String                 '' Variable tag name for data points
-  Dim fpt As Float
-  Dim ic As Integer                 '' Color
-  Dim iw As Integer                 '' Lineweight
-  Dim st As String                  '' Line Type
-  Dim cLty As Collection            '' Line Type list Key:Name
-  Dim sy As String                  '' Layer
-  Dim cLay As Collection            '' Layer list Key:Name
-  Dim vrt As Variant                '' Radius, Text[rotation,height,value]
-  Dim io As Integer                 '' Closed or Open
-  Dim sb As String
-  Dim cBlk As Collection            '' Block list Key:Name
-
-  If CurrentDrawing.cModel.Exist("OBJECTS") Then
-    vrx = CurrentDrawing.cModel["OBJECTS"]
-  Endif
-
-  obx = CurrentDrawing.arrEntities
-  cLty = CurrentDrawing.cLtypes
-  cLay = CurrentDrawing.cLayers
-  cBlk = CurrentDrawing.cBlocks
-
-  For Each e In vrx
-    If e.Exist("object") Then
-      If e["object"] = "LAYER" Then
-        If TypeOf(e["handle"]) = gb.Object Then
-          If cLay.Exist(CStr(e["handle"][1])) = False Then
-            cLay.Add([e["name"], e["color"], e["ltype"], e["linewt"]], CStr(e["handle"][1]))
-          Else
-            cLay[CStr(e["handle"][1])] = [e["name"], e["color"], e["ltype"], e["linewt"]]
-          Endif
-        Endif
-      Endif
-
-      If e["object"] = "LTYPE" Then
-        If TypeOf(e["handle"]) = gb.Object Then
-          If cLty.Exist(CStr(e["handle"][1])) = False Then
-            cLty.Add([e["name"], e["description"]], CStr(e["handle"][1]))
-          Else
-            cLty[CStr(e["handle"][1])] = [e["name"], e["description"]]
-          Endif
-        Endif
-      Endif
-
-      If e["object"] = "BLOCK_HEADER" Then
-        If TypeOf(e["handle"]) = gb.Object Then
-          If cBlk.Exist(CStr(e["handle"][1])) = False Then
-            cBlk.Add([e["name"], e["hasattrs"]], CStr(e["handle"][1]))
-          Else
-            cBlk[CStr(e["handle"][1])] = [e["name"], e["hasattrs"]]
-          Endif
-        Endif
-      Endif
-
-    Endif
-  Next
-
-  For Each e In vrx
-    fxp.Clear
-    If e.Exist("entity") Then
-      For Each tag In ["center", "start", "end", "ins_pt", "points"]
-        If e.Exist(tag) Then
-          If TypeOf(e[tag]) = gb.Object Then
-            Select tag
-              Case "points"
-                For Each v In e[tag]
-                  For p = 0 To 1
-                    fxp.Add(v[p])
-                  Next
-                Next
-              Case Else
-                For p = 0 To 1
-                  fxp.Add(e[tag][p])
-                Next
-            End Select
-          Endif
-        Endif
-      Next
-
-      ic = 7
-      If e.Exist("color") Then
-        If TypeOf(e["color"]) = gb.Object Then
-          If e["color"] Is Collection Or e["color"] Is JSONCollection Then
-            If e["color"].Exist("index") Then
-              ic = e["color"]["index"]
-            Else
-              ic = e["color"]
-            Endif
-          Endif
-        Else
-          ic = e["color"]
-        Endif
-      Endif
-
-      iw = 1
-      If e.Exist("linewt") Then
-        iw = e["linewt"]
-      Endif
-
-      st = "Continous"
-
-      If e.Exist("ltype_flags") Then
-        If TypeOf(e["ltype_flags"]) = gb.Object Then
-          cLty.Exist("0")
-          'st = e["ltype"]
-        Else
-          If cLty.Exist(CStr(e["ltype_flags"])) Then
-            st = cLty[CStr(e["ltype_flags"])]["name"]
-          Endif
-        Endif
-      Endif
-
-      'st = "Continous"
-      sy = "0"
-      sb = "" ' temp like ""
-
-      Select LCase$(e["entity"])
-
-        Case "line"
-          AddLine(obx, fxp, ic, iw, st, sy, sb)
-          obx.Last.Handle = IIf(e.Exist("handle"), e["handle"][1], sog.UUIDHandle(4))
-          Inc t
-        Case "lwpolyline"
-          'ic = 4
-          If e.Exist("flag") Then
-            Print e["flag"] & " : " & CStr(Bin(e["flag"], 8))
-            io = CByte(Mid(Bin(e["flag"], 8), 1, 1))
-          Endif
-          AddPolyLine(obx, fxp, io, ic, iw, st, sy, sb)
-          'obx.Last.Handle = IIf(e.Exist("handle"), e["handle"][1], sog.UUIDHandle(4))
-          'obx.Last.fParam.Add(IIf(e.Exist("flag"), CFloat(e["flag"]), 0))
-          'If e.Exist("flag") Then
-          '  If e["flag"] = 1 Then
-          '    Print "closed"
-          '  Endif
-          'Endif
-          'Print "Puntos: " & CStr(e["points"].Count) & " Mode: " & CStr(e["entmode"]) & " Flag: " & CStr(e["flag"])
-          Inc t
-
-        Case "circle"
-          vrt = e["radius"] ' Radius
-          AddCircle(obx, fxp, vrt, ic, iw, st, sy, sb)
-          obx.Last.Handle = IIf(e.Exist("handle"), e["handle"][1], sog.UUIDHandle(4))
-          Inc t
-
-        Case "text"
-          vrt = [IIf(e.Exist("rotation"), e["rotation"], 0), e["height"], e["text_value"]]
-          AddText(obx, fxp, vrt[0], vrt[1], vrt[2], ic, iw, st, sy, sb)
-          Inc t
-
-        Case "mtext"
-          vrt = [IIf(e.Exist("rotation"), e["rotation"], 0), e["text_height"], e["text"]] ' dxf 50,40,1
-          AddText(obx, fxp, vrt[0], vrt[1], vrt[2], ic, iw, st, sy, sb)
-          Inc t
-
-      End Select
-
-    Endif
-
-  Next
-
-  'Return t
-
-End
 
 '' Importa las cosas de manera descentralizada
-
-Public Sub ImpEnty4(vrx As Collection, obx As Entity[])
-
-  Dim e As Entity               ' Current Entity
-
-  Dim entNueva As Entity
-
-  For Each e In vrx                                         ' Para cada Coleccion de datos de vrx
-
-    If e.dwg.Exist("entity") Then                               ' es una entidad?
-
-      entNueva = New Entity                                 ' entonces, creamos una nueva
-
-      If clsEntities.ImportJsonToEntity(e.dwg, entNueva) Then   ' si esta implementada, llenamos los datos
-
-        obx.Add(entNueva)                                   ' lo agregamos al array
-
-        entNueva = Null                                     ' limpiamos
-
-      Else                                                  ' no esta implementada
-
-        Debug "Entidad no implementada:", e.dwg["entity"]
-
-      Endif
-
-    Endif
-
-  Next
-
-End
-
-'' Importa las cosas de manera descentralizada
-
 Public Sub ImpEnty5(cEny As Collection, obx As Entity[])
 
   Dim e As Collection               ' Current Entity
   Dim entNueva As Entity
 
   For Each e In cEny                                              ' Para cada Coleccion de datos de vrx
-    If e.Exist("entity") Then                                        ' es una entidad?
-      ' If e["entity"] = "ATTDEF" Then Stop
+    If e.Exist("entity") Then                                     ' es una entidad?
+      entNueva = New Entity                                       ' entonces, creamos una nueva
+
       If InStr("ATTDEFATTRIBLINELWPOLYLINECIRCLEELLIPSEARCTEXTMTEXTSPLINESOLIDLEADER", e["entity"]) = 0 Then Continue
 
-      If e.Exist("handle") Then
+      If clsEntities.ImportJsonToEntity(e, entNueva) Then         ' si esta implementada, llenamos los datos
+        If e.Exist("handle") Then
 
-        entNueva = New Entity                                       ' entonces, creamos una nueva
-        If clsEntities.ImportJsonToEntity(e, entNueva) Then         ' si esta implementada, llenamos los datos
-          'obx.Add(entNueva, gcd.UUHandleUnique(gcd.CurrentDrawing)) ' lo agregamos al la coleccion
           obx.Add(entNueva)
           entNueva = Null                                           ' limpiamos
         Else                                                        ' no esta implementada
           Debug "Entidad no implementada:", e["entity"]
         Endif
-      Endif
+      End If
     Endif
   Next
 
 End
 
-'' Importa la clave entidades de la coleccion y las coloca en el array de objetos
 
-Public Function ImportEntities2(colGrp As Collection, obxEntities As Entity[], Optional BlockName As String) As Integer
-
-  Dim i, iTotalEntities As Integer
-  Dim flxPoints As New Float[]
-  Dim P As Float[]
-  Dim ratio As Float
-  Dim fLinewt As Float
-  Dim colEnt As Collection
-  Dim sText As String
-  Dim iClosed As Integer
-  Dim iColor As Integer
-  Dim sLtype As String
-  Dim sLayer As String
-
-  For Each colEnt In colGrp
-    If colEnt.Exist("error") = False Then
-      flxPoints.Clear
-      fLinewt = 2.0 'colent["width"] 'Abs(LineWidth)
-      sLayer = colEnt["layer"]
-      iColor = colEnt["color"]
-      sLtype = colEnt["ltype"]
-
-      Select LCase$(colEnt["entity"]) 'colData.Key
-
-        Case "line"
-          GoSub GetPoints
-          AddLine(obxEntities, flxPoints, iColor, fLinewt, sLtype, sLayer, BlockName)
-          Inc iTotalEntities
-        Case "spline"
-          GoSub GetPoints
-          Try iClosed = colEnt["scenario"] ' TINCHO reparar esto para los DXF
-          AddSPLine(obxEntities, flxPoints, iClosed, iColor, fLinewt, sLtype, sLayer, BlockName)
-          Inc iTotalEntities
-        Case "lwpolyline", "polyline"
-          GoSub GetPoints
-          Try iClosed = colEnt["closed"] ' TINCHO reparar esto para los DXF
-          AddPolyLine(obxEntities, flxPoints, iClosed, iColor, fLinewt, sLtype, sLayer, BlockName)
-          Inc iTotalEntities
-        Case "solid"
-          GoSub GetPoints
-          AddSolid(obxEntities, flxPoints, iColor, fLinewt, sLtype, sLayer, BlockName)
-          Inc iTotalEntities
-        Case "ellipse"
-          GoSub GetPoints
-
-          AddEllipse(obxEntities, flxPoints, colEnt["ratio"], colEnt["start_angle"], colEnt["end_angle"], iColor, fLinewt, sLtype, sLayer, BlockName)
-          Inc iTotalEntities
-
-        Case "circle"
-          GoSub GetPoints
-          AddCircle(obxEntities, flxPoints, colEnt["radius"], iColor, fLinewt, sLtype, sLayer, BlockName)
-          Inc iTotalEntities
-
-        Case "arc"
-          GoSub GetPoints
-          AddArc(obxEntities, flxPoints, colEnt["radius"], colEnt["start_angle"], colEnt["end_angle"], iColor, fLinewt, sLtype, sLayer, BlockName)
-          Inc iTotalEntities
-
-        Case "insert"
-          GoSub GetPoints
-          ' Insert viene con el punto de insercion XYZ, no puedo usar la rutina lectora de puntos
-          'flxPoints.Add(colEnt["p"]["p0"][0])
-          'flxPoints.Add(colEnt["p"]["p0"][1])
-          'If LCase$(colEnt["block"]) = "toma aa" Then Stop
-          AddInsert(obxEntities, flxPoints, colEnt["scalex"], colEnt["scaley"], colEnt["angle"], iColor, sLtype, sLayer, colEnt["block"])
-          Inc iTotalEntities
-
-        Case "text"
-          GoSub GetPoints
-          'flxPoints.Add(colEnt["p"]["p0"][0])
-          'flxPoints.Add(colEnt["p"]["p0"][1])
-          sText = colEnt["text"]
-          Try sText = colEnt["text2"] & sText
-          AddText(obxEntities, flxPoints, colEnt["angle"], colEnt["text_height"], sText, iColor, fLinewt, sLtype, sLayer, BlockName)
-          Inc iTotalEntities
-
-        Case "mtext"
-          GoSub GetPoints
-          'flxPoints.Add(colEnt["p"]["p0"][0])
-          'flxPoints.Add(colEnt["p"]["p0"][1])
-          sText = colEnt["text"]
-          'If InStr(stext, "\\") > 0 Then Stop
-          Try sText = colEnt["text2"] & sText
-          AddMText(obxEntities, flxPoints, IIf(colEnt["angle"], colEnt["angle"], 0), colEnt["text_height"], sText, iColor, fLinewt, sLtype, sLayer, BlockName)
-          Inc iTotalEntities
-
-        Case "dimmension"
-          GoSub GetPoints
-          AddDim(obxEntities, flxPoints, colEnt["angle"], colEnt["text_height"], colEnt["text"], iColor, fLinewt, sLtype, sLayer, BlockName)
-          Inc iTotalEntities
-
-      End Select
-    Endif
-  Next
-
-  Return iTotalEntities
-
-GetPoints:              ' Leo los puntos que estan separados y los meto en un unico array de Float[]
-  flxPoints.Clear
-  For Each p In colEnt["p"]
-    For i = 0 To p.max Step 3
-      flxPoints.Add(p[i])                 'X
-      flxPoints.Add(p[i + 1])             'Y
-      'flxPoints.Add(p[i + 2])            'Z para uso futuro
-    Next
-  Next
-
-  Return
-
-End
 
 ' importing
 
@@ -1295,7 +802,7 @@ Public Function ApplyLayerProperties(Optional mode As Integer = 0)
 
     If mode = 1 Then
       ' reconstruyo el ID del layer en la entidad, para ello busco en la lista cual coincide con su nombre
-      For Each cLayer In gcd.CurrentDrawing.cModel["Layers"]
+      For Each cLayer In gcd.CurrentDrawing.cModel["LAYERS"]
         If e.layer = cLayer["name"] Then
           e.layerID = cLayer["id"]
           Break
@@ -1305,10 +812,10 @@ Public Function ApplyLayerProperties(Optional mode As Integer = 0)
     Endif
 
     ' nombre, el que pudo haber cambiado (exepto el "0")
-    e.layer = gcd.CurrentDrawing.cModel["Layers"][e.layerID]["name"]
+    e.layer = gcd.CurrentDrawing.cModel["LAYERS"][e.layerID]["name"]
 
     ' visibiliad
-    If gcd.CurrentDrawing.cModel["Layers"][e.layerID]["show"] Then e.visible = True Else e.visible = False
+    If gcd.CurrentDrawing.cModel["LAYERS"][e.layerID]["show"] Then e.visible = True Else e.visible = False
 
   Next
 
@@ -1322,7 +829,7 @@ Public Function ApplyLayerPropertieToEntity(e As Entity)
   'Dim LayerName As String
 
   ' reconstruyo el ID del layer en la entidad, para ello busco en la lista cual coincide con su nombre
-  For Each cLayer In gcd.CurrentDrawing.cModel["Layers"]
+  For Each cLayer In gcd.CurrentDrawing.cModel["LAYERS"]
     If e.layer = cLayer["name"] Then
       e.layerID = cLayer["id"]
       Break
@@ -1330,10 +837,10 @@ Public Function ApplyLayerPropertieToEntity(e As Entity)
   Next
 
   ' nombre, el que pudo haber cambiado (exepto el "0")
-  e.layer = gcd.CurrentDrawing.cModel["Layers"][e.layerID]["name"]
+  e.layer = gcd.CurrentDrawing.cModel["LAYERS"][e.layerID]["name"]
 
   ' visibiliad
-  If gcd.CurrentDrawing.cModel["Layers"][e.layerID]["show"] Then e.visible = True Else e.visible = False
+  If gcd.CurrentDrawing.cModel["LAYERS"][e.layerID]["show"] Then e.visible = True Else e.visible = False
 
 End
 
@@ -1344,7 +851,7 @@ Public Function GetLayerID(LayerName As String) As String
   ' FIXME: reparar post layers
   Return "1"
 
-  For Each cLayer In gcd.CurrentDrawing.cModel["Layers"]
+  For Each cLayer In gcd.CurrentDrawing.cModel["LAYERS"]
     If cLayer["name"] = LayerName Then Return cLayer["id"]
   Next
 
@@ -1386,3 +893,57 @@ Public Function UUHandleUnique(d As ClsDrawing) As String
   Return Hex(d.LastHandle, 6)
 
 End
+
+'' Devuelve un handle disponible unico para la coleccion de datos.
+Public Function GetNewHandle(c As Collection) As String
+
+  Dim i As Integer, s As String
+
+  i = c.Count
+  Try i = Val(c[c.Last].handle)
+  Do
+    Inc i
+    s = CStr(i) ' esto podria ser Hex
+    If Not c.Exist(s) Then
+      Return s
+    Endif
+
+  Loop
+
+End
+
+'' Updates the Graphics with the changes in the Model. Can be applied to certain entities only. Forces
+'' a Regen if specified.
+Public Function UpdateGraphics(Optional handles As String[] = [], DoRegen As Boolean = True)
+
+  Dim cEntity As Collection, entNueva As Entity
+
+  If handles.Count = 0 Then                   ' Update all entities
+
+    gcd.ImpEnty5(gcd.CurrentDrawing.cModel["ENTITIES"], gcd.CurrentDrawing.arrEntities)
+
+  Else                                        ' Update only entities with handles provided
+
+    For Each sHandle As String In handles
+
+      If gcd.CurrentDrawing.cModel["ENTITIES"].Exist(sHandle) Then  ' la actualizo
+
+        entNueva = New Entity                                       ' entonces, creamos una nueva
+        If clsEntities.ImportJsonToEntity(gcd.CurrentDrawing.cModel["ENTITIES"][sHandle], entNueva) Then         ' si esta implementada, llenamos los datos
+
+          gcd.CurrentDrawing.arrEntities.Add(entNueva)
+          entNueva = Null                                           ' limpiamos
+
+        Endif
+      Endif
+
+    Next
+
+  End If
+
+  If DoRegen Then Regen
+
+End
+
+
+

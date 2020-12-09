@@ -20,6 +20,11 @@ Public Const DrawingOrder As Integer = 0        ' 1 = draws first
 Public Const OrthogonalIgnored As Boolean = False
 Public Const OrthogonalForced As Boolean = False
 Public Const StretchAble As Boolean = True           ' Si lo puedo deformar
+
+' otras const
+Public Const TypeControls As Integer = 1
+Public Const TypeTangent As Integer = 2
+
 Public Selected As Boolean
 Public ForDeletion As Boolean = True        ' this must be falsed in Finish
 Public DrawAble As Boolean = False          ' True si durante la construccion ya tiene suficientes elementos para poder hacer una representacion digna
@@ -80,7 +85,13 @@ Public Sub Draw(oE As Entity)
   'oe.P.Clear
   'oe.P.Insert([10, 10, 70, 310, 210, 210, 210, 10])
   oE.ColorToPaint = gcd.GetGBColor(oE.colour, oE.Layerid)
-  calculateDrawingPoints(oe.p)
+
+  If oe.fParam[0] = Me.TypeControls Then
+    calculateDrawingPoints(oe.p)
+  Else
+    calculateDrawingPointsWithTangents(oe.p)
+  Endif
+
   GLplus.PolyLines(drawingPoints, oE.ColorToPaint, oE.LineWidth, oe.linetype)
 
 End
@@ -185,6 +196,118 @@ Public Sub Finish(oE As Entity, Optional ParamsDone As Integer = -1) As Boolean
     oE.ForDeletion = True
     oE.DrawAble = False
 
+  End If
+
+End
+
+Public Function calculateDrawingPointsWithTangents(points As Float[])
+
+  ' points es una copia de P
+
+  ' En este caso, los Fit points no se proveeen, por lo que se calculan como el punto medio entre puntos de tangente
+
+
+  Dim interval As Float = 1 / numDrawingPoints
+  Dim t As Float = interval
+  Dim i, segments, iPoints, sobran, i2, faltan As Integer
+  Dim p0, p1, p2, p3 As New Float[]
+
+  ' Tengo que ver cuantos puntos tengo, casos basicos
+  If points.Count / 2 <= 2 Then ' es una recta
+
+    drawingPoints.Insert(points.Copy())
+    Return
+
+  Else If points.Count / 2 = 3 Then
+    ' es una curva quadratica
+    ' para no generar otra formula, puedo engañarme generando un nuevo punto tangente igual al unico que tengo
+    ' con esto, transformo la curva en cubica, que es la curva que siempre tendre
+    p0.Insert(points.Copy(i, 2))
+    p1.Insert(points.Copy(i + 2, 2))
+    p2.Insert(points.Copy(i + 4, 2))
+    p3.Insert(points.Copy(i + 4, 2))
+    For iPoints = 0 To numDrawingPoints - 1
+      drawingPoints.insert(CalculateBezierPoint2D(t, p0, p1, p2, p3))
+      t += interval
+    Next
+    Return
+  Else If points.Count / 2 = 4 Then
+
+    p0.Insert(points.Copy(i, 2))
+    p1.Insert(points.Copy(i + 2, 2))
+    p2.Insert(points.Copy(i + 4, 2))
+    p3.Insert(points.Copy(i + 6, 2))
+    For iPoints = 0 To numDrawingPoints - 1
+      drawingPoints.insert(CalculateBezierPoint2D(t, p0, p1, p2, p3))
+      t += interval
+    Next
+    Return
+
+  Else ' tengo 4 o mas puntos, voy a dibujar lo que pueda
+
+
+    '   01 23 45 67 89 1011 1213 1415 1617 1819 Max = 19 Count=20
+    '    1  2  3  4  5    6    7    8    9   10
+    '    F  T  nTangentes.............   T    F
+    i = 0
+    Do
+
+      ' veo cuantos puntos me quedan
+      If (i = 0) And (points.count - i >= 8) Then   ' primer tramo
+
+        p0.Insert(points.Copy(i, 2))                ' PUNTO INICIAL
+        p1.Insert(points.Copy(i + 2, 2))            ' TANGENTE
+        p2.Insert(points.Copy(i + 4, 2))            ' TANGENTE
+
+        p3.Add((points[i + 6] + points[i + 4]) / 2) ' ESTE PUNTO DEBE SER CALCULADO
+        p3.Add((points[i + 7] + points[i + 5]) / 2)
+
+        i += 4
+
+      Else If points.count - i > 8 Then             ' tramos intermedios
+
+        p0.Add((points[i] + points[i + 2]) / 2)     ' PUNTO INICIAL, se calcula
+        p0.Add((points[i + 1] + points[i + 3]) / 2)
+
+        p1.Insert(points.Copy(i + 2, 2))            ' TANGENTE
+        p2.Insert(points.Copy(i + 2, 2))            ' TANGENTE, igual al anterior
+
+
+        p3.Add((points[i + 4] + points[i + 2]) / 2) ' ESTE PUNTO DEBE SER CALCULADO
+        p3.Add((points[i + 5] + points[i + 3]) / 2)
+
+        i += 2
+
+      Else If points.count - i = 8 Then             ' tramos intermedios
+
+        p0.Add((points[i] + points[i + 2]) / 2)     ' PUNTO INICIAL, se calcula
+        p0.Add((points[i + 1] + points[i + 3]) / 2)
+
+        p1.Insert(points.Copy(i + 2, 2))            ' TANGENTE
+
+        p2.Insert(points.Copy(i + 4, 2))            ' TANGENTE, igual al anterior
+
+        p3.Insert(points.Copy(i + 6, 2))            ' PUNTO FINAL,
+
+        i += 6
+
+
+
+      End If
+
+      t = 0
+      For iPoints = 0 To numDrawingPoints - 1
+
+        drawingPoints.insert(CalculateBezierPoint2D(t, p0, p1, p2, p3))
+        t += interval
+      Next
+
+      p0.Clear
+      p1.Clear
+      p2.Clear
+      p3.Clear
+
+    Loop Until I = points.Count - 2
   End If
 
 End
@@ -352,9 +475,16 @@ End
 ' Importo los datos que puedo procesar de una coleccion y genero un Entity para ser agregado a un array
 Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
 
-  Dim i As Integer
+
+  Dim i, iFinal As Integer
+  Dim fTangLargo As Float
+  Dim fControlPoints As New Float[]
+  Dim fFitPoint As New Float[]
+
 
   If c.Exist("ctrl_pts") Then
+
+    e.fParam.Add(Me.TypeControls)
     For i = 0 To c["ctrl_pts"].Max
       e.P.Add(c["ctrl_pts"][i]["x"])
       e.P.Add(c["ctrl_pts"][i]["y"])
@@ -362,16 +492,54 @@ Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
   End If
 
   If c.Exist("fit_pts") Then
+
+    e.fParam.Add(Me.TypeTangent)
     For i = 0 To c["fit_pts"].Max
       e.P.Add(c["fit_pts"][i][0])
-      e.P.Add(c["fit_pts"][i][0])
+      e.P.Add(c["fit_pts"][i][1])
     Next
+    ' fabrico control points ente fit_points
+
+    ' i = 2
+    ' Do
+    '
+    '   fControlPoints.Add((e.P[i] + e.P[i + 2]) / 2)
+    '   fControlPoints.Add((e.P[i + 1] + e.P[i + 3]) / 2)
+    '   fFitPoint.Add(e.P[i + 2])
+    '   fFitPoint.Add(e.P[i + 3])
+    '   e.P.insert(fControlPoints, i + 2)
+    '   e.P.Insert(fFitPoint, i + 4)
+    '   fControlPoints.Clear
+    '   fFitPoint.Clear
+    '   i = i + 6
+    ' Loop Until i > iFinal
+    '
+    '
+    If c.Exist("beg_tan_vec") Then
+      fTangLargo = puntos.distancia(e.P[0], e.P[1], e.P[2], e.P[3]) / 2
+      'fTangLargo = 1
+      e.P.Insert([e.P[0] + c["beg_tan_vec"][0] * fTangLargo, e.P[1] + c["beg_tan_vec"][1] * fTangLargo], 2)
+
+    Endif
+
+    If c.Exist("end_tan_vec") Then
+      fTangLargo = puntos.distancia(e.P[e.P.Max - 3], e.P[e.P.Max - 2], e.P[e.P.Max - 1], e.P[e.P.Max]) / 2
+      'fTangLargo = 1
+      e.P.Insert([e.P[e.P.Max - 1] - c["end_tan_vec"][0] * fTangLargo, e.P[e.P.Max] - c["end_tan_vec"][1] * fTangLargo], e.P.max - 1)
+
+    Endif
+
+
   End If
+
+  ' puede habre tangentes
+
+
+
+
 
   If e.P.Count = 0 Then e.P.Insert([0, 0, 0, 0, 0, 0, 0, 0])
 
-  ' FIXME: esto indica si es abierta o cerrada
-  e.fParam.Add(0)
 
   Return True
 
