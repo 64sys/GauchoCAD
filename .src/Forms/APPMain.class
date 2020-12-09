@@ -1523,7 +1523,8 @@ Public Sub btnLayers_MouseDown()
   'FLay = New FLayers1(gcd.CurrentDrawing.cModel["Layers"], [Workspace1.ScreenX, Workspace1.ScreenY])
   FLay = New FLayers1(gcd.CurrentDrawing.cModel, [Me.ScreenX, Me.ScreenY])
 
-  cVars = gcd.CurrentDrawing.cModel["Variables"]
+  'cVars = gcd.CurrentDrawing.cModel["Variables"]
+  cVars = gcd.CurrentDrawing.cModel["HEADER"]
 
   If SelectingLayer = False Then
     FLay.Stacking = Window.Above
@@ -1531,8 +1532,12 @@ Public Sub btnLayers_MouseDown()
     FLay.Run()
     Do
       If SelectingLayer = True Then
-        If cVars.Exist("clayer") Then
-          currLayer = cVars["clayer"]
+        If cVars.Exist("CLAYER") Then
+          If cVars["CLAYER"] <> "" Then
+            currLayer = cVars["CLAYER"]
+          Else
+            currLayer = "0"
+          Endif
         Else
           currLayer = "0"
         Endif

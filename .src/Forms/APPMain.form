@@ -493,6 +493,7 @@
           Orientation = Align.Right
           { Panel8 Panel
             MoveScaled(1,2,18,4)
+            Visible = False
             Arrangement = Arrange.Horizontal
             { ToolButton1 ToolButton
               MoveScaled(1,0,4,4)
@@ -503,13 +504,14 @@
             }
           }
           { TreeView1 TreeView
-            MoveScaled(2,11,16,16)
+            MoveScaled(1,7,17,14)
+            Visible = False
             Background = Color.TextBackground
             Expand = True
             Border = False
           }
           { ColumnView1 ColumnView
-            MoveScaled(1,24,18,16)
+            MoveScaled(1,23,18,16)
             Visible = False
             Expand = True
             Border = False
