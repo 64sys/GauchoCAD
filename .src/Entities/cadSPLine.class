@@ -352,8 +352,10 @@ End
 ' Importo los datos que puedo procesar de una coleccion y genero un Entity para ser agregado a un array
 Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
 
-  Dim i As Integer
-
+  Dim i, iFinal As Integer
+  Dim fTangLargo As Float
+  Dim fControlPoints As New Float[]
+  Dim fFitPoint As New Float[]
 
   If c.Exist("ctrl_pts") Then
     For i = 0 To c["ctrl_pts"].Max
@@ -365,9 +367,47 @@ Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
   If c.Exist("fit_pts") Then
     For i = 0 To c["fit_pts"].Max
       e.P.Add(c["fit_pts"][i][0])
-      e.P.Add(c["fit_pts"][i][0])
+      e.P.Add(c["fit_pts"][i][1])
     Next
+    ' fabrico control points ente fit_points
+
+    ' i = 2
+    ' Do
+    '
+    '   fControlPoints.Add((e.P[i] + e.P[i + 2]) / 2)
+    '   fControlPoints.Add((e.P[i + 1] + e.P[i + 3]) / 2)
+    '   fFitPoint.Add(e.P[i + 2])
+    '   fFitPoint.Add(e.P[i + 3])
+    '   e.P.insert(fControlPoints, i + 2)
+    '   e.P.Insert(fFitPoint, i + 4)
+    '   fControlPoints.Clear
+    '   fFitPoint.Clear
+    '   i = i + 6
+    ' Loop Until i > iFinal
+    '
+    '
+    If c.Exist("beg_tan_vec") Then
+      fTangLargo = puntos.distancia(e.P[0], e.P[1], e.P[2], e.P[3]) / 4
+      'fTangLargo = 1
+      e.P.Insert([e.P[0] + c["beg_tan_vec"][0] * fTangLargo, e.P[1] + c["beg_tan_vec"][1] * fTangLargo], 2)
+
+    Endif
+
+    If c.Exist("end_tan_vec") Then
+      fTangLargo = puntos.distancia(e.P[e.P.Max - 3], e.P[e.P.Max - 2], e.P[e.P.Max - 1], e.P[e.P.Max]) / 4
+      'fTangLargo = 1
+      e.P.Insert([e.P[e.P.Max - 1] - c["end_tan_vec"][0] * fTangLargo, e.P[e.P.Max] - c["end_tan_vec"][1] * fTangLargo], e.P.max - 1)
+
+    Endif
+
+
   End If
+
+  ' puede habre tangentes
+
+
+
+
 
   If e.P.Count = 0 Then e.P.Insert([0, 0, 0, 0, 0, 0, 0, 0])
 

@@ -189,55 +189,6 @@ Public Sub glGenDrawList(Optional iEntity As Integer = -1)
 
 End
 
-'' Genera las listas GL de cada entidad individual, y la version seleccionada
-'' Borra la lista anterior y genera una nueva
-' Public Sub glGenDrawList2(Optional hEntity As String = "")
-'
-'   Dim idDrawing As Integer ' la instancia de dibujo en la que estamos
-'   Dim i As Integer, e As Entity
-'
-'   If hEntity <> "" Then
-'     e = gcd.CurrentDrawing.cEntities[hEntity]
-'     If Not gl.islist(e.glDrwList) Then e.glDrwList = gl.GenLists(1)
-'     gl.NewList(e.glDrwList, gl.COMPILE)
-'     e.ClassHandler.Draw(e)
-'     gl.EndList
-'
-'     If Not gl.islist(e.glDrwListSel) Then e.glDrwListSel = gl.GenLists(1)
-'     gl.NewList(e.glDrwListSel, gl.COMPILE)
-'     e.ClassHandler.DrawSelected(e)
-'     gl.EndList
-'
-'   Else
-'
-'     If Not gl.islist(gcd.CurrentDrawing.GlListAllEntities) Then gcd.CurrentDrawing.GlListAllEntities = gl.GenLists(1)
-'     Dim t As Float = Timer
-'     ' listas de entidades
-'     For Each e In gcd.CurrentDrawing.cModel["ENTITIES"]
-'
-'       If Not gl.islist(e.glDrwList) Then e.glDrwList = gl.GenLists(1)
-'       gl.NewList(e.glDrwList, gl.COMPILE)
-'       e.ClassHandler.Draw(e)
-'       gl.EndList
-'
-'     Next
-'
-'     ' lista de entidaes seleccionadas
-'     For Each e In gcd.CurrentDrawing.cModel["ENTITIES"]
-'       If Not gl.islist(e.glDrwListSel) Then e.glDrwListSel = gl.GenLists(1)
-'       gl.NewList(e.glDrwListSel, gl.COMPILE)
-'       e.ClassHandler.DrawSelected(e)
-'       gl.EndList
-'     Next
-'
-'     ' lista de todas las entidades
-'     t = Timer
-'     GLGenDrawListAll
-'
-'     Debug "GLlista de todas CON HANDLE generada en  ", Timer - t
-'   End If
-'
-' End
 
 
 
@@ -1150,3 +1101,19 @@ Catch
   Return False
 
 End
+
+Public Function GetEntityIndex(dDrawing As ClsDrawing, sHandle As String, Optional iStart As Integer = 0) As Integer
+
+  Dim i As Integer
+
+  For i = iStart To dDrawing.arrEntities.Max
+
+    If dDrawing.arrEntities[i].Handle = sHandle Then Return i
+
+  Next
+
+  Return -1           ' no hay handle asociada a esa entidad
+
+
+End
+

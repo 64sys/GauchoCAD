@@ -1091,12 +1091,10 @@ Public Sub gTask(sTask As String)
             If Lower(File.Ext(f)) = "dwg" Or Lower(File.Ext(f)) = "json" Then
               gcd.CurrentDrawing.FileName = f
               gcd.CurrentDrawing.cModel = dwg.Raw(f)
-              'clsEntities.UpdateEntitiesFromDWG(gcd.CurrentDrawing.cModel["ENTITIES"])
-              'gcd.ImpEnty4(gcd.CurrentDrawing.cModel["ENTITIES"], gcd.CurrentDrawing.arrEntities)
-              gcd.ImpEnty5(gcd.CurrentDrawing.cModel["ENTITIES"], gcd.CurrentDrawing.arrEntities)
+              gcd.UpdateGraphics()
 
               Me.Text = f
-              regen
+
               LoadMenu()
             Endif
           Endif
