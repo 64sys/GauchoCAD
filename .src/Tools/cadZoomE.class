@@ -34,7 +34,7 @@ Public limits As New Float[]
 
 '  ViewportX/2 = Pixels(Px) + PanX , despejando PanX = ViewportX/2 - Pixels(Px)
 
-Public Function Start(Optional ElemToBuild As Variant, Optional _Mode As Integer = 0) As Boolean
+Public Function Start(Optional ElemToBuild As Variant, _Mode As Integer = 0) As Boolean
 
   If _mode <> 1 Then
 

@@ -66,7 +66,6 @@ End
 
 Public Function MouseDown(mouseX As Integer, mouseY As Integer) ' called by FCAD-> DrawingArea_MouseDown
 
-  ' This too does nothing here, but you can use it
 
 End
 
