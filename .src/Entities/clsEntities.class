@@ -190,8 +190,6 @@ Public Sub glGenDrawList(Optional iEntity As Integer = -1)
 End
 
 
-
-
 '' Generates a GL list for the selected
 '' Mode: 0=Selected version 1=Normal version
 Public Sub glGenDrawListSel(Optional mode As Integer = 0)
@@ -1075,14 +1073,11 @@ Public Function ImportJsonToEntity(c As JSONCollection, e As Entity) As Boolean
   Dim clsHandler As Object
 
   ' If Not c.Exist("entity") Then Return False
+  ' If Not c "entity") Then Return False
 
   clsHandler = Object.New("cad" & c["entity"])  ' obtenemos el tipo de entidad y buscamos su clase. Si no manjemos esa entidad, esto de error.
-Finally
-  If IsNull(clsHandler) Then
-    e.ClassHandler = cadDummy
-    Return False
-
-  Else If clsHandler.ImportJSONCol(c, e) Then      ' le pedimos a la clase que arme un objeto Entity para agregar al Drawing actual
+  'Finally
+  If clsHandler.ImportJSONCol(c, e) Then      ' le pedimos a la clase que arme un objeto Entity para agregar al Drawing actual
     ' llenamos Common data:
     e.layerID = c["layer"][3]
     e.colour = c["color"]
@@ -1094,9 +1089,13 @@ Finally
 
     Return True
 
+  Else
+
+    Return False
+
   End If
 
-Catch
+  'Catch
   e.ClassHandler = cadDummy
   Return False
 

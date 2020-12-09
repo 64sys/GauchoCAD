@@ -1091,7 +1091,8 @@ Public Sub gTask(sTask As String)
             If Lower(File.Ext(f)) = "dwg" Or Lower(File.Ext(f)) = "json" Then
               gcd.CurrentDrawing.FileName = f
               gcd.CurrentDrawing.cModel = dwg.Raw(f)
-              gcd.UpdateGraphics()
+              gcd.UpdateGraphics()                            ' actualizamos los graficos con el modelo recien cargado
+              cadZoomE.Start()                                ' por ahora mostramos el dibujo centrado, hasta q leamos el estado anterior
 
               Me.Text = f
 

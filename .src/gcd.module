@@ -512,6 +512,11 @@ Public Sub ImpEnty5(cEny As Collection, obx As Entity[])
     If e.Exist("entity") Then                                     ' es una entidad?
       entNueva = New Entity                                       ' entonces, creamos una nueva
       If clsEntities.ImportJsonToEntity(e, entNueva) Then         ' si esta implementada, llenamos los datos
+    If e.Exist("entity") Then                                        ' es una entidad?
+      ' If e["entity"] = "ATTDEF" Then Stop
+      If InStr("ATTDEFATTRIBLINELWPOLYLINECIRCLEELLIPSEARCTEXTMTEXTSPLINESOLIDLEADER", e["entity"]) = 0 Then Continue
+
+      If e.Exist("handle") Then
 
         obx.Add(entNueva)
         entNueva = Null                                           ' limpiamos
@@ -939,4 +944,6 @@ Public Function UpdateGraphics(Optional handles As String[] = [], DoRegen As Boo
   If DoRegen Then Regen
 
 End
+
+
 

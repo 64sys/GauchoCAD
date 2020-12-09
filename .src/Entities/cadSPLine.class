@@ -189,6 +189,150 @@ Public Sub Finish(oE As Entity, Optional ParamsDone As Integer = -1) As Boolean
 
 End
 
+Public Function calculateDrawingPointsWithTangents(points As Float[])
+
+  ' points es una copia de P
+
+  ' En este caso, los Fit points no se proveeen, por lo que se calculan como el punto medio entre puntos de tangente
+
+
+  Dim interval As Float = 1 / numDrawingPoints
+  Dim t As Float = interval
+  Dim i, segments, iPoints, sobran, i2, faltan As Integer
+  Dim p0, p1, p2, p3 As New Float[]
+
+  ' Tengo que ver cuantos puntos tengo, casos basicos
+  If points.Count / 2 <= 2 Then ' es una recta
+
+    drawingPoints.Insert(points.Copy())
+    Return
+
+  Else If points.Count / 2 = 3 Then
+    ' es una curva quadratica
+    ' para no generar otra formula, puedo engañarme generando un nuevo punto tangente igual al unico que tengo
+    ' con esto, transformo la curva en cubica, que es la curva que siempre tendre
+    p0.Insert(points.Copy(i, 2))
+    p1.Insert(points.Copy(i + 2, 2))
+    p2.Insert(points.Copy(i + 4, 2))
+    p3.Insert(points.Copy(i + 4, 2))
+    For iPoints = 0 To numDrawingPoints - 1
+      drawingPoints.insert(CalculateBezierPoint2D(t, p0, p1, p2, p3))
+      t += interval
+    Next
+    Return
+  Else If points.Count / 2 = 4 Then
+
+    p0.Insert(points.Copy(i, 2))
+    p1.Insert(points.Copy(i + 2, 2))
+    p2.Insert(points.Copy(i + 4, 2))
+    p3.Insert(points.Copy(i + 6, 2))
+    For iPoints = 0 To numDrawingPoints - 1
+      drawingPoints.insert(CalculateBezierPoint2D(t, p0, p1, p2, p3))
+      t += interval
+    Next
+    Return
+
+  Else ' tengo 4 o mas puntos, voy a dibujar lo que pueda
+
+
+    '   01 23 45 67 89 1011 1213 1415 1617 1819 Max = 19 Count=20
+    '    1  2  3  4  5    6    7    8    9   10
+    '    F  T  nTangentes.............   T    F
+    i = 0
+    Do
+
+      ' veo cuantos puntos me quedan
+      If (i = 0) And (points.count - i >= 8) Then   ' primer tramo
+
+        p0.Insert(points.Copy(i, 2))                ' PUNTO INICIAL
+        p1.Insert(points.Copy(i + 2, 2))            ' TANGENTE
+        p2.Insert(points.Copy(i + 4, 2))            ' TANGENTE
+        ' ESTE PUNTO DEBE SER CALCULADO
+
+        p3.Add((points[i + 6] + points[i + 4]) / 2)
+        p3.Add((points[i + 7] + points[i + 5]) / 2)
+
+        i += 4
+
+      Else If points.count - i = 6 Then             ' tramos intermedios
+
+        p0.Add((points[i] + points[i + 2]) / 2)     ' PUNTO INICIAL, se calcula
+        p0.Add((points[i + 1] + points[i + 3]) / 2)
+
+        p1.Insert(points.Copy(i + 2, 2))            ' TANGENTE
+        p2.Insert(points.Copy(i + 2, 2))            ' TANGENTE, igual al anterior
+
+
+        p3.Add((points[i + 6] + points[i + 4]) / 2) ' ESTE PUNTO DEBE SER CALCULADO
+        p3.Add((points[i + 7] + points[i + 5]) / 2)
+
+        i += 2
+
+
+      Else If points.count - i = 4 Then  ' caso C: Tengo Fit+Control (nuevo)
+
+        '   01 23 45 67 89  Max = 9 Count=10
+        '    1  2  3  4  5
+        '    F  C  C  F  C
+
+        ' duplico el ultimo Control point
+        points.Add(0)
+        points.Add(0)
+        points[points.max - 1] = points[points.max - 3]
+        points[points.max] = points[points.max - 2]
+
+        ' tengo q engañar a clsEntityBuilder
+        'clsEntityBuilder.iPoints = points.Count / 2
+        clsEntityBuilder.MoveOn()
+
+        '   01 23 45 67 89 1011 Max = 11 Count=12
+        '    1  2  3  4  5    6
+        '    F  C  C  F  C    C
+        '          ^-----|
+        ' el control point agregado es correlativo al de la curva anterior
+        points[points.max - 3] = 2 * points[points.max - 5] - points[points.Max - 7]
+        points[points.max - 2] = 2 * points[points.max - 4] - points[points.Max - 6]
+
+        ' ahora la tomo como un tipo B
+
+        p0.Insert(points.Copy(i, 2))
+        p1.Insert(points.Copy(i + 2, 2))
+        p2.Insert(points.Copy(i + 4, 2))
+        p3.Insert(points.Copy(i + 4, 2))
+
+      Else If points.count - i = 2 Then  ' no hay nada q dibujar
+        p0.Insert(points.Copy(i, 2))
+        p1.Insert(points.Copy(i, 2))
+        p2.Insert(points.Copy(i, 2))
+        p3.Insert(points.Copy(i, 2))
+
+      End If
+
+
+      ' ============================================================
+      ' DIBUJO
+      ' ============================================================
+      'modUtils.DebugMatrix(points, 20)
+
+      'Debug Format(p0[0], "0.00"), Format(p0[1], "0.00"), Format(p1[0], "0.00"), Format(p1[1], "0.00"), Format(p2[0], "0.00"), Format(p2[1], "0.00"), Format(p3[0], "0.00"), Format(p3[1], "0.00")
+
+      t = 0
+      For iPoints = 0 To numDrawingPoints - 1
+
+        drawingPoints.insert(CalculateBezierPoint2D(t, p0, p1, p2, p3))
+        t += interval
+      Next
+
+      p0.Clear
+      p1.Clear
+      p2.Clear
+      p3.Clear
+
+    Loop Until I > points.Count
+  End If
+
+End
+
 Public Function calculateDrawingPoints(points As Float[]) ' points es una copia de P
 
   Dim interval As Float = 1 / numDrawingPoints
@@ -352,10 +496,12 @@ End
 ' Importo los datos que puedo procesar de una coleccion y genero un Entity para ser agregado a un array
 Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
 
+
   Dim i, iFinal As Integer
   Dim fTangLargo As Float
   Dim fControlPoints As New Float[]
   Dim fFitPoint As New Float[]
+
 
   If c.Exist("ctrl_pts") Then
     For i = 0 To c["ctrl_pts"].Max
