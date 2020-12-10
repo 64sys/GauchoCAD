@@ -1100,7 +1100,7 @@ Public Sub gTask(sTask As String)
             Else If Lower(File.Ext(f)) = "dxf" Then
               gcd.CurrentDrawing.FileName = f
               cadDxf.arrToFill = gcd.CurrentDrawing.arrEntities
-              cadDxf.LoadFile(f, True, False, True)
+              cadDxf.LoadFile(f, False, False, True)
               regen
               ' modelo recien cargado
               cadZoomE.Start()                                ' por ahora mostramos el dibujo centrado, hasta q leamos el estado anterior

@@ -21,17 +21,7 @@
 ' Boston, MA  02110-1301  USA
 Create Static
 
-Public Struct arrBlockSt
-  name As String
-  x As Float
-  y As Float
-  scaleX As Float
-  scaleY As Float
-  degRotation As Float
-  mirrored As Boolean
-  layer As String
-  entities As Entity[]
-End Struct
+
 
 Public Const Gender As String = "Dimension"
 Public Const DrawingOrder As Integer = 100 ' 1 a 32.724 esto debe Drawse primero y ser sobreescrito por el resto
@@ -147,7 +137,7 @@ Public iBloque As Integer
 '' Mode = DimType ver gcd.DimXXXX constants
 Public Function Start(Optional Mode As Integer = gcd.dimRadius)
 
-  Dim newBlock As New ArrBlockSt, eParte As Entity
+  Dim newBlock As New Block, eParte As Entity
   Dim f1, f2 As New Float[]
 
   Inc TotalDimensions

@@ -60,20 +60,10 @@ Public cImport As New Collection    '' Impor data from dxf, dwg is loaded here
 ' ===============================================================================================================================
 ' GRAPHICS
 ' ===============================================================================================================================
-Public Struct arrBlockSt
-  name As String
-  x As Float
-  y As Float
-  scaleX As Float
-  scaleY As Float
-  degRotation As Float
-  mirrored As Boolean
-  layer As String
-  entities As Entity[]
-End Struct
+
 
 Public arrExtras As New Entity[]          ' For entities
-Public arrBlocks As New ArrBlockSt[]
+Public arrBlocks As New Block[]
 Public arrEntities As New Entity[]          '' were al elements live
 Public arrTmp As New Entity[]               '' Temporal array to put a copy of an entity before change something in it
 Public arrUndo As New Entity[]              '' An array to put an unmodified copy of an entity before modifying it and then restoring it to the previous version.
