@@ -454,6 +454,7 @@ End
 
 Public Sub Finish()
 
+
   gcd.CurrentDrawing.arrEntities.Add(elem)
 
   elem.ClassHandler.Finish(elem, elem.ClassHandler.StepsDone)
@@ -465,9 +466,7 @@ Public Sub Finish()
   clsDefaultJob.PoiChecking = True
   clsDrawingAids.CleanTexts
 
-  ' sort them
-  'gcd.CurrentDrawing.arrEntities.Sort()
-  'clsMouseTracking.ReBuildPOIPoints
+
   clsEntities.GLGenDrawList
 
   appmain.redraw

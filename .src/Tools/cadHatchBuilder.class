@@ -103,7 +103,7 @@ Public Function Start(Optional filename As Variant, Optional _mode As Integer = 
             entHatch.colour = appmain.CurrentColor
             entHatch.ColorToPaint = Starter.gColor[entHatch.colour]
 
-            If gcd.CurrentDrawing.arrEntities[gcd.CurrentDrawing.arrSelecIndex[0]].Gender <> "PLine" Then
+            If gcd.CurrentDrawing.arrEntities[gcd.CurrentDrawing.arrSelecIndex[0]].Gender <> "LWPolyline" Then
               If gcd.CurrentDrawing.arrEntities[gcd.CurrentDrawing.arrSelecIndex[0]].PolyLine.Count >= 6 Then
                 entHatch.P.Insert(gcd.CurrentDrawing.arrEntities[gcd.CurrentDrawing.arrSelecIndex[0]].PolyLine.Copy())
               Endif
