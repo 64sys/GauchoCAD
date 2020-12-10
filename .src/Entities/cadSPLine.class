@@ -22,8 +22,8 @@ Public Const OrthogonalForced As Boolean = False
 Public Const StretchAble As Boolean = True           ' Si lo puedo deformar
 
 ' otras const
-Public Const TypeControls As Integer = 1
-Public Const TypeTangent As Integer = 2
+Public Const TypeControls As Integer = 0
+Public Const TypeTangent As Integer = 1
 
 Public Selected As Boolean
 Public ForDeletion As Boolean = True        ' this must be falsed in Finish
@@ -88,7 +88,7 @@ Public Sub Draw(oE As Entity)
 
   If oe.fParam[0] = Me.TypeControls Then
     calculateDrawingPoints(oe.p)
-  Else
+  Else If oe.fParam[0] = Me.TypeTangent Then
     calculateDrawingPointsWithTangents(oe.p)
   Endif
 

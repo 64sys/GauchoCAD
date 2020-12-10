@@ -860,7 +860,7 @@ End
 Public Function GetGBColor(CADcolor As Integer, layerID As String) As Integer
 
   ' FIXME: reparar post layers
-  'Return Starter.flgWhiteAndBlack
+  Return Starter.flgWhiteAndBlack
 
   ' color
   If CADcolor = 256 Then          ' buscar color del layer

@@ -398,7 +398,7 @@ Public Procedure LoadFile(stn As String, Optional IgnoreLayers As Boolean = Fals
       End If
       mPolyLinePointsCount += mPolyLine.p.Count / 2
       Inc mPolyLineCount
-      gcd.AddPolyLine(arrToFill, mPolyLine.p, mCommon.bColor, 1, mCommon.linetype, mCommon.layer, mBlock.block_name)
+      gcd.AddPolyLine(arrToFill, mPolyLine.p, mPolyLine.poliflag, mCommon.bColor, 1, mCommon.linetype, mCommon.layer, mBlock.block_name)
 
       '-----------------------------------------------------------
       ' LAYER
@@ -433,7 +433,7 @@ Public Procedure LoadFile(stn As String, Optional IgnoreLayers As Boolean = Fals
       ' DIMSTYLE
       '-----------------------------------------------------------
 
-    Else If (lpcode = "0") And (lpvalue = "DIMSTYLE") Then
+    Else If (lpcode = "0") And (lpvalue = "DIMSTYLE") And Not IgnoreData Then
       Dim newCol As New Collection
 
       ReadData
@@ -559,7 +559,7 @@ Public Procedure LoadFile(stn As String, Optional IgnoreLayers As Boolean = Fals
 
       Inc mSplineCount
 
-      gcd.AddSPLine(arrToFill, mSpline.p, mCommon.bColor, 1, mCommon.linetype, mCommon.layer, mBlock.block_name)
+      gcd.AddSPLine(arrToFill, mSpline.p, 0, mCommon.bColor, 1, mCommon.linetype, mCommon.layer, mBlock.block_name)
 
       '-----------------------------------------------------------
       ' TEXT
@@ -586,7 +586,7 @@ Public Procedure LoadFile(stn As String, Optional IgnoreLayers As Boolean = Fals
         If lpcode = "62" Then mCommon.bColor = CInt(lpvalue)        ' Color code (no es RBG) (256=ByLayer)
         If lpcode = "10" Then mText.x = CFloat(lpValue)         ' X1
         If lpcode = "20" Then mText.y = CFloat(lpValue)         ' Y1
-        If lpcode = "40" Then mText.altura = Val(lpValue)         ' Altura
+        If lpcode = "40" Then mText.altura = CFloat(lpValue)         ' Altura
         If lpcode = "1" Then mText.texto = lpValue                 ' Texto
         If lpcode = "50" Then mText.rotacion = CFloat(lpValue)      ' rotacion
         ReadData
@@ -610,7 +610,7 @@ Public Procedure LoadFile(stn As String, Optional IgnoreLayers As Boolean = Fals
         If lpcode = "62" Then mCommon.bColor = CInt(lpvalue)        ' Color code (no es RBG) (256=ByLayer)
         If lpcode = "10" Then mMText.x = CFloat(lpValue)                ' X1
         If lpcode = "20" Then mMText.y = CFloat(lpValue)                ' Y1
-        If lpcode = "40" Then mMText.altura = Val(lpValue)              ' Altura
+        If lpcode = "40" Then mMText.altura = CFloat(lpValue)              ' Altura
         If lpcode = "3" Or lpcode = "1" Then mMText.texto &= lpValue    ' Texto
         If lpcode = "50" Then mMText.rotacion = CFloat(lpValue)      ' rotacion
         ReadData
