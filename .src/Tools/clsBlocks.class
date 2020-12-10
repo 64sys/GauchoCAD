@@ -23,19 +23,8 @@
 Inherits ToolsBase
 Public Const Gender As String = "Blocks"
 
-Public Struct arrBlockSt
-  name As String
-  x As Float
-  y As Float
-  scaleX As Float
-  scaleY As Float
-  degRotation As Float
-  mirrored As Boolean
-  layer As String
-  entities As Entity[]
-End Struct
 
-Public eBlock As New ArrBlockSt
+Public eBlock As New Block
 
 Public Function Start(Optional filename As Variant, Optional _mode As Integer = 0) As Boolean
 
