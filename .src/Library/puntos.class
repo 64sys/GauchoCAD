@@ -31,7 +31,7 @@
 
 Create Static
 Create Private
-'Fast Unsafe
+Fast Unsafe
 Public HookSize As Integer = 16                       ' for use with poi
 Public NumericTolerance As Float = 1e-7
 Public GridSpacing As Float = 0.5

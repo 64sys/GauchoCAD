@@ -1,6 +1,7 @@
 ' Gambas class file
 
 Create Static
+Fast Unsafe
 
 ' poi
 Public flgSearchingPOI As Boolean
@@ -21,74 +22,74 @@ End
 '' Creo el array de POIpoints
 '' son los puntos que van a enganchar el mouse
 
-Fast Unsafe Public Sub ReBuildPOIPoints()
+Public Sub ReBuildPOIPoints()
 
-Dim i, ii, n As Integer, EPoi As New Integer[], nPois As Integer
-Dim rData As New Float[]
-Dim e, breathe, iPoligon, iLine, iTotalPoints As Integer
-Dim t As Float = Timer
+  Dim i, ii, n As Integer, EPoi As New Integer[], nPois As Integer
+  Dim rData As New Float[]
+  Dim e, breathe, iPoligon, iLine, iTotalPoints As Integer
+  Dim t As Float = Timer
 
-gcd.CurrentDrawing.poiPoints.Clear           ' limpio
-gcd.CurrentDrawing.poiType.Clear
+  gcd.CurrentDrawing.poiPoints.Clear           ' limpio
+  gcd.CurrentDrawing.poiType.Clear
 
-iTotalPoints = PoiTotalPoints()         ' calculo el tamaño total para redimensionar, esto es mas rapido que ir insertando
+  iTotalPoints = PoiTotalPoints()         ' calculo el tamaño total para redimensionar, esto es mas rapido que ir insertando
 
-gcd.CurrentDrawing.poiType.Resize(iTotalPoints)
-gcd.CurrentDrawing.poiEntities.Resize(iTotalPoints)
-gcd.CurrentDrawing.poiPoints.Resize(iTotalPoints * 2)
+  gcd.CurrentDrawing.poiType.Resize(iTotalPoints)
+  gcd.CurrentDrawing.poiEntities.Resize(iTotalPoints)
+  gcd.CurrentDrawing.poiPoints.Resize(iTotalPoints * 2)
 
-For e = 0 To gcd.CurrentDrawing.arrEntities.Max
+  For e = 0 To gcd.CurrentDrawing.arrEntities.Max
 
-  For i = 0 To gcd.CurrentDrawing.arrEntities[e].PoiType.Max
-    gcd.CurrentDrawing.poiType[ii] = gcd.CurrentDrawing.arrEntities[e].PoiType[i]
-    gcd.CurrentDrawing.poiEntities[ii] = e
-    gcd.CurrentDrawing.poiPoints[ii * 2] = gcd.CurrentDrawing.arrEntities[e].PoiPoints[i]
-    gcd.CurrentDrawing.poiPoints[ii * 2 + 1] = gcd.CurrentDrawing.arrEntities[e].PoiPoints[i + 1]
-    Inc ii
+    For i = 0 To gcd.CurrentDrawing.arrEntities[e].PoiType.Max
+      gcd.CurrentDrawing.poiType[ii] = gcd.CurrentDrawing.arrEntities[e].PoiType[i]
+      gcd.CurrentDrawing.poiEntities[ii] = e
+      gcd.CurrentDrawing.poiPoints[ii * 2] = gcd.CurrentDrawing.arrEntities[e].PoiPoints[i]
+      gcd.CurrentDrawing.poiPoints[ii * 2 + 1] = gcd.CurrentDrawing.arrEntities[e].PoiPoints[i + 1]
+      Inc ii
+    Next
+
+  Next
+  Debug "POI points built in ", Timer - t
+
+  For e = 1 To gcd.CurrentDrawing.arrEntities.Max
+    If e = gcd.CurrentDrawing.arrEntities.Max Then t = Timer
+
+    RebuilIntersections(e)
+
   Next
 
-Next
-Debug "POI points built in ", Timer - t
-
-For e = 1 To gcd.CurrentDrawing.arrEntities.Max
-  If e = gcd.CurrentDrawing.arrEntities.Max Then t = Timer
-
-  RebuilIntersections(e)
-
-Next
-
-Debug "POI points built in ", Timer - t
+  Debug "POI points built in ", Timer - t
 
 End
 
-Fast Unsafe Public Sub RebuilIntersections(iEntity As Integer)
+Public Sub RebuilIntersections(iEntity As Integer)
 
-Dim i, i2, n As Integer, EPoi As New Integer[], nPois As Integer
-Dim rData As New Float[]
-Dim breathe, iPoligon, iLine, iTotalPoints As Integer
-Dim t As Float = Timer
-Dim e As Entity
+  Dim i, i2, n As Integer, EPoi As New Integer[], nPois As Integer
+  Dim rData As New Float[]
+  Dim breathe, iPoligon, iLine, iTotalPoints As Integer
+  Dim t As Float = Timer
+  Dim e As Entity
 
-e = gcd.CurrentDrawing.arrEntities[iEntity]
+  e = gcd.CurrentDrawing.arrEntities[iEntity]
 
-' veo cada caso en particular
-Select Case e.Gender
-  Case "Line"
-    For i2 = iEntity - 1 To 0 Step -1
+  ' veo cada caso en particular
+  Select Case e.Gender
+    Case "Line"
+      For i2 = iEntity - 1 To 0 Step -1
 
-      Select Case gcd.CurrentDrawing.arrEntities[i2].Gender
+        Select Case gcd.CurrentDrawing.arrEntities[i2].Gender
 
-        Case "Line"
-          If puntos.doIntersect(e.P[0], e.P[1], e.P[2], e.P[3], gcd.CurrentDrawing.arrEntities[i2].P[0], gcd.CurrentDrawing.arrEntities[i2].P[1], gcd.CurrentDrawing.arrEntities[i2].P[2], gcd.CurrentDrawing.arrEntities[i2].P[3]) Then
-            gcd.CurrentDrawing.poiPoints.Insert(puntos.lineLineIntersection([e.P[0], e.P[1]], [e.P[2], e.P[3]], [gcd.CurrentDrawing.arrEntities[i2].P[0], gcd.CurrentDrawing.arrEntities[i2].P[1]], [gcd.CurrentDrawing.arrEntities[i2].P[2], gcd.CurrentDrawing.arrEntities[i2].P[3]]))
-            gcd.CurrentDrawing.poiEntities.Add(iEntity)
-            gcd.CurrentDrawing.poiType.Add(gcd.poiIntersection)
+          Case "Line"
+            If puntos.doIntersect(e.P[0], e.P[1], e.P[2], e.P[3], gcd.CurrentDrawing.arrEntities[i2].P[0], gcd.CurrentDrawing.arrEntities[i2].P[1], gcd.CurrentDrawing.arrEntities[i2].P[2], gcd.CurrentDrawing.arrEntities[i2].P[3]) Then
+              gcd.CurrentDrawing.poiPoints.Insert(puntos.lineLineIntersection([e.P[0], e.P[1]], [e.P[2], e.P[3]], [gcd.CurrentDrawing.arrEntities[i2].P[0], gcd.CurrentDrawing.arrEntities[i2].P[1]], [gcd.CurrentDrawing.arrEntities[i2].P[2], gcd.CurrentDrawing.arrEntities[i2].P[3]]))
+              gcd.CurrentDrawing.poiEntities.Add(iEntity)
+              gcd.CurrentDrawing.poiType.Add(gcd.poiIntersection)
 
-          Endif
+            Endif
 
-      End Select
-    Next
-End Select
+        End Select
+      Next
+  End Select
 
 End
 

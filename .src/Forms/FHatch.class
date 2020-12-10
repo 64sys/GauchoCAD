@@ -27,7 +27,7 @@ Public Sub ComboBox1_Click()
 
   cadDxf.arrToFill = entyHatch
 
-  cadDxf.LoadFile(Application.Path &/ "patterns" &/ ComboBox1.Text & ".dxf", True,, True)
+  cadDxf.LoadFile(Application.Path &/ "patterns" &/ ComboBox1.Text & ".dxf", True, True, True)
 
   DrawingArea1.Refresh
 
@@ -45,7 +45,8 @@ Public Sub DrawingArea1_Draw()
 
   For Each entidad In entyHatch
 
-    'entidad.ColorToPaint = Starter.flgWhiteAndBlack
+    entidad.ColorToPaint = Starter.flgWhiteAndBlack
+    entidad.LineWidth = 1
     entidad.ClassHandler.draw2(entidad)
   Next
 

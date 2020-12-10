@@ -832,12 +832,22 @@ Public Sub GLArea1_MouseUp()
   ' los rigth clicks se manejan en FCAD , ni las herramientas ni las entidades los necesitan
   If Mouse.Right Then                ' rigth clicks means finish what you're doing rigth now and go back to the previous Job
     ' the Finish() sub will do this in a good manner
-    If gcd.clsJob.gender <> "Default" Then
-      gcd.clsJob.Finish
+    If gcd.clsJob.gender = "Builder" Then
 
-    Else
+      gcd.clsJob.KeyText("U")
+
+
+    Else If gcd.clsJob.gender = "Default" Then
+
       gcd.clsJob = gcd.clsJobPrevious
       gcd.clsJob.Start()
+
+    Else    ' es una tool
+
+      gcd.clsJob.finish
+      gcd.clsJobPrevious = gcd.clsJob
+      gcd.clsJob = clsDefaultJob
+
     Endif
 
   Else If Mouse.Left Then
@@ -950,7 +960,20 @@ End
 
 Public Sub entity_Click()
 
-  gcd.clsJob.KeyText(Last.Tag)
+  ' vamos a mejorar esto
+  ' veo que estoy haciendo
+  If gcd.clsJob.Gender = "Default" Then ' estoy seleccionando
+
+    gcd.clsJob.KeyText(Last.Tag)
+
+  Else ' If gcd.clsJob = clsEntityBuilder Then ' esoy dibjando algo, debo cancelar
+
+    gcd.clsJob.Cancel()
+    gcd.clsJob = clsDefaultJob
+    gcd.clsJob.KeyText(Last.Tag)
+
+  End If
+
 
 End
 
@@ -2177,10 +2200,23 @@ Public Sub Form_KeyPress()
 
     Case Key.Esc
 
-      gcd.clsJob.Finish()  ' Now!
-      ' we cancel everything
-      gcd.clsJobPrevious = gcd.clsJob
-      gcd.clsJob = clsDefaultJob
+      If gcd.clsJob.gender = "Builder" Then
+
+        gcd.clsJob.KeyText("U")
+
+
+      Else If gcd.clsJob.gender = "Default" Then
+
+        gcd.clsJob = gcd.clsJobPrevious
+        gcd.clsJob.Start()
+
+      Else    ' es una tool
+
+        gcd.clsJob.finish
+        gcd.clsJobPrevious = gcd.clsJob
+        gcd.clsJob = clsDefaultJob
+
+      Endif
 
       SelectionRefresh()
 

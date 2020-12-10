@@ -130,7 +130,7 @@ Public Sub Draw2(oE As Entity)
 
   Dim i As Integer
 
-  paint.LineWidth = oE.LineWidth / gcd.CurrentDrawing.ScaleZoom / gcd.ScaleLines
+  paint.LineWidth = oE.LineWidth ' / gcd.CurrentDrawing.ScaleZoom / gcd.ScaleLines
 
   If oE.Selected And Not gcd.ToolActive Then
     paint.brush = Paint.Color(gcd.ColorForSelected)

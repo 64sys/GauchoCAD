@@ -127,8 +127,14 @@ Public Struct solidSt
 End Struct
 
 Public Struct StructsplineeSt
+  mKnotsPoints As Integer
   mFitPointCount As Integer
-  p As Float[]
+  mControlPointCount As Integer
+  pKnotValues As Float[]
+  pFit As Float[]
+  pControl As Float[]
+  pTangents As Float[]
+
 End Struct
 
 Public Nx As Integer
@@ -304,7 +310,6 @@ Public Procedure LoadFile(stn As String, Optional IgnoreLayers As Boolean = Fals
 
   mPolyLine.p = New Float[]
 
-  mSpline.p = New Float[]
 
   fp = Open stn For Read
   If Not fp Then Error.Raise("Error !")
@@ -327,7 +332,6 @@ Public Procedure LoadFile(stn As String, Optional IgnoreLayers As Boolean = Fals
 
       Wend
 
-      ' Print "Line", mLine.layer, mLine.x1, mLine.y1, mLine.x2, mLine.y2
       '
       AddLine(arrToFill, [mLine.x1, mLine.y1, mLine.x2, mLine.y2], mBlock.block_name)
 
@@ -561,20 +565,35 @@ Public Procedure LoadFile(stn As String, Optional IgnoreLayers As Boolean = Fals
       ' SPLINE
       '-----------------------------------------------------------
     Else If (lpcode = "0") And (lpvalue = "SPLINE") Then
-      mSpline.p = New Float[]
+      mSpline.pFit = New Float[]
+      mSpline.pControl = New Float[]
+      mSpline.pKnotValues = New Float[]
+      mSpline.pTangents = New Float[]
 
       ReadData
       While (lpcode <> "0") And Not Eof(fp)
         dxfReadCommonData
-        If lpcode = "73" Then mSpline.mFitPointCount = Val(lpValue)
-        If lpcode = "10" Then mSpline.p.Add(CFloat(lpValue))
-        If lpcode = "20" Then mSpline.p.Add(CFloat(lpValue))
+        If lpcode = "72" Then mSpline.mKnotsPoints = Val(lpValue)
+        If lpcode = "73" Then mSpline.mControlPointCount = Val(lpValue)
+        If lpcode = "74" Then mSpline.mFitPointCount = Val(lpValue)
+
+        If lpcode = "40" Then mSpline.pKnotValues.Add(CFloat(lpValue))
+
+        If lpcode = "10" Then mSpline.pControl.Add(CFloat(lpValue))
+        If lpcode = "20" Then mSpline.pControl.Add(CFloat(lpValue))
+        If lpcode = "11" Then mSpline.pFit.Add(CFloat(lpValue))
+        If lpcode = "21" Then mSpline.pFit.Add(CFloat(lpValue))
+        If lpcode = "12" Then mSpline.pTangents.Add(CFloat(lpValue))
+        If lpcode = "22" Then mSpline.pTangents.Add(CFloat(lpValue))
+        If lpcode = "13" Then mSpline.pTangents.Add(CFloat(lpValue))
+        If lpcode = "23" Then mSpline.pTangents.Add(CFloat(lpValue))
+
         ReadData
       Wend
 
       Inc mSplineCount
 
-      AddSPLine(arrToFill, mSpline.p, 0, mBlock.block_name)
+      AddSPLine(arrToFill, mSpline.pControl, 0, mBlock.block_name)
 
       '-----------------------------------------------------------
       ' TEXT
