@@ -22,7 +22,7 @@
 
 ' Imports DXF 2007 files (limites entities and data)
 ' Tool maintained by Terco
-Inherits ToolsBase
+
 Create Static
 Public Const Gender As String = "Dxf"
 
@@ -185,58 +185,14 @@ Public lpValue As String
 
 Public arrToFill As Entity[]
 
-' Add more if needed
 
-Public Function Start(Optional ElemToBuild As Variant, Optional _mode As Integer = 0) As Boolean
-  ' Llamada por FCAD al inicio de la aplicacion de esta herramienta
 
-  ' Aprovechamos para establecer los helpers (comentarios de ayuda en pantalla)
-  Me.PointsDone = 0
-  Me.PointsTotal = 2                 ' orto: Punto base + Nx + Dx + Ny + Dy   , polar = Punto base + N + angulo
+Public Function SaveDXF(sName As String) As Integer
 
-  Me.mode = _mode
-
-  If Not ElemToBuild Then
-
-    arrToFill = gcd.CurrentDrawing.arrEntities
-
-  Endif
-
-  Dim sDXF As String
-
-  If _mode = 0 Then ' load DXF
-
-    Dialog.Filter = ["*.dxf", "Drawing eXchange Format v2007"]
-    Dialog.OpenFile(False)
-    sDxf = Dialog.Path
-    If Exist(sDxf) Then
-      LoadFile(sDxf)
-    Endif
-
-    clsEntities.ReconstruirBloques
-    gcd.ApplyLayerProperties(1)
-    clsEntities.GLGenDrawList
-    cadZoomE.Start()
-
-    Return
-
-  Else If _mode = 1 Then  ' Save
-
-    'SaveFile(Left(gcd.FileName, -4) & ".dxf")
-    SaveFile("test dxf writer.dxf")
-
-  Else If _mode = 2 Then 'Save as....
-
-    Dialog.Filter = ["*.dxf", "Drawing eXchange Format v2007"]
-    Dialog.OpenFile(False)
-    sDxf = Dialog.Path
-    If Exist(sDxf) Then
-      LoadFile(sDxf)
-    Endif
-
-  End If
+  Return SaveFile(sName)
 
 End
+
 
 Private Sub ReadData()
 
@@ -439,6 +395,7 @@ Public Procedure LoadFile(stn As String, Optional IgnoreLayers As Boolean = Fals
       While (lpcode <> "0") And Not Eof(fp)
         If lpcode = "5" Then newlayer.Add(lpvalue, "handle")
         If lpcode = "2" Then newlayer.Add(lpvalue, "name")
+
         If lpcode = "6" Then newLayer.Add(lpvalue, "style")
         If lpcode = "62" Then
           newLayer.Add(Abs(CInt(lpvalue)), "color")
@@ -713,7 +670,7 @@ End
 
 Private Function SaveFile(sName As String) As Integer
 
-  hFile = Open User.Home &/ sName For Write Create
+  hFile = Open sName For Write Create
 
   If dxfSave1HeadersAndVars() Then Return False
   If dxfSave2Tables() Then Return False
@@ -2959,10 +2916,10 @@ Private Function dxfSave2Tables() As Integer
   Print #hFIle, "100"
   Print #hFIle, "AcDbSymbolTable"
   Print #hFIle, "70"                      ' ENTRIES IN TABLE
-  Print #hFIle, gcd.CurrentDrawing.cModel["Layers"].Count
+  Print #hFIle, gcd.CurrentDrawing.cModel["LAYERS"].Count
   Dim i As Integer, lay As Collection
   ' individual layers
-  For Each lay In gcd.CurrentDrawing.cModel["Layers"]
+  For Each lay In gcd.CurrentDrawing.cModel["LAYERS"]
     Print #hFIle, "  0"
     Print #hFIle, "LAYER"
     Print #hFIle, "  5"                   ' handle
@@ -2974,7 +2931,11 @@ Private Function dxfSave2Tables() As Integer
     Print #hFIle, "100"
     Print #hFIle, "AcDbLayerTableRecord"
     Print #hFIle, "2"                   ' name
-    Print #hFIle, lay["name"]
+    If lay["name"] = Null Then
+      Print #hFIle, "0"
+    Else
+      Print #hFIle, lay["name"]
+    End If
     Print #hFIle, "70"                  '
     ' Standard flags(bit - coded values):
     ' 1 = Layer Is Frozen; otherwise layer Is Thawed
@@ -2985,7 +2946,7 @@ Private Function dxfSave2Tables() As Integer
     ' 64 = If set, the table entry was referenced by at least one entity In the drawing the Last Time the drawing was edited.(This flag Is For the benefit Of AutoCAD commands.It can be ignored by most programs that Read DXF files And need Not be set by programs that Write DXF files)
     Print #hFIle, "  0"
     Print #hFIle, "62"                  ' color (neg = layer off)
-    Print #hFIle, lay["colour"]
+    Print #hFIle, lay["color"]
     Print #hFIle, "6"                                               ' linetype
     Print #hFIle, lay["style"]        '"CONTINUOUS"
     Print #hFIle, "370"
@@ -3614,7 +3575,7 @@ Private Function dxfSave6Objects() As Integer
 
 End
 
-Public Function dxfSaveLine(fPuntos As Float[], Optional layer As String = "0", colour As Integer = "256", LineType As String = "ByLayer", LineWidth As Float = "1")
+Private Function dxfSaveLine(fPuntos As Float[], Optional layer As String = "0", colour As Integer = "256", LineType As String = "ByLayer", LineWidth As Float = "1")
 
   Print #hFIle, "  0"                       ' Entity type
   Print #hFIle, "LINE"
@@ -3643,7 +3604,7 @@ Public Function dxfSaveLine(fPuntos As Float[], Optional layer As String = "0", 
 
 End
 
-Public Function dxfSaveHatch(Pattern As String, rotation As Float, scale As Float, fPuntos As Float[], Optional layer As String = "0", colour As Integer = "256", LineType As String = "ByLayer", LineWidth As Float = "1")
+Private Function dxfSaveHatch(Pattern As String, rotation As Float, scale As Float, fPuntos As Float[], Optional layer As String = "0", colour As Integer = "256", LineType As String = "ByLayer", LineWidth As Float = "1")
 
   Dim i As Integer
 
@@ -3733,7 +3694,7 @@ Public Function dxfSaveHatch(Pattern As String, rotation As Float, scale As Floa
 
 End
 
-Public Function dxfSavePLine(fPuntos As Float[], Optional layer As String = "0", colour As Integer = "256", LineType As String = "ByLayer", LineWidth As Float = "1")
+Private Function dxfSavePLine(fPuntos As Float[], Optional layer As String = "0", colour As Integer = "256", LineType As String = "ByLayer", LineWidth As Float = "1")
 
   Dim i As Integer
 
@@ -3768,7 +3729,7 @@ Public Function dxfSavePLine(fPuntos As Float[], Optional layer As String = "0",
 
 End
 
-Public Function dxfSaveSolid(fPuntos As Float[], Optional layer As String = "0", colour As Integer = "256", LineType As String = "ByLayer", LineWidth As Float = "1")
+Private Function dxfSaveSolid(fPuntos As Float[], Optional layer As String = "0", colour As Integer = "256", LineType As String = "ByLayer", LineWidth As Float = "1")
 
   Dim i As Integer
 
@@ -3805,7 +3766,7 @@ Public Function dxfSaveSolid(fPuntos As Float[], Optional layer As String = "0",
 
 End
 
-Public Function dxfSaveText(texto As String, fPuntos As Float[], heigth As Float, Optional angle As Float = 0, layer As String = "0", colour As Integer = "256", LineType As String = "ByLayer", LineWidth As Float = "1", txtStyle As String = "romanc")
+Private Function dxfSaveText(texto As String, fPuntos As Float[], heigth As Float, Optional angle As Float = 0, layer As String = "0", colour As Integer = "256", LineType As String = "ByLayer", LineWidth As Float = "1", txtStyle As String = "romanc")
 
   Print #hFIle, "  0"
   Print #hFIle, "TEXT"
@@ -3869,7 +3830,7 @@ Public Function dxfSaveText(texto As String, fPuntos As Float[], heigth As Float
 
 End
 
-Public Function dxfSaveCircle(fCentro As Float[], radious As Float, Optional layer As String = "0", colour As Integer = "256", LineType As String = "ByLayer", LineWidth As Float = "1")
+Private Function dxfSaveCircle(fCentro As Float[], radious As Float, Optional layer As String = "0", colour As Integer = "256", LineType As String = "ByLayer", LineWidth As Float = "1")
 
   Print #hFIle, "  0"
   Print #hFIle, "CIRCLE"
@@ -3896,7 +3857,7 @@ Public Function dxfSaveCircle(fCentro As Float[], radious As Float, Optional lay
 
 End
 
-Public Function dxfSaveArc(fCentro As Float[], radious As Float, fStart As Float, fEnd As Float, Optional layer As String = "0", colour As Integer = "256", LineType As String = "ByLayer", LineWidth As Float = "1")
+Private Function dxfSaveArc(fCentro As Float[], radious As Float, fStart As Float, fEnd As Float, Optional layer As String = "0", colour As Integer = "256", LineType As String = "ByLayer", LineWidth As Float = "1")
 
   Print #hFIle, "  0"
   Print #hFIle, "ARC"
@@ -3931,7 +3892,7 @@ Public Function dxfSaveArc(fCentro As Float[], radious As Float, fStart As Float
 
 End
 
-Public Function dxfSaveEllipse(fCentro As Float[], ratio As Float, fStart As Float, fEnd As Float, Optional layer As String = "0", colour As Integer = "256", LineType As String = "ByLayer", LineWidth As Float = "1")
+Private Function dxfSaveEllipse(fCentro As Float[], ratio As Float, fStart As Float, fEnd As Float, Optional layer As String = "0", colour As Integer = "256", LineType As String = "ByLayer", LineWidth As Float = "1")
 
   Print #hFIle, "  0"
   Print #hFIle, "ELLIPSE"
@@ -3970,7 +3931,7 @@ Public Function dxfSaveEllipse(fCentro As Float[], ratio As Float, fStart As Flo
 
 End
 
-Public Function dxfSaveMText(texto As String, fPuntos As Float[], heigth As Float, Optional angle As Float = 0, layer As String = "0", colour As Integer = "256", LineType As String = "ByLayer", LineWidth As Float = "1", txtStyle As String = "romanc")
+Private Function dxfSaveMText(texto As String, fPuntos As Float[], heigth As Float, Optional angle As Float = 0, layer As String = "0", colour As Integer = "256", LineType As String = "ByLayer", LineWidth As Float = "1", txtStyle As String = "romanc")
 
   Print #hFIle, "  0"
   Print #hFIle, "MTEXT"
@@ -4021,7 +3982,7 @@ Public Function dxfSaveMText(texto As String, fPuntos As Float[], heigth As Floa
 
 End
 
-Public Function dxfSaveInsert(BlockName As String, fPuntos As Float[], Optional fScale As Float[] = [1, 1, 1], angle As Float = 0, layer As String = "0", colour As Integer = "256", LineType As String = "ByLayer", LineWidth As Float = "1", RowCol As Integer[] = [1, 1], RowColSpacing As Float[] = [0, 0])
+Private Function dxfSaveInsert(BlockName As String, fPuntos As Float[], Optional fScale As Float[] = [1, 1, 1], angle As Float = 0, layer As String = "0", colour As Integer = "256", LineType As String = "ByLayer", LineWidth As Float = "1", RowCol As Integer[] = [1, 1], RowColSpacing As Float[] = [0, 0])
 
   Print #hFIle, "  0"
   Print #hFIle, "INSERT"
@@ -4066,7 +4027,7 @@ Public Function dxfSaveInsert(BlockName As String, fPuntos As Float[], Optional 
 
 End
 
-Public Function dxfSaveDimension(BlockName As String, fPuntos As Float[], Optional angle As Float = 0, layer As String = "0", colour As Integer = "256", LineType As String = "ByLayer", LineWidth As Float = "1")
+Private Function dxfSaveDimension(BlockName As String, fPuntos As Float[], Optional angle As Float = 0, layer As String = "0", colour As Integer = "256", LineType As String = "ByLayer", LineWidth As Float = "1")
 
   Print #hFIle, "  0"
   Print #hFIle, "DIMENSION"
@@ -4131,7 +4092,7 @@ Public Function dxfSaveDimension(BlockName As String, fPuntos As Float[], Option
 
 End
 
-Public Function dxfSaveSPLine(fPuntos As Float[], Optional layer As String = "0", colour As Integer = "256", LineType As String = "ByLayer", LineWidth As Float = "1")
+Private Function dxfSaveSPLine(fPuntos As Float[], Optional layer As String = "0", colour As Integer = "256", LineType As String = "ByLayer", LineWidth As Float = "1")
 
   Dim i As Integer
 
@@ -4204,7 +4165,7 @@ Private Sub AddCommon(e As Entity)
 End
 
 
-Public Function AddLine(obxContainer As Entity[], Points As Float[], Optional Block As String) As Boolean
+Private Function AddLine(obxContainer As Entity[], Points As Float[], Optional Block As String) As Boolean
 
   ' points are in x,y,x,y,x,y....
   Dim oEntity As New Entity
@@ -4221,7 +4182,7 @@ Public Function AddLine(obxContainer As Entity[], Points As Float[], Optional Bl
 
 End
 
-Public Function AddPolyLine(obxContainer As Entity[], Points As Float[], Optional iClosed As Integer = 0, Optional Block As String) As Boolean
+Private Function AddPolyLine(obxContainer As Entity[], Points As Float[], Optional iClosed As Integer = 0, Optional Block As String) As Boolean
 
   ' points are in x,y,x,y,x,y....
 
@@ -4240,7 +4201,7 @@ Public Function AddPolyLine(obxContainer As Entity[], Points As Float[], Optiona
 
 End
 
-Public Function AddDim(obxContainer As Entity[], Points As Float[], bloque As String, medida As Float, texto As String, alineacion As Integer, angulo As Float, tipo As Integer, Optional Block As String) As Boolean
+Private Function AddDim(obxContainer As Entity[], Points As Float[], bloque As String, medida As Float, texto As String, alineacion As Integer, angulo As Float, tipo As Integer, Optional Block As String) As Boolean
 
   Dim oEntity As New Entity
 
@@ -4262,7 +4223,7 @@ Public Function AddDim(obxContainer As Entity[], Points As Float[], bloque As St
 
 End
 
-Public Function AddSolid(obxContainer As Entity[], Points As Float[], Optional Block As String) As Boolean
+Private Function AddSolid(obxContainer As Entity[], Points As Float[], Optional Block As String) As Boolean
 
   ' points are in x,y,x,y,x,y....
   ' points are in x,y,x,y,x,y....
@@ -4281,7 +4242,7 @@ Public Function AddSolid(obxContainer As Entity[], Points As Float[], Optional B
 
 End
 
-Public Function AddSPLine(obxContainer As Entity[], Points As Float[], Optional iClosed As Integer = 0, Optional Block As String) As Boolean
+Private Function AddSPLine(obxContainer As Entity[], Points As Float[], Optional iClosed As Integer = 0, Optional Block As String) As Boolean
 
   ' points are in x,y,x,y,x,y....
   Dim oEntity As New Entity
@@ -4299,7 +4260,7 @@ Public Function AddSPLine(obxContainer As Entity[], Points As Float[], Optional 
 
 End
 
-Public Function AddCircle(obxContainer As Entity[], Points As Float[], radious As Float, Optional Block As String) As Boolean
+Private Function AddCircle(obxContainer As Entity[], Points As Float[], radious As Float, Optional Block As String) As Boolean
 
   ' points are in x,y,x,y,x,y....
   Dim oEntity As New Entity
@@ -4317,7 +4278,7 @@ Public Function AddCircle(obxContainer As Entity[], Points As Float[], radious A
 
 End
 
-Public Function AddArc(obxContainer As Entity[], Points As Float[], r As Float, angle1 As Float, angle2 As Float, Optional Block As String) As Boolean
+Private Function AddArc(obxContainer As Entity[], Points As Float[], r As Float, angle1 As Float, angle2 As Float, Optional Block As String) As Boolean
 
   ' points are in x,y,x,y,x,y....
   Dim oEntity As New Entity
@@ -4337,7 +4298,7 @@ Public Function AddArc(obxContainer As Entity[], Points As Float[], r As Float, 
 
 End
 
-Public Function AddEllipse(obxContainer As Entity[], Points As Float[], r As Float, angle1 As Float, angle2 As Float, Optional Block As String) As Boolean
+Private Function AddEllipse(obxContainer As Entity[], Points As Float[], r As Float, angle1 As Float, angle2 As Float, Optional Block As String) As Boolean
 
   ' points are in x,y,x,y,x,y....
   Dim oEntity As New Entity
@@ -4359,7 +4320,7 @@ Public Function AddEllipse(obxContainer As Entity[], Points As Float[], r As Flo
 
 End
 
-Public Function AddText(obxContainer As Entity[], Points As Float[], angle As Float, height As Float, _Text As String, Optional Block As String) As Boolean
+Private Function AddText(obxContainer As Entity[], Points As Float[], angle As Float, height As Float, _Text As String, Optional Block As String) As Boolean
 
   Dim oEntity As New Entity
 
@@ -4378,7 +4339,7 @@ Public Function AddText(obxContainer As Entity[], Points As Float[], angle As Fl
 
 End
 
-Public Function AddMText(obxContainer As Entity[], Points As Float[], angle As Float, height As Float, _Text As String, Optional Block As String) As Boolean
+Private Function AddMText(obxContainer As Entity[], Points As Float[], angle As Float, height As Float, _Text As String, Optional Block As String) As Boolean
 
   Dim oEntity As New Entity
 
@@ -4397,7 +4358,7 @@ Public Function AddMText(obxContainer As Entity[], Points As Float[], angle As F
 
 End
 
-Public Function AddCurve(obxContainer As Entity[], Points As Float[], Optional Block As String) As Boolean
+Private Function AddCurve(obxContainer As Entity[], Points As Float[], Optional Block As String) As Boolean
 
   ' points are in x,y,x,y,x,y....
   Dim oEntity As New Entity
@@ -4406,7 +4367,7 @@ Public Function AddCurve(obxContainer As Entity[], Points As Float[], Optional B
 
 End
 
-Public Function AddInsert(obxContainer As Entity[], Points As Float[], scaleX As Float, scaleY As Float, angulo As Float, Block As String) As Boolean
+Private Function AddInsert(obxContainer As Entity[], Points As Float[], scaleX As Float, scaleY As Float, angulo As Float, Block As String) As Boolean
 
   Dim oEntity As New Entity
 
@@ -4425,7 +4386,7 @@ Public Function AddInsert(obxContainer As Entity[], Points As Float[], scaleX As
 
 End
 
-Public Function AddBlock(Points As Float[], Block As String) As Entity[]
+Private Function AddBlock(Points As Float[], Block As String) As Entity[]
 
   Dim newBlock As New Block
 
