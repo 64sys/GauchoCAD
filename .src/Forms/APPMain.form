@@ -118,6 +118,12 @@
       Picture = Picture["svg/entities/text.svg"]
       Tag = "text"
     }
+    { mnuAttdef Menu entity
+      Name = "mnuAttdef"
+      Text = ("Atribute definition")
+      Picture = Picture["svg/entities/attdef.svg"]
+      Tag = "attdef"
+    }
     { mnuLeader Menu entity
       Name = "mnuLeader"
       Text = ("Ledader")
@@ -180,8 +186,13 @@
     { mnuPoint Menu entity
       Name = "mnuPoint"
       Text = ("Point")
-      Visible = False
+      Picture = Picture["svg/entities/point.svg"]
       Tag = "point"
+    }
+    { mnuRay Menu
+      Text = ("Ray")
+      Picture = Picture["svg/entities/ray.svg"]
+      Tag = "ray"
     }
   }
   { grpTools Menu
@@ -352,7 +363,8 @@
     Arrangement = Arrange.Vertical
     { Panel2 Panel
       MoveScaled(1,1,132,5)
-      Arrangement = Arrange.Horizontal
+      Arrangement = Arrange.Row
+      Spacing = True
       { pnlFile Panel
         MoveScaled(1,0,7,5)
         Expand = True
@@ -371,7 +383,7 @@
         Background = Color.Yellow
       }
       { btnWidths Button
-        MoveScaled(49,0,15,5)
+        MoveScaled(51,0,15,5)
       }
       { Panel6 Panel
         MoveScaled(88,0,25,5)
@@ -390,33 +402,33 @@
       }
     }
     { PanEdit1 Panel
-      MoveScaled(1,7,149,71)
+      MoveScaled(-23,-8,149,71)
       Expand = True
       Arrangement = Arrange.Horizontal
       Spacing = True
       Margin = True
       { Panel3 SidePanel
-        MoveScaled(1,2,24,67)
+        MoveScaled(1,2,20,67)
         Arrangement = Arrange.Vertical
         Orientation = Align.Right
         { pnlIcons Panel
-          MoveScaled(0,3,22,33)
+          MoveScaled(0,3,21,33)
           Expand = True
           Arrangement = Arrange.Vertical
           { pnlEntities Panel
-            MoveScaled(0,0,22,18)
+            MoveScaled(0,0,21,18)
             Expand = True
             Arrangement = Arrange.Row
             Spacing = True
             { lblEntities Label
-              MoveScaled(1,0,20,3)
+              MoveScaled(1,0,18,3)
               Visible = False
               Text = ("Entities")
               Alignment = Align.Center
             }
           }
           { pnlTools Panel
-            MoveScaled(0,19,22,18)
+            MoveScaled(0,19,21,18)
             Visible = False
             Expand = True
             Arrangement = Arrange.Row
@@ -429,7 +441,7 @@
           }
         }
         { pnlProperties Panel
-          MoveScaled(0,38,22,26)
+          MoveScaled(0,38,21,26)
           Visible = False
           Expand = True
           Arrangement = Arrange.Vertical

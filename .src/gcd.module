@@ -53,7 +53,6 @@ Public clsJobPrevious As Object                     '' what was doing before
 Public clsJobPreZoom As Object                      '' what was doing before Zooming or Panning
 Public clsJobPreviousParam As Integer               '' a param to pass to clsJob.Start( param )
 
-
 'Public gColor As New Integer[]
 
 Public drwDrawingClass As Integer = 0 '' 0 = Paint, 1 = OpenGL
@@ -340,7 +339,6 @@ Public Sub ImportBlocks(colData As Collection) ', obxEntities As Entity[]) As In
 
 End
 
-
 '' Pasa del arrEntities a la coleccion cModel
 Public Function ExportEntities(colGrp As Collection, obxEntities As Entity[], Optional BlockName As String) As Integer
 
@@ -489,8 +487,6 @@ Common:
 
 End
 
-
-
 '' Importa las cosas de manera descentralizada
 Public Sub ImpEnty5(cEny As Collection, obx As Entity[])
 
@@ -501,7 +497,8 @@ Public Sub ImpEnty5(cEny As Collection, obx As Entity[])
     If e.Exist("entity") Then                                     ' es una entidad?
       entNueva = New Entity                                       ' entonces, creamos una nueva
 
-      If InStr("POINTATTDEFATTRIBLINELWPOLYLINECIRCLEELLIPSEARCTEXTMTEXTSPLINESOLIDLEADER", e["entity"]) = 0 Then Continue
+      'If InStr("POINTATTDEFATTRIBLINELWPOLYLINECIRCLEELLIPSEARCTEXTMTEXTSPLINESOLIDLEADER", e["entity"]) = 0 Then Continue
+      If InStr("ATTDEFATTRIBLINELWPOLYLINECIRCLEELLIPSEARCTEXTMTEXTSPLINESOLIDLEADER", e["entity"]) = 0 Then Continue
 
       If clsEntities.ImportJsonToEntity(e, entNueva) Then         ' si esta implementada, llenamos los datos
         If e.Exist("handle") Then
@@ -516,9 +513,6 @@ Public Sub ImpEnty5(cEny As Collection, obx As Entity[])
   Next
 
 End
-
-
-
 
 '' Aplica los cambios en los Layers a las entidades
 '' Si mode = 1, primero recontruye el layerID (para ser usado luego de abrir un archivo)
@@ -676,6 +670,3 @@ Public Function UpdateGraphics(Optional handles As String[] = [], DoRegen As Boo
   If DoRegen Then Regen
 
 End
-
-
-

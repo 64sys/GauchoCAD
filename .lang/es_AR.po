@@ -2,7 +2,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: GauchoCAD 3.15.2\n"
-"PO-Revision-Date: 2020-11-20 15:05 UTC\n"
+"POT-Creation-Date: 2020-12-11 01:22 UTC\n"
+"PO-Revision-Date: 2020-12-11 01:22 UTC\n"
 "Last-Translator: bmk <bmk@gaucho>\n"
 "Language: es_AR\n"
 "MIME-Version: 1.0\n"
@@ -17,267 +18,294 @@ msgstr "GauchoCAD"
 msgid "GauchoCAD is a free CAD program written in the Gambas language"
 msgstr "GauchoCAD es un programa de CAD libre escrito en el lenguaje gambas"
 
-#: APPMain.class:209 FLayers1.class:87 FLayers_deprecated.class:64 dbs.module:1736
+#: APPMain.class:211 FLayers1.class:87 FLayers_deprecated.class:64
+#: dbs.module:1736
 msgid "Color"
 msgstr "Color"
 
-#: APPMain.class:1257 FLayers1.class:87 FLayers_deprecated.class:64 FText.form:122
+#: APPMain.class:1167 FAlias.form:69 FBlock.form:73 FHatch.form:67
+#: FLayers1.form:68 FLayers_deprecated.form:68 FText.form:154
+msgid "Cancel"
+msgstr "Cancelar"
+
+#: APPMain.class:1167
+msgid "Replace"
+msgstr "Reemplazar"
+
+#: APPMain.class:1167
+msgid "The file exist"
+msgstr "El archivo existe"
+
+#: APPMain.class:1397 FLayers_deprecated.class:64 FText.form:122
 msgid "Width"
 msgstr "Anchura"
 
-#: APPMain.class:1522
+#: APPMain.class:1667
 msgid "All"
 msgstr "Todas"
 
-#: APPMain.class:1818
+#: APPMain.class:1963
 msgid "varies"
 msgstr "varios"
 
-#: APPMain.form:124
+#: APPMain.form:128
 msgid "File"
 msgstr "Archivo"
 
-#: APPMain.form:128
+#: APPMain.form:132
 msgid "New file"
 msgstr "Nuevo archivo"
 
-#: APPMain.form:135
+#: APPMain.form:139
 msgid "Open file"
 msgstr "Abrir un archivo"
 
-#: APPMain.form:142
+#: APPMain.form:146
 msgid "Save file"
 msgstr "Guardar archivo"
 
-#: APPMain.form:149
+#: APPMain.form:153
 msgid "Save file as"
 msgstr "Guardar archivo como"
 
-#: APPMain.form:156
+#: APPMain.form:160
 msgid "Import file"
 msgstr "Importar archivo"
 
-#: APPMain.form:163
+#: APPMain.form:167
 msgid "Export file"
 msgstr "Exportar archivo"
 
-#: APPMain.form:170
+#: APPMain.form:174
 msgid "Plot"
 msgstr "Trazar"
 
-#: APPMain.form:177
+#: APPMain.form:181
 msgid "Close"
 msgstr "Cerrar"
 
-#: APPMain.form:186 FConfig.form:66
+#: APPMain.form:190 FConfig.form:66
 msgid "Quit"
 msgstr "Salir"
 
-#: APPMain.form:193
+#: APPMain.form:197
 msgid "Options"
 msgstr "Opciones"
 
-#: APPMain.form:197 FConfig.form:28
+#: APPMain.form:201 FConfig.form:28
 msgid "Preferences"
 msgstr "Preferencias"
 
-#: APPMain.form:204
+#: APPMain.form:208
 msgid "Entities"
 msgstr "Entidades"
 
-#: APPMain.form:208
+#: APPMain.form:212
 msgid "Selection"
 msgstr "Selección"
 
-#: APPMain.form:216
+#: APPMain.form:220
 msgid "Line"
 msgstr "Línea"
 
-#: APPMain.form:223 cadPLine.class:27
+#: APPMain.form:227
 msgid "Polyline"
 msgstr "Polilínea"
 
-#: APPMain.form:230
+#: APPMain.form:234
 msgid "Circle"
 msgstr "Circulo"
 
-#: APPMain.form:237
+#: APPMain.form:241
 msgid "Arc"
 msgstr "Arco"
 
-#: APPMain.form:244
+#: APPMain.form:248
 msgid "Ellipse"
 msgstr "Elipse"
 
-#: APPMain.form:251
+#: APPMain.form:255
 msgid "Text"
 msgstr "Texto"
 
-#: APPMain.form:258
+#: APPMain.form:262
+msgid "Atribute definition"
+msgstr "Definición de atributo"
+
+#: APPMain.form:269
 msgid "Ledader"
 msgstr "Flecha"
 
-#: APPMain.form:265
+#: APPMain.form:276
 msgid "Create a block"
 msgstr "Crear un bloque"
 
-#: APPMain.form:272
+#: APPMain.form:283
 msgid "Multi Text"
 msgstr "Texto múltiple"
 
-#: APPMain.form:279
+#: APPMain.form:290
 msgid "Dimmension"
 msgstr "Cotas"
 
-#: APPMain.form:286 FBlock.form:68
+#: APPMain.form:297 FBlock.form:68
 msgid "Insert"
 msgstr "Insertar"
 
-#: APPMain.form:293
+#: APPMain.form:304
 msgid "Spline"
 msgstr "Spline"
 
-#: APPMain.form:300 cadSolid.class:27
+#: APPMain.form:311 cadSolid.class:27
 msgid "Solid"
 msgstr "Sólido"
 
-#: APPMain.form:307
+#: APPMain.form:318
 msgid "Rectangle"
 msgstr "Rectángulo"
 
-#: APPMain.form:313
+#: APPMain.form:324
 msgid "Polygon"
 msgstr "Polígono"
 
-#: APPMain.form:320 cadHatch.class:27
+#: APPMain.form:331 cadHatch.class:27
 msgid "Hatch"
 msgstr "Rayados"
 
-#: APPMain.form:327
+#: APPMain.form:338
 msgid "Point"
 msgstr "Punto"
 
-#: APPMain.form:334
+#: APPMain.form:344
+msgid "Ray"
+msgstr "Rayo"
+
+#: APPMain.form:351
 msgid "Tools"
 msgstr "Herramientas"
 
-#: APPMain.form:338
+#: APPMain.form:355
 msgid "Move"
 msgstr "Mover"
 
-#: APPMain.form:345 cadCopy.class:36
+#: APPMain.form:362 cadCopy.class:36
 msgid "Copy"
 msgstr "Copiar"
 
-#: APPMain.form:352 FBlock.form:45 FHatch.form:39 cadScale.class:38
+#: APPMain.form:369 FBlock.form:45 FHatch.form:39 cadScale.class:38
 msgid "Scale"
 msgstr "Escala"
 
-#: APPMain.form:359 cadRotate.class:40
+#: APPMain.form:376 cadRotate.class:40
 msgid "Rotate"
 msgstr "Girar"
 
-#: APPMain.form:366 cadMirror.class:42
+#: APPMain.form:383 cadMirror.class:42
 msgid "Mirror"
 msgstr "Espejar"
 
-#: APPMain.form:373 cadTrim.class:38
+#: APPMain.form:390 cadTrim.class:38
 msgid "Trim"
 msgstr "Cortar"
 
-#: APPMain.form:380
+#: APPMain.form:397
 msgid "Fillet"
 msgstr "Filetear"
 
-#: APPMain.form:387
+#: APPMain.form:404
 msgid "Chamfer"
 msgstr "Chaflán"
 
-#: APPMain.form:394 cadArray.class:47
+#: APPMain.form:411 cadArray.class:47
 msgid "Array"
 msgstr "Matriz"
 
-#: APPMain.form:401
+#: APPMain.form:418
 msgid "Stretch"
 msgstr "Estirar"
 
-#: APPMain.form:408
+#: APPMain.form:425
 msgid "Offset"
 msgstr "Paralelas"
 
-#: APPMain.form:415 cadDivide.class:41
+#: APPMain.form:432 cadDivide.class:41
 msgid "Divide"
 msgstr "Dividir"
 
-#: APPMain.form:422 cadBreak.class:41
+#: APPMain.form:439 cadBreak.class:41
 msgid "Break"
 msgstr "Partir"
 
-#: APPMain.form:429 cadErase.class:35
+#: APPMain.form:446 cadErase.class:35
 msgid "Delete"
 msgstr "Eliminar"
 
-#: APPMain.form:436
+#: APPMain.form:453
 msgid "Structures"
 msgstr "Estructuras"
 
-#: APPMain.form:440
+#: APPMain.form:457
 msgid "Slab 4 sided"
 msgstr "Losa de 4 lados"
 
-#: APPMain.form:448
+#: APPMain.form:465
 msgid "Slab 3 sided"
 msgstr "Losa de 3 lados"
 
-#: APPMain.form:455
+#: APPMain.form:472
 msgid "Column"
 msgstr "Columna"
 
-#: APPMain.form:462
+#: APPMain.form:479
 msgid "Beam"
 msgstr "Viga"
 
-#: APPMain.form:469
+#: APPMain.form:486
 msgid "Wall column"
 msgstr "Columna de pared"
 
-#: APPMain.form:477
+#: APPMain.form:494
 msgid "View"
 msgstr "Vista"
 
-#: APPMain.form:481
+#: APPMain.form:498
 msgid "Zoom window"
 msgstr "Ventana de zoom"
 
-#: APPMain.form:488
+#: APPMain.form:505
 msgid "Pan view"
 msgstr "Vista panorámica"
 
-#: APPMain.form:495
+#: APPMain.form:512
 msgid "Zoom extents"
 msgstr "Extensiones de zoom"
 
-#: APPMain.form:506 FAbout.class:187
+#: APPMain.form:519
+msgid "Drawings"
+msgstr "Dibujos"
+
+#: APPMain.form:527 FAbout.class:187
 msgid "About"
 msgstr "Acerca de"
 
-#: APPMain.form:513
+#: APPMain.form:534
 msgid "Help"
 msgstr "Ayuda"
 
-#: APPMain.form:622
+#: APPMain.form:650
 msgid "Refresh"
 msgstr "Actualizar"
 
-#: APPMain.form:639 FAlias.form:62 FLayers1.form:60 FLayers_deprecated.form:60 FText.form:148
+#: APPMain.form:667 FAlias.form:62 FLayers1.form:60 FLayers_deprecated.form:60
+#: FText.form:148
 msgid "Save"
 msgstr "Salvar"
 
-#: APPMain.form:729
+#: APPMain.form:759
 msgid " Smart entities"
 msgstr " Entidades inteligentes"
 
-#: APPMain.form:791 FAlias.class:42
+#: APPMain.form:821 FAlias.class:42
 msgid "Command"
 msgstr "Orden"
 
@@ -305,10 +333,6 @@ msgstr "Hola desarrolladores de"
 msgid "Alias"
 msgstr "Alias"
 
-#: FAlias.form:69 FBlock.form:73 FHatch.form:67 FLayers1.form:68 FLayers_deprecated.form:68 FText.form:154
-msgid "Cancel"
-msgstr "Cancelar"
-
 #: FBlock.form:31
 msgid "Block insertion"
 msgstr "Inserción de bloque"
@@ -325,7 +349,7 @@ msgstr "Rotación"
 msgid "Folder"
 msgstr "Carpeta"
 
-#: FBlock.form:129 cadBlock.class:25
+#: FBlock.form:129 cadBlock.class:25 cadBlock2.class:25
 msgid "Block"
 msgstr "Bloque"
 
@@ -433,17 +457,25 @@ msgstr "mostrar"
 msgid "State"
 msgstr "Estado"
 
-#: FLayers1.class:87 FLayers_deprecated.class:64
-msgid "Style"
-msgstr "Estilo"
+#: FLayers1.class:87 dbs.module:1735
+msgid "Type"
+msgstr "Tipo"
+
+#: FLayers1.class:87
+msgid "Weight"
+msgstr ""
 
 #: FLayers1.class:87 FLayers_deprecated.class:64
 msgid "id"
 msgstr "carné de identidad"
 
-#: FLayers1.class:119 FLayers_deprecated.class:94 cadLayers.class:36
+#: FLayers1.class:121 FLayers_deprecated.class:94 cadLayers.class:36
 msgid "Layers"
 msgstr "Capas"
+
+#: FLayers_deprecated.class:64
+msgid "Style"
+msgstr "Estilo"
 
 #: FText.form:58
 msgid "Font"
@@ -453,7 +485,8 @@ msgstr "Fuente"
 msgid "Height"
 msgstr "ALtura"
 
-#: FText.form:89 cadArray.class:114 cadMirror.class:85 cadProtractor.class:85 cadRotate.class:82
+#: FText.form:89 cadArray.class:114 cadMirror.class:85 cadProtractor.class:85
+#: cadRotate.class:82
 msgid "Angle"
 msgstr "Ángulo"
 
@@ -541,7 +574,7 @@ msgstr "Mostrar inspector"
 msgid "Draws an arc"
 msgstr "Dibuja un arco"
 
-#: cadArc.class:159
+#: cadArc.class:160
 msgid " to "
 msgstr "a"
 
@@ -553,7 +586,10 @@ msgstr "Área"
 msgid "mark points"
 msgstr "marcar puntos"
 
-#: cadArea.class:99 cadArray.class:102 cadChamfer.class:60 cadDim.class:474 cadFillet.class:60 cadMirror.class:174 cadOffset.class:269 cadProtractor.class:110 cadRotate.class:174 cadRuler.class:98
+#: cadArea.class:99 cadArray.class:102 cadChamfer.class:60
+#: cadDIMENSION_LINEAR.class:464 cadDim.class:464 cadFillet.class:60
+#: cadMirror.class:174 cadOffset.class:269 cadProtractor.class:110
+#: cadRotate.class:174 cadRuler.class:98
 msgid "Bad input"
 msgstr "Mala entrada"
 
@@ -561,15 +597,19 @@ msgstr "Mala entrada"
 msgid "Perimeter"
 msgstr "Perímetro"
 
-#: cadArray.class:54 cadCopy.class:43 cadErase.class:42 cadMirror.class:49 cadMove.class:43 cadRotate.class:47 cadScale.class:45 cadStretch.class:48
+#: cadArray.class:54 cadCopy.class:43 cadErase.class:42 cadMirror.class:49
+#: cadMove.class:43 cadRotate.class:47 cadScale.class:45 cadStretch.class:48
 msgid "Select entities"
 msgstr "Seleccionar entidades"
 
-#: cadArray.class:61 cadCopy.class:50 cadMirror.class:57 cadMove.class:50 cadRotate.class:54 cadScale.class:52 cadStretch.class:56
+#: cadArray.class:61 cadCopy.class:50 cadMirror.class:57 cadMove.class:50
+#: cadRotate.class:54 cadScale.class:52 cadStretch.class:56
 msgid "Base point"
 msgstr "Punto base"
 
-#: cadArray.class:62 cadCopy.class:51 cadMirror.class:58 cadMove.class:51 cadRotate.class:55 cadScale.class:53 cadStretch.class:57 cadTrim.class:140 clsDefaultJob.class:157
+#: cadArray.class:62 cadCopy.class:51 cadMirror.class:58 cadMove.class:51
+#: cadRotate.class:55 cadScale.class:53 cadStretch.class:57 cadTrim.class:140
+#: clsDefaultJob.class:157
 msgid "elements"
 msgstr "elementos"
 
@@ -593,11 +633,19 @@ msgstr "Distancia"
 msgid "Rows"
 msgstr "Filas"
 
+#: cadAttdef.class:28
+msgid "Inserts an attdef"
+msgstr ""
+
+#: cadAttrib.class:28
+msgid "Inserts an attirb"
+msgstr ""
+
 #: cadBeam.class:30
 msgid "Insert a beam"
 msgstr "Insertar una viga"
 
-#: cadBlock.class:65
+#: cadBlock.class:65 cadBlock2.class:65
 msgid "Select two or mores entities first"
 msgstr "Seleccione dos o más entidades primero"
 
@@ -649,7 +697,11 @@ msgstr "Insertar una columna"
 msgid "Final point"
 msgstr "Punto final"
 
-#: cadDim.class:39
+#: cadDIMENSION_LINEAR.class:29
+msgid "Insert a linear acotation"
+msgstr ""
+
+#: cadDim.class:29
 msgid "Insert an acotation"
 msgstr "Insertar una acotación"
 
@@ -680,6 +732,14 @@ msgstr "ingrese un radio"
 #: cadInsert.class:25
 msgid "Inserts a block"
 msgstr "Inserta un bloque"
+
+#: cadLWPolyline.class:27
+msgid "LWPolyline"
+msgstr ""
+
+#: cadLWPolyline.class:29 cadSPLine.class:15
+msgid "Next Point"
+msgstr "Siguiente punto"
 
 #: cadLeader.class:27
 msgid "Leader"
@@ -721,13 +781,13 @@ msgstr "seleccione una entidad"
 msgid "enter a valid text size"
 msgstr "Ingrese un tamaño de texto válido"
 
-#: cadPLine.class:29 cadSPLine.class:12
-msgid "Next Point"
-msgstr "Siguiente punto"
-
 #: cadPan.class:30
 msgid "Panning"
 msgstr "Paneo"
+
+#: cadPoint.class:27
+msgid "a point"
+msgstr ""
 
 #: cadPolygon.class:27
 msgid "a polygon"
@@ -777,7 +837,7 @@ msgstr "Seleccionado"
 msgid "Window is too small"
 msgstr "La ventana es muy pequeña."
 
-#: clsEntities.class:59
+#: clsEntities.class:46
 msgid "Loading blocks "
 msgstr "Cargando bloques"
 
@@ -877,10 +937,6 @@ msgstr "Trabajo"
 msgid "Client"
 msgstr "Cliente"
 
-#: dbs.module:1735
-msgid "Type"
-msgstr "Tipo"
-
 #: dsk.module:172
 msgid "Select File"
 msgstr "Seleccionar archivo"
@@ -897,7 +953,11 @@ msgstr "Seleccionar directorio"
 msgid "Hi"
 msgstr "Hola"
 
-#: modUtils.module:256
+#: dwg.module:242
+msgid "is not contemplated"
+msgstr ""
+
+#: modUtils.module:258
 msgid "Can't determine array type"
 msgstr "No se puede determinar el tipo de matriz"
 
@@ -956,4 +1016,3 @@ msgstr "Excluido"
 #: vag.module:560
 msgid "More than one capital letter"
 msgstr "Más de una letra mayúscula"
-
