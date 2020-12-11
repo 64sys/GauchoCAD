@@ -1105,7 +1105,7 @@ Public Sub gTask(sTask As String)
       NewDrawing = New ClsDrawing
       gcd.Drawings.Add(NewDrawing)
       gcd.CurrentDrawing = gcd.Drawings.Last
-      fx = dsk.FileChooser(Settings["LastDir", User.Home], ["dwg", "json", "dxf"])
+      fx = dsk.FileChooser(Settings["LastDir", User.Home], ["dwg", "json"])
       If fx.Count > 0 Then
         f = fx[0]
         If Exist(f) Then
@@ -1119,17 +1119,7 @@ Public Sub gTask(sTask As String)
               Me.Text = f
 
               LoadMenu()
-            Else If Lower(File.Ext(f)) = "dxf" Then
-              gcd.CurrentDrawing.FileName = f
-              cadDxf.arrToFill = gcd.CurrentDrawing.arrEntities
-              cadDxf.LoadFile(f, False, False, True)
-              regen
-              ' modelo recien cargado
-              cadZoomE.Start()                                ' por ahora mostramos el dibujo centrado, hasta q leamos el estado anterior
 
-              Me.Text = f
-
-              LoadMenu()
 
             Endif
           Endif
@@ -1190,6 +1180,76 @@ Public Sub gTask(sTask As String)
         If dwg.Write(t, f) Then
           Print "ok"
         Endif
+      Endif
+
+    Case "import"
+
+      NewDrawing = New ClsDrawing
+      gcd.Drawings.Add(NewDrawing)
+      gcd.CurrentDrawing = gcd.Drawings.Last
+      fx = dsk.FileChooser(Settings["LastDir", User.Home], ["dxf"])
+      If fx.Count > 0 Then
+        f = fx[0]
+        If Exist(f) Then
+          If Stat(f).Type = gb.File Then
+            If Lower(File.Ext(f)) = "dxf" Then
+              gcd.CurrentDrawing.FileName = f
+              cadDxf.arrToFill = gcd.CurrentDrawing.arrEntities
+              cadDxf.LoadFile(f, False, False, True)
+              regen
+              ' modelo recien cargado
+              cadZoomE.Start()                                ' por ahora mostramos el dibujo centrado, hasta q leamos el estado anterior
+
+              Me.Text = f
+
+              LoadMenu()
+
+            Endif
+          Endif
+        Endif
+      Endif
+
+
+
+
+    Case "export"
+
+
+
+      Dialog.Filter = ["*.dxf", "Drawing DXF"]
+      Dialog.SaveFile()
+      If Dialog.Path Then
+        f = Dialog.Path
+        If Exist(f) Then
+          If Message.Question(("The file exist"), ("Replace"), ("Cancel")) = 2 Then
+            f = ""
+          Endif
+        Endif
+      Else
+        f = ""
+      Endif
+
+
+      If f = "" Then
+        Print "Cancel"
+      Else
+        fbas = File.Dir(f) &/ File.BaseName(f)
+        If LCase(File.Ext(f)) <> "dxf" Then f &= ".dxf"
+
+        If Exist(f) Then
+          Shell "mv " & f & " " & fbas & ".bak" Wait
+          If Exist(t) Then
+            Shell "rm " & t Wait
+          Endif
+
+
+        Else  ' no existe
+          cadDxf.SaveDXF(f)
+
+
+        Endif
+
+
       Endif
 
     Case "info"

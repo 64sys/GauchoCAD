@@ -497,8 +497,8 @@ Public Sub ImpEnty5(cEny As Collection, obx As Entity[])
     If e.Exist("entity") Then                                     ' es una entidad?
       entNueva = New Entity                                       ' entonces, creamos una nueva
 
-      'If InStr("POINTATTDEFATTRIBLINELWPOLYLINECIRCLEELLIPSEARCTEXTMTEXTSPLINESOLIDLEADER", e["entity"]) = 0 Then Continue
-      If InStr("ATTDEFATTRIBLINELWPOLYLINECIRCLEELLIPSEARCTEXTMTEXTSPLINESOLIDLEADER", e["entity"]) = 0 Then Continue
+      If InStr("POINTATTDEFATTRIBLINELWPOLYLINECIRCLEELLIPSEARCTEXTMTEXTSPLINESOLIDLEADER", e["entity"]) = 0 Then Continue
+      'If InStr("ATTDEFATTRIBLINELWPOLYLINECIRCLEELLIPSEARCTEXTMTEXTSPLINESOLIDLEADER", e["entity"]) = 0 Then Continue
 
       If clsEntities.ImportJsonToEntity(e, entNueva) Then         ' si esta implementada, llenamos los datos
         If e.Exist("handle") Then
