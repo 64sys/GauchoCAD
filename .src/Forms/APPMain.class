@@ -112,26 +112,26 @@ Public Sub Run(cin As Collection)
         Select mnu.Name
           Case "grpEntities"
             tob = New ToolButton(pnlEntities) As "entity"
-            z = 48
+            z = 40 '48
           Case "grpTools"
             tob = New ToolButton(pnlEntities) As "tool"
-            z = 48
+            z = 40 '48
           Case "grpSmart"
             tob = New ToolButton(pnlSmart) As "tool"
-            z = 48
+            z = 40 '48
 
           Case "grpFile", "grpHelp"
             tob = New ToolButton(pnlFile) As "menuapp"
-            z = 32
+            z = 40 '32
 
           Case "grpOptions"
             tob = New ToolButton(pnlFile) As "menuapp"
-            z = 32
+            z = 40 '32
 
           Case "grpView"
             'tob = New ToolButton(pnlToolsH) As "tool"
             tob = New ToolButton(pnlFile) As "tool"
-            z = 32
+            z = 40 '32
 
         End Select
 
@@ -149,6 +149,7 @@ Public Sub Run(cin As Collection)
               If Exist(ictn[obj.Tag]) Then
                 If Stat(ictn[obj.Tag]).Type = gb.File Or Stat(ictn[obj.Tag]).Type = gb.Link Then
                   tob.Picture = Image.Load(ictn[obj.Tag]).Stretch(z - 8, z - 8).Picture
+                  .Border = True
                 Else
                   tob.Picture = obj.Picture
                   .Border = True
@@ -836,7 +837,6 @@ Public Sub GLArea1_MouseUp()
 
       gcd.clsJob.KeyText("U")
 
-
     Else If gcd.clsJob.gender = "Default" Then
 
       gcd.clsJob = gcd.clsJobPrevious
@@ -973,7 +973,6 @@ Public Sub entity_Click()
     gcd.clsJob.KeyText(Last.Tag)
 
   End If
-
 
 End
 
@@ -1131,7 +1130,6 @@ Public Sub gTask(sTask As String)
               Me.Text = f
 
               LoadMenu()
-
 
             Endif
           Endif
@@ -1558,7 +1556,8 @@ Public Sub btnLayers_MouseDown()
   'FLay = New FLayers1(gcd.CurrentDrawing.cModel["Layers"], [Workspace1.ScreenX, Workspace1.ScreenY])
   FLay = New FLayers1(gcd.CurrentDrawing.cModel, [Me.ScreenX, Me.ScreenY])
 
-  cVars = gcd.CurrentDrawing.cModel["Variables"]
+  'cVars = gcd.CurrentDrawing.cModel["Variables"]
+  cVars = gcd.CurrentDrawing.cModel["HEADER"]
 
   If SelectingLayer = False Then
     FLay.Stacking = Window.Above
@@ -1566,8 +1565,12 @@ Public Sub btnLayers_MouseDown()
     FLay.Run()
     Do
       If SelectingLayer = True Then
-        If cVars.Exist("clayer") Then
-          currLayer = cVars["clayer"]
+        If cVars.Exist("CLAYER") Then
+          If cVars["CLAYER"] <> "" Then
+            currLayer = cVars["CLAYER"]
+          Else
+            currLayer = "0"
+          Endif
         Else
           currLayer = "0"
         Endif
@@ -2203,7 +2206,6 @@ Public Sub Form_KeyPress()
       If gcd.clsJob.gender = "Builder" Then
 
         gcd.clsJob.KeyText("U")
-
 
       Else If gcd.clsJob.gender = "Default" Then
 

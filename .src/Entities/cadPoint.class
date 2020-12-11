@@ -222,7 +222,6 @@ Public Function ImportJsonCol(c As JSONCollection, e As Entity) As Boolean
   e.P.Add(c["x"])
   e.P.Add(c["y"])
 
-
   Return True
 
 End

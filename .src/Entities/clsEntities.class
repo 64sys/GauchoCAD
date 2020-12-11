@@ -22,8 +22,6 @@
 
 Create Static
 
-
-
 Public Function FIndBlockID(BlockName As String) As Integer
 
   Dim i As Integer
@@ -178,7 +176,6 @@ Public Sub glGenDrawList(Optional iEntity As Integer = -1)
   End If
 
 End
-
 
 '' Generates a GL list for the selected
 '' Mode: 0=Selected version 1=Normal version
@@ -781,7 +778,6 @@ Public Function SelectionSquare(X1real As Float, Y1real As Float, X2real As Floa
 
 End
 
-
 Public Function GetSelectionHandles(sHandles As String[]) As Integer
 
   Dim i As Integer
@@ -801,7 +797,6 @@ Public Function GetSelectionHandles(sHandles As String[]) As Integer
   Return itotal
 
 End
-
 
 ' Public Function SelectionSquare2(X1real As Float, Y1real As Float, X2real As Float, Y2real As Float, Optional NuevaSumaResta As String = "nueva", crossing As Boolean) As Integer
 '
@@ -1127,6 +1122,4 @@ Public Function GetEntityIndex(dDrawing As ClsDrawing, sHandle As String, Option
 
   Return -1           ' no hay handle asociada a esa entidad
 
-
 End
-

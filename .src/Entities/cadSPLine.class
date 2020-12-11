@@ -206,7 +206,6 @@ Public Function calculateDrawingPointsWithTangents(points As Float[])
 
   ' En este caso, los Fit points no se proveeen, por lo que se calculan como el punto medio entre puntos de tangente
 
-
   Dim interval As Float = 1 / numDrawingPoints
   Dim t As Float = interval
   Dim i, segments, iPoints, sobran, i2, faltan As Integer
@@ -245,7 +244,6 @@ Public Function calculateDrawingPointsWithTangents(points As Float[])
 
   Else ' tengo 4 o mas puntos, voy a dibujar lo que pueda
 
-
     '   01 23 45 67 89 1011 1213 1415 1617 1819 Max = 19 Count=20
     '    1  2  3  4  5    6    7    8    9   10
     '    F  T  nTangentes.............   T    F
@@ -272,7 +270,6 @@ Public Function calculateDrawingPointsWithTangents(points As Float[])
         p1.Insert(points.Copy(i + 2, 2))            ' TANGENTE
         p2.Insert(points.Copy(i + 2, 2))            ' TANGENTE, igual al anterior
 
-
         p3.Add((points[i + 4] + points[i + 2]) / 2) ' ESTE PUNTO DEBE SER CALCULADO
         p3.Add((points[i + 5] + points[i + 3]) / 2)
 
@@ -290,8 +287,6 @@ Public Function calculateDrawingPointsWithTangents(points As Float[])
         p3.Insert(points.Copy(i + 6, 2))            ' PUNTO FINAL,
 
         i += 6
-
-
 
       End If
 
@@ -475,12 +470,10 @@ End
 ' Importo los datos que puedo procesar de una coleccion y genero un Entity para ser agregado a un array
 Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
 
-
   Dim i, iFinal As Integer
   Dim fTangLargo As Float
   Dim fControlPoints As New Float[]
   Dim fFitPoint As New Float[]
-
 
   If c.Exist("ctrl_pts") Then
 
@@ -529,17 +522,11 @@ Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
 
     Endif
 
-
   End If
 
   ' puede habre tangentes
 
-
-
-
-
   If e.P.Count = 0 Then e.P.Insert([0, 0, 0, 0, 0, 0, 0, 0])
-
 
   Return True
 
