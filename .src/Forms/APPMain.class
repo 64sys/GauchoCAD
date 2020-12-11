@@ -1120,7 +1120,6 @@ Public Sub gTask(sTask As String)
 
               LoadMenu()
 
-
             Endif
           Endif
         Endif
@@ -1209,12 +1208,7 @@ Public Sub gTask(sTask As String)
         Endif
       Endif
 
-
-
-
     Case "export"
-
-
 
       Dialog.Filter = ["*.dxf", "Drawing DXF"]
       Dialog.SaveFile()
@@ -1229,7 +1223,6 @@ Public Sub gTask(sTask As String)
         f = ""
       Endif
 
-
       If f = "" Then
         Print "Cancel"
       Else
@@ -1242,13 +1235,10 @@ Public Sub gTask(sTask As String)
             Shell "rm " & t Wait
           Endif
 
-
         Else  ' no existe
           cadDxf.SaveDXF(f)
 
-
         Endif
-
 
       Endif
 
@@ -1683,10 +1673,10 @@ Public Sub SelectionRefresh()
 
   If etype.Count > 0 Then
     'pnlProperties.Visible = True
-    SelectionMode("selection")
+    'SelectionMode("selection")
     PropertiesFlag = True
   Else
-    SelectionMode()
+    'SelectionMode()
     pnlProperties.Visible = False
     PropertiesFlag = False
   Endif
