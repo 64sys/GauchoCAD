@@ -51,7 +51,14 @@ Public Sub Draw(oE As Entity)
 
   If Not oE.Visible Then Return
 
-  GLplus.Lines(oE.PolyLine, oE.ColorToPaint, oE.LineWidth, oe.linetype)
+  If oe.StringData[1] <> "Solid" Then
+
+    GLplus.Lines(oE.PolyLine, oE.ColorToPaint, oE.LineWidth, oe.linetype)
+  Else
+
+    glPlus.PolygonFilled(oe.P, oe.ColorToPaint, oe.ColorToPaint)
+
+  End If
 
 End
 

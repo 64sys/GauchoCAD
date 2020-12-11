@@ -114,7 +114,7 @@ Public Function Start(Optional filename As Variant, Optional _mode As Integer = 
 
             Endif
 
-            FillEntityWithHatch()
+            If entHatch.StringData[1] <> "Solid" Then FillEntityWithHatch()
 
             gcd.CurrentDrawing.arrEntities.Add(entHatch)
 
