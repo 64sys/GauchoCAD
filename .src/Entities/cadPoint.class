@@ -90,27 +90,20 @@ Public Sub Draw(oE As Entity)
   gl.Vertex2f(oe.P[0], oe.P[1])
   gl.End
 
-
 End
 
 '' A fat version of the line
 Public Sub DrawSelected(oE As Entity)
-
-
 
 End
 '' A fat version of the line
 
 Public Sub DrawRemark(oE As Entity)
 
-
-
 End
 
 '' The paint version of the entity
 Public Function Draw2(oE As Entity)
-
-
 
 End
 
@@ -127,8 +120,6 @@ Public Function BuildPOI(oE As Entity, Optional arrIndex As Integer = -1) As Int
   ' points: end-mid-end
   oe.poiPoints.insert([oE.p[0], oE.p[1]])
   oe.poiType.Add(gcd.poiEndPoint)
-
-
 
 End
 
