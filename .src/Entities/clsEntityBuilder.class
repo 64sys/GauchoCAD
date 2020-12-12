@@ -461,6 +461,8 @@ Public Sub Finish()
 
   LastEntity = elem                                       ' save it to repeat on rigth click
 
+  gcd.UpdateModel
+
   gcd.clsJobPrevious = Me
   gcd.clsJob = clsDefaultJob
   clsDefaultJob.PoiChecking = True

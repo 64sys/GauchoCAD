@@ -41,6 +41,14 @@ Public Visible As Boolean = True            ' si esta entidad puede ser mostrada
 Public Finished As Boolean = False          ' colocar en true cuando se llegue a completar
 Public StepsDone As Integer                 ' esto lo cambia cls ElementBuilder durante la construccion
 
+' JSON and DXF Read/Export
+Public Const JSON_Reading As Boolean = True
+Public Const JSON_Export As Boolean = True
+
+Public Const DXF_Reading As Boolean = False
+Public Const DXF_Export As Boolean = False
+
+
 Public Sub Translate(e As Entity, dX As Float, dY As Float, Optional OnlySelected As Boolean = False)
 
   Dim i As Integer
@@ -229,49 +237,78 @@ Public Function ImportJsonCol(c As JSONCollection, e As Entity) As Boolean
 End
 
 ' Exporto los datos de una Entity a una coleccion para ser guardados
-'Public Function ExportJsonCol(e As Entity) As Collection
-' Public Function dwg(e As Entity) As JSONCollection
-'
-'   Dim n As New JSONCollection
-'   'Common fields
-'   n["entity"] = "LINE"
-'   n["index"] = 44
-'   n["type"] = 19
-'   n["handle"] = [0, e.Handle]
-'   n["size"] = 43
-'   n["bitsize"] = 283
-'   n["ownerhandle"] = [12, 1, 3, 48]
-'   n["_subclass"] = "AcDbEntity"
-'   n["prev_entity"] = [8, 0, 0, 50]
-'   n["next_entity"] = [4, 0, 0, 0]
-'   n["layer"] = [5, 1, 6, 6]
-'   n["preview_exists"] = 0
-'   n["entmode"] = 0
-'   n["nolinks"] = 0
-'   n["color"] = e.colour
-'   n["ltype_scale"] = 1.0
-'   n["ltype_flags"] = 1
-'   n["plotstyle_flags"] = 0
-'   n["invisible"] = 0
-'   n["linewt"] = 30
-'   n["_subclass"] = "AcDbLine"
-'   n["z_is_zero"] = 1
-'   n["start"] = [-0.5, 0.0, 0.0]
-'   n["end"] = [-1.0, 0.0, 0.0]
-'   n["thickness"] = 0.000000
-'   n["extrusion"] = [0.0, 0.0, 1.0]
-'
-'   n.Add(e.colour, "color")
-'   'puntos
-'   n["start"] = [e.P[0], e.P[1]]
-'   n["end"] = [e.P[2], e.P[3]]
-'
-'   n.add(e.LineWidth * 100, "linewt")
-'
-'   ' etc
-'   Return n
-'
-' End
+Public Sub ExportJsonCol(e As Entity, n As JSONCollection, Optional CreateNew As Boolean = False)
+
+  If CreateNew Then
+
+    n.Add("LINE", "entity")
+    n.Add(0, "index")
+    n.Add(19, "type")
+    n.Add([0, e.Handle], "handle")
+    n.Add(43, "size")
+    n.Add(283, "bitsize")
+    n.Add([12, 1, 3, 48], "ownerhandle")
+    n.Add("AcDbEntity", "_subclass")
+    n.Add([8, 0, 0, 50], "prev_entity")
+    n.add([4, 0, 0, 0], "next_entity")
+    n.add([0, 0, 0, CInt(e.Layerid)], "layer")
+    n.add(0, "preview_exists")
+    n.add(0, "entmode")
+    n.add(0, "nolinks")
+    n.add(e.colour, "color")
+    n.add(1.0, "ltype_scale")
+    n.add(1, "ltype_flags")
+    n.add(0, "plotstyle_flags")
+    n.add(0, "invisible")
+    n.add(e.LineWidth, "linewt")
+    n.add("AcDbLine", "_subclass")
+    n.add(1, "z_is_zero")
+    'puntos
+    n.add([e.p[0], e.P[1]], "start")
+
+    n.add([e.p[2], e.p[3]], "end")
+    n.add(0.00000, "thickness")
+    n.add([0.0, 0.0, 1.0], "extrusion")
+
+
+
+
+  Else
+
+    n["entity"] = "LINE"
+    n["index"] = 44
+    n["type"] = 19
+    n["handle"] = [0, e.Handle]
+    n["size"] = 43
+    n["bitsize"] = 283
+    n["ownerhandle"] = [12, 1, 3, 48]
+    n["_subclass"] = "AcDbEntity"
+    n["prev_entity"] = [8, 0, 0, 50]
+    n["next_entity"] = [4, 0, 0, 0]
+    n["layer"][3] = CInt(e.Layerid)
+    n["preview_exists"] = 0
+    n["entmode"] = 0
+    n["nolinks"] = 0
+    n["color"] = e.colour
+    n["ltype_scale"] = 1.0
+    n["ltype_flags"] = 1
+    n["plotstyle_flags"] = 0
+    n["invisible"] = 0
+    n["linewt"] = e.LineWidth
+    n["_subclass"] = "AcDbLine"
+    n["z_is_zero"] = 1
+    'puntos
+    n["start"][0] = e.P[0]
+    n["start"][1] = e.P[1]
+    n["end"][0] = e.P[2]
+    n["end"][1] = e.P[3]
+    n["thickness"] = 0.000000
+    n["extrusion"] = [0.0, 0.0, 1.0]
+
+
+  Endif
+
+End
 
 '      "entity": "LINE",
 '      "index": 399,
