@@ -42,6 +42,13 @@ Public start As Float
 Public recorrido As Float
 Public angle As Float
 
+' JSON and DXF Read/Export
+Public Const JSON_Reading As Boolean = True
+Public Const JSON_Export As Boolean = False
+
+Public Const DXF_Reading As Boolean = False
+Public Const DXF_Export As Boolean = True
+
 Public Sub Translate(e As Entity, dX As Float, dY As Float, Optional OnlySelected As Boolean = False)
 
   Dim i As Integer
@@ -254,6 +261,37 @@ Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
   Return True
 
 End
+
+Public Sub ExportDXF(e As Entity, hFile As File)
+
+  Print #hFIle, "  0"
+  Print #hFIle, "ELLIPSE"
+  clsEntities.DXFExportCommon(e, hFile)
+  Print #hFIle, "100"
+  Print #hFIle, "AcDbEllipse"
+  Print #hFIle, " 10"                      ' X0
+  Print #hFIle, CStr(e.p[0])
+  Print #hFIle, " 20"                      ' Y0
+  Print #hFIle, CStr(e.p[1])
+  Print #hFIle, " 30"                      ' Z0
+  Print #hFIle, "0"
+  Print #hFIle, " 11"                      ' X1 eje major, relativo al centro
+  Print #hFIle, CStr(e.p[2] - e.p[0])
+  Print #hFIle, " 21"                      ' Y1 eje major, relativo al centro
+  Print #hFIle, CStr(e.p[3] - e.p[1])
+  Print #hFIle, " 31"                      ' Z1 eje major, relativo al centro
+  Print #hFIle, CStr(0)
+  Print #hFIle, " 40"                      ' ratio
+  Print #hFIle, CStr(e.fParam[0])
+  Print #hFIle, " 41"                      ' start angle
+  Print #hFIle, CStr(e.fParam[1] / 180 * Pi)
+  Print #hFIle, " 42"                      ' end angle
+  Print #hFIle, CStr(e.fParam[2] / 180 * Pi)
+
+End
+
+
+
 
 ' "entity": "ELLIPSE",
 ' "index": 2361,

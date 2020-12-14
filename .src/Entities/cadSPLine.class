@@ -35,6 +35,13 @@ Public drawingPoints As New Float[]
 
 Public numDrawingPoints As Integer = 100
 
+' JSON and DXF Read/Export
+Public Const JSON_Reading As Boolean = True
+Public Const JSON_Export As Boolean = False
+
+Public Const DXF_Reading As Boolean = False
+Public Const DXF_Export As Boolean = True
+
 Public Sub Translate(e As Entity, dX As Float, dY As Float, Optional OnlySelected As Boolean = False)
 
   Dim i As Integer
@@ -659,3 +666,52 @@ End
 '          "z": 0.0
 '        }
 '      ]
+
+
+Public Sub ExportDXF(e As Entity, hFile As File)
+
+  Dim i As Integer
+
+  Print #hFIle, "  0"                       ' Entity type
+  Print #hFIle, "SPLINE"
+  clsEntities.DXFExportCommon(e, hFile)
+  Print #hFIle, "100"                     ' Subclass marker
+  Print #hFIle, "AcDbSpline"
+  Print #hFIle, "210"                     ' vector normal
+  Print #hFIle, "  0"
+  Print #hFIle, "220"
+  Print #hFIle, "  0"
+  Print #hFIle, "230"
+  Print #hFIle, "  0"
+  Print #hFIle, " 70"                      ' Spline flag (bit coded):1 = Closed spline 2 = Periodic spline 4 = Rational spline 8 = Planar 16 = Linear(planar bit Is Also set)
+  Print #hFIle, "  8"
+  Print #hFIle, " 71"                      ' grado de la ecuacion
+  Print #hFIle, "2"
+  Print #hFIle, " 72"                      ' cantidad de puntos
+  Print #hFIle, e.p.Count
+  Print #hFIle, " 73"                      ' cantidad de puntos de control ?????????????
+  Print #hFIle, e.p.Count
+  Print #hFIle, " 74"                      ' cantidad de fit points
+  Print #hFIle, "  0"
+  Print #hFIle, " 42"                      ' Knot tolerance (default = 0.0000001)
+  Print #hFIle, "1e-07"
+  Print #hFIle, " 43"                      ' Control-point tolerance (default = 0.0000001)
+  Print #hFIle, "1e-07"
+  Print #hFIle, " 44"                      ' Fit tolerance (default = 0.0000000001)
+  Print #hFIle, "1e-10"
+  For i = 0 To e.p.Max Step 2
+    Print #hFIle, "40"                      ' Knot value ???
+    Print #hFIle, "  0"
+  Next
+  For i = 0 To e.p.Max Step 2
+    Print #hFIle, " 10"                      ' Xi
+    Print #hFIle, CStr(e.p[i])
+    Print #hFIle, " 20"                      ' Yi
+    Print #hFIle, CStr(e.p[i + 1])
+    Print #hFIle, " 30"                      ' Zi
+    Print #hFIle, "  0"
+
+  Next
+
+End
+

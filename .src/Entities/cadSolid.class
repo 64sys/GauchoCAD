@@ -41,6 +41,14 @@ Public Visible As Boolean = True            ' si esta entidad puede ser mostrada
 Public Finished As Boolean = False          ' colocar en true cuando se llegue a completar
 Public StepsDone As Integer                 ' esto lo cambia cls ElementBuilder durante la construccion
 
+' JSON and DXF Read/Export
+Public Const JSON_Reading As Boolean = True
+Public Const JSON_Export As Boolean = False
+
+Public Const DXF_Reading As Boolean = False
+Public Const DXF_Export As Boolean = True
+
+
 Public Sub Translate(e As Entity, dX As Float, dY As Float, Optional OnlySelected As Boolean = False)
 
   Dim i As Integer
@@ -248,3 +256,32 @@ End
 ' "corner3": [3031.97696102900818, 1631.40569016283212],
 ' "corner4": [3031.97696102900818, 1631.40569016283212],
 ' "extrusion": [0.0, 0.0, 1.0]
+
+
+Public Sub ExportDXF(e As Entity, hFile As File)
+
+  Dim i As Integer
+
+  Print #hFIle, "  0"                       ' Entity type
+  Print #hFIle, "SOLID"
+  clsEntities.DXFExportCommon(e, hFile)
+  Print #hFIle, "100"                     ' Subclass marker
+  Print #hFIle, "AcDbTrace"
+  Print #hFIle, " 90"                      ' cantidad de puntos
+  Print #hFIle, e.p.Count
+  Print #hFIle, " 70"                      ' 0 = abierta; 1 = cerrada
+  Print #hFIle, "0"
+  Print #hFIle, " 43"                      ' constant width  0 = constant
+  Print #hFIle, "0"
+  For i = 0 To e.p.Max Step 2
+    Print #hFIle, " 1" & Trim$(Str$(Int(i / 2)))                      ' Xi
+    Print #hFIle, CStr(e.p[i])
+    Print #hFIle, " 2" & Trim$(Str$(Int(i / 2)))
+    Print #hFIle, CStr(CStr(e.p[i + 1]))
+    Print #hFIle, " 3" & Trim$(Str$(Int(i / 2)))
+    Print #hFIle, "0"
+  Next
+
+End
+
+

@@ -46,7 +46,7 @@ Public Const JSON_Reading As Boolean = True
 Public Const JSON_Export As Boolean = True
 
 Public Const DXF_Reading As Boolean = False
-Public Const DXF_Export As Boolean = False
+Public Const DXF_Export As Boolean = True
 
 
 Public Sub Translate(e As Entity, dX As Float, dY As Float, Optional OnlySelected As Boolean = False)
@@ -310,27 +310,24 @@ Public Sub ExportJsonCol(e As Entity, n As JSONCollection, Optional CreateNew As
 
 End
 
-'      "entity": "LINE",
-'      "index": 399,
-'      "type": 19,
-'      "handle": [0, 254700],
-'      "size": 42,
-'      "bitsize": 283,
-'      "ownerhandle": [12, 1, 7, 254693],
-'      "_subclass": "AcDbEntity",
-'      "layer": [5, 2, 16846, 16846],
-'      "preview_exists": 0,
-'      "entmode": 0,
-'      "nolinks": 1,
-'      "color": 256,
-'      "ltype_scale": 1.0,
-'      "ltype_flags": 0,
-'      "plotstyle_flags": 0,
-'      "invisible": 0,
-'      "linewt": 29,
-'      "_subclass": "AcDbLine",
-'      "z_is_zero": 1,
-'      "start": [2914.34678481761921, 1641.03048722972585, 0.0],
-'      "end": [2914.3721519990504, 1641.03048722972585, 0.0],
-'      "thickness": 0.000000,
-'      "extrusion": [0.0, 0.0, 1.0]
+
+Public Sub ExportDXF(e As Entity, hFile As File)
+
+  Print #hFIle, "  0"                       ' Entity type
+  Print #hFIle, "LINE"
+  clsEntities.DXFExportCommon(e, hFile)
+  Print #hFIle, "100"                     ' Subclass marker
+  Print #hFIle, "AcDbLine"
+  Print #hFIle, " 10"                      ' X0
+  Print #hFIle, CStr(e.p[0])
+  Print #hFIle, " 20"                      ' Y0
+  Print #hFIle, CStr(e.p[1])
+  Print #hFIle, " 11"                      ' X1
+  Print #hFIle, CStr(e.p[2])
+  Print #hFIle, " 21"                      ' Y1
+  Print #hFIle, CStr(e.p[3])
+
+
+End
+
+

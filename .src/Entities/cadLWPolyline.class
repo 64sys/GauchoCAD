@@ -49,7 +49,12 @@ Public StepsDone As Integer                 ' esto lo cambia cls ElementBuilder 
 
 Private Const isOpen As Boolean = False
 
+' JSON and DXF Read/Export
+Public Const JSON_Reading As Boolean = True
+Public Const JSON_Export As Boolean = False
 
+Public Const DXF_Reading As Boolean = False
+Public Const DXF_Export As Boolean = True
 
 
 Public Sub Translate(e As Entity, dX As Float, dY As Float, Optional OnlySelected As Boolean = False)
@@ -256,3 +261,26 @@ End
 ' "bulges": [ el panceado de la polilinea, se usan en las nubes de revision por ejemplo,
 ' es una lista de valores Float, uno por vertice
 
+Public Sub ExportDXF(e As Entity, hFile As File)
+
+  Dim i As Integer
+
+  Print #hFIle, "  0"                       ' Entity type
+  Print #hFIle, "LWPOLYLINE"
+  clsEntities.DXFExportCommon(e, hFile)
+  Print #hFIle, "100"                     ' Subclass marker
+  Print #hFIle, "AcDbPolyline"
+  Print #hFIle, " 90"                      ' cantidad de puntos
+  Print #hFIle, e.p.Count
+  Print #hFIle, " 70"                      ' 0 = abierta; 1 = cerrada
+  Print #hFIle, "0"
+  Print #hFIle, " 43"                      ' constant width  0 = constant
+  Print #hFIle, "0"
+  For i = 0 To e.p.Max Step 2
+    Print #hFIle, " 10"                      ' Xi
+    Print #hFIle, CStr(e.p[i])
+    Print #hFIle, " 20"                      ' Yi
+    Print #hFIle, CStr(e.p[i + 1])
+  Next
+
+End

@@ -41,6 +41,13 @@ Public Visible As Boolean = True            ' si esta entidad puede ser mostrada
 Public Finished As Boolean = False          ' colocar en true cuando se llegue a completar
 Public StepsDone As Integer                 ' esto lo cambia cls ElementBuilder durante la construccion
 
+' JSON and DXF Read/Export
+Public Const JSON_Reading As Boolean = True
+Public Const JSON_Export As Boolean = False
+
+Public Const DXF_Reading As Boolean = False
+Public Const DXF_Export As Boolean = True
+
 Public Sub Translate(e As Entity, dX As Float, dY As Float, Optional OnlySelected As Boolean = False)
 
   Dim i As Integer
@@ -212,6 +219,25 @@ Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
   Return True
 
 End
+
+Public Sub ExportDXF(e As Entity, hFile As File)
+
+  Print #hFIle, "  0"
+  Print #hFIle, "CIRCLE"
+  clsEntities.DXFExportCommon(e, hFile)
+  Print #hFIle, "100"
+  Print #hFIle, "AcDbCircle"
+  Print #hFIle, " 10"                      ' X0
+  Print #hFIle, CStr(e.p[0])
+  Print #hFIle, " 20"                      ' Y0
+  Print #hFIle, CStr(e.P[1])
+  Print #hFIle, " 40"                      ' radious
+  Print #hFIle, CStr(e.fParam[0])
+
+
+End
+
+
 
 '    "entity": "CIRCLE",
 '    "index": 401,
