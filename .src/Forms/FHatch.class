@@ -6,6 +6,7 @@ Public Sub form_Open()
 
   Dim sFilename As String
 
+  ComboBox1.Add("Solid")
   For Each sFilename In Dir(Application.Path &/ "patterns", "*.dxf")
 
     ComboBox1.Add(Left$(sFilename, -4))
@@ -22,6 +23,14 @@ Public Sub form_Show()
 End
 
 Public Sub ComboBox1_Click()
+
+  If ComboBox1.Text = "Solid" Then
+    gcd.CurrentDrawing.LastHatch = ComboBox1.Index
+    gcd.CurrentDrawing.LastHatchPattern = ComboBox1.Text
+    DrawingArea1.Refresh
+
+    Return
+  Endif
 
   entyHatch.Clear
 
@@ -40,6 +49,15 @@ End
 Public Sub DrawingArea1_Draw()
 
   Dim entidad As Entity
+
+  If ComboBox1.Text = "Solid" Then
+    Paint.Brush = Paint.Color(Starter.gColor[APPMain.CurrentColor])
+    Paint.MoveTo(0, 0)
+    Paint.Rectangle(0, 0, Paint.w, Paint.h)
+    Paint.Fill
+
+    Return
+  Endif
 
   Paint.Scale(2, 2)
 

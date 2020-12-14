@@ -626,7 +626,7 @@ Public Function GetNewHandle(c As Collection) As String
   Dim i As Integer, s As String
 
   i = c.Count
-  Try i = Val(c[c.Last].handle)
+  Try i = CInt(c.Last)
   Do
     Inc i
     s = CStr(i) ' esto podria ser Hex
@@ -670,3 +670,47 @@ Public Function UpdateGraphics(Optional handles As String[] = [], DoRegen As Boo
   If DoRegen Then Regen
 
 End
+
+Public Sub UpdateModel()
+
+  Dim ent As Entity
+  Dim JSONExporting As Boolean
+  Dim jscNewEntity As JSONCollection
+  Dim sNewHandle As String
+
+  For Each ent In CurrentDrawing.arrEntities
+
+    JSONExporting = False               ' Supongo que la clase todvia no esta lista
+
+    ' Esto puede fallar en caso q no este lista, por eso el Try
+    Try JSONExporting = ent.ClassHandler.JSON_Export
+
+    If JSONExporting Then               ' La clase esta lista para crear/editar JSON
+
+      ' Verifico si la entidad ya existe en cModel, o fue creada por el usuario graficamente
+      If CurrentDrawing.cModel["ENTITIES"].Exist(ent.Handle) Then
+
+        ' Ya existe
+
+        ent.ClassHandler.ExportJsonCol(ent, CurrentDrawing.cModel["ENTITIES"][ent.Handle], False)
+
+      Else
+        ' No existe, debemos crear la entrada
+        jscNewEntity = New JSONCollection
+        sNewHandle = GetNewHandle(CurrentDrawing.cModel["ENTITIES"])
+
+        CurrentDrawing.cModel["ENTITIES"].Add(jscNewEntity, sNewHandle)
+        ent.Handle = sNewHandle
+
+        ' ahora metemos los datos communes
+        ' clsEntities.JSON_Export(ent, CurrentDrawing.cModel["ENTITIES"][ent.Handle])
+
+        ' y los datos particulares
+        ent.ClassHandler.ExportJsonCol(ent, CurrentDrawing.cModel["ENTITIES"][ent.Handle], True)
+      End If
+    End If
+
+  Next
+
+End
+

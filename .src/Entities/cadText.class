@@ -41,6 +41,13 @@ Public Visible As Boolean = True            ' si esta entidad puede ser mostrada
 Public Finished As Boolean = False          ' colocar en true cuando se llegue a completar
 Public StepsDone As Integer                 ' esto lo cambia cls ElementBuilder durante la construccion
 
+' JSON and DXF Read/Export
+Public Const JSON_Reading As Boolean = True
+Public Const JSON_Export As Boolean = False
+
+Public Const DXF_Reading As Boolean = False
+Public Const DXF_Export As Boolean = True
+
 Public Sub Translate(e As Entity, dX As Float, dY As Float, Optional OnlySelected As Boolean = False)
 
   Dim i As Integer
@@ -318,3 +325,58 @@ End
 '   "width_factor": 0.8,
 '   "text_value": "FECHA",
 '   "style": [5, 2, 1466, 1466]
+
+
+Public Sub ExportDXF(e As Entity, hFile As File)
+
+  Print #hFIle, "  0"
+  Print #hFIle, "TEXT"
+  clsEntities.DXFExportCommon(e, hFile)
+  Print #hFIle, "100"
+  Print #hFIle, "AcDbText"
+  Print #hFIle, " 10"                      ' X0
+  Print #hFIle, CStr(e.p[0])
+  Print #hFIle, " 20"                      ' Y0
+  Print #hFIle, CStr(e.p[1])
+  Print #hFIle, " 30"                      ' Z0
+  Print #hFIle, "0"
+  Print #hFIle, " 40"
+  Print #hFIle, CStr(e.fParam[1])
+  Print #hFIle, "  1"
+  Print #hFIle, e.StringData[0]
+  Print #hFIle, " 50"
+  Print #hFIle, CStr(e.fParam[0])
+  Print #hFIle, " 41"
+  Print #hFIle, "1"
+  Print #hFIle, " 51"
+  Print #hFIle, "0"
+  Print #hFIle, "  7"
+  Print #hFIle, "romanc" ' txtStyle
+  Print #hFIle, " 71"
+  Print #hFIle, "0"
+  Print #hFIle, " 72"                      ' justification:
+  ' Horizontal text justification type(Optional , Default = 0)integer codes(Not bit - coded):
+  ' 0 = Left 1 = Center  2 = Right 3 = Aligned( If vertical alignment = 0)  4 = Middle( If vertical alignment = 0) 5 = Fit( If vertical alignment = 0)
+  Print #hFIle, "3"
+  Print #hFIle, " 11"                      ' second point
+  Print #hFIle, "0" 'fPuntos[2]  TODO: fix this
+  Print #hFIle, " 21"
+  Print #hFIle, "0" ' fPuntos[3]
+  Print #hFIle, " 31"
+  Print #hFIle, "0"
+
+  Print #hFIle, "73"                      ' vertical justification:
+  ' Vertical text justification type(Optional , Default = 0): integer codes(Not bit - coded):
+  ' 0 = Baseline 1 = Bottom 2 = Middle 3 = Top
+  Print #hFIle, "  0"
+  Print #hFIle, "210"
+  Print #hFIle, "  0"
+  Print #hFIle, "220"
+  Print #hFIle, "  0"
+  Print #hFIle, "230"
+  Print #hFIle, "1"
+  Print #hFIle, "100"
+  Print #hFIle, "AcDbText"
+
+End
+

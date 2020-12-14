@@ -40,6 +40,13 @@ Public Visible As Boolean = True            ' si esta entidad puede ser mostrada
 Public Finished As Boolean = False          ' colocar en true cuando se llegue a completar
 Public StepsDone As Integer                 ' esto lo cambia cls ElementBuilder durante la construccion
 
+' JSON and DXF Read/Export
+Public Const JSON_Reading As Boolean = True
+Public Const JSON_Export As Boolean = False
+
+Public Const DXF_Reading As Boolean = False
+Public Const DXF_Export As Boolean = True
+
 Public Sub Translate(e As Entity, dX As Float, dY As Float, Optional OnlySelected As Boolean = False)
 
   Dim i As Integer
@@ -268,3 +275,37 @@ End
 '   "extrusion": [0.0, 0.0, 1.0],
 '   "has_attribs": 0,
 '   "block_header": [5, 2, 606, 606]
+
+Public Sub ExportDXF(e As Entity, hFile As File)
+
+  Print #hFIle, "  0"
+  Print #hFIle, "INSERT"
+  clsEntities.DXFExportCommon(e, hFile)
+  Print #hFIle, "100"
+  Print #hFIle, "AcDbBlockReference"
+  Print #hFIle, "  2"
+  Print #hFIle, e.Block
+  Print #hFIle, " 10"                      ' X0
+  Print #hFIle, CStr(e.p[0])
+  Print #hFIle, " 20"                      ' Y0
+  Print #hFIle, CStr(e.p[1])
+  Print #hFIle, " 30"                      ' Z0
+  Print #hFIle, "0"
+  Print #hFIle, " 41"                      ' X scale factor
+  Print #hFIle, CStr(e.fParam[0])
+  Print #hFIle, " 42"                      ' Y scale factor
+  Print #hFIle, CStr(e.fParam[1])
+  Print #hFIle, " 43"                      ' Z scale factor
+  Print #hFIle, "1"
+  Print #hFIle, " 50"                      ' rotation angle deg
+  Print #hFIle, CStr(e.fParam[2])
+  Print #hFIle, " 70"                      ' row count
+  Print #hFIle, "1" 'CStr(RowCol[0])
+  Print #hFIle, " 71"                      ' column count
+  Print #hFIle, "1" ' CStr(RowCol[1])
+  Print #hFIle, " 44"                      ' row spacing
+  Print #hFIle, "0" ' CStr(RowColSpacing[2])
+  Print #hFIle, " 45"                      ' column spacing
+  Print #hFIle, "0" 'CStr(RowColSpacing[3])
+
+End

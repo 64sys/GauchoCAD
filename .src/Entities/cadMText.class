@@ -66,6 +66,13 @@ Private CurrentTextCrossed As Boolean
 Private CurrentTextAngle As Float
 Private CurrentTextColor As Integer
 
+' JSON and DXF Read/Export
+Public Const JSON_Reading As Boolean = True
+Public Const JSON_Export As Boolean = False
+
+Public Const DXF_Reading As Boolean = False
+Public Const DXF_Export As Boolean = True
+
 Public Sub Translate(e As Entity, dX As Float, dY As Float, Optional OnlySelected As Boolean = False)
 
   Dim i As Integer
@@ -480,3 +487,59 @@ End
 ' "linespace_style": 1,
 ' "linespace_factor": 1.0,
 ' "unknown_b0": 0
+
+
+Public Sub ExportDXF(e As Entity, hFile As File)
+
+  Dim i As Integer
+  Dim first As Boolean
+
+  Print #hFIle, "  0"
+  Print #hFIle, "MTEXT"
+  clsEntities.DXFExportCommon(e, hFile)
+  Print #hFIle, "100"
+  Print #hFIle, "AcDbMText"
+  Print #hFIle, " 10"                      ' X0
+  Print #hFIle, CStr(e.p[0])
+  Print #hFIle, " 20"                      ' Y0
+  Print #hFIle, CStr(e.p[1])
+  Print #hFIle, " 30"                      ' Z0
+  Print #hFIle, "  0"
+  Print #hFIle, " 40"
+  Print #hFIle, CStr(e.fParam[1])
+  Print #hFIle, " 41"
+  Print #hFIle, "133.898835"
+  Print #hFIle, " 71"
+  Print #hFIle, "  5"
+  Print #hFIle, " 72"
+  Print #hFIle, "1"
+  first = True
+
+  For Each sText As String In e.StringData
+    If First Then
+      Print #hFIle, "  1"                       ' text, first part
+      Print #hFIle, sText
+      first = False
+    Else
+      Print #hFIle, "  3"                       ' text, first part
+      Print #hFIle, sText
+    End If
+  Next
+
+  Print #hFIle, "  7"
+  Print #hFIle, "romanc" ' e.txtStyle TODO: verificar
+  Print #hFIle, "210"
+  Print #hFIle, "  0"
+  Print #hFIle, "220"
+  Print #hFIle, "  0"
+  Print #hFIle, "230"
+  Print #hFIle, "1"
+  Print #hFIle, " 50"                      ' angle deg
+  Print #hFIle, CStr(e.fParam[0])
+  Print #hFIle, " 73"
+  Print #hFIle, "2"
+  Print #hFIle, " 44"
+  Print #hFIle, "1"
+
+End
+

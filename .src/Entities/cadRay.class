@@ -22,11 +22,11 @@
 Create Static
 'Fast
 
-Public Const Gender As String = "Line"
+Public Const Gender As String = "Ray"
 Public Const DrawingOrder As Integer = 1        ' 1 = draws first
-Public Const HelperTrabajo As String = ("a line")
+Public Const HelperTrabajo As String = ("an infinite ray")
 Public Const ParamType As String = "PP"                             ' that is Point, Point; could be Color Text, etc
-Public Const ParamHelper As String = "Start point;End point"
+Public Const ParamHelper As String = "Start point;Ray direction"
 Public Const GAMBASCADENTITY As String = "EntityBase"
 Public Const USEWITH As String = "clsEntityBuilder"
 Public Const PointsToDraw As Integer = 1             ' minimal point requered for drawing something usefull
@@ -41,12 +41,26 @@ Public Visible As Boolean = True            ' si esta entidad puede ser mostrada
 Public Finished As Boolean = False          ' colocar en true cuando se llegue a completar
 Public StepsDone As Integer                 ' esto lo cambia cls ElementBuilder durante la construccion
 
-' JSON and DXF Read/Export
-Public Const JSON_Reading As Boolean = True
-Public Const JSON_Export As Boolean = True
+Private p2 As New Float[]
 
-Public Const DXF_Reading As Boolean = False
-Public Const DXF_Export As Boolean = True
+Private Sub MakeRay(p As Float[])
+
+  p2.Clear
+
+  p2.Add(P[0])
+  p2.Add(P[1])
+
+  p2.Add((P[2] - p[0]) * 1e10)
+  p2.Add((P[3] - p[1]) * 1e10)
+
+  p2.Add(P[0])
+  p2.Add(P[1])
+
+  p2.Add((P[2] - p[0]) * -1e10)
+  p2.Add((P[3] - p[1]) * -1e10)
+
+
+End
 
 
 Public Sub Translate(e As Entity, dX As Float, dY As Float, Optional OnlySelected As Boolean = False)
@@ -94,7 +108,11 @@ Public Sub Draw(oE As Entity)
 
   oE.ColorToPaint = gcd.GetGBColor(oE.colour, oE.Layerid)
 
-  GLplus.Lines(oE.p, oE.ColorToPaint, oE.LineWidth, oE.LineType)
+  MakeRay(oe.p)
+
+  GLplus.Lines(p2, oE.ColorToPaint, oE.LineWidth, oE.LineType)
+
+
 
 End
 
@@ -105,10 +123,11 @@ Public Sub DrawSelected(oE As Entity)
   Dim iLineType As Integer
 
   If oe.LineType = gcd.stiDashed Then iLineType = 0 Else iLineType = gcd.stiDashed
+  MakeRay(oe.p)
 
-  GLplus.Lines(oE.p, Starter.flgWindowBackColor, oE.LineWidth, iLineType)
+  GLplus.Lines(p2, Starter.flgWindowBackColor, oE.LineWidth, iLineType)
 
-  GLplus.Lines(oE.p, gcd.ColorForSelected, oE.LineWidth, oe.LineType)
+  GLplus.Lines(p2, gcd.ColorForSelected, oE.LineWidth, oe.LineType)
 
 End
 '' A fat version of the line
@@ -117,14 +136,13 @@ Public Sub DrawRemark(oE As Entity)
 
   If Not oE.Visible Then Return
 
-  'GLplus.Lines(oE.p, Starter.flgWindowBackColor, oE.LineWidth, gcd.stiDashed)
-  'GLplus.Lines(oE.p, oE.ColorToPaint, oE.LineWidth + 2, oE.LineType)
+  MakeRay(oe.P)
   If oe.Selected Then
-    GLplus.Lines(oE.P, Starter.flgWindowBackColor, oE.LineWidth + 2, gcd.stiDashed)
-    GLplus.Lines(oE.P, gcd.ColorForSelected, oE.LineWidth + 2, oE.LineType)
+    GLplus.Lines(P2, Starter.flgWindowBackColor, oE.LineWidth + 2, gcd.stiDashed)
+    GLplus.Lines(P2, gcd.ColorForSelected, oE.LineWidth + 2, oE.LineType)
   Else
-    GLplus.Lines(oE.P, Starter.flgWindowBackColor, oE.LineWidth, gcd.stiDashed)
-    GLplus.Lines(oE.P, oE.ColorToPaint, oE.LineWidth + 2, oE.LineType)
+    GLplus.Lines(P2, Starter.flgWindowBackColor, oE.LineWidth, gcd.stiDashed)
+    GLplus.Lines(P2, oE.ColorToPaint, oE.LineWidth + 2, oE.LineType)
   Endif
 
 End
@@ -178,6 +196,22 @@ Public Sub Finish(oE As Entity, Optional ParamsDone As Integer = -1) As Boolean
 
   'Print "Finish en EntityBase"
   'CreatePolygon(oe)
+
+  ' If Abs(oe.P[2]) < 1e10 Then oe.p[2] *= 1e10
+  ' If Abs(oe.P[3]) < 1e10 Then oe.p[3] *= 1e10
+  ' If oe.P.Count < 4 Then
+  '   oe.P.Add(oe.P[0])
+  '   oe.P.Add(oe.P[1])
+  '
+  '   oe.P.Add(oe.P[2] * -1e10)
+  '   oe.P.Add(oe.P[3] * -1e10)
+  ' Else
+  '    If Abs(oe.P[6]) < 1e10 Then oe.p[6] *= 1e10
+  '    If Abs(oe.P[7]) < 1e10 Then oe.p[7] *= 1e10
+  '
+  '
+  ' Endif
+
   BuildPOI(oe)
 
   ' busco el tipo de linea, si hace falta
@@ -237,97 +271,71 @@ Public Function ImportJsonCol(c As JSONCollection, e As Entity) As Boolean
 End
 
 ' Exporto los datos de una Entity a una coleccion para ser guardados
-Public Sub ExportJsonCol(e As Entity, n As JSONCollection, Optional CreateNew As Boolean = False)
+'Public Function ExportJsonCol(e As Entity) As Collection
+' Public Function dwg(e As Entity) As JSONCollection
+'
+'   Dim n As New JSONCollection
+'   'Common fields
+'   n["entity"] = "LINE"
+'   n["index"] = 44
+'   n["type"] = 19
+'   n["handle"] = [0, e.Handle]
+'   n["size"] = 43
+'   n["bitsize"] = 283
+'   n["ownerhandle"] = [12, 1, 3, 48]
+'   n["_subclass"] = "AcDbEntity"
+'   n["prev_entity"] = [8, 0, 0, 50]
+'   n["next_entity"] = [4, 0, 0, 0]
+'   n["layer"] = [5, 1, 6, 6]
+'   n["preview_exists"] = 0
+'   n["entmode"] = 0
+'   n["nolinks"] = 0
+'   n["color"] = e.colour
+'   n["ltype_scale"] = 1.0
+'   n["ltype_flags"] = 1
+'   n["plotstyle_flags"] = 0
+'   n["invisible"] = 0
+'   n["linewt"] = 30
+'   n["_subclass"] = "AcDbLine"
+'   n["z_is_zero"] = 1
+'   n["start"] = [-0.5, 0.0, 0.0]
+'   n["end"] = [-1.0, 0.0, 0.0]
+'   n["thickness"] = 0.000000
+'   n["extrusion"] = [0.0, 0.0, 1.0]
+'
+'   n.Add(e.colour, "color")
+'   'puntos
+'   n["start"] = [e.P[0], e.P[1]]
+'   n["end"] = [e.P[2], e.P[3]]
+'
+'   n.add(e.LineWidth * 100, "linewt")
+'
+'   ' etc
+'   Return n
+'
+' End
 
-  If CreateNew Then
-
-    n.Add("LINE", "entity")
-    n.Add(0, "index")
-    n.Add(19, "type")
-    n.Add([0, e.Handle], "handle")
-    n.Add(43, "size")
-    n.Add(283, "bitsize")
-    n.Add([12, 1, 3, 48], "ownerhandle")
-    n.Add("AcDbEntity", "_subclass")
-    n.Add([8, 0, 0, 50], "prev_entity")
-    n.add([4, 0, 0, 0], "next_entity")
-    n.add([0, 0, 0, CInt(e.Layerid)], "layer")
-    n.add(0, "preview_exists")
-    n.add(0, "entmode")
-    n.add(0, "nolinks")
-    n.add(e.colour, "color")
-    n.add(1.0, "ltype_scale")
-    n.add(1, "ltype_flags")
-    n.add(0, "plotstyle_flags")
-    n.add(0, "invisible")
-    n.add(e.LineWidth, "linewt")
-    n.add("AcDbLine", "_subclass")
-    n.add(1, "z_is_zero")
-    'puntos
-    n.add([e.p[0], e.P[1]], "start")
-
-    n.add([e.p[2], e.p[3]], "end")
-    n.add(0.00000, "thickness")
-    n.add([0.0, 0.0, 1.0], "extrusion")
-
-
-
-
-  Else
-
-    n["entity"] = "LINE"
-    n["index"] = 44
-    n["type"] = 19
-    n["handle"] = [0, e.Handle]
-    n["size"] = 43
-    n["bitsize"] = 283
-    n["ownerhandle"] = [12, 1, 3, 48]
-    n["_subclass"] = "AcDbEntity"
-    n["prev_entity"] = [8, 0, 0, 50]
-    n["next_entity"] = [4, 0, 0, 0]
-    n["layer"][3] = CInt(e.Layerid)
-    n["preview_exists"] = 0
-    n["entmode"] = 0
-    n["nolinks"] = 0
-    n["color"] = e.colour
-    n["ltype_scale"] = 1.0
-    n["ltype_flags"] = 1
-    n["plotstyle_flags"] = 0
-    n["invisible"] = 0
-    n["linewt"] = e.LineWidth
-    n["_subclass"] = "AcDbLine"
-    n["z_is_zero"] = 1
-    'puntos
-    n["start"][0] = e.P[0]
-    n["start"][1] = e.P[1]
-    n["end"][0] = e.P[2]
-    n["end"][1] = e.P[3]
-    n["thickness"] = 0.000000
-    n["extrusion"] = [0.0, 0.0, 1.0]
-
-
-  Endif
-
-End
-
-
-Public Sub ExportDXF(e As Entity, hFile As File)
-
-  Print #hFIle, "  0"                       ' Entity type
-  Print #hFIle, "LINE"
-  clsEntities.DXFExportCommon(e, hFile)
-  Print #hFIle, "100"                     ' Subclass marker
-  Print #hFIle, "AcDbLine"
-  Print #hFIle, " 10"                      ' X0
-  Print #hFIle, CStr(e.p[0])
-  Print #hFIle, " 20"                      ' Y0
-  Print #hFIle, CStr(e.p[1])
-  Print #hFIle, " 11"                      ' X1
-  Print #hFIle, CStr(e.p[2])
-  Print #hFIle, " 21"                      ' Y1
-  Print #hFIle, CStr(e.p[3])
-
-
-End
-
-
+'      "entity": "LINE",
+'      "index": 399,
+'      "type": 19,
+'      "handle": [0, 254700],
+'      "size": 42,
+'      "bitsize": 283,
+'      "ownerhandle": [12, 1, 7, 254693],
+'      "_subclass": "AcDbEntity",
+'      "layer": [5, 2, 16846, 16846],
+'      "preview_exists": 0,
+'      "entmode": 0,
+'      "nolinks": 1,
+'      "color": 256,
+'      "ltype_scale": 1.0,
+'      "ltype_flags": 0,
+'      "plotstyle_flags": 0,
+'      "invisible": 0,
+'      "linewt": 29,
+'      "_subclass": "AcDbLine",
+'      "z_is_zero": 1,
+'      "start": [2914.34678481761921, 1641.03048722972585, 0.0],
+'      "end": [2914.3721519990504, 1641.03048722972585, 0.0],
+'      "thickness": 0.000000,
+'      "extrusion": [0.0, 0.0, 1.0]

@@ -185,6 +185,8 @@ Public lpValue As String
 
 Public arrToFill As Entity[]
 
+Private eExports As Boolean
+
 
 
 Public Function SaveDXF(sName As String) As Integer
@@ -3467,8 +3469,16 @@ Private Function dxfSave4Blocks() As Integer
     Print #hFIle, ""
 
     ' entidades del block
-    For iii = 0 To gcd.CurrentDrawing.arrBlocks[i].entities.Max
-      dxfSave51Entity(gcd.CurrentDrawing.arrBlocks[i].entities[iii])
+    For Each eBlock As Entity In gcd.CurrentDrawing.arrBlocks[i].entities
+      eExports = False
+      Try eExports = eBlock.ClassHandler.DXF_Export
+
+      If eExports Then
+
+        eBlock.ClassHandler.ExportDXF(eBlock, hFile)
+      Else
+        Debug eBlock.gender, "no se exorta a DXF"
+      End If
     Next
     Print #hFIle, "  0"
     Print #hFIle, "ENDBLK"
@@ -3503,7 +3513,15 @@ Private Function dxfSave5Entities() As Integer
 
   ' here go all entities
   For Each e In gcd.CurrentDrawing.arrEntities
-    dxfSave51Entity(e)
+    eExports = False
+    Try eExports = e.ClassHandler.DXF_Export
+
+    If eExports Then
+      e.ClassHandler.ExportDXF(e, hFile)
+    Else
+      Debug e.gender, "no se exporta a DXF"
+    End If
+
   Next
 
   ' end section code
@@ -3512,31 +3530,7 @@ Private Function dxfSave5Entities() As Integer
 
 End
 
-Private Function dxfSave51Entity(e As Entity)
 
-  Select Case e.Gender
-    Case "Line"
-      dxfSaveLine(e.p, e.Layer, e.colour,, e.LineWidth)
-    Case "LWPolyline"
-      dxfSavePLine(e.p, e.Layer, e.colour,, e.LineWidth)
-    Case "SPLine"
-      dxfSaveSPLine(e.p, e.Layer, e.colour,, e.LineWidth)
-    Case "Circle"
-      dxfSaveCircle(e.p, e.fParam[0], e.Layer, e.colour,, e.LineWidth)
-    Case "Arc"
-      dxfSaveArc(e.p, e.fParam[0], e.fParam[1], e.fParam[2], e.Layer, e.colour,, e.LineWidth)
-    Case "Ellipse"
-      dxfSaveEllipse(e.p, e.fParam[0], e.fParam[1], e.fParam[2], e.Layer, e.colour,, e.LineWidth)
-    Case "Text"
-      dxfSaveText(e.stringdata[0], e.p, e.fParam[1], e.fParam[0], e.Layer, e.colour,, e.LineWidth)
-    Case "MText"
-      dxfSaveMText(e.stringdata[0], e.p, e.fParam[1], e.fParam[0], e.Layer, e.colour,, e.LineWidth)
-    Case "Hatch"
-      dxfSaveHatch(e.stringdata[1], e.fParam[1], e.fParam[0], e.P, e.Layer, e.colour,, e.LineWidth)
-
-  End Select
-
-End
 
 Private Function dxfSave6Objects() As Integer
 
@@ -3575,457 +3569,12 @@ Private Function dxfSave6Objects() As Integer
 
 End
 
-Private Function dxfSaveLine(fPuntos As Float[], Optional layer As String = "0", colour As Integer = "256", LineType As String = "ByLayer", LineWidth As Float = "1")
 
-  Print #hFIle, "  0"                       ' Entity type
-  Print #hFIle, "LINE"
-  Print #hFIle, "  5"                       ' handle
-  Print #hFIle, "77"
-  Print #hFIle, "100"                     ' Subclass marker
-  Print #hFIle, "AcDbEntity"
-  Print #hFIle, "  8"                       ' Layer
-  Print #hFIle, layer
-  Print #hFIle, "  6"                       ' Linetype name (present if not BYLAYER). The special name BYBLOCK indicates a floating linetype (optional)
-  Print #hFIle, LineType
-  Print #hFIle, " 62"                      ' Color number (present if not BYLAYER); zero indicates the BYBLOCK (floating) color; 256 indicates BYLAYER;
-  Print #hFIle, colour
-  Print #hFIle, "370"                     ' Lineweight enum value. Stored and moved around as a 16-bit integer.
-  Print #hFIle, CStr(LineWidth)
-  Print #hFIle, "100"                     ' Subclass marker
-  Print #hFIle, "AcDbLine"
-  Print #hFIle, " 10"                      ' X0
-  Print #hFIle, CStr(fPuntos[0])
-  Print #hFIle, " 20"                      ' Y0
-  Print #hFIle, CStr(fPuntos[1])
-  Print #hFIle, " 11"                      ' X1
-  Print #hFIle, CStr(fPuntos[2])
-  Print #hFIle, " 21"                      ' Y1
-  Print #hFIle, CStr(fPuntos[3])
 
-End
 
-Private Function dxfSaveHatch(Pattern As String, rotation As Float, scale As Float, fPuntos As Float[], Optional layer As String = "0", colour As Integer = "256", LineType As String = "ByLayer", LineWidth As Float = "1")
 
-  Dim i As Integer
 
-  Print #hFIle, "  0"                       ' Entity type
-  Print #hFIle, "HATCH"
-  Print #hFIle, "  5"                       ' handle
-  Print #hFIle, "77"
-  Print #hFIle, "100"                     ' Subclass marker
-  Print #hFIle, "AcDbEntity"
-  Print #hFIle, "  8"                       ' Layer
-  Print #hFIle, layer
-  Print #hFIle, "  6"                       ' Linetype name (present if not BYLAYER). The special name BYBLOCK indicates a floating linetype (optional)
-  Print #hFIle, LineType
-  Print #hFIle, " 62"                      ' Color number (present if not BYLAYER); zero indicates the BYBLOCK (floating) color; 256 indicates BYLAYER;
-  Print #hFIle, colour
-  Print #hFIle, "370"                     ' Lineweight enum value. Stored and moved around as a 16-bit integer.
-  Print #hFIle, CStr(LineWidth)
-  Print #hFIle, "100"                     ' Subclass marker
-  Print #hFIle, "AcDbHatch"
 
-  Print #hFIle, " 10"                      ' X0
-  Print #hFIle, "0"
-  Print #hFIle, " 20"                      ' Y0   Elevation point
-  Print #hFIle, "0"
-  Print #hFIle, " 30"                      ' Z0
-  Print #hFIle, "0"                        '
-
-  Print #hFIle, " 210"                     ' X0
-  Print #hFIle, "0"
-  Print #hFIle, " 220"                     ' Y0   Exrusion direction
-  Print #hFIle, "0"
-  Print #hFIle, "230"                      ' Z0
-  Print #hFIle, "1"
-
-  Print #hFIle, "  2"                      ' Color number (present if not BYLAYER); zero indicates the BYBLOCK (floating) color; 256 indicates BYLAYER;
-  Print #hFIle, Pattern
-
-  Print #hFIle, " 70"                      ' 0 = pattern; 1 = solid
-  Print #hFIle, "0"
-
-  Print #hFIle, " 71" ' Associativity flag(0 = non - associative; 1 = associative); For MPolygon, solid - fill flag(0 = lacks solid fill; 1 = has solid fill)
-  Print #hFIle, "0"
-
-  Print #hFIle, " 91" ' Number Of boundary paths(loops) La cantidad de contornos que se definnen a p`partir de este punto
-  Print #hFIle, "1"
-
-  Print #hFIle, " 92" ' boundary paths 0=default; 1=external, 2=poly, 4=derivado, 8=textbox, 16=outermost
-  Print #hFIle, "0"
-
-  Print #hFIle, " 93" ' Numero de elementos q forman este borde (si es poly no se pone nada)
-  Print #hFIle, "0"
-
-  ' Gaucho por ahora define el contorno con polilineas unicamente, asi que las dos lineas siguientes se comentan
-  'Print #hFIle, " 72" ' 1 = lines, 2=arc, 3=ellipse, 4=SPline
-  'Print #hFIle, "0"
-
-  For i = 0 To fPuntos.Max Step 2
-    Print #hFIle, " 10"                      ' Xi
-    Print #hFIle, CStr(fPuntos[i])
-    Print #hFIle, " 20"                      ' Yi
-    Print #hFIle, CStr(CStr(fPuntos[i + 1]))
-  Next
-
-  Print #hFIle, " 97" ' puntos secudarios
-  Print #hFIle, "0"
-
-  Print #hFIle, " 75" ' Hatch style: 0 = Hatch “odd parity” area (Normal style), 1 = Hatch outermost area only(Outer style) , 2 = Hatch through entire area(Ignore style)                       ' 0 = pattern; 1 = solid
-  Print #hFIle, "0"
-
-  Print #hFIle, " 76" ' Hatch pattern type: 0 = User - defined , 1 = Predefined, 2 = Custom
-  Print #hFIle, "1"
-
-  Print #hFIle, " 52" ' rotation en RAD
-  Print #hFIle, CStr(rotation)
-
-  Print #hFIle, " 41" ' scale
-  Print #hFIle, CStr(scale)
-
-  Print #hFIle, " 77" ' Hatch pattern double flag (pattern fill only):0 = Not double,1 = double
-  Print #hFIle, "0"
-
-  Print #hFIle, " 78" ' Number of pattern definition lines  (si 76 es user defined)
-  Print #hFIle, "0"
-
-  Print #hFIle, " 98" ' Numero de elementos q forman este borde (si es poly no se pone nada)
-  Print #hFIle, "0"
-
-End
-
-Private Function dxfSavePLine(fPuntos As Float[], Optional layer As String = "0", colour As Integer = "256", LineType As String = "ByLayer", LineWidth As Float = "1")
-
-  Dim i As Integer
-
-  Print #hFIle, "  0"                       ' Entity type
-  Print #hFIle, "LWPOLYLINE"
-  Print #hFIle, "  5"                       ' handle
-  Print #hFIle, "77"
-  Print #hFIle, "100"                     ' Subclass marker
-  Print #hFIle, "AcDbEntity"
-  Print #hFIle, "  8"                       ' Layer
-  Print #hFIle, layer
-  Print #hFIle, "  6"                       ' Linetype name (present if not BYLAYER). The special name BYBLOCK indicates a floating linetype (optional)
-  Print #hFIle, LineType
-  Print #hFIle, " 62"                      ' Color number (present if not BYLAYER); zero indicates the BYBLOCK (floating) color; 256 indicates BYLAYER;
-  Print #hFIle, colour
-  Print #hFIle, "370"                     ' Lineweight enum value. Stored and moved around as a 16-bit integer.
-  Print #hFIle, CStr(LineWidth)
-  Print #hFIle, "100"                     ' Subclass marker
-  Print #hFIle, "AcDbPolyline"
-  Print #hFIle, " 90"                      ' cantidad de puntos
-  Print #hFIle, fPuntos.Count
-  Print #hFIle, " 70"                      ' 0 = abierta; 1 = cerrada
-  Print #hFIle, "0"
-  Print #hFIle, " 43"                      ' constant width  0 = constant
-  Print #hFIle, "0"
-  For i = 0 To fPuntos.Max Step 2
-    Print #hFIle, " 10"                      ' Xi
-    Print #hFIle, CStr(fPuntos[i])
-    Print #hFIle, " 20"                      ' Yi
-    Print #hFIle, CStr(CStr(fPuntos[i + 1]))
-  Next
-
-End
-
-Private Function dxfSaveSolid(fPuntos As Float[], Optional layer As String = "0", colour As Integer = "256", LineType As String = "ByLayer", LineWidth As Float = "1")
-
-  Dim i As Integer
-
-  Print #hFIle, "  0"                       ' Entity type
-  Print #hFIle, "SOLID"
-  Print #hFIle, "  5"                       ' handle
-  Print #hFIle, "77"
-  Print #hFIle, "100"                     ' Subclass marker
-  Print #hFIle, "AcDbEntity"
-  Print #hFIle, "  8"                       ' Layer
-  Print #hFIle, layer
-  Print #hFIle, "  6"                       ' Linetype name (present if not BYLAYER). The special name BYBLOCK indicates a floating linetype (optional)
-  Print #hFIle, LineType
-  Print #hFIle, " 62"                      ' Color number (present if not BYLAYER); zero indicates the BYBLOCK (floating) color; 256 indicates BYLAYER;
-  Print #hFIle, colour
-  Print #hFIle, "370"                     ' Lineweight enum value. Stored and moved around as a 16-bit integer.
-  Print #hFIle, CStr(LineWidth)
-  Print #hFIle, "100"                     ' Subclass marker
-  Print #hFIle, "AcDbTrace"
-  Print #hFIle, " 90"                      ' cantidad de puntos
-  Print #hFIle, fPuntos.Count
-  Print #hFIle, " 70"                      ' 0 = abierta; 1 = cerrada
-  Print #hFIle, "0"
-  Print #hFIle, " 43"                      ' constant width  0 = constant
-  Print #hFIle, "0"
-  For i = 0 To fPuntos.Max Step 2
-    Print #hFIle, " 1" & Trim$(Str$(Int(i / 2)))                      ' Xi
-    Print #hFIle, CStr(fPuntos[i])
-    Print #hFIle, " 2" & Trim$(Str$(Int(i / 2)))
-    Print #hFIle, CStr(CStr(fPuntos[i + 1]))
-    Print #hFIle, " 3" & Trim$(Str$(Int(i / 2)))
-    Print #hFIle, "0"
-  Next
-
-End
-
-Private Function dxfSaveText(texto As String, fPuntos As Float[], heigth As Float, Optional angle As Float = 0, layer As String = "0", colour As Integer = "256", LineType As String = "ByLayer", LineWidth As Float = "1", txtStyle As String = "romanc")
-
-  Print #hFIle, "  0"
-  Print #hFIle, "TEXT"
-  Print #hFIle, "  5"
-  Print #hFIle, "7C"
-  Print #hFIle, "100"
-  Print #hFIle, "AcDbEntity"
-  Print #hFIle, "  8"                       ' Layer
-  Print #hFIle, layer
-  Print #hFIle, "  6"                       ' Linetype name (present if not BYLAYER). The special name BYBLOCK indicates a floating linetype (optional)
-  Print #hFIle, LineType
-  Print #hFIle, " 62"                      ' Color number (present if not BYLAYER); zero indicates the BYBLOCK (floating) color; 256 indicates BYLAYER;
-  Print #hFIle, colour
-  Print #hFIle, "370"                     ' Lineweight enum value. Stored and moved around as a 16-bit integer.
-  Print #hFIle, CStr(LineWidth)
-  Print #hFIle, "100"
-  Print #hFIle, "AcDbText"
-  Print #hFIle, " 10"                      ' X0
-  Print #hFIle, CStr(fPuntos[0])
-  Print #hFIle, " 20"                      ' Y0
-  Print #hFIle, CStr(fPuntos[1])
-  Print #hFIle, " 30"                      ' Z0
-  Print #hFIle, "0"
-  Print #hFIle, " 40"
-  Print #hFIle, CStr(heigth)
-  Print #hFIle, "  1"
-  Print #hFIle, texto
-  Print #hFIle, " 50"
-  Print #hFIle, CStr(angle)
-  Print #hFIle, " 41"
-  Print #hFIle, "1"
-  Print #hFIle, " 51"
-  Print #hFIle, "0"
-  Print #hFIle, "  7"
-  Print #hFIle, txtStyle
-  Print #hFIle, " 71"
-  Print #hFIle, "0"
-  Print #hFIle, " 72"                      ' justification:
-  ' Horizontal text justification type(Optional , Default = 0)integer codes(Not bit - coded):
-  ' 0 = Left 1 = Center  2 = Right 3 = Aligned( If vertical alignment = 0)  4 = Middle( If vertical alignment = 0) 5 = Fit( If vertical alignment = 0)
-  Print #hFIle, "3"
-  Print #hFIle, " 11"                      ' second point
-  Print #hFIle, "0" 'fPuntos[2]  TODO: fix this
-  Print #hFIle, " 21"
-  Print #hFIle, "0" ' fPuntos[3]
-  Print #hFIle, " 31"
-  Print #hFIle, "0"
-
-  Print #hFIle, "73"                      ' vertical justification:
-  ' Vertical text justification type(Optional , Default = 0): integer codes(Not bit - coded):
-  ' 0 = Baseline 1 = Bottom 2 = Middle 3 = Top
-  Print #hFIle, "  0"
-  Print #hFIle, "210"
-  Print #hFIle, "  0"
-  Print #hFIle, "220"
-  Print #hFIle, "  0"
-  Print #hFIle, "230"
-  Print #hFIle, "1"
-  Print #hFIle, "100"
-  Print #hFIle, "AcDbText"
-
-End
-
-Private Function dxfSaveCircle(fCentro As Float[], radious As Float, Optional layer As String = "0", colour As Integer = "256", LineType As String = "ByLayer", LineWidth As Float = "1")
-
-  Print #hFIle, "  0"
-  Print #hFIle, "CIRCLE"
-  Print #hFIle, "  5"
-  Print #hFIle, "6E"
-  Print #hFIle, "100"
-  Print #hFIle, "AcDbEntity"
-  Print #hFIle, "  8"                       ' Layer
-  Print #hFIle, layer
-  Print #hFIle, "  6"                       ' Linetype name (present if not BYLAYER). The special name BYBLOCK indicates a floating linetype (optional)
-  Print #hFIle, LineType
-  Print #hFIle, " 62"                      ' Color number (present if not BYLAYER); zero indicates the BYBLOCK (floating) color; 256 indicates BYLAYER;
-  Print #hFIle, colour
-  Print #hFIle, "370"                     ' Lineweight enum value. Stored and moved around as a 16-bit integer.
-  Print #hFIle, CStr(LineWidth)
-  Print #hFIle, "100"
-  Print #hFIle, "AcDbCircle"
-  Print #hFIle, " 10"                      ' X0
-  Print #hFIle, CStr(fCentro[0])
-  Print #hFIle, " 20"                      ' Y0
-  Print #hFIle, CStr(fCentro[1])
-  Print #hFIle, " 40"                      ' radious
-  Print #hFIle, CStr(radious)
-
-End
-
-Private Function dxfSaveArc(fCentro As Float[], radious As Float, fStart As Float, fEnd As Float, Optional layer As String = "0", colour As Integer = "256", LineType As String = "ByLayer", LineWidth As Float = "1")
-
-  Print #hFIle, "  0"
-  Print #hFIle, "ARC"
-  Print #hFIle, "  5"
-  Print #hFIle, "6E"
-  Print #hFIle, "100"
-  Print #hFIle, "AcDbEntity"
-  Print #hFIle, "  8"                       ' Layer
-  Print #hFIle, layer
-  Print #hFIle, "  6"                       ' Linetype name (present if not BYLAYER). The special name BYBLOCK indicates a floating linetype (optional)
-  Print #hFIle, LineType
-  Print #hFIle, " 62"                      ' Color number (present if not BYLAYER); zero indicates the BYBLOCK (floating) color; 256 indicates BYLAYER;
-  Print #hFIle, colour
-  Print #hFIle, "370"                     ' Lineweight enum value. Stored and moved around as a 16-bit integer.
-  Print #hFIle, LineWidth
-  Print #hFIle, "100"
-  Print #hFIle, "AcDbCircle"
-  Print #hFIle, " 10"                      ' X0
-  Print #hFIle, CStr(fCentro[0])
-  Print #hFIle, " 20"                      ' Y0
-  Print #hFIle, CStr(fCentro[1])
-  Print #hFIle, " 30"                      ' Z0
-  Print #hFIle, "0"
-  Print #hFIle, " 40"                      ' radious
-  Print #hFIle, CStr(radious)
-  Print #hFIle, "100"
-  Print #hFIle, "AcDbArc"
-  Print #hFIle, " 50"                      ' start angle DEG
-  Print #hFIle, CStr(fStart)
-  Print #hFIle, " 51"                      ' end angle DEG
-  Print #hFIle, CStr(fEnd)
-
-End
-
-Private Function dxfSaveEllipse(fCentro As Float[], ratio As Float, fStart As Float, fEnd As Float, Optional layer As String = "0", colour As Integer = "256", LineType As String = "ByLayer", LineWidth As Float = "1")
-
-  Print #hFIle, "  0"
-  Print #hFIle, "ELLIPSE"
-  Print #hFIle, "  5"
-  Print #hFIle, "6E"
-  Print #hFIle, "100"
-  Print #hFIle, "AcDbEntity"
-  Print #hFIle, "  8"                       ' Layer
-  Print #hFIle, layer
-  Print #hFIle, "  6"                       ' Linetype name (present if not BYLAYER). The special name BYBLOCK indicates a floating linetype (optional)
-  Print #hFIle, LineType
-  Print #hFIle, " 62"                      ' Color number (present if not BYLAYER); zero indicates the BYBLOCK (floating) color; 256 indicates BYLAYER;
-  Print #hFIle, colour
-  Print #hFIle, "370"                     ' Lineweight enum value. Stored and moved around as a 16-bit integer.
-  Print #hFIle, CStr(LineWidth)
-  Print #hFIle, "100"
-  Print #hFIle, "AcDbEllipse"
-  Print #hFIle, " 10"                      ' X0
-  Print #hFIle, CStr(fCentro[0])
-  Print #hFIle, " 20"                      ' Y0
-  Print #hFIle, CStr(fCentro[1])
-  Print #hFIle, " 30"                      ' Z0
-  Print #hFIle, "0"
-  Print #hFIle, " 11"                      ' X1 eje major, relativo al centro
-  Print #hFIle, CStr(fCentro[2] - fCentro[0])
-  Print #hFIle, " 21"                      ' Y1 eje major, relativo al centro
-  Print #hFIle, CStr(fCentro[3] - fCentro[1])
-  Print #hFIle, " 31"                      ' Z1 eje major, relativo al centro
-  Print #hFIle, CStr(0)
-  Print #hFIle, " 40"                      ' ratio
-  Print #hFIle, CStr(ratio)
-  Print #hFIle, " 41"                      ' start angle
-  Print #hFIle, CStr(fStart / 180 * Pi)
-  Print #hFIle, " 42"                      ' end angle
-  Print #hFIle, CStr(fEnd / 180 * Pi)
-
-End
-
-Private Function dxfSaveMText(texto As String, fPuntos As Float[], heigth As Float, Optional angle As Float = 0, layer As String = "0", colour As Integer = "256", LineType As String = "ByLayer", LineWidth As Float = "1", txtStyle As String = "romanc")
-
-  Print #hFIle, "  0"
-  Print #hFIle, "MTEXT"
-  Print #hFIle, "  5"
-  Print #hFIle, "7B"
-  Print #hFIle, "100"
-  Print #hFIle, "AcDbEntity"
-  Print #hFIle, "  8"                       ' Layer
-  Print #hFIle, layer
-  Print #hFIle, "  6"                       ' Linetype name (present if not BYLAYER). The special name BYBLOCK indicates a floating linetype (optional)
-  Print #hFIle, LineType
-  Print #hFIle, " 62"                      ' Color number (present if not BYLAYER); zero indicates the BYBLOCK (floating) color; 256 indicates BYLAYER;
-  Print #hFIle, colour
-  Print #hFIle, "370"                     ' Lineweight enum value. Stored and moved around as a 16-bit integer.
-  Print #hFIle, CStr(LineWidth)
-  Print #hFIle, "100"
-  Print #hFIle, "AcDbMText"
-  Print #hFIle, " 10"                      ' X0
-  Print #hFIle, CStr(fPuntos[0])
-  Print #hFIle, " 20"                      ' Y0
-  Print #hFIle, CStr(fPuntos[1])
-  Print #hFIle, " 30"                      ' Z0
-  Print #hFIle, "  0"
-  Print #hFIle, " 40"
-  Print #hFIle, CStr(heigth)
-  Print #hFIle, " 41"
-  Print #hFIle, "133.898835"
-  Print #hFIle, " 71"
-  Print #hFIle, "  5"
-  Print #hFIle, " 72"
-  Print #hFIle, "1"
-  Print #hFIle, "  1"                       ' text, first part
-  Print #hFIle, texto
-  Print #hFIle, "  7"
-  Print #hFIle, txtStyle
-  Print #hFIle, "210"
-  Print #hFIle, "  0"
-  Print #hFIle, "220"
-  Print #hFIle, "  0"
-  Print #hFIle, "230"
-  Print #hFIle, "1"
-  Print #hFIle, " 50"                      ' angle deg
-  Print #hFIle, CStr(angle)
-  Print #hFIle, " 73"
-  Print #hFIle, "2"
-  Print #hFIle, " 44"
-  Print #hFIle, "1"
-
-End
-
-Private Function dxfSaveInsert(BlockName As String, fPuntos As Float[], Optional fScale As Float[] = [1, 1, 1], angle As Float = 0, layer As String = "0", colour As Integer = "256", LineType As String = "ByLayer", LineWidth As Float = "1", RowCol As Integer[] = [1, 1], RowColSpacing As Float[] = [0, 0])
-
-  Print #hFIle, "  0"
-  Print #hFIle, "INSERT"
-  Print #hFIle, "  5"                       ' handle
-  Print #hFIle, "80"
-  Print #hFIle, "100"
-  Print #hFIle, "AcDbEntity"
-  Print #hFIle, "  8"                       ' Layer
-  Print #hFIle, layer
-  Print #hFIle, "  6"                       ' Linetype name (present if not BYLAYER). The special name BYBLOCK indicates a floating linetype (optional)
-  Print #hFIle, LineType
-  Print #hFIle, " 62"                      ' Color number (present if not BYLAYER); zero indicates the BYBLOCK (floating) color; 256 indicates BYLAYER;
-  Print #hFIle, colour
-  Print #hFIle, "370"                     ' Lineweight enum value. Stored and moved around as a 16-bit integer.
-  Print #hFIle, CStr(LineWidth)
-  Print #hFIle, "100"
-  Print #hFIle, "AcDbBlockReference"
-  Print #hFIle, "  2"
-  Print #hFIle, blockname
-  Print #hFIle, " 10"                      ' X0
-  Print #hFIle, CStr(fPuntos[0])
-  Print #hFIle, " 20"                      ' Y0
-  Print #hFIle, CStr(fPuntos[1])
-  Print #hFIle, " 30"                      ' Z0
-  Print #hFIle, "0"
-  Print #hFIle, " 41"                      ' X scale factor
-  Print #hFIle, CStr(fScale[0])
-  Print #hFIle, " 42"                      ' Y scale factor
-  Print #hFIle, CStr(fScale[1])
-  Print #hFIle, " 43"                      ' Z scale factor
-  Print #hFIle, CStr(fScale[2])
-  Print #hFIle, " 50"                      ' rotation angle deg
-  Print #hFIle, CStr(angle)
-  Print #hFIle, " 70"                      ' row count
-  Print #hFIle, CStr(RowCol[0])
-  Print #hFIle, " 71"                      ' column count
-  Print #hFIle, CStr(RowCol[1])
-  Print #hFIle, " 44"                      ' row spacing
-  Print #hFIle, CStr(RowColSpacing[2])
-  Print #hFIle, " 45"                      ' column spacing
-  Print #hFIle, CStr(RowColSpacing[3])
-
-End
 
 Private Function dxfSaveDimension(BlockName As String, fPuntos As Float[], Optional angle As Float = 0, layer As String = "0", colour As Integer = "256", LineType As String = "ByLayer", LineWidth As Float = "1")
 
@@ -4089,64 +3638,6 @@ Private Function dxfSaveDimension(BlockName As String, fPuntos As Float[], Optio
   Print #hFIle, "  0"
   Print #hFIle, "100"
   Print #hFIle, "AcDbRotatedDimension"
-
-End
-
-Private Function dxfSaveSPLine(fPuntos As Float[], Optional layer As String = "0", colour As Integer = "256", LineType As String = "ByLayer", LineWidth As Float = "1")
-
-  Dim i As Integer
-
-  Print #hFIle, "  0"                       ' Entity type
-  Print #hFIle, "SPLINE"
-  Print #hFIle, "  5"                       ' handle
-  Print #hFIle, "77"
-  Print #hFIle, "100"                     ' Subclass marker
-  Print #hFIle, "AcDbEntity"
-  Print #hFIle, "  8"                       ' Layer
-  Print #hFIle, layer
-  Print #hFIle, "  6"                       ' Linetype name (present if not BYLAYER). The special name BYBLOCK indicates a floating linetype (optional)
-  Print #hFIle, LineType
-  Print #hFIle, "  62"                      ' Color number (present if not BYLAYER); zero indicates the BYBLOCK (floating) color; 256 indicates BYLAYER;
-  Print #hFIle, colour
-  Print #hFIle, "370"                     ' Lineweight enum value. Stored and moved around as a 16-bit integer.
-  Print #hFIle, CStr(LineWidth)
-  Print #hFIle, "100"                     ' Subclass marker
-  Print #hFIle, "AcDbSpline"
-  Print #hFIle, "210"                     ' vector normal
-  Print #hFIle, "  0"
-  Print #hFIle, "220"
-  Print #hFIle, "  0"
-  Print #hFIle, "230"
-  Print #hFIle, "  0"
-  Print #hFIle, " 70"                      ' Spline flag (bit coded):1 = Closed spline 2 = Periodic spline 4 = Rational spline 8 = Planar 16 = Linear(planar bit Is Also set)
-  Print #hFIle, "  8"
-  Print #hFIle, " 71"                      ' grado de la ecuacion
-  Print #hFIle, "2"
-  Print #hFIle, " 72"                      ' cantidad de puntos
-  Print #hFIle, fPuntos.Count
-  Print #hFIle, " 73"                      ' cantidad de puntos de control ?????????????
-  Print #hFIle, fPuntos.Count
-  Print #hFIle, " 74"                      ' cantidad de fit points
-  Print #hFIle, "  0"
-  Print #hFIle, " 42"                      ' Knot tolerance (default = 0.0000001)
-  Print #hFIle, "1e-07"
-  Print #hFIle, " 43"                      ' Control-point tolerance (default = 0.0000001)
-  Print #hFIle, "1e-07"
-  Print #hFIle, " 44"                      ' Fit tolerance (default = 0.0000000001)
-  Print #hFIle, "1e-10"
-  For i = 0 To fPuntos.Max Step 2
-    Print #hFIle, "40"                      ' Knot value ???
-    Print #hFIle, "  0"
-  Next
-  For i = 0 To fPuntos.Max Step 2
-    Print #hFIle, " 10"                      ' Xi
-    Print #hFIle, CStr(fPuntos[i])
-    Print #hFIle, " 20"                      ' Yi
-    Print #hFIle, CStr(fPuntos[i + 1])
-    Print #hFIle, " 30"                      ' Zi
-    Print #hFIle, "  0"
-
-  Next
 
 End
 
