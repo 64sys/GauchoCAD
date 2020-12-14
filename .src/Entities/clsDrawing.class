@@ -55,12 +55,9 @@ Public cBlocks As New Collection    '' All Blocks data from dwg is listed here
 Public cEntities As New Collection  '' All Entity are here if form cEntities[handle] as Entity
 Public cImport As New Collection    '' Impor data from dxf, dwg is loaded here
 
-
-
 ' ===============================================================================================================================
 ' GRAPHICS
 ' ===============================================================================================================================
-
 
 Public arrExtras As New Entity[]          ' For entities
 Public arrBlocks As New Block[]
@@ -73,7 +70,6 @@ Public Layers As New CadLayer[]             ' esto puede ser un array o una cole
 ' SELECTION
 Public arrSelecIndex As New Integer[]       '' List of indexes of selected entities with the mouse
 Public hSelection As New String[]           '' List of handles of selected entities with the mouse
-
 
 ' point of interests, lines, areas and entities: all this is generated n the entity creation
 Public poiPoints As New Float[]                 '' xy pairs of points

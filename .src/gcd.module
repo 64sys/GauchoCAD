@@ -676,7 +676,8 @@ Public Sub UpdateModel()
   Dim ent As Entity
   Dim JSONExporting As Boolean
   Dim jscNewEntity As JSONCollection
-  Dim sNewHandle As String
+  'Dim sNewHandle As String
+  Dim iHandle As Integer
 
   For Each ent In CurrentDrawing.arrEntities
 
@@ -697,20 +698,23 @@ Public Sub UpdateModel()
       Else
         ' No existe, debemos crear la entrada
         jscNewEntity = New JSONCollection
-        sNewHandle = GetNewHandle(CurrentDrawing.cModel["ENTITIES"])
+        'sNewHandle = GetNewHandle(CurrentDrawing.cModel["ENTITIES"])
+        iHandle = CurrentDrawing.cModel["AuxHeader"]["HANDSEED"]
 
-        CurrentDrawing.cModel["ENTITIES"].Add(jscNewEntity, sNewHandle)
-        ent.Handle = sNewHandle
+        CurrentDrawing.cModel["ENTITIES"].Add(jscNewEntity, CStr(iHandle + 1))
+        ent.Handle = CStr(iHandle + 1) 'sNewHandle
 
         ' ahora metemos los datos communes
         ' clsEntities.JSON_Export(ent, CurrentDrawing.cModel["ENTITIES"][ent.Handle])
 
         ' y los datos particulares
         ent.ClassHandler.ExportJsonCol(ent, CurrentDrawing.cModel["ENTITIES"][ent.Handle], True)
+
+        CurrentDrawing.cModel["AuxHeader"]["HANDSEED"] = iHandle + 1
+
       End If
     End If
 
   Next
 
 End
-
