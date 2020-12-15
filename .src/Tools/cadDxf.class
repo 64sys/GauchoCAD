@@ -209,21 +209,6 @@ Private Sub ReadData()
 
 End
 
-Private Function GetData(CODE As Integer) As String
-
-  While (CInt(lpcode) <> CODE) And Not Eof(fp)
-    Line Input #fp, lpcode
-    Line Input #fp, lpValue
-
-    If Right(lpcode, 1) = gb.Cr Then lpcode = Left(lpcode, -1)
-    If Right(lpvalue, 1) = gb.cr Then lpvalue = Left(lpvalue, -1)
-
-    lpcode = Trim$(lpcode)
-    lpvalue = Trim$(lpvalue)
-  Wend
-  Return lpValue
-
-End
 
 Public Sub FinishDXFRead()
 
@@ -237,13 +222,304 @@ Public Sub FinishDXFRead()
   Print "Inserts", mInsertcount
   Print "Blocks", mBlockCount
   Print "Dims", mDimCount
-
   Print
   Print "Total elements", mPolyLinePointsCount + mDimCount + mLineCount + mCircleCount + mMTextcount + mTextcount + mArcCount + mSplineCount + mInsertCount, " processed in ", Str(Timer - t), " Secconds"
 
   fp.Close
 
 End
+
+Public Function dxfLoad(sFile As String, Optional IgnoreLayers As Boolean = False, IgnoreBlocks As Boolean = False, IgnoreData As Boolean = False)
+
+  fp = Open sFile For Read
+
+  If Not fp Then Error.Raise("Error !")
+
+  While Not Eof(fp)
+    Wait 0.0001
+    ReadData
+    If lpCode = "0" And lpValue = "SECTION" Then
+      ' vemos que seccion es
+      ReadData
+      If lpCode = "2" And lpValue = "HEADER" And Not IgnoreData Then dxfLoad1Headers
+
+      If lpCode = "2" And lpValue = "CLASSES" Then Debug "CLASSES ignoradas"
+
+      If lpCode = "2" And lpValue = "TABLES" And Not IgnoreLayers Then dxfLoad3Tables
+
+      If lpCode = "2" And lpValue = "BLOCKS" And Not IgnoreBlocks Then dxfLoad4Blocks
+
+      If lpCode = "2" And lpValue = "ENTITIES" Then dxfLoad5Entities
+
+      If lpCode = "2" And lpValue = "OBJECTS" Then dxfLoad6Objects
+
+    Endif
+  Wend
+
+
+End
+
+Private Sub dxfLoad6Objects()
+
+
+
+End
+
+
+
+Private Sub dxfLoad5Entities(arrAcumulador As Entity[])
+
+  Dim sClave As String[]
+  Dim sValue As String[]
+  Dim sEntidad As String
+  Dim clsHandler As Object
+  Dim eNueva As Entity
+
+  ReadData
+  Do
+    sClave = New String[]
+
+    sValue = New String[]
+
+    sEntidad = lpValue
+
+    If lpValue = "ENDSEC" Then Return
+
+    ' Leo descentralizadamente las entidades
+
+    While (lpcode <> "0") And Not Eof(fp)
+
+      sClave.Add(lpCode)           ' el codigo es el tipo de variable
+      sValue.Add(lpValue)
+
+      ReadData
+
+    Wend
+
+    ' Termino la lectura de la entidad, busco a ver si la tengo lista
+    clsHandler = Object.New("cad" & sEntidad)  ' obtenemos el tipo de entidad y buscamos su clase. Si no
+
+    If clsHandler.DXF_reading Then                  ' verifico si la clase ya lee DXF
+
+      eNueva = New Entity                           ' creo la entidad
+
+      dxfReadCommonEntityData(eNueva, sClave, sValue)
+
+      clsHandler.importDXF(eNueva, sClave, sValue)  ' la leo
+
+      arrAcumulador.Add(eNueva)                     ' la acumulo en el array corresppondiente
+
+
+    Endif
+
+
+
+  Loop
+
+
+End
+
+
+Private Sub dxfLoad4Blocks()
+
+  Dim mBlock As Block
+
+
+  ReadData
+  Do
+
+    mBlock = New Block
+    If lpCode = "0" And lpValue = "ENDSEC" Then Return
+
+    If (lpcode = "0") And (lpvalue = "BLOCK") Then
+      ReadData
+
+      While (lpcode <> "0") And Not Eof(fp)
+        'If lpcode = "5" Then mBlock.handle = lpvalue               ' Handle
+        If lpcode = "8" Then mBlock.layer = lpvalue                ' Layer
+        'If lpcode = "6" Then mBlock.linetype = lpvalue             ' LineType
+        'If lpcode = "62" Then mBlock.bColor = CInt(lpvalue)        ' Color code (no es RBG) (256=ByLayer)
+        'If lpcode = "370" Then mBlock.LineWt = CInt(lpvalue)        ' Color code (no es RBG) (256=ByLayer)
+        If lpcode = "2" Then mBlock.name = lpValue
+        If lpcode = "10" Then mBlock.x = CFloat(lpValue)         ' X
+        If lpcode = "20" Then mBlock.y = CFloat(lpValue)         ' Y
+        ReadData
+
+      Wend
+      ' si estoy leyendo bloques, significa que estoy abriendo un plano
+      mBlock.entities = New Entity[]
+      gcd.CurrentDrawing.arrBlocks.Add(mBlock)
+
+      dxfLoad5Entities(gcd.CurrentDrawing.arrBlocks.Last.entities)
+
+
+    Else If (lpcode = "0") And (lpvalue = "ENDBLK") Then
+
+      ReadData
+
+    Endif
+  Loop
+
+End
+
+
+Private Sub dxfLoad3Tables()
+
+  '    0
+  ' TABLE
+  ' 2
+  ' VPORT
+  '   5
+  '   8
+  ' 330
+  '   0
+  ' 100
+  ' AcDbSymbolTable
+  ' 70
+  ' 1
+  '   0
+  ' VPORT
+
+  ' Yo usare dos colecciones
+
+
+  ReadData
+  Do
+
+
+    If lpCode = "0" And lpValue = "ENDSEC" Then Return
+    Select Case lpValue ' VIEWPORT , LAYER, etc
+      Case "LAYER"
+
+
+        If lpvalue = "LAYER" Then
+          Dim newLayer As JSONCollection, jscLayers As JSONCollection
+          Inc mLayerCount
+
+          ' "object": "LAYER",
+          ' "index": 5,
+          ' "type": 51,
+          ' "handle": [0, 6],
+          ' "size": 25,
+          ' "bitsize": 120,
+          ' "ownerhandle": [10, 1, 12, 18],
+          ' "xdicobjhandle": [3, 2, 1762, 1762],
+          ' "name": "0",
+          ' "is_xref_ref": 1,
+          ' "is_xref_resolved": 0,
+          ' "is_xref_dep": 0,
+          ' "xref": [5, 0, 0, 0],
+          ' "flag": 1008,
+          ' "linewt": 31,
+          ' "color": 7,
+          ' "plotstyle": [5, 1, 7, 7],
+          ' "ltype": [5, 1, 10, 10]
+
+
+          ' primero me fijo si existe
+          If Not gcd.CurrentDrawing.cModel.Exist("LAYERS") Then
+            jscLayers = New JSONCollection
+            gcd.CurrentDrawing.cModel.Add(jscLayers, "LAYERS")
+          Endif
+          newlayer = New JSONCollection
+
+          newlayer.Add(Format(mLayerCount, "0"), "id")
+          ReadData
+          While (lpcode <> "0") And Not Eof(fp)
+            Debug lpcode, lpvalue
+            If lpcode = "5" Then newlayer.Add(lpvalue, "handle")
+            If lpcode = "2" Then
+              If lpvalue = "" Then lpvalue = newlayer["id"]
+              newlayer.Add(lpvalue, "name")
+
+            End If
+            If lpcode = "6" Then newLayer.Add(lpvalue, "style")
+            If lpcode = "62" Then
+              newLayer.Add(Abs(CInt(lpvalue)), "color")
+              If CInt(lpvalue) > 0 Then newLayer.Add(True, "show") Else newLayer.Add(False, "show")
+            End If
+            ' If lpcode = "70" Then
+            '   If ((CInt(lpvalue) And 2) = 2 Or (CInt(lpvalue) And 1) = 1) Then newLayer.Add(True, "locked") Else newLayer.Add(False, "locked")
+            ' End If
+            ' If lpcode = "20" Then
+            '   If ((CInt(lpvalue) And 4) = 4) Then newLayer.Add(True, "frozen") Else newLayer.Add(False, "frozen")
+            ' End If
+            '
+            ' If lpcode = "290" Then newLayer.Add(lpvalue, "print")
+            ' If lpcode = "370" Then newLayer.Add(lpvalue, "width")
+            ReadData
+          Wend
+
+          gcd.CurrentDrawing.cModel["LAYERS"].Add(newlayer, newLayer["name"])
+
+        End If
+
+
+    End Select
+
+    ReadData
+  Loop
+
+End
+
+Private Sub dxfLoad1Headers()
+
+  ' Los header se guardan asi
+  '   9                     Indica que es una variable
+  ' $EXTMAX                 Nombre de la variable
+  '  10                     Tipo de dato1
+  ' 198.0411690635561       Dato1
+  '  20                     Tipo de dato2
+  ' 178.7767572407179       Dato2
+  '  30                     etc
+  '   0
+
+  ' Yo usare dos colecciones
+
+  Dim sVarName As String
+  Dim sClave As String[]
+  Dim sValue As String[]
+
+  ReadData
+  Do
+    sClave = New String[]
+    sValue = New String[]
+
+    If lpCode = "0" And lpValue = "ENDSEC" Then Return
+
+    If lpcode = "9" Then
+      sVarName = lpValue
+      Do                          ' este bucle es por si la variable es un array
+        ReadData
+        If lpcode = "0" Or lpCode = "9" Then Break
+        sClave.Add(lpCode)           ' el codigo es el tipo de variable
+        sValue.Add(lpValue)
+      Loop
+
+    Endif
+
+    If sValue.Count > 1 Then
+
+      gcd.CurrentDrawing.cHeader.Add(sValue, sVarName)
+      gcd.CurrentDrawing.cHeaderCodes.Add(sClave, sVarName)
+    Else
+      gcd.CurrentDrawing.cHeader.Add(sValue, sVarName[0])
+      gcd.CurrentDrawing.cHeaderCodes.Add(sClave, sVarName[0])
+
+    End If
+  Loop
+
+End
+
+
+Private Function dxfReadEntity(e As Entity, hFile As File)
+
+
+
+End
+
+
+
 
 Public Procedure LoadFile(stn As String, Optional IgnoreLayers As Boolean = False, IgnoreBlocks As Boolean = False, IgnoreData As Boolean = False)
 
@@ -268,8 +544,8 @@ Public Procedure LoadFile(stn As String, Optional IgnoreLayers As Boolean = Fals
 
   mPolyLine.p = New Float[]
 
-
   fp = Open stn For Read
+
   If Not fp Then Error.Raise("Error !")
 
   While Not Eof(fp)
@@ -659,6 +935,22 @@ Public Procedure LoadFile(stn As String, Optional IgnoreLayers As Boolean = Fals
   Return
 
 End
+
+Private Sub dxfReadCommonEntityData(e As Entity, sCode As String[], sValue As String[])
+
+  Dim i As Integer
+
+  For i = 0 To sValue.Max
+
+    If sCode[i] = "5" Then e.handle = sValue[i]             ' Handle
+    If sCode[i] = "8" Then e.layer = sValue[i]              ' Layer
+    If sCode[i] = "6" Then e.LineType = sValue[i]           ' LineType
+    If sCode[i] = "62" Then e.colour = CInt(sValue[i])      ' Color code (no es RBG) (256=ByLayer)
+    If sCode[i] = "370" Then e.LineWidth = CInt(sValue[i])  ' debemos ir a una tabla para ver
+  Next
+
+End
+
 
 Private Sub dxfReadCommonData()
 
@@ -2910,14 +3202,6 @@ Private Function dxfSave2Tables() As Integer
   Print #hFIle, "  0"                       ' OBJECT TYPE
   Print #hFIle, "TABLE"
   Print #hFIle, "2"                       ' TABLE NAME
-  Print #hFIle, "LAYER"
-  Print #hFIle, "  5"                       ' HANDLE
-  Print #hFIle, "2"
-  Print #hFIle, "330"
-  Print #hFIle, "  0"
-  Print #hFIle, "100"
-  Print #hFIle, "AcDbSymbolTable"
-  Print #hFIle, "70"                      ' ENTRIES IN TABLE
   Print #hFIle, gcd.CurrentDrawing.cModel["LAYERS"].Count
   Dim i As Integer, lay As Collection
   ' individual layers

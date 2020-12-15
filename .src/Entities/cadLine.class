@@ -45,7 +45,7 @@ Public StepsDone As Integer                 ' esto lo cambia cls ElementBuilder 
 Public Const JSON_Reading As Boolean = True
 Public Const JSON_Export As Boolean = True
 
-Public Const DXF_Reading As Boolean = False
+Public Const DXF_Reading As Boolean = True
 Public Const DXF_Export As Boolean = True
 
 
@@ -331,3 +331,17 @@ Public Sub ExportDXF(e As Entity, hFile As File)
 End
 
 
+Public Function ImportDXF(e As Entity, sClaves As String[], sValues As String[]) As Boolean
+
+  Dim i As Integer
+
+  For i = 0 To sClaves.Max
+
+    If sClaves[i] = "10" Then e.P.Add(CFloat(sValues[i]))
+    If sClaves[i] = "20" Then e.P.Add(CFloat(sValues[i]))
+    If sClaves[i] = "11" Then e.P.Add(CFloat(sValues[i]))
+    If sClaves[i] = "21" Then e.P.Add(CFloat(sValues[i]))
+
+  Next
+
+End

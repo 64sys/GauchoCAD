@@ -55,7 +55,8 @@ Public cBlocks As New Collection    '' All Blocks data from dwg is listed here
 Public cEntities As New Collection  '' All Entity are here if form cEntities[handle] as Entity
 Public cImport As New Collection    '' Impor data from dxf, dwg is loaded here
 
-
+Public cHeader As New Collection    '' Header data
+Public cHeaderCodes As New Collection '' Header codes (used for saving)
 
 ' ===============================================================================================================================
 ' GRAPHICS
