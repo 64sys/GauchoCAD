@@ -1183,9 +1183,15 @@ Public Sub gTask(sTask As String)
 
     Case "import"
 
+      ' NewDrawing = New ClsDrawing
+      ' gcd.Drawings.Add(NewDrawing)
+      ' gcd.CurrentDrawing = gcd.Drawings.Last
+      f = "./minimal/minimal.json"
       NewDrawing = New ClsDrawing
       gcd.Drawings.Add(NewDrawing)
       gcd.CurrentDrawing = gcd.Drawings.Last
+      gcd.CurrentDrawing.FileName = f
+      gcd.CurrentDrawing.cModel = dwg.Raw(f)
       fx = dsk.FileChooser(Settings["LastDir", User.Home], ["dxf"])
       If fx.Count > 0 Then
         f = fx[0]
@@ -1194,7 +1200,8 @@ Public Sub gTask(sTask As String)
             If Lower(File.Ext(f)) = "dxf" Then
               gcd.CurrentDrawing.FileName = f
               cadDxf.arrToFill = gcd.CurrentDrawing.arrEntities
-              cadDxf.dxfLoad(f, False, False, False)
+              cadDxf.LoadFile(f, False, False, False)
+              gcd.UpdateModel
               regen
               ' modelo recien cargado
               cadZoomE.Start()                                ' por ahora mostramos el dibujo centrado, hasta q leamos el estado anterior
@@ -1236,7 +1243,7 @@ Public Sub gTask(sTask As String)
           Endif
 
         Else  ' no existe
-          cadDxf.SaveDXF(f)
+          cadDxf.SaveFile(f)
 
         Endif
 

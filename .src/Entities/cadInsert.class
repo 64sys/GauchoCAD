@@ -44,8 +44,16 @@ Public StepsDone As Integer                 ' esto lo cambia cls ElementBuilder 
 Public Const JSON_Reading As Boolean = True
 Public Const JSON_Export As Boolean = False
 
-Public Const DXF_Reading As Boolean = False
+Public Const DXF_Reading As Boolean = True
 Public Const DXF_Export As Boolean = True
+
+' fParam helpers
+Public Const TotalParams As Integer = 4
+Public Const iEscX As Integer = 0
+Public Const iEscY As Integer = 1
+Public Const iEscZ As Integer = 2
+Public Const iRotacion As Integer = 3
+
 
 Public Sub Translate(e As Entity, dX As Float, dY As Float, Optional OnlySelected As Boolean = False)
 
@@ -72,7 +80,7 @@ End
 Public Sub Rotate(e As Entity, radians As Float)
 
   puntos.Rotate(e.P, radians)
-  E.fParam[2] += radians
+  E.fParam[Me.iRotacion] += radians
 
 End
 
@@ -80,8 +88,8 @@ Public Sub Scale(e As Entity, sX As Float, sY As Float)
 
   Dim i As Integer
 
-  E.fParam[0] *= sX
-  E.fParam[1] *= sY
+  E.fParam[Me.iEscX] *= sX
+  E.fParam[Me.iEscY] *= sY
   For i = 0 To e.p.max Step 2
 
     e.P[i] = e.P[i] * sX
@@ -102,8 +110,8 @@ Public Sub Draw(oE As Entity)
 
   gl.PushMatrix
   gl.Translatef(APPMain.pixels(oE.p[0]) / gcd.CurrentDrawing.ScaleZoom, APPMain.pixels(oE.p[1]) / gcd.CurrentDrawing.ScaleZoom, 0)
-  gl.Rotatef(oE.fParam[2], 0, 0, 1)
-  gl.Scalef(oE.fParam[0], oE.fParam[1], 1)
+  gl.Rotatef(oE.fParam[Me.iRotacion], 0, 0, 1)
+  gl.Scalef(oE.fParam[Me.iEscX], oE.fParam[Me.iEscY], oE.fParam[Me.iEscZ])
 
   For Each ET In gcd.CurrentDrawing.arrBlocks[i].entities
     et.visible = True
@@ -234,8 +242,8 @@ Public Sub Finish(oE As Entity, Optional ParamsDone As Integer = -1) As Boolean
       ' ------------------------------ ERROR TODO: verificar esto, lo puse para evitar recursividad infinita
       gcd.CurrentDrawing.arrEntities.Last.ClassHandler.finish(gcd.CurrentDrawing.arrEntities.Last, -1)
 
-      gcd.CurrentDrawing.arrEntities.Last.ClassHandler.Scale(gcd.CurrentDrawing.arrEntities.Last, oe.fParam[0], oE.fParam[1])
-      gcd.CurrentDrawing.arrEntities.Last.ClassHandler.Rotate(gcd.CurrentDrawing.arrEntities.Last, oE.fParam[2] * Pi / 180)
+      gcd.CurrentDrawing.arrEntities.Last.ClassHandler.Scale(gcd.CurrentDrawing.arrEntities.Last, oe.fParam[Me.iEscX], oE.fParam[Me.iEscY])
+      gcd.CurrentDrawing.arrEntities.Last.ClassHandler.Rotate(gcd.CurrentDrawing.arrEntities.Last, oE.fParam[Me.iRotacion] * Pi / 180)
       gcd.CurrentDrawing.arrEntities.Last.ClassHandler.Translate(gcd.CurrentDrawing.arrEntities.Last, oE.p[0], oE.p[1])
     Next
   End If
@@ -292,13 +300,13 @@ Public Sub ExportDXF(e As Entity, hFile As File)
   Print #hFIle, " 30"                      ' Z0
   Print #hFIle, "0"
   Print #hFIle, " 41"                      ' X scale factor
-  Print #hFIle, CStr(e.fParam[0])
+  Print #hFIle, CStr(e.fParam[Me.iEscX])
   Print #hFIle, " 42"                      ' Y scale factor
-  Print #hFIle, CStr(e.fParam[1])
+  Print #hFIle, CStr(e.fParam[Me.iEscY])
   Print #hFIle, " 43"                      ' Z scale factor
-  Print #hFIle, "1"
+  Print #hFIle, CStr(e.fParam[Me.iEscZ])
   Print #hFIle, " 50"                      ' rotation angle deg
-  Print #hFIle, CStr(e.fParam[2])
+  Print #hFIle, CStr(e.fParam[Me.iRotacion])
   Print #hFIle, " 70"                      ' row count
   Print #hFIle, "1" 'CStr(RowCol[0])
   Print #hFIle, " 71"                      ' column count
@@ -307,5 +315,24 @@ Public Sub ExportDXF(e As Entity, hFile As File)
   Print #hFIle, "0" ' CStr(RowColSpacing[2])
   Print #hFIle, " 45"                      ' column spacing
   Print #hFIle, "0" 'CStr(RowColSpacing[3])
+
+End
+
+Public Function ImportDXF(e As Entity, sClaves As String[], sValues As String[]) As Boolean
+
+  Dim i As Integer
+
+  e.fParam.Resize(Me.TotalParams)
+
+  For i = 0 To sClaves.Max
+
+    If sClaves[i] = "2" Then e.Block = sValues[i]
+    If sClaves[i] = "10" Then e.P.Add(CFloat(sValues[i]))         ' X
+    If sClaves[i] = "20" Then e.P.Add(CFloat(sValues[i]))         ' Y
+    If sClaves[i] = "41" Then e.fParam[Me.iEscX] = CFloat(sValues[i])         ' esc X
+    If sClaves[i] = "42" Then e.fParam[Me.iEscY] = CFloat(sValues[i])         ' esc Y
+    If sClaves[i] = "43" Then e.fParam[Me.iEscZ] = CFloat(sValues[i])         ' esc Z
+    If sClaves[i] = "50" Then e.fParam[Me.iRotacion] = CFloat(sValues[i])      ' rotacion
+  Next
 
 End

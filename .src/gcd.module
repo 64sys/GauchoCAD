@@ -591,18 +591,18 @@ Public Function GetGBColor(CADcolor As Integer, layerID As String) As Integer
   ' color
   If CADcolor = 256 Then          ' buscar color del layer
 
-    Return Starter.gColor[gcd.CurrentDrawing.cModel["LAYERS"][layerID]["color"]]
+    Return Starter.gColor[gcd.CurrentDrawing.Layers[layerID].colour]
     'Return Starter.gColor[11]
 
   Else If CADcolor = 257 Then     ' buscar color del objeto
 
-    Return Starter.gColor[gcd.CurrentDrawing.cModel["LAYERS"][layerID]["color"]]     ' FIXME: cambiar esto
+    Return Starter.gColor[gcd.CurrentDrawing.Layers[layerID].colour]    ' FIXME: cambiar esto
     'Return Starter.gColor[12]
 
   Else If CADcolor = 0 Then       ' buscar color del bloque
 
     'Return Starter.gColor[13]
-    Return Starter.gColor[gcd.CurrentDrawing.cModel["LAYERS"][layerID]["color"]]     ' FIXME: cambiar esto
+    Return Starter.gColor[gcd.CurrentDrawing.Layers[layerID].colour]     ' FIXME: cambiar esto
 
   Else
 
@@ -676,7 +676,8 @@ Public Sub UpdateModel()
   Dim ent As Entity
   Dim JSONExporting As Boolean
   Dim jscNewEntity As JSONCollection
-  Dim sNewHandle As String
+  'Dim sNewHandle As String
+  Dim iHandle As Integer
 
   For Each ent In CurrentDrawing.arrEntities
 
@@ -697,16 +698,19 @@ Public Sub UpdateModel()
       Else
         ' No existe, debemos crear la entrada
         jscNewEntity = New JSONCollection
-        sNewHandle = GetNewHandle(CurrentDrawing.cModel["ENTITIES"])
-
-        CurrentDrawing.cModel["ENTITIES"].Add(jscNewEntity, sNewHandle)
-        ent.Handle = sNewHandle
+        'sNewHandle = GetNewHandle(CurrentDrawing.cModel["ENTITIES"])
+        iHandle = CurrentDrawing.cModel["AuxHeader"]["HANDSEED"]
+        CurrentDrawing.cModel["ENTITIES"].Add(jscNewEntity, CStr(iHandle + 1))
+        ent.Handle = CStr(iHandle + 1) 'sNewHandle
 
         ' ahora metemos los datos communes
         ' clsEntities.JSON_Export(ent, CurrentDrawing.cModel["ENTITIES"][ent.Handle])
 
         ' y los datos particulares
         ent.ClassHandler.ExportJsonCol(ent, CurrentDrawing.cModel["ENTITIES"][ent.Handle], True)
+
+        CurrentDrawing.cModel["AuxHeader"]["HANDSEED"] = iHandle + 1
+
       End If
     End If
 

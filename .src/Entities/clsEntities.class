@@ -661,8 +661,7 @@ Public Sub CopyElemData(origen As Entity, destino As Entity)
   destino.Gender = origen.Gender
   destino.ClassHandler = origen.ClassHandler
   destino.layerID = origen.LayerID
-  destino.RefPointX = origen.refpointX
-  destino.RefPointY = origen.refpointY
+
   destino.Block = origen.Block
   destino.Layer = origen.Layer
   destino.Group = origen.Group

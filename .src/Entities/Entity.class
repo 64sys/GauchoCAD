@@ -30,8 +30,6 @@ Public colour As Integer                    '' 0=by layer, 1=by block, 10+=16 bi
 Public LineTypeName As String               '' Continuous, dashed , etc
 Public LineWidth As Float = 1               '' This is it
 Public Block As String                      '' Para tener la posibilidade de juntar cosas en un block
-Public RefPointX As Float                   '' New
-Public RefPointY As Float
 Public ClassHandler As Object               '' The class used for drawing, creating and other stuff any particular entity
 Public LineType As Integer                  '' 0=continuous, 1=dashed from flxDash
 Public LayerId As String = "0"             '' Esta variable es la Key en la coleccion de layers

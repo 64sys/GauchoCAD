@@ -244,7 +244,7 @@ Public Sub ExportJsonCol(e As Entity, n As JSONCollection, Optional CreateNew As
     n.Add("LINE", "entity")
     n.Add(0, "index")
     n.Add(19, "type")
-    n.Add([0, e.Handle], "handle")
+    n.Add([0, CInt(e.Handle)], "handle")
     n.Add(43, "size")
     n.Add(283, "bitsize")
     n.Add([12, 1, 3, 48], "ownerhandle")
@@ -278,7 +278,7 @@ Public Sub ExportJsonCol(e As Entity, n As JSONCollection, Optional CreateNew As
     n["entity"] = "LINE"
     n["index"] = 44
     n["type"] = 19
-    n["handle"] = [0, e.Handle]
+    n["handle"] = [0, CInt(e.Handle)]
     n["size"] = 43
     n["bitsize"] = 283
     n["ownerhandle"] = [12, 1, 3, 48]
