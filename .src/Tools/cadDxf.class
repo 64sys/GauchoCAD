@@ -185,6 +185,8 @@ Private Sub dxfLoad5Entities(arrAcumulador As Entity[])
 
       arrAcumulador.Add(eNueva)                     ' la acumulo en el array corresppondiente
 
+      'Debug eNueva.gender
+
       clsHandler = Null
 
       nEntitiesRead += 1

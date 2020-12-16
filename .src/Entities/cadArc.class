@@ -191,7 +191,7 @@ Public Sub Draw(oE As Entity)
     Next
 
 
-    glPlus.Lines(oe.PolyLine, oe.ColorToPaint, oe.LineWidth, oe.LineType)
+    glPlus.PolyLines(oe.PolyLine, oe.ColorToPaint, oe.LineWidth, oe.LineType)
 
   End If
 

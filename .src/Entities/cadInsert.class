@@ -115,7 +115,12 @@ Public Sub Draw(oE As Entity)
 
   For Each ET In gcd.CurrentDrawing.arrBlocks[i].entities
     et.visible = True
+    et.LineType = oe.LineType
+    et.colour = oe.colour
+    et.LineWidth = oe.LineWidth
     et.ClassHandler.Draw(et)
+
+    Debug et.Gender, et.LineType
   Next
   gl.PopMatrix
 
@@ -236,6 +241,9 @@ Public Sub Finish(oE As Entity, Optional ParamsDone As Integer = -1) As Boolean
     'gcd.CurrentDrawing.arrEntities.Last.iInsert = iInsert
     For Each ET In gcd.CurrentDrawing.arrBlocks[i].entities
       gcd.CurrentDrawing.arrEntities.Add(clsEntities.ClonEntity(et))
+      et.LineType = oe.LineType
+      et.colour = oe.colour
+      et.LineWidth = oe.LineWidth
       'gcd.CurrentDrawing.arrEntities.Last.Block = oe.block
       gcd.CurrentDrawing.arrEntities.Last.iInsert = iInsert
 

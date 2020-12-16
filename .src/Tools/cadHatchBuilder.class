@@ -76,8 +76,8 @@ Public Function Start(Optional filename As Variant, Optional _mode As Integer = 
         entHatch = New Entity
         entHatch.Gender = "Hatch"
         entHatch.ClassHandler = cadHatch
-        entHatch.StringData.Add(gcd.CurrentDrawing.LastHatchFile)
         entHatch.StringData.Add(gcd.CurrentDrawing.LastHatchPattern)
+        entHatch.StringData.Add(gcd.CurrentDrawing.LastHatchFile)
         iRet = FHatch.Showmodal()
 
         Debug gcd.CurrentDrawing.LastHatchFile
@@ -160,7 +160,7 @@ Public Sub FillEntityWithHatch()
   ' cargo el sombreado en un array auxiliar
   Dim enxPattern As New Entity[]
   cadDxf.arrToFill = enxPattern     ' le digo a la clase donde cargar las entidades del patron
-  cadDxf.LoadFile(entHatch.StringData[0], True,, True) ' lo cargo
+  cadDxf.LoadFile(entHatch.StringData[1], True,, True) ' lo cargo
 
   ' necesito saber cuanto mide el contorno para aplicar la escala y multiplicar hasta cubrir todo el contorno
   Dim flxPatternLimits As Float[]

@@ -44,8 +44,19 @@ Public StepsDone As Integer                 ' esto lo cambia cls ElementBuilder 
 Public Const JSON_Reading As Boolean = True
 Public Const JSON_Export As Boolean = False
 
-Public Const DXF_Reading As Boolean = False
+Public Const DXF_Reading As Boolean = True
 Public Const DXF_Export As Boolean = True
+
+' fParam helpers
+Public Const TotalParams As Integer = 10
+Public Const iSolid As Integer = 0
+Public Const iAsociativity As Integer = 1
+Public Const iTotalLoops As Integer = 2
+Public Const iRotation As Integer = 3
+Public Const iScale As Integer = 4
+Public Const iParity As Integer = 5
+Public Const iPatternType As Integer = 6
+
 
 ' Parametros de la entidad:
 
@@ -57,6 +68,8 @@ Public Const DXF_Export As Boolean = True
 Public Sub Draw(oE As Entity)
 
   If Not oE.Visible Then Return
+
+  oE.ColorToPaint = gcd.GetGBColor(oE.colour, oE.Layerid)
 
   If oe.StringData[1] <> "Solid" Then
 
@@ -357,16 +370,16 @@ Public Sub ExportDXF(e As Entity, hFile As File)
   Print #hFIle, "230"                      ' Z0
   Print #hFIle, "1"
 
-  Print #hFIle, "  2"                      ' Color number (present if not BYLAYER); zero indicates the BYBLOCK (floating) color; 256 indicates BYLAYER;
-  Print #hFIle, e.StringData[0]
+  Print #hFIle, "  2"
+  Print #hFIle, e.StringData[1]
 
   Print #hFIle, " 70"                      ' 0 = pattern; 1 = solid
-  Print #hFIle, "0"
+  If LCase(e.StringData[1]) = "solid" Then Print #hFIle, "1" Else Print #hFIle, "0"
 
   Print #hFIle, " 71" ' Associativity flag(0 = non - associative; 1 = associative); For MPolygon, solid - fill flag(0 = lacks solid fill; 1 = has solid fill)
   Print #hFIle, "0"
 
-  Print #hFIle, " 91" ' Number Of boundary paths(loops) La cantidad de contornos que se definnen a p`partir de este punto
+  Print #hFIle, " 91" ' Number Of boundary paths(loops) La cantidad de contornos que se definnen a partir de este punto
   Print #hFIle, "1"
 
   Print #hFIle, " 92" ' boundary paths 0=default; 1=external, 2=poly, 4=derivado, 8=textbox, 16=outermost
@@ -412,3 +425,42 @@ Public Sub ExportDXF(e As Entity, hFile As File)
 
 End
 
+Public Function ImportDXF(e As Entity, sClaves As String[], sValues As String[]) As Boolean
+
+  Dim i As Integer
+
+
+  e.fParam.Resize(Me.TotalParams)
+
+  For i = 0 To sClaves.Max
+
+    If sClaves[i] = "2" Then e.StringData.Add(sValues[i]) ' hach file
+
+    If sClaves[i] = "70" Then e.fParam[Me.iSolid] = CInt(sValues[i])
+    If sClaves[i] = "71" Then e.fParam[Me.iAsociativity] = CInt(sValues[i])
+    If sClaves[i] = "91" Then e.fParam[Me.iTotalLoops] = CInt(sValues[i])
+    If sClaves[i] = "52" Then e.fParam[Me.iRotation] = CFloat(sValues[i])
+    If sClaves[i] = "41" Then e.fParam[Me.iScale] = CInt(sValues[i])
+    If sClaves[i] = "75" Then e.fParam[Me.iParity] = CInt(sValues[i])
+    If sClaves[i] = "76" Then e.fParam[Me.iPatternType] = CInt(sValues[i])
+
+
+    ' boundary
+    If e.fParam[Me.iTotalLoops] Then
+      If sClaves[i] = "10" Then e.p.Add(CFloat(sValues[i]))
+      If sClaves[i] = "20" Then e.p.Add(CFloat(sValues[i]))
+    End If
+
+
+
+  Next
+
+  If e.fParam[Me.iSolid] Then
+    e.StringData.Add("Solid")
+  Else
+    e.StringData.Add(Application.Path &/ "patterns" &/ e.StringData[0] & ".dxf")
+  End If
+
+
+
+End
