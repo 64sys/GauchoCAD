@@ -644,6 +644,8 @@ Public Function UpdateGraphics(Optional handles As String[] = [], DoRegen As Boo
 
   Dim cEntity As Collection, entNueva As Entity
 
+  UpdateLayers
+
   If handles.Count = 0 Then                   ' Update all entities
 
     gcd.ImpEnty5(gcd.CurrentDrawing.cModel["ENTITIES"], gcd.CurrentDrawing.arrEntities)
@@ -670,6 +672,26 @@ Public Function UpdateGraphics(Optional handles As String[] = [], DoRegen As Boo
   If DoRegen Then Regen
 
 End
+
+
+'' Pasa los layers de cModel a los graficos
+Public Sub UpdateLayers()
+
+  Dim CMLayer As Collection
+  Dim newlayer As Layer
+
+  CurrentDrawing.Layers.Clear
+  For Each CMLayer In CurrentDrawing.cModel["LAYERS"]
+    newlayer = New Layer
+    newlayer.Colour = CMLayer["color"]
+    newlayer.Name = CMLayer["name"]
+    newlayer.handle = CMLayer["handle"][1]
+    newlayer.id = newlayer.handle
+    CurrentDrawing.Layers.Add(newlayer, newlayer.id)
+  Next
+
+End
+
 
 Public Sub UpdateModel()
 
