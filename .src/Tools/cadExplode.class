@@ -51,7 +51,7 @@ Public Function Start(Optional ElemToBuild As Variant, Optional _Mode As Integer
       If e.Selected Then
         Select Case e.Gender
           Case "Insert", "Dimension"
-            e.ForDeletion = True
+            'e.ForDeletion = True
           Case Else
             ' le saco la referencia a un bloque
 

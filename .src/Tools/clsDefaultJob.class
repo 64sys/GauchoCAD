@@ -231,21 +231,34 @@ Public Function KeyText(EnteredText As String)
 
   If EnteredText = "" Then Return                                ' no BS here
 
-  gcd.clsJobPrevious = gcd.clsJob
+  Select Case LCase(EnteredText)
+    Case "regen"
+      APPMain.Regen
+    Case "redraw"
+      APPMain.redraw
+    Case "save"
+      appmain.gTask("save")
 
-  o = Object.New("cad" & EnteredText)
 
-  ' check if the class needs to be run trough other
-  If o.usewith = "" Then                        ' its a tool
-    gcd.clsJob = o
-    gcd.clsJob.start
+    Case Else
 
-  Else                                                    ' its propably an eentity
+      gcd.clsJobPrevious = gcd.clsJob
 
-    gcd.clsJob = Object.New(o.usewith)
-    gcd.clsJob.start(o)
+      o = Object.New("cad" & EnteredText)
 
-  End If
+      ' check if the class needs to be run trough other
+      If o.usewith = "" Then                        ' its a tool
+        gcd.clsJob = o
+        gcd.clsJob.start
+
+      Else                                                    ' its propably an eentity
+
+        gcd.clsJob = Object.New(o.usewith)
+        gcd.clsJob.start(o)
+
+      End If
+
+  End Select
 
   Return
 

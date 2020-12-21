@@ -34,7 +34,7 @@ Public Const OrthogonalIgnored As Boolean = False
 Public Const OrthogonalForced As Boolean = False
 Public Const StretchAble As Boolean = True           ' Si lo puedo deformar
 Public Selected As Boolean
-Public ForDeletion As Boolean = True        ' this must be falsed in Finish
+
 Public DrawAble As Boolean = False          ' True si durante la construccion ya tiene suficientes elementos para poder hacer una representacion digna
 Public Visible As Boolean = True            ' si esta entidad puede ser mostrada independientmente
 Public Finished As Boolean = False          ' colocar en true cuando se llegue a completar
@@ -49,13 +49,19 @@ Public Const DXF_Export As Boolean = True
 
 ' fParam helpers
 Public Const TotalParams As Integer = 10
-Public Const iSolid As Integer = 0
-Public Const iAsociativity As Integer = 1
-Public Const iTotalLoops As Integer = 2
-Public Const iRotation As Integer = 3
-Public Const iScale As Integer = 4
-Public Const iParity As Integer = 5
-Public Const iPatternType As Integer = 6
+Public Const ipaSolid As Integer = 0
+Public Const ipaAsociativity As Integer = 1
+Public Const ipaTotalLoops As Integer = 2
+Public Const ipaRotation As Integer = 3
+Public Const ipaScale As Integer = 4
+Public Const ipaParity As Integer = 5
+Public Const ipaPatternType As Integer = 6
+Public Const ipaBoundaryType As Integer = 7 ' 0=lwpolyine, 1=lines, 2=circular arc, 3=ellipse arc, 4=spline
+
+' stringdata helpers
+Public Const sdaTotalParams As Integer = 2
+Public Const sdaPattern As Integer = 0
+Public Const sdaPaternFile As Integer = 1
 
 
 ' Parametros de la entidad:
@@ -104,25 +110,7 @@ End
 
 Public Function Draw2(oE As Entity)
 
-  Dim i As Integer
 
-  If Not oE.Visible Then Return
-
-  paint.LineWidth = oE.LineWidth ' / gcd.CurrentDrawing.ScaleZoom / gcd.ScaleLines
-
-  If oE.Selected And Not gcd.ToolActive Then
-    paint.brush = Paint.Color(gcd.ColorForSelected)
-  Else
-    paint.brush = Paint.Color(oE.ColorToPaint)
-  Endif
-
-  paint.moveto(oE.p[0], oE.p[1])
-  For i = 2 To oE.P.Max Step 2
-    paint.lineto(oE.p[i], oE.p[i + 1])
-
-  Next
-
-  paint.Stroke
 
 End
 
@@ -171,19 +159,16 @@ Public Sub Finish(oE As Entity, Optional ParamsDone As Integer = -1) As Boolean
   ' busco el tipo de linea, si hace falta
   If oE.LineTypeName = "Dashed" Then oE.LineType = 1
   ' tareas finales de armado del objeto
+  If LCase(oe.StringData[Me.sdaPattern]) <> "solid" Then cadHatchBuilder.FillEntityWithHatch(oe)
+
 
   oE.psel.resize(oE.p.count / 2)
-  oE.ForDeletion = False
+
   oE.DrawAble = True
   oE.Selected = False
   oE.Finished = True
 
-  If Not True Then
 
-    oE.ForDeletion = True
-    oE.DrawAble = False
-
-  End If
 
 End
 
@@ -371,10 +356,10 @@ Public Sub ExportDXF(e As Entity, hFile As File)
   Print #hFIle, "1"
 
   Print #hFIle, "  2"
-  Print #hFIle, e.StringData[1]
+  Print #hFIle, e.StringData[Me.sdaPattern]
 
   Print #hFIle, " 70"                      ' 0 = pattern; 1 = solid
-  If LCase(e.StringData[1]) = "solid" Then Print #hFIle, "1" Else Print #hFIle, "0"
+  If LCase(e.StringData[Me.sdaPattern]) = "solid" Then Print #hFIle, "1" Else Print #hFIle, "0"
 
   Print #hFIle, " 71" ' Associativity flag(0 = non - associative; 1 = associative); For MPolygon, solid - fill flag(0 = lacks solid fill; 1 = has solid fill)
   Print #hFIle, "0"
@@ -409,10 +394,10 @@ Public Sub ExportDXF(e As Entity, hFile As File)
   Print #hFIle, "1"
 
   Print #hFIle, " 52" ' rotation en RAD
-  Print #hFIle, CStr(e.fParam[0])
+  Print #hFIle, CStr(e.fParam[Me.ipaRotation])
 
   Print #hFIle, " 41" ' scale
-  Print #hFIle, CStr(e.fParam[1])
+  Print #hFIle, CStr(e.fParam[Me.ipaScale])
 
   Print #hFIle, " 77" ' Hatch pattern double flag (pattern fill only):0 = Not double,1 = double
   Print #hFIle, "0"
@@ -425,28 +410,40 @@ Public Sub ExportDXF(e As Entity, hFile As File)
 
 End
 
+Public Sub setEntity(e As Entity)
+
+  e.fParam.Resize(Me.TotalParams)
+  e.StringData.Resize(Me.sdaTotalParams) ' text, style
+
+
+End
+
 Public Function ImportDXF(e As Entity, sClaves As String[], sValues As String[]) As Boolean
 
   Dim i As Integer
 
 
-  e.fParam.Resize(Me.TotalParams)
+  Me.setEntity(e)
 
   For i = 0 To sClaves.Max
 
-    If sClaves[i] = "2" Then e.StringData.Add(sValues[i]) ' hach file
+    If sClaves[i] = "2" Then e.StringData[Me.sdaPattern] = sValues[i] ' hach file
 
-    If sClaves[i] = "70" Then e.fParam[Me.iSolid] = CInt(sValues[i])
-    If sClaves[i] = "71" Then e.fParam[Me.iAsociativity] = CInt(sValues[i])
-    If sClaves[i] = "91" Then e.fParam[Me.iTotalLoops] = CInt(sValues[i])
-    If sClaves[i] = "52" Then e.fParam[Me.iRotation] = CFloat(sValues[i])
-    If sClaves[i] = "41" Then e.fParam[Me.iScale] = CInt(sValues[i])
-    If sClaves[i] = "75" Then e.fParam[Me.iParity] = CInt(sValues[i])
-    If sClaves[i] = "76" Then e.fParam[Me.iPatternType] = CInt(sValues[i])
+    If sClaves[i] = "70" Then e.fParam[Me.ipaSolid] = CFloat(sValues[i])
+    If sClaves[i] = "71" Then e.fParam[Me.ipaAsociativity] = CFloat(sValues[i])
+    If sClaves[i] = "72" Then e.fParam[Me.ipaBoundaryType] = CFloat(sValues[i])
+    If sClaves[i] = "91" Then e.fParam[Me.ipaTotalLoops] = CFloat(sValues[i])
+    If sClaves[i] = "52" Then e.fParam[Me.ipaRotation] = CFloat(sValues[i])
+    If sClaves[i] = "41" Then
+      e.fParam[Me.ipaScale] = CFloat(sValues[i])
+
+    End If
+    If sClaves[i] = "75" Then e.fParam[Me.ipaParity] = CFloat(sValues[i])
+    If sClaves[i] = "76" Then e.fParam[Me.ipaPatternType] = CFloat(sValues[i])
 
 
     ' boundary
-    If e.fParam[Me.iTotalLoops] Then
+    If e.fParam[Me.ipaTotalLoops] Then
       If sClaves[i] = "10" Then e.p.Add(CFloat(sValues[i]))
       If sClaves[i] = "20" Then e.p.Add(CFloat(sValues[i]))
     End If
@@ -455,10 +452,10 @@ Public Function ImportDXF(e As Entity, sClaves As String[], sValues As String[])
 
   Next
 
-  If e.fParam[Me.iSolid] Then
-    e.StringData.Add("Solid")
+  If e.fParam[Me.ipaSolid] Then
+    e.StringData[Me.sdaPaternFile] = "Solid"
   Else
-    e.StringData.Add(Application.Path &/ "patterns" &/ e.StringData[0] & ".dxf")
+    e.StringData[Me.sdaPaternFile] = Application.Path &/ "patterns" &/ e.StringData[Me.sdaPattern] & ".dxf"
   End If
 
 

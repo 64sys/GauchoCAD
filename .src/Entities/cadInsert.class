@@ -34,7 +34,7 @@ Public Const OrthogonalIgnored As Boolean = False
 Public Const OrthogonalForced As Boolean = False
 Public Const StretchAble As Boolean = True           ' Si lo puedo deformar
 Public Selected As Boolean
-Public ForDeletion As Boolean = True        ' this must be falsed in Finish
+
 Public DrawAble As Boolean = False          ' True si durante la construccion ya tiene suficientes elementos para poder hacer una representacion digna
 Public Visible As Boolean = True            ' si esta entidad puede ser mostrada independientmente
 Public Finished As Boolean = False          ' colocar en true cuando se llegue a completar
@@ -49,10 +49,10 @@ Public Const DXF_Export As Boolean = True
 
 ' fParam helpers
 Public Const TotalParams As Integer = 4
-Public Const iEscX As Integer = 0
-Public Const iEscY As Integer = 1
-Public Const iEscZ As Integer = 2
-Public Const iRotacion As Integer = 3
+Public Const ipaEscX As Integer = 0
+Public Const ipaEscY As Integer = 1
+Public Const ipaEscZ As Integer = 2
+Public Const ipaRotacion As Integer = 3
 
 
 Public Sub Translate(e As Entity, dX As Float, dY As Float, Optional OnlySelected As Boolean = False)
@@ -80,7 +80,7 @@ End
 Public Sub Rotate(e As Entity, radians As Float)
 
   puntos.Rotate(e.P, radians)
-  E.fParam[Me.iRotacion] += radians
+  E.fParam[Me.ipaRotacion] += radians
 
 End
 
@@ -88,8 +88,8 @@ Public Sub Scale(e As Entity, sX As Float, sY As Float)
 
   Dim i As Integer
 
-  E.fParam[Me.iEscX] *= sX
-  E.fParam[Me.iEscY] *= sY
+  E.fParam[Me.ipaEscX] *= sX
+  E.fParam[Me.ipaEscY] *= sY
   For i = 0 To e.p.max Step 2
 
     e.P[i] = e.P[i] * sX
@@ -110,8 +110,8 @@ Public Sub Draw(oE As Entity)
 
   gl.PushMatrix
   gl.Translatef(APPMain.pixels(oE.p[0]) / gcd.CurrentDrawing.ScaleZoom, APPMain.pixels(oE.p[1]) / gcd.CurrentDrawing.ScaleZoom, 0)
-  gl.Rotatef(oE.fParam[Me.iRotacion], 0, 0, 1)
-  gl.Scalef(oE.fParam[Me.iEscX], oE.fParam[Me.iEscY], oE.fParam[Me.iEscZ])
+  gl.Rotatef(oE.fParam[Me.ipaRotacion], 0, 0, 1)
+  gl.Scalef(oE.fParam[Me.ipaEscX], oE.fParam[Me.ipaEscY], oE.fParam[Me.ipaEscZ])
 
   For Each ET In gcd.CurrentDrawing.arrBlocks[i].entities
     et.visible = True
@@ -223,7 +223,7 @@ Public Sub Finish(oE As Entity, Optional ParamsDone As Integer = -1) As Boolean
   If oE.LineTypeName = "Dashed" Then oE.LineType = 1
 
   oE.psel.resize(oE.p.count / 2)
-  oE.ForDeletion = False
+
   oE.DrawAble = True
   oE.Selected = False
   oE.Finished = True
@@ -250,8 +250,8 @@ Public Sub Finish(oE As Entity, Optional ParamsDone As Integer = -1) As Boolean
       ' ------------------------------ ERROR TODO: verificar esto, lo puse para evitar recursividad infinita
       gcd.CurrentDrawing.arrEntities.Last.ClassHandler.finish(gcd.CurrentDrawing.arrEntities.Last, -1)
 
-      gcd.CurrentDrawing.arrEntities.Last.ClassHandler.Scale(gcd.CurrentDrawing.arrEntities.Last, oe.fParam[Me.iEscX], oE.fParam[Me.iEscY])
-      gcd.CurrentDrawing.arrEntities.Last.ClassHandler.Rotate(gcd.CurrentDrawing.arrEntities.Last, oE.fParam[Me.iRotacion] * Pi / 180)
+      gcd.CurrentDrawing.arrEntities.Last.ClassHandler.Scale(gcd.CurrentDrawing.arrEntities.Last, oe.fParam[Me.ipaEscX], oE.fParam[Me.ipaEscY])
+      gcd.CurrentDrawing.arrEntities.Last.ClassHandler.Rotate(gcd.CurrentDrawing.arrEntities.Last, oE.fParam[Me.ipaRotacion] * Pi / 180)
       gcd.CurrentDrawing.arrEntities.Last.ClassHandler.Translate(gcd.CurrentDrawing.arrEntities.Last, oE.p[0], oE.p[1])
     Next
   End If
@@ -308,13 +308,13 @@ Public Sub ExportDXF(e As Entity, hFile As File)
   Print #hFIle, " 30"                      ' Z0
   Print #hFIle, "0"
   Print #hFIle, " 41"                      ' X scale factor
-  Print #hFIle, CStr(e.fParam[Me.iEscX])
+  Print #hFIle, CStr(e.fParam[Me.ipaEscX])
   Print #hFIle, " 42"                      ' Y scale factor
-  Print #hFIle, CStr(e.fParam[Me.iEscY])
+  Print #hFIle, CStr(e.fParam[Me.ipaEscY])
   Print #hFIle, " 43"                      ' Z scale factor
-  Print #hFIle, CStr(e.fParam[Me.iEscZ])
+  Print #hFIle, CStr(e.fParam[Me.ipaEscZ])
   Print #hFIle, " 50"                      ' rotation angle deg
-  Print #hFIle, CStr(e.fParam[Me.iRotacion])
+  Print #hFIle, CStr(e.fParam[Me.ipaRotacion])
   Print #hFIle, " 70"                      ' row count
   Print #hFIle, "1" 'CStr(RowCol[0])
   Print #hFIle, " 71"                      ' column count
@@ -337,10 +337,10 @@ Public Function ImportDXF(e As Entity, sClaves As String[], sValues As String[])
     If sClaves[i] = "2" Then e.Block = sValues[i]
     If sClaves[i] = "10" Then e.P.Add(CFloat(sValues[i]))         ' X
     If sClaves[i] = "20" Then e.P.Add(CFloat(sValues[i]))         ' Y
-    If sClaves[i] = "41" Then e.fParam[Me.iEscX] = CFloat(sValues[i])         ' esc X
-    If sClaves[i] = "42" Then e.fParam[Me.iEscY] = CFloat(sValues[i])         ' esc Y
-    If sClaves[i] = "43" Then e.fParam[Me.iEscZ] = CFloat(sValues[i])         ' esc Z
-    If sClaves[i] = "50" Then e.fParam[Me.iRotacion] = CFloat(sValues[i])      ' rotacion
+    If sClaves[i] = "41" Then e.fParam[Me.ipaEscX] = CFloat(sValues[i])         ' esc X
+    If sClaves[i] = "42" Then e.fParam[Me.ipaEscY] = CFloat(sValues[i])         ' esc Y
+    If sClaves[i] = "43" Then e.fParam[Me.ipaEscZ] = CFloat(sValues[i])         ' esc Z
+    If sClaves[i] = "50" Then e.fParam[Me.ipaRotacion] = CFloat(sValues[i])      ' rotacion
   Next
 
 End

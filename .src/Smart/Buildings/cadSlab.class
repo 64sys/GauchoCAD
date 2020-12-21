@@ -80,17 +80,11 @@ End
 Public Sub Finish(ParamsDone As Integer) As Boolean
 
   Me.CreatePolygon
-  Me.ForDeletion = False
+
   Me.DrawAble = True
   Me.Selected = False
   Me.Finished = True
 
-  If Me.p[0] = Me.p[2] Or Me.p[1] = Me.p[3] Then ' this is a line , not a square
-
-    Me.ForDeletion = True ' queda marcado para eliminarse
-    Me.DrawAble = False
-
-  End If
 
 End
 

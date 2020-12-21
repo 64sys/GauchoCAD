@@ -35,7 +35,7 @@ Public Const OrthogonalIgnored As Boolean = False
 Public Const OrthogonalForced As Boolean = False
 Public Const StretchAble As Boolean = True           ' Si lo puedo deformar
 Public Selected As Boolean
-Public ForDeletion As Boolean = True        ' this must be falsed in Finish
+
 Public DrawAble As Boolean = False          ' True si durante la construccion ya tiene suficientes elementos para poder hacer una representacion digna
 Public Visible As Boolean = True            ' si esta entidad puede ser mostrada independientmente
 Public Finished As Boolean = False          ' colocar en true cuando se llegue a completar
@@ -73,9 +73,27 @@ Public Const DXF_Reading As Boolean = True
 Public Const DXF_Export As Boolean = True
 
 ' fParam helpers
-Public Const TotalParams As Integer = 2
-Public Const iTextHeight As Integer = 1
-Public Const iTextAngle As Integer = 0
+Public Const TotalParams As Integer = 7
+Public Const ipaTextHeight As Integer = 0
+Public Const ipaTextAngle As Integer = 1
+Public Const ipaGenerationFlags As Integer = 2
+Public Const ipaHorizJustif As Integer = 3
+Public Const ipaVertJustif As Integer = 4
+Public Const ipaRelativeFactor As Integer = 5
+Public Const ipaObliqueAngle As Integer = 6
+
+' stringdata helpers
+Public Const sdaTotalParams As Integer = 2
+Public Const sdaText As Integer = 0
+Public Const sdaStyle As Integer = 1
+
+Public Sub setEntity(e As Entity)
+
+  e.fParam.Resize(Me.TotalParams)
+  e.StringData.Resize(Me.sdaTotalParams) ' text, style
+
+
+End
 
 Public Sub Translate(e As Entity, dX As Float, dY As Float, Optional OnlySelected As Boolean = False)
 
@@ -107,7 +125,7 @@ Public Sub Rotate(e As Entity, radians As Float)
   puntos.Rotate(e.P, radians)
 
   ' el parametro lo tengo que pasar a grados porque la rutina que dibuja el texto usa eso
-  E.fParam[Me.iTextAngle] += radians * 180 / Pi
+  E.fParam[Me.ipaTextAngle] += radians * 180 / Pi
 
   CreatePolygon(e)
   BuildPOI(e)
@@ -118,7 +136,7 @@ Public Sub Scale(e As Entity, sX As Float, sY As Float)
 
   Dim i As Integer
 
-  E.fParam[Me.iTextHeight] *= sY
+  E.fParam[Me.ipaTextHeight] *= sY
   For i = 0 To e.p.max Step 2
 
     e.P[i] = e.P[i] * sX
@@ -220,7 +238,7 @@ Public Sub CreatePolygon(oE As Entity)
 
   oE.Polygon.Clear
 
-  tRect = glPlus.MTextExtends(oE.stringdata[0], oE.p[0], oE.p[1], oE.fParam[1])
+  tRect = glPlus.MTextExtends(oE.stringdata[Me.sdaText], oE.p[0], oE.p[1], oE.fParam[Me.ipaTextHeight])
 
   ' armo el poligono , que ya tiene la escala
 
@@ -259,17 +277,12 @@ Public Sub Finish(oE As Entity, Optional ParamsDone As Integer = -1) As Boolean
   ' tareas finales de armado del objeto
 
   oE.psel.resize(oE.p.count / 2)
-  oE.ForDeletion = False
+
   oE.DrawAble = True
   oE.Selected = False
   oE.Finished = True
 
-  If Not True Then
 
-    oE.ForDeletion = True
-    oE.DrawAble = False
-
-  End If
 
 End
 
@@ -281,13 +294,13 @@ Public Sub Draw(oE As Entity)
   ' voy a procesar texto
   CurrentTextPosX = oE.p[0]
   CurrentTextPosY = oE.p[1]
-  CurrentTextHeigth = oE.fParam[Me.iTextHeight]
-  CurrentTextAngle = oE.fParam[Me.iTextAngle]
+  CurrentTextHeigth = oE.fParam[Me.ipaTextHeight]
+  CurrentTextAngle = oE.fParam[Me.ipaTextAngle]
   CurrentTextColor = oE.ColorToPaint
 
   'If InStr(oE.stringdata[0], "Cristia") > 0 Then Stop
 
-  ProcessText(oE.stringdata[0])
+  ProcessText(oE.stringdata[Me.sdaText])
 
   'glPlus.DrawMultilineText(oE.stringdata[0], oE.p[0], oE.p[1], oE.fParam[0], oE.fParam[1], oE.ColorToPaint)
 
@@ -413,15 +426,17 @@ End
 ' Importo los datos que puedo procesar de una coleccion y genero un Entity para ser agregado a un array
 Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
 
+  Me.setEntity(e)
+
   e.ClassHandler = Me
   e.P.Add(c["ins_pt"][0])
   e.P.Add(c["ins_pt"][1])
-  e.StringData.Add(c["text"])
+  e.StringData[Me.sdaText] = c["text"]
 
   ' FIXME: reparar esto
-  e.fParam.Add(0) ' Angulo en grados
+  e.fParam[Me.ipaTextAngle] = 0  ' Angulo en grados
 
-  e.fParam.Add(c["text_height"])
+  e.fParam[Me.ipaTextHeight] = CFloat(c["text_height"])
 
   Return True
 
@@ -502,6 +517,7 @@ Public Sub ExportDXF(e As Entity, hFile As File)
 
   Dim i As Integer
   Dim first As Boolean
+  Dim sText As String
 
   Print #hFIle, "  0"
   Print #hFIle, "MTEXT"
@@ -515,38 +531,70 @@ Public Sub ExportDXF(e As Entity, hFile As File)
   Print #hFIle, " 30"                      ' Z0
   Print #hFIle, "  0"
   Print #hFIle, " 40"
-  Print #hFIle, CStr(e.fParam[1])
+  Print #hFIle, CStr(e.fParam[Me.ipaTextHeight])
+  Print #hFIle, " 50"
+  Print #hFIle, CStr(e.fParam[Me.ipaTextAngle])
   Print #hFIle, " 41"
-  Print #hFIle, "133.898835"
+  Print #hFIle, CStr(e.fParam[Me.ipaRelativeFactor])
+  Print #hFIle, " 51"
+  Print #hFIle, CStr(e.fParam[Me.ipaObliqueAngle])
+  Print #hFIle, "  7"
+  Print #hFIle, e.StringData[Me.sdaStyle]
   Print #hFIle, " 71"
-  Print #hFIle, "  5"
-  Print #hFIle, " 72"
-  Print #hFIle, "1"
+  Print #hFIle, e.fParam[Me.ipaGenerationFlags]
+  Print #hFIle, " 72"                      ' justification:
+  ' Horizontal text justification type(Optional , Default = 0)integer codes(Not bit - coded):
+  ' 0 = Left 1 = Center  2 = Right 3 = Aligned( If vertical alignment = 0)  4 = Middle( If vertical alignment = 0) 5 = Fit( If vertical alignment = 0)
+  Print #hFIle, e.fParam[Me.ipaHorizJustif]
+  Print #hFIle, " 11"                      ' second point
+  If e.P.Count > 2 Then Print #hFIle, e.P[2] Else Print #hFile, "0"
+  Print #hFIle, " 21"
+  If e.P.Count > 2 Then Print #hFIle, e.P[3] Else Print #hFile, "0"
+  Print #hFIle, " 31"
+  Print #hFIle, "0"
+
+  Print #hFIle, "73"                      ' vertical justification:
+  ' Vertical text justification type(Optional , Default = 0): integer codes(Not bit - coded):
+  ' 0 = Baseline 1 = Bottom 2 = Middle 3 = Top
+  Print #hFIle, e.fParam[Me.ipaVertJustif]
   first = True
 
-  For Each sText As String In e.StringData
-    If First Then
-      Print #hFIle, "  1"                       ' text, first part
-      Print #hFIle, sText
-      first = False
-    Else
-      Print #hFIle, "  3"                       ' text, first part
-      Print #hFIle, sText
-    End If
-  Next
+  If e.StringData[0].Len > 250 Then
+    Print #hFIle, "  1"                       ' text, first part
+    Print #hFIle, Left(sText, 250)
+    i = 250
+    Do
 
-  Print #hFIle, "  7"
-  Print #hFIle, "romanc" ' e.txtStyle TODO: verificar
+      If e.StringData[0].Len - i > 250 Then
+        sText = Mid(e.StringData[0], i, 250)
+        Print #hFIle, "  3"                       ' text, first part
+        Print #hFIle, sText
+        i += 250
+      Else
+        sText = Mid(e.StringData[0], i)
+        Print #hFIle, "  3"                       ' text, first part
+        Print #hFIle, sText
+        Break
+
+
+      End If
+
+    Loop
+  Else
+    Print #hFIle, "  1"                       ' text, first part
+    Print #hFIle, e.StringData[0]
+
+  Endif
+
+
+
   Print #hFIle, "210"
   Print #hFIle, "  0"
   Print #hFIle, "220"
   Print #hFIle, "  0"
   Print #hFIle, "230"
   Print #hFIle, "1"
-  Print #hFIle, " 50"                      ' angle deg
-  Print #hFIle, CStr(e.fParam[0])
-  Print #hFIle, " 73"
-  Print #hFIle, "2"
+
   Print #hFIle, " 44"
   Print #hFIle, "1"
 
@@ -558,24 +606,30 @@ Public Function ImportDXF(e As Entity, sClaves As String[], sValues As String[])
   Dim TextHeigthSet As Boolean = False
   Dim TextAngleSet As Boolean = False
 
-  e.fParam.Resize(Me.TotalParams)
-  e.StringData.Add("")
+  setEntity(e)
 
   For i = 0 To sClaves.Max
 
     If sClaves[i] = "10" Then e.p.Add(CFloat(sValues[i]))         ' X1
     If sClaves[i] = "20" Then e.P.Add(CFloat(sValues[i]))         ' Y1
     If sClaves[i] = "40" And Not TextHeigthSet Then
-      e.fParam[Me.iTextHeight] = CFloat(sValues[i])         ' Altura
+      e.fParam[Me.ipaTextHeight] = CFloat(sValues[i])         ' Altura
       TextHeigthSet = True
     End If
-    If sClaves[i] = "1" Or sClaves[i] = "3" Then e.StringData[0] &= sValues[i]                ' Texto
+    If sClaves[i] = "1" Or sClaves[i] = "3" Then e.StringData[Me.sdaText] &= sValues[i]                ' Texto
     If sClaves[i] = "50" And Not TextAngleSet Then
-      e.fParam[Me.iTextAngle] = CFloat(sValues[i])      ' rotacion
+      e.fParam[Me.ipaTextAngle] = CFloat(sValues[i])      ' rotacion
       TextAngleSet = True
     End If
-    'If InStr(sValues[i], "Cristia") > 0 Then Stop
+    If sClaves[i] = "7" Then e.StringData[Me.sdaStyle] = sValues[i]                ' texy
+    If sClaves[i] = "41" Then e.fParam[Me.ipaRelativeFactor] = CFloat(sValues[i])
+    If sClaves[i] = "51" Then e.fParam[Me.ipaObliqueAngle] = CFloat(sValues[i])
+    If sClaves[i] = "71" Then e.fParam[Me.ipaGenerationFlags] = CInt(sValues[i])
+    If sClaves[i] = "72" Then e.fParam[Me.ipaHorizJustif] = CFloat(sValues[i])
+    If sClaves[i] = "73" Then e.fParam[Me.ipaVertJustif] = CFloat(sValues[i])
   Next
+
+  If e.StringData[Me.sdaStyle] = "" Then e.StringData[Me.sdaStyle] = "STANDARD"
 
 
 

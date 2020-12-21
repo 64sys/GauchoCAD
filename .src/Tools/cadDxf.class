@@ -34,7 +34,6 @@ Private hFile As File
 Public lpCode As String
 Public lpValue As String
 
-Public arrToFill As Entity[]
 
 Private eExports As Boolean
 
@@ -59,7 +58,7 @@ End
 
 
 
-Public Function LoadFile(sFile As String, Optional IgnoreLayers As Boolean = False, IgnoreBlocks As Boolean = False, IgnoreData As Boolean = False)
+Public Function LoadFile(sFile As String, arrToFill As Entity[], Optional IgnoreLayers As Boolean = False, IgnoreBlocks As Boolean = False, IgnoreData As Boolean = False)
 
   Dim t As Float = Timer
 
@@ -84,7 +83,7 @@ Public Function LoadFile(sFile As String, Optional IgnoreLayers As Boolean = Fal
 
       If lpCode = "2" And lpValue = "BLOCKS" And Not IgnoreBlocks Then dxfLoad4Blocks
 
-      If lpCode = "2" And lpValue = "ENTITIES" Then dxfLoad5Entities(gcd.CurrentDrawing.arrEntities)
+      If lpCode = "2" And lpValue = "ENTITIES" Then dxfLoad5Entities(arrToFill)
 
       If lpCode = "2" And lpValue = "OBJECTS" Then dxfLoad6Objects
 
@@ -140,7 +139,7 @@ Private Sub dxfLoad5Entities(arrAcumulador As Entity[])
     ' Leo descentralizadamente las entidades
     ReadData
 
-
+    'If sEntidad = "HATCH" Then Stop
     While (lpcode <> "0") And Not Eof(fp)
 
       sClave.Add(lpCode)           ' el codigo es el tipo de variable
@@ -150,7 +149,8 @@ Private Sub dxfLoad5Entities(arrAcumulador As Entity[])
 
     Wend
 
-    If sEntidad = "ENDBLK" Then Return
+    If sEntidad = "ENDBLK" Or sEntidad = "" Then Return
+
 
     ' Termino la lectura de la entidad, busco a ver si la tengo lista
     Try clsHandler = Object.New("cad" & sEntidad)  ' obtenemos el tipo de entidad y buscamos su clase. Si no
@@ -162,6 +162,7 @@ Private Sub dxfLoad5Entities(arrAcumulador As Entity[])
       Else
         cEntitiesUnread.Add(sEntidad, sEntidad)
       Endif
+
       Continue
 
     End If
@@ -186,6 +187,8 @@ Private Sub dxfLoad5Entities(arrAcumulador As Entity[])
       arrAcumulador.Add(eNueva)                     ' la acumulo en el array corresppondiente
 
       'Debug eNueva.gender
+
+
 
       clsHandler = Null
 
@@ -279,6 +282,8 @@ Private Sub dxfLoad3Tables()
   ' Yo usare dos colecciones
   Dim mLayerCount As Integer
   Dim newLayer As Layer
+  Dim cLayer As Collection
+  Dim jscLayers As JSONCollection
 
   ReadData
   Do
@@ -291,28 +296,6 @@ Private Sub dxfLoad3Tables()
 
 
         If lpvalue = "LAYER" Then
-          Dim jscLayers As JSONCollection
-
-
-          ' "object": "LAYER",
-          ' "index": 5,
-          ' "type": 51,
-          ' "handle": [0, 6],
-          ' "size": 25,
-          ' "bitsize": 120,
-          ' "ownerhandle": [10, 1, 12, 18],
-          ' "xdicobjhandle": [3, 2, 1762, 1762],
-          ' "name": "0",
-          ' "is_xref_ref": 1,
-          ' "is_xref_resolved": 0,
-          ' "is_xref_dep": 0,
-          ' "xref": [5, 0, 0, 0],
-          ' "flag": 1008,
-          ' "linewt": 31,
-          ' "color": 7,
-          ' "plotstyle": [5, 1, 7, 7],
-          ' "ltype": [5, 1, 10, 10]
-
 
           ' primero me fijo si existe
           If Not gcd.CurrentDrawing.cModel.Exist("LAYERS") Then
@@ -348,8 +331,28 @@ Private Sub dxfLoad3Tables()
 
           If newLayer.Name = "" Then newLayer.Name = newlayer.id
           gcd.CurrentDrawing.Layers.Add(newLayer, newlayer.id)
-          'gcd.CurrentDrawing.cModel["LAYERS"].Add(newlayer, newLayer["name"])
+          ' DWG
+          cLayer = New Collection
 
+          cLayer.Add("LAYER", "object")
+          cLayer.Add(gcd.CurrentDrawing.cModel["LAYERS"].Count, "index")
+          cLayer.Add(51, "type")
+          cLayer.Add([0, 6], "handle")
+          cLayer.Add(25, "size")
+          cLayer.Add(120, "bitsize")
+          cLayer.Add([10, 1, 12, 18], "ownerhandle")
+          cLayer.Add([3, 2, 1762, 1762], "xdicobjhandle")
+          cLayer.Add(newLayer.Name, "name")
+          cLayer.Add(1, "is_xref_ref")
+          cLayer.Add(0, "is_xref_resolved")
+          cLayer.Add(0, "is_xref_dep")
+          cLayer.Add([5, 0, 0, 0], "xref")
+          cLayer.Add(1008, "flag")
+          cLayer.Add(newLayer.LineWt, "linewt")
+          cLayer.Add(newlayer.Colour, "color")
+          cLayer.Add([5, 1, 7, 7], "plotstyle")
+          cLayer.Add([5, 1, 10, 10], "ltype")
+          gcd.CurrentDrawing.cModel["LAYERS"].Add(clayer, cLayer["handle"][1])
           Inc mLayerCount
 
         End If
@@ -422,14 +425,23 @@ End
 Private Sub dxfReadCommonEntityData(e As Entity, sCode As String[], sValue As String[])
 
   Dim i As Integer
+  Dim lay As Layer
 
   For i = 0 To sValue.Max
 
     If sCode[i] = "5" Then e.handle = sValue[i]             ' Handle
-    If sCode[i] = "8" Then e.layer = sValue[i]              ' Layer
+    If sCode[i] = "8" Then
+      ' obtengo el id basado en el nombre
+      For Each Lay In gcd.CurrentDrawing.layers
+        If Lay.Name = sValue[i] Then
+          e.LayerId = lay.id              ' Layer
+          Break
+        End If
+      Next
+    End If
     If sCode[i] = "6" Then e.LineType = 0 'sValue[i]           ' LineType
     If sCode[i] = "62" Then e.colour = CInt(sValue[i])      ' Color code (no es RBG) (256=ByLayer)
-    If sCode[i] = "370" Then e.LineWidth = CInt(sValue[i])  ' debemos ir a una tabla para ver
+    If sCode[i] = "370" Then e.LineWidth = 1 ' CInt(sValue[i])  ' debemos ir a una tabla para ver
 
     e.Gender = e.ClassHandler.gender
 

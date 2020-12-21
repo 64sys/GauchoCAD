@@ -50,7 +50,7 @@ Public CurrentColor As Integer
 Public imgColor As Image
 
 Public SelectingLayer As Boolean    '' Selecting Layer
-Public CurrentLayer As String
+Public CurrentLayer As String = "0"
 
 Public SelectingLtype As Boolean    '' Selecting Linetype
 Public CurrentLtype As Integer
@@ -952,6 +952,7 @@ End
 '' Regenera las listas de OpenGL
 Public Sub Regen()
 
+  gcd.UpdateLayers
   clsEntities.glGenDrawList
   clsEntities.glGenDrawListSel
   redraw
@@ -1199,8 +1200,8 @@ Public Sub gTask(sTask As String)
           If Stat(f).Type = gb.File Then
             If Lower(File.Ext(f)) = "dxf" Then
               gcd.CurrentDrawing.FileName = f
-              cadDxf.arrToFill = gcd.CurrentDrawing.arrEntities
-              cadDxf.LoadFile(f, False, False, False)
+
+              cadDxf.LoadFile(f, gcd.CurrentDrawing.arrEntities, False, False, False)
               gcd.UpdateModel
               regen
               ' modelo recien cargado
@@ -1243,6 +1244,10 @@ Public Sub gTask(sTask As String)
           Endif
 
         Else  ' no existe
+          ' antes de guardar, actualizamos
+          gcd.UpdateLayers()
+
+
           cadDxf.SaveFile(f)
 
         Endif
@@ -1765,9 +1770,9 @@ Public Sub PropSave()
         Select TableView1[r, 0].Text
           Case "Layer"
             cProp["Layer"] = TableView1[r, 1].Text
-            If e.Layer <> cProp["Layer"] Then
+            If e.LayerId <> cProp["Layer"] Then
               Changed = True
-              e.Layer = cProp["Layer"]
+              e.LayerId = cProp["Layer"]
               For Each ly In lay
                 If ly["name"] = cProp["Layer"] Then
                   e.LayerId = ly["id"]
@@ -1879,10 +1884,10 @@ Public Sub LoadPropertiesList(eFilter As String)
 
       ' Layers
       If cProp.Exist("Layer") = False Then
-        cProp.Add([e.Layer], "Layer")
+        cProp.Add([e.LayerId], "Layer")
       Else
-        If cProp["Layer"].Exist(e.Layer) = False Then
-          cProp["Layer"].Add(e.Layer)
+        If cProp["Layer"].Exist(e.LayerId) = False Then
+          cProp["Layer"].Add(e.LayerId)
         Endif
       Endif
 

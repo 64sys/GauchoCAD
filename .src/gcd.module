@@ -575,7 +575,7 @@ Public Function GetLayerID(LayerName As String) As String
   Dim cLayer As Collection
 
   ' FIXME: reparar post layers
-  Return "1"
+  Return "0"
 
   For Each cLayer In gcd.CurrentDrawing.cModel["LAYERS"]
     If cLayer["name"] = LayerName Then Return cLayer["id"]
@@ -591,18 +591,18 @@ Public Function GetGBColor(CADcolor As Integer, layerID As String) As Integer
   ' color
   If CADcolor = 256 Then          ' buscar color del layer
 
-    Return Starter.gColor[gcd.CurrentDrawing.Layers[layerID].colour]
+    Return Starter.gColor[gcd.CurrentDrawing.cModel["LAYERS"][layerID]["color"]]
     'Return Starter.gColor[11]
 
   Else If CADcolor = 257 Then     ' buscar color del objeto
 
-    Return Starter.gColor[gcd.CurrentDrawing.Layers[layerID].colour]    ' FIXME: cambiar esto
+    Return Starter.gColor[gcd.CurrentDrawing.cModel["LAYERS"][layerID]["color"]]    ' FIXME: cambiar esto
     'Return Starter.gColor[12]
 
   Else If CADcolor = 0 Then       ' buscar color del bloque
 
     'Return Starter.gColor[13]
-    Return Starter.gColor[gcd.CurrentDrawing.Layers[layerID].colour]     ' FIXME: cambiar esto
+    Return Starter.gColor[gcd.CurrentDrawing.cModel["LAYERS"][layerID]["color"]]     ' FIXME: cambiar esto
 
   Else
 

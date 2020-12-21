@@ -110,7 +110,7 @@ Public Sub FillEntity(o As Entity)
       Case "P"
         o.p.add(0)
         o.p.add(0)
-        o.level.add(0)
+
 
         o.psel.add(0)
       Case "F", "A", "M", "L"
@@ -404,25 +404,20 @@ Public Function GetSelectionCount() As Integer
 
 End Function
 
-Public Function DeleteSelected(Optional Purge As Boolean = False) As Integer
+Public Function DeleteSelected() As Integer
 
   Dim i As Integer, c As Integer
 
   '  Purgue will also delete those with .ForDeletion = true
 
   For i = gcd.CurrentDrawing.arrEntities.Max To 0 Step -1
-    If Purge Then
-      If gcd.CurrentDrawing.arrEntities[i].ForDeletion Then
-        gcd.CurrentDrawing.arrEntities.Remove(i)
-        Inc c
-      End If
-    Else
 
-      If gcd.CurrentDrawing.arrEntities[i].ForDeletion Or gcd.CurrentDrawing.arrEntities[i].Selected Then
-        gcd.CurrentDrawing.arrEntities.Remove(i)
-        Inc c
-      End If
+
+    If gcd.CurrentDrawing.arrEntities[i].Selected Then
+      gcd.CurrentDrawing.arrEntities.Remove(i)
+      Inc c
     End If
+
   Next
 
   Return c
@@ -643,15 +638,13 @@ Public Sub CopyElemData(origen As Entity, destino As Entity)
 
   destino.p.resize(origen.p.count)
   destino.fparam.resize(origen.fparam.count)
-  destino.level.resize(origen.level.count)
+
   destino.psel.resize(origen.psel.count)
   destino.StringData.resize(origen.StringData.count)
   For i = 0 To origen.p.Max
     destino.P[i] = origen.P[i]
   Next
-  For i = 0 To origen.level.Max
-    destino.Level[i] = origen.Level[i]
-  Next
+
   For i = 0 To origen.fparam.Max
     destino.fparam[i] = origen.fparam[i]
   Next
@@ -663,7 +656,7 @@ Public Sub CopyElemData(origen As Entity, destino As Entity)
   destino.layerID = origen.LayerID
 
   destino.Block = origen.Block
-  destino.Layer = origen.Layer
+
   destino.Group = origen.Group
   destino.colour = origen.colour
   destino.ColorToPaint = origen.ColorToPaint
@@ -1130,7 +1123,7 @@ Public Sub DXFExportCommon(e As Entity, hFile As File)
   Print #hFIle, "100"
   Print #hFIle, "AcDbEntity"
   Print #hFIle, "  8"                       ' Layer
-  Print #hFIle, e.layer
+  Print #hFIle, gcd.CurrentDrawing.layers[e.LayerId].name
   Print #hFIle, "  6"                       ' Linetype name (present if not BYLAYER). The special name BYBLOCK indicates a floating linetype (optional)
   Print #hFIle, e.LineType
   Print #hFIle, " 62"                      ' Color number (present if not BYLAYER); zero indicates the BYBLOCK (floating) color; 256 indicates BYLAYER;

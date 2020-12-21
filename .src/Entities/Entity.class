@@ -22,10 +22,8 @@
 
 Public Gender As String = ""
 Public P As New Float[]                     '' X,Y pairs
-Public Level As New Float[]                 '' The future Z or elevation
 Public StringData As New String[]           '' Split with "|" separator if neccesary, that's is Entity specific.
 Public fParam As New Float[]                '' Array of floats
-Public Layer As String = "0"                '' Capa o Layer que se guarda en el archivo
 Public colour As Integer                    '' 0=by layer, 1=by block, 10+=16 bit color code  ;  ths is not the color to be draw, ColorToPaint is, set in Finish()
 Public LineTypeName As String               '' Continuous, dashed , etc
 Public LineWidth As Float = 1               '' This is it
@@ -37,13 +35,10 @@ Public BlockNumber As Integer
 Public iInsert As Integer = -1              '  Tiene que ser -1 para no confundir a las rutinas en caso que el primer elemento sea un Inserto
 Public ColorToPaint As Integer              '' Este es el color que realmente se va a dibujar
 Public Selected As Boolean                  '' The entity is selected in drawing
-Public ForDeletion As Boolean = True        '' This must be falsed in Finish
 Public DrawAble As Boolean = False          '' True si durante la construccion ya tiene suficientes elementos para poder hacer una representacion digna
 Public Visible As Boolean = True            '' Si esta entidad puede ser mostrada independientmente
 Public Finished As Boolean = False          '' Colocar en true cuando se llegue a completar
 Public Flags As Integer = 0                 '' Flags de estado, bit wise
-
-Public Changed As Boolean
 Public Handle As String
 Public Group As Integer = 0                 '' Pertenecemos a un grupo?
 Public Psel As New Boolean[]                '' Selected points

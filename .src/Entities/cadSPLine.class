@@ -26,7 +26,7 @@ Public Const TypeControls As Integer = 0
 Public Const TypeTangent As Integer = 1
 
 Public Selected As Boolean
-Public ForDeletion As Boolean = True        ' this must be falsed in Finish
+
 Public DrawAble As Boolean = False          ' True si durante la construccion ya tiene suficientes elementos para poder hacer una representacion digna
 Public Visible As Boolean = True            ' si esta entidad puede ser mostrada independientmente
 Public Finished As Boolean = False          ' colocar en true cuando se llegue a completar
@@ -44,16 +44,16 @@ Public Const DXF_Export As Boolean = True
 
 ' fParam helpers
 Public Const TotalParams As Integer = 10
-Public Const iDegree As Integer = 0
-Public Const iTotalKnots As Integer = 1
-Public Const iTotalControlPoints As Integer = 2
-Public Const iTotalFitPoints As Integer = 3
-Public Const iKnotTolerance As Integer = 4
-Public Const iControlTolerance As Integer = 5
-Public Const iFitTolerance As Integer = 6
-Public Const iFlag As Integer = 7
-Public Const iTang1 As Integer = 8
-Public Const iTang2 As Integer = 9
+Public Const ipaDegree As Integer = 0
+Public Const ipaTotalKnots As Integer = 1
+Public Const ipaTotalControlPoints As Integer = 2
+Public Const ipaTotalFitPoints As Integer = 3
+Public Const ipaKnotTolerance As Integer = 4
+Public Const ipaControlTolerance As Integer = 5
+Public Const ipaFitTolerance As Integer = 6
+Public Const ipaFlag As Integer = 7
+Public Const ipaTang1 As Integer = 8
+Public Const ipaTang2 As Integer = 9
 
 Public Sub Translate(e As Entity, dX As Float, dY As Float, Optional OnlySelected As Boolean = False)
 
@@ -106,16 +106,16 @@ Public Sub Draw(oE As Entity)
   'oe.P.Insert([10, 10, 70, 310, 210, 210, 210, 10])
   oE.ColorToPaint = gcd.GetGBColor(oE.colour, oE.Layerid)
   If oe.fParam.Count < Me.TotalParams Then oe.fParam.Resize(Me.TotalParams)
-  oe.fParam[Me.iDegree] = 2
+  oe.fParam[Me.ipaDegree] = 2
   ' La Spline de grado 2 es la que va a traves de Fit Points
-  If oe.fParam[Me.iDegree] = 2 Then
+  If oe.fParam[Me.ipaDegree] = 2 Then
     calculateDrawingPoints(oe.p)
     'SplineTroughFitPoints(oe.p)
   Else  ' a traves de control points (no los toca)
 
-    'calculateDrawingPointsWithTangents2(oe.p, oe.fParam[Me.iTang1] = 1, oe.fParam[Me.iTang2] = 1)
+    'calculateDrawingPointsWithTangents2(oe.p, oe.fParam[me.ipaTang1] = 1, oe.fParam[me.ipaTang2] = 1)
 
-    SplineTroughControlPoints(oe.p, oe.fParam[Me.iTang1] = 1, oe.fParam[Me.iTang2] = 1)
+    SplineTroughControlPoints(oe.p, oe.fParam[Me.ipaTang1] = 1, oe.fParam[Me.ipaTang2] = 1)
   Endif
 
   GLplus.PolyLines(drawingPoints, oE.ColorToPaint, oE.LineWidth, oe.linetype)
@@ -174,17 +174,10 @@ Public Sub Finish(oE As Entity, Optional ParamsDone As Integer = -1) As Boolean
   ' tareas finales de armado del objeto
 
   oE.psel.resize(oE.p.count / 2)
-  oE.ForDeletion = False
+
   oE.DrawAble = True
   oE.Selected = False
   oE.Finished = True
-
-  If Not True Then
-
-    oE.ForDeletion = True
-    oE.DrawAble = False
-
-  End If
 
 End
 
@@ -917,21 +910,21 @@ Public Sub ExportDXF(e As Entity, hFile As File)
   Print #hFIle, "230"
   Print #hFIle, "  0"
   Print #hFIle, " 70"                      ' Spline flag (bit coded):1 = Closed spline 2 = Periodic spline 4 = Rational spline 8 = Planar 16 = Linear(planar bit Is Also set)
-  Print #hFIle, e.fParam[Me.iFlag]
+  Print #hFIle, e.fParam[Me.ipaFlag]
   Print #hFIle, " 71"                      ' grado de la ecuacion
-  Print #hFIle, e.fParam[Me.iDegree]
+  Print #hFIle, e.fParam[Me.ipaDegree]
   Print #hFIle, " 72"                      ' cantidad de nudos
-  Print #hFIle, e.fParam[Me.iTotalKnots]
+  Print #hFIle, e.fParam[Me.ipaTotalKnots]
   Print #hFIle, " 73"                      ' cantidad de puntos de control ?????????????
-  Print #hFIle, e.fParam[Me.iTotalControlPoints]
+  Print #hFIle, e.fParam[Me.ipaTotalControlPoints]
   Print #hFIle, " 74"                      ' cantidad de fit points
-  Print #hFIle, e.fParam[Me.iTotalFitPoints]
+  Print #hFIle, e.fParam[Me.ipaTotalFitPoints]
   Print #hFIle, " 42"                      ' Knot tolerance (default = 0.0000001)
-  Print #hFIle, e.fParam[Me.iKnotTolerance]
+  Print #hFIle, e.fParam[Me.ipaKnotTolerance]
   Print #hFIle, " 43"                      ' Control-point tolerance (default = 0.0000001)
-  Print #hFIle, e.fParam[Me.iControlTolerance]
+  Print #hFIle, e.fParam[Me.ipaControlTolerance]
   Print #hFIle, " 44"                      ' Fit tolerance (default = 0.0000000001)
-  Print #hFIle, e.fParam[Me.iFitTolerance]
+  Print #hFIle, e.fParam[Me.ipaFitTolerance]
   For i = 0 To e.p.Max Step 2
     Print #hFIle, "40"                      ' Knot value ???
     Print #hFIle, "0"
@@ -959,14 +952,14 @@ Public Function ImportDXF(e As Entity, sClaves As String[], sValues As String[])
 
   For i = 0 To sClaves.Max
 
-    If sClaves[i] = "70" Then e.fParam[Me.iFlag] = CInt(sValues[i])
-    If sClaves[i] = "71" Then e.fParam[Me.iDegree] = CInt(sValues[i])
-    If sClaves[i] = "72" Then e.fParam[Me.iTotalKnots] = CInt(sValues[i])
-    If sClaves[i] = "73" Then e.fParam[Me.iTotalControlPoints] = CInt(sValues[i])
-    If sClaves[i] = "74" Then e.fParam[Me.iTotalFitPoints] = CInt(sValues[i])
-    If sClaves[i] = "42" Then e.fParam[Me.iKnotTolerance] = CFloat(sValues[i])
-    If sClaves[i] = "43" Then e.fParam[Me.iControlTolerance] = CFloat(sValues[i])
-    If sClaves[i] = "44" Then e.fParam[Me.iFitTolerance] = CFloat(sValues[i])
+    If sClaves[i] = "70" Then e.fParam[Me.ipaFlag] = CInt(sValues[i])
+    If sClaves[i] = "71" Then e.fParam[Me.ipaDegree] = CInt(sValues[i])
+    If sClaves[i] = "72" Then e.fParam[Me.ipaTotalKnots] = CInt(sValues[i])
+    If sClaves[i] = "73" Then e.fParam[Me.ipaTotalControlPoints] = CInt(sValues[i])
+    If sClaves[i] = "74" Then e.fParam[Me.ipaTotalFitPoints] = CInt(sValues[i])
+    If sClaves[i] = "42" Then e.fParam[Me.ipaKnotTolerance] = CFloat(sValues[i])
+    If sClaves[i] = "43" Then e.fParam[Me.ipaControlTolerance] = CFloat(sValues[i])
+    If sClaves[i] = "44" Then e.fParam[Me.ipaFitTolerance] = CFloat(sValues[i])
 
     If sClaves[i] = "40" Then e.fParam.Add(CFloat(sValues[i]))
 
@@ -989,7 +982,7 @@ Public Function ImportDXF(e As Entity, sClaves As String[], sValues As String[])
   ' con todos los datos recabados, armo el array
 
   If Ptang1.Count > 0 Then
-    e.fParam[Me.iTang1] = 1
+    e.fParam[Me.ipaTang1] = 1
     e.P.Add(Ptang1[0])
     e.P.Add(Ptang1[1])
   End If
@@ -998,7 +991,7 @@ Public Function ImportDXF(e As Entity, sClaves As String[], sValues As String[])
 
   If Ptang2.Count > 0 Then
 
-    e.fParam[Me.iTang2] = 1
+    e.fParam[Me.ipaTang2] = 1
     e.P.Add(Ptang2[0])
     e.P.Add(Ptang2[1])
   End If
