@@ -337,7 +337,7 @@ Private Sub dxfLoad3Tables()
           cLayer.Add("LAYER", "object")
           cLayer.Add(gcd.CurrentDrawing.cModel["LAYERS"].Count, "index")
           cLayer.Add(51, "type")
-          cLayer.Add([0, 6], "handle")
+          cLayer.Add([0, CInt(newlayer.id)], "handle")
           cLayer.Add(25, "size")
           cLayer.Add(120, "bitsize")
           cLayer.Add([10, 1, 12, 18], "ownerhandle")
@@ -362,6 +362,8 @@ Private Sub dxfLoad3Tables()
 
     ReadData
   Loop
+
+  'gcd.UpdateLayers
 
   Try Print "DXF: Leidas", gcd.CurrentDrawing.cModel["LAYERS"].count, " tablas"
 

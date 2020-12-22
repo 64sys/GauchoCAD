@@ -170,7 +170,6 @@ Public Sub Draw(oE As Entity)
     clsDrawingAids.Helper.texto = Format$(oE.fParam[1], "0.0 deg") & (" to ") & Format$(oE.fParam[2], "0.0 deg")
   Else
 
-    If oe.fParam[1] > oe.fParam[2] Then angle_increment *= -1
 
     If oe.fParam[3] > 0 Then
 
@@ -182,13 +181,16 @@ Public Sub Draw(oE As Entity)
 
     Endif
 
+    If oe.fParam[1] > oe.fParam[2] Then oe.fParam[3] = -1
+
+
     ' veo el cuantos pixels tendria cada tramo
     LargoReal = 2 * oE.fParam[0] * Pi * Abs(oE.fParam[1] - oE.fParam[2]) / 360
     LargoPixels = APPMain.Pixels(LargoReal)
 
     ' si quiero tramos de 10 pixels...
     angle_increment = 5 / LargoPixels * 2 * Pi * oe.fParam[3]
-    'angle_increment = Pi * 2 / 360 * oe.fParam[3] * 10
+    If angle_increment > Pi * 2 / 360 * oe.fParam[3] * 10 Then angle_increment = Pi * 2 / 360 * oe.fParam[3] * 10
     Debug "LargoPixels", LargoPixels, " paso angular ", angle_increment
 
 
@@ -198,7 +200,7 @@ Public Sub Draw(oE As Entity)
 
 
     oE.polyline.Clear
-    'angle_increment = Pi * 2 / 360 * oe.fParam[3] * 10
+    'angle_increment = Pi * 2 / 360 * oe.fParam[3]
 
 
 
