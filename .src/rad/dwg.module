@@ -33,6 +33,8 @@ Public Function Encode(cMdl As Collection) As String
   Dim xSec As New String[]          ''DWG Sections
   Dim zSec As New String[]          ''Sections in dwg not contemplated
   Dim sec As String
+  Dim subsec As String
+
   'Dim foot As String
 
   xSec = ["FILEHEADER", "HEADER", "CLASSES", "OBJECTS", "THUMBNAILIMAGE", "Template", "AuxHeader"]
@@ -40,28 +42,80 @@ Public Function Encode(cMdl As Collection) As String
   s = "{\n  \"created_by\": \"GauchoCAD 0.0.88\",\n"
 
   For Each sec In xSec
-    If cMdl.Exist(sec) Then
-      s &= "  \"" & sec & "\":"
+    s &= "  \"" & sec & "\":"
+    Select sec
+      Case "OBJECTS"
+        For Each subsec In ["BLOCKS", "LAYERS", "LTYPES", "NESTED", "OBJECTS", "ENTITIES"]
+          If cMdl.Exist(subsec) Then
+            's &= "  \n"
+            For Each vrt In cMdl[subsec]
+              'vrt =
+              t = ""
+              Try t = JSON.Encode(vrt)
+              If t <> "" Then
+                's &= "  " & t & ",\n"
+                t = jq(t)
+                't = Replace(t, "{\"", "{\n\"")
+                't = Replace(t, "\":", "\": ")
+                't = Replace(t, ",\"", ",\n\"")
+                't = Replace(t, ": null", ": \"\"")
+                Print t
 
-      If sec = "CLASSES" Or sec = "OBJECTS" Then
-        s &= "  \n"
-      Endif
+                s &= "  " & t & "\n"
+              Else
+                Print "Error " & ox
+              Endif
+            Next
+          Endif
+        Next
 
-      vrt = cMdl[sec]
-      t = ""
-      Try t = JSON.Encode(vrt)
-      If t <> "" Then
-        s &= "  " & t & ",\n"
-      Else
-        Print "Error " & ox
-      Endif
-    Endif
-    's &= foot
+      Case Else
+        vrt = cMdl[sec]
+        t = ""
+        Try t = JSON.Encode(vrt)
+        If t <> "" Then
+          t = jq(t)
+          s &= "  " & t & ",\n"
+        Else
+          Print "Error " & ox
+        Endif
+
+    End Select
+
+    ' If cMdl.Exist(sec) Then
+    '   s &= "  \"" & sec & "\":"
+    '   If sec = "CLASSES" Or sec = "OBJECTS" Then
+    '     s &= "  \n"
+    '   Endif
+    '
+    '   vrt = cMdl[sec]
+    '   t = ""
+    '   Try t = JSON.Encode(vrt)
+    '   If t <> "" Then
+    '     s &= "  " & t & ",\n"
+    '   Else
+    '     Print "Error " & ox
+    '   Endif
+    ' Endif
+    ' 's &= foot
   Next
 
   s &= "\n}"
 
   Return s
+
+End
+
+Private Function jq(s As String) As String
+
+  Dim t As String
+
+  t = Replace(s, "{\"", "{\n\"")
+  t = Replace(t, "\":", "\": ")
+  t = Replace(t, ",\"", ",\n\"")
+  t = Replace(t, ": null", ": \"\"")
+
+  Return t
 
 End
 
@@ -160,6 +214,7 @@ Public Function Raw(f As String) As Collection
   Dim o As Integer
   Dim x As Integer
   Dim obx As New Variant[]
+  Dim iHandle As Integer
 
   If Exist(f) Then
     If Lower(File.Ext(f)) = "dwg" Then
@@ -230,6 +285,15 @@ Public Function Raw(f As String) As Collection
           Try vrt = JSON.Decode(tmx[x], True)
           If vrt Then
             obx.Add(vrt.Copy())
+            If vrt.Exist("entity") Then
+              If vrt["entity"] = "LINE" Then
+                Print vrt["entity"] & ": " & vrt["handle"][vrt["handle"].Max]
+              Endif
+              '    If iHandle < vrt["handle"][vrt["handle"].Max] Then
+              '      iHandle = vrt["handle"][vrt["handle"].Max]
+              '    Endif
+              '  Endif
+            Endif
 
           Endif
           If Error Then

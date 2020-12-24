@@ -63,7 +63,8 @@ Public CurrentText As String
 
 'Public SelectedWidth As Boolean
 
-Private PropertiesFlag As Boolean = False
+'Private PropertiesFlag As Boolean = False
+Private PropertiesFlag As Boolean = True
 Private RawFlag As Boolean = False
 
 'variables de ambiente
@@ -112,6 +113,7 @@ Public Sub Run(cin As Collection)
         Select mnu.Name
           Case "grpEntities"
             tob = New ToolButton(pnlEntities) As "entity"
+            'tob = New ToolButton(ToolBar1) As "entity"
             z = 40 '48
           Case "grpTools"
             tob = New ToolButton(pnlEntities) As "tool"
@@ -140,6 +142,7 @@ Public Sub Run(cin As Collection)
           .Tag = obj.Tag
           .Tooltip = obj.Text
           .Enabled = obj.Enabled
+          .AutoResize = False
 
           .W = z
           .H = z
@@ -2299,6 +2302,26 @@ Public Sub Form_KeyPress()
 
         Select Key.Code
           Case Asc("1") ' Properties
+
+            Select PropertiesFlag
+              Case 1 ' Tools
+                PropertiesFlag = 2
+                pnlProperties.Visible = True
+                pnlIcons.Visible = False
+                'btnSelectionMode.Value = False
+              Case 2 ' Props
+                PropertiesFlag = 0
+                pnlProperties.Visible = False
+                pnlIcons.Visible = False
+                'btnSelectionMode.Value = True
+
+              Case Else ' Invisible
+                PropertiesFlag = 1
+                pnlProperties.Visible = False
+                pnlIcons.Visible = True
+
+            End Select
+
             If PropertiesFlag = False Then
               pnlProperties.Visible = True
               PropertiesFlag = True
