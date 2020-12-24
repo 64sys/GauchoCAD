@@ -27,6 +27,7 @@ Public Sub ComboBox1_Click()
   If ComboBox1.Text = "Solid" Then
     gcd.CurrentDrawing.LastHatch = ComboBox1.Index
     gcd.CurrentDrawing.LastHatchPattern = ComboBox1.Text
+    gcd.CurrentDrawing.LastHatchFile = ComboBox1.Text
     DrawingArea1.Refresh
 
     Return
@@ -34,9 +35,7 @@ Public Sub ComboBox1_Click()
 
   entyHatch.Clear
 
-  cadDxf.arrToFill = entyHatch
-
-  cadDxf.LoadFile(Application.Path &/ "patterns" &/ ComboBox1.Text & ".dxf", True, True, True)
+  cadDxf.LoadFile(Application.Path &/ "patterns" &/ ComboBox1.Text & ".dxf", entyHatch, True, True, True)
 
   DrawingArea1.Refresh
 

@@ -86,17 +86,12 @@ Public Sub Finish(ParamsDone As Integer) As Boolean
 
   Me.fParam.add(0.2)         ' TODO: fix this when having params entered correctly
   Me.CreatePolygon
-  Me.ForDeletion = False
+
   Me.DrawAble = True
   Me.Selected = False
   Me.Finished = True
 
-  If puntos.distancia(Me.p[0], Me.p[1], Me.p[2], Me.p[3]) = 0 Then ' this is too little
 
-    Me.ForDeletion = True
-    Me.DrawAble = False
-
-  End If
 
 End
 

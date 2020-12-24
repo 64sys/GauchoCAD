@@ -35,7 +35,7 @@ Public Const StretchAble As Boolean = True           ' Si lo puedo deformar
 
 ' SAVE from this vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 Public P As New Float[]                     ' X,Y pairs
-Public Level As New Float[]                 ' the future Z or elevation
+
 Public StringData As String                 ' split with "|" separator if neccesary, that's is Entity specific.
 Public StringData2 As String                ' split with "|" separator if neccesary, that's is Entity specific.
 Public StringData3 As String                ' split with "|" separator if neccesary, that's is Entity specific.
@@ -51,7 +51,7 @@ Public LayerId As String = "0"                ' esta variable es la Key en la co
 Public BlockNumber As Integer
 Public ColorToPaint As Integer              ' este es el color que realmente se va a dibujar
 Public Selected As Boolean
-Public ForDeletion As Boolean = True        ' this must be falsed in Finish
+
 Public DrawAble As Boolean = False          ' True si durante la construccion ya tiene suficientes elementos para poder hacer una representacion digna
 Public Visible As Boolean = True            ' si esta entidad puede ser mostrada independientmente
 Public Finished As Boolean = False          ' colocar en true cuando se llegue a completar
@@ -233,16 +233,11 @@ Public Sub Finish(ParamsDone As Integer) As Boolean
   ' tareas finales de armado del objeto
 
   Me.psel.resize(Me.p.count / 2)
-  Me.ForDeletion = False
+
   Me.DrawAble = True
   Me.Selected = False
   Me.Finished = True
 
-  If Not True Then
 
-    Me.ForDeletion = True
-    Me.DrawAble = False
-
-  End If
 
 End

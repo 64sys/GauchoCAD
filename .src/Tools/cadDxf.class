@@ -26,155 +26,6 @@
 Create Static
 Public Const Gender As String = "Dxf"
 
-Public Struct commonSt
-  layer As String         ' 8
-  handle As String        ' 5
-  linetype As String      ' 6
-  bColor As Integer       ' 62
-  linetypescale As Float  ' 42 o 41
-  visible As Integer      ' 60
-  LineWt As Float         ' 370
-End Struct
-
-Public Struct lineSt
-  x1 As Float
-  y1 As Float
-  x2 As Float
-  y2 As Float
-End Struct
-
-Public Struct textSt
-  x As Float              ' 10
-  y As Float              ' 20
-  altura As Float         ' 40
-  texto As String         '  1
-  rotacion As Float       ' 50
-End Struct
-
-Public Struct mtextSt
-  x As Float              ' 10
-  y As Float              ' 20
-  h As Float              ' 10
-  w As Float              ' 20
-  alineacion As Integer
-
-  altura As Float         ' 40
-  texto As String         '  1
-  rotacion As Float       ' 50
-End Struct
-
-Public Struct dimSt
-  bloque As String        '  2
-  p As Float[]            ' 10,20,11,21,12,22.......
-  tipo As Integer          ' 70 0 = rotado 1 = alineado, 2 = angular
-  alineacion As Integer   ' 71
-  medida As Float         ' 42
-  texto As String         ' 1 text override
-  angulo As Float         ' 50
-End Struct
-
-Public Struct InsertSt
-  block_name As String    '  2
-  x As Float              ' 10
-  y As Float              ' 20
-  z As Float              ' 30
-  escX As Float           ' 41
-  escY As Float           ' 42
-  escZ As Float           ' 43
-  rotacion As Float       ' 50
-End Struct
-
-Public Struct blockSt
-  layer As String         '  8
-  block_name As String    '  2
-  x As Float              ' 10
-  y As Float              ' 20
-  z As Float              ' 30
-End Struct
-
-Public Struct circleSt
-  x As Float
-  y As Float
-  r As Float
-End Struct
-
-Public Struct arcSt
-  x As Float
-  y As Float
-  r As Float
-  sa As Float
-  ea As Float
-End Struct
-
-Public Struct ellipseSt
-  xc As Float
-  yc As Float
-  xm As Float
-  ym As Float
-  relacion As Float
-  StartAngle As Float
-  EndAngle As Float
-End Struct
-
-Public Struct StructpolylineSt
-  vertexcount As Integer
-  poliflag As Integer
-  p As Float[]
-End Struct
-
-Public Struct solidSt
-  p As Float[]
-End Struct
-
-Public Struct StructsplineeSt
-  mKnotsPoints As Integer
-  mFitPointCount As Integer
-  mControlPointCount As Integer
-  pKnotValues As Float[]
-  pFit As Float[]
-  pControl As Float[]
-  pTangents As Float[]
-
-End Struct
-
-Public Nx As Integer
-Public Ny As Integer
-Public Dx As Float
-Public Dy As Float
-Public Np As Integer
-Public Dp As Float
-
-Public mCommon As New CommonSt
-Public mLine As New LineSt
-Public mCircle As New CircleSt
-Public mEllipse As New EllipseSt
-Public mPolyLine As New StructpolylineSt
-Public mText As New TextSt
-Public mMText As New TextSt
-Public mSpline As New StructsplineeSt
-Public mArc As New ArcSt
-Public mInsert As New InsertSt
-Public mBlock As New BlockSt
-Public mSolid As New SolidSt
-Public mDim As New DimSt
-
-Private mBlockCount As Integer
-Private mInsertCount As Integer
-Private mTextcount As Integer
-Private mMTextcount As Integer
-Private mLineCount As Integer
-Private mPolyLineCount As Integer
-Private mPolyLinePointsCount As Integer
-Private mCircleCount As Integer
-Private mEllipseCount As Integer
-Private mArcCount As Integer
-Private mSplineCount As Integer
-Private mSolidCount As Integer
-Private mDimCount As Integer
-Private mLayerCount As Integer
-
-Private flgReadingBlock As Boolean
-
 Public t As Float = Timer
 
 Public fp As File
@@ -183,17 +34,13 @@ Private hFile As File
 Public lpCode As String
 Public lpValue As String
 
-Public arrToFill As Entity[]
 
 Private eExports As Boolean
 
+Public cEntitiesUnread As Collection
+Public nEntitiesUnread As Integer
+Public nEntitiesRead As Integer
 
-
-Public Function SaveDXF(sName As String) As Integer
-
-  Return SaveFile(sName)
-
-End
 
 
 Private Sub ReadData()
@@ -209,468 +56,404 @@ Private Sub ReadData()
 
 End
 
-Private Function GetData(CODE As Integer) As String
-
-  While (CInt(lpcode) <> CODE) And Not Eof(fp)
-    Line Input #fp, lpcode
-    Line Input #fp, lpValue
-
-    If Right(lpcode, 1) = gb.Cr Then lpcode = Left(lpcode, -1)
-    If Right(lpvalue, 1) = gb.cr Then lpvalue = Left(lpvalue, -1)
-
-    lpcode = Trim$(lpcode)
-    lpvalue = Trim$(lpvalue)
-  Wend
-  Return lpValue
-
-End
-
-Public Sub FinishDXFRead()
-
-  Print "SPlines", mSplineCount
-  Print "lines", mLineCount
-  Print "Polylines", mPolyLineCount
-  Print "Circles", mCircleCount
-  Print "Arcs", mArcCount
-  Print "Texto", mTextcount
-  Print "MTexto", mMTextcount
-  Print "Inserts", mInsertcount
-  Print "Blocks", mBlockCount
-  Print "Dims", mDimCount
-
-  Print
-  Print "Total elements", mPolyLinePointsCount + mDimCount + mLineCount + mCircleCount + mMTextcount + mTextcount + mArcCount + mSplineCount + mInsertCount, " processed in ", Str(Timer - t), " Secconds"
-
-  fp.Close
-
-End
-
-Public Procedure LoadFile(stn As String, Optional IgnoreLayers As Boolean = False, IgnoreBlocks As Boolean = False, IgnoreData As Boolean = False)
-
-  Dim i As Integer
-  Dim mLoadStatus As Boolean
-  Dim enxArray As Entity[]
-
-  mBlockCount = 0
-  mInsertCount = 0
-  mTextcount = 0
-  mMTextcount = 0
-  mLineCount = 0
-  mPolyLineCount = 0
-  mPolyLinePointsCount = 0
-  mCircleCount = 0
-  mEllipseCount = 0
-  mArcCount = 0
-  mSplineCount = 0
-  mSolidCount = 0
-  mDimCount = 0
-  mLayerCount = 0
-
-  mPolyLine.p = New Float[]
 
 
-  fp = Open stn For Read
+Public Function LoadFile(sFile As String, arrToFill As Entity[], Optional IgnoreLayers As Boolean = False, IgnoreBlocks As Boolean = False, IgnoreData As Boolean = False)
+
+  Dim t As Float = Timer
+
+  fp = Open sFile For Read
+
   If Not fp Then Error.Raise("Error !")
+  cEntitiesUnread = New Collection
+  nEntitiesUnread = 0
+  nEntitiesRead = 0
 
   While Not Eof(fp)
-    Wait 0.0001
+    'Wait 0.0001
+    ReadData
+    If lpCode = "0" And lpValue = "SECTION" Then
+      ' vemos que seccion es
+      ReadData
+      If lpCode = "2" And lpValue = "HEADER" And Not IgnoreData Then dxfLoad1Headers
 
-    'Print lpcode, lpvalue
-    If (lpvalue = "LINE") And Not Eof(fp) Then
+      If lpCode = "2" And lpValue = "CLASSES" Then Print "DXF: CLASSES ignoradas"
+
+      If lpCode = "2" And lpValue = "TABLES" And Not IgnoreLayers Then dxfLoad3Tables
+
+      If lpCode = "2" And lpValue = "BLOCKS" And Not IgnoreBlocks Then dxfLoad4Blocks
+
+      If lpCode = "2" And lpValue = "ENTITIES" Then dxfLoad5Entities(arrToFill)
+
+      If lpCode = "2" And lpValue = "OBJECTS" Then dxfLoad6Objects
+
+    Endif
+  Wend
+
+  Print "DXF: Leidas", nEntitiesread, " entidades"
+  If cEntitiesUnread.Count > 0 Then
+    Print "DXF: Un total de", nEntitiesUnread, " entidades no pudieron ser leidas:"
+    For Each unread As String In cEntitiesUnread
+      Print unread
+    Next
+  Endif
+  Print
+  Print "DXF: fin lectura en ", Timer - t
+
+
+
+
+End
+
+Private Sub dxfLoad6Objects()
+
+
+
+End
+
+
+
+Private Sub dxfLoad5Entities(arrAcumulador As Entity[])
+
+  Dim sClave As String[]
+  Dim sValue As String[]
+  Dim sEntidad As String
+  Dim clsHandler As Object
+  Dim eNueva As Entity
+  Dim Reads As Boolean
+
+
+
+  Do
+    'Debug lpcode, lpvalue
+    sClave = New String[]
+
+    sValue = New String[]
+
+    If lpValue = "ENTITIES" Then ReadData
+
+    sEntidad = lpValue
+
+    If lpValue = "ENDSEC" Then Return
+
+    ' Leo descentralizadamente las entidades
+    ReadData
+
+    'If sEntidad = "HATCH" Then Stop
+    While (lpcode <> "0") And Not Eof(fp)
+
+      sClave.Add(lpCode)           ' el codigo es el tipo de variable
+      sValue.Add(lpValue)
 
       ReadData
-      While (lpcode <> "0") And Not Eof(fp)
-        dxfReadCommonData
-        If lpcode = "10" Then mLine.x1 = CFloat(lpvalue)
-        If lpcode = "20" Then mLine.y1 = CFloat(lpvalue)
-        If lpcode = "11" Then mLine.x2 = CFloat(lpvalue)
-        If lpcode = "21" Then mLine.y2 = CFloat(lpvalue)
-        ReadData
-        Inc mLineCount
 
-      Wend
+    Wend
 
-      '
-      AddLine(arrToFill, [mLine.x1, mLine.y1, mLine.x2, mLine.y2], mBlock.block_name)
-
-      '-----------------------------------------------------------
-      ' DIM
-      '-----------------------------------------------------------
-    Else If (lpcode = "0") And (lpvalue = "DIMENSION") Then
-
-      ReadData
-      mDim.p = New Float[]
-
-      While (lpcode <> "0") And Not Eof(fp)
-        dxfReadCommonData
-        If lpcode = "2" Then mDim.bloque = lpvalue
-        If lpcode = "10" Then mDim.p.Add(CFloat(lpvalue))
-        If lpcode = "20" Then mDim.p.Add(CFloat(lpvalue))
-        If lpcode = "11" Then mDim.p.Add(CFloat(lpvalue))
-        If lpcode = "21" Then mDim.p.Add(CFloat(lpvalue))
-        If lpcode = "70" Then mDim.tipo = CInt(lpvalue)
-        If lpcode = "71" Then mDim.alineacion = CInt(lpvalue)
-        If lpcode = "42" Then mDim.medida = CFloat(lpvalue)
-        If lpcode = "42" Then mDim.texto = lpvalue
-        If lpcode = "12" Then mDim.p.Add(CFloat(lpvalue))
-        If lpcode = "13" Then mDim.p.Add(CFloat(lpvalue))
-        If lpcode = "14" Then mDim.p.Add(CFloat(lpvalue))
-        If lpcode = "15" Then mDim.p.Add(CFloat(lpvalue))
-        If lpcode = "16" Then mDim.p.Add(CFloat(lpvalue))
-        If lpcode = "26" Then mDim.p.Add(CFloat(lpvalue))
-        If lpcode = "22" Then mDim.p.Add(CFloat(lpvalue))
-        If lpcode = "23" Then mDim.p.Add(CFloat(lpvalue))
-        If lpcode = "24" Then mDim.p.Add(CFloat(lpvalue))
-        If lpcode = "25" Then mDim.p.Add(CFloat(lpvalue))
-        If lpcode = "50" Then mDim.angulo = CFloat(lpvalue)
-
-        ReadData
-      Wend
-
-      Inc mDimCount
-      AddDim(arrToFill, mDim.p, mDim.bloque, mDim.medida, mDim.texto, mDim.alineacion, mDim.angulo, mDim.tipo, mBlock.block_name)
-
-      '-----------------------------------------------------------
-      ' LWPOLYLINE
-      '-----------------------------------------------------------
-
-      '' Lwpolyline command:
-    Else If (lpcode = "0") And (lpvalue = "LWPOLYLINE") Then
-
-      mPolyLine.p = New Float[]
-
-      ReadData
-      While (lpcode <> "0") And Not Eof(fp)
-        dxfReadCommonData
-        If lpcode = "90" Then mPolyLine.vertexcount = Val(lpValue)
-        If lpcode = "70" Then mPolyLine.poliflag = Val(lpValue)       ' 0 = abierta, 1 = cerrada
-        If lpcode = "10" Then mPolyLine.p.Add(CFloat(lpValue))
-        If lpcode = "20" Then mPolyLine.p.Add(CFloat(lpValue))
-
-        ReadData
-      Wend
-
-      If mPolyLine.poliflag = 1 And mPolyLine.p.Count > 0 Then ' agrego el primer punto de nuevo
-        mPolyLine.p.Add(mPolyLine.p[0])
-        mPolyLine.p.Add(mPolyLine.p[1])
-      End If
-      mPolyLinePointsCount += mPolyLine.p.Count / 2
-      Inc mPolyLineCount
-      AddPolyLine(arrToFill, mPolyLine.p, mPolyLine.poliflag, mBlock.block_name)
-
-      '-----------------------------------------------------------
-      ' LAYER
-      '-----------------------------------------------------------
-    Else If (lpcode = "0") And (lpvalue = "LAYER") And Not IgnoreLayers Then
-      Dim newLayer As JSONCollection, jscLayers As JSONCollection
-      Inc mLayerCount
-
-      ' "object": "LAYER",
-      ' "index": 5,
-      ' "type": 51,
-      ' "handle": [0, 6],
-      ' "size": 25,
-      ' "bitsize": 120,
-      ' "ownerhandle": [10, 1, 12, 18],
-      ' "xdicobjhandle": [3, 2, 1762, 1762],
-      ' "name": "0",
-      ' "is_xref_ref": 1,
-      ' "is_xref_resolved": 0,
-      ' "is_xref_dep": 0,
-      ' "xref": [5, 0, 0, 0],
-      ' "flag": 1008,
-      ' "linewt": 31,
-      ' "color": 7,
-      ' "plotstyle": [5, 1, 7, 7],
-      ' "ltype": [5, 1, 10, 10]
+    If sEntidad = "ENDBLK" Or sEntidad = "" Then Return
 
 
-      ' primero me fijo si existe
-      If Not gcd.CurrentDrawing.cModel.Exist("LAYERS") Then
-        jscLayers = New JSONCollection
-        gcd.CurrentDrawing.cModel.Add(jscLayers, "LAYERS")
+    ' Termino la lectura de la entidad, busco a ver si la tengo lista
+    Try clsHandler = Object.New("cad" & sEntidad)  ' obtenemos el tipo de entidad y buscamos su clase. Si no
+
+    If IsNull(clsHandler) Then
+      ' Acumulo informacion para mostrar al usuario
+      If cEntitiesUnread.Exist(sEntidad) Then
+        nEntitiesUnread += 1
+      Else
+        cEntitiesUnread.Add(sEntidad, sEntidad)
       Endif
-      newlayer = New JSONCollection
 
-      newlayer.Add(Format(mLayerCount, "0"), "id")
-      ReadData
-      While (lpcode <> "0") And Not Eof(fp)
-        If lpcode = "5" Then newlayer.Add(lpvalue, "handle")
-        If lpcode = "2" Then newlayer.Add(lpvalue, "name")
+      Continue
 
-        If lpcode = "6" Then newLayer.Add(lpvalue, "style")
-        If lpcode = "62" Then
-          newLayer.Add(Abs(CInt(lpvalue)), "color")
-          If CInt(lpvalue) > 0 Then newLayer.Add(True, "show") Else newLayer.Add(False, "show")
-        End If
-        ' If lpcode = "70" Then
-        '   If ((CInt(lpvalue) And 2) = 2 Or (CInt(lpvalue) And 1) = 1) Then newLayer.Add(True, "locked") Else newLayer.Add(False, "locked")
-        ' End If
-        ' If lpcode = "20" Then
-        '   If ((CInt(lpvalue) And 4) = 4) Then newLayer.Add(True, "frozen") Else newLayer.Add(False, "frozen")
-        ' End If
-        '
-        ' If lpcode = "290" Then newLayer.Add(lpvalue, "print")
-        ' If lpcode = "370" Then newLayer.Add(lpvalue, "width")
-        ReadData
-      Wend
+    End If
 
-      gcd.CurrentDrawing.cModel["LAYERS"].Add(newlayer, newLayer["name"])
+    Reads = False
 
-      '-----------------------------------------------------------
-      ' DIMSTYLE
-      '-----------------------------------------------------------
 
-    Else If (lpcode = "0") And (lpvalue = "DIMSTYLE") And Not IgnoreData Then
-      Dim newCol As New Collection
+    Try Reads = clsHandler.DXF_reading
 
-      ReadData
-      While (lpcode <> "0") And Not Eof(fp)
-        If lpcode = "2" Then gcd.CurrentDrawing.cModel["DimSts"].Add(newCol, lpvalue)
+    If Reads Then                  ' verifico si la clase ya lee DXF
 
-        If lpcode = "40" Then newCol.Add(CFloat(lpvalue), "DIMSCALE")
-        'If lpcode = "3" Then newCol.Add(CFloat(lpvalue), "DIMPOST")
-        'If lpcode = "4" Then newCol.Add(CFloat(lpvalue), "DIMAPOST")
+      eNueva = New Entity                           ' creo la entidad
 
-        ReadData
-      Wend
+      eNueva.ClassHandler = clsHandler
 
-      '-----------------------------------------------------------
-      ' SOLID
-      '-----------------------------------------------------------
-    Else If (lpcode = "0") And (lpvalue = "SOLID") Then
+      dxfReadCommonEntityData(eNueva, sClave, sValue)
 
-      mSolid.p = New Float[]
+      clsHandler.importDXF(eNueva, sClave, sValue)  ' la leo
 
-      ReadData
-      While (lpcode <> "0") And Not Eof(fp)
-        dxfReadCommonData
-        If lpcode = "10" Then mSolid.p.Add(CFloat(lpValue))
-        If lpcode = "20" Then mSolid.p.Add(CFloat(lpValue))
-        If lpcode = "11" Then mSolid.p.Add(CFloat(lpValue))
-        If lpcode = "21" Then mSolid.p.Add(CFloat(lpValue))
-        If lpcode = "12" Then mSolid.p.Add(CFloat(lpValue))
-        If lpcode = "22" Then mSolid.p.Add(CFloat(lpValue))
-        If lpcode = "13" Then mSolid.p.Add(CFloat(lpValue))
-        If lpcode = "23" Then mSolid.p.Add(CFloat(lpValue))
-        ReadData
-      Wend
-      Inc mSolidCount
-      AddSolid(arrToFill, mSolid.p, mBlock.block_name)
+      clsHandler.finish(eNueva)                     ' la termino
 
-      '-----------------------------------------------------------
-      ' CIRCLE
-      '-----------------------------------------------------------
-      '' Circle command:
-    Else If (lpcode = "0") And (lpvalue = "CIRCLE") Then
-      ReadData
-      While (lpcode <> "0") And Not Eof(fp)
-        dxfReadCommonData
-        If lpcode = "10" Then mCircle.x = CFloat(lpValue)
-        If lpcode = "20" Then mCircle.y = CFloat(lpValue)
-        If lpcode = "40" Then mCircle.r = CFloat(lpValue)
-        ReadData
-      Wend
-      Inc mCircleCount
-      ' Print "Circle", mCircle.layer, mCircle.x, mCircle.y, mCircle.r
-      AddCircle(arrToFill, [mCircle.x, mCircle.y], mCircle.r, mBlock.block_name)
+      arrAcumulador.Add(eNueva)                     ' la acumulo en el array corresppondiente
 
-      '-----------------------------------------------------------
-      ' ELLIPSE
-      '-----------------------------------------------------------
+      'Debug eNueva.gender
 
-    Else If (lpcode = "0") And (lpvalue = "ELLIPSE") Then
 
+
+      clsHandler = Null
+
+      nEntitiesRead += 1
+
+    Else
+
+      ' Acumulo informacion para mostrar al usuario
+      If cEntitiesUnread.Exist(sEntidad) Then
+        nEntitiesUnread += 1
+      Else
+        cEntitiesUnread.Add(sEntidad, sEntidad)
+      Endif
+
+
+    Endif
+
+
+
+  Loop
+
+
+End
+
+
+Private Sub dxfLoad4Blocks()
+
+  Dim mBlock As Block
+  Dim unread As Variant
+
+
+  ReadData
+  Do
+
+    mBlock = New Block
+    If lpCode = "0" And lpValue = "ENDSEC" Then Break
+
+    If (lpcode = "0") And (lpvalue = "BLOCK") Then
       ReadData
 
-      While (lpcode <> "0") And Not Eof(fp)
-        dxfReadCommonData
-        If lpcode = "10" Then mEllipse.xc = CFloat(lpValue)     ' centro
-        If lpcode = "20" Then mEllipse.yc = CFloat(lpValue)
-        If lpcode = "11" Then mEllipse.xm = CFloat(lpValue)     ' eje mayor, relativo al centro
-        If lpcode = "21" Then mEllipse.ym = CFloat(lpValue)
-        If lpcode = "40" Then mEllipse.relacion = CFloat(lpValue)
-        If lpcode = "41" Then mEllipse.StartAngle = CFloat(lpValue)
-        If lpcode = "42" Then mEllipse.EndAngle = CFloat(lpValue)
-        ReadData
-      Wend
-      Inc mEllipseCount
-      '
-      AddEllipse(arrToFill, [mEllipse.xc, mEllipse.yc, mEllipse.xm, mEllipse.ym], mEllipse.relacion, mEllipse.StartAngle, mEllipse.EndAngle, mBlock.block_name)
-
-      '-----------------------------------------------------------
-      ' ARC
-      '-----------------------------------------------------------
-      ' Arc command
-    Else If (lpcode = "0") And (lpvalue = "ARC") Then
-
-      ReadData
-
-      While (lpcode <> "0") And Not Eof(fp)
-        dxfReadCommonData
-        If lpcode = "10" Then mArc.x = CFloat(lpValue)
-        If lpcode = "20" Then mArc.y = CFloat(lpValue)
-        If lpcode = "40" Then mArc.r = CFloat(lpValue)
-        If lpcode = "50" Then mArc.sa = CFloat(lpValue)
-        If lpcode = "51" Then mArc.ea = CFloat(lpValue)
-        ReadData
-      Wend
-      Inc mArcCount
-      ' Print "Arc", mCommon.layer, mArc.x, mArc.y, mArc.r, mArc.sa, mArc.ea
-      Addarc(arrToFill, [mArc.x, mArc.y], mArc.r, mArc.sa, mArc.ea, mBlock.block_name)
-
-      '
-      '-----------------------------------------------------------
-      ' SPLINE
-      '-----------------------------------------------------------
-    Else If (lpcode = "0") And (lpvalue = "SPLINE") Then
-      mSpline.pFit = New Float[]
-      mSpline.pControl = New Float[]
-      mSpline.pKnotValues = New Float[]
-      mSpline.pTangents = New Float[]
-
-      ReadData
-      While (lpcode <> "0") And Not Eof(fp)
-        dxfReadCommonData
-        If lpcode = "72" Then mSpline.mKnotsPoints = Val(lpValue)
-        If lpcode = "73" Then mSpline.mControlPointCount = Val(lpValue)
-        If lpcode = "74" Then mSpline.mFitPointCount = Val(lpValue)
-
-        If lpcode = "40" Then mSpline.pKnotValues.Add(CFloat(lpValue))
-
-        If lpcode = "10" Then mSpline.pControl.Add(CFloat(lpValue))
-        If lpcode = "20" Then mSpline.pControl.Add(CFloat(lpValue))
-        If lpcode = "11" Then mSpline.pFit.Add(CFloat(lpValue))
-        If lpcode = "21" Then mSpline.pFit.Add(CFloat(lpValue))
-        If lpcode = "12" Then mSpline.pTangents.Add(CFloat(lpValue))
-        If lpcode = "22" Then mSpline.pTangents.Add(CFloat(lpValue))
-        If lpcode = "13" Then mSpline.pTangents.Add(CFloat(lpValue))
-        If lpcode = "23" Then mSpline.pTangents.Add(CFloat(lpValue))
-
-        ReadData
-      Wend
-
-      Inc mSplineCount
-
-      AddSPLine(arrToFill, mSpline.pControl, 0, mBlock.block_name)
-
-      '-----------------------------------------------------------
-      ' TEXT
-      '-----------------------------------------------------------
-
-
-    Else If (lpcode = "0") And (lpvalue = "TEXT") Then
-
-      ReadData
-      While (lpcode <> "0") And Not Eof(fp)
-        dxfReadCommonData
-        If lpcode = "10" Then mText.x = CFloat(lpValue)         ' X1
-        If lpcode = "20" Then mText.y = CFloat(lpValue)         ' Y1
-        If lpcode = "40" Then mText.altura = CFloat(lpValue)         ' Altura
-        If lpcode = "1" Then mText.texto = lpValue                 ' Texto
-        If lpcode = "50" Then mText.rotacion = CFloat(lpValue)      ' rotacion
-        ReadData
-      Wend
-
-      Inc mTextCount
-      AddText(arrToFill, [mText.x, mText.y], mText.rotacion, mText.altura, mText.texto, mBlock.block_name)
-
-      '-----------------------------------------------------------
-      ' MTEXT
-      '-----------------------------------------------------------
-
-    Else If (lpcode = "0") And (lpvalue = "MTEXT") Then
-
-      mMText.texto = ""
-      ReadData
-
-      While (lpcode <> "0") And Not Eof(fp)
-        dxfReadCommonData
-        If lpcode = "10" Then mMText.x = CFloat(lpValue)                ' X1
-        If lpcode = "20" Then mMText.y = CFloat(lpValue)                ' Y1
-        If lpcode = "40" Then mMText.altura = CFloat(lpValue)              ' Altura
-        If lpcode = "3" Or lpcode = "1" Then mMText.texto &= lpValue    ' Texto
-        If lpcode = "50" Then mMText.rotacion = CFloat(lpValue)      ' rotacion
-        ReadData
-      Wend
-      Inc mMTextCount
-      AddMText(arrToFill, [mMText.x, mMText.y], mMText.rotacion, mMText.altura, mMText.texto, mBlock.block_name)
-
-      '-----------------------------------------------------------
-      ' INSERT
-      '-----------------------------------------------------------
-      '
-    Else If (lpcode = "0") And (lpvalue = "INSERT") Then
-
-      ReadData
-      While (lpcode <> "0") And Not Eof(fp)
-        dxfReadCommonData
-        If lpcode = "2" Then mInsert.block_name = lpValue
-        If lpcode = "10" Then mInsert.x = CFloat(lpValue)         ' X
-        If lpcode = "20" Then mInsert.y = CFloat(lpValue)         ' Y
-        If lpcode = "41" Then mInsert.escX = CFloat(lpValue)         ' esc X
-        If lpcode = "42" Then mInsert.escY = CFloat(lpValue)         ' esc Y
-        If lpcode = "50" Then mInsert.rotacion = CFloat(lpValue)      ' rotacion
-        ReadData
-
-      Wend
-
-      Inc mInsertCount
-      AddInsert(arrToFill, [mInsert.x, mInsert.y], mInsert.escX, mInsert.escY, mInsert.rotacion, mInsert.block_name)
-
-      '-----------------------------------------------------------
-      ' BLOCK
-      '-----------------------------------------------------------
-      '
-    Else If (lpcode = "0") And (lpvalue = "BLOCK") And Not IgnoreBlocks Then
-      ReadData
-      FlgReadingBlock = True
-      While (lpcode <> "0") And Not Eof(fp)
-        dxfReadCommonData
-        If lpcode = "2" Then mBlock.block_name = lpValue
+      While (lpcode <> "0") And Not Eof(fp)     ' con el codigo 0 termina el encabezado del bloque
+        ' siguen las entidades o el ENDBLK
+        'Debug lpcode, lpvalue
+        'If lpcode = "5" Then mBlock.handle = lpvalue               ' Handle
+        If lpcode = "8" Then mBlock.layer = lpvalue                ' Layer
+        'If lpcode = "6" Then mBlock.linetype = lpvalue             ' LineType
+        'If lpcode = "62" Then mBlock.bColor = CInt(lpvalue)        ' Color code (no es RBG) (256=ByLayer)
+        'If lpcode = "370" Then mBlock.LineWt = CInt(lpvalue)        ' Color code (no es RBG) (256=ByLayer)
+        If lpcode = "2" Then mBlock.name = lpValue
         If lpcode = "10" Then mBlock.x = CFloat(lpValue)         ' X
         If lpcode = "20" Then mBlock.y = CFloat(lpValue)         ' Y
         ReadData
 
       Wend
-      mBlock.layer = mCommon.layer
+      ' si estoy leyendo bloques, significa que estoy abriendo un plano
+      mBlock.entities = New Entity[]
 
-      enxArray = arrToFill
+      gcd.CurrentDrawing.arrBlocks.Add(mBlock)
 
-      arrToFill = AddBlock([mBlock.x, mBlock.y], mBlock.block_name)
+      dxfLoad5Entities(gcd.CurrentDrawing.arrBlocks.Last.entities)
 
-      Inc mBlockCount
 
-    Else If (lpcode = "0") And (lpvalue = "ENDBLK") And Not IgnoreBlocks Then
-      ReadData
-      flgReadingBlock = False
-      mBlock.block_name = ""
-      arrToFill = enxArray
 
-    Else
-      ReadData
+    Endif
+  Loop
+
+  Print "DXF: Leidos", gcd.CurrentDrawing.arrBlocks.Count, " bloques"
+
+
+
+End
+
+
+Private Sub dxfLoad3Tables()
+
+  '    0
+  ' TABLE
+  ' 2
+  ' VPORT
+  '   5
+  '   8
+  ' 330
+  '   0
+  ' 100
+  ' AcDbSymbolTable
+  ' 70
+  ' 1
+  '   0
+  ' VPORT
+
+  ' Yo usare dos colecciones
+  Dim mLayerCount As Integer
+  Dim newLayer As Layer
+  Dim cLayer As Collection
+  Dim jscLayers As JSONCollection
+
+  ReadData
+  Do
+    If Eof(fp) Then Break
+
+
+    If lpCode = "0" And lpValue = "ENDSEC" Then Break
+    Select Case lpValue ' VIEWPORT , LAYER, etc
+      Case "LAYER"
+
+
+        If lpvalue = "LAYER" Then
+
+          ' primero me fijo si existe
+          If Not gcd.CurrentDrawing.cModel.Exist("LAYERS") Then
+            jscLayers = New JSONCollection
+            gcd.CurrentDrawing.cModel.Add(jscLayers, "LAYERS")
+          Endif
+          newlayer = New Layer
+
+          newlayer.id = CStr(mLayerCount)
+          ReadData
+          While (lpcode <> "0") And Not Eof(fp)
+            'Debug lpcode, lpvalue
+            If lpcode = "5" Then newlayer.handle = lpvalue
+            If lpcode = "2" Then newlayer.Name = lpvalue
+
+
+            If lpcode = "6" Then newLayer.LType = lpvalue
+            If lpcode = "62" Then
+              newLayer.Colour = Abs(CInt(lpvalue))
+              If CInt(lpvalue) > 0 Then newLayer.Shown = True
+            End If
+            ' If lpcode = "70" Then
+            '   If ((CInt(lpvalue) And 2) = 2 Or (CInt(lpvalue) And 1) = 1) Then newLayer.Add(True, "locked") Else newLayer.Add(False, "locked")
+            ' End If
+            ' If lpcode = "20" Then
+            '   If ((CInt(lpvalue) And 4) = 4) Then newLayer.Add(True, "frozen") Else newLayer.Add(False, "frozen")
+            ' End If
+            '
+            ' If lpcode = "290" Then newLayer.Add(lpvalue, "print")
+            ' If lpcode = "370" Then newLayer.Add(lpvalue, "width")
+            ReadData
+          Wend
+
+          If newLayer.Name = "" Then newLayer.Name = newlayer.id
+          gcd.CurrentDrawing.Layers.Add(newLayer, newlayer.id)
+          ' DWG
+          cLayer = New Collection
+
+          cLayer.Add("LAYER", "object")
+          cLayer.Add(gcd.CurrentDrawing.cModel["LAYERS"].Count, "index")
+          cLayer.Add(51, "type")
+          cLayer.Add([0, CInt(newlayer.id)], "handle")
+          cLayer.Add(25, "size")
+          cLayer.Add(120, "bitsize")
+          cLayer.Add([10, 1, 12, 18], "ownerhandle")
+          cLayer.Add([3, 2, 1762, 1762], "xdicobjhandle")
+          cLayer.Add(newLayer.Name, "name")
+          cLayer.Add(1, "is_xref_ref")
+          cLayer.Add(0, "is_xref_resolved")
+          cLayer.Add(0, "is_xref_dep")
+          cLayer.Add([5, 0, 0, 0], "xref")
+          cLayer.Add(1008, "flag")
+          cLayer.Add(newLayer.LineWt, "linewt")
+          cLayer.Add(newlayer.Colour, "color")
+          cLayer.Add([5, 1, 7, 7], "plotstyle")
+          cLayer.Add([5, 1, 10, 10], "ltype")
+          gcd.CurrentDrawing.cModel["LAYERS"].Add(clayer, cLayer["handle"][1])
+          Inc mLayerCount
+
+        End If
+
+
+    End Select
+
+    ReadData
+  Loop
+
+  'gcd.UpdateLayers
+
+  Try Print "DXF: Leidas", gcd.CurrentDrawing.cModel["LAYERS"].count, " tablas"
+
+
+End
+
+Private Sub dxfLoad1Headers()
+
+  ' Los header se guardan asi
+  '   9                     Indica que es una variable
+  ' $EXTMAX                 Nombre de la variable
+  '  10                     Tipo de dato1
+  ' 198.0411690635561       Dato1
+  '  20                     Tipo de dato2
+  ' 178.7767572407179       Dato2
+  '  30                     etc
+  '   0
+
+  ' Yo usare dos colecciones
+
+  Dim sVarName As String
+  Dim sClave As String[]
+  Dim sValue As String[]
+
+  ReadData
+  Do
+    sClave = New String[]
+    sValue = New String[]
+
+    If lpCode = "0" And lpValue = "ENDSEC" Then Break
+
+    If lpcode = "9" Then
+      sVarName = lpValue
+      Do                          ' este bucle es por si la variable es un array
+        ReadData
+        If lpcode = "0" Or lpCode = "9" Then Break
+        sClave.Add(lpCode)           ' el codigo es el tipo de variable
+        sValue.Add(lpValue)
+      Loop
 
     Endif
 
-  Wend
+    If sValue.Count > 1 Then
 
-  FinishDXFRead
+      gcd.CurrentDrawing.cHeader.Add(sValue, sVarName)
+      gcd.CurrentDrawing.cHeaderCodes.Add(sClave, sVarName)
+    Else
+      gcd.CurrentDrawing.cHeader.Add(sValue[0], sVarName)
+      gcd.CurrentDrawing.cHeaderCodes.Add(sClave[0], sVarName)
 
-  Return
+    End If
+  Loop
+
+  Print "DXF: Leidas", gcd.CurrentDrawing.cHeader.Count, "variables de ambiente"
+
+
 
 End
 
-Private Sub dxfReadCommonData()
 
-  If lpcode = "5" Then mCommon.handle = lpvalue               ' Handle
-  If lpcode = "8" Then mCommon.layer = lpvalue                ' Layer
-  If lpcode = "6" Then mCommon.linetype = lpvalue             ' LineType
-  If lpcode = "62" Then mCommon.bColor = CInt(lpvalue)        ' Color code (no es RBG) (256=ByLayer)
-  If lpcode = "370" Then mCommon.LineWt = CInt(lpvalue)        ' Color code (no es RBG) (256=ByLayer)
+Private Sub dxfReadCommonEntityData(e As Entity, sCode As String[], sValue As String[])
+
+  Dim i As Integer
+  Dim lay As Layer
+
+  For i = 0 To sValue.Max
+
+    If sCode[i] = "5" Then e.handle = sValue[i]             ' Handle
+    If sCode[i] = "8" Then
+      ' obtengo el id basado en el nombre
+      For Each Lay In gcd.CurrentDrawing.layers
+        If Lay.Name = sValue[i] Then
+          e.LayerId = lay.id              ' Layer
+          Break
+        End If
+      Next
+    End If
+    If sCode[i] = "6" Then e.LineType = 0 'sValue[i]           ' LineType
+    If sCode[i] = "62" Then e.colour = CInt(sValue[i])      ' Color code (no es RBG) (256=ByLayer)
+    If sCode[i] = "370" Then e.LineWidth = 1 ' CInt(sValue[i])  ' debemos ir a una tabla para ver
+
+    e.Gender = e.ClassHandler.gender
+
+  Next
 
 End
 
-Private Function SaveFile(sName As String) As Integer
+
+
+Public Function SaveFile(sName As String) As Integer
 
   hFile = Open sName For Write Create
 
@@ -2910,14 +2693,6 @@ Private Function dxfSave2Tables() As Integer
   Print #hFIle, "  0"                       ' OBJECT TYPE
   Print #hFIle, "TABLE"
   Print #hFIle, "2"                       ' TABLE NAME
-  Print #hFIle, "LAYER"
-  Print #hFIle, "  5"                       ' HANDLE
-  Print #hFIle, "2"
-  Print #hFIle, "330"
-  Print #hFIle, "  0"
-  Print #hFIle, "100"
-  Print #hFIle, "AcDbSymbolTable"
-  Print #hFIle, "70"                      ' ENTRIES IN TABLE
   Print #hFIle, gcd.CurrentDrawing.cModel["LAYERS"].Count
   Dim i As Integer, lay As Collection
   ' individual layers
@@ -3483,7 +3258,7 @@ Private Function dxfSave4Blocks() As Integer
     Print #hFIle, "  0"
     Print #hFIle, "ENDBLK"
     Print #hFIle, "  5"
-    Print #hFIle, gcd.CurrentDrawing.arrBlocks[i].layer
+    Print #hFIle, gcd.CurrentDrawing.arrBlocks[i].handle
     Print #hFIle, "330"
     Print #hFIle, "51"
     Print #hFIle, "100"
@@ -3641,253 +3416,4 @@ Private Function dxfSaveDimension(BlockName As String, fPuntos As Float[], Optio
 
 End
 
-
-' importing
-
-Private Sub AddCommon(e As Entity)
-
-  e.layer = mCommon.Layer
-  e.colour = mCommon.bColor
-  e.LineWidth = 1 ' mCommon.LineWt  ' TODO: transformar esto
-  e.linetypename = mCommon.linetype
-  e.Handle = mCommon.handle
-
-
-End
-
-
-Private Function AddLine(obxContainer As Entity[], Points As Float[], Optional Block As String) As Boolean
-
-  ' points are in x,y,x,y,x,y....
-  Dim oEntity As New Entity
-
-  AddCommon(oEntity)
-  oEntity.ClassHandler = cadLine
-  oEntity.Gender = oEntity.ClassHandler.gender
-  oEntity.P.insert(points)                    ' recibimos los dos vertices de la linea x1,y1,x2,y2
-  oEntity.Block = Block
-  If oEntity.Block <> "" Then oEntity.visible = False
-  obxContainer.Add(oEntity)
-  oEntity.ClassHandler.finish(oEntity, -1)
-  oEntity = Null                  ' free entity
-
-End
-
-Private Function AddPolyLine(obxContainer As Entity[], Points As Float[], Optional iClosed As Integer = 0, Optional Block As String) As Boolean
-
-  ' points are in x,y,x,y,x,y....
-
-  Dim oEntity As New Entity
-
-  oEntity.ClassHandler = cadLWPolyline
-  oEntity.Gender = oEntity.ClassHandler.gender
-  oEntity.P.insert(points)                    ' recibimos los dos vertices de la linea x1,y1,x2,y2
-  oEntity.fParam.Add(iClosed)                 ' cerrada o abierta
-  AddCommon(oEntity)
-  oEntity.Block = Block
-  If oEntity.Block <> "" Then oEntity.visible = False
-  obxContainer.Add(oEntity)
-  oEntity.ClassHandler.finish(oEntity, -1)
-  oEntity = Null                  ' free entity
-
-End
-
-Private Function AddDim(obxContainer As Entity[], Points As Float[], bloque As String, medida As Float, texto As String, alineacion As Integer, angulo As Float, tipo As Integer, Optional Block As String) As Boolean
-
-  Dim oEntity As New Entity
-
-  oEntity.ClassHandler = cadDim              ' create the new entity of proper class
-  oEntity.Gender = oEntity.ClassHandler.gender
-  oEntity.P.insert(points)                    ' recibimos los dos vertices de la linea x1,y1,x2,y2
-  oEntity.fParam.Add(tipo)
-  oEntity.fParam.Add(MEDIDA)
-  oEntity.fParam.Add(alineacion)
-  oEntity.fParam.Add(angulo)
-  oEntity.stringdata.Add(texto)
-  oEntity.stringdata.Add(bloque)
-  AddCommon(oEntity)
-  oEntity.Block = Block
-  If oEntity.Block <> "" Then oEntity.visible = False
-  obxContainer.Add(oEntity)
-  oEntity.ClassHandler.finish(oEntity, -1)
-  oEntity = Null                  ' free entity
-
-End
-
-Private Function AddSolid(obxContainer As Entity[], Points As Float[], Optional Block As String) As Boolean
-
-  ' points are in x,y,x,y,x,y....
-  ' points are in x,y,x,y,x,y....
-  Dim oEntity As New Entity
-
-  oEntity.ClassHandler = cadSolid             ' create the new entity of proper class
-  oEntity.Gender = oEntity.ClassHandler.gender
-  oEntity.P.insert(points)                    ' recibimos los dos vertices de la linea x1,y1,x2,y2
-
-  AddCommon(oEntity)
-  oEntity.Block = Block
-  If oEntity.Block <> "" Then oEntity.visible = False
-  obxContainer.Add(oEntity)
-  oEntity.ClassHandler.finish(oEntity, -1)
-  oEntity = Null                  ' free entity
-
-End
-
-Private Function AddSPLine(obxContainer As Entity[], Points As Float[], Optional iClosed As Integer = 0, Optional Block As String) As Boolean
-
-  ' points are in x,y,x,y,x,y....
-  Dim oEntity As New Entity
-
-  oEntity.ClassHandler = cadSPLine
-  oEntity.Gender = oEntity.ClassHandler.gender
-  oEntity.P.insert(points)                    ' recibimos los dos vertices de la linea x1,y1,x2,y2
-  oEntity.fParam.Add(iClosed)                 ' cerrada o abierta
-  AddCommon(oEntity)
-  oEntity.Block = Block
-  If oEntity.Block <> "" Then oEntity.visible = False
-  obxContainer.Add(oEntity)
-  oEntity.ClassHandler.finish(oEntity, -1)
-  oEntity = Null                  ' free entity
-
-End
-
-Private Function AddCircle(obxContainer As Entity[], Points As Float[], radious As Float, Optional Block As String) As Boolean
-
-  ' points are in x,y,x,y,x,y....
-  Dim oEntity As New Entity
-
-  oEntity.ClassHandler = cadCircle
-  oEntity.Gender = oEntity.ClassHandler.gender
-  oEntity.P.insert(points)                    ' centro x1,y1
-  oEntity.fParam.Add(radious)                 ' radio
-  AddCommon(oEntity)
-  oEntity.Block = Block
-  If oEntity.Block <> "" Then oEntity.visible = False
-  obxContainer.Add(oEntity)
-  oEntity.ClassHandler.finish(oEntity, -1)
-  oEntity = Null                  ' free entity
-
-End
-
-Private Function AddArc(obxContainer As Entity[], Points As Float[], r As Float, angle1 As Float, angle2 As Float, Optional Block As String) As Boolean
-
-  ' points are in x,y,x,y,x,y....
-  Dim oEntity As New Entity
-
-  oEntity.ClassHandler = cadArc
-  oEntity.Gender = oEntity.ClassHandler.gender
-  oEntity.P.insert(points)                    ' centro x1,y1
-  oEntity.fParam.Add(r)                      ' radio
-  oEntity.fParam.Add(angle1)                   ' angulo
-  oEntity.fParam.Add(angle2)                   ' angulo
-  AddCommon(oEntity)
-  oEntity.Block = Block
-  If oEntity.Block <> "" Then oEntity.visible = False
-  obxContainer.Add(oEntity)
-  oEntity.ClassHandler.finish(oEntity, -1)
-  oEntity = Null                  ' free entity
-
-End
-
-Private Function AddEllipse(obxContainer As Entity[], Points As Float[], r As Float, angle1 As Float, angle2 As Float, Optional Block As String) As Boolean
-
-  ' points are in x,y,x,y,x,y....
-  Dim oEntity As New Entity
-
-  oEntity.ClassHandler = cadEllipse
-  oEntity.Gender = oEntity.ClassHandler.gender
-  oEntity.P.insert(points)                    ' centro x1,y1
-  oEntity.p[2] += oEntity.p[0]                ' un pequeño truco porque gaucho usa los puntos de manera diferente a DXF
-  oEntity.p[3] += oEntity.p[1]
-  oEntity.fParam.Add(r)                      ' ratio minor/major
-  oEntity.fParam.Add(angle1 * 180 / Pi)     ' start angle
-  oEntity.fParam.Add(angle2 * 180 / Pi)      ' end angle
-  AddCommon(oEntity)
-  oEntity.Block = Block
-  If oEntity.Block <> "" Then oEntity.visible = False
-  obxContainer.Add(oEntity)
-  oEntity.ClassHandler.finish(oEntity, -1)
-  oEntity = Null                  ' free entity
-
-End
-
-Private Function AddText(obxContainer As Entity[], Points As Float[], angle As Float, height As Float, _Text As String, Optional Block As String) As Boolean
-
-  Dim oEntity As New Entity
-
-  oEntity.ClassHandler = cadText
-  oEntity.Gender = oEntity.ClassHandler.gender
-  oEntity.P.insert(points)                    ' recibimos position x1,y1
-  oEntity.fParam.Add(angle)                   ' grados
-  oEntity.fParam.Add(height)                  ' alto letras
-  oEntity.stringdata.Add(_text)                  ' el texto
-  AddCommon(oEntity)
-  oEntity.Block = Block
-  If oEntity.Block <> "" Then oEntity.visible = False
-  obxContainer.Add(oEntity)
-  oEntity.ClassHandler.finish(oEntity, -1)
-  oEntity = Null                  ' free entity
-
-End
-
-Private Function AddMText(obxContainer As Entity[], Points As Float[], angle As Float, height As Float, _Text As String, Optional Block As String) As Boolean
-
-  Dim oEntity As New Entity
-
-  oEntity.ClassHandler = cadMText
-  oEntity.Gender = oEntity.ClassHandler.gender
-  oEntity.P.insert(points)                    ' recibimos position x1,y1 pero tal vez venga un recuadro
-  oEntity.fParam.Add(angle)                  ' GRADOS
-  oEntity.fParam.Add(height)                  ' alto letras
-  oEntity.stringdata.add(_text)                  ' el texto
-  AddCommon(oEntity)
-  oEntity.Block = Block
-  If oEntity.Block <> "" Then oEntity.visible = False
-  obxContainer.Add(oEntity)
-  oEntity.ClassHandler.finish(oEntity, -1)
-  oEntity = Null                  ' free entity
-
-End
-
-Private Function AddCurve(obxContainer As Entity[], Points As Float[], Optional Block As String) As Boolean
-
-  ' points are in x,y,x,y,x,y....
-  Dim oEntity As New Entity
-
-  oEntity.Gender = oEntity.ClassHandler.gender
-
-End
-
-Private Function AddInsert(obxContainer As Entity[], Points As Float[], scaleX As Float, scaleY As Float, angulo As Float, Block As String) As Boolean
-
-  Dim oEntity As New Entity
-
-  oEntity.ClassHandler = cadInsert
-  oEntity.Gender = oEntity.ClassHandler.gender
-  oEntity.P.insert(points)                    ' recibimos position x1,y1
-  oEntity.fParam.Add(scaleX)
-  oEntity.fParam.Add(scaleY)
-  oEntity.fParam.Add(angulo)                  ' GRADOS
-  AddCommon(oEntity)
-  oEntity.Block = block
-  obxContainer.Add(oEntity)
-  oEntity.ClassHandler.finish(oEntity, -1)
-
-  oEntity = Null                  ' free entity
-
-End
-
-Private Function AddBlock(Points As Float[], Block As String) As Entity[]
-
-  Dim newBlock As New Block
-
-  newBlock.entities = New Entity[]
-  newBlock.name = block
-  newBlock.x = Points[0]
-  newBlock.y = Points[1]
-  gcd.CurrentDrawing.arrBlocks.Add(newBlock)
-
-  Return newBlock.entities
-
-End
 

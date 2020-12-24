@@ -33,7 +33,7 @@ Public Const OrthogonalIgnored As Boolean = False
 Public Const OrthogonalForced As Boolean = False
 Public Const StretchAble As Boolean = True           ' Si lo puedo deformar
 Public Selected As Boolean
-Public ForDeletion As Boolean = True        ' this must be falsed in Finish
+
 Public DrawAble As Boolean = False          ' True si durante la construccion ya tiene suficientes elementos para poder hacer una representacion digna
 Public Visible As Boolean = True            ' si esta entidad puede ser mostrada independientmente
 Public Finished As Boolean = False          ' colocar en true cuando se llegue a completar
@@ -46,7 +46,7 @@ Public recorrido As Float
 Public Const JSON_Reading As Boolean = True
 Public Const JSON_Export As Boolean = False
 
-Public Const DXF_Reading As Boolean = False
+Public Const DXF_Reading As Boolean = True
 Public Const DXF_Export As Boolean = True
 
 
@@ -127,6 +127,8 @@ Public Sub Draw(oE As Entity)
   Dim difAng As Float
   Dim major, minor, angle, la As Float
 
+  Dim LargoPixels, LargoReal, EscalaTramos As Float
+
   If Not oE.Visible Then Return
   oE.ColorToPaint = gcd.GetGBColor(oE.colour, oE.Layerid)
 
@@ -168,6 +170,7 @@ Public Sub Draw(oE As Entity)
     clsDrawingAids.Helper.texto = Format$(oE.fParam[1], "0.0 deg") & (" to ") & Format$(oE.fParam[2], "0.0 deg")
   Else
 
+
     If oe.fParam[3] > 0 Then
 
       If oE.fParam[2] < oE.fParam[1] Then oE.fParam[2] = 360 + oE.fParam[2]              ' grados
@@ -178,8 +181,29 @@ Public Sub Draw(oE As Entity)
 
     Endif
 
+    If oe.fParam[1] > oe.fParam[2] Then oe.fParam[3] = -1
+
+
+    ' veo el cuantos pixels tendria cada tramo
+    LargoReal = 2 * oE.fParam[0] * Pi * Abs(oE.fParam[1] - oE.fParam[2]) / 360
+    LargoPixels = APPMain.Pixels(LargoReal)
+
+    ' si quiero tramos de 10 pixels...
+    angle_increment = 5 / LargoPixels * 2 * Pi * oe.fParam[3]
+    If angle_increment > Pi * 2 / 360 * oe.fParam[3] * 10 Then angle_increment = Pi * 2 / 360 * oe.fParam[3] * 10
+    Debug "LargoPixels", LargoPixels, " paso angular ", angle_increment
+
+
+    If LargoPixels < 10 Then
+      EscalaTramos = 1
+    Endif
+
+
     oE.polyline.Clear
-    angle_increment = Pi * 2 / 360 * oe.fParam[3]
+    'angle_increment = Pi * 2 / 360 * oe.fParam[3]
+
+
+
 
     For theta = oE.fParam[1] / 180 * Pi To oE.fParam[2] / 180 * Pi Step angle_increment
       ' el punto considerando 0,0 al centro
@@ -191,7 +215,7 @@ Public Sub Draw(oE As Entity)
     Next
 
 
-    glPlus.Lines(oe.PolyLine, oe.ColorToPaint, oe.LineWidth, oe.LineType)
+    glPlus.PolyLines(oe.PolyLine, oe.ColorToPaint, oe.LineWidth, oe.LineType)
 
   End If
 
@@ -242,18 +266,11 @@ Public Sub Finish(oE As Entity, Optional ParamsDone As Integer = -1) As Boolean
   ' tareas finales de armado del objeto
 
   oE.psel.resize(oE.p.count / 2)
-  oE.ForDeletion = False
+
   oE.DrawAble = True
   oE.Selected = False
   oE.Finished = True
   oe.fParam.Add(1) ' sentido de giro
-
-  If Not True Then
-
-    oE.ForDeletion = True
-    oE.DrawAble = False
-
-  End If
 
 End
 
@@ -293,7 +310,28 @@ Public Sub ExportDXF(e As Entity, hFile As File)
   Print #hFIle, CStr(e.fParam[1])
   Print #hFIle, " 51"                      ' end angle DEG
   Print #hFIle, CStr(e.fParam[2])
-  
+
+End
+
+
+
+Public Function ImportDXF(e As Entity, sClaves As String[], sValues As String[]) As Boolean
+
+  Dim i As Integer
+
+  For i = 0 To sClaves.Max
+    If sClaves[i] = "10" Then e.P.Add(CFloat(sValues[i]))
+    If sClaves[i] = "20" Then e.P.Add(CFloat(sValues[i]))
+    If sClaves[i] = "40" Then e.fParam.Add(CFloat(sValues[i]))
+    If sClaves[i] = "50" Then e.fParam.Add(CFloat(sValues[i]))
+    If sClaves[i] = "51" Then e.fParam.Add(CFloat(sValues[i]))
+  Next
+
+  If e.fParam.Count = 0 Then Stop ' e.fParam.Add(0)  ' TODO: averiguar q pasa aca q algunas entidades CIRCLE
+  ' vienen sin el radio
+
+
+
 End
 
 ' "entity": "ARC",

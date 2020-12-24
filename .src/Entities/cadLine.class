@@ -34,18 +34,13 @@ Public Const OrthogonalIgnored As Boolean = False
 Public Const OrthogonalForced As Boolean = False
 Public Const ParamDefault As String = " "
 Public Const StretchAble As Boolean = True           ' Si lo puedo deformar
-Public Selected As Boolean
-Public ForDeletion As Boolean = True        ' this must be falsed in Finish
-Public DrawAble As Boolean = False          ' True si durante la construccion ya tiene suficientes elementos para poder hacer una representacion digna
-Public Visible As Boolean = True            ' si esta entidad puede ser mostrada independientmente
-Public Finished As Boolean = False          ' colocar en true cuando se llegue a completar
 Public StepsDone As Integer                 ' esto lo cambia cls ElementBuilder durante la construccion
 
 ' JSON and DXF Read/Export
 Public Const JSON_Reading As Boolean = True
 Public Const JSON_Export As Boolean = True
 
-Public Const DXF_Reading As Boolean = False
+Public Const DXF_Reading As Boolean = True
 Public Const DXF_Export As Boolean = True
 
 Public Sub Translate(e As Entity, dX As Float, dY As Float, Optional OnlySelected As Boolean = False)
@@ -184,17 +179,12 @@ Public Sub Finish(oE As Entity, Optional ParamsDone As Integer = -1) As Boolean
   ' tareas finales de armado del objeto
 
   oE.psel.resize(oE.p.count / 2)
-  oE.ForDeletion = False
+
   oE.DrawAble = True
   oE.Selected = False
   oE.Finished = True
 
-  If Not True Then
 
-    oE.ForDeletion = True
-    oE.DrawAble = False
-
-  End If
 
 End
 
@@ -274,7 +264,7 @@ Public Sub ExportJsonCol(e As Entity, n As JSONCollection, Optional CreateNew As
     n["entity"] = "LINE"
     n["index"] = 44
     n["type"] = 19
-    n["handle"] = [0, e.Handle]
+    n["handle"] = [0, CInt(e.Handle)]
     n["size"] = 43
     n["bitsize"] = 283
     n["ownerhandle"] = [12, 1, 3, 48]
@@ -320,5 +310,20 @@ Public Sub ExportDXF(e As Entity, hFile As File)
   Print #hFIle, CStr(e.p[2])
   Print #hFIle, " 21"                      ' Y1
   Print #hFIle, CStr(e.p[3])
+
+End
+
+Public Function ImportDXF(e As Entity, sClaves As String[], sValues As String[]) As Boolean
+
+  Dim i As Integer
+
+  For i = 0 To sClaves.Max
+
+    If sClaves[i] = "10" Then e.P.Add(CFloat(sValues[i]))
+    If sClaves[i] = "20" Then e.P.Add(CFloat(sValues[i]))
+    If sClaves[i] = "11" Then e.P.Add(CFloat(sValues[i]))
+    If sClaves[i] = "21" Then e.P.Add(CFloat(sValues[i]))
+
+  Next
 
 End

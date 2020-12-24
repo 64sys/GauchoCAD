@@ -55,17 +55,19 @@ Public cBlocks As New Collection    '' All Blocks data from dwg is listed here
 Public cEntities As New Collection  '' All Entity are here if form cEntities[handle] as Entity
 Public cImport As New Collection    '' Impor data from dxf, dwg is loaded here
 
+Public cHeader As New Collection    '' Header data
+Public cHeaderCodes As New Collection '' Header codes (used for saving)
 ' ===============================================================================================================================
 ' GRAPHICS
 ' ===============================================================================================================================
 
+Public layers As New Collection           ' de objetos Layer
 Public arrExtras As New Entity[]          ' For entities
 Public arrBlocks As New Block[]
 Public arrEntities As New Entity[]          '' were al elements live
 Public arrTmp As New Entity[]               '' Temporal array to put a copy of an entity before change something in it
 Public arrUndo As New Entity[]              '' An array to put an unmodified copy of an entity before modifying it and then restoring it to the previous version.
 
-Public Layers As New CadLayer[]             ' esto puede ser un array o una coleccion
 
 ' SELECTION
 Public arrSelecIndex As New Integer[]       '' List of indexes of selected entities with the mouse

@@ -35,7 +35,7 @@ Public Const OrthogonalIgnored As Boolean = False
 Public Const OrthogonalForced As Boolean = False
 Public Const StretchAble As Boolean = True           ' Si lo puedo deformar
 Public Selected As Boolean
-Public ForDeletion As Boolean = True        ' this must be falsed in Finish
+
 Public DrawAble As Boolean = False          ' True si durante la construccion ya tiene suficientes elementos para poder hacer una representacion digna
 Public Visible As Boolean = True            ' si esta entidad puede ser mostrada independientmente
 Public Finished As Boolean = False          ' colocar en true cuando se llegue a completar
@@ -45,7 +45,7 @@ Public StepsDone As Integer                 ' esto lo cambia cls ElementBuilder 
 Public Const JSON_Reading As Boolean = True
 Public Const JSON_Export As Boolean = False
 
-Public Const DXF_Reading As Boolean = False
+Public Const DXF_Reading As Boolean = True
 Public Const DXF_Export As Boolean = True
 
 Public Sub Translate(e As Entity, dX As Float, dY As Float, Optional OnlySelected As Boolean = False)
@@ -194,17 +194,11 @@ Public Sub Finish(oE As Entity, Optional ParamsDone As Integer = -1) As Boolean
   ' tareas finales de armado del objeto
 
   oE.psel.resize(oE.p.count / 2)
-  oE.ForDeletion = False
+
   oE.DrawAble = True
   oE.Selected = False
   oE.Finished = True
 
-  If Not True Then
-
-    oE.ForDeletion = True
-    oE.DrawAble = False
-
-  End If
 
 End
 
@@ -236,6 +230,24 @@ Public Sub ExportDXF(e As Entity, hFile As File)
 
 
 End
+
+Public Function ImportDXF(e As Entity, sClaves As String[], sValues As String[]) As Boolean
+
+  Dim i As Integer
+
+  For i = 0 To sClaves.Max
+    If sClaves[i] = "10" Then e.P.Add(CFloat(sValues[i]))
+    If sClaves[i] = "20" Then e.P.Add(CFloat(sValues[i]))
+    If sClaves[i] = "40" Then e.fParam.Add(CFloat(sValues[i]))
+  Next
+
+  If e.fParam.Count = 0 Then Stop ' e.fParam.Add(0)  ' TODO: averiguar q pasa aca q algunas entidades CIRCLE
+  ' vienen sin el radio
+
+
+
+End
+
 
 
 

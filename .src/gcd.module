@@ -575,7 +575,7 @@ Public Function GetLayerID(LayerName As String) As String
   Dim cLayer As Collection
 
   ' FIXME: reparar post layers
-  Return "1"
+  Return "0"
 
   For Each cLayer In gcd.CurrentDrawing.cModel["LAYERS"]
     If cLayer["name"] = LayerName Then Return cLayer["id"]
@@ -596,7 +596,7 @@ Public Function GetGBColor(CADcolor As Integer, layerID As String) As Integer
 
   Else If CADcolor = 257 Then     ' buscar color del objeto
 
-    Return Starter.gColor[gcd.CurrentDrawing.cModel["LAYERS"][layerID]["color"]]     ' FIXME: cambiar esto
+    Return Starter.gColor[gcd.CurrentDrawing.cModel["LAYERS"][layerID]["color"]]    ' FIXME: cambiar esto
     'Return Starter.gColor[12]
 
   Else If CADcolor = 0 Then       ' buscar color del bloque
@@ -644,6 +644,8 @@ Public Function UpdateGraphics(Optional handles As String[] = [], DoRegen As Boo
 
   Dim cEntity As Collection, entNueva As Entity
 
+  UpdateLayers
+
   If handles.Count = 0 Then                   ' Update all entities
 
     gcd.ImpEnty5(gcd.CurrentDrawing.cModel["ENTITIES"], gcd.CurrentDrawing.arrEntities)
@@ -670,6 +672,26 @@ Public Function UpdateGraphics(Optional handles As String[] = [], DoRegen As Boo
   If DoRegen Then Regen
 
 End
+
+
+'' Pasa los layers de cModel a los graficos
+Public Sub UpdateLayers()
+
+  Dim CMLayer As Collection
+  Dim newlayer As Layer
+
+  CurrentDrawing.Layers.Clear
+  For Each CMLayer In CurrentDrawing.cModel["LAYERS"]
+    newlayer = New Layer
+    newlayer.Colour = CMLayer["color"]
+    newlayer.Name = CMLayer["name"]
+    newlayer.handle = CMLayer["handle"][1]
+    newlayer.id = newlayer.handle
+    CurrentDrawing.Layers.Add(newlayer, newlayer.id)
+  Next
+
+End
+
 
 Public Sub UpdateModel()
 
@@ -700,7 +722,6 @@ Public Sub UpdateModel()
         jscNewEntity = New JSONCollection
         'sNewHandle = GetNewHandle(CurrentDrawing.cModel["ENTITIES"])
         iHandle = CurrentDrawing.cModel["AuxHeader"]["HANDSEED"]
-
         CurrentDrawing.cModel["ENTITIES"].Add(jscNewEntity, CStr(iHandle + 1))
         ent.Handle = CStr(iHandle + 1) 'sNewHandle
 

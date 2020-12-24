@@ -46,7 +46,7 @@ Public angle As Float
 Public Const JSON_Reading As Boolean = True
 Public Const JSON_Export As Boolean = False
 
-Public Const DXF_Reading As Boolean = False
+Public Const DXF_Reading As Boolean = True
 Public Const DXF_Export As Boolean = True
 
 Public Sub Translate(e As Entity, dX As Float, dY As Float, Optional OnlySelected As Boolean = False)
@@ -229,19 +229,14 @@ Public Sub Finish(oE As Entity, Optional ParamsDone As Integer = -1) As Boolean
   ' tareas finales de armado del objeto
 
   oE.psel.resize(oE.p.count / 2)
-  oE.ForDeletion = False
+
   oE.DrawAble = True
   oE.Selected = False
   oE.Finished = True
 
   If oE.fParam[2] < oE.fParam[1] Then oE.fParam[2] += 360
 
-  If Not True Then
 
-    oE.ForDeletion = True
-    oE.DrawAble = False
-
-  End If
 
 End
 
@@ -290,6 +285,23 @@ Public Sub ExportDXF(e As Entity, hFile As File)
 
 End
 
+Public Function ImportDXF(e As Entity, sClaves As String[], sValues As String[]) As Boolean
+
+  Dim i As Integer
+
+  For i = 0 To sClaves.Max
+
+    If sClaves[i] = "10" Then e.P.Add(CFloat(sValues[i]))     ' centro
+    If sClaves[i] = "20" Then e.P.Add(CFloat(sValues[i]))
+    If sClaves[i] = "11" Then e.P.Add(CFloat(sValues[i]) + e.P[0])     ' eje mayor, relativo al centro
+    If sClaves[i] = "21" Then e.P.Add(CFloat(sValues[i]) + e.P[1])
+    If sClaves[i] = "40" Then e.fParam.Add(CFloat(sValues[i]))
+    If sClaves[i] = "41" Then e.fParam.Add(CFloat(sValues[i]) * 180 / Pi)
+    If sClaves[i] = "42" Then e.fParam.Add(CFloat(sValues[i]) * 180 / Pi)
+
+  Next
+
+End
 
 
 

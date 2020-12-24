@@ -35,11 +35,23 @@ Public Const USEWITH As String = "clsEntityBuilder"
 Public Const OrthogonalIgnored As Boolean = False
 Public Const OrthogonalForced As Boolean = False
 Public Selected As Boolean
-Public ForDeletion As Boolean = True        ' this must be falsed in Finish
+
 Public DrawAble As Boolean = False          ' True si durante la construccion ya tiene suficientes elementos para poder hacer una representacion digna
 Public Visible As Boolean = True            ' si esta entidad puede ser mostrada independientmente
 Public Finished As Boolean = False          ' colocar en true cuando se llegue a completar
 Public StepsDone As Integer                 ' esto lo cambia cls ElementBuilder durante la construccion
+
+' JSON and DXF Read/Export
+Public Const JSON_Reading As Boolean = True
+Public Const JSON_Export As Boolean = False
+
+Public Const DXF_Reading As Boolean = True
+Public Const DXF_Export As Boolean = True
+
+' fParam helpers
+Public Const TotalParams As Integer = 2
+Public Const iTextHeight As Integer = 1
+Public Const iTextAngle As Integer = 0
 
 Public Sub Translate(e As Entity, dX As Float, dY As Float, Optional OnlySelected As Boolean = False)
 
@@ -197,17 +209,11 @@ Public Sub Finish(oE As Entity, Optional ParamsDone As Integer = -1) As Boolean
   oE.ColorToPaint = gcd.GetGBColor(oE.colour, oE.Layerid)
 
   oE.psel.resize(oE.p.count / 2)
-  oE.ForDeletion = False
+
   oE.DrawAble = True
   oE.Selected = False
   oE.Finished = True
 
-  If Not True Then
-
-    oE.ForDeletion = True
-    oE.DrawAble = False
-
-  End If
 
 End
 
@@ -263,3 +269,23 @@ End
 '    "field_length": 0,
 '    "flags": 0,
 '    "style": [5, 1, 25, 25]
+Public Function ImportDXF(e As Entity, sClaves As String[], sValues As String[]) As Boolean
+
+  Dim i As Integer
+
+  e.fParam.Resize(Me.TotalParams)
+  e.StringData.Add("")
+
+  For i = 0 To sClaves.Max
+
+    If sClaves[i] = "10" Then e.p.Add(CFloat(sValues[i]))         ' X1
+    If sClaves[i] = "20" Then e.P.Add(CFloat(sValues[i]))         ' Y1
+    If sClaves[i] = "40" Then e.fParam[Me.iTextHeight] = CFloat(sValues[i])         ' Altura
+    If sClaves[i] = "1" Or sClaves[i] = "3" Then e.StringData[0] &= sValues[i]                ' Texto
+    If sClaves[i] = "50" Then e.fParam[Me.iTextAngle] = CFloat(sValues[i])      ' rotacion
+
+  Next
+
+
+
+End

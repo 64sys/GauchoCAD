@@ -39,7 +39,7 @@ Public Const StretchAble As Boolean = True           ' Si lo puedo deformar
 
 
 Public Selected As Boolean
-Public ForDeletion As Boolean = True        ' this must be falsed in Finish
+
 Public DrawAble As Boolean = False          ' True si durante la construccion ya tiene suficientes elementos para poder hacer una representacion digna
 Public Visible As Boolean = True            ' si esta entidad puede ser mostrada independientmente
 Public Finished As Boolean = False          ' colocar en true cuando se llegue a completar
@@ -53,8 +53,13 @@ Private Const isOpen As Boolean = False
 Public Const JSON_Reading As Boolean = True
 Public Const JSON_Export As Boolean = False
 
-Public Const DXF_Reading As Boolean = False
+Public Const DXF_Reading As Boolean = True
 Public Const DXF_Export As Boolean = True
+
+' fParam helpers
+Public Const TotalParams As Integer = 1
+Public Const ipaPolylineClosed As Integer = 0
+
 
 
 Public Sub Translate(e As Entity, dX As Float, dY As Float, Optional OnlySelected As Boolean = False)
@@ -105,14 +110,16 @@ Public Sub Draw(oE As Entity)
 
   oE.ColorToPaint = gcd.GetGBColor(oE.colour, oE.Layerid)
 
-  GLplus.PolyLines(oE.p, oE.ColorToPaint, oE.LineWidth, oe.linetype, oe.fParam[0])
+  If oe.fParam.Count = 0 Then oe.fParam.Add(0)
+
+  GLplus.PolyLines(oE.p, oE.ColorToPaint, oE.LineWidth, oe.linetype, oe.fParam[Me.ipaPolylineClosed])
 
 End
 
 Public Sub DrawSelected(oE As Entity)
 
-  GLplus.PolyLines(oE.P, Starter.flgWindowBackColor, oE.LineWidth, gcd.stiDashed, oe.fParam[0])
-  GLplus.PolyLines(oE.P, gcd.ColorForSelected, oE.LineWidth, oE.LineType, oe.fParam[0])
+  GLplus.PolyLines(oE.P, Starter.flgWindowBackColor, oE.LineWidth, gcd.stiDashed, oe.fParam[Me.ipaPolylineClosed])
+  GLplus.PolyLines(oE.P, gcd.ColorForSelected, oE.LineWidth, oE.LineType, oe.fParam[Me.ipaPolylineClosed])
 
 End
 
@@ -196,6 +203,8 @@ Public Sub Finish(oE As Entity, Optional ParamsDone As Integer = -1) As Boolean
 
   'Print "Finish en EntityBase"
   'CreatePolygon(oe)
+
+  If oe.fParam.Count = 0 Then oe.fParam.Add(0)
   BuildPOI(oe)
 
   ' busco el tipo de linea, si hace falta
@@ -203,17 +212,12 @@ Public Sub Finish(oE As Entity, Optional ParamsDone As Integer = -1) As Boolean
   ' tareas finales de armado del objeto
 
   oE.psel.resize(oE.p.count / 2)
-  oE.ForDeletion = False
+
   oE.DrawAble = True
   oE.Selected = False
   oE.Finished = True
 
-  If Not True Then
 
-    oE.ForDeletion = True
-    oE.DrawAble = False
-
-  End If
 
 End
 
@@ -282,5 +286,26 @@ Public Sub ExportDXF(e As Entity, hFile As File)
     Print #hFIle, " 20"                      ' Yi
     Print #hFIle, CStr(e.p[i + 1])
   Next
+
+End
+
+Public Function ImportDXF(e As Entity, sClaves As String[], sValues As String[]) As Boolean
+
+  Dim i As Integer
+
+  For i = 0 To sClaves.Max
+
+
+    'If sClaves[i] = "90" Then mPolyLine.vertexcount = Val(sValues[i])
+    If sClaves[i] = "70" Then e.fParam.Add(CInt(sValues[i]))       ' 0 = abierta, 1 = cerrada
+    If sClaves[i] = "10" Then e.p.Add(CFloat(sValues[i]))
+    If sClaves[i] = "20" Then e.p.Add(CFloat(sValues[i]))
+
+  Next
+  If e.fParam.Count = 0 Then e.fParam.Add(0)
+  If e.fParam[0] = 1 And e.p.Count > 0 Then ' agrego el primer punto de nuevo
+    e.p.Add(e.p[0])
+    e.p.Add(e.p[1])
+  End If
 
 End
