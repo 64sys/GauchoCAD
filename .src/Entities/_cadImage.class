@@ -113,5 +113,4 @@ Public Sub Finish(oE As Entity, Optional ParamsDone As Integer = -1) As Boolean
   oE.Selected = False
   oE.Finished = True
 
-
 End

@@ -217,6 +217,8 @@ Public Sub Run(cin As Collection)
   btnGrid.Picture = Image.Load("./svg/locks/grid.svg").Stretch(35, 35).Picture
   btnOrtho.Picture = Image.Load("./svg/locks/ortho.svg").Stretch(35, 35).Picture
 
+  btnEditionMode.Picture = Image.Load("./svg/locks/drawing.svg").Stretch(35, 35).Picture
+
   btnSelectionMode.Value = True
   btnSelectionMode.Picture = Image.Load("./svg/locks/tools.svg").Stretch(35, 35).Picture
 
@@ -505,6 +507,21 @@ End
 Public Sub locks_Click()
 
   Select Last.Tag
+
+    Case "data"
+      If Last.Value Then
+        Panel7.Visible = False
+        Panel3.Visible = False
+        pnlData.Visible = True
+        LoadDrawingMap3()
+        Last.Picture = Image.Load("./svg/locks/table.svg").Stretch(35, 35).Picture
+      Else
+        Panel7.Visible = True
+        Panel3.Visible = True
+        pnlData.Visible = False
+        Last.Picture = Image.Load("./svg/locks/drawing.svg").Stretch(35, 35).Picture
+      Endif
+
     Case "selection"
       If Last.Value Then
         pnlIcons.Visible = False
@@ -1249,7 +1266,6 @@ Public Sub gTask(sTask As String)
         Else  ' no existe
           ' antes de guardar, actualizamos
           gcd.UpdateLayers()
-
 
           cadDxf.SaveFile(f)
 
@@ -2233,6 +2249,8 @@ Public Sub Form_KeyPress()
       gcd.clsJob.KeyText(KeysAccumulator)
       KeysAccumulator = ""
 
+    Case Key.f2
+
     Case Key.f6
 
       If btnBounds.Value = True Then
@@ -2544,6 +2562,176 @@ Public Sub LoadVars()
 
 End
 
+Public Sub LoadDrawingMap3()
+
+  Dim grp As Variant
+  Dim picDw As Picture
+  Dim picLy As Picture
+
+  Dim vrt As Variant
+  Dim ent As Variant
+  Dim v As Variant
+  Dim sKey As String
+  Dim iQty As Integer
+
+  picDw = Image.Load("./svg/locks/drawing.svg").Stretch(24, 24).Picture
+  'picLy = Image.Load("./svg/layers/layers.svg").Stretch(35, 35).Picture
+  picLy = Image.Load("./svg/colors/3.svg").Stretch(16, 16).Picture
+
+  TreeView1.Clear
+  TreeView1.Add("dwg", ("Drawing"), picDw)
+  TreeView1.Add("LAYERS", "", picLy, "dwg")
+  TreeView1.Add("ENTITIES", "", picLy, "dwg")
+  TreeView1.Add("BLOCKS", "", picLy, "dwg")
+
+  For Each vrt In gcd.CurrentDrawing.cModel
+    If TypeOf(vrt) = gb.Object Then
+      sKey = gcd.CurrentDrawing.cModel.Key
+      iQty = gcd.CurrentDrawing.cModel[sKey].Count
+      Select sKey
+        Case "LAYERS", "ENTITIES", "BLOCKS"
+          TreeView1[sKey].Text = Lower(sKey) & " [" & CStr(iQty) & "]"
+          If sKey = "LAYERS" Then
+            For Each ent In gcd.CurrentDrawing.cModel[sKey]
+              gcd.CurrentDrawing.cLayers[ent["handle"][ent["handle"].Max]] = ent["name"]
+            Next
+          Endif
+
+          If sKey = "BLOCKS" Then
+            For Each ent In gcd.CurrentDrawing.cModel[sKey]
+              gcd.CurrentDrawing.cBlocks[ent["handle"][ent["handle"].Max]] = ent["name"]
+            Next
+          Endif
+
+      End Select
+    Endif
+  Next
+
+  TreeView1["dwg"].Expanded = True
+  TreeView1["dwg"].Selected = True
+
+End
+
+Public Sub TreeView1_Select()
+
+  Dim v As Variant
+  Dim vrt As Variant
+  Dim r As Integer
+  Dim c As Integer
+  Dim lay As New Collection
+
+  Select TreeView1.Key
+    Case "dwg"
+      pnlFileData.Visible = True
+      GridView1.Visible = False
+
+    Case "LAYERS" ', "ENTITIES", "BLOCKS"
+      GridView1.Clear
+      lay.Clear
+      pnlFileData.Visible = False
+      GridView1.Visible = True
+      GridView1.Columns.Count = 4 'gcd.CurrentDrawing.cModel[TreeView1.Key].Count
+      'name, color, ltype
+      If gcd.CurrentDrawing.cModel.Exist(TreeView1.Key) Then
+        GridView1.Rows.Count = gcd.CurrentDrawing.cModel[TreeView1.Key].Count
+        GridView1.Columns[0].Text = ("Name")
+        GridView1.Columns[1].Text = ("Handle")
+        GridView1.Columns[2].Text = ("Color")
+        GridView1.Columns[3].Text = ("Line type")
+
+        For Each v In gcd.CurrentDrawing.cModel[TreeView1.Key]
+          If TypeOf(v) = gb.Object Then
+            'lay.Add(v["name"], CStr(v["handle"][v["handle"].Max]))
+            GridView1[r, 0].Text = v["name"]
+            GridView1[r, 1].Text = CStr(v["handle"][v["handle"].Max])
+            GridView1[r, 2].Text = v["color"]
+            GridView1[r, 3].Text = "" 'v["ltype"]
+
+          Endif
+          Inc r
+        Next
+      Endif
+
+    Case "ENTITIES"
+      GridView1.Clear
+      pnlFileData.Visible = False
+      GridView1.Visible = True
+      GridView1.Columns.Count = 6
+
+      If gcd.CurrentDrawing.cModel.Exist(TreeView1.Key) Then
+        GridView1.Rows.Count = gcd.CurrentDrawing.cModel[TreeView1.Key].Count
+        GridView1.Columns[0].Text = ("Entity")
+        GridView1.Columns[1].Text = ("Handle")
+        GridView1.Columns[2].Text = ("Layer")
+        GridView1.Columns[3].Text = ("Style")
+        GridView1.Columns[4].Text = ("Width")
+        GridView1.Columns[5].Text = ("Color")
+
+        For Each v In gcd.CurrentDrawing.cModel[TreeView1.Key]
+          If TypeOf(v) = gb.Object Then
+            GridView1[r, 0].Text = v["entity"]
+            GridView1[r, 1].Text = CStr(v["handle"][v["handle"].Max])
+            GridView1[r, 2].Text = gcd.CurrentDrawing.cLayers[CStr(v["layer"][v["layer"].Max])]
+            GridView1[r, 3].Text = ""
+            GridView1[r, 4].Text = ""
+            'GridView1[r, 5].Text = ""
+
+            If TypeOf(v["color"]) = gb.Object Then
+              GridView1[r, 5].Text = v["color"][v["color"].Max]
+            Else
+              If TypeOf(v["color"]) = gb.Integer Then
+                GridView1[r, 5].Text = v["color"]
+              Else
+                GridView1[r, 5].Text = ""
+              Endif
+            Endif
+          Endif
+          Inc r
+        Next
+      Endif
+
+    Case "BLOCKS" '(BLOCKS_HEADERS)
+      GridView1.Clear
+      pnlFileData.Visible = False
+      GridView1.Visible = True
+      GridView1.Columns.Count = 2
+
+      If gcd.CurrentDrawing.cModel.Exist(TreeView1.Key) Then
+        GridView1.Rows.Count = gcd.CurrentDrawing.cModel[TreeView1.Key].Count
+        GridView1.Columns[0].Text = ("Name")
+        GridView1.Columns[1].Text = ("Handle")
+        'GridView1.Columns[2].Text = ("Style")
+        'GridView1.Columns[3].Text = ("Width")
+        'GridView1.Columns[4].Text = ("Color")
+
+        For Each v In gcd.CurrentDrawing.cModel[TreeView1.Key]
+          If TypeOf(v) = gb.Object Then
+            GridView1[r, 0].Text = v["name"]
+            'GridView1[r, 1].Text = gcd.CurrentDrawing.cLayers[CStr(v["layer"][v["layer"].Max])]
+            GridView1[r, 1].Text = CStr(v["handle"][v["handle"].Max])
+            'GridView1[r, 3].Text = ""
+            'GridView1[r, 4].Text = ""
+
+            'If TypeOf(v["color"]) = gb.Object Then
+            '  GridView1[r, 4].Text = v["color"][v["color"].Max]
+            'Else
+            '  If TypeOf(v["color"]) = gb.Integer Then
+            '    GridView1[r, 4].Text = v["color"]
+            '  Else
+            '    GridView1[r, 4].Text = ""
+            '  Endif
+            'Endif
+          Endif
+          Inc r
+        Next
+      Endif
+
+      'Case "LAYER", "ENTITY", "BLOCK"
+
+  End Select
+
+End
+
 Public Sub LoadDrawingMap2()
 
   Dim ctn As New Collection
@@ -2553,7 +2741,6 @@ Public Sub LoadDrawingMap2()
   Dim sQty As String
   Dim sEle As String
   Dim sEty As String
-
   Dim it As Variant
   Dim gru As Variant
   Dim ety As Variant
