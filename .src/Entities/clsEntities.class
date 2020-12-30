@@ -1079,7 +1079,11 @@ Public Function ImportJsonToEntity(c As JSONCollection, e As Entity) As Boolean
   If clsHandler.ImportJSONCol(c, e) Then      ' le pedimos a la clase que arme un objeto Entity para agregar al Drawing actual
     ' llenamos Common data:
     e.layerID = c["layer"][3]
-    e.colour = c["color"]["index"]
+    If TypeOf(c["color"]) = gb.Object Then
+      e.colour = c["color"]["index"]
+    Else
+      e.colour = c["color"]
+    Endif
     e.LineWidth = c["linewt"] / 100
     If e.LineWidth < 1 Then e.LineWidth = 1
     e.Gender = clsHandler.Gender

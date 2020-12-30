@@ -849,7 +849,6 @@ Public Sub GLArea1_MouseMove()
 
   glarea1.Refresh
 
-
 End
 
 Public Sub GLArea1_MouseUp()

@@ -189,7 +189,6 @@ Public Sub Draw(oE As Entity)
     angle_increment = 5 / LargoPixels * 2 * Pi * oe.fParam[3]
     If Abs(angle_increment * 10) > Abs(oE.fParam[2] / 180 * Pi - oE.fParam[1] / 180 * Pi) Then
 
-
       angle_increment = (oE.fParam[2] / 180 * Pi - oE.fParam[1] / 180 * Pi) / 10
 
     End If
