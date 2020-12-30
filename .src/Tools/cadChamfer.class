@@ -39,6 +39,8 @@ Public Function Start(Optional ElemToBuild As Variant, Optional _Mode As Integer
   Me.Mode = _Mode
   Me.PointsDone = 0
   Me.PointsTotal = 3
+  Me.PoiChecking = False
+  Me.EntityChecking = True
 
   Try Me.ChamferSize = gcd.CurrentDrawing.cModel["Vars"]["ChamferSize"]
 
@@ -281,7 +283,19 @@ Public Function DoFillet() As Boolean
           ' creo otra linea
           ' para ello veo cual angulo es el inicial
 
-          gcd.Addline(gcd.CurrentDrawing.arrEntities, [e1.P[2], e1.P[3], e2.P[2], e2.P[3]], appmain.CurrentColor, appmain.CurrentLtype,, appmain.CurrentLayer)
+
+          Dim eLine As New Entity
+          eLine.Gender = "Line"
+          eLine.ClassHandler = cadLine
+          eLine.P.Insert([e1.P[2], e1.P[3], e2.P[2], e2.P[3]])
+
+          eLine.colour = appmain.CurrentColor
+          eLine.LineType = appmain.CurrentLtype
+          eLine.LayerId = appmain.CurrentLayer
+          cadLine.Finish(eLine)
+          gcd.CurrentDrawing.arrEntities.Add(eLine)
+
+          'gcd.Addline(gcd.CurrentDrawing.arrEntities, [e1.P[2], e1.P[3], e2.P[2], e2.P[3]], appmain.CurrentColor, appmain.CurrentLtype,, appmain.CurrentLayer)
 
           Me.Finish
 

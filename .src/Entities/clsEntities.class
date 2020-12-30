@@ -112,7 +112,7 @@ Public Sub FillEntity(o As Entity)
         o.p.add(0)
 
         o.psel.add(0)
-      Case "F", "A", "M", "L"
+      Case "F", "A", "M", "L", "R"
         o.fParam.Add(0)
 
       Case "T"
@@ -1079,7 +1079,7 @@ Public Function ImportJsonToEntity(c As JSONCollection, e As Entity) As Boolean
   If clsHandler.ImportJSONCol(c, e) Then      ' le pedimos a la clase que arme un objeto Entity para agregar al Drawing actual
     ' llenamos Common data:
     e.layerID = c["layer"][3]
-    e.colour = c["color"]
+    e.colour = c["color"]["index"]
     e.LineWidth = c["linewt"] / 100
     If e.LineWidth < 1 Then e.LineWidth = 1
     e.Gender = clsHandler.Gender

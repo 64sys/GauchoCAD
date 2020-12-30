@@ -32,6 +32,10 @@ Public Ymenor As Float = 1e10
 Public Xmayor As Float = -1e10
 Public Ymayor As Float = -1e10
 
+Public polyHatchFinal As Polygon
+Public polyEntity As Polygon
+
+
 Public Function Start(Optional filename As Variant, Optional _mode As Integer = 0) As Boolean
 
   Dim xf As String[]
@@ -62,7 +66,7 @@ Public Function Start(Optional filename As Variant, Optional _mode As Integer = 
 
       End Select
 
-    Case 1 ' vengo de seleccionar el contorno
+    Case 1 ' vengo de seleccionar los parametros de hatch
 
       nSel = clsEntities.GetSelectionCount()
       If nsel = 0 Then Return
@@ -71,15 +75,13 @@ Public Function Start(Optional filename As Variant, Optional _mode As Integer = 
 
       Else
         StepsDone = 2
-        entHatch = New Entity
-        entHatch.Gender = "Hatch"
-        entHatch.ClassHandler = cadHatch
-        entHatch.ClassHandler.SetEntity(entHatch)
-        entHatch.StringData[cadHatch.sdaPattern] = gcd.CurrentDrawing.LastHatchPattern
-        entHatch.StringData[cadHatch.sdaPaternFile] = gcd.CurrentDrawing.LastHatchFile
         iRet = FHatch.Showmodal()
 
+
         Debug gcd.CurrentDrawing.LastHatchFile
+
+
+
         Select Case iRet
           Case 2 ' nueva busqueda de contorno
             gcd.clsJobPrevious = Me
@@ -92,6 +94,14 @@ Public Function Start(Optional filename As Variant, Optional _mode As Integer = 
             StepsDone = 0 ' cuando vuelvo aca, empiezo de nuevo
 
           Case 3 ' confirma el Hatch
+
+            entHatch = New Entity
+            entHatch.Gender = "Hatch"
+            entHatch.ClassHandler = cadHatch
+            entHatch.ClassHandler.SetEntity(entHatch)
+            entHatch.StringData[cadHatch.sdaPattern] = gcd.CurrentDrawing.LastHatchPattern
+            entHatch.StringData[cadHatch.sdaPaternFile] = gcd.CurrentDrawing.LastHatchFile
+
 
             entHatch.fParam[cadHatch.ipaScale] = gcd.CurrentDrawing.LastScale
             entHatch.fParam[cadHatch.ipaRotation] = gcd.CurrentDrawing.LastAngle
@@ -222,3 +232,12 @@ Public Sub GetBoundLimits(e As Entity)
   Next
 
 End
+
+
+Public Function ConformPolygon() As Boolean ' True = contorno bien definido
+
+  ' formo el poligono que seria la interseccion de todos los pasados como parametro
+  'gcd.CurrentDrawing.arrSelecIndex
+
+End
+

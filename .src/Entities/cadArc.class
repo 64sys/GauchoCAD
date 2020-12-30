@@ -187,9 +187,14 @@ Public Sub Draw(oE As Entity)
 
     ' si quiero tramos de 10 pixels...
     angle_increment = 5 / LargoPixels * 2 * Pi * oe.fParam[3]
-    If angle_increment > Pi * 2 / 360 * oe.fParam[3] * 10 Then angle_increment = Pi * 2 / 360 * oe.fParam[3] * 10
-    Debug "LargoPixels", LargoPixels, " paso angular ", angle_increment
+    If Abs(angle_increment * 10) > Abs(oE.fParam[2] / 180 * Pi - oE.fParam[1] / 180 * Pi) Then
 
+
+      angle_increment = (oE.fParam[2] / 180 * Pi - oE.fParam[1] / 180 * Pi) / 10
+
+    End If
+    Debug "Tramos", (oE.fParam[2] / 180 * Pi - oE.fParam[1] / 180 * Pi) / angle_increment
+    If (oE.fParam[2] / 180 * Pi - oE.fParam[1] / 180 * Pi) / angle_increment < 10 Then Stop
     If LargoPixels < 10 Then
       EscalaTramos = 1
     Endif
@@ -205,6 +210,13 @@ Public Sub Draw(oE As Entity)
       oE.polyline.Add(y)
 
     Next
+    If x <> oE.p[0] + oE.fParam[0] * Cos(oE.fParam[2] / 180 * Pi) Then
+      x = oE.p[0] + oE.fParam[0] * Cos(oE.fParam[2] / 180 * Pi)
+      y = oE.p[1] + oE.fParam[0] * Sin(oE.fParam[2] / 180 * Pi)
+      oE.polyline.Add(x)
+      oE.polyline.Add(y)
+
+    Endif
 
     glPlus.PolyLines(oe.PolyLine, oe.ColorToPaint, oe.LineWidth, oe.LineType)
 

@@ -25,10 +25,10 @@ Create Static
 Public Const Gender As String = "Ellipse"
 Public Const PointsToDraw As Integer = 1             ' minimal point requered for drawing something usefull
 Public Const HelperTrabajo As String = ("Draw an ellipse")
-Public Const ParamType As String = "PPFFF"
+Public Const ParamType As String = "PPRFF"
 Public Const ParamHelper As String = "Start point;Major Radious;Minor/Major;Start;End"      ' a little text that is shown at the prompt waiting for user input during build
 Public Const ParamDefault As String = " ;  ;0.5;0;360"
-Public Const USEWITH As String = "clsEntityBuilder"
+Public Const USEWITH As String = "EntityBuilder"
 Public Const DrawingOrder As Integer = 0        ' 1 = draws first
 Public Const OrthogonalIgnored As Boolean = False
 Public Const OrthogonalForced As Boolean = False
@@ -38,7 +38,7 @@ Public Finished As Boolean = False          ' colocar en true cuando se llegue a
 Public StepsDone As Integer                 ' esto lo cambia cls ElementBuilder durante la construccion
 
 ' vars creadas en finish
-Public start As Float
+
 Public recorrido As Float
 Public angle As Float
 
@@ -48,6 +48,74 @@ Public Const JSON_Export As Boolean = False
 
 Public Const DXF_Reading As Boolean = True
 Public Const DXF_Export As Boolean = True
+
+' The entity handler receives a user action, and returns the number of expected parameter
+' If definitive = true, means the parameter is set
+Public Function NewParameter(eBuild As Entity, vParam As Variant[], Optional Definitive As Boolean = False) As Boolean
+
+
+  If Me.StepsDone = 0 Then
+
+    If vParam[0] <> "point" Then Return Me.StepsDone
+
+    Try eBuild.P[0] = vParam[1]
+    Try eBuild.P[1] = vParam[2]
+    eBuild.P[2] = eBuild.P[0]
+    eBuild.P[3] = eBuild.P[1]
+    If definitive Then Return True
+
+  Else If Me.StepsDone = 1 Then
+
+    If vParam[0] <> "point" Then Return False
+
+    eBuild.DrawAble = True
+    Try eBuild.P[2] = vParam[1]
+    Try eBuild.P[3] = vParam[2]
+    eBuild.fParam[0] = 0.5
+    eBuild.fParam[1] = 0
+    eBuild.fParam[2] = 360
+    If definitive Then Return True
+
+  Else If Me.StepsDone = 2 Then   ' recibimos la relacion de minor/major
+
+    If vParam[0] = "point" Then  ' vino como un punto, entonces la calculo de otra manera
+
+      ' return the angle from horizontal to us
+      eBuild.fParam[0] = Abs(puntos.PointToLineDistance([vParam[1], vParam[2]], [eBuild.p[0], eBuild.p[1], eBuild.p[2], eBuild.p[3]])) / puntos.distancia(eBuild.p[0], eBuild.p[1], eBuild.p[2], eBuild.p[3])
+
+    Else If vParam[0] = "float" Then  ' vino como un punto, entonces la calculo de otra manera
+      eBuild.fParam[0] = vParam[1]
+
+    Else
+      Return False
+    End If
+
+    If definitive Then Return True
+
+  Else If Me.StepsDone = 3 Then   ' recibimos el angulo inicial
+    If vParam[0] = "float" Then  ' vino como un punto, entonces la calculo de otra manera
+      eBuild.fParam[1] = vParam[1]
+
+    Else
+      Return False
+    End If
+
+    If definitive Then Return True
+
+  Else If Me.StepsDone = 4 Then   ' recibimos el angulo final
+    If vParam[0] = "float" Then  ' vino como un punto, entonces la calculo de otra manera
+      eBuild.fParam[2] = vParam[1]
+
+    Else
+      Return False
+    End If
+
+    If definitive Then Return True
+
+
+  Endif
+
+End
 
 Public Sub Translate(e As Entity, dX As Float, dY As Float, Optional OnlySelected As Boolean = False)
 
@@ -117,25 +185,6 @@ Public Sub Draw(oE As Entity)
 
   major = Sqr((oE.p[2] - oE.p[0]) ^ 2 + (oE.p[3] - oE.p[1]) ^ 2)
   angle = Ang(oE.p[2] - oE.p[0], oE.p[3] - oE.p[1])          ' Los coordenadas del eje mayor son relativas al centro
-  If Not oE.Finished Then
-
-    If Me.StepsDone = 1 Then
-      oE.fParam[0] = 0.5
-      oE.fParam[1] = 0
-      oE.fParam[2] = 360
-
-    Else If Me.StepsDone = 2 Then
-      ' despues de definir el eje mayor
-
-    Else If Me.StepsDone = 3 Then
-      ' defino la relacion entre ejes
-
-    Else If Me.StepsDone = 4 Then
-
-    Else If Me.StepsDone = 5 Then
-
-    Endif
-  Endif
 
   Minor = major * oE.fParam[0]
   If major = 0 Then major = 1

@@ -76,7 +76,7 @@ Public Function MouseMove(mouseX As Integer, mouseY As Integer) ' called by FCAD
 
 End
 
-Public Sub Draw()               ' called by gcd.CurrentDrawing.drwArea_Draw
+Public Sub Draw(Optional what As Object)               ' called by gcd.CurrentDrawing.drwArea_Draw
 
   gl.PushMatrix
 
