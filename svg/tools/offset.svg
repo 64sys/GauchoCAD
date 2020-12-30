@@ -18,7 +18,7 @@
    xml:space="preserve"
    id="svg116"
    sodipodi:docname="offset.svg"
-   inkscape:version="0.92.5 (2060ec1f9f, 2020-04-08)"><metadata
+   inkscape:version="1.0.1 (3bc2e813f5, 2020-09-07)"><metadata
    id="metadata120"><rdf:RDF><cc:Work
        rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
          rdf:resource="http://purl.org/dc/dcmitype/StillImage" /></cc:Work></rdf:RDF></metadata><sodipodi:namedview
@@ -31,16 +31,17 @@
    inkscape:pageopacity="0"
    inkscape:pageshadow="2"
    inkscape:window-width="1920"
-   inkscape:window-height="1029"
+   inkscape:window-height="1015"
    id="namedview118"
    showgrid="false"
-   inkscape:zoom="0.39111459"
-   inkscape:cx="-459.47324"
-   inkscape:cy="-146.00199"
+   inkscape:zoom="1.5644584"
+   inkscape:cx="209.46862"
+   inkscape:cy="134.00806"
    inkscape:window-x="1366"
-   inkscape:window-y="25"
+   inkscape:window-y="37"
    inkscape:window-maximized="1"
-   inkscape:current-layer="g68" />
+   inkscape:current-layer="g68"
+   inkscape:document-rotation="0" />
  <defs
    class="ClipPathGroup"
    id="defs8">
@@ -154,13 +155,13 @@
    x="2698"
    class="BoundingBox" /><path
    sodipodi:nodetypes="cc"
-   style="fill:none;stroke:#b30077;stroke-width:476.24999802;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:476.24999802,952.49999603;stroke-opacity:1;stroke-dashoffset:0"
+   style="fill:none;stroke:#0066b3;stroke-width:661.45833058;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:661.45833058, 1322.91666114999998172;stroke-opacity:1;stroke-dashoffset:0"
    inkscape:connector-curvature="0"
    id="path65"
    d="M 2056.7691,10502.851 C 4669.8959,6151.5494 9489.6194,5449.3405 10513.769,2021.8517" />
       <path
    sodipodi:nodetypes="cc"
-   style="fill:none;stroke:#0066b3;stroke-width:343.95837402;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none"
+   style="fill:none;stroke:#0066b3;stroke-width:661.45833058;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none"
    inkscape:connector-curvature="0"
    id="path65-3"
    d="M 746.59097,9454.6104 C 3359.7181,5103.3076 8179.4421,4401.0986 9203.5923,973.60944" /></g></g>

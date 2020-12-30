@@ -30,16 +30,16 @@
    guidetolerance="10"
    inkscape:pageopacity="0"
    inkscape:pageshadow="2"
-   inkscape:window-width="1506"
-   inkscape:window-height="1013"
+   inkscape:window-width="1920"
+   inkscape:window-height="1015"
    id="namedview118"
    showgrid="false"
-   inkscape:zoom="0.70019455"
-   inkscape:cx="9.2760062"
-   inkscape:cy="334.09152"
-   inkscape:window-x="1553"
+   inkscape:zoom="1.4003891"
+   inkscape:cx="277.94299"
+   inkscape:cy="222.65327"
+   inkscape:window-x="1366"
    inkscape:window-y="37"
-   inkscape:window-maximized="0"
+   inkscape:window-maximized="1"
    inkscape:current-layer="g108"
    inkscape:document-rotation="0" />
  <defs
@@ -274,7 +274,7 @@
       
       
      <rect
-   style="fill:#c0c0c0;fill-opacity:0.294118;stroke:#0066b3;stroke-width:264.58333223;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+   style="fill:none;fill-opacity:0.294118;stroke:none;stroke-width:264.58333223;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
    id="rect836"
    width="10127.245"
    height="10124.43"
@@ -285,12 +285,12 @@
    inkscape:connector-curvature="0"
    id="path4194"
    d="M 10181.249,1255.6292 6492.6398,2369.0878 7298.23,3151.0745 5994.9191,4493.7239 7069.0386,5536.3726 8372.3493,4193.7229 l 805.59,781.9863 z"
-   style="fill:#b30077;fill-opacity:1;fill-rule:evenodd;stroke:#0066b3;stroke-width:343.958;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" /><path
+   style="fill:#0066b3;fill-opacity:1;fill-rule:evenodd;stroke:#0066b3;stroke-width:343.9583319;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" /><path
    sodipodi:nodetypes="cccccccc"
    inkscape:connector-curvature="0"
    id="path4194-3"
    d="M 1315.0533,10106.748 5012.8851,8990.505 4205.2809,8206.5632 5511.8501,6860.5567 4435.0452,5815.3015 3128.4759,7161.308 2320.8718,6377.3664 Z"
-   style="fill:#b30077;fill-opacity:1;fill-rule:evenodd;stroke:#0066b3;stroke-width:343.958;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" /></g>
+   style="fill:#0066b3;fill-opacity:1;fill-rule:evenodd;stroke:#0066b3;stroke-width:343.9583319;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" /></g>
    </g>
  </g>
 </svg>
