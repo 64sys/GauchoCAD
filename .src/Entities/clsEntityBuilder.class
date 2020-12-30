@@ -148,7 +148,6 @@ End
 
 Public Function KeyText(EnteredText As String) ' esta rutina es llamada por FCAD en el evento FCAD_KeyPress cuando recibe una texto + <Enter>
 
-
   ' Lets see what are we expecting
   Dim Xt, Zt As Float, ErrTxt As String, Relative As Boolean
 
@@ -409,7 +408,6 @@ Public Function MouseDown(mouseX As Integer, mouseY As Integer) ' esta rutina es
     Return              ' nothing more to do here
   End If
 
-
   If NextParamType = "L" Then
 
     ' return the angle from horizontal to us
@@ -459,7 +457,6 @@ Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' esta rutina es l
   'Debug elem.P.Count
 
 End
-
 
 Public Sub Draw()               ' called bygcd.CurrentDrawing.drwArea_Draw
 
