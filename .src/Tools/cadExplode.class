@@ -49,7 +49,7 @@ Public Function Start(Optional ElemToBuild As Variant, Optional _Mode As Integer
 
       e = gcd.CurrentDrawing.arrEntities[i]
       If e.Selected Then
-        Select Case e.Gender
+        Select e.Gender
           Case "Insert", "Dimension"
             'e.ForDeletion = True
           Case Else

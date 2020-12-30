@@ -63,15 +63,12 @@ Public Const sdaTotalParams As Integer = 2
 Public Const sdaText As Integer = 0
 Public Const sdaStyle As Integer = 1
 
-
 Public Sub setEntity(e As Entity)
 
   e.fParam.Resize(Me.TotalParams)
   e.StringData.Resize(Me.sdaTotalParams) ' text, style
 
-
 End
-
 
 Public Sub Translate(e As Entity, dX As Float, dY As Float, Optional OnlySelected As Boolean = False)
 
@@ -273,7 +270,6 @@ Public Sub Finish(oE As Entity, Optional ParamsDone As Integer = -1) As Boolean
   oE.Selected = False
   oE.Finished = True
 
-
 End
 
 ' Importo los datos que puedo procesar de una coleccion y genero un Entity para ser agregado a un array
@@ -350,7 +346,6 @@ End
 '   "text_value": "FECHA",
 '   "style": [5, 2, 1466, 1466]
 
-
 Public Sub ExportDXF(e As Entity, hFile As File)
 
   Print #hFIle, "  0"
@@ -404,7 +399,6 @@ Public Sub ExportDXF(e As Entity, hFile As File)
 
 End
 
-
 Public Function ImportDXF(e As Entity, sClaves As String[], sValues As String[]) As Boolean
 
   Dim i As Integer
@@ -429,7 +423,5 @@ Public Function ImportDXF(e As Entity, sClaves As String[], sValues As String[])
   Next
 
   If e.StringData[Me.sdaStyle] = "" Then e.StringData[Me.sdaStyle] = "STANDARD"
-
-
 
 End

@@ -34,14 +34,11 @@ Private hFile As File
 Public lpCode As String
 Public lpValue As String
 
-
 Private eExports As Boolean
 
 Public cEntitiesUnread As Collection
 Public nEntitiesUnread As Integer
 Public nEntitiesRead As Integer
-
-
 
 Private Sub ReadData()
 
@@ -55,8 +52,6 @@ Private Sub ReadData()
   lpvalue = Trim$(lpvalue)
 
 End
-
-
 
 Public Function LoadFile(sFile As String, arrToFill As Entity[], Optional IgnoreLayers As Boolean = False, IgnoreBlocks As Boolean = False, IgnoreData As Boolean = False)
 
@@ -100,18 +95,11 @@ Public Function LoadFile(sFile As String, arrToFill As Entity[], Optional Ignore
   Print
   Print "DXF: fin lectura en ", Timer - t
 
-
-
-
 End
 
 Private Sub dxfLoad6Objects()
 
-
-
 End
-
-
 
 Private Sub dxfLoad5Entities(arrAcumulador As Entity[])
 
@@ -121,8 +109,6 @@ Private Sub dxfLoad5Entities(arrAcumulador As Entity[])
   Dim clsHandler As Object
   Dim eNueva As Entity
   Dim Reads As Boolean
-
-
 
   Do
     'Debug lpcode, lpvalue
@@ -151,7 +137,6 @@ Private Sub dxfLoad5Entities(arrAcumulador As Entity[])
 
     If sEntidad = "ENDBLK" Or sEntidad = "" Then Return
 
-
     ' Termino la lectura de la entidad, busco a ver si la tengo lista
     Try clsHandler = Object.New("cad" & sEntidad)  ' obtenemos el tipo de entidad y buscamos su clase. Si no
 
@@ -168,7 +153,6 @@ Private Sub dxfLoad5Entities(arrAcumulador As Entity[])
     End If
 
     Reads = False
-
 
     Try Reads = clsHandler.DXF_reading
 
@@ -188,8 +172,6 @@ Private Sub dxfLoad5Entities(arrAcumulador As Entity[])
 
       'Debug eNueva.gender
 
-
-
       clsHandler = Null
 
       nEntitiesRead += 1
@@ -203,22 +185,16 @@ Private Sub dxfLoad5Entities(arrAcumulador As Entity[])
         cEntitiesUnread.Add(sEntidad, sEntidad)
       Endif
 
-
     Endif
-
-
 
   Loop
 
-
 End
-
 
 Private Sub dxfLoad4Blocks()
 
   Dim mBlock As Block
   Dim unread As Variant
-
 
   ReadData
   Do
@@ -250,17 +226,12 @@ Private Sub dxfLoad4Blocks()
 
       dxfLoad5Entities(gcd.CurrentDrawing.arrBlocks.Last.entities)
 
-
-
     Endif
   Loop
 
   Print "DXF: Leidos", gcd.CurrentDrawing.arrBlocks.Count, " bloques"
 
-
-
 End
-
 
 Private Sub dxfLoad3Tables()
 
@@ -289,11 +260,9 @@ Private Sub dxfLoad3Tables()
   Do
     If Eof(fp) Then Break
 
-
     If lpCode = "0" And lpValue = "ENDSEC" Then Break
-    Select Case lpValue ' VIEWPORT , LAYER, etc
+    Select lpValue ' VIEWPORT , LAYER, etc
       Case "LAYER"
-
 
         If lpvalue = "LAYER" Then
 
@@ -310,7 +279,6 @@ Private Sub dxfLoad3Tables()
             'Debug lpcode, lpvalue
             If lpcode = "5" Then newlayer.handle = lpvalue
             If lpcode = "2" Then newlayer.Name = lpvalue
-
 
             If lpcode = "6" Then newLayer.LType = lpvalue
             If lpcode = "62" Then
@@ -357,7 +325,6 @@ Private Sub dxfLoad3Tables()
 
         End If
 
-
     End Select
 
     ReadData
@@ -366,7 +333,6 @@ Private Sub dxfLoad3Tables()
   'gcd.UpdateLayers
 
   Try Print "DXF: Leidas", gcd.CurrentDrawing.cModel["LAYERS"].count, " tablas"
-
 
 End
 
@@ -419,10 +385,7 @@ Private Sub dxfLoad1Headers()
 
   Print "DXF: Leidas", gcd.CurrentDrawing.cHeader.Count, "variables de ambiente"
 
-
-
 End
-
 
 Private Sub dxfReadCommonEntityData(e As Entity, sCode As String[], sValue As String[])
 
@@ -450,8 +413,6 @@ Private Sub dxfReadCommonEntityData(e As Entity, sCode As String[], sValue As St
   Next
 
 End
-
-
 
 Public Function SaveFile(sName As String) As Integer
 
@@ -3305,8 +3266,6 @@ Private Function dxfSave5Entities() As Integer
 
 End
 
-
-
 Private Function dxfSave6Objects() As Integer
 
   Print #hFIle, "  0"
@@ -3343,13 +3302,6 @@ Private Function dxfSave6Objects() As Integer
   Print #hFIle, "EOF"
 
 End
-
-
-
-
-
-
-
 
 Private Function dxfSaveDimension(BlockName As String, fPuntos As Float[], Optional angle As Float = 0, layer As String = "0", colour As Integer = "256", LineType As String = "ByLayer", LineWidth As Float = "1")
 
@@ -3415,5 +3367,3 @@ Private Function dxfSaveDimension(BlockName As String, fPuntos As Float[], Optio
   Print #hFIle, "AcDbRotatedDimension"
 
 End
-
-

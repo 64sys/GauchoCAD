@@ -149,8 +149,6 @@ End
 
 Public Sub Draw2(oE As Entity)
 
-
-
 End
 '' Creo los puntos de interes
 '' Build point of interest
@@ -370,8 +368,6 @@ Public Function SplineTroughControlPoints(points As Float[], Tang1 As Boolean, T
           i += 2
 
         End If
-
-
 
       Else If points.count - i > 8 Then             ' tramos intermedios
 
@@ -893,7 +889,6 @@ End
 '        }
 '      ]
 
-
 Public Sub ExportDXF(e As Entity, hFile As File)
 
   Dim i As Integer
@@ -978,7 +973,6 @@ Public Function ImportDXF(e As Entity, sClaves As String[], sValues As String[])
 
   Next
 
-
   ' con todos los datos recabados, armo el array
 
   If Ptang1.Count > 0 Then
@@ -988,16 +982,12 @@ Public Function ImportDXF(e As Entity, sClaves As String[], sValues As String[])
   End If
   e.P.Insert(Pbase.Copy(), e.P.Max)
 
-
   If Ptang2.Count > 0 Then
 
     e.fParam[Me.ipaTang2] = 1
     e.P.Add(Ptang2[0])
     e.P.Add(Ptang2[1])
   End If
-
-
-
 
   ' If e.fParam.Count = 0 Then e.fParam.Add(0)
   ' If e.fParam[0] = 1 And e.p.Count > 0 Then ' agrego el primer punto de nuevo

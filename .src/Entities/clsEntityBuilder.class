@@ -131,7 +131,6 @@ Public Function Start(Optional ElemToBuild As Variant, Optional Mode As Integer 
   gcd.OrthogonalIgnored = elem.ClassHandler.OrthogonalIgnored
   gcd.OrthogonalForced = elem.ClassHandler.OrthogonalForced
 
-
   elem.layerid = appmain.CurrentLayer ' gcd.GetLayerID(appmain.CurrentLayer)
 
   elem.colour = appmain.CurrentColor
@@ -165,7 +164,7 @@ Public Function KeyText(EnteredText As String) ' esta rutina es llamada por FCAD
   ' Lets see what are we expecting
   Dim Xt, Zt As Float, ErrTxt As String, Relative As Boolean
 
-  Select Case NextParamType
+  Select NextParamType
 
     Case "P", "+"
       errtxt = ", expected a valid point like 12.4,9.5  or @12.34,10.5"
@@ -439,7 +438,6 @@ End
 
 Public Sub CancelarConstruccion()
 
-
   elem.DrawAble = False         ' don't draw me anymore
 
 End
@@ -454,7 +452,6 @@ End
 
 Public Sub Finish()
 
-
   gcd.CurrentDrawing.arrEntities.Add(elem)
 
   elem.ClassHandler.Finish(elem, elem.ClassHandler.StepsDone)
@@ -467,7 +464,6 @@ Public Sub Finish()
   gcd.clsJob = clsDefaultJob
   clsDefaultJob.PoiChecking = True
   clsDrawingAids.CleanTexts
-
 
   clsEntities.GLGenDrawList
 

@@ -277,12 +277,12 @@ Private Sub WriteValue(vVal As Variant)
   Dim aArray As Array
   Dim cCol As Collection
 
-  Select Case TypeOf(vVal)
+  Select TypeOf(vVal)
 
     Case gb.Null
       Write #$hStream, "null"
 
-    Case gb.Boolean
+Case gb.Boolean
       If vVal Then
         Write #$hStream, "true"
       Else

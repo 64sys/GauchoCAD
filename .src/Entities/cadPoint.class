@@ -148,8 +148,6 @@ Public Sub Finish(oE As Entity, Optional ParamsDone As Integer = -1) As Boolean
   oE.Selected = False
   oE.Finished = True
 
-
-
 End
 
 ' Importo los datos que puedo procesar de una coleccion y genero un Entity para ser agregado a un array
@@ -233,9 +231,7 @@ Public Sub ExportDXF(e As Entity, hFile As File)
     Print #hFIle, "0"
   End If
 
-
 End
-
 
 ' 100 Subclass marker(AcDbPoint)
 '

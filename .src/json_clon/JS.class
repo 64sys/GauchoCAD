@@ -8,7 +8,7 @@ Static Public Sub _call(Value As Variant) As String
   Dim iPos As Integer
   Dim cCol As Collection
 
-  Select Case TypeOf(Value)
+  Select TypeOf(Value)
 
     Case gb.Null
       Return "null"

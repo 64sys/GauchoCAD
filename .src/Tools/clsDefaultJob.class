@@ -239,7 +239,6 @@ Public Function KeyText(EnteredText As String)
     Case "save"
       appmain.gTask("save")
 
-
     Case Else
 
       gcd.clsJobPrevious = gcd.clsJob
