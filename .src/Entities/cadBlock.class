@@ -54,8 +54,6 @@ End
 
 Public Sub Draw(oE As Entity)
 
-  Dim n As Integer
-
   If oE.fParam.Count > 0 Then Return
 
   ' nothing
