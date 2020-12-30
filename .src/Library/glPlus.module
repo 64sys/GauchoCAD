@@ -462,6 +462,53 @@ Public Function Arc(Optional radio As Float, start_angle As Float, length As Flo
   GL.End
 
 End
+
+Public Sub Arrow(fBase As Float[], fPunta As Float[], Optional colour As Integer = 0, LineWidth As Float = 1, Style As Integer = 0, ArrowSize As Integer = 0)
+
+  ' Style: 0 = Simple lines, 1 = ...to do
+  ' ArrowSize: 0 = 20% of length, other = length of angled lines
+
+
+  Dim i As Integer
+
+  'glColorRGB(colour)
+  gl.LineWidth(LineWidth) ' obsoleto en WebGL
+
+  gl.Begin(gl.LINE_STRIP)
+
+  ' Select vertices.Count
+  '     Case 2
+  '
+  '         For i = 0 To 1 ' Step 2
+  '             glColorRGB(colour)
+  '             gl.Vertex2f(vertices[i], vertices[i + 1])
+  '
+  '         Next
+  '     Case 3
+  '         For i = 0 To 2 'Step 2
+  '             glColorRGB(colour)
+  '             gl.Vertex2f(vertices[i], vertices[i + 1])
+  '         Next
+  '
+  '     Case Else
+  '
+  '         Print "Error mas puntos"
+  '
+  ' End Select
+  ' '
+  ' For i = 0 To vertices.Max Step 2
+  '   glColorRGB(colour)
+  '   gl.Vertex2f(vertices[i], vertices[i + 1])
+  ' Next
+  '
+  ' If iClosed Then
+  '   gl.Vertex2f(vertices[0], vertices[1])
+  ' End If
+  '
+  ' gl.end
+  ' If dashes > 0 Then gl.Disable(GL.LINE_STIPPLE)
+
+End
 '' Dibuja un seria de polilinea
 
 Public Function PolyLines(vertices As Float[], Optional colour As Integer = 0, LineWidth As Float = 1, dashes As Integer, Optional iClosed As Boolean = False)

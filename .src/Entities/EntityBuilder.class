@@ -156,7 +156,7 @@ Public Function KeyText(EnteredText As String) ' esta rutina es llamada por FCAD
 
 
   ' Lets see what are we expecting
-  Dim Xt, Zt As Float, ErrTxt As String, Relative As Boolean
+  Dim Xt, yt As Float, ErrTxt As String, Relative As Boolean
   Dim bResult As Boolean
 
   Select Case NextParamType
@@ -172,15 +172,12 @@ Public Function KeyText(EnteredText As String) ' esta rutina es llamada por FCAD
 
       If Left(EnteredText, 1) = "C" Then          ' close the element
         ' got othe first point and exit
-        elem.P[iPoints * 2] = elem.P[0]
-        elem.P[iPoints * 2 + 1] = elem.P[1]
-        Me.Finish
+        If elem.ClassHandler.NewParameter(elem, ["close"]) Then Me.Finish
 
       Else If Left(EnteredText, 1) = "U" Then     ' undo last command and go
 
-        elem.P.remove(elem.P.max)
-        elem.P.remove(elem.P.max)
-        Me.Finish
+        If elem.ClassHandler.NewParameter(elem, ["undo"]) Then Me.Finish
+
       Else                                        ' an X,Y or @X,Y
 
         If InStr(EnteredText, "@") > 0 Then    ' may be a point
@@ -188,19 +185,19 @@ Public Function KeyText(EnteredText As String) ' esta rutina es llamada por FCAD
           EnteredText = Replace(EnteredText, "@", "")
         Endif
         Xt = CFloat(Split(EnteredText, ",")[0])
-        Zt = CFloat(Split(EnteredText, ",")[1])
+        yt = CFloat(Split(EnteredText, ",")[1])
 
-        ' if we are stll here, input was good
-        elem.P[iPoints * 2] = Xt
-        elem.P[iPoints * 2 + 1] = Zt
+
 
         If Relative And (elem.P.count > 2) Then
-          elem.P[iPoints * 2] += elem.P[(iPoints - 1) * 2]
-          elem.P[iPoints * 2 + 1] += elem.P[(iPoints - 1) * 2 + 1]
+          xt += Me.LastX
+          yt += Me.LastY
 
         Endif
-        Inc iPoints
-        AdvanceStep
+        Me.LastX = xt
+        Me.LastY = yt
+
+        If elem.ClassHandler.NewParameter(elem, ["point", xt, yt], True) Then AdvanceStep
 
       End If
 
@@ -275,9 +272,10 @@ Public Sub AdvanceStep()
     ' prepare next stuff
     '
     NextParamType = UCase(Mid(elem.ClassHandler.ParamType, elem.ClassHandler.StepsDone + 1, 1))
+    If NextParamType = "" Then NextParamType = "+"
     If NextParamType = "+" Then ' add another point
       Inc StepsTotal
-
+      NextParamType = "P"
     Endif
 
     Try clsDrawingAids.HelperTrabajoNext = ParamHelperList[elem.ClassHandler.StepsDone]          ' try in case of lack of desciption or keep last
@@ -314,8 +312,9 @@ Public Function MouseMove(mouseX As Integer, mouseY As Integer) ' esta rutina es
   If NextParamType = "A" Then
 
     ' return the angle from horizontal to us
-    elem.fParam[iFloat] = Ang(appmain.Xreal(mouseX) - elem.p[elem.p.max - 1], appmain.Yreal(mouseY) - elem.p[elem.p.max])
-    elem.fParam[iFloat] *= 180 / Pi
+    f = Ang(appmain.Xreal(mouseX) - Me.LastX, appmain.Yreal(mouseY) - Me.lastY)
+    f *= 180 / Pi
+    elem.ClassHandler.NewParameter(elem, ["float", f])
 
     Return              ' nothing more to do here
   End If
@@ -373,7 +372,7 @@ End
 
 Public Function MouseDown(mouseX As Integer, mouseY As Integer) ' esta rutina es llamada por FCAD en el evento DrawingArea_MouseDown
 
-  Dim X, Y As Float
+  Dim X, Y, f As Float
 
 
   clsDrawingAids.ErrorMessage = ""
@@ -383,11 +382,9 @@ Public Function MouseDown(mouseX As Integer, mouseY As Integer) ' esta rutina es
   If NextParamType = "A" Then
 
     ' return the angle from horizontal to us
-    elem.fParam[iFloat] = Ang(appmain.Xreal(mouseX) - elem.p[elem.p.max - 1], appmain.Yreal(mouseY) - elem.p[elem.p.max])
-    elem.fParam[iFloat] *= 180 / Pi
-
-    Inc iFloat
-    AdvanceStep
+    f = Ang(appmain.Xreal(mouseX) - Me.LastX, appmain.Yreal(mouseY) - Me.lastY)
+    f *= 180 / Pi
+    If elem.ClassHandler.NewParameter(elem, ["float", f], True) Then AdvanceStep
     Return              ' nothing more to do here
   End If
 
@@ -395,7 +392,7 @@ Public Function MouseDown(mouseX As Integer, mouseY As Integer) ' esta rutina es
 
     If elem.ClassHandler.NewParameter(elem, ["point", x, y], True) Then AdvanceStep
 
-    Return              ' nothing more to do here
+    Return
   End If
 
 
