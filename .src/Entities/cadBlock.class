@@ -57,7 +57,7 @@ Public Sub Draw(oE As Entity)
   If oE.fParam.Count > 0 Then Return
 
   ' nothing
-  Dim n As Integer
+  Dim n As Integer = 0
   '''n = clsEntities.GetSelectionCount()
   ' en este caso necesitamos que esten seleccionadas dos o mas entidades
   If n < 2 Then

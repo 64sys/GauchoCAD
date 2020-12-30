@@ -271,7 +271,7 @@ Public Function KeyText(EnteredText As String)
 
 End
 
-Public Sub Draw() ' esta rutina es llamada por FCAD en el evento DrawingArea_Draw
+Public Sub Draw(Optional what As Object) ' esta rutina es llamada por FCAD en el evento DrawingArea_Draw
   ' por ultimo, y para que se vea arriba, la seleccion
 
   If Me.Active Then

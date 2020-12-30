@@ -22,6 +22,7 @@
 
 Create Static
 
+
 ' Pixeles
 Public Const Gender As String = "Builder"
 Public LastMouseDownX As Integer    ' change in MouseDown
@@ -36,6 +37,10 @@ Public SelStartXr As Float          ' Seleccion libre rectangular
 Public SelStartZr As Float          ' en metros
 Public SelEndXr As Float            ' aca Y es Z
 Public SelEndZr As Float
+
+Public LastX As Float               ' change in MouseMove/MouseUp
+Public LastY As Float
+
 
 ' indicadores
 'Public elem.ClassHandler.StepsDone As Integer = 0          ' La cantidad de puntos que marco para el trabajo actual--->Gurdado en la entidad
@@ -152,6 +157,7 @@ Public Function KeyText(EnteredText As String) ' esta rutina es llamada por FCAD
 
   ' Lets see what are we expecting
   Dim Xt, Zt As Float, ErrTxt As String, Relative As Boolean
+  Dim bResult As Boolean
 
   Select Case NextParamType
 
@@ -221,17 +227,18 @@ Public Function KeyText(EnteredText As String) ' esta rutina es llamada por FCAD
       errtxt = "enter a valid text size"
 
       If EnteredText = "" Then
-
-        Try elem.fParam[iFloat] = ParamDefault[elem.ClassHandler.StepsDone]
+        Try bResult = elem.ClassHandler.NewParameter(elem, ["float", ParamDefault[elem.ClassHandler.StepsDone]], True)
 
       Else
 
-        elem.fParam[iFloat] = CFloat(EnteredText)
+        Try bResult = elem.ClassHandler.NewParameter(elem, ["float", CFloat(EnteredText)], True)
+
+
 
       Endif
 
-      Inc iFloat
-      AdvanceStep
+      If bResult Then AdvanceStep
+
 
     Case "R"
 
@@ -282,16 +289,8 @@ Public Sub AdvanceStep()
     '
     NextParamType = UCase(Mid(elem.ClassHandler.ParamType, elem.ClassHandler.StepsDone + 1, 1))
     If NextParamType = "+" Then ' add another point
-      elem.p.add(0)
-      elem.p.add(0)
+      Inc StepsTotal
 
-      Debug "P vs iPoints", elem.P.Count / 2, iPoints
-
-      ' ' la SPLine requiere
-      ' If elem.p.Count / 2 - 1 = iPoints Then Inc iPoints
-
-      elem.Psel.add(0)
-      Dec elem.ClassHandler.StepsDone
     Endif
 
     Try clsDrawingAids.HelperTrabajoNext = ParamHelperList[elem.ClassHandler.StepsDone]          ' try in case of lack of desciption or keep last
@@ -304,9 +303,6 @@ Public Sub AdvanceStep()
     gcd.CurrentDrawing.LastPoint.Clear
     Try gcd.CurrentDrawing.LastPoint.Insert([elem.P[(iPoints - 1) * 2], elem.P[(iPoints - 1) * 2 + 1]])
 
-    ' we set the next point in the same position of this
-    Try elem.P[iPoints * 2] = elem.P[(iPoints - 1) * 2]
-    Try elem.P[iPoints * 2 + 1] = elem.P[(iPoints - 1) * 2 + 1]
 
   Endif
 
@@ -316,9 +312,13 @@ End
 
 Public Function MouseMove(mouseX As Integer, mouseY As Integer) ' esta rutina es llamada por FCAD en el evento DrawingArea_MouseMove
 
-  Dim X, Y As Float
+  Dim X, Y, f As Float
 
-  If (Me.iPoints > elem.P.Count / 2) And InStr("LAP", NextParamType) = 0 Then Return ' we are expecting a parameter
+  X = puntos.Near(appmain.Xreal(mouseX))
+  Y = puntos.Near(appmain.Yreal(mouseY))
+
+
+  If InStr("LAPR", NextParamType) = 0 Then Return ' we are expecting a parameter
 
   ' a very special case
   If elem.Gender = "SPLine" And (Me.iPoints <> elem.P.Count / 2 - 1) Then Inc iPoints
@@ -335,9 +335,9 @@ Public Function MouseMove(mouseX As Integer, mouseY As Integer) ' esta rutina es
 
   If NextParamType = "R" Then
 
-    ' return the angle from horizontal to us
-    elem.fParam[iFloat] = Abs(puntos.PointToLineDistance([appmain.Xreal(mouseX), appmain.Yreal(mouseY)], [elem.p[elem.p.max - 3], elem.p[elem.p.max - 2], elem.p[elem.p.max - 1], elem.p[elem.p.max]]))
-    'elem.fParam[iFloat] *= 180 / Pi
+    elem.ClassHandler.NewParameter(elem, ["point", x, y])
+
+
     'appmain.redraw
     Return              ' nothing more to do here
   End If
@@ -353,8 +353,6 @@ Public Function MouseMove(mouseX As Integer, mouseY As Integer) ' esta rutina es
 
   If Me.iPoints >= elem.P.Count / 2 Then Return
 
-  elem.P[iPoints * 2] = puntos.Near(appmain.Xreal(mouseX))
-  elem.P[iPoints * 2 + 1] = puntos.Near(appmain.Yreal(mouseY))
 
   ' y si tengo enganche?
 
@@ -362,23 +360,25 @@ Public Function MouseMove(mouseX As Integer, mouseY As Integer) ' esta rutina es
 
     ' esto re enganchado
 
-    elem.p[iPoints * 2] = gcd.CurrentDrawing.iEntity[0]
-    elem.p[iPoints * 2 + 1] = gcd.CurrentDrawing.iEntity[1]
+    X = gcd.CurrentDrawing.iEntity[0]
+    Y = gcd.CurrentDrawing.iEntity[1]
 
     ' aca tengo que verificar el ortogonal
 
   Else If Me.iPoints > 0 Then                                                                          ' puedo hacer ortogonal
     If gcd.OrthogonalForced Or (Not gcd.OrthogonalIgnored And gcd.Orthogonal) Then          ' hablame de operadores logicos
 
-      If Abs(elem.p[iPoints * 2] - elem.P[(iPoints - 1) * 2]) > Abs(elem.p[iPoints * 2 + 1] - elem.P[(iPoints - 1) * 2 + 1]) Then ' prevalece X
-        elem.p[iPoints * 2 + 1] = elem.P[(iPoints - 1) * 2 + 1]
+      If Abs(X - LastX) > Abs(Y - LastY) Then ' prevalece X
+        Y = LastY
       Else
-        elem.p[iPoints * 2] = elem.P[(iPoints - 1) * 2]
+        X = LastX
       Endif
 
     End If
 
   End If
+
+  elem.ClassHandler.NewParameter(elem, ["point", x, y])
 
   appmain.redraw
 
@@ -386,8 +386,11 @@ End
 
 Public Function MouseDown(mouseX As Integer, mouseY As Integer) ' esta rutina es llamada por FCAD en el evento DrawingArea_MouseDown
 
+  Dim X, Y As Float
+
+
   clsDrawingAids.ErrorMessage = ""
-  If (Me.iPoints > elem.P.Count / 2) And InStr("LAP", NextParamType) = 0 Then Return ' we are expecting a parameter
+  If InStr("LAPR", NextParamType) = 0 Then Return ' we are expecting a parameter
 
   ' if we expect a parameter, it will be passed
   If NextParamType = "A" Then
@@ -403,10 +406,8 @@ Public Function MouseDown(mouseX As Integer, mouseY As Integer) ' esta rutina es
 
   If NextParamType = "R" Then
 
-    ' return the angle from horizontal to us
-    elem.fParam[iFloat] = Abs(puntos.PointToLineDistance([appmain.Xreal(mouseX), appmain.Yreal(mouseY)], [elem.p[elem.p.max - 3], elem.p[elem.p.max - 2], elem.p[elem.p.max - 1], elem.p[elem.p.max]]))
-    Inc iFloat
-    AdvanceStep
+    If elem.ClassHandler.NewParameter(elem, ["point", x, y], True) Then AdvanceStep
+
     Return              ' nothing more to do here
   End If
 
@@ -420,12 +421,11 @@ Public Function MouseDown(mouseX As Integer, mouseY As Integer) ' esta rutina es
     Return              ' nothing more to do here
   End If
 
-  If iPoints >= elem.P.Count / 2 Then Return
 
   ' we are waiting for a point
 
-  elem.P[iPoints * 2] = puntos.Near(appmain.Xreal(mouseX))
-  elem.P[iPoints * 2 + 1] = puntos.Near(appmain.Yreal(mouseY))
+  X = puntos.Near(appmain.Xreal(mouseX))
+  Y = puntos.Near(appmain.Yreal(mouseY))
 
   ' y si tengo enganche?
 
@@ -433,25 +433,31 @@ Public Function MouseDown(mouseX As Integer, mouseY As Integer) ' esta rutina es
 
     ' esto re enganchado
 
-    elem.p[iPoints * 2] = gcd.CurrentDrawing.iEntity[0]
-    elem.p[iPoints * 2 + 1] = gcd.CurrentDrawing.iEntity[1]
+    X = gcd.CurrentDrawing.iEntity[0]
+    Y = gcd.CurrentDrawing.iEntity[1]
 
     ' aca tengo que verificar el ortogonal
 
   Else If Me.iPoints > 0 Then                                                                          ' puedo hacer ortogonal
     If gcd.OrthogonalForced Or (Not gcd.OrthogonalIgnored And gcd.Orthogonal) Then          ' hablame de operadores logicos
 
-      If Abs(elem.p[iPoints * 2] - elem.P[(iPoints - 1) * 2]) > Abs(elem.p[iPoints * 2 + 1] - elem.P[(iPoints - 1) * 2 + 1]) Then ' prevalece X
-        elem.p[iPoints * 2 + 1] = elem.P[(iPoints - 1) * 2 + 1]
+      If Abs(X - LastX) > Abs(Y - LastY) Then ' prevalece X
+        Y = LastY
       Else
-        elem.p[iPoints * 2] = elem.P[(iPoints - 1) * 2]
+        X = LastX
       Endif
 
     End If
 
   End If
-  Inc iPoints
-  AdvanceStep
+
+  LastX = X
+  LastY = Y
+
+  If elem.ClassHandler.NewParameter(elem, ["point", x, y], True) Then AdvanceStep
+
+
+
 
 End
 
@@ -465,7 +471,6 @@ End
 
 Public Sub Draw()               ' called bygcd.CurrentDrawing.drwArea_Draw
 
-  If Me.iPoints < elem.ClassHandler.pointstodraw Then Return
 
   elem.ClassHandler.draw(elem)
 
@@ -504,9 +509,3 @@ Public Sub Cancel()
 
 End
 
-Public Sub MoveOn()
-
-  Inc Me.iPoints
-  Inc Me.iPoints
-
-End

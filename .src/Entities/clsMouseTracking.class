@@ -260,19 +260,19 @@ Public Function CheckAboveEntity(xr As Float, Yr As Float, tolerance As Float) A
 
     End Select
 
-    modUtils.DoEvents(0.00100)
+    modUtils.DoEvents(0.25000)
 
   Next
 
 ExitSearch:
 
   flgSearchingEntity = False
-  'Debug "Above entity en ", Timer - t
+  ' Debug "Above entity en ", Timer - t
   If e = gcd.CurrentDrawing.arrEntities.Count Then
 
     Return -1
   Else
-    Debug "Encontre una entidad " & gcd.CurrentDrawing.arrEntities[e].Gender
+    Debug "Encontre una entidad " & gcd.CurrentDrawing.arrEntities[e].Gender, "en", Timer - t
     Return e
 
   End If

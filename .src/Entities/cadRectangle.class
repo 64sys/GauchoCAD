@@ -56,7 +56,7 @@ End
 Public Sub Finish(oE As Entity, Optional ParamsDone As Integer = -1) As Boolean
 
   ' aca vamos a trasnformar la entidad en una polilinea
-  
+
   oe.ClassHandler = cadLWPolyline
   oe.gender = oe.ClassHandler.Gender
   Dim w, h As Float

@@ -591,18 +591,18 @@ Public Function GetGBColor(CADcolor As Integer, layerID As String) As Integer
   ' color
   If CADcolor = 256 Then          ' buscar color del layer
 
-    Return Starter.gColor[gcd.CurrentDrawing.cModel["LAYERS"][layerID]["color"]]
+    Return Starter.gColor[gcd.CurrentDrawing.cModel["LAYERS"][layerID]["color"]["index"]]
     'Return Starter.gColor[11]
 
   Else If CADcolor = 257 Then     ' buscar color del objeto
 
-    Return Starter.gColor[gcd.CurrentDrawing.cModel["LAYERS"][layerID]["color"]]    ' FIXME: cambiar esto
+    Return Starter.gColor[gcd.CurrentDrawing.cModel["LAYERS"][layerID]["color"]["index"]]    ' FIXME: cambiar esto
     'Return Starter.gColor[12]
 
   Else If CADcolor = 0 Then       ' buscar color del bloque
 
     'Return Starter.gColor[13]
-    Return Starter.gColor[gcd.CurrentDrawing.cModel["LAYERS"][layerID]["color"]]     ' FIXME: cambiar esto
+    Return Starter.gColor[gcd.CurrentDrawing.cModel["LAYERS"][layerID]["color"]["index"]]   ' FIXME: cambiar esto
 
   Else
 
@@ -683,7 +683,7 @@ Public Sub UpdateLayers()
   CurrentDrawing.Layers.Clear
   For Each CMLayer In CurrentDrawing.cModel["LAYERS"]
     newlayer = New Layer
-    newlayer.Colour = CMLayer["color"]
+    newlayer.Colour = CMLayer["color"]["index"]
     newlayer.Name = CMLayer["name"]
     newlayer.handle = CMLayer["handle"][1]
     newlayer.id = newlayer.handle

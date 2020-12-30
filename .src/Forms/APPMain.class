@@ -600,7 +600,8 @@ Public Sub GLArea1_draw()
 
     ' si no esta seleccionada, la resalto
     'If Not arrEntities[iEntity[3]].Selected Then
-    iParent = clsEntities.GetParentBlock(gcd.CurrentDrawing.iEntity[3]) ' esto verifica si tiene que resaltar el bloque completo
+    'iParent = clsEntities.GetParentBlock(gcd.CurrentDrawing.iEntity[3]) ' esto verifica si tiene que resaltar el bloque completo
+    iParent = gcd.CurrentDrawing.iEntity[3]
     gcd.CurrentDrawing.arrEntities[iParent].ClassHandler.DrawRemark(gcd.CurrentDrawing.arrEntities[iParent])
     'End If
 
@@ -609,7 +610,7 @@ Public Sub GLArea1_draw()
 
   clsDrawingAids.DibujaHelper
 
-  gcd.clsJob.Draw
+  gcd.clsJob.Draw()
 
   gl.CallList(gcd.CurrentDrawing.GlListAllEntities)                      ' si GL no tiene contexto, la lista no se genera. Es necesario que la instancia de FCAD este cargada.
 
@@ -636,7 +637,7 @@ Public Sub GLArea1_draw()
 
   Endif
 
-  ' Debug "redraw"
+  Debug "redraw"
 
 End
 
@@ -761,7 +762,11 @@ Public Sub GLArea1_MouseMove()
         If gcd.clsJob.iEntityForEdit < 0 Then
           If Not clsMouseTracking.flgSearchingEntity Then
             gcd.CurrentDrawing.iEntity[2] = -1
-            gcd.CurrentDrawing.iEntity[3] = clsMouseTracking.CheckAboveEntity(Xreal(mouse.x), Yreal(mouse.Y), Metros(16))
+            gcd.CurrentDrawing.iEntity[3] = clsMouseTracking.CheckAboveEntity(Xreal(mouse.x), Yreal(mouse.Y), Metros(8))
+            If gcd.CurrentDrawing.iEntity[3] <> gcd.CurrentDrawing.iLastEntity Then
+              gcd.CurrentDrawing.iLastEntity = gcd.CurrentDrawing.iEntity[3]
+
+            End If
           End If
         Else
           If Not clsMouseTracking.flgSearchingPOI Then
@@ -808,7 +813,7 @@ Public Sub GLArea1_MouseMove()
 
       If gcd.clsJob.EntityChecking Then
         If Not clsMouseTracking.flgSearchingEntity Then
-          gcd.CurrentDrawing.iEntity[3] = clsMouseTracking.CheckAboveEntity(Xreal(mouse.x), Yreal(mouse.Y), Metros(16))
+          gcd.CurrentDrawing.iEntity[3] = clsMouseTracking.CheckAboveEntity(Xreal(mouse.x), Yreal(mouse.Y), Metros(8))
         End If
       End If
 
@@ -821,7 +826,8 @@ Public Sub GLArea1_MouseMove()
 
   End Select
 
-  redraw
+  glarea1.Refresh
+
 
 End
 
