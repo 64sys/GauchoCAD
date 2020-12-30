@@ -57,7 +57,6 @@ Public cImport As New Collection    '' Impor data from dxf, dwg is loaded here
 
 Public cHeader As New Collection    '' Header data
 Public cHeaderCodes As New Collection '' Header codes (used for saving)
-
 ' ===============================================================================================================================
 ' GRAPHICS
 ' ===============================================================================================================================
@@ -69,11 +68,9 @@ Public arrEntities As New Entity[]          '' were al elements live
 Public arrTmp As New Entity[]               '' Temporal array to put a copy of an entity before change something in it
 Public arrUndo As New Entity[]              '' An array to put an unmodified copy of an entity before modifying it and then restoring it to the previous version.
 
-
 ' SELECTION
 Public arrSelecIndex As New Integer[]       '' List of indexes of selected entities with the mouse
 Public hSelection As New String[]           '' List of handles of selected entities with the mouse
-
 
 ' point of interests, lines, areas and entities: all this is generated n the entity creation
 Public poiPoints As New Float[]                 '' xy pairs of points

@@ -154,7 +154,8 @@ End
 '' Creo los puntos de interes
 '' Build point of interest
 
-Public Function BuildPOI(oE As Entity, Optional arrIndex As Integer = -1) As Integer
+'Public Function BuildPOI(oE As Entity, Optional arrIndex As Integer = -1) As Integer
+Public Function BuildPOI(oE As Entity) As Integer
 
   oe.PoiPoints.Clear
   oe.PoiType.Clear
@@ -183,7 +184,8 @@ End
 ' This function will return False if the element couldn't be created for some reason: bad or incomple user input
 ' True means all is good, False will instruct the clsEntityBuilder to delete it
 
-Public Sub Finish(oE As Entity, Optional ParamsDone As Integer = -1) As Boolean
+'Public Sub Finish(oE As Entity, Optional ParamsDone As Integer = -1) As Boolean
+Public Sub Finish(oE As Entity) As Boolean
 
   'Print "Finish en EntityBase"
   'CreatePolygon(oe)
@@ -199,12 +201,10 @@ Public Sub Finish(oE As Entity, Optional ParamsDone As Integer = -1) As Boolean
   oE.Selected = False
   oE.Finished = True
 
-
 End
 
 ' Importo los datos que puedo procesar de una coleccion y genero un Entity para ser agregado a un array
 Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
-
 
   e.P.Add(c["center"][0])
   e.P.Add(c["center"][1])
@@ -228,7 +228,6 @@ Public Sub ExportDXF(e As Entity, hFile As File)
   Print #hFIle, " 40"                      ' radious
   Print #hFIle, CStr(e.fParam[0])
 
-
 End
 
 Public Function ImportDXF(e As Entity, sClaves As String[], sValues As String[]) As Boolean
@@ -244,12 +243,7 @@ Public Function ImportDXF(e As Entity, sClaves As String[], sValues As String[])
   If e.fParam.Count = 0 Then Stop ' e.fParam.Add(0)  ' TODO: averiguar q pasa aca q algunas entidades CIRCLE
   ' vienen sin el radio
 
-
-
 End
-
-
-
 
 '    "entity": "CIRCLE",
 '    "index": 401,

@@ -223,7 +223,7 @@ Public Function KeyText(EnteredText As String) ' esta rutina es llamada por FCAD
 
       AdvanceStep
 
-    Case "F", "M", "A", "L"                 ' Float, Mixed, Angle, Longitud
+    Case "F", "M", "A", "L", "R"                ' Float, Mixed, Angle, Longitud
       errtxt = "enter a valid text size"
 
       If EnteredText = "" Then
@@ -240,20 +240,7 @@ Public Function KeyText(EnteredText As String) ' esta rutina es llamada por FCAD
       If bResult Then AdvanceStep
 
 
-    Case "R"
 
-      If EnteredText = "" Then
-
-        Try elem.fParam[iFloat] = ParamDefault[elem.ClassHandler.StepsDone]
-
-      Else
-
-        elem.fParam[iFloat] = CFloat(EnteredText)
-
-      Endif
-
-      Inc iFloat
-      AdvanceStep
 
     Case "C"                                ' color
       If Dialog.SelectColor() Then

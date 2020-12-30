@@ -1,9 +1,9 @@
 # Gambas Form File 3.0
 
 { Form Form
-  MoveScaled(0,0,153,89)
+  MoveScaled(0,0,153,97)
   Background = Color.TextBackground
-  Icon = Picture["logo.svg"]
+  Icon = Picture["logo.png"]
   Arrangement = Arrange.Vertical
   { grpFile Menu
     Text = ("File")
@@ -358,13 +358,14 @@
     }
   }
   { Panel1 Panel
-    MoveScaled(1,0,151,85)
+    MoveScaled(1,0,151,92)
     Expand = True
     Arrangement = Arrange.Vertical
     { Panel2 Panel
-      MoveScaled(1,1,132,5)
+      MoveScaled(1,1,132,7)
       Arrangement = Arrange.Row
       Spacing = True
+      Margin = True
       { pnlFile Panel
         MoveScaled(1,0,7,5)
         Expand = True
@@ -402,7 +403,7 @@
       }
     }
     { PanEdit1 Panel
-      MoveScaled(1,7,149,71)
+      MoveScaled(1,16,149,70)
       Expand = True
       Arrangement = Arrange.Horizontal
       Spacing = True
@@ -468,7 +469,7 @@
         }
       }
       { PanEdit2 Panel
-        MoveScaled(25,1,47,50)
+        MoveScaled(26,1,83,50)
         Expand = True
         Arrangement = Arrange.Horizontal
         { Panel7 Panel
@@ -498,35 +499,38 @@
             }
           }
         }
-        { SidePanel1 SidePanel
-          MoveScaled(26,1,21,45)
+        { pnlData HSplit
+          MoveScaled(26,1,48,42)
           Visible = False
-          Arrangement = Arrange.Vertical
-          Orientation = Align.Right
-          { Panel8 Panel
-            MoveScaled(1,2,18,4)
-            Visible = False
-            Arrangement = Arrange.Horizontal
-            { ToolButton1 ToolButton
-              MoveScaled(1,0,4,4)
-              Picture = Picture["icon:/32/refresh"]
-            }
-            { SwitchButton1 SwitchButton
-              MoveScaled(10,0,7,4)
-            }
-          }
+          Expand = True
           { TreeView1 TreeView
-            MoveScaled(1,7,17,14)
-            Visible = False
+            MoveScaled(3,4,13,36)
             Background = Color.TextBackground
             Expand = True
             Border = False
           }
-          { ColumnView1 ColumnView
-            MoveScaled(1,23,18,16)
-            Visible = False
+          { Panel13 Panel
+            MoveScaled(18,6,30,33)
             Expand = True
-            Border = False
+            Arrangement = Arrange.Vertical
+            { Panel8 Panel
+              MoveScaled(1,1,27,4)
+              Visible = False
+              Arrangement = Arrange.Horizontal
+            }
+            { GridView1 GridView
+              MoveScaled(2,7,26,10)
+              Expand = True
+              Border = False
+              Header = GridView.Horizontal
+            }
+            { pnlFileData Panel
+              MoveScaled(3,19,24,12)
+              Visible = False
+              Background = Color.LightBackground
+              Expand = True
+              Arrangement = Arrange.Vertical
+            }
           }
         }
       }
@@ -572,7 +576,7 @@
       }
     }
     { Panel4 Panel
-      MoveScaled(1,79,149,5)
+      MoveScaled(1,86,149,5)
       Arrangement = Arrange.Horizontal
       { Panel10 Panel
         MoveScaled(1,1,1,3)
@@ -582,7 +586,7 @@
         MoveScaled(3,0,5,5)
         #Translate = False
         Tag = "selection"
-        ToolTip = "F6"
+        ToolTip = "Selection mode"
         Border = True
         Toggle = True
       }
@@ -634,6 +638,18 @@
         { Panel5 Panel
           MoveScaled(21,1,1,3)
         }
+      }
+      { btnEditionMode ToolButton locks
+        Name = "btnEditionMode"
+        MoveScaled(136,0,5,5)
+        #Translate = False
+        Tag = "data"
+        ToolTip = "F2"
+        Border = True
+        Toggle = True
+      }
+      { Panel12 Panel
+        MoveScaled(142,1,1,3)
       }
     }
     { tmr500 #Timer

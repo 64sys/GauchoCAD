@@ -111,7 +111,6 @@ Public Sub FillEntity(o As Entity)
         o.p.add(0)
         o.p.add(0)
 
-
         o.psel.add(0)
       Case "F", "A", "M", "L", "R"
         o.fParam.Add(0)
@@ -411,7 +410,6 @@ Public Function DeleteSelected() As Integer
   '  Purgue will also delete those with .ForDeletion = true
 
   For i = gcd.CurrentDrawing.arrEntities.Max To 0 Step -1
-
 
     If gcd.CurrentDrawing.arrEntities[i].Selected Then
       gcd.CurrentDrawing.arrEntities.Remove(i)
@@ -1131,6 +1129,4 @@ Public Sub DXFExportCommon(e As Entity, hFile As File)
   Print #hFIle, "370"                     ' Lineweight enum value. Stored and moved around as a 16-bit integer.
   Print #hFIle, CStr(e.LineWidth)
 
-
 End
-

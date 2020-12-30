@@ -48,7 +48,6 @@ Public Const JSON_Export As Boolean = False
 Public Const DXF_Reading As Boolean = True
 Public Const DXF_Export As Boolean = True
 
-
 Public Sub Translate(e As Entity, dX As Float, dY As Float, Optional OnlySelected As Boolean = False)
 
   Dim i As Integer
@@ -196,7 +195,6 @@ Public Sub Finish(oE As Entity, Optional ParamsDone As Integer = -1) As Boolean
   oE.Selected = False
   oE.Finished = True
 
-
 End
 
 ' Importo los datos que puedo procesar de una coleccion y genero un Entity para ser agregado a un array
@@ -250,7 +248,6 @@ End
 ' "corner3": [3031.97696102900818, 1631.40569016283212],
 ' "corner4": [3031.97696102900818, 1631.40569016283212],
 ' "extrusion": [0.0, 0.0, 1.0]
-
 
 Public Sub ExportDXF(e As Entity, hFile As File)
 

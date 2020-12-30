@@ -415,6 +415,24 @@ GauchoCAD is currently under development and the status is as follows:
 ## Contact
 gauchocad@gmail.com
 
+## LibreDWG  project
+
+# How to install
+```bash
+    #!/bin/bash
+    # Script para instalar LibreDWG en el sistema
+    #===============================================================================
+    # LibDWG
+    git clone git://git.sv.gnu.org/libredwg.git
+    cd libredwg
+    sh autogen.sh
+    ./configure --enable-trace
+    make
+    sudo make install
+    make check
+    cd ..
+```
+
 ## Gambas project
 Gambas is a free development environment and a full powerful development platform based on a Basic interpreter with object extensions.
 http://gambas.sourceforge.net/en/main.html

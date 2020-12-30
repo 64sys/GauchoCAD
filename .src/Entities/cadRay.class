@@ -50,7 +50,6 @@ Public Const JSON_Export As Boolean = False
 Public Const DXF_Reading As Boolean = True
 Public Const DXF_Export As Boolean = True
 
-
 Private Sub MakeRay(p As Float[])
 
   p2.Clear
@@ -67,9 +66,7 @@ Private Sub MakeRay(p As Float[])
   p2.Add((P[2] - p[0]) * -1e10)
   p2.Add((P[3] - p[1]) * -1e10)
 
-
 End
-
 
 Public Sub Translate(e As Entity, dX As Float, dY As Float, Optional OnlySelected As Boolean = False)
 
@@ -119,8 +116,6 @@ Public Sub Draw(oE As Entity)
   MakeRay(oe.p)
 
   GLplus.Lines(p2, oE.ColorToPaint, oE.LineWidth, oE.LineType)
-
-
 
 End
 
@@ -231,8 +226,6 @@ Public Sub Finish(oE As Entity, Optional ParamsDone As Integer = -1) As Boolean
   oE.DrawAble = True
   oE.Selected = False
   oE.Finished = True
-
-
 
 End
 
@@ -358,9 +351,7 @@ Public Sub ExportDXF(e As Entity, hFile As File)
   Print #hFIle, " 21"                      ' Y1
   Print #hFIle, CStr(e.p[3])
 
-
 End
-
 
 Public Function ImportDXF(e As Entity, sClaves As String[], sValues As String[]) As Boolean
 

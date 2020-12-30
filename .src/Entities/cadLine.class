@@ -70,9 +70,6 @@ Public Function NewParameter(eBuild As Entity, vParam As Variant[], Optional Def
 End
 
 
-
-
-
 Public Sub Translate(e As Entity, dX As Float, dY As Float, Optional OnlySelected As Boolean = False)
 
   Dim i As Integer
@@ -214,8 +211,6 @@ Public Sub Finish(oE As Entity, Optional ParamsDone As Integer = -1) As Boolean
   oE.Selected = False
   oE.Finished = True
 
-
-
 End
 
 ' Importo los datos que puedo procesar de una coleccion y genero un Entity para ser agregado a un array
@@ -289,9 +284,6 @@ Public Sub ExportJsonCol(e As Entity, n As JSONCollection, Optional CreateNew As
     n.add(0.00000, "thickness")
     n.add([0.0, 0.0, 1.0], "extrusion")
 
-
-
-
   Else
 
     n["entity"] = "LINE"
@@ -324,11 +316,9 @@ Public Sub ExportJsonCol(e As Entity, n As JSONCollection, Optional CreateNew As
     n["thickness"] = 0.000000
     n["extrusion"] = [0.0, 0.0, 1.0]
 
-
   Endif
 
 End
-
 
 Public Sub ExportDXF(e As Entity, hFile As File)
 
@@ -346,9 +336,7 @@ Public Sub ExportDXF(e As Entity, hFile As File)
   Print #hFIle, " 21"                      ' Y1
   Print #hFIle, CStr(e.p[3])
 
-
 End
-
 
 Public Function ImportDXF(e As Entity, sClaves As String[], sValues As String[]) As Boolean
 

@@ -12,7 +12,7 @@ Public Sub Run(o As Object)
   ' FInspector.lblColor.Background = oEntity.gbcolor
   ' FInspector.lblColorName.TExt = oEntity.colour
   lblLayer.TExt = o.layer
-  Select Case o.gender
+  Select o.gender
     Case "Line"
 
       Me.lblPropName1.Text = ("Length")

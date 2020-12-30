@@ -49,7 +49,6 @@ Public Const JSON_Export As Boolean = False
 Public Const DXF_Reading As Boolean = True
 Public Const DXF_Export As Boolean = True
 
-
 Public Sub Stretch(e As Entity, dX As Float, dY As Float)
 
 End
@@ -170,7 +169,6 @@ Public Sub Draw(oE As Entity)
     clsDrawingAids.Helper.texto = Format$(oE.fParam[1], "0.0 deg") & (" to ") & Format$(oE.fParam[2], "0.0 deg")
   Else
 
-
     If oe.fParam[3] > 0 Then
 
       If oE.fParam[2] < oE.fParam[1] Then oE.fParam[2] = 360 + oE.fParam[2]              ' grados
@@ -183,7 +181,6 @@ Public Sub Draw(oE As Entity)
 
     If oe.fParam[1] > oe.fParam[2] Then oe.fParam[3] = -1
 
-
     ' veo el cuantos pixels tendria cada tramo
     LargoReal = 2 * oE.fParam[0] * Pi * Abs(oE.fParam[1] - oE.fParam[2]) / 360
     LargoPixels = APPMain.Pixels(LargoReal)
@@ -192,22 +189,18 @@ Public Sub Draw(oE As Entity)
     angle_increment = 5 / LargoPixels * 2 * Pi * oe.fParam[3]
     If Abs(angle_increment * 10) > Abs(oE.fParam[2] / 180 * Pi - oE.fParam[1] / 180 * Pi) Then
 
+
       angle_increment = (oE.fParam[2] / 180 * Pi - oE.fParam[1] / 180 * Pi) / 10
 
     End If
     Debug "Tramos", (oE.fParam[2] / 180 * Pi - oE.fParam[1] / 180 * Pi) / angle_increment
     If (oE.fParam[2] / 180 * Pi - oE.fParam[1] / 180 * Pi) / angle_increment < 10 Then Stop
-
     If LargoPixels < 10 Then
       EscalaTramos = 1
     Endif
 
-
     oE.polyline.Clear
     'angle_increment = Pi * 2 / 360 * oe.fParam[3]
-
-
-
 
     For theta = oE.fParam[1] / 180 * Pi To oE.fParam[2] / 180 * Pi Step angle_increment
       ' el punto considerando 0,0 al centro
@@ -224,7 +217,6 @@ Public Sub Draw(oE As Entity)
       oE.polyline.Add(y)
 
     Endif
-
 
     glPlus.PolyLines(oe.PolyLine, oe.ColorToPaint, oe.LineWidth, oe.LineType)
 
@@ -288,7 +280,6 @@ End
 ' Importo los datos que puedo procesar de una coleccion y genero un Entity para ser agregado a un array
 Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
 
-
   e.P.Add(c["center"][0])
   e.P.Add(c["center"][1])
   e.fParam.Add(c["radius"])
@@ -300,7 +291,6 @@ Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
 End
 
 Public Sub ExportDXF(e As Entity, hFile As File)
-
 
   Print #hFIle, "  0"
   Print #hFIle, "ARC"
@@ -324,8 +314,6 @@ Public Sub ExportDXF(e As Entity, hFile As File)
 
 End
 
-
-
 Public Function ImportDXF(e As Entity, sClaves As String[], sValues As String[]) As Boolean
 
   Dim i As Integer
@@ -340,8 +328,6 @@ Public Function ImportDXF(e As Entity, sClaves As String[], sValues As String[])
 
   If e.fParam.Count = 0 Then Stop ' e.fParam.Add(0)  ' TODO: averiguar q pasa aca q algunas entidades CIRCLE
   ' vienen sin el radio
-
-
 
 End
 

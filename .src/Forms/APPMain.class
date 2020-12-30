@@ -63,7 +63,8 @@ Public CurrentText As String
 
 'Public SelectedWidth As Boolean
 
-Private PropertiesFlag As Boolean = False
+'Private PropertiesFlag As Boolean = False
+Private PropertiesFlag As Boolean = True
 Private RawFlag As Boolean = False
 
 'variables de ambiente
@@ -74,6 +75,7 @@ Public cMod As New Collection       '' All drawings common collection
 Public cProp As New Collection      '' Properties list
 Public cRaw As New Collection       '' Raw properties list
 Private iTheme As Integer           '' Theme luminance (determine if Dark or Light)
+'Private LSelect As String           '' Last Section selected
 
 'Public iSteps As Integer            '' Total steps for Progressbar
 'Public iSDone As Integer            '' Done steps for Progressbar
@@ -112,6 +114,7 @@ Public Sub Run(cin As Collection)
         Select mnu.Name
           Case "grpEntities"
             tob = New ToolButton(pnlEntities) As "entity"
+            'tob = New ToolButton(ToolBar1) As "entity"
             z = 40 '48
           Case "grpTools"
             tob = New ToolButton(pnlEntities) As "tool"
@@ -140,6 +143,7 @@ Public Sub Run(cin As Collection)
           .Tag = obj.Tag
           .Tooltip = obj.Text
           .Enabled = obj.Enabled
+          .AutoResize = False
 
           .W = z
           .H = z
@@ -213,6 +217,8 @@ Public Sub Run(cin As Collection)
   btnBounds.Picture = Image.Load("./svg/locks/bounds.svg").Stretch(35, 35).Picture
   btnGrid.Picture = Image.Load("./svg/locks/grid.svg").Stretch(35, 35).Picture
   btnOrtho.Picture = Image.Load("./svg/locks/ortho.svg").Stretch(35, 35).Picture
+
+  btnEditionMode.Picture = Image.Load("./svg/locks/drawing.svg").Stretch(35, 35).Picture
 
   btnSelectionMode.Value = True
   btnSelectionMode.Picture = Image.Load("./svg/locks/tools.svg").Stretch(35, 35).Picture
@@ -502,6 +508,21 @@ End
 Public Sub locks_Click()
 
   Select Last.Tag
+
+    Case "data"
+      If Last.Value Then
+        Panel7.Visible = False
+        Panel3.Visible = False
+        pnlData.Visible = True
+        LoadDrawingMap3()
+        Last.Picture = Image.Load("./svg/locks/table.svg").Stretch(35, 35).Picture
+      Else
+        Panel7.Visible = True
+        Panel3.Visible = True
+        pnlData.Visible = False
+        Last.Picture = Image.Load("./svg/locks/drawing.svg").Stretch(35, 35).Picture
+      Endif
+
     Case "selection"
       If Last.Value Then
         pnlIcons.Visible = False
@@ -617,7 +638,7 @@ Public Sub GLArea1_draw()
   ' POI dinamicos
   If gcd.CurrentDrawing.flgShowPOIinfo Then
 
-    Select Case gcd.CurrentDrawing.iEntity[2]
+    Select gcd.CurrentDrawing.iEntity[2]
       Case gcd.poiMidPoint
         glPlus.PolygonFilled([gcd.CurrentDrawing.iEntity[0] - Metros(4), gcd.CurrentDrawing.iEntity[1], gcd.CurrentDrawing.iEntity[0], gcd.CurrentDrawing.iEntity[1] + Metros(4), gcd.CurrentDrawing.iEntity[0] + Metros(4), gcd.CurrentDrawing.iEntity[1], gcd.CurrentDrawing.iEntity[0], gcd.CurrentDrawing.iEntity[1] - Metros(4)], Color.Blue, Color.Green)
       Case gcd.poiQuadrant
@@ -673,7 +694,7 @@ Public Sub GLArea1_MouseDown()
 
   If Mouse.Middle Then Return  'handled in MouseUp
 
-  Select Case gcd.clsJob.gender
+  Select gcd.clsJob.gender
 
     Case "Default"                                                  ' 1. Seleccionando
 
@@ -703,7 +724,7 @@ Public Sub GLArea1_DblClick()
   CursorX = mouse.x
   CursorY = mouse.y
 
-  Select Case gcd.clsJob.gender
+  Select gcd.clsJob.gender
 
     Case "Default"                                                  ' 1. Seleccionando
 
@@ -754,7 +775,7 @@ Public Sub GLArea1_MouseMove()
   CursorX = mouse.x
   CursorY = mouse.y
 
-  Select Case gcd.clsJob.gender
+  Select gcd.clsJob.gender
 
     Case "Default"                                                  ' 1. Seleccionando
 
@@ -1252,7 +1273,6 @@ Public Sub gTask(sTask As String)
         Else  ' no existe
           ' antes de guardar, actualizamos
           gcd.UpdateLayers()
-
 
           cadDxf.SaveFile(f)
 
@@ -2236,6 +2256,8 @@ Public Sub Form_KeyPress()
       gcd.clsJob.KeyText(KeysAccumulator)
       KeysAccumulator = ""
 
+    Case Key.f2
+
     Case Key.f6
 
       If btnBounds.Value = True Then
@@ -2305,6 +2327,26 @@ Public Sub Form_KeyPress()
 
         Select Key.Code
           Case Asc("1") ' Properties
+
+            Select PropertiesFlag
+              Case 1 ' Tools
+                PropertiesFlag = 2
+                pnlProperties.Visible = True
+                pnlIcons.Visible = False
+                'btnSelectionMode.Value = False
+              Case 2 ' Props
+                PropertiesFlag = 0
+                pnlProperties.Visible = False
+                pnlIcons.Visible = False
+                'btnSelectionMode.Value = True
+
+              Case Else ' Invisible
+                PropertiesFlag = 1
+                pnlProperties.Visible = False
+                pnlIcons.Visible = True
+
+            End Select
+
             If PropertiesFlag = False Then
               pnlProperties.Visible = True
               PropertiesFlag = True
@@ -2527,6 +2569,209 @@ Public Sub LoadVars()
 
 End
 
+Public Sub LoadDrawingMap3()
+
+  Dim grp As Variant
+  Dim picDw As Picture
+  Dim picLy As Picture
+
+  Dim vrt As Variant
+  Dim ent As Variant
+  Dim v As Variant
+  Dim sKey As String
+  Dim iQty As Integer
+  Dim LSelect As Variant
+  Dim picEy As Picture
+
+  pnlData.Layout = [1, 5]
+  picDw = Image.Load("./svg/locks/drawing.svg").Stretch(24, 24).Picture
+  'picLy = Image.Load("./svg/layers/layers.svg").Stretch(35, 35).Picture
+  picLy = Image.Load("./svg/colors/3.svg").Stretch(16, 16).Picture
+  picEy = Image.Load("./svg/colors/4.svg").Stretch(16, 16).Picture
+
+  TreeView1.Clear
+  TreeView1.Add("DWG", ("Drawing"), picDw)
+  TreeView1.Add("LAYERS", "", picLy, "DWG")
+  TreeView1.Add("ENTITIES", "", picLy, "DWG")
+  TreeView1.Add("BLOCKS", "", picLy, "DWG")
+
+  For Each vrt In gcd.CurrentDrawing.cModel
+    If TypeOf(vrt) = gb.Object Then
+      sKey = gcd.CurrentDrawing.cModel.Key
+      iQty = gcd.CurrentDrawing.cModel[sKey].Count
+      Select sKey
+        Case "LAYERS", "ENTITIES", "BLOCKS"
+          TreeView1[sKey].Text = Lower(sKey) & " [" & CStr(iQty) & "]"
+
+          Select sKey
+            Case "ENTITIES"
+              TreeView1[sKey].Text = Lower(sKey) & " [" & CStr(iQty) & "]"
+              For Each ent In gcd.CurrentDrawing.cModel[sKey]
+                If TreeView1.Exist(ent["entity"]) = False Then
+                  TreeView1.Add(ent["entity"], ent["entity"], picEy, "ENTITIES")
+                  'Else
+                  'TreeView1.Add(ent["entity"], ent["entity"], picEy, "ENTITIES")
+                Endif
+              Next
+            Case "LAYERS"
+              For Each ent In gcd.CurrentDrawing.cModel[sKey]
+                gcd.CurrentDrawing.cLayers[ent["handle"][ent["handle"].Max]] = ent["name"]
+              Next
+            Case "BLOCKS"
+              For Each ent In gcd.CurrentDrawing.cModel[sKey]
+                gcd.CurrentDrawing.cBlocks[ent["handle"][ent["handle"].Max]] = ent["name"]
+              Next
+
+          End Select
+      End Select
+    Endif
+  Next
+
+  TreeView1["DWG"].Expanded = True
+
+  LSelect = Settings["Section/Selected", "DWG"]
+
+  If TreeView1.Exist(LSelect) Then
+    TreeView1[LSelect].Selected = True
+  Else
+    TreeView1["DWG"].Selected = True
+  Endif
+
+End
+
+Public Sub TreeView1_Select()
+
+  Dim v As Variant
+  Dim vrt As Variant
+  Dim r As Integer
+  Dim c As Integer
+  Dim lay As New Collection
+
+  Settings["Section/Selected"] = TreeView1.Key
+
+  Select TreeView1.Key
+    Case "DWG"
+      'Settings["Section/Selected"] = TreeView1.Key
+      pnlFileData.Visible = True
+      GridView1.Visible = False
+
+    Case "LAYERS" ', "ENTITIES", "BLOCKS"
+      'Settings["Section/Selected"] = TreeView1.Key
+      GridView1.Clear
+      lay.Clear
+      pnlFileData.Visible = False
+      GridView1.Visible = True
+      GridView1.Columns.Count = 4 'gcd.CurrentDrawing.cModel[TreeView1.Key].Count
+      'name, color, ltype
+      If gcd.CurrentDrawing.cModel.Exist(TreeView1.Key) Then
+        GridView1.Rows.Count = gcd.CurrentDrawing.cModel[TreeView1.Key].Count
+        GridView1.Columns[0].Text = ("Name")
+        GridView1.Columns[1].Text = ("Handle")
+        GridView1.Columns[2].Text = ("Color")
+        GridView1.Columns[3].Text = ("Line type")
+
+        For Each v In gcd.CurrentDrawing.cModel[TreeView1.Key]
+          If TypeOf(v) = gb.Object Then
+            'lay.Add(v["name"], CStr(v["handle"][v["handle"].Max]))
+            GridView1[r, 0].Text = v["name"]
+            GridView1[r, 1].Text = CStr(v["handle"][v["handle"].Max])
+            GridView1[r, 2].Text = v["color"]
+            GridView1[r, 3].Text = "" 'v["ltype"]
+
+          Endif
+          Inc r
+        Next
+      Endif
+
+    Case "ENTITIES"
+      'Settings["Section/Selected"] = TreeView1.Key
+      GridView1.Clear
+      pnlFileData.Visible = False
+      GridView1.Visible = True
+      GridView1.Columns.Count = 6
+
+      If gcd.CurrentDrawing.cModel.Exist(TreeView1.Key) Then
+        GridView1.Rows.Count = gcd.CurrentDrawing.cModel[TreeView1.Key].Count
+        GridView1.Columns[0].Text = ("Entity")
+        GridView1.Columns[1].Text = ("Handle")
+        GridView1.Columns[2].Text = ("Layer")
+        GridView1.Columns[3].Text = ("Style")
+        GridView1.Columns[4].Text = ("Width")
+        GridView1.Columns[5].Text = ("Color")
+
+        For Each v In gcd.CurrentDrawing.cModel[TreeView1.Key]
+          If TypeOf(v) = gb.Object Then
+            GridView1[r, 0].Text = v["entity"]
+            GridView1[r, 1].Text = CStr(v["handle"][v["handle"].Max])
+            GridView1[r, 2].Text = gcd.CurrentDrawing.cLayers[CStr(v["layer"][v["layer"].Max])]
+            GridView1[r, 3].Text = ""
+            GridView1[r, 4].Text = ""
+            'GridView1[r, 5].Text = ""
+
+            If TypeOf(v["color"]) = gb.Object Then
+              GridView1[r, 5].Text = v["color"][v["color"].Max]
+            Else
+              If TypeOf(v["color"]) = gb.Integer Then
+                GridView1[r, 5].Text = v["color"]
+              Else
+                GridView1[r, 5].Text = ""
+              Endif
+            Endif
+          Endif
+          Inc r
+        Next
+      Endif
+
+    Case "BLOCKS" '(BLOCKS_HEADERS)
+      'Settings["Section/Selected"] = TreeView1.Key
+      GridView1.Clear
+      pnlFileData.Visible = False
+      GridView1.Visible = True
+      GridView1.Columns.Count = 2
+
+      If gcd.CurrentDrawing.cModel.Exist(TreeView1.Key) Then
+        GridView1.Rows.Count = gcd.CurrentDrawing.cModel[TreeView1.Key].Count
+        GridView1.Columns[0].Text = ("Name")
+        GridView1.Columns[1].Text = ("Handle")
+        'GridView1.Columns[2].Text = ("Style")
+        'GridView1.Columns[3].Text = ("Width")
+        'GridView1.Columns[4].Text = ("Color")
+
+        For Each v In gcd.CurrentDrawing.cModel[TreeView1.Key]
+          If TypeOf(v) = gb.Object Then
+            GridView1[r, 0].Text = v["name"]
+            'GridView1[r, 1].Text = gcd.CurrentDrawing.cLayers[CStr(v["layer"][v["layer"].Max])]
+            GridView1[r, 1].Text = CStr(v["handle"][v["handle"].Max])
+            'GridView1[r, 3].Text = ""
+            'GridView1[r, 4].Text = ""
+
+            'If TypeOf(v["color"]) = gb.Object Then
+            '  GridView1[r, 4].Text = v["color"][v["color"].Max]
+            'Else
+            '  If TypeOf(v["color"]) = gb.Integer Then
+            '    GridView1[r, 4].Text = v["color"]
+            '  Else
+            '    GridView1[r, 4].Text = ""
+            '  Endif
+            'Endif
+          Endif
+          Inc r
+        Next
+      Endif
+
+    Case Else
+      If Starter.cEntities.Exist(TreeView1.Key) Then
+        If Starter.cEntities[TreeView1.Key] = True Then
+          Print TreeView1.Key
+        Endif
+      Endif
+
+      'Case "LAYER", "ENTITY", "BLOCK"
+
+  End Select
+
+End
+
 Public Sub LoadDrawingMap2()
 
   Dim ctn As New Collection
@@ -2536,7 +2781,6 @@ Public Sub LoadDrawingMap2()
   Dim sQty As String
   Dim sEle As String
   Dim sEty As String
-
   Dim it As Variant
   Dim gru As Variant
   Dim ety As Variant
@@ -2622,6 +2866,7 @@ Public Sub cboDrawing_Click()
     If gcd.Drawings[i].FileName = cboDrawing.Text Then
       gcd.CurrentDrawing = gcd.Drawings[i]
       cboDrawing.Text = gcd.Drawings[i].FileName
+      LoadDrawingMap3()
       'Print gcd.CurrentDrawing.cModel.Count
       Break
     Endif

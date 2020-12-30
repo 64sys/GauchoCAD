@@ -285,13 +285,10 @@ Public Sub Finish(oE As Entity, Optional ParamsDone As Integer = -1) As Boolean
 
   If oE.fParam[2] < oE.fParam[1] Then oE.fParam[2] += 360
 
-
-
 End
 
 ' Importo los datos que puedo procesar de una coleccion y genero un Entity para ser agregado a un array
 Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
-
 
   e.P.Add(c["center"][0])
   e.P.Add(c["center"][1])
@@ -351,8 +348,6 @@ Public Function ImportDXF(e As Entity, sClaves As String[], sValues As String[])
   Next
 
 End
-
-
 
 ' "entity": "ELLIPSE",
 ' "index": 2361,

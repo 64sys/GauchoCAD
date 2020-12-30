@@ -354,7 +354,7 @@ Public Function ExportEntities(colGrp As Collection, obxEntities As Entity[], Op
     flxPoints = New Float[]
     colEnt = New Collection
     p = New Collection
-    Select Case e.Gender
+    Select e.Gender
       Case "Line"
         If Not colgrp.Exist("line") Then colgrp.Add(colLines, "line")
         colLines.Add(colEnt, Str$(eCount))
@@ -673,7 +673,6 @@ Public Function UpdateGraphics(Optional handles As String[] = [], DoRegen As Boo
 
 End
 
-
 '' Pasa los layers de cModel a los graficos
 Public Sub UpdateLayers()
 
@@ -691,7 +690,6 @@ Public Sub UpdateLayers()
   Next
 
 End
-
 
 Public Sub UpdateModel()
 
@@ -739,4 +737,3 @@ Public Sub UpdateModel()
   Next
 
 End
-

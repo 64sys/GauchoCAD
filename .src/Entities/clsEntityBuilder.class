@@ -133,7 +133,6 @@ Public Function Start(Optional ElemToBuild As Variant, Optional Mode As Integer 
   gcd.OrthogonalIgnored = elem.ClassHandler.OrthogonalIgnored
   gcd.OrthogonalForced = elem.ClassHandler.OrthogonalForced
 
-
   elem.layerid = appmain.CurrentLayer ' gcd.GetLayerID(appmain.CurrentLayer)
 
   elem.colour = appmain.CurrentColor
@@ -153,7 +152,7 @@ Public Function KeyText(EnteredText As String) ' esta rutina es llamada por FCAD
   ' Lets see what are we expecting
   Dim Xt, Zt As Float, ErrTxt As String, Relative As Boolean
 
-  Select Case NextParamType
+  Select NextParamType
 
     Case "P", "+"
       errtxt = ", expected a valid point like 12.4,9.5  or @12.34,10.5"
@@ -462,7 +461,6 @@ Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' esta rutina es l
 End
 
 
-
 Public Sub Draw()               ' called bygcd.CurrentDrawing.drwArea_Draw
 
   If Me.iPoints < elem.ClassHandler.pointstodraw Then Return
@@ -472,7 +470,6 @@ Public Sub Draw()               ' called bygcd.CurrentDrawing.drwArea_Draw
 End
 
 Public Sub Finish()
-
 
   gcd.CurrentDrawing.arrEntities.Add(elem)
 
@@ -486,7 +483,6 @@ Public Sub Finish()
   gcd.clsJob = clsDefaultJob
   clsDefaultJob.PoiChecking = True
   clsDrawingAids.CleanTexts
-
 
   clsEntities.GLGenDrawList
 

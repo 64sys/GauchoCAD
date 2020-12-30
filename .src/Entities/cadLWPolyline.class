@@ -35,9 +35,6 @@ Public Const OrthogonalIgnored As Boolean = False
 Public Const OrthogonalForced As Boolean = False
 Public Const StretchAble As Boolean = True           ' Si lo puedo deformar
 
-
-
-
 Public Selected As Boolean
 
 Public DrawAble As Boolean = False          ' True si durante la construccion ya tiene suficientes elementos para poder hacer una representacion digna
@@ -59,8 +56,6 @@ Public Const DXF_Export As Boolean = True
 ' fParam helpers
 Public Const TotalParams As Integer = 1
 Public Const ipaPolylineClosed As Integer = 0
-
-
 
 Public Sub Translate(e As Entity, dX As Float, dY As Float, Optional OnlySelected As Boolean = False)
 
@@ -217,8 +212,6 @@ Public Sub Finish(oE As Entity, Optional ParamsDone As Integer = -1) As Boolean
   oE.Selected = False
   oE.Finished = True
 
-
-
 End
 
 ' Importo los datos que puedo procesar de una coleccion y genero un Entity para ser agregado a un array
@@ -294,7 +287,6 @@ Public Function ImportDXF(e As Entity, sClaves As String[], sValues As String[])
   Dim i As Integer
 
   For i = 0 To sClaves.Max
-
 
     'If sClaves[i] = "90" Then mPolyLine.vertexcount = Val(sValues[i])
     If sClaves[i] = "70" Then e.fParam.Add(CInt(sValues[i]))       ' 0 = abierta, 1 = cerrada

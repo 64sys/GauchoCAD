@@ -23,7 +23,6 @@
 Inherits ToolsBase
 Public Const Gender As String = "Blocks"
 
-
 Public eBlock As New Block
 
 Public Function Start(Optional filename As Variant, Optional _mode As Integer = 0) As Boolean
