@@ -92,7 +92,6 @@ Public Sub setEntity(e As Entity)
   e.fParam.Resize(Me.TotalParams)
   e.StringData.Resize(Me.sdaTotalParams) ' text, style
 
-
 End
 
 Public Sub Translate(e As Entity, dX As Float, dY As Float, Optional OnlySelected As Boolean = False)
@@ -282,8 +281,6 @@ Public Sub Finish(oE As Entity, Optional ParamsDone As Integer = -1) As Boolean
   oE.Selected = False
   oE.Finished = True
 
-
-
 End
 
 Public Sub Draw(oE As Entity)
@@ -335,8 +332,6 @@ Public Sub ProcessPart(s As String)
 
   Dim s2, sFont, s3, s4 As String
   Dim p1, p2, p3, p4 As Integer
-
-
 
   s2 = s
   If Left$(s2, 1) = "\\" Then
@@ -512,7 +507,6 @@ End
 ' "linespace_factor": 1.0,
 ' "unknown_b0": 0
 
-
 Public Sub ExportDXF(e As Entity, hFile As File)
 
   Dim i As Integer
@@ -576,7 +570,6 @@ Public Sub ExportDXF(e As Entity, hFile As File)
         Print #hFIle, sText
         Break
 
-
       End If
 
     Loop
@@ -585,8 +578,6 @@ Public Sub ExportDXF(e As Entity, hFile As File)
     Print #hFIle, e.StringData[0]
 
   Endif
-
-
 
   Print #hFIle, "210"
   Print #hFIle, "  0"
@@ -631,7 +622,4 @@ Public Function ImportDXF(e As Entity, sClaves As String[], sValues As String[])
 
   If e.StringData[Me.sdaStyle] = "" Then e.StringData[Me.sdaStyle] = "STANDARD"
 
-
-
 End
-

@@ -54,16 +54,17 @@ End
 
 Public Sub Draw(oE As Entity)
 
+  Dim n As Integer
+
   If oE.fParam.Count > 0 Then Return
 
   ' nothing
-  Dim n As Integer
+
   '''n = clsEntities.GetSelectionCount()
   ' en este caso necesitamos que esten seleccionadas dos o mas entidades
   If n < 2 Then
 
     clsDrawingAids.ErrorMessage = ("Select two or mores entities first")
-
 
   Else
 
@@ -75,29 +76,31 @@ Public Sub Draw(oE As Entity)
 End
 
 '' A fat version of the entity
-Public Sub DrawSelected(oE As Entity)
-
-End
-
-'' A fat version of the entity
-Public Sub DrawRemark(oE As Entity)
-
-End
+' Public Sub DrawSelected(oE As Entity)
+'
+' End
 
 '' A fat version of the entity
-Public Sub Draw2(oE As Entity)
+' Public Sub DrawRemark(oE As Entity)
+'
+' End
 
-End
+'' A fat version of the entity
+' Public Sub Draw2(oE As Entity)
+'
+' End
 
-Public Sub Finish(oE As Entity, Optional ParamsDone As Integer = -1) As Boolean
+'Public Sub Finish(oE As Entity, Optional ParamsDone As Integer = -1) As Boolean
+Public Sub Finish(oE As Entity) As Boolean
 
   ' we set the block property of all entities selected
 
   ' if an entitty is part of other block, we look for that block
-  Dim e As Entity, iBlock As Integer
+  Dim e As Entity
+  'Dim iBlock As Integer
 
   '''iBlock = clsEntities.GetFreeBlockNumber()
-  oE.fParam.add(iBlock)
+  'oE.fParam.add(iBlock)
   oE.Finished = True
 
   For Each e In gcd.CurrentDrawing.arrEntities
@@ -107,7 +110,7 @@ Public Sub Finish(oE As Entity, Optional ParamsDone As Integer = -1) As Boolean
         ' nothing to do, as we will find the block and make it part of this one
 
       Else
-        e.Block = iBlock
+        'e.Block = iBlock
       End If
 
     Endif
@@ -117,6 +120,6 @@ Public Sub Finish(oE As Entity, Optional ParamsDone As Integer = -1) As Boolean
 End
 
 ' Importo los datos que puedo procesar de una coleccion y genero un Entity para ser agregado a un array
-Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
-
-End
+' Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
+'
+' End

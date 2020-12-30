@@ -53,6 +53,7 @@ Public ColorsRGB As New String[]     '' Colors lists each item as r,g,b string
 Public cStyles As New Collection     '' Linetypes list
 Public cWidths As New Collection     '' Widths list
 Public sDecimal As String            '' Character used in system for separation decimal
+Public cEntities As New Collection   '' DWG Entities list
 
 ' Variables de un solo uso
 'Private ldd As Boolean              '' Testigo de finalización de carga.
@@ -78,6 +79,7 @@ Public Sub Run()
 
   '' Bandera de indicacion de formulario cargado
   'ldd = True
+  cEntities = cad.DWGEntityList()
 
   '' Abrir el formulario principal del programa
   cex = ["AppDir": adi, "AppCfg": apc, "CADCfg": CADConfig, "AppEdi": etx, "AppLog": lgg]

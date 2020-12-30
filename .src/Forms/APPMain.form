@@ -3,7 +3,7 @@
 { Form Form
   MoveScaled(0,0,153,97)
   Background = Color.TextBackground
-  Icon = Picture["logo.svg"]
+  Icon = Picture["logo.png"]
   Arrangement = Arrange.Vertical
   { grpFile Menu
     Text = ("File")

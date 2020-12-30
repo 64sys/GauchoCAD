@@ -354,7 +354,7 @@ Public Function ExportEntities(colGrp As Collection, obxEntities As Entity[], Op
     flxPoints = New Float[]
     colEnt = New Collection
     p = New Collection
-    Select Case e.Gender
+    Select e.Gender
       Case "Line"
         If Not colgrp.Exist("line") Then colgrp.Add(colLines, "line")
         colLines.Add(colEnt, Str$(eCount))

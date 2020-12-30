@@ -21,8 +21,6 @@
 ' Boston, MA  02110-1301  USA
 Create Static
 
-
-
 Public Const Gender As String = "Dimension"
 Public Const DrawingOrder As Integer = 100 ' 1 a 32.724 esto debe Drawse primero y ser sobreescrito por el resto
 Public Const PointsToDraw As Integer = 1             ' minimal point requered for drawing something usefull
@@ -137,7 +135,8 @@ Public iBloque As Integer
 '' Mode = DimType ver gcd.DimXXXX constants
 Public Function Start(Optional Mode As Integer = gcd.dimRadius)
 
-  Dim newBlock As New Block, eParte As Entity
+  Dim newBlock As New Block
+  'Dim eParte As Entity
   Dim f1, f2 As New Float[]
 
   Inc TotalDimensions
@@ -161,7 +160,7 @@ Public Function Start(Optional Mode As Integer = gcd.dimRadius)
   iPoints = 0
 
   ' init arrays
-  Select Case DimType
+  Select DimType
     Case -1                 ' tengo que pregunta que dim quiere
       clsDrawingAids.HelperTrabajo = "DimType? Horizontal;Vertical;Aligned;aNgular;rOtated,Radial;Diameter"
       NextParamType = "T"
@@ -345,7 +344,7 @@ Public Function KeyText(EnteredText As String) ' esta rutina es llamada por FCAD
   ' Lets see what are we expecting
   Dim Xt, Zt As Float, ErrTxt As String, Relative As Boolean
 
-  Select Case NextParamType
+  Select NextParamType
 
     Case "P", "+"
       errtxt = ", expected a valid point like 12.4,9.5  or @12.34,10.5"
@@ -443,9 +442,9 @@ Public Sub ReBuildBlock()
   ' -> el bloque
   iBloque = clsEntities.FIndBlockID(elem.Block)
 
-  Select Case DimType
+  Select DimType
     Case -1 'clsDrawingAids.HelperTrabajo = "DimType? Horizontal;Vertical;Aligned;aNgular;rOtated,Radial;Diameter"
-      Select Case UCase(TextEntry)
+      Select UCase(TextEntry)
         Case "H"
           DimType = gcd.dimHorizontal
         Case "V"
@@ -959,9 +958,9 @@ Public Function MouseDown(mouseX As Integer, mouseY As Integer) ' esta rutina es
 
 End
 
-Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' esta rutina es llamada por FCAD en el evento DrawingArea_MouseUp
-
-End
+' Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' esta rutina es llamada por FCAD en el evento DrawingArea_MouseUp
+'
+' End
 
 Public Sub AdvanceStep()
 
@@ -1013,7 +1012,6 @@ Public Sub Finish(oE As Entity, Optional ParamsDone As Integer = -1) As Boolean
 
 End
 
-
 ' "entity": "DIMENSION_LINEAR",
 ' "index": 262,
 ' "type": 21,
@@ -1058,7 +1056,6 @@ End
 ' "_subclass": "AcDbRotatedDimension",
 ' "dimstyle": [5, 1, 57, 57],
 ' "block": [5, 2, 3228, 3228]
-
 
 ' "entity": "DIMENSION_ANG3PT",
 '      "index": 278,
@@ -1106,8 +1103,6 @@ End
 '      "center_pt": [336.34758655818501, 133.69728917520501, 0.0],
 '      "dimstyle": [5, 1, 57, 57],
 '     "block": [5, 2, 4507, 4507]
-
-
 
 ' "entity": "ARC_DIMENSION",
 '     "index": 287,
@@ -1165,8 +1160,6 @@ End
 '     "leader2_pt": [378.5734835508681, 120.49165811629108, 0.0],
 '     "dimstyle": [5, 1, 57, 57],
 '     "block": [5, 2, 4606, 4606]
-
-
 
 ' "entity": "DIMENSION_RADIUS",
 '   "index": 296,
@@ -1242,7 +1235,6 @@ End
 '   "dimstyle": [5, 1, 57, 57],
 '  "block": [5, 2, 4735, 4735]
 
-
 '    "entity": "DIMENSION_DIAMETER",
 ' "index": 303,
 ' "type": 26,
@@ -1316,7 +1308,6 @@ End
 ' "leader_len": 0.0,
 ' "dimstyle": [5, 1, 57, 57],
 ' "block": [5, 2, 4768, 4768]
-
 
 '       "entity": "LARGE_RADIAL_DIMENSION",
 ' "index": 312,
@@ -1420,7 +1411,6 @@ End
 ' "dimstyle": [5, 1, 57, 57],
 ' "block": [5, 2, 4863, 4863]
 
-
 '      "entity": "DIMENSION_ORDINATE",
 ' "index": 319,
 ' "type": 20,
@@ -1463,7 +1453,6 @@ End
 ' "flag": 128,
 ' "dimstyle": [5, 1, 57, 57],
 ' "block": [5, 2, 4937, 4937]
-
 
 ' If lpcode = "2" Then mDim.bloque = lpvalue
 ' If lpcode = "10" Then mDim.p.Add(CFloat(lpvalue))
