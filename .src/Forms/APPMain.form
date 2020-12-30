@@ -76,12 +76,6 @@
   { grpEntities Menu
     Text = ("Entities")
     Tag = "entities"
-    { mnuSelection Menu
-      Text = ("Selection")
-      Picture = Picture["svg/tools/selection.svg"]
-      Enabled = False
-      Tag = "selection"
-    }
     { mnuLine Menu entity
       Name = "mnuLine"
       Text = ("Line")
@@ -91,7 +85,7 @@
     { mnuPolyline Menu entity
       Name = "mnuPolyline"
       Text = ("Polyline")
-      Picture = Picture["svg/entities/polyline.svg"]
+      Picture = Picture["svg/entities/lwpolyline.svg"]
       Tag = "lwpolyline"
     }
     { mnuCircle Menu entity
@@ -197,6 +191,12 @@
   }
   { grpTools Menu
     Text = ("Tools")
+    { mnuSelection Menu tool
+      Name = "mnuSelection"
+      Text = ("Selection")
+      Picture = Picture["svg/tools/selection.svg"]
+      Tag = "selection"
+    }
     { mnuMove Menu tool
       Name = "mnuMove"
       Text = ("Move")
@@ -213,7 +213,7 @@
       Name = "mnuScale"
       Text = ("Scale")
       Picture = Picture["svg/tools/scale.svg"]
-      Tag = "Scale"
+      Tag = "scale"
     }
     { mnuRotate Menu tool
       Name = "mnuRotate"
@@ -408,10 +408,9 @@
       Arrangement = Arrange.Horizontal
       Spacing = True
       Margin = True
-      { Panel3 SidePanel
+      { Panel3 Panel
         MoveScaled(1,2,20,67)
         Arrangement = Arrange.Vertical
-        Orientation = Align.Right
         { pnlIcons Panel
           MoveScaled(0,3,21,33)
           Expand = True
@@ -527,7 +526,6 @@
             { pnlFileData Panel
               MoveScaled(3,19,24,12)
               Visible = False
-              Background = Color.LightBackground
               Expand = True
               Arrangement = Arrange.Vertical
             }

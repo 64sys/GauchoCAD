@@ -94,6 +94,8 @@ Public Sub Run(cin As Collection)
   Dim g As Integer
   Dim b As Integer
   Dim img As Image
+  Dim sPic As String
+  Dim svg As String
   '------------------------------------------------------------------------------
   '' Setting connection variables and more
   cex = cin
@@ -163,9 +165,49 @@ Public Sub Run(cin As Collection)
                 .Border = True
               Endif
 
-            Case "grpSmart", "grpEntities", "grpView", "grpTools"
-              tob.Picture = obj.Picture.Image.Stretch(z - 8, z - 8).Picture
+            Case "grpEntities"
+              sPic = "./svg/entities/" & obj.Tag & ".svg"
+              If Exist(sPic) Then
+                If Application.DarkTheme Then
+                  svg = Replace(File.Load(sPic), "#0066b3;", "#eeeeee;")
+                Else
+                  svg = Replace(File.Load(sPic), "#0066b3;", "#000000;")
+                Endif
+                tob.Picture = Image.FromString(svg).Stretch(z - 8, z - 8).Picture
+                'Else
+                '  pic = Image.Load("./svg/colors/4.svg").Stretch(9, 9).Picture
+              Endif
+              'tob.Picture = obj.Picture.Image.Stretch(z - 8, z - 8).Picture
               .Border = True
+
+            Case "grpSmart"
+              sPic = "./svg/smart/" & obj.Tag & ".svg"
+              If Exist(sPic) Then
+                If Application.DarkTheme Then
+                  svg = Replace(File.Load(sPic), "#0066b3;", "#eeeeee;")
+                Else
+                  svg = Replace(File.Load(sPic), "#0066b3;", "#000000;")
+                Endif
+                tob.Picture = Image.FromString(svg).Stretch(z - 8, z - 8).Picture
+              Endif
+              .Border = True
+
+            Case "grpTools", "grpView"
+              sPic = "./svg/tools/" & obj.Tag & ".svg"
+              If obj.Tag = "selection" Then
+                Print "x"
+              Endif
+              If Exist(sPic) Then
+                If Application.DarkTheme Then
+                  svg = Replace(File.Load(sPic), "#0066b3;", "#eeeeee;")
+                Else
+                  svg = Replace(File.Load(sPic), "#0066b3;", "#000000;")
+                Endif
+                svg = Highligh(sPic)
+                tob.Picture = Image.FromString(svg).Stretch(z - 8, z - 8).Picture
+              Endif
+              .Border = True
+
           End Select
 
         End With
@@ -214,14 +256,14 @@ Public Sub Run(cin As Collection)
 
   btnColors.Tooltip = ("Color") & ": " & CStr(CurrentColor)
 
-  btnBounds.Picture = Image.Load("./svg/locks/bounds.svg").Stretch(35, 35).Picture
-  btnGrid.Picture = Image.Load("./svg/locks/grid.svg").Stretch(35, 35).Picture
-  btnOrtho.Picture = Image.Load("./svg/locks/ortho.svg").Stretch(35, 35).Picture
+  btnBounds.Picture = Image.FromString(Highligh("./svg/locks/bounds.svg")).Stretch(35, 35).Picture
+  btnGrid.Picture = Image.FromString(Highligh("./svg/locks/grid.svg")).Stretch(35, 35).Picture
+  btnOrtho.Picture = Image.FromString(Highligh("./svg/locks/ortho.svg")).Stretch(35, 35).Picture
 
-  btnEditionMode.Picture = Image.Load("./svg/locks/drawing.svg").Stretch(35, 35).Picture
+  btnEditionMode.Picture = Image.FromString(Highligh("./svg/locks/table.svg")).Stretch(35, 35).Picture
 
   btnSelectionMode.Value = True
-  btnSelectionMode.Picture = Image.Load("./svg/locks/tools.svg").Stretch(35, 35).Picture
+  btnSelectionMode.Picture = Image.FromString(Highligh("./svg/locks/tools.svg")).Stretch(35, 35).Picture
 
   TableView1.Rows.Height = 35
 
@@ -230,6 +272,24 @@ Public Sub Run(cin As Collection)
   'pnlIcons.Visible = True
 
   Me.Show()
+
+End
+
+'' Change the color of the graphic objects within the svg file that is passed as a parameter. For this, it takes into account the desktop theme and if it is a dark theme or not.
+
+Public Function Highligh(sPic As String) As String
+
+  Dim svg As String
+
+  If Exist(sPic) Then
+    If Application.DarkTheme Then
+      svg = Replace(File.Load(sPic), "#0066b3;", "#eeeeee;")
+    Else
+      svg = Replace(File.Load(sPic), "#0066b3;", "#000000;")
+    Endif
+  Endif
+
+  Return svg
 
 End
 
@@ -492,10 +552,10 @@ Public Sub LoadLocks()
       Case "ToolButton"
         Select obj.Tag
           Case "grid"
-            obj.Picture = Image.Load("./svg/locks/grid.svg").Stretch(22, 22).Picture
+            obj.Picture = Image.FromString(Highligh("./svg/locks/grid.svg")).Stretch(22, 22).Picture
 
           Case "debug"
-            obj.Picture = Image.Load("./svg/locks/debug.svg").Stretch(22, 22).Picture
+            obj.Picture = Image.FromString(Highligh("./svg/locks/debug.svg")).Stretch(22, 22).Picture
 
         End Select
 
@@ -515,23 +575,23 @@ Public Sub locks_Click()
         Panel3.Visible = False
         pnlData.Visible = True
         LoadDrawingMap3()
-        Last.Picture = Image.Load("./svg/locks/table.svg").Stretch(35, 35).Picture
+        Last.Picture = Image.FromString(Highligh("./svg/locks/drawing.svg")).Stretch(35, 35).Picture
       Else
         Panel7.Visible = True
         Panel3.Visible = True
         pnlData.Visible = False
-        Last.Picture = Image.Load("./svg/locks/drawing.svg").Stretch(35, 35).Picture
+        Last.Picture = Image.FromString(Highligh("./svg/locks/table.svg")).Stretch(35, 35).Picture
       Endif
 
     Case "selection"
       If Last.Value Then
         pnlIcons.Visible = False
         pnlProperties.Visible = True
-        Last.Picture = Image.Load("./svg/locks/selection.svg").Stretch(35, 35).Picture
+        Last.Picture = Image.FromString(Highligh("./svg/locks/selection.svg")).Stretch(35, 35).Picture
       Else
         pnlIcons.Visible = True
         pnlProperties.Visible = False
-        Last.Picture = Image.Load("./svg/locks/tools.svg").Stretch(35, 35).Picture
+        Last.Picture = Image.FromString(Highligh("./svg/locks/tools.svg")).Stretch(35, 35).Picture
       Endif
 
     Case "bounds"
@@ -2572,7 +2632,11 @@ Public Sub LoadDrawingMap3()
 
   Dim grp As Variant
   Dim picDw As Picture
+  Dim picL1 As Picture
+  Dim picL2 As Picture
   Dim picLy As Picture
+  Dim picEy As Picture
+  Dim picBy As Picture
 
   Dim vrt As Variant
   Dim ent As Variant
@@ -2580,19 +2644,26 @@ Public Sub LoadDrawingMap3()
   Dim sKey As String
   Dim iQty As Integer
   Dim LSelect As Variant
-  Dim picEy As Picture
+
+  Dim stxEnty As New String[]
+  Dim sEnty As String
+  Dim sPic As String
+  Dim pic As Picture
+  Dim svg As String
 
   pnlData.Layout = [1, 5]
-  picDw = Image.Load("./svg/locks/drawing.svg").Stretch(24, 24).Picture
-  'picLy = Image.Load("./svg/layers/layers.svg").Stretch(35, 35).Picture
-  picLy = Image.Load("./svg/colors/3.svg").Stretch(16, 16).Picture
-  picEy = Image.Load("./svg/colors/4.svg").Stretch(16, 16).Picture
+  picDw = Image.FromString(Highligh("./svg/locks/drawing.svg")).Stretch(24, 24).Picture
+  picLy = Image.FromString(Highligh("./svg/layers/layers.svg")).Stretch(24, 24).Picture
+  picEy = Image.FromString(Highligh("./svg/entities/entities.svg")).Stretch(24, 24).Picture
+  picBy = Image.FromString(Highligh("./svg/entities/block.svg")).Stretch(24, 24).Picture
+  picL1 = Image.FromString(Highligh("./svg/colors/3.svg")).Stretch(16, 16).Picture
+  picL2 = Image.FromString(Highligh("./svg/colors/4.svg")).Stretch(9, 9).Picture
 
   TreeView1.Clear
   TreeView1.Add("DWG", ("Drawing"), picDw)
   TreeView1.Add("LAYERS", "", picLy, "DWG")
-  TreeView1.Add("ENTITIES", "", picLy, "DWG")
-  TreeView1.Add("BLOCKS", "", picLy, "DWG")
+  TreeView1.Add("ENTITIES", "", picEy, "DWG")
+  TreeView1.Add("BLOCKS", "", picBy, "DWG")
 
   For Each vrt In gcd.CurrentDrawing.cModel
     If TypeOf(vrt) = gb.Object Then
@@ -2606,12 +2677,30 @@ Public Sub LoadDrawingMap3()
             Case "ENTITIES"
               TreeView1[sKey].Text = Lower(sKey) & " [" & CStr(iQty) & "]"
               For Each ent In gcd.CurrentDrawing.cModel[sKey]
-                If TreeView1.Exist(ent["entity"]) = False Then
-                  TreeView1.Add(ent["entity"], ent["entity"], picEy, "ENTITIES")
-                  'Else
-                  'TreeView1.Add(ent["entity"], ent["entity"], picEy, "ENTITIES")
+                If stxEnty.Exist(ent["entity"]) = False Then
+                  stxEnty.Add(ent["entity"])
                 Endif
+                'If TreeView1.Exist(ent["entity"]) = False Then
+                '  TreeView1.Add(ent["entity"], ent["entity"], picEy, "ENTITIES")
+                'Else
+                'TreeView1.Add(ent["entity"], ent["entity"], picEy, "ENTITIES")
+                'Endif
               Next
+              For Each sEnty In stxEnty
+                sPic = "./svg/entities/" & Lower(sEnty) & ".svg"
+                If Exist(sPic) Then
+                  If Application.DarkTheme Then
+                    svg = Replace(File.Load(sPic), "#0066b3;", "#eeeeee;")
+                  Else
+                    svg = Replace(File.Load(sPic), "#0066b3;", "#000000;")
+                  Endif
+                  pic = Image.FromString(svg).Stretch(16, 16).Picture
+                Else
+                  pic = Image.Load("./svg/colors/4.svg").Stretch(9, 9).Picture
+                Endif
+                TreeView1.Add(sEnty, " " & Lower(sEnty), pic, "ENTITIES")
+              Next
+
             Case "LAYERS"
               For Each ent In gcd.CurrentDrawing.cModel[sKey]
                 gcd.CurrentDrawing.cLayers[ent["handle"][ent["handle"].Max]] = ent["name"]
