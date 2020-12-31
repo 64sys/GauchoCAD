@@ -27,7 +27,7 @@ Public Const ParamType As String = "TPFFF"
 Public Const ParamHelper As String = "BlockName; Position ; X scale ; Y scale ; Rotation"
 Public Const ParamDefault As String = "<no name>; 0,0 ; 1 ;1 ; 0"
 Public Const GAMBASCADENTITY As String = "EntityBase"
-Public Const USEWITH As String = "clsEntityBuilder"
+Public Const USEWITH As String = "EntityBuilder"
 Public Const DrawingOrder As Integer = 0        ' 1 = draws first
 Public Const PointsToDraw As Integer = 1             ' minimal point requered for drawing something usefull
 Public Const OrthogonalIgnored As Boolean = False
@@ -210,7 +210,7 @@ End
 
 ' This function will return False if the element couldn't be created for some reason: bad or incomple user input
 ' True means all is good, False will instruct the clsEntityBuilder to delete it
-Public Sub Finish(oE As Entity, Optional ParamsDone As Integer = -1) As Boolean
+Public Sub Finish(oE As Entity) As Boolean
 
   Dim ET As Entity, i, iInsert As Integer
 

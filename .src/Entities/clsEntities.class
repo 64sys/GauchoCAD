@@ -1134,3 +1134,261 @@ Public Sub DXFExportCommon(e As Entity, hFile As File)
   Print #hFIle, CStr(e.LineWidth)
 
 End
+' importing
+
+Public Function AddLine(obxContainer As Entity[], Points As Float[], Optional colour As Integer = 0, Optional LineWidth As Float = 1, Optional Linetype As String, Optional Layer As String, Optional Block As String) As Boolean
+
+  ' points are in x,y,x,y,x,y....
+  Dim oEntity As New Entity
+
+  oEntity.ClassHandler = cadLine
+  oEntity.Gender = oEntity.ClassHandler.gender
+  oEntity.P.insert(points)                    ' recibimos los dos vertices de la linea x1,y1,x2,y2
+  oEntity.layer = Layer
+  oEntity.colour = colour
+  oEntity.LineWidth = 1 'LineWidth               ' datos CAD
+  oEntity.linetypename = linetype
+  oEntity.Block = Block
+  If oEntity.Block <> "" Then oEntity.visible = False
+  obxContainer.Add(oEntity)
+  oEntity.ClassHandler.finish(oEntity, -1)
+  oEntity = Null                  ' free entity
+
+End
+
+Public Function AddPolyLine(obxContainer As Entity[], Points As Float[], Optional iClosed As Integer = 0, Optional colour As Integer = 0, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
+
+  ' points are in x,y,x,y,x,y....
+
+  Dim oEntity As New Entity
+
+  oEntity.ClassHandler = cadLWPolyline
+  oEntity.Gender = oEntity.ClassHandler.gender
+  oEntity.P.insert(points)                    ' recibimos los dos vertices de la linea x1,y1,x2,y2
+  oEntity.fParam.Add(iClosed)                 ' cerrada o abierta
+  oEntity.layer = Layer
+  oEntity.colour = colour
+  oEntity.LineWidth = 1 ' LineWidth               ' datos CAD
+  oEntity.Block = Block
+  If oEntity.Block <> "" Then oEntity.visible = False
+  obxContainer.Add(oEntity)
+  oEntity.ClassHandler.finish(oEntity, -1)
+  oEntity = Null                  ' free entity
+
+End
+
+Public Function AddDim(obxContainer As Entity[], Points As Float[], bloque As String, medida As Float, texto As String, alineacion As Integer, angulo As Float, tipo As Integer, colour As Integer, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
+
+  Dim oEntity As New Entity
+
+  oEntity.ClassHandler = cadDim              ' create the new entity of proper class
+  oEntity.Gender = oEntity.ClassHandler.gender
+  oEntity.P.insert(points)                    ' recibimos los dos vertices de la linea x1,y1,x2,y2
+  oEntity.fParam.Add(tipo)
+  oEntity.fParam.Add(MEDIDA)
+  oEntity.fParam.Add(alineacion)
+  oEntity.fParam.Add(angulo)
+  oEntity.stringdata.Add(texto)
+  oEntity.stringdata.Add(bloque)
+  oEntity.layer = Layer
+  oEntity.colour = colour
+  oEntity.LineWidth = LineWidth               ' datos CAD
+  oEntity.Block = Block
+  If oEntity.Block <> "" Then oEntity.visible = False
+  obxContainer.Add(oEntity)
+  oEntity.ClassHandler.finish(oEntity, -1)
+  oEntity = Null                  ' free entity
+
+End
+
+Public Function AddSolid(obxContainer As Entity[], Points As Float[], Optional colour As Integer = 0, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
+
+  ' points are in x,y,x,y,x,y....
+  ' points are in x,y,x,y,x,y....
+  Dim oEntity As New Entity
+
+  oEntity.ClassHandler = cadSolid             ' create the new entity of proper class
+  oEntity.Gender = oEntity.ClassHandler.gender
+  oEntity.P.insert(points)                    ' recibimos los dos vertices de la linea x1,y1,x2,y2
+
+  oEntity.layer = Layer
+  oEntity.colour = colour
+  oEntity.LineWidth = LineWidth               ' datos CAD
+  oEntity.Block = Block
+  If oEntity.Block <> "" Then oEntity.visible = False
+  obxContainer.Add(oEntity)
+  oEntity.ClassHandler.finish(oEntity, -1)
+  oEntity = Null                  ' free entity
+
+End
+
+Public Function AddSPLine(obxContainer As Entity[], Points As Float[], Optional iClosed As Integer = 0, Optional colour As Integer = 0, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
+
+  ' points are in x,y,x,y,x,y....
+  Dim oEntity As New Entity
+
+  oEntity.ClassHandler = cadSPLine
+  oEntity.Gender = oEntity.ClassHandler.gender
+  oEntity.P.insert(points)                    ' recibimos los dos vertices de la linea x1,y1,x2,y2
+  oEntity.fParam.Add(iClosed)                 ' cerrada o abierta
+  oEntity.layer = Layer
+  oEntity.colour = colour
+  oEntity.LineWidth = LineWidth               ' datos CAD
+  oEntity.Block = Block
+  If oEntity.Block <> "" Then oEntity.visible = False
+  obxContainer.Add(oEntity)
+  oEntity.ClassHandler.finish(oEntity, -1)
+  oEntity = Null                  ' free entity
+
+End
+
+Public Function AddCircle(obxContainer As Entity[], Points As Float[], radious As Float, Optional colour As Integer = 0, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
+
+  ' points are in x,y,x,y,x,y....
+  Dim oEntity As New Entity
+
+  oEntity.ClassHandler = cadCircle
+  oEntity.Gender = oEntity.ClassHandler.gender
+  oEntity.P.insert(points)                    ' centro x1,y1
+  oEntity.fParam.Add(radious)                 ' radio
+  oEntity.layer = Layer
+  oEntity.colour = colour
+  oEntity.LineWidth = LineWidth               ' datos CAD
+  oEntity.Block = Block
+  If oEntity.Block <> "" Then oEntity.visible = False
+  obxContainer.Add(oEntity)
+  oEntity.ClassHandler.finish(oEntity, -1)
+  oEntity = Null                  ' free entity
+
+End
+
+Public Function AddArc(obxContainer As Entity[], Points As Float[], r As Float, angle1 As Float, angle2 As Float, Optional colour As Integer = 0, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
+
+  ' points are in x,y,x,y,x,y....
+  Dim oEntity As New Entity
+
+  oEntity.ClassHandler = cadArc
+  oEntity.Gender = oEntity.ClassHandler.gender
+  oEntity.P.insert(points)                    ' centro x1,y1
+  oEntity.fParam.Add(r)                      ' radio
+  oEntity.fParam.Add(angle1)                   ' angulo
+  oEntity.fParam.Add(angle2)                   ' angulo
+  oEntity.layer = Layer
+  oEntity.colour = colour
+  oEntity.LineWidth = LineWidth               ' datos CAD
+  oEntity.Block = Block
+  If oEntity.Block <> "" Then oEntity.visible = False
+  obxContainer.Add(oEntity)
+  oEntity.ClassHandler.finish(oEntity, -1)
+  oEntity = Null                  ' free entity
+
+End
+
+Public Function AddEllipse(obxContainer As Entity[], Points As Float[], r As Float, angle1 As Float, angle2 As Float, Optional colour As Integer = 0, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
+
+  ' points are in x,y,x,y,x,y....
+  Dim oEntity As New Entity
+
+  oEntity.ClassHandler = cadEllipse
+  oEntity.Gender = oEntity.ClassHandler.gender
+  oEntity.P.insert(points)                    ' centro x1,y1
+  oEntity.p[2] += oEntity.p[0]                ' un pequeño truco porque gaucho usa los puntos de manera diferente a DXF
+  oEntity.p[3] += oEntity.p[1]
+  oEntity.fParam.Add(r)                      ' ratio minor/major
+  oEntity.fParam.Add(angle1 * 180 / Pi)     ' start angle
+  oEntity.fParam.Add(angle2 * 180 / Pi)      ' end angle
+  oEntity.layer = Layer
+  oEntity.colour = colour
+  oEntity.LineWidth = LineWidth               ' datos CAD
+  oEntity.Block = Block
+  If oEntity.Block <> "" Then oEntity.visible = False
+  obxContainer.Add(oEntity)
+  oEntity.ClassHandler.finish(oEntity, -1)
+  oEntity = Null                  ' free entity
+
+End
+
+Public Function AddText(obxContainer As Entity[], Points As Float[], angle As Float, height As Float, _Text As String, Optional colour As Integer = Color.Blue, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
+
+  Dim oEntity As New Entity
+
+  oEntity.ClassHandler = cadText
+  oEntity.Gender = oEntity.ClassHandler.gender
+  oEntity.P.insert(points)                    ' recibimos position x1,y1
+  oEntity.fParam.Add(angle)                   ' grados
+  oEntity.fParam.Add(height)                  ' alto letras
+  oEntity.stringdata.Add(_text)                  ' el texto
+  oEntity.layer = Layer
+  oEntity.colour = colour
+  oEntity.LineWidth = LineWidth               ' datos CAD
+  oEntity.Block = Block
+  If oEntity.Block <> "" Then oEntity.visible = False
+  obxContainer.Add(oEntity)
+  oEntity.ClassHandler.finish(oEntity, -1)
+  oEntity = Null                  ' free entity
+
+End
+
+Public Function AddMText(obxContainer As Entity[], Points As Float[], angle As Float, height As Float, _Text As String, Optional colour As Integer = Color.Blue, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
+
+  Dim oEntity As New Entity
+
+  oEntity.ClassHandler = cadMText
+  oEntity.Gender = oEntity.ClassHandler.gender
+  oEntity.P.insert(points)                    ' recibimos position x1,y1 pero tal vez venga un recuadro
+  oEntity.fParam.Add(angle)                  ' GRADOS
+  oEntity.fParam.Add(height)                  ' alto letras
+  oEntity.stringdata.add(_text)                  ' el texto
+  oEntity.layer = Layer
+  oEntity.colour = colour
+  oEntity.LineWidth = LineWidth               ' datos CAD
+  oEntity.Block = Block
+  If oEntity.Block <> "" Then oEntity.visible = False
+  obxContainer.Add(oEntity)
+  oEntity.ClassHandler.finish(oEntity, -1)
+  oEntity = Null                  ' free entity
+
+End
+
+Public Function AddCurve(obxContainer As Entity[], Points As Float[], Optional colour As Integer = 0, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
+
+  ' points are in x,y,x,y,x,y....
+  Dim oEntity As New Entity
+
+  oEntity.Gender = oEntity.ClassHandler.gender
+
+End
+
+Public Function AddInsert(obxContainer As Entity[], Points As Float[], scaleX As Float, scaleY As Float, angulo As Float, Optional colour As Integer = Color.Blue, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
+
+  Dim oEntity As New Entity
+
+  oEntity.ClassHandler = cadInsert
+  oEntity.Gender = oEntity.ClassHandler.gender
+  oEntity.P.insert(points)                    ' recibimos position x1,y1
+  oEntity.fParam.Add(scaleX)
+  oEntity.fParam.Add(scaleY)
+  oEntity.fParam.Add(angulo)                  ' GRADOS
+  oEntity.layer = Layer
+  oEntity.colour = colour
+  oEntity.Block = Block
+  obxContainer.Add(oEntity)
+  oEntity.ClassHandler.finish(oEntity, -1)
+
+  oEntity = Null                  ' free entity
+
+End
+
+' Public Function AddBlock(Points As Float[], Block As String) As Entity[]
+'
+'   Dim newBlock As New ArrBlockSt
+'
+'   newBlock.entities = New Entity[]
+'   newBlock.name = block
+'   newBlock.x = Points[0]
+'   newBlock.y = Points[1]
+'   gcd.CurrentDrawing.arrBlocks.Add(newBlock)
+'
+'   Return newBlock.entities
+'
+' End

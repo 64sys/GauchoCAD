@@ -156,7 +156,7 @@ Public Function KeyText(EnteredText As String) ' esta rutina es llamada por FCAD
 
 
   ' Lets see what are we expecting
-  Dim Xt, yt As Float, ErrTxt As String, Relative As Boolean
+  Dim Xt, yt As Float, sText, ErrTxt As String, Relative As Boolean
   Dim bResult As Boolean
 
   Select Case NextParamType
@@ -206,19 +206,15 @@ Public Function KeyText(EnteredText As String) ' esta rutina es llamada por FCAD
       ' its a valid input?
       If EnteredText = "" Then
 
-        'elem.stringdata[0] = EnteredText
-        elem.stringdata[0] &= ParamDefault[elem.ClassHandler.StepsDone]
-      Else If elem.stringdata[0] <> "" Then                      ' we have a previous entry
-
-        elem.stringdata[0] &= "|" & EnteredText  ' split if necessary
+        sText = ParamDefault[elem.ClassHandler.StepsDone]
 
       Else
 
-        elem.stringdata[0] &= EnteredText                      ' first entry
+        sText = EnteredText
 
       End If
 
-      AdvanceStep
+      If elem.ClassHandler.NewParameter(elem, ["text", sText], True) Then AdvanceStep
 
     Case "F", "M", "A", "L", "R"                ' Float, Mixed, Angle, Longitud
       errtxt = "enter a valid text size"
@@ -228,7 +224,7 @@ Public Function KeyText(EnteredText As String) ' esta rutina es llamada por FCAD
 
       Else
 
-        Try bResult = elem.ClassHandler.NewParameter(elem, ["float", CFloat(EnteredText)], True)
+        bResult = elem.ClassHandler.NewParameter(elem, ["float", CFloat(EnteredText)], True)
 
 
 
@@ -331,14 +327,13 @@ Public Function MouseMove(mouseX As Integer, mouseY As Integer) ' esta rutina es
   If NextParamType = "L" Then
 
     ' return the angle from horizontal to us
-    elem.fParam[iFloat] = puntos.distancia(puntos.Near(appmain.Xreal(mouseX)), puntos.Near(appmain.Yreal(mouseY)), elem.p[elem.p.max - 1], elem.p[elem.p.max])
+    f = puntos.distancia(appmain.Xreal(mouseX), appmain.Yreal(mouseY), Me.LastX, Me.lastY)
 
-    appmain.redraw
+    elem.ClassHandler.NewParameter(elem, ["float", f])
+
     Return              ' nothing more to do here
+
   End If
-
-  If Me.iPoints >= elem.P.Count / 2 Then Return
-
 
   ' y si tengo enganche?
 
@@ -351,7 +346,7 @@ Public Function MouseMove(mouseX As Integer, mouseY As Integer) ' esta rutina es
 
     ' aca tengo que verificar el ortogonal
 
-  Else If Me.iPoints > 0 Then                                                                          ' puedo hacer ortogonal
+  Else                                                                        ' puedo hacer ortogonal
     If gcd.OrthogonalForced Or (Not gcd.OrthogonalIgnored And gcd.Orthogonal) Then          ' hablame de operadores logicos
 
       If Abs(X - LastX) > Abs(Y - LastY) Then ' prevalece X
@@ -399,10 +394,12 @@ Public Function MouseDown(mouseX As Integer, mouseY As Integer) ' esta rutina es
   If NextParamType = "L" Then
 
     ' return the angle from horizontal to us
-    elem.fParam[iFloat] = puntos.distancia(puntos.Near(appmain.Xreal(mouseX)), puntos.Near(appmain.Yreal(mouseY)), elem.p[elem.p.max - 1], elem.p[elem.p.max])
-    Inc iFloat
-    AdvanceStep
+    f = puntos.distancia(appmain.Xreal(mouseX), appmain.Yreal(mouseY), Me.LastX, Me.lastY)
+
+    If elem.ClassHandler.NewParameter(elem, ["float", f], True) Then AdvanceStep
+
     Return              ' nothing more to do here
+
   End If
 
 
@@ -422,7 +419,7 @@ Public Function MouseDown(mouseX As Integer, mouseY As Integer) ' esta rutina es
 
     ' aca tengo que verificar el ortogonal
 
-  Else If Me.iPoints > 0 Then                                                                          ' puedo hacer ortogonal
+  Else                                                                        ' puedo hacer ortogonal
     If gcd.OrthogonalForced Or (Not gcd.OrthogonalIgnored And gcd.Orthogonal) Then          ' hablame de operadores logicos
 
       If Abs(X - LastX) > Abs(Y - LastY) Then ' prevalece X
@@ -465,7 +462,7 @@ Public Sub Finish()
 
   gcd.CurrentDrawing.arrEntities.Add(elem)
 
-  elem.ClassHandler.Finish(elem, elem.ClassHandler.StepsDone)
+  elem.ClassHandler.Finish(elem)
 
   LastEntity = elem                                       ' save it to repeat on rigth click
 

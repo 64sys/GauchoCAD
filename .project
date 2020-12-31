@@ -2,7 +2,7 @@
 Title=GauchoCAD
 Startup=Starter
 Icon=logo.png
-Version=0.0.91 (libredwg)
+Version=0.0.91 (master)
 VersionAddBranch=1
 Component=gb.image
 Component=gb.cairo

@@ -79,7 +79,7 @@ Public StepsDone As Integer                 ' esto lo cambia cls ElementBuilder 
 
 ' This function will return False if the element couldn't be created for some reason: bad or incomple user input
 ' True means all is good, False will instruct the clsEntityBuilder to delete it
-' Public Sub Finish(oE As Entity, Optional ParamsDone As Integer = -1) As Boolean
+' Public Sub Finish(oE As Entity) As Boolean
 '
 ' End
 

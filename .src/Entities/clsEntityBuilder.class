@@ -470,7 +470,7 @@ Public Sub Finish()
 
   gcd.CurrentDrawing.arrEntities.Add(elem)
 
-  elem.ClassHandler.Finish(elem, elem.ClassHandler.StepsDone)
+  elem.ClassHandler.Finish(elem)
 
   LastEntity = elem                                       ' save it to repeat on rigth click
 
