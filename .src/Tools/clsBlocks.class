@@ -132,7 +132,7 @@ Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' called by FCAD->
   entInsert.fParam.Add(FBlock.degRotation)
   entInsert.ClassHandler.Finish(entInsert, -1)
 
-  clsEntityBuilder.LastEntity = entInsert                                       ' save it to repeat on rigth click
+  EntityBuilder.LastEntity = entInsert                                       ' save it to repeat on rigth click
 
   ' limpio el selector de bloques
 

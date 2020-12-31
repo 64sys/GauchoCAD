@@ -31,7 +31,7 @@ Public Const ParamHelper As String = "Start point;Angle;Heigth;"      ' a little
 Public Const ParamDefault As String = " ; 0 ; 10 ; "
 Public Const StretchAble As Boolean = False
 Public Const GAMBASCADENTITY As String = "EntityBase"
-Public Const USEWITH As String = "clsEntityBuilder"
+Public Const USEWITH As String = "EntityBuilder"
 Public Const OrthogonalIgnored As Boolean = False
 Public Const OrthogonalForced As Boolean = False
 Public Selected As Boolean

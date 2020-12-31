@@ -173,22 +173,22 @@ Public Function Start(Optional Mode As Integer = gcd.dimRadius)
       newBlock.name = "*D" & Str$(gcd.CurrentDrawing.arrBlocks.Count)
       gcd.CurrentDrawing.arrBlocks.Add(newBlock)
       ' linea principal
-      gcd.AddLine(newBlock.entities, [0, 0, 0, 0], elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
+      clsEntities.AddLine(newBlock.entities, [0, 0, 0, 0], elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
 
       ' lineas de demarcacion
-      gcd.AddLine(newBlock.entities, [0, Me.DimExtension, 0, -Me.DimExtension], elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
-      gcd.AddLine(newBlock.entities, [0, Me.DimExtension, 0, -Me.DimExtension], elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
+      clsEntities.AddLine(newBlock.entities, [0, Me.DimExtension, 0, -Me.DimExtension], elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
+      clsEntities.AddLine(newBlock.entities, [0, Me.DimExtension, 0, -Me.DimExtension], elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
 
       ' flechas
 
       f1.Insert([0, 0, Me.DimArrowSize, Me.DimArrowWidth, Me.DimArrowSize, -Me.DimArrowWidth, 0, 0])
       f2.Insert([0, 0, -Me.DimArrowSize, Me.DimArrowWidth, -Me.DimArrowSize, -Me.DimArrowWidth, 0, 0])
 
-      gcd.Addsolid(newBlock.entities, f1, elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
-      gcd.Addsolid(newBlock.entities, f2, elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
+      clsEntities.Addsolid(newBlock.entities, f1, elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
+      clsEntities.Addsolid(newBlock.entities, f2, elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
 
       ' texto
-      gcd.AddMText(newBlock.entities, [0, 0, 0, 0], 0, Me.DimTextHeight, "0.00", elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
+      clsEntities.AddMText(newBlock.entities, [0, 0, 0, 0], 0, Me.DimTextHeight, "0.00", elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
 
       ' y ahora e
 
@@ -202,22 +202,22 @@ Public Function Start(Optional Mode As Integer = gcd.dimRadius)
       newBlock.name = "*D" & Str$(gcd.CurrentDrawing.arrBlocks.Count)
       gcd.CurrentDrawing.arrBlocks.Add(newBlock)
       ' la linea principal ahora es un arco
-      gcd.Addarc(newBlock.entities, [0, 0], 0, 0, 0, elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
+      clsEntities.Addarc(newBlock.entities, [0, 0], 0, 0, 0, elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
 
       ' lineas de demarcacion
-      gcd.AddLine(newBlock.entities, [0, Me.DimExtension, 0, -Me.DimExtension], elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
-      gcd.AddLine(newBlock.entities, [0, Me.DimExtension, 0, -Me.DimExtension], elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
+      clsEntities.AddLine(newBlock.entities, [0, Me.DimExtension, 0, -Me.DimExtension], elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
+      clsEntities.AddLine(newBlock.entities, [0, Me.DimExtension, 0, -Me.DimExtension], elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
 
       ' flechas
 
       'f1.Insert()
       'f2.Insert([0, 0, -Me.DimArrowSize, Me.DimArrowWidth, -Me.DimArrowSize, -Me.DimArrowWidth, 0, 0])
 
-      gcd.Addsolid(newBlock.entities, [0, 0, Me.DimArrowSize, Me.DimArrowWidth, Me.DimArrowSize, -Me.DimArrowWidth, 0, 0], elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
-      gcd.Addsolid(newBlock.entities, [0, 0, -Me.DimArrowSize, Me.DimArrowWidth, -Me.DimArrowSize, -Me.DimArrowWidth, 0, 0], elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
+      clsEntities.Addsolid(newBlock.entities, [0, 0, Me.DimArrowSize, Me.DimArrowWidth, Me.DimArrowSize, -Me.DimArrowWidth, 0, 0], elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
+      clsEntities.Addsolid(newBlock.entities, [0, 0, -Me.DimArrowSize, Me.DimArrowWidth, -Me.DimArrowSize, -Me.DimArrowWidth, 0, 0], elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
 
       ' texto
-      gcd.AddMText(newBlock.entities, [0, 0, 0, 0], 0, Me.DimTextHeight, "0.00", elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
+      clsEntities.AddMText(newBlock.entities, [0, 0, 0, 0], 0, Me.DimTextHeight, "0.00", elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
 
     Case gcd.dimRadius
 
@@ -230,17 +230,17 @@ Public Function Start(Optional Mode As Integer = gcd.dimRadius)
       gcd.CurrentDrawing.arrBlocks.Add(newBlock)
 
       ' linea principal
-      gcd.AddLine(newBlock.entities, [0, 0, 0, 0], elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
+      clsEntities.AddLine(newBlock.entities, [0, 0, 0, 0], elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
 
       ' linea de demarcacion
-      gcd.AddLine(newBlock.entities, [0, Me.DimExtension, 0, -Me.DimExtension], elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
+      clsEntities.AddLine(newBlock.entities, [0, Me.DimExtension, 0, -Me.DimExtension], elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
 
       ' flecha
 
-      gcd.Addsolid(newBlock.entities, [0, 0, -Me.DimArrowSize, Me.DimArrowWidth, -Me.DimArrowSize, -Me.DimArrowWidth, 0, 0], elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
+      clsEntities.Addsolid(newBlock.entities, [0, 0, -Me.DimArrowSize, Me.DimArrowWidth, -Me.DimArrowSize, -Me.DimArrowWidth, 0, 0], elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
 
       ' texto
-      gcd.AddMText(newBlock.entities, [0, 0, 0, 0], 0, Me.DimTextHeight, "0.00", elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
+      clsEntities.AddMText(newBlock.entities, [0, 0, 0, 0], 0, Me.DimTextHeight, "0.00", elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
 
     Case gcd.dimDiameter
 
@@ -253,14 +253,14 @@ Public Function Start(Optional Mode As Integer = gcd.dimRadius)
       gcd.CurrentDrawing.arrBlocks.Add(newBlock)
 
       ' linea principal
-      gcd.AddLine(newBlock.entities, [0, 0, 0, 0], elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
+      clsEntities.AddLine(newBlock.entities, [0, 0, 0, 0], elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
 
       ' flecha
-      gcd.Addsolid(newBlock.entities, [0, 0, Me.DimArrowSize, Me.DimArrowWidth, Me.DimArrowSize, -Me.DimArrowWidth, 0, 0], elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
-      gcd.Addsolid(newBlock.entities, [0, 0, -Me.DimArrowSize, Me.DimArrowWidth, -Me.DimArrowSize, -Me.DimArrowWidth, 0, 0], elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
+      clsEntities.Addsolid(newBlock.entities, [0, 0, Me.DimArrowSize, Me.DimArrowWidth, Me.DimArrowSize, -Me.DimArrowWidth, 0, 0], elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
+      clsEntities.Addsolid(newBlock.entities, [0, 0, -Me.DimArrowSize, Me.DimArrowWidth, -Me.DimArrowSize, -Me.DimArrowWidth, 0, 0], elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
 
       ' texto
-      gcd.AddMText(newBlock.entities, [0, 0, 0, 0], 0, Me.DimTextHeight, "0.00", elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
+      clsEntities.AddMText(newBlock.entities, [0, 0, 0, 0], 0, Me.DimTextHeight, "0.00", elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
 
   End Select
 
@@ -331,108 +331,7 @@ Public Sub DrawSelected(oE As Entity)
 
 End
 
-Public Function KeyText(EnteredText As String) ' esta rutina es llamada por FCAD en el evento FCAD_KeyPress cuando recibe una texto + <Enter>
 
-  ' this could be many things, but lets concentrate in what to expect and check if its correct
-  ' The element provides a constant called ParamType wich is a string like "PPFCTB"
-  ' P = point in X,Y format with decimal point as dot "."
-  '     it can also be @X,Y wich means that the coordinates are relative to the last point
-  ' F = float, thats any number
-  ' T = a text or a single character too
-  ' C = color input
-  ' B = boolean, Yes/Si or No
-  ' Lets see what are we expecting
-  Dim Xt, Zt As Float, ErrTxt As String, Relative As Boolean
-
-  Select NextParamType
-
-    Case "P", "+"
-      errtxt = ", expected a valid point like 12.4,9.5  or @12.34,10.5"
-      ' lets filter
-      EnteredText = Trim$(UCase$(EnteredText))
-      ' So we expect a position x,y , but in some cases it can be
-      ' C = close
-      ' U = undo, delete last segment
-      ' and others
-
-      If Left(EnteredText, 1) = "C" Then          ' close the element
-        ' got othe first point and exit
-        elem.P[iPoints * 2] = elem.P[0]
-        elem.P[iPoints * 2 + 1] = elem.P[1]
-        Me.Finish
-
-      Else If Left(EnteredText, 1) = "U" Then     ' undo last command and go
-
-        elem.P.remove(elem.P.max)
-        elem.P.remove(elem.P.max)
-        Me.Finish
-      Else                                        ' an X,Y or @X,Y
-
-        If InStr(EnteredText, "@") > 0 Then    ' may be a point
-          Relative = True
-          EnteredText = Replace(EnteredText, "@", "")
-        Endif
-        Xt = CFloat(Split(EnteredText, ",")[0])
-        Zt = CFloat(Split(EnteredText, ",")[1])
-
-        ' if we are stll here, input was good
-        elem.P[iPoints * 2] = Xt
-        elem.P[iPoints * 2 + 1] = Zt
-
-        If Relative And (elem.P.count > 2) Then
-          elem.P[iPoints * 2] += elem.P[(iPoints - 1) * 2]
-          elem.P[iPoints * 2 + 1] += elem.P[(iPoints - 1) * 2 + 1]
-
-        Endif
-        Inc iPoints
-        AdvanceStep
-
-      End If
-
-    Case "T"
-      errtxt = ", expected text, not a point"
-
-      TextEntry = EnteredText
-
-      AdvanceStep
-
-    Case "F", "M", "A", "L"                 ' Float, Mixed, Angle, Longitud
-      errtxt = "enter a valid text size"
-
-      If EnteredText = "" Then
-
-        Try elem.fParam[iFloat] = ParamDefault[elem.StepsDone]
-
-      Else
-
-        elem.fParam[iFloat] = CFloat(EnteredText)
-
-      Endif
-
-      Inc iFloat
-      AdvanceStep
-
-    Case "C"                                ' color
-      If Dialog.SelectColor() Then
-        elem.fParam[iFloat] = CFloat(Dialog.Color)
-        Inc iFloat
-        AdvanceStep
-
-      Endif
-      Key.Cod
-
-  End Select
-
-Finally
-
-  Return
-
-Catch
-
-  ' unexpected input
-  clsDrawingAids.ErrorMessage = ("Bad input" & ErrTxt)
-
-End
 
 Public Sub ReBuildBlock()
 
@@ -841,138 +740,6 @@ Public Sub ReBuildBlock()
 
 End
 
-Public Function MouseMove(mouseX As Integer, mouseY As Integer) ' esta rutina es llamada por FCAD en el evento DrawingArea_MouseMove
-
-  If InStr("LAP", NextParamType) = 0 Then Return ' we are expecting a parameter
-
-  ' if we expect a parameter, it will be passed
-  If NextParamType = "A" Then
-
-    ' return the angle from horizontal to us
-    elem.fParam[iFloat] = Ang(appmain.Xreal(mouseX) - elem.p[elem.p.max - 1], appmain.Yreal(mouseY) - elem.p[elem.p.max])
-    elem.fParam[iFloat] *= 180 / Pi
-    appmain.redraw
-    Return              ' nothing more to do here
-  End If
-
-  If NextParamType = "L" Then
-
-    ' return the angle from horizontal to us
-    elem.fParam[iFloat] = puntos.distancia(puntos.Near(appmain.Xreal(mouseX)), puntos.Near(appmain.Yreal(mouseY)), elem.p[elem.p.max - 1], elem.p[elem.p.max])
-
-    appmain.redraw
-    Return              ' nothing more to do here
-  End If
-
-  ' we are waiting for a point
-  ClickXr = puntos.Near(appmain.Xreal(mouseX))
-  ClickYr = puntos.Near(appmain.Yreal(mouseY))
-
-  ' y si tengo enganche?
-  If (gcd.CurrentDrawing.iEntity[2] >= 0) And (gcd.OrthogonalForced = False) Then
-
-    ' esto re enganchado
-    ClickXr = gcd.CurrentDrawing.iEntity[0]
-    ClickYr = gcd.CurrentDrawing.iEntity[1]
-
-    ' aca tengo que verificar el ortogonal
-  Else If Me.StepsDone > 0 Then                                                                          ' puedo hacer ortogonal
-    If gcd.OrthogonalForced Or (Not gcd.OrthogonalIgnored And gcd.Orthogonal) Then          ' hablame de operadores logicos
-
-      If Abs(ClickXr - ClickPrevXr) > Abs(ClickYr - ClickPrevYr) Then ' prevalece X
-        ClickYr = ClickPrevYr
-      Else
-        ClickXr = ClickPrevXr
-      Endif
-
-    End If
-
-  End If
-
-  RebuildBlock
-
-  appmain.redraw
-
-End
-
-Public Function MouseDown(mouseX As Integer, mouseY As Integer) ' esta rutina es llamada por FCAD en el evento DrawingArea_MouseDown
-
-  clsDrawingAids.ErrorMessage = ""
-  If InStr("LAP", NextParamType) = 0 Then Return ' we are expecting a parameter
-
-  ' if we expect a parameter, it will be passed
-  If NextParamType = "A" Then
-
-    ' return the angle from horizontal to us
-    elem.fParam[iFloat] = Ang(appmain.Xreal(mouseX) - elem.p[elem.p.max - 1], appmain.Yreal(mouseY) - elem.p[elem.p.max])
-    elem.fParam[iFloat] *= 180 / Pi
-
-    Inc iFloat
-    AdvanceStep
-    Return              ' nothing more to do here
-  End If
-
-  If NextParamType = "L" Then
-
-    ' return the angle from horizontal to us
-    elem.fParam[iFloat] = puntos.distancia(puntos.Near(appmain.Xreal(mouseX)), puntos.Near(appmain.Yreal(mouseY)), elem.p[elem.p.max - 1], elem.p[elem.p.max])
-    Inc iFloat
-    AdvanceStep
-    Return              ' nothing more to do here
-  End If
-
-  ' we are waiting for a point
-
-  ClickXr = puntos.Near(appmain.Xreal(mouseX))
-  ClickYr = puntos.Near(appmain.Yreal(mouseY))
-
-  ' y si tengo enganche?
-
-  If (gcd.CurrentDrawing.iEntity[2] >= 0) And (gcd.OrthogonalForced = False) Then
-
-    ' esto re enganchado
-
-    ClickXr = gcd.CurrentDrawing.iEntity[0]
-    ClickYr = gcd.CurrentDrawing.iEntity[1]
-
-    ' aca tengo que verificar el ortogonal
-
-  Else If Me.StepsDone > 0 Then                                                                          ' puedo hacer ortogonal
-    If gcd.OrthogonalForced Or (Not gcd.OrthogonalIgnored And gcd.Orthogonal) Then          ' hablame de operadores logicos
-
-      If Abs(ClickXr - ClickPrevXr) > Abs(ClickYr - ClickPrevYr) Then ' prevalece X
-        ClickYr = ClickPrevYr
-      Else
-        ClickXr = ClickPrevXr
-      Endif
-
-    End If
-
-  End If
-
-  ClickPrevXr = ClickXr
-  ClickPrevYr = ClickYr
-
-  Inc iPoints
-  AdvanceStep
-
-End
-
-' Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' esta rutina es llamada por FCAD en el evento DrawingArea_MouseUp
-'
-' End
-
-Public Sub AdvanceStep()
-
-  Inc StepsDone
-  If Me.StepsDone = Me.StepsTotal Then
-    clsEntityBuilder.elem = elem
-    clsEntityBuilder.Finish
-    elem = Null
-
-  End If
-
-End
 
 Public Function Draw2(oE As Entity)
 

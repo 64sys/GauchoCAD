@@ -1144,14 +1144,14 @@ Public Function AddLine(obxContainer As Entity[], Points As Float[], Optional co
   oEntity.ClassHandler = cadLine
   oEntity.Gender = oEntity.ClassHandler.gender
   oEntity.P.insert(points)                    ' recibimos los dos vertices de la linea x1,y1,x2,y2
-  oEntity.layer = Layer
+  oEntity.layerid = Layer
   oEntity.colour = colour
   oEntity.LineWidth = 1 'LineWidth               ' datos CAD
   oEntity.linetypename = linetype
   oEntity.Block = Block
   If oEntity.Block <> "" Then oEntity.visible = False
   obxContainer.Add(oEntity)
-  oEntity.ClassHandler.finish(oEntity, -1)
+  oEntity.ClassHandler.finish(oEntity)
   oEntity = Null                  ' free entity
 
 End
@@ -1166,13 +1166,13 @@ Public Function AddPolyLine(obxContainer As Entity[], Points As Float[], Optiona
   oEntity.Gender = oEntity.ClassHandler.gender
   oEntity.P.insert(points)                    ' recibimos los dos vertices de la linea x1,y1,x2,y2
   oEntity.fParam.Add(iClosed)                 ' cerrada o abierta
-  oEntity.layer = Layer
+  oentity.layerid = Layer
   oEntity.colour = colour
   oEntity.LineWidth = 1 ' LineWidth               ' datos CAD
   oEntity.Block = Block
   If oEntity.Block <> "" Then oEntity.visible = False
   obxContainer.Add(oEntity)
-  oEntity.ClassHandler.finish(oEntity, -1)
+  oEntity.ClassHandler.finish(oEntity)
   oEntity = Null                  ' free entity
 
 End
@@ -1190,13 +1190,13 @@ Public Function AddDim(obxContainer As Entity[], Points As Float[], bloque As St
   oEntity.fParam.Add(angulo)
   oEntity.stringdata.Add(texto)
   oEntity.stringdata.Add(bloque)
-  oEntity.layer = Layer
+  oentity.layerid = Layer
   oEntity.colour = colour
   oEntity.LineWidth = LineWidth               ' datos CAD
   oEntity.Block = Block
   If oEntity.Block <> "" Then oEntity.visible = False
   obxContainer.Add(oEntity)
-  oEntity.ClassHandler.finish(oEntity, -1)
+  oEntity.ClassHandler.finish(oEntity)
   oEntity = Null                  ' free entity
 
 End
@@ -1211,13 +1211,13 @@ Public Function AddSolid(obxContainer As Entity[], Points As Float[], Optional c
   oEntity.Gender = oEntity.ClassHandler.gender
   oEntity.P.insert(points)                    ' recibimos los dos vertices de la linea x1,y1,x2,y2
 
-  oEntity.layer = Layer
+  oentity.layerid = Layer
   oEntity.colour = colour
   oEntity.LineWidth = LineWidth               ' datos CAD
   oEntity.Block = Block
   If oEntity.Block <> "" Then oEntity.visible = False
   obxContainer.Add(oEntity)
-  oEntity.ClassHandler.finish(oEntity, -1)
+  oEntity.ClassHandler.finish(oEntity)
   oEntity = Null                  ' free entity
 
 End
@@ -1231,13 +1231,13 @@ Public Function AddSPLine(obxContainer As Entity[], Points As Float[], Optional 
   oEntity.Gender = oEntity.ClassHandler.gender
   oEntity.P.insert(points)                    ' recibimos los dos vertices de la linea x1,y1,x2,y2
   oEntity.fParam.Add(iClosed)                 ' cerrada o abierta
-  oEntity.layer = Layer
+  oentity.layerid = Layer
   oEntity.colour = colour
   oEntity.LineWidth = LineWidth               ' datos CAD
   oEntity.Block = Block
   If oEntity.Block <> "" Then oEntity.visible = False
   obxContainer.Add(oEntity)
-  oEntity.ClassHandler.finish(oEntity, -1)
+  oEntity.ClassHandler.finish(oEntity)
   oEntity = Null                  ' free entity
 
 End
@@ -1251,13 +1251,13 @@ Public Function AddCircle(obxContainer As Entity[], Points As Float[], radious A
   oEntity.Gender = oEntity.ClassHandler.gender
   oEntity.P.insert(points)                    ' centro x1,y1
   oEntity.fParam.Add(radious)                 ' radio
-  oEntity.layer = Layer
+  oentity.layerid = Layer
   oEntity.colour = colour
   oEntity.LineWidth = LineWidth               ' datos CAD
   oEntity.Block = Block
   If oEntity.Block <> "" Then oEntity.visible = False
   obxContainer.Add(oEntity)
-  oEntity.ClassHandler.finish(oEntity, -1)
+  oEntity.ClassHandler.finish(oEntity)
   oEntity = Null                  ' free entity
 
 End
@@ -1273,13 +1273,13 @@ Public Function AddArc(obxContainer As Entity[], Points As Float[], r As Float, 
   oEntity.fParam.Add(r)                      ' radio
   oEntity.fParam.Add(angle1)                   ' angulo
   oEntity.fParam.Add(angle2)                   ' angulo
-  oEntity.layer = Layer
+  oentity.layerid = Layer
   oEntity.colour = colour
   oEntity.LineWidth = LineWidth               ' datos CAD
   oEntity.Block = Block
   If oEntity.Block <> "" Then oEntity.visible = False
   obxContainer.Add(oEntity)
-  oEntity.ClassHandler.finish(oEntity, -1)
+  oEntity.ClassHandler.finish(oEntity)
   oEntity = Null                  ' free entity
 
 End
@@ -1297,13 +1297,13 @@ Public Function AddEllipse(obxContainer As Entity[], Points As Float[], r As Flo
   oEntity.fParam.Add(r)                      ' ratio minor/major
   oEntity.fParam.Add(angle1 * 180 / Pi)     ' start angle
   oEntity.fParam.Add(angle2 * 180 / Pi)      ' end angle
-  oEntity.layer = Layer
+  oentity.layerid = Layer
   oEntity.colour = colour
   oEntity.LineWidth = LineWidth               ' datos CAD
   oEntity.Block = Block
   If oEntity.Block <> "" Then oEntity.visible = False
   obxContainer.Add(oEntity)
-  oEntity.ClassHandler.finish(oEntity, -1)
+  oEntity.ClassHandler.finish(oEntity)
   oEntity = Null                  ' free entity
 
 End
@@ -1318,13 +1318,13 @@ Public Function AddText(obxContainer As Entity[], Points As Float[], angle As Fl
   oEntity.fParam.Add(angle)                   ' grados
   oEntity.fParam.Add(height)                  ' alto letras
   oEntity.stringdata.Add(_text)                  ' el texto
-  oEntity.layer = Layer
+  oentity.layerid = Layer
   oEntity.colour = colour
   oEntity.LineWidth = LineWidth               ' datos CAD
   oEntity.Block = Block
   If oEntity.Block <> "" Then oEntity.visible = False
   obxContainer.Add(oEntity)
-  oEntity.ClassHandler.finish(oEntity, -1)
+  oEntity.ClassHandler.finish(oEntity)
   oEntity = Null                  ' free entity
 
 End
@@ -1339,13 +1339,13 @@ Public Function AddMText(obxContainer As Entity[], Points As Float[], angle As F
   oEntity.fParam.Add(angle)                  ' GRADOS
   oEntity.fParam.Add(height)                  ' alto letras
   oEntity.stringdata.add(_text)                  ' el texto
-  oEntity.layer = Layer
+  oentity.layerid = Layer
   oEntity.colour = colour
   oEntity.LineWidth = LineWidth               ' datos CAD
   oEntity.Block = Block
   If oEntity.Block <> "" Then oEntity.visible = False
   obxContainer.Add(oEntity)
-  oEntity.ClassHandler.finish(oEntity, -1)
+  oEntity.ClassHandler.finish(oEntity)
   oEntity = Null                  ' free entity
 
 End
@@ -1369,11 +1369,11 @@ Public Function AddInsert(obxContainer As Entity[], Points As Float[], scaleX As
   oEntity.fParam.Add(scaleX)
   oEntity.fParam.Add(scaleY)
   oEntity.fParam.Add(angulo)                  ' GRADOS
-  oEntity.layer = Layer
+  oentity.layerid = Layer
   oEntity.colour = colour
   oEntity.Block = Block
   obxContainer.Add(oEntity)
-  oEntity.ClassHandler.finish(oEntity, -1)
+  oEntity.ClassHandler.finish(oEntity)
 
   oEntity = Null                  ' free entity
 

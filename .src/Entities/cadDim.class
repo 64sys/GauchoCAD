@@ -173,22 +173,22 @@ Public Function Start(Optional Mode As Integer = gcd.dimRadius)
       newBlock.name = "*D" & Str$(gcd.CurrentDrawing.arrBlocks.Count)
       gcd.CurrentDrawing.arrBlocks.Add(newBlock)
       ' linea principal
-      gcd.AddLine(newBlock.entities, [0, 0, 0, 0], elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
+      clsEntities.AddLine(newBlock.entities, [0, 0, 0, 0], elem.colour, elem.LineWidth, elem.LineType, elem.layerid, newBlock.name)
 
       ' lineas de demarcacion
-      gcd.AddLine(newBlock.entities, [0, Me.DimExtension, 0, -Me.DimExtension], elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
-      gcd.AddLine(newBlock.entities, [0, Me.DimExtension, 0, -Me.DimExtension], elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
+      clsEntities.AddLine(newBlock.entities, [0, Me.DimExtension, 0, -Me.DimExtension], elem.colour, elem.LineWidth, elem.LineType, elem.layerid, newBlock.name)
+      clsEntities.AddLine(newBlock.entities, [0, Me.DimExtension, 0, -Me.DimExtension], elem.colour, elem.LineWidth, elem.LineType, elem.layerid, newBlock.name)
 
       ' flechas
 
       f1.Insert([0, 0, Me.DimArrowSize, Me.DimArrowWidth, Me.DimArrowSize, -Me.DimArrowWidth, 0, 0])
       f2.Insert([0, 0, -Me.DimArrowSize, Me.DimArrowWidth, -Me.DimArrowSize, -Me.DimArrowWidth, 0, 0])
 
-      gcd.Addsolid(newBlock.entities, f1, elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
-      gcd.Addsolid(newBlock.entities, f2, elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
+      clsEntities.Addsolid(newBlock.entities, f1, elem.colour, elem.LineWidth, elem.LineType, elem.layerid, newBlock.name)
+      clsEntities.Addsolid(newBlock.entities, f2, elem.colour, elem.LineWidth, elem.LineType, elem.layerid, newBlock.name)
 
       ' texto
-      gcd.AddMText(newBlock.entities, [0, 0, 0, 0], 0, Me.DimTextHeight, "0.00", elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
+      clsEntities.AddMText(newBlock.entities, [0, 0, 0, 0], 0, Me.DimTextHeight, "0.00", elem.colour, elem.LineWidth, elem.LineType, elem.layerid, newBlock.name)
 
       ' y ahora e
 
@@ -202,22 +202,22 @@ Public Function Start(Optional Mode As Integer = gcd.dimRadius)
       newBlock.name = "*D" & Str$(gcd.CurrentDrawing.arrBlocks.Count)
       gcd.CurrentDrawing.arrBlocks.Add(newBlock)
       ' la linea principal ahora es un arco
-      gcd.Addarc(newBlock.entities, [0, 0], 0, 0, 0, elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
+      clsEntities.Addarc(newBlock.entities, [0, 0], 0, 0, 0, elem.colour, elem.LineWidth, elem.LineType, elem.layerid, newBlock.name)
 
       ' lineas de demarcacion
-      gcd.AddLine(newBlock.entities, [0, Me.DimExtension, 0, -Me.DimExtension], elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
-      gcd.AddLine(newBlock.entities, [0, Me.DimExtension, 0, -Me.DimExtension], elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
+      clsEntities.AddLine(newBlock.entities, [0, Me.DimExtension, 0, -Me.DimExtension], elem.colour, elem.LineWidth, elem.LineType, elem.layerid, newBlock.name)
+      clsEntities.AddLine(newBlock.entities, [0, Me.DimExtension, 0, -Me.DimExtension], elem.colour, elem.LineWidth, elem.LineType, elem.layerid, newBlock.name)
 
       ' flechas
 
       'f1.Insert()
       'f2.Insert([0, 0, -Me.DimArrowSize, Me.DimArrowWidth, -Me.DimArrowSize, -Me.DimArrowWidth, 0, 0])
 
-      gcd.Addsolid(newBlock.entities, [0, 0, Me.DimArrowSize, Me.DimArrowWidth, Me.DimArrowSize, -Me.DimArrowWidth, 0, 0], elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
-      gcd.Addsolid(newBlock.entities, [0, 0, -Me.DimArrowSize, Me.DimArrowWidth, -Me.DimArrowSize, -Me.DimArrowWidth, 0, 0], elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
+      clsEntities.Addsolid(newBlock.entities, [0, 0, Me.DimArrowSize, Me.DimArrowWidth, Me.DimArrowSize, -Me.DimArrowWidth, 0, 0], elem.colour, elem.LineWidth, elem.LineType, elem.layerid, newBlock.name)
+      clsEntities.Addsolid(newBlock.entities, [0, 0, -Me.DimArrowSize, Me.DimArrowWidth, -Me.DimArrowSize, -Me.DimArrowWidth, 0, 0], elem.colour, elem.LineWidth, elem.LineType, elem.layerid, newBlock.name)
 
       ' texto
-      gcd.AddMText(newBlock.entities, [0, 0, 0, 0], 0, Me.DimTextHeight, "0.00", elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
+      clsEntities.AddMText(newBlock.entities, [0, 0, 0, 0], 0, Me.DimTextHeight, "0.00", elem.colour, elem.LineWidth, elem.LineType, elem.layerid, newBlock.name)
 
     Case gcd.dimRadius
 
@@ -230,17 +230,17 @@ Public Function Start(Optional Mode As Integer = gcd.dimRadius)
       gcd.CurrentDrawing.arrBlocks.Add(newBlock)
 
       ' linea principal
-      gcd.AddLine(newBlock.entities, [0, 0, 0, 0], elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
+      clsEntities.AddLine(newBlock.entities, [0, 0, 0, 0], elem.colour, elem.LineWidth, elem.LineType, elem.layerid, newBlock.name)
 
       ' linea de demarcacion
-      gcd.AddLine(newBlock.entities, [0, Me.DimExtension, 0, -Me.DimExtension], elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
+      clsEntities.AddLine(newBlock.entities, [0, Me.DimExtension, 0, -Me.DimExtension], elem.colour, elem.LineWidth, elem.LineType, elem.layerid, newBlock.name)
 
       ' flecha
 
-      gcd.Addsolid(newBlock.entities, [0, 0, -Me.DimArrowSize, Me.DimArrowWidth, -Me.DimArrowSize, -Me.DimArrowWidth, 0, 0], elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
+      clsEntities.Addsolid(newBlock.entities, [0, 0, -Me.DimArrowSize, Me.DimArrowWidth, -Me.DimArrowSize, -Me.DimArrowWidth, 0, 0], elem.colour, elem.LineWidth, elem.LineType, elem.layerid, newBlock.name)
 
       ' texto
-      gcd.AddMText(newBlock.entities, [0, 0, 0, 0], 0, Me.DimTextHeight, "0.00", elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
+      clsEntities.AddMText(newBlock.entities, [0, 0, 0, 0], 0, Me.DimTextHeight, "0.00", elem.colour, elem.LineWidth, elem.LineType, elem.layerid, newBlock.name)
 
     Case gcd.dimDiameter
 
@@ -253,14 +253,14 @@ Public Function Start(Optional Mode As Integer = gcd.dimRadius)
       gcd.CurrentDrawing.arrBlocks.Add(newBlock)
 
       ' linea principal
-      gcd.AddLine(newBlock.entities, [0, 0, 0, 0], elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
+      clsEntities.AddLine(newBlock.entities, [0, 0, 0, 0], elem.colour, elem.LineWidth, elem.LineType, elem.layerid, newBlock.name)
 
       ' flecha
-      gcd.Addsolid(newBlock.entities, [0, 0, Me.DimArrowSize, Me.DimArrowWidth, Me.DimArrowSize, -Me.DimArrowWidth, 0, 0], elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
-      gcd.Addsolid(newBlock.entities, [0, 0, -Me.DimArrowSize, Me.DimArrowWidth, -Me.DimArrowSize, -Me.DimArrowWidth, 0, 0], elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
+      clsEntities.Addsolid(newBlock.entities, [0, 0, Me.DimArrowSize, Me.DimArrowWidth, Me.DimArrowSize, -Me.DimArrowWidth, 0, 0], elem.colour, elem.LineWidth, elem.LineType, elem.layerid, newBlock.name)
+      clsEntities.Addsolid(newBlock.entities, [0, 0, -Me.DimArrowSize, Me.DimArrowWidth, -Me.DimArrowSize, -Me.DimArrowWidth, 0, 0], elem.colour, elem.LineWidth, elem.LineType, elem.layerid, newBlock.name)
 
       ' texto
-      gcd.AddMText(newBlock.entities, [0, 0, 0, 0], 0, Me.DimTextHeight, "0.00", elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
+      clsEntities.AddMText(newBlock.entities, [0, 0, 0, 0], 0, Me.DimTextHeight, "0.00", elem.colour, elem.LineWidth, elem.LineType, elem.layerid, newBlock.name)
 
   End Select
 
@@ -281,8 +281,8 @@ Public Function Start(Optional Mode As Integer = gcd.dimRadius)
   gcd.OrthogonalIgnored = Me.OrthogonalIgnored
   gcd.OrthogonalForced = Me.OrthogonalForced
 
-  elem.layer = appmain.CurrentLayer
-  elem.layerid = gcd.GetLayerID(appmain.CurrentLayer)
+
+  elem.layerid = appmain.CurrentLayer
 
   clsDrawingAids.HelperTrabajo = elem.ClassHandler.HelperTrabajo
 
@@ -966,8 +966,8 @@ Public Sub AdvanceStep()
 
   Inc StepsDone
   If Me.StepsDone = Me.StepsTotal Then
-    clsEntityBuilder.elem = elem
-    clsEntityBuilder.Finish
+    EntityBuilder.elem = elem
+    EntityBuilder.Finish
     elem = Null
 
   End If
