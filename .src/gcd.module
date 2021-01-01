@@ -326,16 +326,62 @@ End
 Public Sub ImportBlocks(colData As Collection) ', obxEntities As Entity[]) As Integer
 
   Dim iTotalEntities As Integer, colent, colBlk As Collection, flxPoints As New Float[], P As Float[]
+  Dim hBlock As String
+  Dim cEntyList As New Collection
+  Dim hEnty As Variant, iEnty As Integer
+  Dim cEnty As Variant[]
 
-  If Not colData.Exist("Blocks") Then Return
-  For Each colBlk In colData["Blocks"]
+  If Not colData.Exist("BLOCKS") Then Return
+  For Each colBlk In colData["BLOCKS"]
     Dim newBlock As New Block
+    hBlock = colBlk["block_entity"][3]
     newBlock.entities = New Entity[]
-    newBlock.name = colBlk["block"]
+    newBlock.name = colBlk["name"]
+    If colData["ENTITIES"].Exist(hBlock) Then
+      newBlock.handle = colData["ENTITIES"][hBlock]["handle"][1]
+      newBlock.layer = colData["ENTITIES"][hBlock]["layer"][3]
+    Else If colData["NESTED"].Exist(hBlock) Then
+      newBlock.handle = colData["NESTED"][hBlock]["handle"][1]
+      newBlock.layer = colData["NESTED"][hBlock]["layer"][3]
+
+    Endif
+    If colBlk.Exist("entities") Then
+      For Each cEnty In colBlk["entities"]
+        hEnty = cEnty[3]
+        If colData["NESTED"].Exist(hEnty) Then
+          cEntyList.Add(colData["NESTED"][hEnty], hEnty)
+        Else If colData["ENTITIES"].Exist(hEnty) Then
+          cEntyList.Add(colData["ENTITIES"][hEnty], hEnty)
+
+        End If
+      Next
+      ImpEnty5(cEntyList, newBlock.entities)
+      cEntyList.Clear
+
+    Else If colBlk.Exist("first_entity") Then
+      For iEnty = CInt(colBlk["first_entity"][3]) To CInt(colBlk["last_entity"][3])
+        ' pero no se si estan en Nested o en Entities
+        hEnty = CStr(iEnty)
+        If colData["NESTED"].Exist(hEnty) Then
+          cEntyList.Add(colData["NESTED"][hEnty], hEnty)
+        Else If colData["ENTITIES"].Exist(hEnty) Then
+          cEntyList.Add(colData["ENTITIES"][hEnty], hEnty)
+
+        End If
+      Next
+      ImpEnty5(cEntyList, newBlock.entities)
+      cEntyList.Clear
+    Else
+
+      Debug "Error loading block", newBlock.name
+
+
+    End If
     gcd.CurrentDrawing.arrBlocks.Add(newBlock)
     'ImportEntities2(colBlk["Entities"], newBlock.entities, newBlock.name)
 
   Next
+  Stop
 
 End
 
@@ -497,8 +543,8 @@ Public Sub ImpEnty5(cEny As Collection, obx As Entity[])
     If e.Exist("entity") Then                                     ' es una entidad?
       entNueva = New Entity                                       ' entonces, creamos una nueva
 
-      If InStr("POINTATTDEFATTRIBLINELWPOLYLINECIRCLEELLIPSEARCTEXTMTEXTSPLINESOLIDLEADER", e["entity"]) = 0 Then Continue
-      'If InStr("ATTDEFATTRIBLINELWPOLYLINECIRCLEELLIPSEARCTEXTMTEXTSPLINESOLIDLEADER", e["entity"]) = 0 Then Continue
+      If InStr("POINT_ATTDEF_ATTRIB_LINE_LWPOLYLINE_CIRCLE_ELLIPSE_ARC_TEXT_MTEXT_SPLINE_SOLID_LEADER_INSERT", e["entity"]) = 0 Then Continue
+
 
       If clsEntities.ImportJsonToEntity(e, entNueva) Then         ' si esta implementada, llenamos los datos
         If e.Exist("handle") Then
@@ -586,7 +632,7 @@ End
 Public Function GetGBColor(CADcolor As Integer, layerID As String) As Integer
 
   ' FIXME: reparar post layers
-  'Return Starter.flgWhiteAndBlack
+  If Not gcd.CurrentDrawing.cModel["LAYERS"].Exist(layerID) Then Return Starter.flgWhiteAndBlack
 
   ' color
   If CADcolor = 256 Then          ' buscar color del layer
@@ -659,6 +705,7 @@ Public Function UpdateGraphics(Optional handles As String[] = [], DoRegen As Boo
   Dim cEntity As Collection, entNueva As Entity
 
   UpdateLayers
+  ImportBlocks(gcd.CurrentDrawing.cModel)
 
   If handles.Count = 0 Then                   ' Update all entities
 

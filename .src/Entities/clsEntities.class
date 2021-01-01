@@ -22,6 +22,17 @@
 
 Create Static
 
+Public Function FIndBlockIDbyHandle(BlockHandle As String) As Integer
+
+  Dim i As Integer
+
+  For i = 0 To gcd.CurrentDrawing.arrBlocks.Max
+    If gcd.CurrentDrawing.arrBlocks[i].handle = BlockHandle Then Return i
+  Next
+  Return -1
+
+End
+
 Public Function FIndBlockID(BlockName As String) As Integer
 
   Dim i As Integer
@@ -59,7 +70,7 @@ Public Function ReconstruirBloques() As Boolean
             Dim o2 As Entity
             o2 = ClonEntity(gcd.CurrentDrawing.arrEntities[i2])
 
-            o2.ClassHandler.finish(o2, -1)
+            o2.ClassHandler.finish(o2)
             newBlock.entities.Add(o2)
           End If
         Else
@@ -269,9 +280,9 @@ Public Sub Finish(Optional selected As Boolean = True)
   m = gcd.CurrentDrawing.arrEntities.Max
   For i = 0 To m
     If selected Then                                                    ' apply to only the selected ones
-      If gcd.CurrentDrawing.arrEntities[i].Selected Then gcd.CurrentDrawing.arrEntities[i].ClassHandler.Finish(gcd.CurrentDrawing.arrEntities[i], -1)
+      If gcd.CurrentDrawing.arrEntities[i].Selected Then gcd.CurrentDrawing.arrEntities[i].ClassHandler.Finish(gcd.CurrentDrawing.arrEntities[i])
     Else                                                                ' apply to all
-      gcd.CurrentDrawing.arrEntities[i].ClassHandler.Finish(gcd.CurrentDrawing.arrEntities[i], -1)
+      gcd.CurrentDrawing.arrEntities[i].ClassHandler.Finish(gcd.CurrentDrawing.arrEntities[i])
     End If
 
   Next
@@ -290,11 +301,11 @@ Public Sub ClonElements(Optional selected As Boolean = True, SkipParts As Boolea
       If SkipParts Then
         If (gcd.CurrentDrawing.arrEntities[i].iInsert < 0) Or (gcd.CurrentDrawing.arrEntities[i].iInsert = i) Then
           gcd.CurrentDrawing.arrEntities.Add(ClonEntity(gcd.CurrentDrawing.arrEntities[i]))
-          gcd.CurrentDrawing.arrEntities.Last.ClassHandler.finish(gcd.CurrentDrawing.arrEntities.Last, -1)
+          gcd.CurrentDrawing.arrEntities.Last.ClassHandler.finish(gcd.CurrentDrawing.arrEntities.Last)
         End If
       Else
         gcd.CurrentDrawing.arrEntities.Add(ClonEntity(gcd.CurrentDrawing.arrEntities[i]))
-        gcd.CurrentDrawing.arrEntities.Last.ClassHandler.finish(gcd.CurrentDrawing.arrEntities.Last, -1)
+        gcd.CurrentDrawing.arrEntities.Last.ClassHandler.finish(gcd.CurrentDrawing.arrEntities.Last)
 
       Endif
 
@@ -1080,9 +1091,9 @@ Public Function ImportJsonToEntity(c As JSONCollection, e As Entity) As Boolean
     ' llenamos Common data:
     e.layerID = c["layer"][3]
     If TypeOf(c["color"]) = gb.Object Then
-      e.colour = c["color"]["index"]
+      Try e.colour = c["color"]["index"]    ' FIXME: esto sigue dando error
     Else
-      e.colour = c["color"]
+      Try e.colour = c["color"]
     Endif
     e.LineWidth = c["linewt"] / 100
     If e.LineWidth < 1 Then e.LineWidth = 1

@@ -190,6 +190,9 @@ Public Sub Draw(oE As Entity)
 
   If Not oE.Visible Then Return
   If Not oE.DrawAble Then Return
+
+  If oE.fParam[2] = oE.fParam[1] Then Return
+
   oE.ColorToPaint = gcd.GetGBColor(oE.colour, oE.Layerid)
 
   If Me.StepsDone = 1 Then
@@ -245,7 +248,7 @@ Public Sub Draw(oE As Entity)
     ' veo el cuantos pixels tendria cada tramo
     LargoReal = 2 * oE.fParam[0] * Pi * Abs(oE.fParam[1] - oE.fParam[2]) / 360
     LargoPixels = APPMain.Pixels(LargoReal)
-
+    If LargoPixels = 0 Then LargoPixels = 1
     ' si quiero tramos de 10 pixels...
     angle_increment = 5 / LargoPixels * 2 * Pi * oe.fParam[3]
     If Abs(angle_increment * 10) > Abs(oE.fParam[2] / 180 * Pi - oE.fParam[1] / 180 * Pi) Then

@@ -130,7 +130,7 @@ Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' called by FCAD->
   entInsert.fParam.Add(FBlock.scaleX)
   entInsert.fParam.Add(FBlock.scaleY)
   entInsert.fParam.Add(FBlock.degRotation)
-  entInsert.ClassHandler.Finish(entInsert, -1)
+  entInsert.ClassHandler.Finish(entInsert)
 
   EntityBuilder.LastEntity = entInsert                                       ' save it to repeat on rigth click
 
