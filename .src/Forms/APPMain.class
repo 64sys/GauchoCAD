@@ -1532,22 +1532,22 @@ Public Sub btnWidths_MouseDown()
     Do
       If SelectingWidth = True Then
         vrx = Starter.cWidths[CStr(CurrentWidth)]
-        If vrx.Count > 1 Then
-          If Object.Type(vrx[2]) = "Image" Then
-            If CInt(CurrentWidth) > 0 And CInt(CurrentWidth) < 27 Then
-              img2 = vrx[2]
+        If vrx Then
+          If vrx.Count > 1 Then
+            If Object.Type(vrx[2]) = "Image" Then
+              If CInt(CurrentWidth) > 0 And CInt(CurrentWidth) < 27 Then
+                img2 = vrx[2]
+                wtx = dsk.TextWidth(CStr(vrx[0]) & " mm", btnWidths.Font.Name, btnWidths.Font.Size)
+                btnWidths.Text = " " & CStr(vrx[0]) & " mm"
+                btnWidths.Picture = img2.Stretch(btnWidths.W - wtx - 24, img2.H).Picture
+                btnWidths.Tooltip = ("Width") & " " & CStr(vrx[0]) & " mm"
+              Else
+                btnWidths.Picture = Null
+                btnWidths.Text = vrx[0]
+                btnWidths.Tooltip = ("Width") & " " & vrx[0]
+              Endif
 
-              wtx = dsk.TextWidth(CStr(vrx[0]) & " mm", btnWidths.Font.Name, btnWidths.Font.Size)
-
-              btnWidths.Text = " " & CStr(vrx[0]) & " mm"
-              btnWidths.Picture = img2.Stretch(btnWidths.W - wtx - 24, img2.H).Picture
-              btnWidths.Tooltip = ("Width") & " " & CStr(vrx[0]) & " mm"
-            Else
-              btnWidths.Picture = Null
-              btnWidths.Text = vrx[0]
-              btnWidths.Tooltip = ("Width") & " " & vrx[0]
             Endif
-
           Endif
         Endif
         SelectingWidth = False

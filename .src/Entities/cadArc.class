@@ -63,7 +63,6 @@ Public Function NewParameter(eBuild As Entity, vParam As Variant[], Optional Def
     Try eBuild.P[0] = vParam[1]
     Try eBuild.P[1] = vParam[2]
 
-
     If definitive Then
       eBuild.fParam.Add(0)
       Return True
@@ -88,24 +87,17 @@ Public Function NewParameter(eBuild As Entity, vParam As Variant[], Optional Def
 
     If definitive Then Return True
 
-
   Else If Me.StepsDone = 3 Then    ' recibimos el angulo inicial
 
     If vParam[0] <> "float" Then Return False
-
 
     eBuild.fParam[2] = vParam[1]
 
     If definitive Then Return True
 
-
-
   Else
     Return False
   End If
-
-
-
 
 End
 

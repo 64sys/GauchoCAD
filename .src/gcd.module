@@ -297,8 +297,6 @@ End
 
 Public Sub ExportBlocks(colData As Collection) ', obxEntities As Entity[]) As Integer
 
-
-
 End
 
 Public Sub ImportBlocks(colData As Collection) ', obxEntities As Entity[]) As Integer
@@ -353,7 +351,6 @@ Public Sub ImportBlocks(colData As Collection) ', obxEntities As Entity[]) As In
 
       Debug "Error loading block", newBlock.name
 
-
     End If
     gcd.CurrentDrawing.arrBlocks.Add(newBlock)
     'ImportEntities2(colBlk["Entities"], newBlock.entities, newBlock.name)
@@ -362,7 +359,6 @@ Public Sub ImportBlocks(colData As Collection) ', obxEntities As Entity[]) As In
   'Stop
 
 End
-
 
 '' Importa las cosas de manera descentralizada
 Public Sub ImpEnty5(cEny As Collection, obx As Entity[])
@@ -375,7 +371,6 @@ Public Sub ImpEnty5(cEny As Collection, obx As Entity[])
       entNueva = New Entity                                       ' entonces, creamos una nueva
 
       If InStr("POINT_ATTDEF_ATTRIB_LINE_LWPOLYLINE_CIRCLE_ELLIPSE_ARC_TEXT_MTEXT_SPLINE_SOLID_LEADER_INSERT_DIMENSION_LINEAR", e["entity"]) = 0 Then Continue
-
 
       If clsEntities.ImportJsonToEntity(e, entNueva) Then         ' si esta implementada, llenamos los datos
         If e.Exist("handle") Then
