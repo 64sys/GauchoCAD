@@ -305,6 +305,24 @@
       Picture = Picture["svg/tools/erase.svg"]
       Tag = "erase"
     }
+    { mnuArea Menu tool
+      Name = "mnuArea"
+      Text = ("Area")
+      Picture = Picture["svg/tools/area.svg"]
+      Tag = "area"
+    }
+    { mnuRuler Menu tool
+      Name = "mnuRuler"
+      Text = ("Ruler")
+      Picture = Picture["svg/tools/ruler.svg"]
+      Tag = "ruler"
+    }
+    { mnuProtractor Menu tool
+      Name = "mnuProtractor"
+      Text = ("Protractor")
+      Picture = Picture["svg/tools/protractor.svg"]
+      Tag = "protractor"
+    }
   }
   { grpSmart Menu
     Text = ("Structures")
@@ -427,7 +445,7 @@
       }
     }
     { PanEdit1 Panel
-      MoveScaled(1,16,149,70)
+      MoveScaled(0,10,149,70)
       Expand = True
       Arrangement = Arrange.Horizontal
       Spacing = True
