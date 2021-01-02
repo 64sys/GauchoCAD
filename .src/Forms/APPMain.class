@@ -194,9 +194,9 @@ Public Sub Run(cin As Collection)
 
             Case "grpTools", "grpView"
               sPic = "./svg/tools/" & obj.Tag & ".svg"
-              If obj.Tag = "selection" Then
-                Print "x"
-              Endif
+              'If obj.Tag = "selection" Then
+              'Print obj.Tag
+              'Endif
               If Exist(sPic) Then
                 If Application.DarkTheme Then
                   svg = Replace(File.Load(sPic), "#0066b3;", "#eeeeee;")
@@ -213,6 +213,7 @@ Public Sub Run(cin As Collection)
         End With
 
         obj.Picture = obj.Picture.Image.Stretch(22, 22).Picture
+        Print obj.Tag
 
       Endif
       Inc i
@@ -225,7 +226,7 @@ Public Sub Run(cin As Collection)
   btnLayers.Reparent(pnlFile)
   btnWidths.Reparent(pnlFile)
   cboDrawing.Reparent(pnlFile)
-  Panel6.Reparent(pnlFile)
+  '  Panel6.Reparent(pnlFile)
   'cboLayers.Reparent(pnlFile)
   'tobLayers.Reparent(pnlFile)
   'cboWidths.Reparent(pnlFile)
@@ -265,12 +266,15 @@ Public Sub Run(cin As Collection)
   btnSelectionMode.Value = True
   btnSelectionMode.Picture = Image.FromString(Highligh("./svg/locks/tools.svg")).Stretch(35, 35).Picture
 
+  btnMenuShow.Value = False
+
   TableView1.Rows.Height = 35
 
   SelectionMode()
   'pnlProperties.Visible = False
   'pnlIcons.Visible = True
 
+  Me.Menus.Hide
   Me.Show()
 
 End
@@ -2959,5 +2963,15 @@ Public Sub cboDrawing_Click()
       Break
     Endif
   Next
+
+End
+
+Public Sub btnMenuShow_Click()
+
+  If btnMenuShow.Value = False Then
+    Me.Menus.Hide
+  Else
+    Me.Menus.show
+  Endif
 
 End
