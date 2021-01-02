@@ -25,18 +25,14 @@ Public Const Gender As String = "Dimension_Linear"
 Public Const DrawingOrder As Integer = 100 ' 1 a 32.724 esto debe Drawse primero y ser sobreescrito por el resto
 Public Const PointsToDraw As Integer = 1             ' minimal point requered for drawing something usefull
 Public Const HelperTrabajo As String = ("Insert a linear acotation")
-Public ParamType As String = "TPP"                             ' that is Point, Point, Float; could be Color Text, etc
+Public ParamType As String = "PP"                             ' that is Point, Point, Float; could be Color Text, etc
 Public ParamHelper As String = "Start point;End point"
 Public Const USEWITH As String = ""
 Public Const OrthogonalIgnored As Boolean = False
 Public Const OrthogonalForced As Boolean = False
 Public Const ParamDefault As String = " "
 Public Const StretchAble As Boolean = True           ' Si lo puedo deformar
-Public Selected As Boolean
 
-Public DrawAble As Boolean = False          ' True si durante la construccion ya tiene suficientes elementos para poder hacer una representacion digna
-Public Visible As Boolean = True            ' si esta entidad puede ser mostrada independientmente
-Public Finished As Boolean = False          ' colocar en true cuando se llegue a completar
 Public StepsDone As Integer                 ' esto lo cambia cls ElementBuilder durante la construccion
 
 Public TotalDimensions As Integer           ' the total dimensions present in this drawing
@@ -55,55 +51,31 @@ Public DimTextHeight As Float = 0.3      '
 Public DimSeparation As Float = 0.5      ' la separacion entre el punto que define la cota y el inicio de la linea q marca inicio y fin
 Public DimExtension As Float = 0.5       ' la continuacion de esas lineas
 
-' Pixeles
-
-Public LastMouseDownX As Integer    ' change in MouseDown
-Public LastMouseDownY As Integer
-Public SelStartX As Integer         ' change in MouseDown
-Public SelStartY As Integer
-Public SelEndX As Integer           ' change in MouseMove/MouseUp
-Public SelEndY As Integer
-
-' Metros
-Public SelStartXr As Float          ' Seleccion libre rectangular
-Public SelStartZr As Float          ' en metros
-Public SelEndXr As Float            ' aca Y es Z
-Public SelEndZr As Float
-
-' Clicks en Metros
-Public ClickXr As Float
-Public ClickYr As Float
-Public ClickPrevXr As Float
-Public ClickPrevYr As Float
-
-Public TextEntry As String
-
-' indicadores
-'Public elem.StepsDone As Integer = 0          ' La cantidad de puntos que marco para el trabajo actual--->Gurdado en la entidad
-Public StepsTotal As Integer = 0          ' Tomado de la lista de tipo de paramtros
-Public PointsTotal As Integer = 0          ' Tomado de la lista de tipo de paramtros
-Public NextParamType As String          ' What kind of input the element expects P=point, F=float, C=color, S=string, M=mixed either Point, or Float that is taken from Max(Px-Px', Pz-Pz')
-Public ParamHelperList As String[]
-
-' indices de valores ingresados
-Public iPoints As Integer
-Public iFloat As Integer
-Public iString As Integer
-
-' conserva los ultimos valores del mouse
-Public CursorX As Integer
-Public CursorY As Integer
-
-Public elem As Entity
-
-Public PoiChecking As Boolean = True
-Public EntityChecking As Boolean = False
-Public LastEntity As Entity
-
-Public XYreal As Float[]
 
 Public extension As Float
 Public iBloque As Integer
+
+
+' JSON and DXF Read/Export
+Public Const JSON_Reading As Boolean = True
+Public Const JSON_Export As Boolean = False
+Public Const DXF_Reading As Boolean = True
+Public Const DXF_Export As Boolean = True
+
+' fParam helpers
+Public Const TotalParams As Integer = 7
+Public Const ipaEscX As Integer = 0
+Public Const ipaEscY As Integer = 1
+Public Const ipaEscZ As Integer = 2
+Public Const ipaRotacion As Integer = 3
+Public Const ipaVertJustif As Integer = 4
+Public Const ipaRelativeFactor As Integer = 5
+Public Const ipaObliqueAngle As Integer = 6
+
+' stringdata helpers
+Public Const sdaTotalParams As Integer = 2
+Public Const sdaText As Integer = 0
+Public Const sdaStyle As Integer = 1
 
 ' Para mejor generalidad y para compatibilidad futura usaremos los P[] asi con los CODE del DXF
 ' P[] = DXF CODE
@@ -132,162 +104,6 @@ Public iBloque As Integer
 
 ' 2 = DimScale
 
-'' Mode = DimType ver gcd.DimXXXX constants
-Public Function Start(Optional Mode As Integer = gcd.dimRadius)
-
-  Dim newBlock As New Block
-  'Dim eParte As Entity
-  Dim f1, f2 As New Float[]
-
-  Inc TotalDimensions
-
-  elem = New Entity
-
-  Me.DimType = Mode
-
-  elem.Gender = Me.Gender
-  elem.ClassHandler = cadDim
-  elem.p.Resize(24)
-  elem.fParam.Resize(6)
-  elem.Visible = False
-
-  ' como esto sera tratado como un inserto
-  elem.fParam[0] = 1  ' scaleX
-  elem.fParam[1] = 1  ' scaleY
-  elem.fParam[2] = 0  ' rotate
-
-  StepsDone = 0
-  iPoints = 0
-
-  ' init arrays
-  Select DimType
-    Case -1                 ' tengo que pregunta que dim quiere
-      clsDrawingAids.HelperTrabajo = "DimType? Horizontal;Vertical;Aligned;aNgular;rOtated,Radial;Diameter"
-      NextParamType = "T"
-
-    Case gcd.DimAligned
-      Me.StepsTotal = 3 ' 1-punto 2-punto 3-ubicacion del texto
-      NextParamType = "P"
-      ' ahora creo el bloque asociado
-      newBlock.entities = New Entity[]
-      newBlock.name = "*D" & Str$(gcd.CurrentDrawing.arrBlocks.Count)
-      gcd.CurrentDrawing.arrBlocks.Add(newBlock)
-      ' linea principal
-      gcd.AddLine(newBlock.entities, [0, 0, 0, 0], elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
-
-      ' lineas de demarcacion
-      gcd.AddLine(newBlock.entities, [0, Me.DimExtension, 0, -Me.DimExtension], elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
-      gcd.AddLine(newBlock.entities, [0, Me.DimExtension, 0, -Me.DimExtension], elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
-
-      ' flechas
-
-      f1.Insert([0, 0, Me.DimArrowSize, Me.DimArrowWidth, Me.DimArrowSize, -Me.DimArrowWidth, 0, 0])
-      f2.Insert([0, 0, -Me.DimArrowSize, Me.DimArrowWidth, -Me.DimArrowSize, -Me.DimArrowWidth, 0, 0])
-
-      gcd.Addsolid(newBlock.entities, f1, elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
-      gcd.Addsolid(newBlock.entities, f2, elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
-
-      ' texto
-      gcd.AddMText(newBlock.entities, [0, 0, 0, 0], 0, Me.DimTextHeight, "0.00", elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
-
-      ' y ahora e
-
-    Case gcd.dimAngular
-
-      Me.StepsTotal = 4 ' 1-centro 2-punto 3-punto 4-ubicacion del texto
-      NextParamType = "P"
-
-      ' ahora creo el bloque asociado
-      newBlock.entities = New Entity[]
-      newBlock.name = "*D" & Str$(gcd.CurrentDrawing.arrBlocks.Count)
-      gcd.CurrentDrawing.arrBlocks.Add(newBlock)
-      ' la linea principal ahora es un arco
-      gcd.Addarc(newBlock.entities, [0, 0], 0, 0, 0, elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
-
-      ' lineas de demarcacion
-      gcd.AddLine(newBlock.entities, [0, Me.DimExtension, 0, -Me.DimExtension], elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
-      gcd.AddLine(newBlock.entities, [0, Me.DimExtension, 0, -Me.DimExtension], elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
-
-      ' flechas
-
-      'f1.Insert()
-      'f2.Insert([0, 0, -Me.DimArrowSize, Me.DimArrowWidth, -Me.DimArrowSize, -Me.DimArrowWidth, 0, 0])
-
-      gcd.Addsolid(newBlock.entities, [0, 0, Me.DimArrowSize, Me.DimArrowWidth, Me.DimArrowSize, -Me.DimArrowWidth, 0, 0], elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
-      gcd.Addsolid(newBlock.entities, [0, 0, -Me.DimArrowSize, Me.DimArrowWidth, -Me.DimArrowSize, -Me.DimArrowWidth, 0, 0], elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
-
-      ' texto
-      gcd.AddMText(newBlock.entities, [0, 0, 0, 0], 0, Me.DimTextHeight, "0.00", elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
-
-    Case gcd.dimRadius
-
-      Me.StepsTotal = 2 ' 1-centro 2-punto
-      NextParamType = "P"
-
-      ' ahora creo el bloque asociado
-      newBlock.entities = New Entity[]
-      newBlock.name = "*D" & Str$(gcd.CurrentDrawing.arrBlocks.Count)
-      gcd.CurrentDrawing.arrBlocks.Add(newBlock)
-
-      ' linea principal
-      gcd.AddLine(newBlock.entities, [0, 0, 0, 0], elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
-
-      ' linea de demarcacion
-      gcd.AddLine(newBlock.entities, [0, Me.DimExtension, 0, -Me.DimExtension], elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
-
-      ' flecha
-
-      gcd.Addsolid(newBlock.entities, [0, 0, -Me.DimArrowSize, Me.DimArrowWidth, -Me.DimArrowSize, -Me.DimArrowWidth, 0, 0], elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
-
-      ' texto
-      gcd.AddMText(newBlock.entities, [0, 0, 0, 0], 0, Me.DimTextHeight, "0.00", elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
-
-    Case gcd.dimDiameter
-
-      Me.StepsTotal = 2 ' 1-quadrant 2-quadrant
-      NextParamType = "P"
-
-      ' ahora creo el bloque asociado
-      newBlock.entities = New Entity[]
-      newBlock.name = "*D" & Str$(gcd.CurrentDrawing.arrBlocks.Count)
-      gcd.CurrentDrawing.arrBlocks.Add(newBlock)
-
-      ' linea principal
-      gcd.AddLine(newBlock.entities, [0, 0, 0, 0], elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
-
-      ' flecha
-      gcd.Addsolid(newBlock.entities, [0, 0, Me.DimArrowSize, Me.DimArrowWidth, Me.DimArrowSize, -Me.DimArrowWidth, 0, 0], elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
-      gcd.Addsolid(newBlock.entities, [0, 0, -Me.DimArrowSize, Me.DimArrowWidth, -Me.DimArrowSize, -Me.DimArrowWidth, 0, 0], elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
-
-      ' texto
-      gcd.AddMText(newBlock.entities, [0, 0, 0, 0], 0, Me.DimTextHeight, "0.00", elem.colour, elem.LineWidth, elem.LineType, elem.Layer, newBlock.name)
-
-  End Select
-
-  'elem.gbcolor = appmain.CurrentColor
-  elem.Block = newBlock.name
-
-  iPoints = 0
-  iFloat = 0
-  iString = 0
-
-  ' Pointstotal = elem.p.count / 2                                          ' at this point P is either set or 0 if non determined
-  ' StepsTotal = Len(elem.ClassHandler.ParamType)
-  '
-  ' NextParamType = UCase(Mid(elem.ClassHandler.ParamType, elem.StepsDone + 1, 1))
-  ' clsDrawingAids.HelperTrabajoNext = ParamHelperList[0]
-
-  ' instructions to FCAD
-  gcd.OrthogonalIgnored = Me.OrthogonalIgnored
-  gcd.OrthogonalForced = Me.OrthogonalForced
-
-  elem.layer = appmain.CurrentLayer
-  elem.layerid = gcd.GetLayerID(appmain.CurrentLayer)
-
-  clsDrawingAids.HelperTrabajo = elem.ClassHandler.HelperTrabajo
-
-End
-
 Public Sub Translate(e As Entity, dX As Float, dY As Float, Optional OnlySelected As Boolean = False)
 
   cadInsert.Translate(e, dx, dy, OnlySelected)
@@ -308,12 +124,9 @@ End
 
 Public Sub Draw(Optional e As Entity)
 
-  If e Then
-    cadInsert.Draw(e)
-  Else
 
-    cadInsert.Draw(elem)
-  End If
+  cadInsert.Draw(e)
+
 
 End
 
@@ -331,110 +144,9 @@ Public Sub DrawSelected(oE As Entity)
 
 End
 
-Public Function KeyText(EnteredText As String) ' esta rutina es llamada por FCAD en el evento FCAD_KeyPress cuando recibe una texto + <Enter>
 
-  ' this could be many things, but lets concentrate in what to expect and check if its correct
-  ' The element provides a constant called ParamType wich is a string like "PPFCTB"
-  ' P = point in X,Y format with decimal point as dot "."
-  '     it can also be @X,Y wich means that the coordinates are relative to the last point
-  ' F = float, thats any number
-  ' T = a text or a single character too
-  ' C = color input
-  ' B = boolean, Yes/Si or No
-  ' Lets see what are we expecting
-  Dim Xt, Zt As Float, ErrTxt As String, Relative As Boolean
 
-  Select NextParamType
-
-    Case "P", "+"
-      errtxt = ", expected a valid point like 12.4,9.5  or @12.34,10.5"
-      ' lets filter
-      EnteredText = Trim$(UCase$(EnteredText))
-      ' So we expect a position x,y , but in some cases it can be
-      ' C = close
-      ' U = undo, delete last segment
-      ' and others
-
-      If Left(EnteredText, 1) = "C" Then          ' close the element
-        ' got othe first point and exit
-        elem.P[iPoints * 2] = elem.P[0]
-        elem.P[iPoints * 2 + 1] = elem.P[1]
-        Me.Finish
-
-      Else If Left(EnteredText, 1) = "U" Then     ' undo last command and go
-
-        elem.P.remove(elem.P.max)
-        elem.P.remove(elem.P.max)
-        Me.Finish
-      Else                                        ' an X,Y or @X,Y
-
-        If InStr(EnteredText, "@") > 0 Then    ' may be a point
-          Relative = True
-          EnteredText = Replace(EnteredText, "@", "")
-        Endif
-        Xt = CFloat(Split(EnteredText, ",")[0])
-        Zt = CFloat(Split(EnteredText, ",")[1])
-
-        ' if we are stll here, input was good
-        elem.P[iPoints * 2] = Xt
-        elem.P[iPoints * 2 + 1] = Zt
-
-        If Relative And (elem.P.count > 2) Then
-          elem.P[iPoints * 2] += elem.P[(iPoints - 1) * 2]
-          elem.P[iPoints * 2 + 1] += elem.P[(iPoints - 1) * 2 + 1]
-
-        Endif
-        Inc iPoints
-        AdvanceStep
-
-      End If
-
-    Case "T"
-      errtxt = ", expected text, not a point"
-
-      TextEntry = EnteredText
-
-      AdvanceStep
-
-    Case "F", "M", "A", "L"                 ' Float, Mixed, Angle, Longitud
-      errtxt = "enter a valid text size"
-
-      If EnteredText = "" Then
-
-        Try elem.fParam[iFloat] = ParamDefault[elem.StepsDone]
-
-      Else
-
-        elem.fParam[iFloat] = CFloat(EnteredText)
-
-      Endif
-
-      Inc iFloat
-      AdvanceStep
-
-    Case "C"                                ' color
-      If Dialog.SelectColor() Then
-        elem.fParam[iFloat] = CFloat(Dialog.Color)
-        Inc iFloat
-        AdvanceStep
-
-      Endif
-      Key.Cod
-
-  End Select
-
-Finally
-
-  Return
-
-Catch
-
-  ' unexpected input
-  clsDrawingAids.ErrorMessage = ("Bad input" & ErrTxt)
-
-End
-
-Public Sub ReBuildBlock()
+Public Sub ReBuildBlock(ELEM As Entity)
 
   Dim d As Float, flxTextExt As Float[]
   Dim fRotXY As Float[]
@@ -444,396 +156,120 @@ Public Sub ReBuildBlock()
 
   Select DimType
     Case -1 'clsDrawingAids.HelperTrabajo = "DimType? Horizontal;Vertical;Aligned;aNgular;rOtated,Radial;Diameter"
-      Select UCase(TextEntry)
-        Case "H"
-          DimType = gcd.dimHorizontal
-        Case "V"
-          DimType = gcd.dimVertical
-        Case "A"
-          DimType = gcd.dimAligned
-        Case "N"
-          DimType = gcd.dimAngular
-        Case "O"
-          DimType = gcd.dimRotated
-        Case "R"
-          DimType = gcd.dimRadius
-        Case "D"
-          DimType = gcd.dimDiameter
-        Case Else
-          clsDrawingAids.ErrorMessage = ("Bad input")
-          Return
-      End Select
-      ' good input
 
-    Case gcd.DimAligned
-      If iPoints = 0 Then     ' marco el primer punto
-        elem.P[0] = ClickXr     ' posicion base del inserto
-        elem.P[1] = ClickYr
+      ' Case gcd.DimAligned
+      '   If iPoints = 0 Then     ' marco el primer punto
+      '     elem.P[0] = ClickXr     ' posicion base del inserto
+      '     elem.P[1] = ClickYr
+      '
+      '     elem.fParam[0] = 1      ' ScaleX del inserto
+      '     elem.fParam[1] = 1      ' ScaleY del inserto
+      '     elem.fParam[2] = 0      ' degAngle del inserto
+      '
+      '   Else If iPoints = 1 Then ' marco el segundo punto, lo que modifica los parametros del bloque
+      '     elem.Visible = True
+      '     elem.P[2] = ClickXr     ' posicion base del inserto
+      '     elem.P[3] = ClickYr
+      '
+      '     ' el largo de la linea principal viene dado por la distancia entre ambos puntos
+      '     d = puntos.distancia(elem.P[0], elem.P[1], ClickXr, ClickYr)
+      '
+      '     ' con este click calculo el angulo
+      '     elem.fParam[2] = Ang(ClickXr - elem.P[0], ClickYr - elem.P[1]) * 180 / Pi
+      '
+      '     ' la primer entidad del bloque es la linea principal
+      '     gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].P[0] = 0           ' X0
+      '     gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].P[1] = 0           ' Y0
+      '
+      '     gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].P[2] = d           ' X1
+      '     gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].P[3] = 0           ' Y1
+      '
+      '     ' la segunda es la primer linea de demarcacion (sin cambios)
+      '     'gcd.CurrentDrawing.arrBlocks[iBloque].entities[1].P[0] = 0           ' X0
+      '     'gcd.CurrentDrawing.arrBlocks[iBloque].entities[1].P[1] = 0           ' Y0
+      '
+      '     'gcd.CurrentDrawing.arrBlocks[iBloque].entities[1].P[2] = d           ' X1
+      '     'gcd.CurrentDrawing.arrBlocks[iBloque].entities[1].P[3] = 0           ' Y1
+      '
+      '     ' la tercera es la segunda linea de demarcacion
+      '     gcd.CurrentDrawing.arrBlocks[iBloque].entities[2].P[0] = d           ' X0
+      '     'gcd.CurrentDrawing.arrBlocks[iBloque].entities[2].P[1] = 0           ' Y0
+      '
+      '     gcd.CurrentDrawing.arrBlocks[iBloque].entities[2].P[2] = d           ' X1
+      '     'gcd.CurrentDrawing.arrBlocks[iBloque].entities[2].P[3] = 0           ' Y1
+      '
+      '     ' la sexta es el texto
+      '     gcd.CurrentDrawing.arrBlocks[iBloque].entities[5].StringData[0] = Format(d, Me.DimFormat)
+      '
+      '     flxTextExt = glPlus.MTextExtends(gcd.CurrentDrawing.arrBlocks[iBloque].entities[5].StringData[0], 0, 0, gcd.CurrentDrawing.arrBlocks[iBloque].entities[5].fParam[1])
+      '
+      '     ' la cuarta y quinta son las flechas , tengo que verificar si entran, o el texto
+      '     If flxTextExt[2] * 1.1 > d Then                      ' no entra
+      '
+      '       gcd.CurrentDrawing.arrBlocks[iBloque].entities[3].P[0] = d           ' X0
+      '       gcd.CurrentDrawing.arrBlocks[iBloque].entities[3].P[2] = Me.DimArrowSize + d           ' X0
+      '       gcd.CurrentDrawing.arrBlocks[iBloque].entities[3].P[4] = Me.DimArrowSize + d           ' X0
+      '       gcd.CurrentDrawing.arrBlocks[iBloque].entities[3].P[6] = d           ' X0
+      '
+      '       gcd.CurrentDrawing.arrBlocks[iBloque].entities[4].P[0] = 0           ' X0
+      '       gcd.CurrentDrawing.arrBlocks[iBloque].entities[4].P[2] = -Me.DimArrowSize
+      '       gcd.CurrentDrawing.arrBlocks[iBloque].entities[4].P[4] = -Me.DimArrowSize
+      '       gcd.CurrentDrawing.arrBlocks[iBloque].entities[4].P[6] = 0           ' X0
+      '
+      '       ' el texto va afuera
+      '       gcd.CurrentDrawing.arrBlocks[iBloque].entities[5].P[0] = d + Me.DimArrowSize / 2
+      '       gcd.CurrentDrawing.arrBlocks[iBloque].entities[5].P[1] = Me.DimArrowWidth
+      '
+      '     Else                                                                ' entra
+      '       gcd.CurrentDrawing.arrBlocks[iBloque].entities[3].P[0] = 0           ' X0
+      '       gcd.CurrentDrawing.arrBlocks[iBloque].entities[3].P[2] = Me.DimArrowSize
+      '       gcd.CurrentDrawing.arrBlocks[iBloque].entities[3].P[4] = Me.DimArrowSize
+      '       gcd.CurrentDrawing.arrBlocks[iBloque].entities[3].P[6] = 0           ' X0
+      '
+      '       gcd.CurrentDrawing.arrBlocks[iBloque].entities[4].P[0] = d           ' X0
+      '       gcd.CurrentDrawing.arrBlocks[iBloque].entities[4].P[2] = -Me.DimArrowSize + d           ' X0
+      '       gcd.CurrentDrawing.arrBlocks[iBloque].entities[4].P[4] = -Me.DimArrowSize + d           ' X0
+      '       gcd.CurrentDrawing.arrBlocks[iBloque].entities[4].P[6] = d           ' X0
+      '
+      '       ' el texto va adentro
+      '       gcd.CurrentDrawing.arrBlocks[iBloque].entities[5].P[0] = d / 2 - flxTextExt[2] / 2
+      '       gcd.CurrentDrawing.arrBlocks[iBloque].entities[5].P[1] = Me.DimArrowWidth
+      '
+      '     End If
+      '
+      '   Else If iPoints = 2 Then ' marco la extension
+      '
+      '     extension = -puntos.PointToLineDistance([ClickXr, ClickYr], [elem.P[0], elem.P[1], elem.P[2], elem.P[3]])
+      '     'Debug extension
+      '
+      '     ' linea principal
+      '     gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].P[1] = extension           ' Y0
+      '     gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].P[3] = extension           ' Y1
+      '
+      '     ' linea de demarcacion
+      '     gcd.CurrentDrawing.arrBlocks[iBloque].entities[1].P[1] = Me.DimExtension + extension           ' Y0
+      '     gcd.CurrentDrawing.arrBlocks[iBloque].entities[1].P[3] = -Me.DimExtension + extension           ' Y1
+      '
+      '     ' segunda linea de demarcacion
+      '     gcd.CurrentDrawing.arrBlocks[iBloque].entities[2].P[1] = Me.DimExtension + extension           ' Y0
+      '     gcd.CurrentDrawing.arrBlocks[iBloque].entities[2].P[3] = -Me.DimExtension + extension           ' Y1
+      '
+      '     ' texto
+      '     gcd.CurrentDrawing.arrBlocks[iBloque].entities[5].P[1] = Me.DimArrowWidth + extension
+      '
+      '     ' flechas
+      '     gcd.CurrentDrawing.arrBlocks[iBloque].entities[3].P[1] = extension           ' X0
+      '     gcd.CurrentDrawing.arrBlocks[iBloque].entities[3].P[3] = extension + Me.DimArrowWidth
+      '     gcd.CurrentDrawing.arrBlocks[iBloque].entities[3].P[5] = extension - Me.DimArrowWidth
+      '     gcd.CurrentDrawing.arrBlocks[iBloque].entities[3].P[7] = extension           ' X0
+      '
+      '     gcd.CurrentDrawing.arrBlocks[iBloque].entities[4].P[1] = extension           ' X0
+      '     gcd.CurrentDrawing.arrBlocks[iBloque].entities[4].P[3] = extension + Me.DimArrowWidth
+      '     gcd.CurrentDrawing.arrBlocks[iBloque].entities[4].P[5] = extension - Me.DimArrowWidth
+      '     gcd.CurrentDrawing.arrBlocks[iBloque].entities[4].P[7] = extension           ' X0
+      '
+      '   End If
 
-        elem.fParam[0] = 1      ' ScaleX del inserto
-        elem.fParam[1] = 1      ' ScaleY del inserto
-        elem.fParam[2] = 0      ' degAngle del inserto
-
-      Else If iPoints = 1 Then ' marco el segundo punto, lo que modifica los parametros del bloque
-        elem.Visible = True
-        elem.P[2] = ClickXr     ' posicion base del inserto
-        elem.P[3] = ClickYr
-
-        ' el largo de la linea principal viene dado por la distancia entre ambos puntos
-        d = puntos.distancia(elem.P[0], elem.P[1], ClickXr, ClickYr)
-
-        ' con este click calculo el angulo
-        elem.fParam[2] = Ang(ClickXr - elem.P[0], ClickYr - elem.P[1]) * 180 / Pi
-
-        ' la primer entidad del bloque es la linea principal
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].P[0] = 0           ' X0
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].P[1] = 0           ' Y0
-
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].P[2] = d           ' X1
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].P[3] = 0           ' Y1
-
-        ' la segunda es la primer linea de demarcacion (sin cambios)
-        'gcd.CurrentDrawing.arrBlocks[iBloque].entities[1].P[0] = 0           ' X0
-        'gcd.CurrentDrawing.arrBlocks[iBloque].entities[1].P[1] = 0           ' Y0
-
-        'gcd.CurrentDrawing.arrBlocks[iBloque].entities[1].P[2] = d           ' X1
-        'gcd.CurrentDrawing.arrBlocks[iBloque].entities[1].P[3] = 0           ' Y1
-
-        ' la tercera es la segunda linea de demarcacion
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[2].P[0] = d           ' X0
-        'gcd.CurrentDrawing.arrBlocks[iBloque].entities[2].P[1] = 0           ' Y0
-
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[2].P[2] = d           ' X1
-        'gcd.CurrentDrawing.arrBlocks[iBloque].entities[2].P[3] = 0           ' Y1
-
-        ' la sexta es el texto
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[5].StringData[0] = Format(d, Me.DimFormat)
-
-        flxTextExt = glPlus.MTextExtends(gcd.CurrentDrawing.arrBlocks[iBloque].entities[5].StringData[0], 0, 0, gcd.CurrentDrawing.arrBlocks[iBloque].entities[5].fParam[1])
-
-        ' la cuarta y quinta son las flechas , tengo que verificar si entran, o el texto
-        If flxTextExt[2] * 1.1 > d Then                      ' no entra
-
-          gcd.CurrentDrawing.arrBlocks[iBloque].entities[3].P[0] = d           ' X0
-          gcd.CurrentDrawing.arrBlocks[iBloque].entities[3].P[2] = Me.DimArrowSize + d           ' X0
-          gcd.CurrentDrawing.arrBlocks[iBloque].entities[3].P[4] = Me.DimArrowSize + d           ' X0
-          gcd.CurrentDrawing.arrBlocks[iBloque].entities[3].P[6] = d           ' X0
-
-          gcd.CurrentDrawing.arrBlocks[iBloque].entities[4].P[0] = 0           ' X0
-          gcd.CurrentDrawing.arrBlocks[iBloque].entities[4].P[2] = -Me.DimArrowSize
-          gcd.CurrentDrawing.arrBlocks[iBloque].entities[4].P[4] = -Me.DimArrowSize
-          gcd.CurrentDrawing.arrBlocks[iBloque].entities[4].P[6] = 0           ' X0
-
-          ' el texto va afuera
-          gcd.CurrentDrawing.arrBlocks[iBloque].entities[5].P[0] = d + Me.DimArrowSize / 2
-          gcd.CurrentDrawing.arrBlocks[iBloque].entities[5].P[1] = Me.DimArrowWidth
-
-        Else                                                                ' entra
-          gcd.CurrentDrawing.arrBlocks[iBloque].entities[3].P[0] = 0           ' X0
-          gcd.CurrentDrawing.arrBlocks[iBloque].entities[3].P[2] = Me.DimArrowSize
-          gcd.CurrentDrawing.arrBlocks[iBloque].entities[3].P[4] = Me.DimArrowSize
-          gcd.CurrentDrawing.arrBlocks[iBloque].entities[3].P[6] = 0           ' X0
-
-          gcd.CurrentDrawing.arrBlocks[iBloque].entities[4].P[0] = d           ' X0
-          gcd.CurrentDrawing.arrBlocks[iBloque].entities[4].P[2] = -Me.DimArrowSize + d           ' X0
-          gcd.CurrentDrawing.arrBlocks[iBloque].entities[4].P[4] = -Me.DimArrowSize + d           ' X0
-          gcd.CurrentDrawing.arrBlocks[iBloque].entities[4].P[6] = d           ' X0
-
-          ' el texto va adentro
-          gcd.CurrentDrawing.arrBlocks[iBloque].entities[5].P[0] = d / 2 - flxTextExt[2] / 2
-          gcd.CurrentDrawing.arrBlocks[iBloque].entities[5].P[1] = Me.DimArrowWidth
-
-        End If
-
-      Else If iPoints = 2 Then ' marco la extension
-
-        extension = -puntos.PointToLineDistance([ClickXr, ClickYr], [elem.P[0], elem.P[1], elem.P[2], elem.P[3]])
-        'Debug extension
-
-        ' linea principal
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].P[1] = extension           ' Y0
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].P[3] = extension           ' Y1
-
-        ' linea de demarcacion
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[1].P[1] = Me.DimExtension + extension           ' Y0
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[1].P[3] = -Me.DimExtension + extension           ' Y1
-
-        ' segunda linea de demarcacion
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[2].P[1] = Me.DimExtension + extension           ' Y0
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[2].P[3] = -Me.DimExtension + extension           ' Y1
-
-        ' texto
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[5].P[1] = Me.DimArrowWidth + extension
-
-        ' flechas
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[3].P[1] = extension           ' X0
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[3].P[3] = extension + Me.DimArrowWidth
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[3].P[5] = extension - Me.DimArrowWidth
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[3].P[7] = extension           ' X0
-
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[4].P[1] = extension           ' X0
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[4].P[3] = extension + Me.DimArrowWidth
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[4].P[5] = extension - Me.DimArrowWidth
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[4].P[7] = extension           ' X0
-
-      End If
-
-    Case gcd.dimAngular
-      If iPoints = 0 Then     ' marco el primer punto
-        elem.P[0] = ClickXr     ' posicion base del inserto
-        elem.P[1] = ClickYr
-
-        elem.fParam[0] = 1      ' ScaleX del inserto
-        elem.fParam[1] = 1      ' ScaleY del inserto
-        elem.fParam[2] = 0      ' degAngle del inserto
-
-      Else If iPoints = 1 Then ' marco el segundo punto, lo que modifica los parametros del bloque
-
-        elem.P[2] = ClickXr     ' con esto puedo definir el radio del arco
-        elem.P[3] = ClickYr
-        d = puntos.distancia(elem.P[0], elem.P[1], ClickXr, ClickYr)
-
-        ' con este click calculo el angulo
-        'elem.fParam[2] = Ang(ClickXr - elem.P[0], ClickYr - elem.P[1]) * 180 / Pi
-
-        ' la primer entidad del bloque es el arco
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].P[0] = 0 'elem.P[0]
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].P[1] = 0 'elem.P[1]
-
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[0] = d          ' radio
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[1] = Ang(ClickXr - elem.P[0], ClickYr - elem.P[1]) * 180 / Pi
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[2] = 0
-
-        ' las lineas de extension (las hago HORIZONTALES y las roto)
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[1].P.Clear
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[1].P.Insert([-Me.DimExtension, 0, Me.DimExtension, 0])
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[2].P.Clear
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[2].P.Insert([-Me.DimExtension, 0, Me.DimExtension, 0])
-
-        ' flechas
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[3].P.Clear
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[3].P.Insert([0, 0, -Me.DimArrowWidth, Me.DimArrowSize, Me.DimArrowWidth, Me.DimArrowSize, 0, 0])
-
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[4].P.Clear
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[4].P.Insert([0, 0, -Me.DimArrowWidth, -Me.DimArrowSize, Me.DimArrowWidth, -Me.DimArrowSize, 0, 0])
-
-        ' roto
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[1].ClassHandler.Rotate(gcd.CurrentDrawing.arrBlocks[iBloque].entities[1], gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[1] / 180 * Pi)
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[2].ClassHandler.Rotate(gcd.CurrentDrawing.arrBlocks[iBloque].entities[2], gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[1] / 180 * Pi)
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[3].ClassHandler.Rotate(gcd.CurrentDrawing.arrBlocks[iBloque].entities[3], gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[1] / 180 * Pi)
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[4].ClassHandler.Rotate(gcd.CurrentDrawing.arrBlocks[iBloque].entities[4], gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[1] / 180 * Pi)
-
-        ' traslado
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[1].ClassHandler.Translate(gcd.CurrentDrawing.arrBlocks[iBloque].entities[1], elem.P[2] - elem.P[0], elem.P[3] - elem.P[1])
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[2].ClassHandler.Translate(gcd.CurrentDrawing.arrBlocks[iBloque].entities[2], elem.P[2] - elem.P[0], elem.P[3] - elem.P[1])
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[3].ClassHandler.Translate(gcd.CurrentDrawing.arrBlocks[iBloque].entities[3], elem.P[2] - elem.P[0], elem.P[3] - elem.P[1])
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[4].ClassHandler.Translate(gcd.CurrentDrawing.arrBlocks[iBloque].entities[4], elem.P[2] - elem.P[0], elem.P[3] - elem.P[1])
-
-        ' la sexta es el texto
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[5].StringData[0] = Format(0, Me.DimFormatAng)
-        flxTextExt = glPlus.MTextExtends(gcd.CurrentDrawing.arrBlocks[iBloque].entities[5].StringData[0], 0, 0, gcd.CurrentDrawing.arrBlocks[iBloque].entities[5].fParam[1])
-
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[5].P[0] = elem.P[2] - elem.P[0]
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[5].P[1] = elem.P[3] - elem.P[1]
-
-      Else If iPoints = 2 Then ' marco el segundo punto, lo que modifica los parametros del bloque
-        elem.Visible = True
-        elem.P[4] = ClickXr
-        elem.P[5] = ClickYr
-
-        'gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[1] = Ang(ClickXr - elem.P[0], ClickYr - elem.P[1]) * 180 / Pi
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[2] = Ang(ClickXr - elem.P[0], ClickYr - elem.P[1]) * 180 / Pi
-
-        ' las lineas de extension (las hago HORIZONTALES y las roto)
-        'gcd.CurrentDrawing.arrBlocks[iBloque].entities[1].P.Clear
-        'gcd.CurrentDrawing.arrBlocks[iBloque].entities[1].P.Insert([-Me.DimExtension, 0, Me.DimExtension, 0])
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[2].P.Clear
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[2].P.Insert([-Me.DimExtension, 0, Me.DimExtension, 0])
-
-        ' flechas
-        'gcd.CurrentDrawing.arrBlocks[iBloque].entities[3].P.Clear
-        'gcd.CurrentDrawing.arrBlocks[iBloque].entities[3].P.Insert([0, 0, -Me.DimArrowWidth, Me.DimArrowSize, Me.DimArrowWidth, Me.DimArrowSize, 0, 0])
-
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[4].P.Clear
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[4].P.Insert([0, 0, -Me.DimArrowWidth, -Me.DimArrowSize, Me.DimArrowWidth, -Me.DimArrowSize, 0, 0])
-
-        ' roto
-
-        'gcd.CurrentDrawing.arrBlocks[iBloque].entities[1].ClassHandler.Rotate(gcd.CurrentDrawing.arrBlocks[iBloque].entities[1], gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[1] / 180 * Pi)
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[2].ClassHandler.Rotate(gcd.CurrentDrawing.arrBlocks[iBloque].entities[2], gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[2] / 180 * Pi)
-        'gcd.CurrentDrawing.arrBlocks[iBloque].entities[3].ClassHandler.Rotate(gcd.CurrentDrawing.arrBlocks[iBloque].entities[3], gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[1] / 180 * Pi)
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[4].ClassHandler.Rotate(gcd.CurrentDrawing.arrBlocks[iBloque].entities[4], gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[2] / 180 * Pi)
-
-        ' muevo
-        fRotXY = puntos.RotateFromPointWithAngle(elem.P[0], elem.P[1], (gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[2] - gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[1]) / 180 * Pi, elem.P[2], elem.P[3])
-
-        'gcd.CurrentDrawing.arrBlocks[iBloque].entities[2].ClassHandler.Translate(gcd.CurrentDrawing.arrBlocks[iBloque].entities[2], elem.P[4] - elem.P[0], elem.P[5] - elem.P[1])
-        'gcd.CurrentDrawing.arrBlocks[iBloque].entities[4].ClassHandler.Translate(gcd.CurrentDrawing.arrBlocks[iBloque].entities[4], elem.P[4] - elem.P[0], elem.P[5] - elem.P[1])
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[2].ClassHandler.Translate(gcd.CurrentDrawing.arrBlocks[iBloque].entities[2], fRotXY[0] - elem.P[0], fRotXY[1] - elem.P[1])
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[4].ClassHandler.Translate(gcd.CurrentDrawing.arrBlocks[iBloque].entities[4], fRotXY[0] - elem.P[0], fRotXY[1] - elem.P[1])
-
-        ' la sexta es el texto
-        If (gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[2] - gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[1]) < 0 Then gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[2] += 360
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[5].StringData[0] = Format((gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[2] - gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[1]), Me.DimFormatAng)
-        fRotXY = puntos.RotateFromPointWithAngle(elem.P[0], elem.P[1], (gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[2] - gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[1]) / 180 * Pi / 2, elem.P[2], elem.P[3])
-
-        flxTextExt = glPlus.MTextExtends(gcd.CurrentDrawing.arrBlocks[iBloque].entities[5].StringData[0], 0, 0, gcd.CurrentDrawing.arrBlocks[iBloque].entities[5].fParam[1])
-
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[5].P[0] = fRotXY[0] - elem.P[0]
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[5].P[1] = fRotXY[1] - elem.P[1]
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[5].fParam[0] = (gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[2] + gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[1]) / 2 - 90
-
-      Else If iPoints = 3 Then ' aca marco la extension, que es todo lo anterior, pero con otro radio
-
-        elem.P[6] = ClickXr
-        elem.P[7] = ClickYr
-
-        ' nuevo radio
-        d = puntos.distancia(elem.P[0], elem.P[1], ClickXr, ClickYr)
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[0] = d          ' radio del arco
-
-        ' regenero
-
-        ' las lineas de extension (las hago HORIZONTALES y las roto)
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[1].P.Clear
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[1].P.Insert([-Me.DimExtension, 0, Me.DimExtension, 0])
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[2].P.Clear
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[2].P.Insert([-Me.DimExtension, 0, Me.DimExtension, 0])
-
-        ' flechas
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[3].P.Clear
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[3].P.Insert([0, 0, -Me.DimArrowWidth, Me.DimArrowSize, Me.DimArrowWidth, Me.DimArrowSize, 0, 0])
-
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[4].P.Clear
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[4].P.Insert([0, 0, -Me.DimArrowWidth, -Me.DimArrowSize, Me.DimArrowWidth, -Me.DimArrowSize, 0, 0])
-
-        ' roto
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[1].ClassHandler.Rotate(gcd.CurrentDrawing.arrBlocks[iBloque].entities[1], gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[1] / 180 * Pi)
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[2].ClassHandler.Rotate(gcd.CurrentDrawing.arrBlocks[iBloque].entities[2], gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[2] / 180 * Pi)
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[3].ClassHandler.Rotate(gcd.CurrentDrawing.arrBlocks[iBloque].entities[3], gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[1] / 180 * Pi)
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[4].ClassHandler.Rotate(gcd.CurrentDrawing.arrBlocks[iBloque].entities[4], gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[2] / 180 * Pi)
-
-        ' muevo
-        fRotXY = puntos.RotateFromPointWithAngle(elem.P[0], elem.P[1], gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[1] / 180 * Pi, d + elem.P[0], elem.P[1])
-        ' traslado una flecha y una linea de extension
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[1].ClassHandler.Translate(gcd.CurrentDrawing.arrBlocks[iBloque].entities[1], fRotXY[0] - elem.P[0], fRotXY[1] - elem.P[1])
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[3].ClassHandler.Translate(gcd.CurrentDrawing.arrBlocks[iBloque].entities[3], fRotXY[0] - elem.P[0], fRotXY[1] - elem.P[1])
-
-        ' muevo
-        fRotXY = puntos.RotateFromPointWithAngle(elem.P[0], elem.P[1], gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[2] / 180 * Pi, d + elem.P[0], elem.P[1])
-        ' traslado las otras
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[2].ClassHandler.Translate(gcd.CurrentDrawing.arrBlocks[iBloque].entities[2], fRotXY[0] - elem.P[0], fRotXY[1] - elem.P[1])
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[4].ClassHandler.Translate(gcd.CurrentDrawing.arrBlocks[iBloque].entities[4], fRotXY[0] - elem.P[0], fRotXY[1] - elem.P[1])
-
-        ' la sexta es el texto
-
-        fRotXY = puntos.RotateFromPointWithAngle(elem.P[0], elem.P[1], (gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[2] + gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[1]) / 180 * Pi / 2, d + elem.P[0], elem.P[1])
-
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[5].P[0] = fRotXY[0] - elem.P[0]
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[5].P[1] = fRotXY[1] - elem.P[1]
-
-      End If
-
-    Case gcd.dimRadius
-      If iPoints = 0 Then     ' marco el primer punto
-        elem.P[0] = ClickXr     ' posicion base del inserto
-        elem.P[1] = ClickYr
-
-        elem.fParam[0] = 1      ' ScaleX del inserto
-        elem.fParam[1] = 1      ' ScaleY del inserto
-        elem.fParam[2] = 0      ' degAngle del inserto
-
-      Else If iPoints = 1 Then ' marco el segundo punto, lo que modifica los parametros del bloque
-        elem.Visible = True
-        elem.P[2] = ClickXr     ' posicion base del inserto
-        elem.P[3] = ClickYr
-
-        ' el largo de la linea principal viene dado por la distancia entre ambos puntos
-        d = puntos.distancia(elem.P[0], elem.P[1], ClickXr, ClickYr)
-
-        ' con este click calculo el angulo
-        elem.fParam[2] = Ang(ClickXr - elem.P[0], ClickYr - elem.P[1]) * 180 / Pi
-
-        ' la primer entidad del bloque es la linea principal
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].P[0] = 0           ' X0
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].P[1] = 0           ' Y0
-
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].P[2] = d           ' X1
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].P[3] = 0           ' Y1
-
-        ' la segunda es la primer linea de demarcacion (sin cambios)
-        'gcd.CurrentDrawing.arrBlocks[iBloque].entities[1].P[0] = 0           ' X0
-        'gcd.CurrentDrawing.arrBlocks[iBloque].entities[1].P[1] = 0           ' Y0
-
-        'gcd.CurrentDrawing.arrBlocks[iBloque].entities[1].P[2] = d           ' X1
-        'gcd.CurrentDrawing.arrBlocks[iBloque].entities[1].P[3] = 0           ' Y1
-
-        ' la sexta es el texto
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[3].StringData[0] = Format(d, Me.DimFormat)
-
-        flxTextExt = glPlus.MTextExtends(gcd.CurrentDrawing.arrBlocks[iBloque].entities[3].StringData[0], 0, 0, gcd.CurrentDrawing.arrBlocks[iBloque].entities[3].fParam[1])
-
-        ' la tercera es una flecha
-
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[2].P[0] = d           ' X0
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[2].P[2] = -Me.DimArrowSize + d           ' X0
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[2].P[4] = -Me.DimArrowSize + d           ' X0
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[2].P[6] = d           ' X0
-
-        ' el texto va adentro
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[3].P[0] = d / 2 - flxTextExt[2] / 2
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[3].P[1] = Me.DimArrowWidth
-
-      End If
-
-    Case gcd.dimDiameter
-
-      If iPoints = 0 Then     ' marco el primer punto
-        elem.P[0] = ClickXr     ' posicion base del inserto
-        elem.P[1] = ClickYr
-
-        elem.fParam[0] = 1      ' ScaleX del inserto
-        elem.fParam[1] = 1      ' ScaleY del inserto
-        elem.fParam[2] = 0      ' degAngle del inserto
-
-      Else If iPoints = 1 Then ' marco el segundo punto, lo que modifica los parametros del bloque
-        elem.Visible = True
-        elem.P[2] = ClickXr     ' posicion base del inserto
-        elem.P[3] = ClickYr
-
-        ' el largo de la linea principal viene dado por la distancia entre ambos puntos
-        d = puntos.distancia(elem.P[0], elem.P[1], ClickXr, ClickYr)
-
-        ' con este click calculo el angulo
-        elem.fParam[2] = Ang(ClickXr - elem.P[0], ClickYr - elem.P[1]) * 180 / Pi
-
-        ' la primer entidad del bloque es la linea principal
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].P[0] = 0           ' X0
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].P[1] = 0           ' Y0
-
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].P[2] = d           ' X1
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].P[3] = 0           ' Y1
-
-        ' la sexta es el texto
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[3].StringData[0] = Format(d, Me.DimFormat)
-
-        flxTextExt = glPlus.MTextExtends(gcd.CurrentDrawing.arrBlocks[iBloque].entities[3].StringData[0], 0, 0, gcd.CurrentDrawing.arrBlocks[iBloque].entities[3].fParam[1])
-
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[1].P[0] = 0           ' X0
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[1].P[2] = Me.DimArrowSize
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[1].P[4] = Me.DimArrowSize
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[1].P[6] = 0           ' X0
-
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[2].P[0] = d           ' X0
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[2].P[2] = -Me.DimArrowSize + d           ' X0
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[2].P[4] = -Me.DimArrowSize + d           ' X0
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[2].P[6] = d           ' X0
-
-        ' el texto va adentro
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[3].P[0] = d / 2 - flxTextExt[2] / 2
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[3].P[1] = Me.DimArrowWidth
-
-      End If
 
   End Select
 
@@ -841,138 +277,6 @@ Public Sub ReBuildBlock()
 
 End
 
-Public Function MouseMove(mouseX As Integer, mouseY As Integer) ' esta rutina es llamada por FCAD en el evento DrawingArea_MouseMove
-
-  If InStr("LAP", NextParamType) = 0 Then Return ' we are expecting a parameter
-
-  ' if we expect a parameter, it will be passed
-  If NextParamType = "A" Then
-
-    ' return the angle from horizontal to us
-    elem.fParam[iFloat] = Ang(appmain.Xreal(mouseX) - elem.p[elem.p.max - 1], appmain.Yreal(mouseY) - elem.p[elem.p.max])
-    elem.fParam[iFloat] *= 180 / Pi
-    appmain.redraw
-    Return              ' nothing more to do here
-  End If
-
-  If NextParamType = "L" Then
-
-    ' return the angle from horizontal to us
-    elem.fParam[iFloat] = puntos.distancia(puntos.Near(appmain.Xreal(mouseX)), puntos.Near(appmain.Yreal(mouseY)), elem.p[elem.p.max - 1], elem.p[elem.p.max])
-
-    appmain.redraw
-    Return              ' nothing more to do here
-  End If
-
-  ' we are waiting for a point
-  ClickXr = puntos.Near(appmain.Xreal(mouseX))
-  ClickYr = puntos.Near(appmain.Yreal(mouseY))
-
-  ' y si tengo enganche?
-  If (gcd.CurrentDrawing.iEntity[2] >= 0) And (gcd.OrthogonalForced = False) Then
-
-    ' esto re enganchado
-    ClickXr = gcd.CurrentDrawing.iEntity[0]
-    ClickYr = gcd.CurrentDrawing.iEntity[1]
-
-    ' aca tengo que verificar el ortogonal
-  Else If Me.StepsDone > 0 Then                                                                          ' puedo hacer ortogonal
-    If gcd.OrthogonalForced Or (Not gcd.OrthogonalIgnored And gcd.Orthogonal) Then          ' hablame de operadores logicos
-
-      If Abs(ClickXr - ClickPrevXr) > Abs(ClickYr - ClickPrevYr) Then ' prevalece X
-        ClickYr = ClickPrevYr
-      Else
-        ClickXr = ClickPrevXr
-      Endif
-
-    End If
-
-  End If
-
-  RebuildBlock
-
-  appmain.redraw
-
-End
-
-Public Function MouseDown(mouseX As Integer, mouseY As Integer) ' esta rutina es llamada por FCAD en el evento DrawingArea_MouseDown
-
-  clsDrawingAids.ErrorMessage = ""
-  If InStr("LAP", NextParamType) = 0 Then Return ' we are expecting a parameter
-
-  ' if we expect a parameter, it will be passed
-  If NextParamType = "A" Then
-
-    ' return the angle from horizontal to us
-    elem.fParam[iFloat] = Ang(appmain.Xreal(mouseX) - elem.p[elem.p.max - 1], appmain.Yreal(mouseY) - elem.p[elem.p.max])
-    elem.fParam[iFloat] *= 180 / Pi
-
-    Inc iFloat
-    AdvanceStep
-    Return              ' nothing more to do here
-  End If
-
-  If NextParamType = "L" Then
-
-    ' return the angle from horizontal to us
-    elem.fParam[iFloat] = puntos.distancia(puntos.Near(appmain.Xreal(mouseX)), puntos.Near(appmain.Yreal(mouseY)), elem.p[elem.p.max - 1], elem.p[elem.p.max])
-    Inc iFloat
-    AdvanceStep
-    Return              ' nothing more to do here
-  End If
-
-  ' we are waiting for a point
-
-  ClickXr = puntos.Near(appmain.Xreal(mouseX))
-  ClickYr = puntos.Near(appmain.Yreal(mouseY))
-
-  ' y si tengo enganche?
-
-  If (gcd.CurrentDrawing.iEntity[2] >= 0) And (gcd.OrthogonalForced = False) Then
-
-    ' esto re enganchado
-
-    ClickXr = gcd.CurrentDrawing.iEntity[0]
-    ClickYr = gcd.CurrentDrawing.iEntity[1]
-
-    ' aca tengo que verificar el ortogonal
-
-  Else If Me.StepsDone > 0 Then                                                                          ' puedo hacer ortogonal
-    If gcd.OrthogonalForced Or (Not gcd.OrthogonalIgnored And gcd.Orthogonal) Then          ' hablame de operadores logicos
-
-      If Abs(ClickXr - ClickPrevXr) > Abs(ClickYr - ClickPrevYr) Then ' prevalece X
-        ClickYr = ClickPrevYr
-      Else
-        ClickXr = ClickPrevXr
-      Endif
-
-    End If
-
-  End If
-
-  ClickPrevXr = ClickXr
-  ClickPrevYr = ClickYr
-
-  Inc iPoints
-  AdvanceStep
-
-End
-
-' Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' esta rutina es llamada por FCAD en el evento DrawingArea_MouseUp
-'
-' End
-
-Public Sub AdvanceStep()
-
-  Inc StepsDone
-  If Me.StepsDone = Me.StepsTotal Then
-    clsEntityBuilder.elem = elem
-    clsEntityBuilder.Finish
-    elem = Null
-
-  End If
-
-End
 
 Public Function Draw2(oE As Entity)
 
@@ -992,67 +296,89 @@ Public Function BuildPOI(oE As Entity, Optional arrIndex As Integer = -1) As Int
 
 End
 
-Public Sub Cancel()
 
-  elem = Null
-  gcd.clsJobPrevious = Me
-  gcd.clsJob = clsDefaultJob
-  clsDrawingAids.CleanTexts
-  appmain.redraw
-
-End
 
 ' This function will return False if the element couldn't be created for some reason: bad or incomple user input
 ' True means all is good, False will instruct the clsEntityBuilder to delete it
-Public Sub Finish(oE As Entity, Optional ParamsDone As Integer = -1) As Boolean
+Public Sub Finish(oE As Entity) As Boolean
 
   ' primero agregamos la entidad al array
 
-  cadInsert.Finish(oe, ParamsDone)
+  cadInsert.Finish(oe)
 
 End
 
-' "entity": "DIMENSION_LINEAR",
-' "index": 262,
-' "type": 21,
-' "handle": [0, 3226],
-' "size": 123,
-' "bitsize": 872,
-' "_subclass": "AcDbEntity",
-' "prev_entity": [12, 1, 164, 3062],
-' "next_entity": [10, 2, 577, 3803],
-' "layer": [5, 2, 1883, 1883],
-' "preview_exists": 0,
-' "entmode": 2,
-' "nolinks": 0,
-' "color": 256,
-' "ltype_scale": 1.0,
-' "ltype_flags": 0,
-' "plotstyle_flags": 0,
-' "invisible": 0,
-' "linewt": 29,
-' "_subclass": "AcDbDimension",
-' "extrusion": [0.0, 0.0, 1.0],
-' "text_midpt": [217.50000000000006, 85.76276491494264],
-' "elevation": 0.0,
-' "flag1": 10,
-' "user_text": "",
-' "text_rotation": 0.0,
-' "horiz_dir": 0.0,
-' "ins_scale": [1.0, 1.0, 1.0],
-' "ins_rotation": 0.0,
-' "attachment": 5,
-' "lspace_style": 1,
-' "lspace_factor": 1.0,
-' "act_measurement": 384.99999999999989,
-' "clone_ins_pt": [0.0, 0.0],
-' "flag": 128,
-' "_subclass": "AcDbAlignedDimension",
-' "xline1_pt": [25.0000000000001, 10.0, 0.0],
-' "xline2_pt": [410.0, 10.0, 0.0],
-' "def_pt": [410.0, 85.76276491494264, 0.0],
-' "oblique_angle": 0.0,
-' "dim_rotation": 0.0,
-' "_subclass": "AcDbRotatedDimension",
-' "dimstyle": [5, 1, 57, 57],
-' "block": [5, 2, 3228, 3228]
+' Importo los datos que puedo procesar de una coleccion y genero un Entity para ser agregado a un array
+Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
+
+
+  e.fParam.Resize(Me.TotalParams)
+
+
+  '    MANEJADO EN clsEntities
+  '============================
+  ' "entity": "DIMENSION_LINEAR",
+  ' "index": 262,
+  ' "type": 21,
+  ' "handle": [0, 3226],
+  ' "size": 123,
+  ' "bitsize": 872,
+  ' "_subclass": "AcDbEntity",
+  ' "prev_entity": [12, 1, 164, 3062],
+  ' "next_entity": [10, 2, 577, 3803],
+  ' "layer": [5, 2, 1883, 1883],
+  ' "preview_exists": 0,
+  ' "entmode": 2,
+  ' "nolinks": 0,
+  ' "color": 256,
+  ' "ltype_scale": 1.0,
+  ' "ltype_flags": 0,
+  ' "plotstyle_flags": 0,
+  ' "invisible": 0,
+  ' "linewt": 29,
+
+  ' ===========================================================================================
+
+  ' "_subclass": "AcDbDimension",
+  ' "extrusion": [0.0, 0.0, 1.0],
+  ' "text_midpt": [217.50000000000006, 85.76276491494264],
+  ' "elevation": 0.0,
+  ' "flag1": 10,
+  ' "user_text": "",
+  ' "text_rotation": 0.0,
+  ' "horiz_dir": 0.0,
+  ' "ins_scale": [1.0, 1.0, 1.0],
+  ' "ins_rotation": 0.0,
+  ' "attachment": 5,
+  ' "lspace_style": 1,
+  ' "lspace_factor": 1.0,
+  ' "act_measurement": 384.99999999999989,
+  ' "clone_ins_pt": [0.0, 0.0],
+  ' "flag": 128,
+  ' "_subclass": "AcDbAlignedDimension",
+  ' "xline1_pt": [25.0000000000001, 10.0, 0.0],
+  e.P.Add(0)
+  e.P.Add(0)
+  'e.P.Add(c["xline1_pt"][0])
+  'e.P.Add(c["xline1_pt"][1])
+  ' "xline2_pt": [410.0, 10.0, 0.0],
+  ' "def_pt": [410.0, 85.76276491494264, 0.0],
+  ' "oblique_angle": 0.0,
+  ' "dim_rotation": 0.0,
+  e.fParam[Me.ipaEscX] = 1
+  e.fParam[Me.ipaEscY] = 1
+  e.fParam[Me.ipaEscZ] = 1
+
+  e.fParam[Me.ipaRotacion] = CFloat(c["dim_rotation"]) * 180 / Pi
+  ' "_subclass": "AcDbRotatedDimension",
+  ' "dimstyle": [5, 1, 57, 57],
+  Dim hBlock As Integer
+
+  e.Block = gcd.CurrentDrawing.cmodel["BLOCKS"][c["block"][3]]["block_entity"][3]
+  'e.Block = gcd.CurrentDrawing.arrBlocks[clsEntities.FIndBlockIDbyHandle(hBlock)].name
+  ' "block": [5, 2, 3228, 3228] '  esto apunta a cModel["BLOCKS"] , pero hay q buscar otra cosa
+
+
+  Return True
+
+End

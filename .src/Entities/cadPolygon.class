@@ -28,7 +28,7 @@ Public Const HelperTrabajo As String = ("a polygon")
 Public Const ParamType As String = "FPL"
 Public Const ParamHelper As String = "Sides;Start point;End point"
 Public Const GAMBASCADENTITY As String = "EntityBase"
-Public Const USEWITH As String = "clsEntityBuilder"
+Public Const USEWITH As String = "EntityBuilder"
 Public Const PointsToDraw As Integer = 1             ' minimal point requered for drawing something usefull
 Public Const OrthogonalIgnored As Boolean = False
 Public Const OrthogonalForced As Boolean = False
@@ -40,6 +40,52 @@ Public DrawAble As Boolean = False          ' True si durante la construccion ya
 Public Visible As Boolean = True            ' si esta entidad puede ser mostrada independientmente
 Public Finished As Boolean = False          ' colocar en true cuando se llegue a completar
 Public StepsDone As Integer                 ' esto lo cambia cls ElementBuilder durante la construccion
+
+
+
+' The entity handler receives a user action, and returns the number of expected parameter
+' If definitive = true, means the parameter is set
+Public Function NewParameter(eBuild As Entity, vParam As Variant[], Optional Definitive As Boolean = False) As Boolean
+
+  Dim f As Float
+  Dim ip As Integer
+
+  If Me.StepsDone = 0 Then                    ' lados
+    If vParam[0] <> "float" Then Return
+
+    eBuild.fParam[0] = vParam[1]
+
+    If definitive Then Return True
+
+  Else If Me.StepsDone = 1 Then               ' centro del poligono
+
+    If vParam[0] <> "point" Then Return
+
+    Try eBuild.P[0] = vParam[1]
+    Try eBuild.P[1] = vParam[2]
+
+
+    If definitive Then Return True
+
+
+  Else If Me.StepsDone = 2 Then               ' lados
+
+    If vParam[0] <> "float" Then Return False
+
+    eBuild.fParam[1] = vParam[1]
+    eBuild.DrawAble = True
+
+
+    If definitive Then Return True
+
+  Else
+    Return False
+  End If
+
+
+
+
+End
 
 Public Sub Draw(oE As Entity)
 
@@ -68,7 +114,7 @@ End
 
 ' This function will return False if the element couldn't be created for some reason: bad or incomple user input
 ' True means all is good, False will instruct the clsEntityBuilder to delete it
-Public Sub Finish(oE As Entity, Optional ParamsDone As Integer = -1) As Boolean
+Public Sub Finish(oE As Entity) As Boolean
 
   ' aca vamos a trasnformar la entidad en una polilinea
 

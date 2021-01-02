@@ -31,7 +31,7 @@ Public Const ParamHelper As String = "Start point;Angle;Heigth;"      ' a little
 Public Const ParamDefault As String = " ; 0 ; 10 ; "
 Public Const StretchAble As Boolean = False
 Public Const GAMBASCADENTITY As String = "EntityBase"
-Public Const USEWITH As String = "clsEntityBuilder"
+Public Const USEWITH As String = "EntityBuilder"
 Public Const OrthogonalIgnored As Boolean = False
 Public Const OrthogonalForced As Boolean = False
 Public Selected As Boolean
@@ -45,8 +45,8 @@ Public StepsDone As Integer                 ' esto lo cambia cls ElementBuilder 
 Public Const JSON_Reading As Boolean = True
 Public Const JSON_Export As Boolean = False
 
-Public Const DXF_Reading As Boolean = True
-Public Const DXF_Export As Boolean = True
+Public Const DXF_Reading As Boolean = False
+Public Const DXF_Export As Boolean = False
 
 ' fParam helpers
 Public Const TotalParams As Integer = 2
@@ -197,7 +197,7 @@ End
 ' This function will return False if the element couldn't be created for some reason: bad or incomple user input
 ' True means all is good, False will instruct the clsEntityBuilder to delete it
 
-Public Sub Finish(oE As Entity, Optional ParamsDone As Integer = -1) As Boolean
+Public Sub Finish(oE As Entity) As Boolean
 
   'Print "Finish en EntityBase"
   'CreatePolygon(oe)

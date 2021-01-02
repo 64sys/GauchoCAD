@@ -28,7 +28,7 @@ Public Const HelperTrabajo As String = ("a point")
 Public Const ParamType As String = "P"                             ' that is Point, Point; could be Color Text, etc
 Public Const ParamHelper As String = "Point"
 Public Const GAMBASCADENTITY As String = "EntityBase"
-Public Const USEWITH As String = "clsEntityBuilder"
+Public Const USEWITH As String = "EntityBuilder"
 Public Const PointsToDraw As Integer = 1             ' minimal point requered for drawing something usefull
 Public Const OrthogonalIgnored As Boolean = False
 Public Const OrthogonalForced As Boolean = False
@@ -47,6 +47,25 @@ Public Const JSON_Export As Boolean = False
 
 Public Const DXF_Reading As Boolean = True
 Public Const DXF_Export As Boolean = True
+
+' The entity handler receives a user action, and returns the number of expected parameter
+' If definitive = true, means the parameter is set
+Public Function NewParameter(eBuild As Entity, vParam As Variant[], Optional Definitive As Boolean = False) As Boolean
+
+
+
+  If Me.StepsDone = 0 Then
+    eBuild.DrawAble = True
+    Try eBuild.P[0] = vParam[1]
+    Try eBuild.P[1] = vParam[2]
+
+    If definitive Then Return True
+
+
+  Endif
+
+
+End
 
 Public Sub Translate(e As Entity, dX As Float, dY As Float, Optional OnlySelected As Boolean = False)
 
@@ -91,6 +110,8 @@ End
 
 Public Sub Draw(oE As Entity)
 
+  If Not oE.Visible Then Return
+  If Not oE.DrawAble Then Return
   oE.ColorToPaint = gcd.GetGBColor(oE.colour, oE.Layerid)
   gl.PointSize(oe.LineWidth)
   gl.Begin(gl.POINTS)
@@ -132,7 +153,7 @@ End
 
 ' This function will return False if the element couldn't be created for some reason: bad or incomple user input
 ' True means all is good, False will instruct the clsEntityBuilder to delete it
-Public Sub Finish(oE As Entity, Optional ParamsDone As Integer = -1) As Boolean
+Public Sub Finish(oE As Entity) As Boolean
 
   'Print "Finish en EntityBase"
   'CreatePolygon(oe)
