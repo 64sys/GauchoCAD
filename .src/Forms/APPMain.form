@@ -400,52 +400,11 @@
     }
   }
   { Panel1 Panel
-    MoveScaled(1,0,151,92)
+    MoveScaled(-1,-1,151,92)
     Expand = True
     Arrangement = Arrange.Vertical
-    { Panel2 Panel
-      MoveScaled(1,1,132,7)
-      Arrangement = Arrange.Row
-      Spacing = True
-      Margin = True
-      { pnlFile Panel
-        MoveScaled(1,0,7,5)
-        Expand = True
-        Arrangement = Arrange.Horizontal
-        Spacing = True
-      }
-      { btnLtypes Button
-        MoveScaled(8,0,15,5)
-      }
-      { btnLayers Button
-        MoveScaled(24,0,15,5)
-        Background = Color.Yellow
-      }
-      { btnColors Button
-        MoveScaled(41,0,5,5)
-        Background = Color.Yellow
-      }
-      { btnWidths Button
-        MoveScaled(51,0,15,5)
-      }
-      { Panel6 Panel
-        MoveScaled(88,0,25,5)
-        Arrangement = Arrange.Horizontal
-        Margin = True
-        { ProgressBar1 ProgressBar
-          MoveScaled(7,0,24,5)
-          Visible = False
-          Expand = True
-        }
-      }
-      { cboDrawing ComboBox
-        MoveScaled(115,0,17,5)
-        Expand = True
-        ReadOnly = True
-      }
-    }
     { PanEdit1 Panel
-      MoveScaled(0,10,149,70)
+      MoveScaled(2,4,149,70)
       Expand = True
       Arrangement = Arrange.Horizontal
       Spacing = True
@@ -510,11 +469,11 @@
         }
       }
       { PanEdit2 Panel
-        MoveScaled(22,2,76,50)
+        MoveScaled(22,2,124,58)
         Expand = True
         Arrangement = Arrange.Horizontal
         { Panel7 Panel
-          MoveScaled(1,1,24,29)
+          MoveScaled(2,14,24,32)
           Expand = True
           Arrangement = Arrange.Vertical
           { pnlDrawing Panel
@@ -534,24 +493,24 @@
             Visible = False
             Arrangement = Arrange.Horizontal
             { lblInfo Label
-              MoveScaled(3,0,24,4)
+              MoveScaled(2.875,0.625,24,4)
               Expand = True
               Alignment = Align.Left
             }
           }
         }
         { pnlData HSplit
-          MoveScaled(26,1,48,42)
+          MoveScaled(28,14,48,32)
           Visible = False
           Expand = True
           { TreeView1 TreeView
-            MoveScaled(3,4,13,36)
+            MoveScaled(3,4,13,26)
             Background = Color.TextBackground
             Expand = True
             Border = False
           }
           { Panel13 Panel
-            MoveScaled(18,6,30,33)
+            MoveScaled(18,4,30,26)
             Expand = True
             Arrangement = Arrange.Vertical
             { Panel8 Panel
@@ -560,63 +519,104 @@
               Arrangement = Arrange.Horizontal
             }
             { GridView1 GridView
-              MoveScaled(2,7,26,10)
+              MoveScaled(2,7,26,8)
               Expand = True
               Border = False
               Header = GridView.Horizontal
             }
             { pnlFileData Panel
-              MoveScaled(3,19,24,12)
+              MoveScaled(2,17,24,6)
               Visible = False
               Expand = True
               Arrangement = Arrange.Vertical
             }
           }
         }
-      }
-      { pnlBlocks Panel
-        MoveScaled(108,1,9,50)
-        Visible = False
-        Arrangement = Arrange.Vertical
-      }
-      { pnlDebug Panel
-        MoveScaled(118,1,9,50)
-        Visible = False
-        Arrangement = Arrange.Vertical
-        { pnlSmart Panel
-          MoveScaled(1,1,10,17)
-          Expand = True
+        { Panel2 Panel
+          MoveScaled(1,2,124,7)
           Arrangement = Arrange.Row
-          { lblSmart Label
-            MoveScaled(0,1,20,3)
-            Visible = False
-            Text = (" Smart entities")
-            Alignment = Align.Center
+          Spacing = True
+          Margin = True
+          { pnlFile Panel
+            MoveScaled(1,0,7,5)
+            Expand = True
+            Arrangement = Arrange.Horizontal
+            Spacing = True
+          }
+          { btnLtypes Button
+            MoveScaled(8,0,15,5)
+          }
+          { btnLayers Button
+            MoveScaled(24,0,15,5)
+            Background = Color.Yellow
+          }
+          { btnColors Button
+            MoveScaled(41,0,5,5)
+            Background = Color.Yellow
+          }
+          { btnWidths Button
+            MoveScaled(51,0,15,5)
+          }
+          { Panel6 Panel
+            MoveScaled(77,0,25,5)
+            Arrangement = Arrange.Horizontal
+            Margin = True
+            { ProgressBar1 ProgressBar
+              MoveScaled(7,0,24,5)
+              Visible = False
+              Expand = True
+            }
+          }
+          { cboDrawing ComboBox
+            MoveScaled(106,0,17,5)
+            Expand = True
+            ReadOnly = True
           }
         }
-        { txaDebug TextArea
-          MoveScaled(1,19,10,17)
-          Font = Font["Noto Mono"]
-          Expand = True
+        { pnlBlocks Panel
+          MoveScaled(82,14,9,42)
+          Visible = False
+          Arrangement = Arrange.Vertical
         }
-      }
-      { pnlBlock Panel
-        MoveScaled(128,1,9,50)
-        Visible = False
-        { TableView2 TableView
-          MoveScaled(2,17,14,24)
-          Expand = True
-          Border = False
+        { pnlDebug Panel
+          MoveScaled(92,14,9,42)
+          Visible = False
+          Arrangement = Arrange.Vertical
+          { pnlSmart Panel
+            MoveScaled(1,1,10,17)
+            Expand = True
+            Arrangement = Arrange.Row
+            { lblSmart Label
+              MoveScaled(0,1,20,3)
+              Visible = False
+              Text = (" Smart entities")
+              Alignment = Align.Center
+            }
+          }
+          { txaDebug TextArea
+            MoveScaled(1,19,10,17)
+            Font = Font["Noto Mono"]
+            Expand = True
+          }
         }
-      }
-      { pnlRaw Panel
-        MoveScaled(138,1,9,50)
-        Visible = False
-        Arrangement = Arrange.Vertical
-        { TableView3 TableView
-          MoveScaled(1,1,11,46)
-          Expand = True
-          Border = False
+        { pnlBlock Panel
+          MoveScaled(102,14,9,42)
+          Visible = False
+          { TableView2 TableView
+            MoveScaled(2,17,14,24)
+            Expand = True
+            Border = False
+          }
+        }
+        { pnlRaw Panel
+          MoveScaled(112,14,9,42)
+          Visible = False
+          Arrangement = Arrange.Vertical
+          { TableView3 TableView
+            MoveScaled(1,1,11,46)
+            Expand = True
+            Border = False
+          }
         }
       }
     }
