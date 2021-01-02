@@ -25,7 +25,7 @@ Create Static
 Public Const Gender As String = "Ellipse"
 Public Const PointsToDraw As Integer = 1             ' minimal point requered for drawing something usefull
 Public Const HelperTrabajo As String = ("Draw an ellipse")
-Public Const ParamType As String = "PPRFF"
+Public Const ParamType As String = "PPRRR"
 Public Const ParamHelper As String = "Start point;Major Radious;Minor/Major;Start;End"      ' a little text that is shown at the prompt waiting for user input during build
 Public Const ParamDefault As String = " ;  ;0.5;0;360"
 Public Const USEWITH As String = "EntityBuilder"
@@ -53,6 +53,8 @@ Public Const DXF_Export As Boolean = True
 ' If definitive = true, means the parameter is set
 Public Function NewParameter(eBuild As Entity, vParam As Variant[], Optional Definitive As Boolean = False) As Boolean
 
+  Dim f As Float
+  Dim ip As Integer
 
   If Me.StepsDone = 0 Then
 
@@ -92,28 +94,30 @@ Public Function NewParameter(eBuild As Entity, vParam As Variant[], Optional Def
 
     If definitive Then Return True
 
-  Else If Me.StepsDone = 3 Then   ' recibimos el angulo inicial
-    If vParam[0] = "float" Then  ' vino como un punto, entonces la calculo de otra manera
-      eBuild.fParam[1] = vParam[1]
+  Else If Me.StepsDone = 3 Or Me.StepsDone = 4 Then    ' recibimos el angulo inicial
 
+    If Me.StepsDone = 3 Then ip = 1 Else ip = 2
+
+    If vParam[0] = "float" Then  ' vino como un punto, entonces la calculo de otra manera
+      eBuild.fParam[ip] = vParam[1]
+
+    Else If vParam[0] = "point" Then
+      f = Ang(vParam[1] - eBuild.P[0], vParam[2] - eBuild.P[1])
+      f *= 180 / Pi
+      eBuild.fParam[ip] = f
     Else
       Return False
     End If
 
     If definitive Then Return True
 
-  Else If Me.StepsDone = 4 Then   ' recibimos el angulo final
-    If vParam[0] = "float" Then  ' vino como un punto, entonces la calculo de otra manera
-      eBuild.fParam[2] = vParam[1]
 
-    Else
-      Return False
-    End If
-
-    If definitive Then Return True
+  Else
+    Return False
+  End If
 
 
-  Endif
+
 
 End
 
@@ -203,6 +207,21 @@ Public Sub Draw(oE As Entity)
   oE.ColorToPaint = gcd.GetGBColor(oE.colour, oE.Layerid)
   GLplus.PolyLines(oE.PolyLine, oE.ColorToPaint, oe.LineWidth, oe.LineType)
 
+  ' ayudas al user
+  If Me.StepsDone = 3 Or Me.StepsDone = 4 Then ' dibujo una linea para indicar el angulo
+    Dim iP As Integer
+    Dim x0, y0, x1, y1 As Float
+
+    If Me.StepsDone = 3 Then ip = 1 Else ip = 2
+    x0 = oe.P[0]          ' centro de la elipse
+    y0 = oe.P[1]
+    x1 = x0 + major * Cos(angle + oe.fParam[ip] / 180 * Pi) * 1.1
+    y1 = y0 + major * Sin(angle + oe.fParam[ip] / 180 * Pi) * 1.1
+
+    glPlus.Lines([x0, y0, x1, y1], Starter.flgOnScreenHelpColor)
+
+  Endif
+
 End
 
 '' A fat version of the entity
@@ -268,7 +287,7 @@ End
 
 ' This function will return False if the element couldn't be created for some reason: bad or incomple user input
 ' True means all is good, False will instruct the clsEntityBuilder to delete it
-Public Sub Finish(oE As Entity, Optional ParamsDone As Integer = -1) As Boolean
+Public Sub Finish(oE As Entity) As Boolean
 
   ' calculo el recorrido del arco como
   ' OJO en la ELLIPSE vienen en radianes, y en ARC en grados

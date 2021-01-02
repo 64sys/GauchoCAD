@@ -27,7 +27,7 @@ Public Const HelperTrabajo As String = ("Draws an arc")
 Public Const ParamType As String = "PLAA"                             ' that is Point, Point, Float; could be Color Text, etc
 Public Const ParamHelper As String = "Center;Radious;Start;End"      ' a little text that is shown at the prompt waiting for user input during build
 Public Const ParamDefault As String = "0,0;1;0;90"
-Public Const USEWITH As String = "clsEntityBuilder"
+Public Const USEWITH As String = "EntityBuilder"
 Public Const DrawingOrder As Integer = 0        ' 1 = draws first
 Public Const OrthogonalIgnored As Boolean = False
 Public Const OrthogonalForced As Boolean = False
@@ -48,6 +48,66 @@ Public Const JSON_Export As Boolean = False
 
 Public Const DXF_Reading As Boolean = True
 Public Const DXF_Export As Boolean = True
+
+' The entity handler receives a user action, and returns the number of expected parameter
+' If definitive = true, means the parameter is set
+Public Function NewParameter(eBuild As Entity, vParam As Variant[], Optional Definitive As Boolean = False) As Boolean
+
+  Dim f As Float
+  Dim ip As Integer
+
+  If Me.StepsDone = 0 Then
+
+    If vParam[0] <> "point" Then Return Me.StepsDone
+
+    Try eBuild.P[0] = vParam[1]
+    Try eBuild.P[1] = vParam[2]
+
+
+    If definitive Then
+      eBuild.fParam.Add(0)
+      Return True
+    End If
+  Else If Me.StepsDone = 1 Then
+
+    If vParam[0] <> "float" Then Return False
+
+    eBuild.DrawAble = True
+    eBuild.fParam[0] = vParam[1]
+    eBuild.fParam[1] = 0
+    eBuild.fParam[2] = 360
+
+    If definitive Then Return True
+
+  Else If Me.StepsDone = 2 Then   ' recibimos la relacion de minor/major
+
+    If vParam[0] <> "float" Then Return False
+    eBuild.DrawAble = True
+
+    eBuild.fParam[1] = vParam[1]
+
+    If definitive Then Return True
+
+
+  Else If Me.StepsDone = 3 Then    ' recibimos el angulo inicial
+
+    If vParam[0] <> "float" Then Return False
+
+
+    eBuild.fParam[2] = vParam[1]
+
+    If definitive Then Return True
+
+
+
+  Else
+    Return False
+  End If
+
+
+
+
+End
 
 Public Sub Stretch(e As Entity, dX As Float, dY As Float)
 
@@ -129,6 +189,10 @@ Public Sub Draw(oE As Entity)
   Dim LargoPixels, LargoReal, EscalaTramos As Float
 
   If Not oE.Visible Then Return
+  If Not oE.DrawAble Then Return
+
+  If oE.fParam[2] = oE.fParam[1] Then Return
+
   oE.ColorToPaint = gcd.GetGBColor(oE.colour, oE.Layerid)
 
   If Me.StepsDone = 1 Then
@@ -184,7 +248,7 @@ Public Sub Draw(oE As Entity)
     ' veo el cuantos pixels tendria cada tramo
     LargoReal = 2 * oE.fParam[0] * Pi * Abs(oE.fParam[1] - oE.fParam[2]) / 360
     LargoPixels = APPMain.Pixels(LargoReal)
-
+    If LargoPixels = 0 Then LargoPixels = 1
     ' si quiero tramos de 10 pixels...
     angle_increment = 5 / LargoPixels * 2 * Pi * oe.fParam[3]
     If Abs(angle_increment * 10) > Abs(oE.fParam[2] / 180 * Pi - oE.fParam[1] / 180 * Pi) Then
@@ -261,7 +325,7 @@ End
 
 ' This function will return False if the element couldn't be created for some reason: bad or incomple user input
 ' True means all is good, False will instruct the clsEntityBuilder to delete it
-Public Sub Finish(oE As Entity, Optional ParamsDone As Integer = -1) As Boolean
+Public Sub Finish(oE As Entity) As Boolean
 
   ' calculo el recorrido del arco como
 

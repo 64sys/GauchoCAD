@@ -30,7 +30,7 @@ Public Const ParamType As String = "PAFT"
 Public Const ParamHelper As String = "Start point;Angle;Heigth;"     ' a little text that is shown at the prompt waiting for user input during build
 Public Const ParamDefault As String = " ; 0 ; 10 ; "
 Public Const GAMBASCADENTITY As String = "EntityBase"
-Public Const USEWITH As String = "clsEntityBuilder"
+Public Const USEWITH As String = "EntityBuilder"
 Public Const OrthogonalIgnored As Boolean = False
 Public Const OrthogonalForced As Boolean = False
 Public Const StretchAble As Boolean = True           ' Si lo puedo deformar
@@ -86,6 +86,68 @@ Public Const ipaObliqueAngle As Integer = 6
 Public Const sdaTotalParams As Integer = 2
 Public Const sdaText As Integer = 0
 Public Const sdaStyle As Integer = 1
+
+' The entity handler receives a user action, and returns the number of expected parameter
+' If definitive = true, means the parameter is set
+Public Function NewParameter(eBuild As Entity, vParam As Variant[], Optional Definitive As Boolean = False) As Boolean
+
+  Dim f As Float
+  Dim ip As Integer
+
+  If Me.StepsDone = 0 Then  '  posicion
+
+    If vParam[0] <> "point" Then Return Me.StepsDone
+
+    Try eBuild.P[0] = vParam[1]
+    Try eBuild.P[1] = vParam[2]
+
+
+    If definitive Then
+      eBuild.fParam.Add(0)
+      Return True
+    End If
+  Else If Me.StepsDone = 1 Then ' angulo del texto
+
+    If vParam[0] <> "float" Then Return False
+
+
+    eBuild.fParam[0] = vParam[1]
+    eBuild.fParam[1] = 0
+    eBuild.fParam[2] = 360
+
+    If definitive Then Return True
+
+  Else If Me.StepsDone = 2 Then   ' altura
+
+    If vParam[0] <> "float" Then Return False
+
+    eBuild.fParam[1] = vParam[1]
+
+    If definitive Then Return True
+
+
+  Else If Me.StepsDone = 3 Then    ' texto
+
+    If vParam[0] <> "text" Then Return False
+
+    eBuild.DrawAble = True
+    eBuild.stringdata[Me.sdaText] = vParam[1]
+
+    If definitive Then Return True
+
+
+
+  Else
+    Return False
+  End If
+
+
+
+
+End
+
+
+
 
 Public Sub setEntity(e As Entity)
 
@@ -265,7 +327,7 @@ End
 
 ' This function will return False if the element couldn't be created for some reason: bad or incomple user input
 ' True means all is good, False will instruct the clsEntityBuilder to delete it
-Public Sub Finish(oE As Entity, Optional ParamsDone As Integer = -1) As Boolean
+Public Sub Finish(oE As Entity) As Boolean
 
   'Print "Finish en EntityBase"
   'CreatePolygon(oe)
@@ -365,7 +427,17 @@ Public Sub ProcessPart(s As String)
         CurrentTextPosX += CFloat(Mid(s2, 2, p2 - 2))
         s2 = Mid(s2, p2 + 1)
         If Len(s2) > 0 Then ProcessPart(s2)
+      Case "A"            ' no se que significa esto, suele venir \A1;
+        ' veo q tipo de alineacion
+        If Mid(s2, 2, 1) = "1" Then ' es mid
 
+          p2 = InStr(s2, ";", p1)
+
+          s2 = Mid(s2, p2 + 1)
+          CurrentTextPosX -= glPlus.TextExtends(s2, CurrentTextHeigth)[0] * 0.5
+
+        End If
+        If Len(s2) > 0 Then ProcessPart(s2)
     End Select
   Else     ' es un texto, pero puede terminar en un scape
     p2 = InStr(s2, "\\")

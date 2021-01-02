@@ -87,7 +87,7 @@ Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' called by FCAD->
     ' creo una nueva entidad en el mismo lugar
     gcd.CurrentDrawing.arrEntities.Add(clsEntities.ClonEntity(e))
     e = gcd.CurrentDrawing.arrEntities.Last
-    e.ClassHandler.Finish(e, -1)
+    e.ClassHandler.Finish(e)
 
     Select Case e.Gender
       Case "Spline", "LWPolyline"

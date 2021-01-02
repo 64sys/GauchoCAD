@@ -222,7 +222,7 @@ Public Sub DrawPolygons() ' and other debugging stuff
 
   Dim e As Entity, i As Integer, p0, p1 As Float
 
-  HelperTrabajo2 = "gcd.clsJob: " & Str(gcd.clsJob) & "->" & Str(clsEntityBuilder.elem)
+  HelperTrabajo2 = "gcd.clsJob: " & Str(gcd.clsJob) & "->" & Str(EntityBuilder.elem)
   '
   Texting(HelperTrabajo2, 300, appmain.glarea1.h - 20, Color.Blue)
   '
