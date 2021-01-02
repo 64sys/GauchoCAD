@@ -427,7 +427,17 @@ Public Sub ProcessPart(s As String)
         CurrentTextPosX += CFloat(Mid(s2, 2, p2 - 2))
         s2 = Mid(s2, p2 + 1)
         If Len(s2) > 0 Then ProcessPart(s2)
+      Case "A"            ' no se que significa esto, suele venir \A1;
+        ' veo q tipo de alineacion
+        If Mid(s2, 2, 1) = "1" Then ' es mid
 
+          p2 = InStr(s2, ";", p1)
+
+          s2 = Mid(s2, p2 + 1)
+          CurrentTextPosX -= glPlus.TextExtends(s2, CurrentTextHeigth)[0] * 0.5
+
+        End If
+        If Len(s2) > 0 Then ProcessPart(s2)
     End Select
   Else     ' es un texto, pero puede terminar en un scape
     p2 = InStr(s2, "\\")

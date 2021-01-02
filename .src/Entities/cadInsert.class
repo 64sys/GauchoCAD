@@ -103,9 +103,12 @@ Public Sub Draw(oE As Entity)
   Dim ET As Entity, i As Integer
 
   If Not oe.Finished Then Return
-
-  i = clsEntities.FIndBlockID(oE.Block)
-  If i < 0 Then Return
+  If UCase(Left(oe.Gender, 3)) = "DIM" Then
+    i = clsEntities.FIndBlockIDbyHandle(oE.Block)
+  Else
+    i = clsEntities.FIndBlockID(oE.Block)
+  End If
+  If i < 0 Then Stop ' Return
 
   gl.PushMatrix
   gl.Translatef(APPMain.pixels(oE.p[0]) / gcd.CurrentDrawing.ScaleZoom, APPMain.pixels(oE.p[1]) / gcd.CurrentDrawing.ScaleZoom, 0)
@@ -117,7 +120,9 @@ Public Sub Draw(oE As Entity)
     et.LineType = oe.LineType
     et.colour = oe.colour
     et.LineWidth = oe.LineWidth
+    'If et.Gender = "MText" Then Stop
     et.ClassHandler.Draw(et)
+
 
     Debug et.Gender, et.LineType
   Next

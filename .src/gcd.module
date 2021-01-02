@@ -297,29 +297,7 @@ End
 
 Public Sub ExportBlocks(colData As Collection) ', obxEntities As Entity[]) As Integer
 
-  Dim i, iTE As Integer, colEnt, colBlk, colBlocks As New Collection, flxPoints As New Float[], P As Float[]
 
-  If Not colData.Exist("Blocks") Then
-    colData.Add(colBlocks, "Blocks")
-  Else
-    colData.Remove("Blocks")
-    colData.Add(colBlocks, "Blocks")
-  End If
-
-  For i = 0 To gcd.CurrentDrawing.arrBlocks.max
-    colBlk = New Collection
-    colData["Blocks"].Add(colBlk, gcd.CurrentDrawing.arrBlocks[i].name)
-
-    colData["Blocks"][gcd.CurrentDrawing.arrBlocks[i].name].Add("BLOCK", "entity")
-    colData["Blocks"][gcd.CurrentDrawing.arrBlocks[i].name].Add(gcd.CurrentDrawing.arrBlocks[i].name, "block")
-    colData["Blocks"][gcd.CurrentDrawing.arrBlocks[i].name].Add("BYLAYER", "style")
-    colEnt = New Collection
-    colData["Blocks"][gcd.CurrentDrawing.arrBlocks[i].name].Add(colEnt, "Entities")
-    For iTE = 0 To gcd.CurrentDrawing.arrBlocks[i].entities.Max
-      ExportEntities(colData["Blocks"]["Entities"], gcd.CurrentDrawing.arrBlocks[i].entities)
-    Next
-
-  Next
 
 End
 
@@ -381,157 +359,10 @@ Public Sub ImportBlocks(colData As Collection) ', obxEntities As Entity[]) As In
     'ImportEntities2(colBlk["Entities"], newBlock.entities, newBlock.name)
 
   Next
-  Stop
+  'Stop
 
 End
 
-'' Pasa del arrEntities a la coleccion cModel
-Public Function ExportEntities(colGrp As Collection, obxEntities As Entity[], Optional BlockName As String) As Integer
-
-  Dim i, eCount As Integer
-  Dim flxPoints As New Float[]
-  Dim P, Pn As New Collection
-  Dim ratio As Float
-  Dim colEnt As New Collection
-  Dim e As Entity
-  Dim colLines, colCircles, colPolylines, colArcs, colEllipses, colText, colMtext, colInserts As New Collection
-
-  For Each e In obxEntities
-    flxPoints = New Float[]
-    colEnt = New Collection
-    p = New Collection
-    Select e.Gender
-      Case "Line"
-        If Not colgrp.Exist("line") Then colgrp.Add(colLines, "line")
-        colLines.Add(colEnt, Str$(eCount))
-        colEnt.Add("line", "entity")
-        GoSub Common
-        colEnt.Add(p, "p")
-        flxPoints.Add(e.P[0])                   ' X
-        flxPoints.Add(e.P[1])                   ' Y
-        flxPoints.Add(0)                        ' Z
-        colEnt["p"].Add(flxPoints, "p0")
-        flxPoints = New Float[]
-        flxPoints.Add(e.P[2])                   ' X
-        flxPoints.Add(e.P[3])                   ' Y
-        flxPoints.Add(0)                        ' Z
-        colEnt["p"].Add(flxPoints, "p1")
-      Case "LWPolyline"
-        If Not colgrp.Exist("polyline") Then colgrp.Add(colPolylines, "polyline")
-        colPolylines.Add(colEnt, Str$(eCount))
-        colEnt.Add("polyline", "entity")
-        GoSub Common
-        colEnt.Add(p, "p")
-        For i = 0 To e.P.Max Step 2
-          flxPoints = New Float[]
-          flxPoints.Add(e.P[i])                   ' X
-          flxPoints.Add(e.P[i + 1])               ' Y
-          flxPoints.Add(0)                        ' Z
-          colEnt["p"].Add(flxPoints, "p" & Trim(Str(i / 2)))
-        Next
-      Case "Ellipse"
-        If Not colgrp.Exist("ellipse") Then colgrp.Add(colEllipses, "ellipse")
-        colEllipses.Add(colEnt, Str$(eCount))
-        colEnt.Add("ellipse", "entity")
-        GoSub Common
-        colEnt.Add(p, "p")
-        flxPoints.Add(e.P[0])                   ' X
-        flxPoints.Add(e.P[1])                   ' Y
-        flxPoints.Add(0)                        ' Z
-        colEnt["p"].Add(flxPoints, "p0")
-        flxPoints = New Float[]
-        flxPoints.Add(e.P[2])                   ' X
-        flxPoints.Add(e.P[3])                   ' Y
-        flxPoints.Add(0)                        ' Z
-        colEnt["p"].Add(flxPoints, "p1")
-        colEnt.Add(e.fParam[0], "ratio")
-        colEnt.Add(e.fParam[1], "start_angle")
-        colEnt.Add(e.fParam[2], "end_angle")
-      Case "Arc"
-        If Not colgrp.Exist("arc") Then colgrp.Add(colArcs, "arc")
-        colArcs.Add(colEnt, Str$(eCount))
-        colEnt.Add("arc", "entity")
-        GoSub Common
-        colEnt.Add(p, "p")
-        flxPoints.Add(e.P[0])                   ' X
-        flxPoints.Add(e.P[1])                   ' Y
-        flxPoints.Add(0)                        ' Z
-        colEnt["p"].Add(flxPoints, "p0")
-        colEnt.Add(e.fParam[0], "radius")
-        colEnt.Add(e.fParam[1], "start_angle")
-        colEnt.Add(e.fParam[2], "end_angle")
-      Case "Circle"
-        If Not colgrp.Exist("circle") Then colgrp.Add(colcircles, "circle")
-        colcircles.Add(colEnt, Str$(eCount))
-        colEnt.Add("circle", "entity")
-        GoSub Common
-        colEnt.Add(p, "p")
-        flxPoints.Add(e.P[0])                   ' X
-        flxPoints.Add(e.P[1])                   ' Y
-        flxPoints.Add(0)                        ' Z
-        colEnt["p"].Add(flxPoints, "p0")
-        colEnt.Add(e.fParam[0], "radius")
-      Case "Insert"
-        If Not colgrp.Exist("insert") Then colgrp.Add(colInserts, "insert")
-        colInserts.Add(colEnt, Str$(eCount))
-
-        colEnt.Add("insert", "entity")
-        GoSub Common
-        colEnt.Add(p, "p")
-        flxPoints.Add(e.P[0])                   ' X
-        flxPoints.Add(e.P[1])                   ' Y
-        flxPoints.Add(0)                        ' Z
-        colEnt["p"].Add(flxPoints, "p0")
-        colEnt.Add(e.fParam[0], "scalex")
-        'colEnt.Add(e.fParam[1], "scalex")
-        colEnt.Add(e.fParam[1], "scaley")
-        colEnt.Add(1, "scalez")
-        colEnt.Add(e.fParam[2], "angle")
-        colEnt.Add(e.Block, "block")
-
-      Case "Text"
-        If Not colgrp.Exist("text") Then colgrp.Add(colText, "text")
-        colText.Add(colEnt, Str$(eCount))
-
-        colEnt.Add("text", "entity")
-        GoSub Common
-        colEnt.Add(p, "p")
-        flxPoints.Add(e.P[0])                   ' X
-        flxPoints.Add(e.P[1])                   ' Y
-        flxPoints.Add(0)                        ' Z
-        colEnt["p"].Add(flxPoints, "p0")
-        colEnt.Add(e.stringdata[0], "text")
-        colEnt.Add(e.fParam[0], "angle")
-        colEnt.Add(e.fParam[1], "height")
-      Case "MText"
-        If Not colgrp.Exist("mtext") Then colgrp.Add(colMtext, "ellipse")
-        colMtext.Add(colEnt, Str$(eCount))
-
-        colEnt.Add("mtext", "entity")
-        GoSub Common
-        colEnt.Add(p, "p")
-        flxPoints.Add(e.P[0])                   ' X
-        flxPoints.Add(e.P[1])                   ' Y
-        flxPoints.Add(0)                        ' Z
-        colEnt["p"].Add(flxPoints, "p0")
-        colEnt.Add(e.stringdata[0], "text")
-        colEnt.Add(e.fParam[0], "angle")
-        colEnt.Add(e.fParam[1], "height")
-
-    End Select
-    Inc eCount
-  Next
-
-  Return eCount
-
-Common:
-  colEnt.Add(e.Layer, "layer")
-  colEnt.Add(e.LineTypeName, "style")
-  colEnt.Add(e.colour, "colour")
-  colEnt.Add(e.LineWidth, "width")
-  Return
-
-End
 
 '' Importa las cosas de manera descentralizada
 Public Sub ImpEnty5(cEny As Collection, obx As Entity[])
@@ -543,7 +374,7 @@ Public Sub ImpEnty5(cEny As Collection, obx As Entity[])
     If e.Exist("entity") Then                                     ' es una entidad?
       entNueva = New Entity                                       ' entonces, creamos una nueva
 
-      If InStr("POINT_ATTDEF_ATTRIB_LINE_LWPOLYLINE_CIRCLE_ELLIPSE_ARC_TEXT_MTEXT_SPLINE_SOLID_LEADER_INSERT", e["entity"]) = 0 Then Continue
+      If InStr("POINT_ATTDEF_ATTRIB_LINE_LWPOLYLINE_CIRCLE_ELLIPSE_ARC_TEXT_MTEXT_SPLINE_SOLID_LEADER_INSERT_DIMENSION_LINEAR", e["entity"]) = 0 Then Continue
 
 
       If clsEntities.ImportJsonToEntity(e, entNueva) Then         ' si esta implementada, llenamos los datos

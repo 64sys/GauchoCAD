@@ -704,6 +704,8 @@ Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
   Dim fControlPoints As New Float[]
   Dim fFitPoint As New Float[]
 
+  e.fParam.Resize(Me.TotalParams)
+
   If c.Exist("ctrl_pts") Then
 
     e.fParam.Add(Me.TypeControls)
