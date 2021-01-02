@@ -51,10 +51,8 @@ Public DimTextHeight As Float = 0.3      '
 Public DimSeparation As Float = 0.5      ' la separacion entre el punto que define la cota y el inicio de la linea q marca inicio y fin
 Public DimExtension As Float = 0.5       ' la continuacion de esas lineas
 
-
 Public extension As Float
 Public iBloque As Integer
-
 
 ' JSON and DXF Read/Export
 Public Const JSON_Reading As Boolean = True
@@ -124,9 +122,7 @@ End
 
 Public Sub Draw(Optional e As Entity)
 
-
   cadInsert.Draw(e)
-
 
 End
 
@@ -143,8 +139,6 @@ Public Sub DrawSelected(oE As Entity)
   cadInsert.DrawSelected(oe)
 
 End
-
-
 
 Public Sub ReBuildBlock(ELEM As Entity)
 
@@ -270,13 +264,11 @@ Public Sub ReBuildBlock(ELEM As Entity)
       '
       '   End If
 
-
   End Select
 
   appmain.redraw
 
 End
-
 
 Public Function Draw2(oE As Entity)
 
@@ -296,8 +288,6 @@ Public Function BuildPOI(oE As Entity, Optional arrIndex As Integer = -1) As Int
 
 End
 
-
-
 ' This function will return False if the element couldn't be created for some reason: bad or incomple user input
 ' True means all is good, False will instruct the clsEntityBuilder to delete it
 Public Sub Finish(oE As Entity) As Boolean
@@ -311,9 +301,7 @@ End
 ' Importo los datos que puedo procesar de una coleccion y genero un Entity para ser agregado a un array
 Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
 
-
   e.fParam.Resize(Me.TotalParams)
-
 
   '    MANEJADO EN clsEntities
   '============================
@@ -377,7 +365,6 @@ Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
   e.Block = gcd.CurrentDrawing.cmodel["BLOCKS"][c["block"][3]]["block_entity"][3]
   'e.Block = gcd.CurrentDrawing.arrBlocks[clsEntities.FIndBlockIDbyHandle(hBlock)].name
   ' "block": [5, 2, 3228, 3228] '  esto apunta a cModel["BLOCKS"] , pero hay q buscar otra cosa
-
 
   Return True
 

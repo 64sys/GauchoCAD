@@ -43,7 +43,6 @@ Public flgWindowCursorColor As Integer '' Window cursor color
 Public flgWhiteAndBlack As Integer     '' El color blanco/negro siempre sera distinto al
 Public flgOnScreenHelpColor As Integer = Color.LightGray    '' Tincho, esta es nueva
 
-
 ''Vars for environment
 Public flgWindowMode As Integer
 Public flgWindowInfoColor As Integer           ' habria que agrupar todas las vars de ambiente, hay dos opciones simples

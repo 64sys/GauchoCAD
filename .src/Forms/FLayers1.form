@@ -46,7 +46,7 @@
       }
       { ToolButton4 ToolButton LMenu
         Name = "ToolButton4"
-        MoveScaled(52,0,15,4)
+        MoveScaled(52,1,15,4)
         Tag = "cancel"
         Text = ("Cancel")
         Picture = Picture["icon:/32/cancel"]
