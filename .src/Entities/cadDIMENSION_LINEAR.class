@@ -438,13 +438,18 @@ Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
   ' "flag": 128,
   ' "_subclass": "AcDbAlignedDimension",
   ' "xline1_pt": [25.0000000000001, 10.0, 0.0],
-  e.P.Add(0)
-  e.P.Add(0)
-  'e.P.Add(c["xline1_pt"][0])
-  'e.P.Add(c["xline1_pt"][1])
+  'e.P.Add(0)
+  'e.P.Add(0)
+  e.P.Add(c["xline1_pt"][0])
+  e.P.Add(c["xline1_pt"][1])
   ' "xline2_pt": [410.0, 10.0, 0.0],
+  e.P.Add(c["xline2_pt"][0])
+  e.P.Add(c["xline2_pt"][1])
+
   ' "def_pt": [410.0, 85.76276491494264, 0.0],
   ' "oblique_angle": 0.0,
+
+
   ' "dim_rotation": 0.0,
   e.fParam[Me.ipaEscX] = 1
   e.fParam[Me.ipaEscY] = 1
@@ -456,6 +461,7 @@ Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
   Dim hBlock As Integer
 
   e.Block = gcd.CurrentDrawing.cmodel["BLOCKS"][c["block"][3]]["block_entity"][3]
+  e.pBlock = ReBuildBlock(e)
   'e.Block = gcd.CurrentDrawing.arrBlocks[clsEntities.FIndBlockIDbyHandle(hBlock)].name
   ' "block": [5, 2, 3228, 3228] '  esto apunta a cModel["BLOCKS"] , pero hay q buscar otra cosa
 

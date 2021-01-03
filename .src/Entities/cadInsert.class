@@ -109,7 +109,7 @@ Public Sub Draw(oE As Entity)
     pBlockToDraw = oe.pBlock
   Else
     i = clsEntities.FIndBlockID(oE.Block)
-    pBlockToDraw = gcd.CurrentDrawing.arrBlocks[i].entities
+    pBlockToDraw = gcd.CurrentDrawing.arrBlocks[i]
   End If
   If i < 0 Then Stop ' Return
 

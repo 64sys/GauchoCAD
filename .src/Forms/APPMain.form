@@ -146,13 +146,18 @@
       Name = "mnuDimRadial"
       Text = ("Radial Dimension")
       Picture = Picture["svg/entities/dimradial.svg"]
-      Tag = "dimradial"
+      Tag = "DIMENSION_RADIUS"
+    }
+    { mnuDimDiameter Menu entity
+      Name = "mnuDimDiameter"
+      Text = ("Diameter Dimension")
+      Tag = "DIMENSION_DIAMETER"
     }
     { mnuDimAngular Menu entity
       Name = "mnuDimAngular"
       Text = ("Angular Dimension")
       Picture = Picture["svg/entities/dimangular.svg"]
-      Tag = "dimangular"
+      Tag = "DIMENSION_ANG3PT"
     }
     { mnuDimArc Menu entity
       Name = "mnuDimArc"

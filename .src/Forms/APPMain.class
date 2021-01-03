@@ -212,7 +212,7 @@ Public Sub Run(cin As Collection)
 
         End With
 
-        obj.Picture = obj.Picture.Image.Stretch(22, 22).Picture
+        Try obj.Picture = obj.Picture.Image.Stretch(22, 22).Picture
         Print obj.Tag
 
       Endif
