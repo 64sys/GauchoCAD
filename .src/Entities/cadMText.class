@@ -149,12 +149,7 @@ End
 
 
 
-Public Sub setEntity(e As Entity)
 
-  e.fParam.Resize(Me.TotalParams)
-  e.StringData.Resize(Me.sdaTotalParams) ' text, style
-
-End
 
 Public Sub Translate(e As Entity, dX As Float, dY As Float, Optional OnlySelected As Boolean = False)
 
@@ -669,7 +664,7 @@ Public Function ImportDXF(e As Entity, sClaves As String[], sValues As String[])
   Dim TextHeigthSet As Boolean = False
   Dim TextAngleSet As Boolean = False
 
-  setEntity(e)
+  clsEntities.setEntity(e)
 
   For i = 0 To sClaves.Max
 

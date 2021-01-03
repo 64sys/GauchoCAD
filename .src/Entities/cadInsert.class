@@ -101,12 +101,15 @@ End
 Public Sub Draw(oE As Entity)
 
   Dim ET As Entity, i As Integer
+  Dim pBlockToDraw As Block
 
   If Not oe.Finished Then Return
   If UCase(Left(oe.Gender, 3)) = "DIM" Then
-    i = clsEntities.FIndBlockIDbyHandle(oE.Block)
+    'i = clsEntities.FIndBlockIDbyHandle(oE.Block)
+    pBlockToDraw = oe.pBlock
   Else
     i = clsEntities.FIndBlockID(oE.Block)
+    pBlockToDraw = gcd.CurrentDrawing.arrBlocks[i].entities
   End If
   If i < 0 Then Stop ' Return
 
@@ -115,7 +118,7 @@ Public Sub Draw(oE As Entity)
   gl.Rotatef(oE.fParam[Me.ipaRotacion], 0, 0, 1)
   gl.Scalef(oE.fParam[Me.ipaEscX], oE.fParam[Me.ipaEscY], oE.fParam[Me.ipaEscZ])
 
-  For Each ET In gcd.CurrentDrawing.arrBlocks[i].entities
+  For Each ET In pBlockToDraw.entities
     et.visible = True
     et.LineType = oe.LineType
     et.colour = oe.colour

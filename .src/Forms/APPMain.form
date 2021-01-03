@@ -140,7 +140,7 @@
       Name = "mnuDimLinear"
       Text = ("Linear dimension")
       Picture = Picture["svg/entities/dimlinear.svg"]
-      Tag = "dimlinear"
+      Tag = "dimension_linear"
     }
     { mnuDimRadial Menu entity
       Name = "mnuDimRadial"

@@ -734,57 +734,6 @@ Public Sub ReBuildBlock()
 
       End If
 
-    Case gcd.dimRadius
-      If iPoints = 0 Then     ' marco el primer punto
-        elem.P[0] = ClickXr     ' posicion base del inserto
-        elem.P[1] = ClickYr
-
-        elem.fParam[0] = 1      ' ScaleX del inserto
-        elem.fParam[1] = 1      ' ScaleY del inserto
-        elem.fParam[2] = 0      ' degAngle del inserto
-
-      Else If iPoints = 1 Then ' marco el segundo punto, lo que modifica los parametros del bloque
-        elem.Visible = True
-        elem.P[2] = ClickXr     ' posicion base del inserto
-        elem.P[3] = ClickYr
-
-        ' el largo de la linea principal viene dado por la distancia entre ambos puntos
-        d = puntos.distancia(elem.P[0], elem.P[1], ClickXr, ClickYr)
-
-        ' con este click calculo el angulo
-        elem.fParam[2] = Ang(ClickXr - elem.P[0], ClickYr - elem.P[1]) * 180 / Pi
-
-        ' la primer entidad del bloque es la linea principal
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].P[0] = 0           ' X0
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].P[1] = 0           ' Y0
-
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].P[2] = d           ' X1
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].P[3] = 0           ' Y1
-
-        ' la segunda es la primer linea de demarcacion (sin cambios)
-        'gcd.CurrentDrawing.arrBlocks[iBloque].entities[1].P[0] = 0           ' X0
-        'gcd.CurrentDrawing.arrBlocks[iBloque].entities[1].P[1] = 0           ' Y0
-
-        'gcd.CurrentDrawing.arrBlocks[iBloque].entities[1].P[2] = d           ' X1
-        'gcd.CurrentDrawing.arrBlocks[iBloque].entities[1].P[3] = 0           ' Y1
-
-        ' la sexta es el texto
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[3].StringData[0] = Format(d, Me.DimFormat)
-
-        flxTextExt = glPlus.MTextExtends(gcd.CurrentDrawing.arrBlocks[iBloque].entities[3].StringData[0], 0, 0, gcd.CurrentDrawing.arrBlocks[iBloque].entities[3].fParam[1])
-
-        ' la tercera es una flecha
-
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[2].P[0] = d           ' X0
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[2].P[2] = -Me.DimArrowSize + d           ' X0
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[2].P[4] = -Me.DimArrowSize + d           ' X0
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[2].P[6] = d           ' X0
-
-        ' el texto va adentro
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[3].P[0] = d / 2 - flxTextExt[2] / 2
-        gcd.CurrentDrawing.arrBlocks[iBloque].entities[3].P[1] = Me.DimArrowWidth
-
-      End If
 
     Case gcd.dimDiameter
 
@@ -1118,79 +1067,6 @@ End
 '     "dimstyle": [5, 1, 57, 57],
 '     "block": [5, 2, 4606, 4606]
 
-' "entity": "DIMENSION_RADIUS",
-'   "index": 296,
-'   "type": 25,
-'   "handle": [0, 4732],
-'   "size": 145,
-'   "bitsize": 1018,
-'   "eed": [
-'     {
-'       "size": 30,
-'       "handle": [5, 4701],
-'       "code": 70,
-'       "value": 387
-'     },
-'     {
-'       "code": 70,
-'       "value": 1
-'     },
-'     {
-'       "code": 70,
-'       "value": 388
-'     },
-'     {
-'       "code": 40,
-'       "value": 0.0
-'     },
-'     {
-'       "code": 70,
-'       "value": 390
-'     },
-'     {
-'       "code": 40,
-'       "value": 0.0
-'     }
-'   ],
-'   "reactors": [
-'     [4, 2, 4734, 4734]
-'   ],
-'   "xdicobjhandle": [3, 2, 4733, 4733],
-'   "_subclass": "AcDbEntity",
-'   "prev_entity": [8, 0, 0, 4731],
-'   "next_entity": [10, 1, 32, 4764],
-'   "layer": [5, 2, 5261, 5261],
-'   "preview_exists": 0,
-'   "entmode": 2,
-'   "nolinks": 0,
-'   "color": 256,
-'   "ltype_scale": 1.0,
-'   "ltype_flags": 0,
-'   "plotstyle_flags": 0,
-'   "invisible": 0,
-'   "linewt": 29,
-'   "_subclass": "AcDbDimension",
-'   "extrusion": [0.0, 0.0, 1.0],
-'   "text_midpt": [339.36338569594892, 172.70867755725541],
-'   "elevation": 0.0,
-'   "flag1": 11,
-'   "user_text": "",
-'   "text_rotation": 0.0,
-'   "horiz_dir": 0.0,
-'   "ins_scale": [1.0, 1.0, 1.0],
-'   "ins_rotation": 0.0,
-'   "attachment": 5,
-'   "lspace_style": 1,
-'   "lspace_factor": 1.0,
-'   "act_measurement": 10.50494238347653,
-'   "clone_ins_pt": [0.0, 0.0],
-'   "flag": 128,
-'   "_subclass": "AcDbRadialDimension",
-'   "def_pt": [336.34758655818518, 168.24654323153257, 0.0],
-'   "first_arc_pt": [344.00833947299708, 175.43449699170401, 0.0],
-'   "leader_len": 0.0,
-'   "dimstyle": [5, 1, 57, 57],
-'  "block": [5, 2, 4735, 4735]
 
 '    "entity": "DIMENSION_DIAMETER",
 ' "index": 303,
