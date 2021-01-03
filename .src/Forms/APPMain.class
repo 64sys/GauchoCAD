@@ -275,6 +275,7 @@ Public Sub Run(cin As Collection)
   'pnlIcons.Visible = True
 
   Me.Menus.Hide
+  Me.Border = False
   Me.Show()
 
 End
@@ -579,11 +580,23 @@ Public Sub locks_Click()
         Panel3.Visible = False
         pnlData.Visible = True
         LoadDrawingMap3()
+        Me.Menus.Hide
+        Panel14.Visible = False
+        Panel15.Visible = False
+        pnlLocks.Visible = False
+        lblCommand.Visible = False
+        Panel11.Visible = True
         Last.Picture = Image.FromString(Highligh("./svg/locks/drawing.svg")).Stretch(35, 35).Picture
       Else
         Panel7.Visible = True
         Panel3.Visible = True
         pnlData.Visible = False
+        Me.Menus.Show
+        Panel14.Visible = True
+        Panel15.Visible = True
+        pnlLocks.Visible = True
+        lblCommand.Visible = True
+        Panel11.Visible = False
         Last.Picture = Image.FromString(Highligh("./svg/locks/table.svg")).Stretch(35, 35).Picture
       Endif
 
@@ -2354,6 +2367,17 @@ Public Sub Form_KeyPress()
       Endif
       btnGrid.Value = puntos.Gridactive
 
+    Case Key.F11
+      If btnMenuShow.Value = False Then
+        Me.Menus.Hide
+        Me.Border = False
+        btnMenuShow.Value = True
+      Else
+        Me.Menus.show
+        Me.Border = True
+        btnMenuShow.Value = False
+      Endif
+
     Case Key.Esc
 
       If gcd.clsJob.gender = "Builder" Then
@@ -2738,6 +2762,8 @@ Public Sub TreeView1_Select()
   Dim r As Integer
   Dim c As Integer
   Dim lay As New Collection
+  Dim d As Float
+  Dim i As Integer
 
   Settings["Section/Selected"] = TreeView1.Key
 
@@ -2780,7 +2806,7 @@ Public Sub TreeView1_Select()
       GridView1.Clear
       pnlFileData.Visible = False
       GridView1.Visible = True
-      GridView1.Columns.Count = 6
+      GridView1.Columns.Count = 7
 
       If gcd.CurrentDrawing.cModel.Exist(TreeView1.Key) Then
         GridView1.Rows.Count = gcd.CurrentDrawing.cModel[TreeView1.Key].Count
@@ -2788,8 +2814,9 @@ Public Sub TreeView1_Select()
         GridView1.Columns[1].Text = ("Handle")
         GridView1.Columns[2].Text = ("Layer")
         GridView1.Columns[3].Text = ("Style")
-        GridView1.Columns[4].Text = ("Width")
+        GridView1.Columns[4].Text = ("Weight")
         GridView1.Columns[5].Text = ("Color")
+        GridView1.Columns[6].Text = ("Particular")
 
         For Each v In gcd.CurrentDrawing.cModel[TreeView1.Key]
           If TypeOf(v) = gb.Object Then
@@ -2809,6 +2836,32 @@ Public Sub TreeView1_Select()
                 GridView1[r, 5].Text = ""
               Endif
             Endif
+            Select v["entity"]
+              Case "TEXT", "ATTRIB"
+                GridView1[r, 6].Text = v["text_value"]
+              Case "INSERT"
+                GridView1[r, 6].Text = gcd.CurrentDrawing.cBlocks[v["block_header"][v["block_header"].Max]]
+              Case "CIRCLE", "ARC"
+                GridView1[r, 6].Text = v["radius"]
+              Case "LINE"
+                d = Sqr((v["end"][0] - v["start"][0]) ^ 2 + (v["end"][1] - v["start"][1]) ^ 2 + (v["end"][2] - v["start"][2]) ^ 2)
+                GridView1[r, 6].Text = CStr(d)
+
+              Case "LWPOLYLINE"
+                For i = 1 To v["points"].Count - 1
+                  d = d + Sqr((v["points"][i][0] - v["points"][i - 1][0]) ^ 2 + (v["points"][i][1] - v["points"][i - 1][1]) ^ 2)
+                Next
+                GridView1[r, 6].Text = CStr(d)
+
+              Case "MTEXT"
+                GridView1[r, 6].Text = v["text"]
+
+              Case "HATCH"
+                GridView1[r, 6].Text = v["name"]
+
+              Case Else
+                GridView1[r, 6].Text = ""
+            End Select
           Endif
           Inc r
         Next
@@ -2970,8 +3023,10 @@ Public Sub btnMenuShow_Click()
 
   If btnMenuShow.Value = False Then
     Me.Menus.Hide
+    Me.Border = False
   Else
     Me.Menus.show
+    Me.Border = True
   Endif
 
 End
