@@ -21,12 +21,12 @@
 ' Boston, MA  02110-1301  USA
 Create Static
 
-Public Const Gender As String = "Dimension_Diameter"
+Public Const Gender As String = "Dimension_Ordinate"
 Public Const DrawingOrder As Integer = 100 ' 1 a 32.724 esto debe Drawse primero y ser sobreescrito por el resto
 Public Const PointsToDraw As Integer = 1             ' minimal point requered for drawing something usefull
 Public Const HelperTrabajo As String = ("Insert a linear acotation")
-Public ParamType As String = "PP"                             ' that is Point, Point, Float; could be Color Text, etc
-Public ParamHelper As String = "Start point;End point"
+Public ParamType As String = "PPR"                             ' that is Point, Point, Float; could be Color Text, etc
+Public ParamHelper As String = "Start point;End point;extension"
 Public Const USEWITH As String = "EntityBuilder"
 Public Const OrthogonalIgnored As Boolean = False
 Public Const OrthogonalForced As Boolean = False
@@ -127,7 +127,23 @@ Public Function NewParameter(eBuild As Entity, vParam As Variant[], Optional Def
     Try eBuild.P[3] = vParam[2]
     eBuild.pBlock = ReBuildBlock(eBuild)
     If definitive Then Return True
+  Else If Me.StepsDone = 2 Then
+    If vParam[0] = "point" Then  ' vino como un punto, entonces la calculo de otra manera
 
+      ' return the angle from horizontal to us
+      eBuild.fParam[Me.ipaExtension] = -puntos.PointToLineDistance([vParam[1], vParam[2]], [eBuild.p[0], eBuild.p[1], eBuild.p[2], eBuild.p[3]]) ' / puntos.distancia(eBuild.p[0], eBuild.p[1], eBuild.p[2], eBuild.p[3]
+
+    Else If vParam[0] = "float" Then  ' vino como un punto, entonces la calculo de otra manera
+      eBuild.fParam[Me.ipaExtension] = vParam[1]
+
+
+    End If
+
+    eBuild.pBlock = ReBuildBlock(eBuild)
+    If definitive Then
+      'Stop
+      Return True
+    End If
   Endif
 
 
@@ -198,6 +214,21 @@ Public Sub ReBuildBlock(ELEM As Entity) As Block
   clsEntities.AddLine(newBlock.entities, [0, 0, 0, 0], elem.colour, elem.LineWidth, elem.LineType, elem.layerid, newBlock.name)
   eLineaPpal = newBlock.entities.Last
 
+  ' lineas de demarcacion
+  clsEntities.AddLine(newBlock.entities, [0, Me.DimExtension, 0, -Me.DimExtension], elem.colour, elem.LineWidth, elem.LineType, elem.layerid, newBlock.name)
+  eExtension1 = newBlock.entities.Last
+
+  clsEntities.AddLine(newBlock.entities, [0, Me.DimExtension, 0, -Me.DimExtension], elem.colour, elem.LineWidth, elem.LineType, elem.layerid, newBlock.name)
+
+  eExtension2 = newBlock.entities.Last
+
+  ' puntos base
+
+  clsEntities.AddPoint(newBlock.entities, [0, 0], elem.colour, elem.LineWidth, elem.LineType, elem.layerid, newBlock.name)
+
+  clsEntities.AddPoint(newBlock.entities, [0, 0], elem.colour, elem.LineWidth, elem.LineType, elem.layerid, newBlock.name)
+  ePoint2 = newBlock.entities.Last
+
   ' flechas
 
   f1.Insert([0, 0, Me.DimArrowSize, Me.DimArrowWidth, Me.DimArrowSize, -Me.DimArrowWidth, 0, 0])
@@ -219,14 +250,8 @@ Public Sub ReBuildBlock(ELEM As Entity) As Block
   elem.fParam[cadInsert.ipaEscY] = 1      ' ScaleY del inserto
   elem.fParam[cadInsert.ipaEscZ] = 1      ' ScaleY del inserto
 
-
-  '  If stage = 0 Then     ' marco el primer punto
-
-
-  '    Else If stage = 1 Then ' marco el segundo punto, lo que modifica los parametros del bloque
   elem.Visible = True
 
-
   ' el largo de la linea principal viene dado por la distancia entre ambos puntos
   d = puntos.distancia(elem.P[0], elem.P[1], elem.P[2], elem.P[3])
 
@@ -240,29 +265,34 @@ Public Sub ReBuildBlock(ELEM As Entity) As Block
   eLineaPpal.P[2] = d           ' X1
   eLineaPpal.P[3] = 0           ' Y1
 
+  ePoint2.P[0] = d
 
-  ' el largo de la linea principal viene dado por la distancia entre ambos puntos
-  d = puntos.distancia(elem.P[0], elem.P[1], elem.P[2], elem.P[3])
+  ' la segunda es la primer linea de demarcacion (sin cambios)
+  ' eExtension1.P[0] = 0           ' X0
+  ' eExtension1.P[1] = 0           ' Y0
+  '
+  ' eExtension1.P[2] = 0           ' X1
+  ' eExtension1.P[3] = 0           ' Y1
 
-  ' con este click calculo el angulo
-  elem.fParam[cadInsert.ipaRotacion] = Ang(elem.p[2] - elem.P[0], elem.p[3] - elem.P[1]) * 180 / Pi
+  ' la tercera es la segunda linea de demarcacion
+  eExtension2.P[0] = d           ' X0
+  'eExtension2.P[1] = 0           ' Y0
 
-  ' la primer entidad del bloque es la linea principal
-  eLineaPpal.P[0] = 0           ' X0
-  eLineaPpal.P[1] = 0           ' Y0
-
-  eLineaPpal.P[2] = d           ' X1
-  eLineaPpal.P[3] = 0           ' Y1
-
+  eExtension2.P[2] = d           ' X1
+  'eExtension2.P[3] = 0           ' Y1
 
   ' el texto
-  eText.StringData[cadMText.sdaText] = "D " & Format(d, Me.DimFormat)
+  eText.StringData[cadMText.sdaText] = Format(d, Me.DimFormat)
 
   flxTextExt = glPlus.MTextExtends(eText.StringData[0], 0, 0, eText.fParam[1])
 
   ' la cuarta y quinta son las flechas , tengo que verificar si entran, o el texto
   If flxTextExt[2] * 1.1 > d Then                      ' no entra
 
+    eOblique1.P[0] = d           ' X0
+    eOblique1.P[2] = Me.DimArrowSize + d           ' X0
+    eOblique1.P[4] = Me.DimArrowSize + d           ' X0
+    eOblique1.P[6] = d           ' X0
 
     eOblique2.P[0] = 0           ' X0
     eOblique2.P[2] = -Me.DimArrowSize
@@ -274,6 +304,10 @@ Public Sub ReBuildBlock(ELEM As Entity) As Block
     eText.P[1] = Me.DimArrowWidth
 
   Else                                                                ' entra
+    eOblique1.P[0] = 0           ' X0
+    eOblique1.P[2] = Me.DimArrowSize
+    eOblique1.P[4] = Me.DimArrowSize
+    eOblique1.P[6] = 0           ' X0
 
     eOblique2.P[0] = d           ' X0
     eOblique2.P[2] = -Me.DimArrowSize + d           ' X0
@@ -287,13 +321,27 @@ Public Sub ReBuildBlock(ELEM As Entity) As Block
   End If
 
 
+  extension = elem.fParam[Me.ipaExtension]
   ' linea principal
   eLineaPpal.P[1] = extension           ' Y0
   eLineaPpal.P[3] = extension           ' Y1
 
+  ' linea de demarcacion
+  eExtension1.P[1] = Me.DimExtension + extension           ' Y0
+  eExtension1.P[3] = -Me.DimExtension + extension           ' Y1
+
+  ' segunda linea de demarcacion
+  eExtension2.P[1] = Me.DimExtension + extension           ' Y0
+  eExtension2.P[3] = -Me.DimExtension + extension           ' Y1
+
   ' texto
   eText.P[1] = Me.DimArrowWidth + extension
 
+  ' flechas
+  eOblique1.P[1] = extension           ' X0
+  eOblique1.P[3] = extension + Me.DimArrowWidth
+  eOblique1.P[5] = extension - Me.DimArrowWidth
+  eOblique1.P[7] = extension           ' X0
 
   eOblique2.P[1] = extension           ' X0
   eOblique2.P[3] = extension + Me.DimArrowWidth
@@ -348,48 +396,15 @@ Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
 
   e.fParam.Resize(Me.TotalParams)
 
-
-  ' "entity": "DIMENSION_DIAMETER",
-  ' "index": 303,
-  ' "type": 26,
-  ' "handle": [0, 4765],
-  ' "size": 145,
-  ' "bitsize": 1018,
-  ' "eed": [
-  '   {
-  '     "size": 30,
-  '     "handle": [5, 4701],
-  '     "code": 70,
-  '     "value": 387
-  '   },
-  '   {
-  '     "code": 70,
-  '     "value": 1
-  '   },
-  '   {
-  '     "code": 70,
-  '     "value": 388
-  '   },
-  '   {
-  '     "code": 40,
-  '     "value": 0.0
-  '   },
-  '   {
-  '     "code": 70,
-  '     "value": 390
-  '   },
-  '   {
-  '     "code": 40,
-  '     "value": 0.0
-  '   }
-  ' ],
-  ' "reactors": [
-  '   [4, 2, 4767, 4767]
-  ' ],
-  ' "xdicobjhandle": [3, 2, 4766, 4766],
+  ' "entity": "DIMENSION_ORDINATE",
+  ' "index": 319,
+  ' "type": 20,
+  ' "handle": [0, 4936],
+  ' "size": 122,
+  ' "bitsize": 876,
   ' "_subclass": "AcDbEntity",
-  ' "prev_entity": [8, 0, 0, 4764],
-  ' "next_entity": [10, 1, 14, 4779],
+  ' "prev_entity": [8, 0, 0, 4935],
+  ' "next_entity": [10, 1, 9, 4945],
   ' "layer": [5, 2, 5261, 5261],
   ' "preview_exists": 0,
   ' "entmode": 2,
@@ -401,11 +416,11 @@ Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
   ' "invisible": 0,
   ' "linewt": 29,
 
-  '=======================================================================
+  '=========================================================================
 
   ' "_subclass": "AcDbDimension",
   ' "extrusion": [0.0, 0.0, 1.0],
-  ' "text_midpt": [379.65954790543469, 169.39468359475671],
+  ' "text_midpt": [339.406966706015, 201.3821301658075],
   ' "elevation": 0.0,
   ' "flag1": 11,
   ' "user_text": "",
@@ -416,33 +431,39 @@ Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
   ' "attachment": 5,
   ' "lspace_style": 1,
   ' "lspace_factor": 1.0,
-  ' "act_measurement": 21.00988476695261,
+  ' "act_measurement": 126.38743121141022,
   ' "clone_ins_pt": [0.0, 0.0],
+  ' "_subclass": "AcDbOrdinateDimension",
+  ' "def_pt": [142.92093415289901, 73.80422276392108, 0.0],
+  ' "feature_location_pt": [326.91019506733892, 200.19165397533129, 0.0],
+  ' "leader_endpt": [335.5974428964912, 200.19165397533129, 0.0],
+  ' "flag2": 0,
   ' "flag": 128,
-  ' "_subclass": "AcDbDiametricDimension",
-  ' "first_arc_pt": [389.47625832969106, 165.46998685659418, 0.0],
+  ' "dimstyle": [5, 1, 57, 57],
+  ' "block": [5, 2, 4937, 4937]
 
-  ' "def_pt": [369.2135290784824, 171.02309960647062, 0.0],
+  e.P.Add(0) ' TODO: cuando este terminada la entidad, remover esto
+  e.P.Add(0)
+  '
   e.P.Add(c["def_pt"][0])
   e.P.Add(c["def_pt"][1])
-  e.P.Add(c["first_arc_pt"][0])
-  e.P.Add(c["first_arc_pt"][1])
-
-
-  ' "leader_len": 0.0,
-  ' "dimstyle": [5, 1, 57, 57],
-  ' "block": [5, 2, 4768, 4768]
+  '
+  ' e.P.Add(c["xline2_pt"][0])
+  ' e.P.Add(c["xline2_pt"][1])
+  '
+  '
   e.fParam[Me.ipaEscX] = 1
   e.fParam[Me.ipaEscY] = 1
   e.fParam[Me.ipaEscZ] = 1
+  '
+  ' e.fParam[Me.ipaRotacion] = CFloat(c["dim_rotation"]) * 180 / Pi
 
-  e.fParam[Me.ipaRotacion] = CFloat(c["text_rotation"]) * 180 / Pi
+  Dim hBlock As Integer
 
   e.Block = gcd.CurrentDrawing.cmodel["BLOCKS"][c["block"][3]]["block_entity"][3]
-  e.pBlock = ReBuildBlock(e)
-
+  'e.pBlock = ReBuildBlock(e)
+  'e.Block = gcd.CurrentDrawing.arrBlocks[clsEntities.FIndBlockIDbyHandle(hBlock)].name
 
   Return True
-
 
 End

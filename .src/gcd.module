@@ -370,7 +370,7 @@ Public Sub ImpEnty5(cEny As Collection, obx As Entity[])
     If e.Exist("entity") Then                                     ' es una entidad?
       entNueva = New Entity                                       ' entonces, creamos una nueva
 
-      If InStr("POINT ATTDEF ATTRIB LINE LWPOLYLINE CIRCLE ELLIPSE ARC TEXT MTEXT SPLINE SOLID LEADER INSERT DIMENSION_LINEAR DIMENSION_DIAMETER DIMENSION_RADIUS DIMENSION_ANG3PT", e["entity"]) = 0 Then Continue
+      If InStr("POINT ATTDEF ATTRIB LINE LWPOLYLINE CIRCLE ELLIPSE ARC TEXT MTEXT SPLINE SOLID LEADER INSERT DIMENSION_LINEAR DIMENSION_DIAMETER DIMENSION_RADIUS DIMENSION_ANG3PT DIMENSION_ALIGNED DIMENSION_ORDINATE LARGE_RADIAL_DIMENSION ARC_DIMENSION", e["entity"]) = 0 Then Continue
 
       If clsEntities.ImportJsonToEntity(e, entNueva) Then         ' si esta implementada, llenamos los datos
         If e.Exist("handle") Then

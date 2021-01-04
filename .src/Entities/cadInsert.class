@@ -104,9 +104,13 @@ Public Sub Draw(oE As Entity)
   Dim pBlockToDraw As Block
 
   If Not oe.Finished Then Return
-  If UCase(Left(oe.Gender, 3)) = "DIM" Then
-    'i = clsEntities.FIndBlockIDbyHandle(oE.Block)
-    pBlockToDraw = oe.pBlock
+  If UCase(Left(oe.Gender, 3)) <> "INS" Then
+    If Not IsNull(oe.pBlock) Then
+      pBlockToDraw = oe.pBlock
+    Else
+      i = clsEntities.FIndBlockIDbyHandle(oE.Block)
+      pBlockToDraw = gcd.CurrentDrawing.arrBlocks[i]
+    End If
   Else
     i = clsEntities.FIndBlockID(oE.Block)
     pBlockToDraw = gcd.CurrentDrawing.arrBlocks[i]

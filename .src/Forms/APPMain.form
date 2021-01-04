@@ -163,13 +163,13 @@
       Name = "mnuDimArc"
       Text = ("Arc length Dimension")
       Picture = Picture["svg/entities/dimarc.svg"]
-      Tag = "dimarc"
+      Tag = "ARC_DIMENSION"
     }
     { mnuDimOrdinate Menu entity
       Name = "mnuDimOrdinate"
       Text = ("Ordinate Dimension")
       Picture = Picture["svg/entities/dimordinate.svg"]
-      Tag = "dimordinate"
+      Tag = "DIMENSION_ORDINATE"
     }
     { mnuInsert Menu entity
       Name = "mnuInsert"

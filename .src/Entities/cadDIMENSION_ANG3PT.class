@@ -28,7 +28,7 @@ Public Const DrawingOrder As Integer = 100 ' 1 a 32.724 esto debe Drawse primero
 Public Const PointsToDraw As Integer = 1             ' minimal point requered for drawing something usefull
 Public Const HelperTrabajo As String = ("Insert a linear acotation")
 Public ParamType As String = "PPPP"                             ' that is Point, Point, Float; could be Color Text, etc
-Public ParamHelper As String = "Start point;End point;extension"
+Public ParamHelper As String = "Center of arc;First point;Secont point; extension"
 Public Const USEWITH As String = "EntityBuilder"
 Public Const OrthogonalIgnored As Boolean = False
 Public Const OrthogonalForced As Boolean = False
@@ -254,17 +254,11 @@ Public Sub ReBuildBlock(ELEM As Entity) As Block
   elem.Visible = True
 
 
-  ' con este click calculo el angulo
-  'elem.fParam[2] = Ang(ClickXr - elem.P[0], ClickYr - elem.P[1]) * 180 / Pi
-
-  ' la primer entidad del bloque es el arco
-  eLineaPpal.P[0] = 0 'elem.P[0]
-  eLineaPpal.P[1] = 0 'elem.P[1]
-
-  eLineaPpal.fParam[0] = d          ' radio
+  '
+  eLineaPpal.fParam[0] = 0          ' radio
   eLineaPpal.fParam[1] = Ang(elem.P[2] - elem.P[0], elem.P[3] - elem.P[1]) * 180 / Pi
-  eLineaPpal.fParam[2] = 0
 
+  '
   ' las lineas de extension (las hago HORIZONTALES y las roto)
   eExtension1.P.Clear
   eExtension1.P.Insert([-Me.DimExtension, 0, Me.DimExtension, 0])
@@ -277,93 +271,30 @@ Public Sub ReBuildBlock(ELEM As Entity) As Block
 
   eOblique2.P.Clear
   eOblique2.P.Insert([0, 0, -Me.DimArrowWidth, -Me.DimArrowSize, Me.DimArrowWidth, -Me.DimArrowSize, 0, 0])
+  '
 
-  ' roto
-  eExtension1.ClassHandler.Rotate(eExtension1, eLineaPpal.fParam[1] / 180 * Pi)
-  eExtension2.ClassHandler.Rotate(eExtension2, eLineaPpal.fParam[1] / 180 * Pi)
-  eOblique1.ClassHandler.Rotate(eOblique1, eLineaPpal.fParam[1] / 180 * Pi)
-  eOblique2.ClassHandler.Rotate(eOblique2, eLineaPpal.fParam[1] / 180 * Pi)
+  ' 2========================================================================================
 
-  ' traslado
-  eExtension1.ClassHandler.Translate(eExtension1, elem.P[2] - elem.P[0], elem.P[3] - elem.P[1])
-  eExtension2.ClassHandler.Translate(eExtension2, elem.P[2] - elem.P[0], elem.P[3] - elem.P[1])
-  eOblique1.ClassHandler.Translate(eOblique1, elem.P[2] - elem.P[0], elem.P[3] - elem.P[1])
-  eOblique2.ClassHandler.Translate(eOblique2, elem.P[2] - elem.P[0], elem.P[3] - elem.P[1])
-
-  ' la sexta es el texto
-  eText.StringData[cadMText.sdaText] = Format(0, Me.DimFormatAng) & " deg"
-  flxTextExt = glPlus.MTextExtends(eText.StringData[0], 0, 0, eText.fParam[1])
-
-  eText.P[0] = elem.P[2] - elem.P[0]
-  eText.P[1] = elem.P[3] - elem.P[1]
-
-  'Else If iPoints = 2 Then ' marco el segundo punto, lo que modifica los parametros del bloque
-
-
-  'gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[1] = Ang(ClickXr - elem.P[0], ClickYr - elem.P[1]) * 180 / Pi
   eLineaPpal.fParam[2] = Ang(elem.P[4] - elem.P[0], elem.P[5] - elem.P[1]) * 180 / Pi
+  '
 
-  ' las lineas de extension (las hago HORIZONTALES y las roto)
-  'gcd.CurrentDrawing.arrBlocks[iBloque].entities[1].P.Clear
-  'gcd.CurrentDrawing.arrBlocks[iBloque].entities[1].P.Insert([-Me.DimExtension, 0, Me.DimExtension, 0])
-  eExtension2.P.Clear
-  eExtension2.P.Insert([-Me.DimExtension, 0, Me.DimExtension, 0])
-
-  ' flechas
-  'gcd.CurrentDrawing.arrBlocks[iBloque].entities[3].P.Clear
-  'gcd.CurrentDrawing.arrBlocks[iBloque].entities[3].P.Insert([0, 0, -Me.DimArrowWidth, Me.DimArrowSize, Me.DimArrowWidth, Me.DimArrowSize, 0, 0])
-
-  eOblique2.P.Clear
-  eOblique2.P.Insert([0, 0, -Me.DimArrowWidth, -Me.DimArrowSize, Me.DimArrowWidth, -Me.DimArrowSize, 0, 0])
-
-  ' roto
-
-  'gcd.CurrentDrawing.arrBlocks[iBloque].entities[1].ClassHandler.Rotate(gcd.CurrentDrawing.arrBlocks[iBloque].entities[1], gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[1] / 180 * Pi)
-  eExtension2.ClassHandler.Rotate(eExtension2, eLineaPpal.fParam[2] / 180 * Pi)
-  'gcd.CurrentDrawing.arrBlocks[iBloque].entities[3].ClassHandler.Rotate(gcd.CurrentDrawing.arrBlocks[iBloque].entities[3], gcd.CurrentDrawing.arrBlocks[iBloque].entities[0].fParam[1] / 180 * Pi)
-  eOblique2.ClassHandler.Rotate(eOblique2, eLineaPpal.fParam[2] / 180 * Pi)
-
-  ' muevo
-  fRotXY = puntos.RotateFromPointWithAngle(elem.P[0], elem.P[1], (eLineaPpal.fParam[2] - eLineaPpal.fParam[1]) / 180 * Pi, elem.P[2], elem.P[3])
-
-  'gcd.CurrentDrawing.arrBlocks[iBloque].entities[2].ClassHandler.Translate(gcd.CurrentDrawing.arrBlocks[iBloque].entities[2], elem.P[4] - elem.P[0], elem.P[5] - elem.P[1])
-  'gcd.CurrentDrawing.arrBlocks[iBloque].entities[4].ClassHandler.Translate(gcd.CurrentDrawing.arrBlocks[iBloque].entities[4], elem.P[4] - elem.P[0], elem.P[5] - elem.P[1])
-  eExtension2.ClassHandler.Translate(eExtension2, fRotXY[0] - elem.P[0], fRotXY[1] - elem.P[1])
-  eOblique2.ClassHandler.Translate(eOblique2, fRotXY[0] - elem.P[0], fRotXY[1] - elem.P[1])
-
-  ' la sexta es el texto
+  ' ' la sexta es el texto
   If (eLineaPpal.fParam[2] - eLineaPpal.fParam[1]) < 0 Then eLineaPpal.fParam[2] += 360
-  eText.StringData[0] = Format((eLineaPpal.fParam[2] - eLineaPpal.fParam[1]), Me.DimFormatAng)
+  eText.StringData[0] = Format((eLineaPpal.fParam[2] - eLineaPpal.fParam[1]), Me.DimFormatAng) & "*"
   fRotXY = puntos.RotateFromPointWithAngle(elem.P[0], elem.P[1], (eLineaPpal.fParam[2] - eLineaPpal.fParam[1]) / 180 * Pi / 2, elem.P[2], elem.P[3])
-
+  '
   flxTextExt = glPlus.MTextExtends(eText.StringData[cadMText.sdaText], 0, 0, eText.fParam[1])
-
+  '
   eText.P[0] = fRotXY[0] - elem.P[0]
   eText.P[1] = fRotXY[1] - elem.P[1]
   eText.fParam[cadMText.ipaTextAngle] = (eLineaPpal.fParam[2] + eLineaPpal.fParam[1]) / 2 - 90
 
-  'Else If iPoints = 3 Then ' aca marco la extension, que es todo lo anterior, pero con otro radio
-
-
+  ' 3 ===========================================================================
 
   ' nuevo radio
   d = puntos.distancia(elem.P[0], elem.P[1], elem.P[6], elem.P[7])
   eLineaPpal.fParam[0] = d          ' radio del arco
 
-  ' regenero
-
-  ' las lineas de extension (las hago HORIZONTALES y las roto)
-  eExtension1.P.Clear
-  eExtension1.P.Insert([-Me.DimExtension, 0, Me.DimExtension, 0])
-  eExtension2.P.Clear
-  eExtension2.P.Insert([-Me.DimExtension, 0, Me.DimExtension, 0])
-
-  ' flechas
-  eOblique1.P.Clear
-  eOblique1.P.Insert([0, 0, -Me.DimArrowWidth, Me.DimArrowSize, Me.DimArrowWidth, Me.DimArrowSize, 0, 0])
-
-  eOblique2.P.Clear
-  eOblique2.P.Insert([0, 0, -Me.DimArrowWidth, -Me.DimArrowSize, Me.DimArrowWidth, -Me.DimArrowSize, 0, 0])
 
   ' roto
   eExtension1.ClassHandler.Rotate(eExtension1, eLineaPpal.fParam[1] / 180 * Pi)
@@ -394,11 +325,11 @@ Public Sub ReBuildBlock(ELEM As Entity) As Block
   d = puntos.distancia(elem.P[0], elem.P[1], elem.P[2], elem.P[3])
 
   ' con este click calculo el angulo
-  elem.fParam[cadInsert.ipaRotacion] = Ang(elem.p[2] - elem.P[0], elem.p[3] - elem.P[1]) * 180 / Pi
+  'elem.fParam[cadInsert.ipaRotacion] = Ang(elem.p[2] - elem.P[0], elem.p[3] - elem.P[1]) * 180 / Pi
 
   ' X0
 
-  ' End If
+  '===========================================
   Return newBlock
 
 
@@ -495,11 +426,20 @@ Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
   '      "dimstyle": [5, 1, 57, 57],
   '     "block": [5, 2, 4507, 4507]
 
-  e.P.Add(c["xline1_pt"][0])
-  e.P.Add(c["xline1_pt"][1])
-  ' "xline2_pt": [410.0, 10.0, 0.0],
+  e.P.Add(c["center_pt"][0])
+  e.P.Add(c["center_pt"][1])
+
+
+
   e.P.Add(c["xline2_pt"][0])
   e.P.Add(c["xline2_pt"][1])
+
+
+  e.P.Add(c["xline1_pt"][0])
+  e.P.Add(c["xline1_pt"][1])
+
+  e.P.Add(c["def_pt"][0])
+  e.P.Add(c["def_pt"][1])
 
   ' "def_pt": [410.0, 85.76276491494264, 0.0],
   ' "oblique_angle": 0.0,
@@ -510,7 +450,7 @@ Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
   e.fParam[Me.ipaEscY] = 1
   e.fParam[Me.ipaEscZ] = 1
 
-  e.fParam[Me.ipaRotacion] = CFloat(c["dim_rotation"]) * 180 / Pi
+  'e.fParam[Me.ipaRotacion] = CFloat(c["dim_rotation"]) * 180 / Pi
   ' "_subclass": "AcDbRotatedDimension",
   ' "dimstyle": [5, 1, 57, 57],
   Dim hBlock As Integer
