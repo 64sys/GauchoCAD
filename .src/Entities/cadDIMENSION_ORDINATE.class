@@ -466,4 +466,8 @@ Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
 
   Return True
 
+Catch
+
+  Return False
+
 End

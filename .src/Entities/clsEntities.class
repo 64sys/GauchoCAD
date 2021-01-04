@@ -1117,8 +1117,8 @@ Public Function ImportJsonToEntity(c As JSONCollection, e As Entity) As Boolean
 
   End If
 
-  'Catch
-  e.ClassHandler = cadDummy
+Catch
+  'e.ClassHandler = cadDummy
   Return False
 
 End

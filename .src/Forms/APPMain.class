@@ -735,7 +735,7 @@ Public Sub GLArea1_draw()
 
   Endif
 
-  Debug "redraw"
+  ' Debug "redraw"
 
 End
 

@@ -25,7 +25,7 @@
 ' Boston, MA  02110-1301  USA
 Create Static
 
-Public Const Gender As String = "ARC_DIMENSION"
+Public Const Gender As String = "Arc_Dimension"
 Public Const DrawingOrder As Integer = 100 ' 1 a 32.724 esto debe Drawse primero y ser sobreescrito por el resto
 Public Const PointsToDraw As Integer = 1             ' minimal point requered for drawing something usefull
 Public Const HelperTrabajo As String = ("Insert a linear acotation")
@@ -464,5 +464,10 @@ Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
   ' "block": [5, 2, 3228, 3228] '  esto apunta a cModel["BLOCKS"] , pero hay q buscar otra cosa
 
   Return True
+
+
+Catch
+
+  Return False
 
 End

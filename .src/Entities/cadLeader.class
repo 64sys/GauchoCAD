@@ -234,4 +234,10 @@ End
 ' Importo los datos que puedo procesar de una coleccion y genero un Entity para ser agregado a un array
 Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
 
+  If c = Null Then Return
+
+Catch
+
+  Return False
+
 End

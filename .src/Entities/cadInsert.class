@@ -113,9 +113,9 @@ Public Sub Draw(oE As Entity)
     End If
   Else
     i = clsEntities.FIndBlockID(oE.Block)
-    pBlockToDraw = gcd.CurrentDrawing.arrBlocks[i]
+    Try pBlockToDraw = gcd.CurrentDrawing.arrBlocks[i]
   End If
-  If i < 0 Then Stop ' Return
+  If i < 0 Then Return
 
   gl.PushMatrix
   gl.Translatef(APPMain.pixels(oE.p[0]) / gcd.CurrentDrawing.ScaleZoom, APPMain.pixels(oE.p[1]) / gcd.CurrentDrawing.ScaleZoom, 0)
@@ -131,7 +131,7 @@ Public Sub Draw(oE As Entity)
     et.ClassHandler.Draw(et)
 
 
-    Debug et.Gender, et.LineType
+    'Debug et.Gender, et.LineType
   Next
   gl.PopMatrix
 
@@ -318,6 +318,11 @@ Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
   e.Block = gcd.CurrentDrawing.cModel["BLOCKS"][c["block_header"][3]]["name"]
 
   Return True
+
+
+Catch
+
+  Return False
 
 End
 

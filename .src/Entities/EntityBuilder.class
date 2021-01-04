@@ -197,7 +197,12 @@ Public Function KeyText(EnteredText As String) ' esta rutina es llamada por FCAD
         Me.LastX = xt
         Me.LastY = yt
 
-        If elem.ClassHandler.NewParameter(elem, ["point", xt, yt], True) Then AdvanceStep
+        If elem.ClassHandler.NewParameter(elem, ["point", xt, yt], True) Then
+          ' last point
+          gcd.CurrentDrawing.LastPoint.Clear
+          gcd.CurrentDrawing.LastPoint.Insert([xt, yt])
+          AdvanceStep
+        End If
 
       End If
 
@@ -280,9 +285,7 @@ Public Sub AdvanceStep()
       If ParamDefault[elem.ClassHandler.StepsDone] <> "" Then clsDrawingAids.HelperTrabajoNext &= "[" & ParamDefault[elem.ClassHandler.StepsDone] & "]"           ' try in case of lack of desciption or keep last
     End If
 
-    ' last point
-    gcd.CurrentDrawing.LastPoint.Clear
-    Try gcd.CurrentDrawing.LastPoint.Insert([elem.P[(iPoints - 1) * 2], elem.P[(iPoints - 1) * 2 + 1]])
+
 
 
   Endif
@@ -385,8 +388,13 @@ Public Function MouseDown(mouseX As Integer, mouseY As Integer) ' esta rutina es
 
   If NextParamType = "R" Then
 
-    If elem.ClassHandler.NewParameter(elem, ["point", appmain.Xreal(mouseX), appmain.Yreal(mouseY)], True) Then AdvanceStep
+    If elem.ClassHandler.NewParameter(elem, ["point", appmain.Xreal(mouseX), appmain.Yreal(mouseY)], True) Then
 
+      ' last point
+      gcd.CurrentDrawing.LastPoint.Clear
+      gcd.CurrentDrawing.LastPoint.Insert([appmain.Xreal(mouseX), appmain.Yreal(mouseY)])
+      AdvanceStep
+    End If
     Return
   End If
 
@@ -435,8 +443,13 @@ Public Function MouseDown(mouseX As Integer, mouseY As Integer) ' esta rutina es
   LastX = X
   LastY = Y
 
-  If elem.ClassHandler.NewParameter(elem, ["point", x, y], True) Then AdvanceStep
+  If elem.ClassHandler.NewParameter(elem, ["point", x, y], True) Then
 
+    ' last point
+    gcd.CurrentDrawing.LastPoint.Clear
+    gcd.CurrentDrawing.LastPoint.Insert([x, y])
+    AdvanceStep
+  End If
 
 
 

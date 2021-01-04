@@ -294,6 +294,11 @@ Public Function ImportJsonCol(c As JSONCollection, e As Entity) As Boolean
 
   Return True
 
+
+Catch
+
+  Return False
+
 End
 
 ' Exporto los datos de una Entity a una coleccion para ser guardados
