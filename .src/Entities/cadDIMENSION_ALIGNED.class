@@ -21,7 +21,7 @@
 ' Boston, MA  02110-1301  USA
 Create Static
 
-Public Const Gender As String = "Dimension_Linear"
+Public Const Gender As String = "Dimension_Aligned"
 Public Const DrawingOrder As Integer = 100 ' 1 a 32.724 esto debe Drawse primero y ser sobreescrito por el resto
 Public Const PointsToDraw As Integer = 1             ' minimal point requered for drawing something usefull
 Public Const HelperTrabajo As String = ("Insert a linear acotation")
@@ -455,7 +455,7 @@ Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
   e.fParam[Me.ipaEscY] = 1
   e.fParam[Me.ipaEscZ] = 1
 
-  e.fParam[Me.ipaRotacion] = CFloat(c["dim_rotation"]) * 180 / Pi
+  'e.fParam[Me.ipaRotacion] = CFloat(c["dim_rotation"]) * 180 / Pi
   ' "_subclass": "AcDbRotatedDimension",
   ' "dimstyle": [5, 1, 57, 57],
   Dim hBlock As Integer

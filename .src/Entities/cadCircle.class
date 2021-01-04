@@ -72,8 +72,7 @@ Public Function NewParameter(eBuild As Entity, vParam As Variant[], Optional Def
 
     eBuild.DrawAble = True
     eBuild.fParam[0] = vParam[1]
-    eBuild.fParam[1] = 0
-    eBuild.fParam[2] = 360
+
 
     If definitive Then Return True
 

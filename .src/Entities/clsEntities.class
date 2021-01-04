@@ -44,6 +44,14 @@ Public Function FIndBlockID(BlockName As String) As Integer
 
 End
 
+
+Public Sub setEntity(e As Entity)
+
+  e.fParam.Resize(e.ClassHandler.TotalParams)
+  e.StringData.Resize(e.ClassHandler.TotalParams) ' text, style
+
+End
+
 Public Function ReconstruirBloques() As Boolean
 
   ' busco bloques y coloco puntos de referencias
@@ -1167,6 +1175,26 @@ Public Function AddLine(obxContainer As Entity[], Points As Float[], Optional co
 
 End
 
+Public Function AddPoint(obxContainer As Entity[], Points As Float[], Optional colour As Integer = 0, Optional LineWidth As Float = 1, Optional Linetype As String, Optional Layer As String, Optional Block As String) As Boolean
+
+  ' points are in x,y,x,y,x,y....
+  Dim oEntity As New Entity
+
+  oEntity.ClassHandler = cadPoint
+  oEntity.Gender = oEntity.ClassHandler.gender
+  oEntity.P.insert(points)                    ' recibimos los dos vertices de la linea x1,y1,x2,y2
+  oEntity.layerid = Layer
+  oEntity.colour = colour
+  oEntity.LineWidth = 1 'LineWidth               ' datos CAD
+  oEntity.linetypename = linetype
+  oEntity.Block = Block
+  If oEntity.Block <> "" Then oEntity.visible = False
+  obxContainer.Add(oEntity)
+  oEntity.ClassHandler.finish(oEntity)
+  oEntity = Null                  ' free entity
+
+End
+
 Public Function AddPolyLine(obxContainer As Entity[], Points As Float[], Optional iClosed As Integer = 0, Optional colour As Integer = 0, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
 
   ' points are in x,y,x,y,x,y....
@@ -1188,29 +1216,7 @@ Public Function AddPolyLine(obxContainer As Entity[], Points As Float[], Optiona
 
 End
 
-Public Function AddDim(obxContainer As Entity[], Points As Float[], bloque As String, medida As Float, texto As String, alineacion As Integer, angulo As Float, tipo As Integer, colour As Integer, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
 
-  Dim oEntity As New Entity
-
-  oEntity.ClassHandler = cadDim              ' create the new entity of proper class
-  oEntity.Gender = oEntity.ClassHandler.gender
-  oEntity.P.insert(points)                    ' recibimos los dos vertices de la linea x1,y1,x2,y2
-  oEntity.fParam.Add(tipo)
-  oEntity.fParam.Add(MEDIDA)
-  oEntity.fParam.Add(alineacion)
-  oEntity.fParam.Add(angulo)
-  oEntity.stringdata.Add(texto)
-  oEntity.stringdata.Add(bloque)
-  oentity.layerid = Layer
-  oEntity.colour = colour
-  oEntity.LineWidth = LineWidth               ' datos CAD
-  oEntity.Block = Block
-  If oEntity.Block <> "" Then oEntity.visible = False
-  obxContainer.Add(oEntity)
-  oEntity.ClassHandler.finish(oEntity)
-  oEntity = Null                  ' free entity
-
-End
 
 Public Function AddSolid(obxContainer As Entity[], Points As Float[], Optional colour As Integer = 0, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
 
@@ -1346,10 +1352,11 @@ Public Function AddMText(obxContainer As Entity[], Points As Float[], angle As F
 
   oEntity.ClassHandler = cadMText
   oEntity.Gender = oEntity.ClassHandler.gender
+  setEntity(oentity)
   oEntity.P.insert(points)                    ' recibimos position x1,y1 pero tal vez venga un recuadro
-  oEntity.fParam.Add(angle)                  ' GRADOS
-  oEntity.fParam.Add(height)                  ' alto letras
-  oEntity.stringdata.add(_text)                  ' el texto
+  oEntity.fParam[cadMText.ipaTextAngle] = angle                  ' GRADOS
+  oEntity.fParam[cadMText.ipaTextHeight] = height                  ' alto letras
+  oEntity.stringdata[cadMText.sdaText] = _text                  ' el texto
   oentity.layerid = Layer
   oEntity.colour = colour
   oEntity.LineWidth = LineWidth               ' datos CAD

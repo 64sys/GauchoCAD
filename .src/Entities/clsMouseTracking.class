@@ -1,7 +1,7 @@
 ' Gambas class file
 
 Create Static
-Fast Unsafe
+'Fast Unsafe
 
 ' poi
 Public flgSearchingPOI As Boolean
@@ -341,13 +341,13 @@ Public Sub CheckPOI(xr As Float, Yr As Float) As Float[]
   If indexEntity >= 0 Then                                               ' ofrezco opciones de enganche
     e = gcd.CurrentDrawing.arrEntities[indexEntity]
     'Debug "Encontrada entidad ", e.Gender, " en ", Timer - t
-    If gcd.CurrentDrawing.LastPoint.max > 0 Then                     ' tengo un punto anterior
 
-      Select Case e.Gender
+    Select Case e.Gender
 
-        Case "Line"
+      Case "Line"
 
-          ' perpendicular
+        ' perpendicular
+        If gcd.CurrentDrawing.LastPoint.max > 0 Then                     ' tengo un punto anterior
 
           If e.P[2] - e.P[0] <> 0 Then
             pend1 = (e.P[3] - e.P[1]) / (e.P[2] - e.P[0])
@@ -383,6 +383,7 @@ Public Sub CheckPOI(xr As Float, Yr As Float) As Float[]
 
           End If
 
+
           ' veo si el punto b esta entre los extremos de la linea , aunque deberia estarlo!!!
           If puntos.onSegment(e.P[0], e.P[1], puntoB[0], puntoB[1], e.P[2], e.P[3]) Then
 
@@ -390,24 +391,27 @@ Public Sub CheckPOI(xr As Float, Yr As Float) As Float[]
             DistPer = puntos.distancia(puntoB[0], puntoB[1], xr, yr)
 
           Endif
+        End If
 
-          ' busco tambien intersecciones
-          For i2 = 0 To gcd.CurrentDrawing.arrEntities.Max
-            Select Case gcd.CurrentDrawing.arrEntities[i2].Gender
+        ' busco tambien intersecciones
+        For i2 = 0 To gcd.CurrentDrawing.arrEntities.Max
+          Select Case gcd.CurrentDrawing.arrEntities[i2].Gender
 
-              Case "Line"
-                If puntos.doIntersect(e.P[0], e.P[1], e.P[2], e.P[3], gcd.CurrentDrawing.arrEntities[i2].P[0], gcd.CurrentDrawing.arrEntities[i2].P[1], gcd.CurrentDrawing.arrEntities[i2].P[2], gcd.CurrentDrawing.arrEntities[i2].P[3]) Then
-                  pInter = puntos.lineLineIntersection([e.P[0], e.P[1]], [e.P[2], e.P[3]], [gcd.CurrentDrawing.arrEntities[i2].P[0], gcd.CurrentDrawing.arrEntities[i2].P[1]], [gcd.CurrentDrawing.arrEntities[i2].P[2], gcd.CurrentDrawing.arrEntities[i2].P[3]])
-                  DistInter = puntos.distancia(xr, yr, pInter[0], pInter[1])
+            Case "Line"
+              If puntos.doIntersect(e.P[0], e.P[1], e.P[2], e.P[3], gcd.CurrentDrawing.arrEntities[i2].P[0], gcd.CurrentDrawing.arrEntities[i2].P[1], gcd.CurrentDrawing.arrEntities[i2].P[2], gcd.CurrentDrawing.arrEntities[i2].P[3]) Then
+                pInter = puntos.lineLineIntersection([e.P[0], e.P[1]], [e.P[2], e.P[3]], [gcd.CurrentDrawing.arrEntities[i2].P[0], gcd.CurrentDrawing.arrEntities[i2].P[1]], [gcd.CurrentDrawing.arrEntities[i2].P[2], gcd.CurrentDrawing.arrEntities[i2].P[3]])
+                DistInter = puntos.distancia(xr, yr, pInter[0], pInter[1])
 
-                Endif
+              Endif
 
-              Case "LWPolyline"
+            Case "LWPolyline"
 
-            End Select
-          Next
+          End Select
+        Next
 
-        Case "Circle"
+      Case "Circle"
+        If gcd.CurrentDrawing.LastPoint.max > 0 Then                     ' tengo un punto anterior
+
           ' buscamos una tangente..
 
           ' Extraido de StackExchange
@@ -457,38 +461,39 @@ Public Sub CheckPOI(xr As Float, Yr As Float) As Float[]
             DistTang = 1e6
             ' No tangent Is Possible
           End If
+        End If
 
-          ' busco los quadrants
-          Dim qx, qy, q1, q2, q3, q4 As Float
-          q1 = puntos.distancia(e.P[0] - e.fParam[0], e.P[1], xr, yr)
-          q2 = puntos.distancia(e.P[0] + e.fParam[0], e.P[1], xr, yr)
-          q3 = puntos.distancia(e.P[0], e.P[1] - e.fParam[0], xr, yr)
-          q4 = puntos.distancia(e.P[0], e.P[1] + e.fParam[0], xr, yr)
+        ' busco los quadrants
+        Dim qx, qy, q1, q2, q3, q4 As Float
+        q1 = puntos.distancia(e.P[0] - e.fParam[0], e.P[1], xr, yr)
+        q2 = puntos.distancia(e.P[0] + e.fParam[0], e.P[1], xr, yr)
+        q3 = puntos.distancia(e.P[0], e.P[1] - e.fParam[0], xr, yr)
+        q4 = puntos.distancia(e.P[0], e.P[1] + e.fParam[0], xr, yr)
 
-          DistQuad = 1e10
-          If DistQuad > q1 Then
-            DistQuad = q1
-            qx = e.P[0] - e.fParam[0]
-            qy = e.P[1]
-          End If
-          If DistQuad > q2 Then
-            DistQuad = q2
-            qx = e.P[0] + e.fParam[0]
-            qy = e.P[1]
-          End If
-          If DistQuad > q3 Then
-            DistQuad = q3
-            qx = e.P[0]
-            qy = e.P[1] - e.fParam[0]
-          End If
-          If DistQuad > q4 Then
-            DistQuad = q4
-            qx = e.P[0]
-            qy = e.P[1] + e.fParam[0]
-          End If
+        DistQuad = 1e10
+        If DistQuad > q1 Then
+          DistQuad = q1
+          qx = e.P[0] - e.fParam[0]
+          qy = e.P[1]
+        End If
+        If DistQuad > q2 Then
+          DistQuad = q2
+          qx = e.P[0] + e.fParam[0]
+          qy = e.P[1]
+        End If
+        If DistQuad > q3 Then
+          DistQuad = q3
+          qx = e.P[0]
+          qy = e.P[1] - e.fParam[0]
+        End If
+        If DistQuad > q4 Then
+          DistQuad = q4
+          qx = e.P[0]
+          qy = e.P[1] + e.fParam[0]
+        End If
 
-      End Select
-    End If
+    End Select
+
     ' otros puntos
     Select Case e.Gender
       Case "Line"

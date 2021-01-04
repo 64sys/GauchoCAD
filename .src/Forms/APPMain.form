@@ -140,31 +140,36 @@
       Name = "mnuDimLinear"
       Text = ("Linear dimension")
       Picture = Picture["svg/entities/dimlinear.svg"]
-      Tag = "dimlinear"
+      Tag = "dimension_linear"
     }
     { mnuDimRadial Menu entity
       Name = "mnuDimRadial"
       Text = ("Radial Dimension")
       Picture = Picture["svg/entities/dimradial.svg"]
-      Tag = "dimradial"
+      Tag = "DIMENSION_RADIUS"
+    }
+    { mnuDimDiameter Menu entity
+      Name = "mnuDimDiameter"
+      Text = ("Diameter Dimension")
+      Tag = "DIMENSION_DIAMETER"
     }
     { mnuDimAngular Menu entity
       Name = "mnuDimAngular"
       Text = ("Angular Dimension")
       Picture = Picture["svg/entities/dimangular.svg"]
-      Tag = "dimangular"
+      Tag = "DIMENSION_ANG3PT"
     }
     { mnuDimArc Menu entity
       Name = "mnuDimArc"
       Text = ("Arc length Dimension")
       Picture = Picture["svg/entities/dimarc.svg"]
-      Tag = "dimarc"
+      Tag = "ARC_DIMENSION"
     }
     { mnuDimOrdinate Menu entity
       Name = "mnuDimOrdinate"
       Text = ("Ordinate Dimension")
       Picture = Picture["svg/entities/dimordinate.svg"]
-      Tag = "dimordinate"
+      Tag = "DIMENSION_ORDINATE"
     }
     { mnuInsert Menu entity
       Name = "mnuInsert"

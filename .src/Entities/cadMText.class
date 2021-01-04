@@ -149,12 +149,7 @@ End
 
 
 
-Public Sub setEntity(e As Entity)
 
-  e.fParam.Resize(Me.TotalParams)
-  e.StringData.Resize(Me.sdaTotalParams) ' text, style
-
-End
 
 Public Sub Translate(e As Entity, dX As Float, dY As Float, Optional OnlySelected As Boolean = False)
 
@@ -493,9 +488,10 @@ End
 ' Importo los datos que puedo procesar de una coleccion y genero un Entity para ser agregado a un array
 Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
 
-  Me.setEntity(e)
 
   e.ClassHandler = Me
+  clsEntities.setEntity(e)
+
   e.P.Add(c["ins_pt"][0])
   e.P.Add(c["ins_pt"][1])
   e.StringData[Me.sdaText] = c["text"]
@@ -669,7 +665,7 @@ Public Function ImportDXF(e As Entity, sClaves As String[], sValues As String[])
   Dim TextHeigthSet As Boolean = False
   Dim TextAngleSet As Boolean = False
 
-  setEntity(e)
+  clsEntities.setEntity(e)
 
   For i = 0 To sClaves.Max
 

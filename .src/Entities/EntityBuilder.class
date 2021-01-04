@@ -385,7 +385,7 @@ Public Function MouseDown(mouseX As Integer, mouseY As Integer) ' esta rutina es
 
   If NextParamType = "R" Then
 
-    If elem.ClassHandler.NewParameter(elem, ["point", x, y], True) Then AdvanceStep
+    If elem.ClassHandler.NewParameter(elem, ["point", appmain.Xreal(mouseX), appmain.Yreal(mouseY)], True) Then AdvanceStep
 
     Return
   End If
