@@ -40,7 +40,6 @@ Public Visible As Boolean = True            ' si esta entidad puede ser mostrada
 Public Finished As Boolean = False          ' colocar en true cuando se llegue a completar
 Public StepsDone As Integer                 ' esto lo cambia cls ElementBuilder durante la construccion
 
-
 ' The entity handler receives a user action, and returns the number of expected parameter
 ' If definitive = true, means the parameter is set
 Public Function NewParameter(eBuild As Entity, vParam As Variant[], Optional Definitive As Boolean = False) As Boolean
@@ -69,11 +68,7 @@ Public Function NewParameter(eBuild As Entity, vParam As Variant[], Optional Def
 
   Endif
 
-
-
-
 End
-
 
 Public Sub Translate(e As Entity, dX As Float, dY As Float, Optional OnlySelected As Boolean = False)
 

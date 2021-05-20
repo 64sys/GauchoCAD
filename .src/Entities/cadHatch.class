@@ -201,7 +201,6 @@ Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
 
   e.ClassHandler = cadDummy
 
-
 Catch
 
   Return False

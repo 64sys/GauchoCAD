@@ -1,0 +1,75 @@
+' Gambas class file
+
+'
+' tradukisto
+' Translation of software
+'
+' Copyright (C) Martín Belmonte
+'
+' This program is free software; you can redistribute it and/or modify
+' it under the terms of the GNU General Public License as published by
+' the Free Software Foundation; either version 2 of the License, or
+' (at your option) any later version.
+'
+' This program is distributed in the hope that it will be useful,
+' but WITHOUT ANY WARRANTY; without even the implied warranty of
+' MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+' GNU General Public License for more details.
+'
+' You should have received a copy of the GNU General Public License
+' along with this program; if not, write to the Free Software
+' Foundation, Inc., 51 Franklin St, Fifth Floor,
+' Boston, MA  02110-1301  USA
+'
+
+Export
+
+'' Encode in JSON format in a human readable way. Based on a Laurent tool
+
+Static Public Function Encode2(vData As Variant) As String
+
+  Dim sInput As String
+  Dim sOutput As String
+  Dim iStream As Stream
+
+  Dim $sReadChar As String
+  Dim $iTab As Integer
+  Dim $bQuote, $bBracket As Boolean
+
+  sInput = JSON.Encode(vData)
+
+  iStream = Open String sInput For Read
+
+  While (Not Eof(iStream))
+    $sReadChar = Read #iStream, 1
+    If ($sReadChar = "{" And Not $bQuote) Then
+      $iTab += 1
+      $sReadChar &= "\n" & Space$($iTab * 2)
+    Else If ($sReadChar = "}" And Not $bQuote) Then
+      $iTab -= 1
+      $sReadChar = "\n" & Space$($iTab * 2) & $sReadChar
+    Else If ($sReadChar = "\"") Then
+      $bQuote = Not $bQuote
+    Else If ($sReadChar = "[") Then
+      $bBracket = True
+    Else If ($sReadChar = "]") Then
+      $bBracket = False
+    Else If ($sReadChar = ":" And Not $bQuote) Then
+      $sReadChar &= " "
+    Else If ($sReadChar = "," And Not $bQuote) Then
+      If (Not $bBracket) Then
+        $sReadChar &= "\n" & Space$($iTab * 2)
+      Else
+        $sReadChar &= " "
+      Endif
+    Endif
+    sOutput &= $sReadChar
+  Wend
+
+  Close iStream
+  ' replace null with ""
+  sOutput = Replace(sOutput, " null", " \"\"")
+
+  Return sOutput
+
+End

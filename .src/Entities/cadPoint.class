@@ -52,8 +52,6 @@ Public Const DXF_Export As Boolean = True
 ' If definitive = true, means the parameter is set
 Public Function NewParameter(eBuild As Entity, vParam As Variant[], Optional Definitive As Boolean = False) As Boolean
 
-
-
   If Me.StepsDone = 0 Then
     eBuild.DrawAble = True
     Try eBuild.P[0] = vParam[1]
@@ -61,9 +59,7 @@ Public Function NewParameter(eBuild As Entity, vParam As Variant[], Optional Def
 
     If definitive Then Return True
 
-
   Endif
-
 
 End
 
@@ -203,7 +199,6 @@ Public Function ImportJsonCol(c As JSONCollection, e As Entity) As Boolean
   e.P.Add(c["y"])
 
   Return True
-
 
 Catch
 

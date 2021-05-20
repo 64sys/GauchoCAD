@@ -52,7 +52,6 @@ Public Const DXF_Export As Boolean = True
 ' If definitive = true, means the parameter is set
 Public Function NewParameter(eBuild As Entity, vParam As Variant[], Optional Definitive As Boolean = False) As Boolean
 
-
   If vParam[0] <> "point" Then Return False
 
   If Me.StepsDone = 0 Then
@@ -86,10 +85,7 @@ Public Function NewParameter(eBuild As Entity, vParam As Variant[], Optional Def
 
   Endif
 
-
 End
-
-
 
 Public Sub Translate(e As Entity, dX As Float, dY As Float, Optional OnlySelected As Boolean = False)
 
@@ -254,7 +250,6 @@ Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
   e.P.Add(c["corner4"][1])
 
   Return True
-
 
 Catch
 

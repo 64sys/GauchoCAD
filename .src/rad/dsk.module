@@ -24,6 +24,22 @@
 
 Export
 
+'' Replace a color in an svg file with one that contrasts with the background of the desktop theme
+
+Public Function Contrary(sFile As String, sColor As String) As String
+
+  Dim svg As String
+
+  If Application.DarkTheme Then
+    svg = Replace(File.Load(sFile), sColor & ";", "#eeeeee;")
+  Else
+    svg = Replace(File.Load(sFile), sColor & ";", "#000000;")
+  Endif
+
+  Return svg
+
+End
+
 Public Function Mimex(strMimeType As String) As String[] ''Devuelve una lista de los programas que estan asociados al tipo mime que se pasa como parametro.
 
   Dim stxOut As New String[]

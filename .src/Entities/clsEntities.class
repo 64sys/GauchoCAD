@@ -44,7 +44,6 @@ Public Function FIndBlockID(BlockName As String) As Integer
 
 End
 
-
 Public Sub setEntity(e As Entity)
 
   e.fParam.Resize(e.ClassHandler.TotalParams)
@@ -1215,8 +1214,6 @@ Public Function AddPolyLine(obxContainer As Entity[], Points As Float[], Optiona
   oEntity = Null                  ' free entity
 
 End
-
-
 
 Public Function AddSolid(obxContainer As Entity[], Points As Float[], Optional colour As Integer = 0, Optional LineWidth As Float = 1, Optional Linetye As String, Optional Layer As String, Optional Block As String) As Boolean
 

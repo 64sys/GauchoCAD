@@ -22,7 +22,6 @@
 
 Create Static
 
-
 ' Pixeles
 Public Const Gender As String = "Builder"
 Public LastMouseDownX As Integer    ' change in MouseDown
@@ -40,7 +39,6 @@ Public SelEndZr As Float
 
 Public LastX As Float               ' change in MouseMove/MouseUp
 Public LastY As Float
-
 
 ' indicadores
 'Public elem.ClassHandler.StepsDone As Integer = 0          ' La cantidad de puntos que marco para el trabajo actual--->Gurdado en la entidad
@@ -138,7 +136,6 @@ Public Function Start(Optional ElemToBuild As Variant, Optional Mode As Integer 
   gcd.OrthogonalIgnored = elem.ClassHandler.OrthogonalIgnored
   gcd.OrthogonalForced = elem.ClassHandler.OrthogonalForced
 
-
   elem.layerid = appmain.CurrentLayer ' gcd.GetLayerID(appmain.CurrentLayer)
 
   elem.colour = appmain.CurrentColor
@@ -153,7 +150,6 @@ Public Function Start(Optional ElemToBuild As Variant, Optional Mode As Integer 
 End
 
 Public Function KeyText(EnteredText As String) ' esta rutina es llamada por FCAD en el evento FCAD_KeyPress cuando recibe una texto + <Enter>
-
 
   ' Lets see what are we expecting
   Dim Xt, yt As Float, sText, ErrTxt As String, Relative As Boolean
@@ -186,8 +182,6 @@ Public Function KeyText(EnteredText As String) ' esta rutina es llamada por FCAD
         Endif
         Xt = CFloat(Split(EnteredText, ",")[0])
         yt = CFloat(Split(EnteredText, ",")[1])
-
-
 
         If Relative And (elem.P.count > 2) Then
           xt += Me.LastX
@@ -231,14 +225,9 @@ Public Function KeyText(EnteredText As String) ' esta rutina es llamada por FCAD
 
         bResult = elem.ClassHandler.NewParameter(elem, ["float", CFloat(EnteredText)], True)
 
-
-
       Endif
 
       If bResult Then AdvanceStep
-
-
-
 
     Case "C"                                ' color
       If Dialog.SelectColor() Then
@@ -285,9 +274,6 @@ Public Sub AdvanceStep()
       If ParamDefault[elem.ClassHandler.StepsDone] <> "" Then clsDrawingAids.HelperTrabajoNext &= "[" & ParamDefault[elem.ClassHandler.StepsDone] & "]"           ' try in case of lack of desciption or keep last
     End If
 
-
-
-
   Endif
 
   appmain.redraw
@@ -300,7 +286,6 @@ Public Function MouseMove(mouseX As Integer, mouseY As Integer) ' esta rutina es
 
   X = puntos.Near(appmain.Xreal(mouseX))
   Y = puntos.Near(appmain.Yreal(mouseY))
-
 
   If InStr("LAPR", NextParamType) = 0 Then Return ' we are expecting a parameter
 
@@ -321,7 +306,6 @@ Public Function MouseMove(mouseX As Integer, mouseY As Integer) ' esta rutina es
   If NextParamType = "R" Then
 
     elem.ClassHandler.NewParameter(elem, ["point", x, y])
-
 
     'appmain.redraw
     Return              ' nothing more to do here
@@ -372,7 +356,6 @@ Public Function MouseDown(mouseX As Integer, mouseY As Integer) ' esta rutina es
 
   Dim X, Y, f As Float
 
-
   clsDrawingAids.ErrorMessage = ""
   If InStr("LAPR", NextParamType) = 0 Then Return ' we are expecting a parameter
 
@@ -398,7 +381,6 @@ Public Function MouseDown(mouseX As Integer, mouseY As Integer) ' esta rutina es
     Return
   End If
 
-
   If NextParamType = "L" Then
 
     ' return the angle from horizontal to us
@@ -409,7 +391,6 @@ Public Function MouseDown(mouseX As Integer, mouseY As Integer) ' esta rutina es
     Return              ' nothing more to do here
 
   End If
-
 
   ' we are waiting for a point
 
@@ -451,8 +432,6 @@ Public Function MouseDown(mouseX As Integer, mouseY As Integer) ' esta rutina es
     AdvanceStep
   End If
 
-
-
 End
 
 Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' esta rutina es llamada por FCAD en el evento DrawingArea_MouseUp
@@ -461,17 +440,13 @@ Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' esta rutina es l
 
 End
 
-
-
 Public Sub Draw()               ' called bygcd.CurrentDrawing.drwArea_Draw
-
 
   elem.ClassHandler.draw(elem)
 
 End
 
 Public Sub Finish()
-
 
   gcd.CurrentDrawing.arrEntities.Add(elem)
 
@@ -485,7 +460,6 @@ Public Sub Finish()
   gcd.clsJob = clsDefaultJob
   clsDefaultJob.PoiChecking = True
   clsDrawingAids.CleanTexts
-
 
   clsEntities.GLGenDrawList
 
@@ -502,4 +476,3 @@ Public Sub Cancel()
   appmain.redraw
 
 End
-

@@ -283,7 +283,6 @@ Public Function DoFillet() As Boolean
           ' creo otra linea
           ' para ello veo cual angulo es el inicial
 
-
           Dim eLine As New Entity
           eLine.Gender = "Line"
           eLine.ClassHandler = cadLine

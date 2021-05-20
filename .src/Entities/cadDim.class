@@ -192,9 +192,6 @@ Public Function Start(Optional Mode As Integer = gcd.dimRadius)
 
       ' y ahora e
 
-
-
-
   End Select
 
   'elem.gbcolor = appmain.CurrentColor
@@ -213,7 +210,6 @@ Public Function Start(Optional Mode As Integer = gcd.dimRadius)
   ' instructions to FCAD
   gcd.OrthogonalIgnored = Me.OrthogonalIgnored
   gcd.OrthogonalForced = Me.OrthogonalForced
-
 
   elem.layerid = appmain.CurrentLayer
 
@@ -511,7 +507,6 @@ Public Sub ReBuildBlock()
 
       End If
 
-
   End Select
 
   appmain.redraw
@@ -688,11 +683,6 @@ Public Sub Finish(oE As Entity) As Boolean
   cadInsert.Finish(oe)
 
 End
-
-
-
-
-
 
 ' If lpcode = "2" Then mDim.bloque = lpvalue
 ' If lpcode = "10" Then mDim.p.Add(CFloat(lpvalue))

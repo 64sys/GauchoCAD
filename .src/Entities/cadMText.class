@@ -101,7 +101,6 @@ Public Function NewParameter(eBuild As Entity, vParam As Variant[], Optional Def
     Try eBuild.P[0] = vParam[1]
     Try eBuild.P[1] = vParam[2]
 
-
     If definitive Then
       eBuild.fParam.Add(0)
       Return True
@@ -109,7 +108,6 @@ Public Function NewParameter(eBuild As Entity, vParam As Variant[], Optional Def
   Else If Me.StepsDone = 1 Then ' angulo del texto
 
     If vParam[0] <> "float" Then Return False
-
 
     eBuild.fParam[0] = vParam[1]
     eBuild.fParam[1] = 0
@@ -125,7 +123,6 @@ Public Function NewParameter(eBuild As Entity, vParam As Variant[], Optional Def
 
     If definitive Then Return True
 
-
   Else If Me.StepsDone = 3 Then    ' texto
 
     If vParam[0] <> "text" Then Return False
@@ -135,21 +132,11 @@ Public Function NewParameter(eBuild As Entity, vParam As Variant[], Optional Def
 
     If definitive Then Return True
 
-
-
   Else
     Return False
   End If
 
-
-
-
 End
-
-
-
-
-
 
 Public Sub Translate(e As Entity, dX As Float, dY As Float, Optional OnlySelected As Boolean = False)
 
@@ -488,7 +475,6 @@ End
 ' Importo los datos que puedo procesar de una coleccion y genero un Entity para ser agregado a un array
 Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
 
-
   e.ClassHandler = Me
   clsEntities.setEntity(e)
 
@@ -502,7 +488,6 @@ Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
   e.fParam[Me.ipaTextHeight] = CFloat(c["text_height"])
 
   Return True
-
 
 Catch
 

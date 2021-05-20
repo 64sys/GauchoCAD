@@ -737,6 +737,10 @@
             MoveScaled(115,1,1,3)
           }
         }
+        { !Printer1 #Printer
+          #MoveScaled(104,58)
+          #Public = True
+        }
       }
     }
     { tmr500 #Timer

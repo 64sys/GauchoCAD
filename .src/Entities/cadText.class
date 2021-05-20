@@ -77,7 +77,6 @@ Public Function NewParameter(eBuild As Entity, vParam As Variant[], Optional Def
     Try eBuild.P[0] = vParam[1]
     Try eBuild.P[1] = vParam[2]
 
-
     If definitive Then
       eBuild.fParam.Add(0)
       Return True
@@ -85,7 +84,6 @@ Public Function NewParameter(eBuild As Entity, vParam As Variant[], Optional Def
   Else If Me.StepsDone = 1 Then ' angulo del texto
 
     If vParam[0] <> "float" Then Return False
-
 
     eBuild.fParam[0] = vParam[1]
     eBuild.fParam[1] = 0
@@ -101,7 +99,6 @@ Public Function NewParameter(eBuild As Entity, vParam As Variant[], Optional Def
 
     If definitive Then Return True
 
-
   Else If Me.StepsDone = 3 Then    ' texto
 
     If vParam[0] <> "text" Then Return False
@@ -111,18 +108,11 @@ Public Function NewParameter(eBuild As Entity, vParam As Variant[], Optional Def
 
     If definitive Then Return True
 
-
-
   Else
     Return False
   End If
 
-
-
-
 End
-
-
 
 Public Sub setEntity(e As Entity)
 

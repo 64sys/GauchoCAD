@@ -57,7 +57,6 @@ Public Const DXF_Export As Boolean = True
 Public Const TotalParams As Integer = 1
 Public Const ipaPolylineClosed As Integer = 0
 
-
 ' The entity handler receives a user action, and returns the number of expected parameter
 ' If definitive = true, means the parameter is set
 Public Function NewParameter(eBuild As Entity, vParam As Variant[], Optional Definitive As Boolean = False) As Boolean
@@ -85,9 +84,6 @@ Public Function NewParameter(eBuild As Entity, vParam As Variant[], Optional Def
     Return True
 
   Endif
-
-
-
 
 End
 
@@ -262,7 +258,6 @@ Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
   If c["flag"] > 0 Then e.fParam.Add(1) Else e.fParam.Add(0)
 
   Return True
-
 
 Catch
 

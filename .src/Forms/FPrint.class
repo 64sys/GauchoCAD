@@ -1,1 +1,194 @@
 ' Gambas class file
+
+Private pic As Picture
+Public sConfig As String
+Public jConfig As New JSONCollection
+Private jPaper As New JSONCollection
+
+Public Sub Form_Open()
+
+  Me.Text = ("Print configuration")
+
+  LoadConfig()
+
+End
+
+Public Sub LoadConfig()
+
+  Dim sDir As String
+  Dim jDef As New JSONCollection
+  Dim Var As Variant
+  Dim sPaper As String
+
+  jPaper.Clear
+  jPaper.Add("A4", Printer.A4)
+  jPaper.Add("A3", Printer.A3)
+  jPaper.Add("A5", Printer.A5)
+  jPaper.Add("B5", Printer.B5)
+  jPaper.Add("Leter", Printer.Letter)
+  jPaper.Add("Executive", Printer.Executive)
+  jPaper.Add("Legal", Printer.Legal)
+
+  sDir = User.Home &/ ".gauchocad"
+
+  If Not Exist(sDir) Then
+    Shell "md -p " & sDir Wait
+  Endif
+  sConfig = sDir &/ "print.json"
+
+  ''Default settings
+  jDef.Add(0, "Pens")
+  jDef.Add(APPMain.Printer1.Paper, "Paper")
+  jDef.Add(APPMain.Printer1.Orientation, "Orientation")
+  jDef.Add(False, "Invert")
+  jDef.Add(0, "Range")
+
+  If Not Exist(sConfig) Then
+    File.Save(sConfig, JSON2.Encode2(jDef))
+    jConfig = jDef.Copy()
+  Else
+    jConfig = JSON.FromString(File.Load(sConfig), True)
+    '' Here it is verified that all configuration keys are present.
+    For Each Var In jDef
+      If Not jConfig.Exist(jDef.Key) Then
+        jConfig.Add(Var, jDef.Key)
+      Endif
+    Next
+  Endif
+
+  If jConfig["Pens"] Then
+    Select jConfig["Pens"]
+      Case 0 ' mono
+        radMono.Value = True
+
+      Case 1 ' color
+        radColor.Value = True
+
+      Case 2   'gray
+        radGray.Value = True
+
+        'Case 3  ' Custom
+
+    End Select
+  Else
+    radMono.Value = True
+  Endif
+
+  cmoSize.Clear
+  For Each sPaper In jPaper
+    cmoSize.Add(sPaper)
+  Next
+  If jConfig["Paper"] Then
+    If jPaper.Exist(jConfig["Paper"]) Then
+      cmoSize.Text = jPaper[jConfig["Paper"]]
+    Endif
+  Endif
+
+  If jConfig["Orientation"] Then
+    If jConfig["Orientation"] = 0 Then
+      radPortait.Value = True
+    Else
+      radLandscape.Value = True
+    Endif
+  Endif
+
+  LoadPic(jConfig["Orientation"])
+
+End
+
+Public Sub LoadPic(iMode As Integer)
+
+  Dim svg As String
+  Dim iWidth As Integer
+  Dim iHeight As Float
+
+  iWidth = PictureBox1.W
+  iHeight = iWidth * (1 / Sqr(2))
+  svg = dsk.Contrary("./page.svg", "#000000")
+
+  Select iMode
+    Case 1
+      pic = Image.FromString(svg).Stretch(iWidth, iHeight).Picture
+    Case 0
+      pic = Image.FromString(svg).Stretch(iWidth, iHeight).Rotate(Rad(90)).Picture
+  End Select
+
+  PictureBox1.Picture = pic
+
+End
+
+Public Sub mprint_Change()
+
+  Dim sPaper As String
+
+  Select Last.tag
+    Case "paper"
+      For Each sPaper In jPaper
+        If sPaper = Last.Text Then
+          jConfig["Paper"] = CInt(jPaper.Key)
+          File.Save(sConfig, JSON2.Encode2(jConfig))
+          Break
+        Endif
+      Next
+  End Select
+
+End
+
+Public Sub mprint_Click()
+
+  Select Last.tag
+
+      'Case "printer"
+      '  LoadPic(jConfig["Printer"])
+
+      ' Case "paper"
+      '   If jPaper.Exist(APPMain.Printer1.Paper) Then
+      '     jConfig["Paper"] = APPMain.Printer1.Paper
+      '     'jDef.Add(APPMain.Printer1.Orientation, "Orientation")
+      '     File.Save(sConfig, JSON2.Encode2(jConfig))
+      '   Endif
+
+    Case "monochrome"
+      jConfig["Pens"] = 0
+      File.Save(sConfig, JSON2.Encode2(jConfig))
+
+    Case "gray"
+      jConfig["Pens"] = 2
+      File.Save(sConfig, JSON2.Encode2(jConfig))
+
+    Case "color"
+      jConfig["Pens"] = 1
+      File.Save(sConfig, JSON2.Encode2(jConfig))
+
+    Case "portait"
+      jConfig["Orientation"] = 0
+      LoadPic(jConfig["Orientation"])
+      File.Save(sConfig, JSON2.Encode2(jConfig))
+
+    Case "landscape"
+      jConfig["Orientation"] = 1
+      LoadPic(jConfig["Orientation"])
+      File.Save(sConfig, JSON2.Encode2(jConfig))
+
+    Case "invert"
+      jConfig["Invert"] = Last.Value
+
+    Case "plot"
+      File.Save(sConfig, JSON2.Encode2(jConfig))
+      Wait 0.1
+      Me.Hide
+      APPMain.gTask("plot")
+
+    Case "cancel"
+      Me.Hide
+
+    Case "size"
+      jConfig["Paper"] = 0
+
+    Case "fit"
+
+    Case "scalelines"
+
+  End Select
+
+End

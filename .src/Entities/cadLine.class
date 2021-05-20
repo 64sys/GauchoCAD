@@ -43,7 +43,6 @@ Public Const JSON_Export As Boolean = True
 Public Const DXF_Reading As Boolean = True
 Public Const DXF_Export As Boolean = True
 
-
 ' The entity handler receives a user action, and returns the number of expected parameter
 ' If definitive = true, means the parameter is set
 Public Function NewParameter(eBuild As Entity, vParam As Variant[], Optional Definitive As Boolean = False) As Boolean
@@ -66,9 +65,7 @@ Public Function NewParameter(eBuild As Entity, vParam As Variant[], Optional Def
 
   Endif
 
-
 End
-
 
 Public Sub Translate(e As Entity, dX As Float, dY As Float, Optional OnlySelected As Boolean = False)
 
@@ -247,7 +244,6 @@ Public Function ImportJsonCol(c As JSONCollection, e As Entity) As Boolean
   e.P.Add(c["end"][1])
 
   Return True
-
 
 Catch
 

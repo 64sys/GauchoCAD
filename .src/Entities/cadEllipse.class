@@ -111,13 +111,9 @@ Public Function NewParameter(eBuild As Entity, vParam As Variant[], Optional Def
 
     If definitive Then Return True
 
-
   Else
     Return False
   End If
-
-
-
 
 End
 
@@ -319,7 +315,6 @@ Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
   e.fParam.Add(c["end_angle"] * 180 / Pi)
 
   Return True
-
 
 Catch
 

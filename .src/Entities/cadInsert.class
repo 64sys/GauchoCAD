@@ -130,7 +130,6 @@ Public Sub Draw(oE As Entity)
     'If et.Gender = "MText" Then Stop
     et.ClassHandler.Draw(et)
 
-
     'Debug et.Gender, et.LineType
   Next
   gl.PopMatrix
@@ -272,9 +271,7 @@ End
 ' Importo los datos que puedo procesar de una coleccion y genero un Entity para ser agregado a un array
 Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
 
-
   e.fParam.Resize(Me.TotalParams)
-
 
   '    MANEJADO EN clsEntities
   '============================
@@ -298,7 +295,6 @@ Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
   '   "linewt": 30,
   '   "_subclass": "AcDbBlockReference",
 
-
   '   "ins_pt": [2897.47088581027083, 1635.43128744943124, 0.0],
   e.P.Add(c["ins_pt"][0])
   e.P.Add(c["ins_pt"][1])
@@ -318,7 +314,6 @@ Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
   e.Block = gcd.CurrentDrawing.cModel["BLOCKS"][c["block_header"][3]]["name"]
 
   Return True
-
 
 Catch
 

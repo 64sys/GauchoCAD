@@ -319,8 +319,6 @@ Public Function DoFillet() As Boolean
 
           'gcd.AddArc(gcd.CurrentDrawing.arrEntities, [cx, cy], Me.Radious, StartAngle, EndAngle, appmain.CurrentColor, appmain.CurrentLtype,, appmain.CurrentLayer)
 
-
-
           Me.Finish
 
       End Select

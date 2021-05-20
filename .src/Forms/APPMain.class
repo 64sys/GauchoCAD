@@ -1186,6 +1186,11 @@ Public Sub gTask(sTask As String)
   Dim ob As Variant
   Dim et As Variant
   Dim iColor As Variant
+  ''variables para plotear
+  Dim plot As CairoPdfSurface
+  Dim entidad As Entity
+
+  Dim jConfig As New JSONCollection 'Printer config
 
   '' if the drawing is drawingX.xml, drawingX.gcad where X is a integer number then the Ssave is changed to Save As
 
@@ -1383,10 +1388,70 @@ Public Sub gTask(sTask As String)
       Endif
       hFConfig = New FConfig(cex)
 
+    Case "print"
+      FPrint.Show()
+
+    Case "plot"
+
+      If Exist(FPrint.sConfig) Then
+        jConfig = JSON.FromString(File.Load(FPrint.sConfig), True)
+      Endif
+
+      Printer1.Paper = jConfig["Paper"] 'Printer1.A4
+      Printer1.Orientation = jConfig["Orientation"] 'Printer1.Landscape
+      Printer1.Resolution = 600
+      Printer1.FullPage = True
+
+      If Printer1.Configure() Then Return
+      Printer1.Print
+
     Case "quit", "exit"
       Me.Close
 
   End Select
+
+End
+
+Public Sub Printer1_Draw()
+
+  Dim i As Integer
+  Dim flxLimits As New Float[]
+  Dim scaleX, scale, scaleY As Float
+  Dim jPrint As New JSONCollection
+
+  flxLimits = clsEntities.ComputeLimits(gcd.CurrentDrawing.arrEntities, True)
+
+  Debug "Printing"
+
+  ' trato de meter centrado
+  scaleX = Printer1.PaperWidth / (flxLimits[2] - flxLimits[0])
+  scaleY = Printer1.PaperHeight / (flxLimits[3] - flxLimits[1])
+
+  If scaleX < scaleY Then Scale = scaleX * Paint.w / Printer1.PaperWidth Else Scale = scaley * Paint.h / Printer1.PaperHeight
+  Paint.Scale(scale, -scale)
+  Printer1.FullPage = True
+
+  Paint.Translate(-flxLimits[0], flxLimits[1])
+
+  'For i = 0 To gcd.CurrentDrawing.cLayer.arrLayer.Max
+  '  If gcd.CurrDrawing.arrLayers[i].Visible Then
+
+  If Exist(FPrint.sConfig) Then
+    jPrint = JSON.FromString(File.Load(FPrint.sConfig), True)
+
+  Endif
+
+  For Each e As Entity In gcd.CurrentDrawing.arrEntities
+    If e.LineWidth = 0 Then e.LineWidth = 1 / scale
+    If jPrint.Exist("Monochrome") Then
+      If jPrint["Monochrome"] Then
+        e.colour = 255
+      Endif
+    Endif
+    e.ClassHandler.draw2(e)
+  Next
+
+  Debug "Print done"
 
 End
 

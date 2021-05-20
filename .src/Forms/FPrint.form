@@ -1,14 +1,132 @@
 # Gambas Form File 3.0
 
 { Form Form
-  MoveScaled(0,0,64,64)
-  { Frame1 Frame
-    MoveScaled(1,3,30,22)
-    { RadioButton1 RadioButton
-      MoveScaled(1,4,26,4)
+  MoveScaled(0,0,65,61)
+  Arrangement = Arrange.Vertical
+  Margin = True
+  { Panel1 Panel
+    MoveScaled(1,1,63,52)
+    Expand = True
+    Arrangement = Arrange.Horizontal
+    { Panel2 Panel
+      MoveScaled(0,0,32,48)
+      Expand = True
+      Arrangement = Arrange.Vertical
+      Spacing = True
+      Margin = True
+      { Panel5 Panel
+        MoveScaled(2,0,25,14)
+        Arrangement = Arrange.Vertical
+        { radGray RadioButton
+          MoveScaled(0,0,24,4)
+          Tag = "gray"
+          Text = ("Gray scale")
+        }
+        { radMono RadioButton
+          MoveScaled(0,4,24,4)
+          Tag = "monochrome"
+          Text = ("Monochrome")
+        }
+        { radColor RadioButton
+          MoveScaled(0,8,24,4)
+          Tag = "color"
+          Text = ("Color")
+        }
+      }
+      { cmoSize ComboBox mprint
+        Name = "cmoSize"
+        MoveScaled(2,16,20,4)
+        Tag = "paper"
+      }
+      { radAll RadioButton mprint
+        Name = "radAll"
+        MoveScaled(2,21,24,4)
+        Tag = "geometry"
+        Text = ("Geometry")
+      }
+      { radAll2 RadioButton mprint
+        Name = "radAll2"
+        MoveScaled(2,26,24,4)
+        Tag = "sheet"
+        Text = ("Sheet")
+      }
+      { radAll3 RadioButton mprint
+        Name = "radAll3"
+        MoveScaled(2,31,24,4)
+        Tag = "rectangle"
+        Text = ("Rectangle")
+      }
+      { radAll4 RadioButton mprint
+        Name = "radAll4"
+        MoveScaled(2,35,24,4)
+        Tag = "view"
+        Text = ("View")
+      }
+      { chkFit CheckBox mprint
+        Name = "chkFit"
+        MoveScaled(2,39,24,4)
+        Tag = "fit"
+        Text = ("Fit to paper size")
+      }
+      { chkScaleLines CheckBox mprint
+        Name = "chkScaleLines"
+        MoveScaled(2,43,24,4)
+        Tag = "scalelines"
+        Text = ("Scale line weight")
+      }
     }
-    { CheckBox1 CheckBox
-      MoveScaled(4,8,22,4)
+    { Panel3 Panel
+      MoveScaled(32,0,32,48)
+      Expand = True
+      Arrangement = Arrange.Vertical
+      Spacing = True
+      Margin = True
+      { radLandscape RadioButton mprint
+        Name = "radLandscape"
+        MoveScaled(2,1,24,4)
+        Tag = "landscape"
+        Text = ("Landscape")
+      }
+      { radPortait RadioButton mprint
+        Name = "radPortait"
+        MoveScaled(2,5,24,4)
+        Tag = "portait"
+        Text = ("Portait")
+      }
+      { chkInverse CheckBox mprint
+        Name = "chkInverse"
+        MoveScaled(2,9,24,4)
+        Tag = "invert"
+        Text = ("Invert")
+      }
+      { PictureBox1 PictureBox
+        MoveScaled(1,13,30,30)
+        Background = Color.Background
+        Alignment = Align.Center
+      }
+    }
+  }
+  { Panel4 Panel
+    MoveScaled(8,54,50,6)
+    Arrangement = Arrange.Horizontal
+    Spacing = True
+    Margin = True
+    { btnAcept Button mprint
+      Name = "btnAcept"
+      MoveScaled(1,0,11,4)
+      Tag = "plot"
+      Expand = True
+      Text = ("Print")
+    }
+    { Spring1 Spring
+      MoveScaled(20,1,7,4)
+    }
+    { btnCancel Button mprint
+      Name = "btnCancel"
+      MoveScaled(37,1,11,4)
+      Tag = "cancel"
+      Expand = True
+      Text = ("Cancel")
     }
   }
 }
