@@ -1475,15 +1475,13 @@ Public Sub Printer1_Draw()
 
   '==============================TEST 3==========================================
 
-  'Paint.Translate(-flxLimits[0], flxLimits[1])
-
   ' testing limites
   Paint.reset
   Paint.Brush = Paint.Color(Color.red)
   Paint.Arc(0, 0, 30)
-  Paint.Fill
+
   Paint.Brush = Paint.Color(Color.Purple)
-  Paint.Arc(Paint.w, Paint.h, 30) ' "", Printer1.PaperHeight, 30)
+  Paint.Arc(Paint.w, Paint.h, 30)
   Paint.Fill
 
   '==============================TEST 4==========================================
@@ -1536,7 +1534,9 @@ Public Sub Printer1_Draw()
     Endif
     Paint.Brush = Paint.Color(Color.Black)
 
+    ' TODO: aplicar las puntas segun color de la entidad
     Paint.LineWidth = e.LineWidth / scale
+
     Paint.Save  ' guardamos la matriz de transformacion por si la entidad la modifica
     e.ClassHandler.draw2(e)
     Paint.Restore ' restauramos la matriz
