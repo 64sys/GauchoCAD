@@ -251,31 +251,17 @@ Public Function Draw2(oE As Entity)
 
   major = Sqr((oE.p[2] - oE.p[0]) ^ 2 + (oE.p[3] - oE.p[1]) ^ 2)
   angle = Ang(oE.p[2] - oE.p[0], oE.p[3] - oE.p[1])          ' Los coordenadas del eje mayor son relativas al centro
-  If Not oE.Finished Then
-    If Me.StepsDone < 2 Then
-      oE.fParam[0] = 0.5
-      Me.start = 0
-      Me.recorrido = 2 * Pi
-      Minor = major * oE.fParam[0]
-    Else If Me.StepsDone < 3 Then
-      Minor = major * oE.fParam[0]
-      'If oE.fParam[0] > major Then oE.fParam[0] = major
-      'Minor = oE.fParam[0]
 
-    Endif
-  Endif
   Minor = major * oE.fParam[0]
   If major = 0 Then major = 1
 
   paint.Save
 
-  paint.brush = Paint.Color(oE.ColorToPaint)
-
   paint.Translate(oE.p[0], oE.p[1])
   paint.Rotate(-angle)
   Paint.Scale(1, Minor / major)
-  paint.LineWidth = oE.LineWidth ' / gcd.CurrentDrawing.ScaleZoom / gcd.ScaleLines
-  paint.arc(0, 0, major, Me.start, Me.recorrido)
+
+  paint.arc(0, 0, major, oE.fParam[1] / 2 / Pi, oE.fParam[2] / 2 / Pi)
   paint.Stroke
   paint.Restore
 

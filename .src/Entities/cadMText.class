@@ -220,9 +220,6 @@ Public Function Draw2(oE As Entity)
 
   'FontScalePrev = paint.FontScale
 
-  paint.LineWidth = 1
-  ' La cota puede estar inclinada, entonces debo rotarla
-
   If oE.fParam.Count > 0 Then
 
     angulo = oE.fParam[0] / 180 * Pi
@@ -260,8 +257,6 @@ Public Function Draw2(oE As Entity)
   End If
 
   htext = paint.TextExtents(ltext)
-
-  paint.brush = Paint.Color(oE.ColorToPaint)
 
   paint.Translate(oE.p[0], oE.p[1])
   paint.Rotate(-angulo)
