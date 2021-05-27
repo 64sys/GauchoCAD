@@ -212,45 +212,13 @@ Public Function Draw2(oE As Entity)
 
   paint.Save
 
-  'FontScalePrev = paint.FontScale
-  paint.LineWidth = 1
-  ' La cota puede estar inclinada, entonces debo rotarla
 
-  If oE.fParam.Count > 0 Then
+  angulo = oE.fParam[Me.ipaTextAngle] / 180 * Pi    ' ojo OPENGL--> GRADOS, GAMBAS-->RADIANESDXF
 
-    angulo = oE.fParam[0] / 180 * Pi    ' ojo OPENGL--> GRADOS, GAMBAS-->RADIANESDXF
 
-  Else
 
-    angulo = 0
 
-  End If
-
-  If oE.stringdata[0] = "" Then
-
-    ltext = "ABCdef123"
-
-  Else
-
-    ltext = oE.stringdata[0]
-
-  End If
-
-  If oE.fParam.Count > 1 Then
-
-    If oE.fParam[1] <= 0 Then
-      paint.Font.Size = 10
-    Else
-      paint.Font.Size = oE.fParam[1]
-    End If
-
-  Else
-    ' cuando ScaleZoom es 0.15 el texto coincide con DXF
-    ' entonces voy a trabajar con esa relacion
-
-    paint.Font.Size = 10
-
-  End If
+  paint.Font.Size = oE.fParam[Me.ipaTextHeight]
 
   htext = paint.TextExtents(ltext)
 

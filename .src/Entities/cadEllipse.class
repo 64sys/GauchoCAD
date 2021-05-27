@@ -245,7 +245,6 @@ End
 
 Public Function Draw2(oE As Entity)
 
-  If Not oE.Visible Then Return
 
   Dim major, minor, la As Float
 
