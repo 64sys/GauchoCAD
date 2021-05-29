@@ -1,6 +1,6 @@
 ' Gambas class file
 
-' GauchoCAD
+' m-designer
 ' A simple CAD made in Gambas
 '
 ' Copyright (C) Ing Martin P Cristia
@@ -21,6 +21,7 @@
 ' Boston, MA  02110-1301  USA
 Create Static
 'Fast
+Inherits CadLWpolyline
 
 Public Const Gender As String = "Polygon"
 Public Const DrawingOrder As Integer = 1        ' 1 = draws first
@@ -34,12 +35,6 @@ Public Const OrthogonalIgnored As Boolean = False
 Public Const OrthogonalForced As Boolean = False
 Public Const ParamDefault As String = "5; ; "
 Public Const StretchAble As Boolean = True           ' Si lo puedo deformar
-Public Selected As Boolean
-
-Public DrawAble As Boolean = False          ' True si durante la construccion ya tiene suficientes elementos para poder hacer una representacion digna
-Public Visible As Boolean = True            ' si esta entidad puede ser mostrada independientmente
-Public Finished As Boolean = False          ' colocar en true cuando se llegue a completar
-Public StepsDone As Integer                 ' esto lo cambia cls ElementBuilder durante la construccion
 
 ' The entity handler receives a user action, and returns the number of expected parameter
 ' If definitive = true, means the parameter is set
@@ -51,8 +46,8 @@ Public Function NewParameter(eBuild As Entity, vParam As Variant[], Optional Def
   If Me.StepsDone = 0 Then                    ' lados
     If vParam[0] <> "float" Then Return
 
-    eBuild.fParam[0] = vParam[1]
-
+    eBuild.iParam[0] = vParam[1]
+    eBuild.fParam.Add(0)
     If definitive Then Return True
 
   Else If Me.StepsDone = 1 Then               ' centro del poligono
@@ -68,7 +63,7 @@ Public Function NewParameter(eBuild As Entity, vParam As Variant[], Optional Def
 
     If vParam[0] <> "float" Then Return False
 
-    eBuild.fParam[1] = vParam[1]
+    eBuild.fParam[0] = vParam[1]
     eBuild.DrawAble = True
 
     If definitive Then Return True
@@ -86,11 +81,11 @@ Public Sub Draw(oE As Entity)
   Dim angle, xangle, x, y, z, r As Float
   Dim i As Integer
 
-  If oe.fParam[0] < 3 Then Return
-  r = oe.fParam[1]
-  xangle = 3.1415927 / oe.fParam[0]
+  If oe.iParam[0] < 3 Then Return
+  r = oe.fParam[0]
+  xangle = 3.1415927 / oe.iParam[0]
   oe.Polygon.Clear
-  For i = 0 To oe.fParam[0] * 2 - 1 Step 2
+  For i = 0 To oe.iParam[0] * 2 - 1 Step 2
 
     angle = xangle * i
     oe.Polygon.Add(r * Cos(angle) + oe.P[0])
@@ -100,7 +95,7 @@ Public Sub Draw(oE As Entity)
   oe.Polygon.Add(oe.Polygon[0])
   oe.Polygon.Add(oe.Polygon[1])
 
-  GLplus.Polygon(oE.Polygon, oE.ColorToPaint, oe.LineWidth, oe.LineType)
+  GLplus.Polygon(oE.Polygon, oE.ColorToPaint, oE.LineWidth, oE.LineType.index)
 
 End
 
@@ -123,7 +118,7 @@ Public Sub Finish(oE As Entity) As Boolean
   cadLWPolyline.BuildPOI(oe)
 
   ' busco el tipo de linea, si hace falta
-  If oE.LineTypeName = "Dashed" Then oE.LineType = 1
+
   ' tareas finales de armado del objeto
 
   oE.psel.resize(oE.p.count / 2)

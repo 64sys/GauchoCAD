@@ -1,6 +1,6 @@
 ' Gambas class file
 
-' GauchoCAD
+' m-designer
 ' A simple CAD made in Gambas
 '
 ' Copyright (C) Ing Martin P Cristia
@@ -50,8 +50,8 @@ Public Function MouseDown(mouseX As Integer, mouseY As Integer) ' esta rutina es
   GripPoint = -1
   Me.SelStartX = mouseX
   Me.SelStartY = mouseY
-  Me.SelStartXr = appmain.Xreal(Me.SelStartX)
-  Me.SelStartYr = appmain.yreal(Me.SelStartY)
+  Me.SelStartXr = gcd.Xreal(Me.SelStartX)
+  Me.SelStartYr = gcd.Yreal(Me.SelStartY)
 
   dX = Me.SelStartXr
   dY = Me.SelStartYr
@@ -71,7 +71,7 @@ Public Function MouseDown(mouseX As Integer, mouseY As Integer) ' esta rutina es
 
         ' veo si esta en un grip
         For i = 0 To gcd.CurrentDrawing.arrEntities[gcd.CurrentDrawing.iEntity[3]].PoiType.Max
-          If puntos.Around(Me.SelStartXr, Me.SelStartYr, gcd.CurrentDrawing.arrEntities[gcd.CurrentDrawing.iEntity[3]].PoiPoints[i * 2], gcd.CurrentDrawing.arrEntities[gcd.CurrentDrawing.iEntity[3]].PoiPoints[i * 2 + 1], appmain.Metros(8)) Then
+          If puntos.Around(Me.SelStartXr, Me.SelStartYr, gcd.CurrentDrawing.arrEntities[gcd.CurrentDrawing.iEntity[3]].PoiPoints[i * 2], gcd.CurrentDrawing.arrEntities[gcd.CurrentDrawing.iEntity[3]].PoiPoints[i * 2 + 1], gcd.Metros(8)) Then
 
             ' estoy editando la entidad desde un grip
             EntityForEdit = gcd.CurrentDrawing.arrEntities[gcd.CurrentDrawing.iEntity[3]]
@@ -95,7 +95,7 @@ Public Function MouseDown(mouseX As Integer, mouseY As Integer) ' esta rutina es
         If GripPoint < 0 Then clsEntities.deSelectElem(gcd.CurrentDrawing.iEntity[3])               '   -> la deselecciono
       Else
         clsEntities.SelectElem(gcd.CurrentDrawing.iEntity[3])                 '   -> la selecciono
-        AppMain.SelectionRefresh()
+        'fMain.SelectionRefresh()
       Endif
       Me.Active = False
 
@@ -136,10 +136,10 @@ Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' esta rutina es l
     If Mouse.Control Then tipo = "suma" ' elementos a la seleccion anterior
 
     ' Paso a coordenadas reales
-    Me.SelStartXr = appmain.Xreal(Me.SelStartX)
-    Me.SelStartYr = appmain.yreal(Me.SelStartY)
-    Me.SelEndXr = appmain.Xreal(Me.SelEndX)
-    Me.SelEndyr = appmain.yreal(Me.SelEndy)
+    Me.SelStartXr = gcd.Xreal(Me.SelStartX)
+    Me.SelStartYr = gcd.Yreal(Me.SelStartY)
+    Me.SelEndXr = gcd.Xreal(Me.SelEndX)
+    Me.SelEndyr = gcd.Yreal(Me.SelEndy)
 
     ' veo si el rectangulo es suficientemente grande como para representar una seleccion por rectangulo
     If (Me.SelEndX - Me.SelStartX + (-Me.SelEndy + Me.SelStartY)) > 10 Then
@@ -152,9 +152,9 @@ Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' esta rutina es l
 
     End If
     clsEntities.GLGenDrawListSel(0)
-    AppMain.SelectionRefresh()
+    'fMain.SelectionRefresh()
 
-    clsDrawingAids.HelperTrabajo = ("Selected") & " " & Str$(Me.selectionCount) & " " & ("elements")
+    DrawingAids.HelperTrabajo = ("Selected") & " " & Str$(Me.selectionCount) & " " & ("elements")
 
   Else If GripPoint >= 0 Then
 
@@ -176,12 +176,12 @@ Public Function MouseMove(mouseX As Integer, mouseY As Integer) ' esta rutina es
 
   Me.SelEndX = mouseX
   Me.SelEndy = mouseY
-  Me.SelEndXr = appmain.Xreal(Me.SelEndX)
-  Me.SelEndyr = appmain.yreal(Me.SelEndy)
+  Me.SelEndXr = gcd.Xreal(Me.SelEndX)
+  Me.SelEndyr = gcd.Yreal(Me.SelEndy)
 
   If Me.Active Then
 
-    appmain.redraw
+    gcd.Redraw
 
   Else
 
@@ -229,15 +229,16 @@ Public Function KeyText(EnteredText As String)
   ' in this case, we try to run the command wich is a class
   Dim o As Object, RunWith As String, c As Class
 
+  EnteredText = LCase(Trim(EnteredText))
   If EnteredText = "" Then Return                                ' no BS here
 
   Select Case LCase(EnteredText)
     Case "regen"
-      APPMain.Regen
+      AppMain.Regen
     Case "redraw"
-      APPMain.redraw
+      gcd.Redraw
     Case "save"
-      appmain.gTask("save")
+      AppMain.gTask("save")
 
     Case Else
 
@@ -262,9 +263,9 @@ Public Function KeyText(EnteredText As String)
   Return
 
   ' TODO: dejar comentado mientras hagamos debug
-  'Catch
+  '' catch
 
-  clsDrawingAids.ErrorMessage = "Command not recognized"
+  DrawingAids.ErrorMessage = "Command not recognized"
   '
   '
 
@@ -279,9 +280,20 @@ Public Sub Draw() ' esta rutina es llamada por FCAD en el evento DrawingArea_Dra
 
       GLplus.Rectangle2D(Me.SelStartXr, Me.SelStartYr, Me.SelEndXr - Me.SelStartXr, Me.SelEndyr - Me.SelStartYr, Color.RGB(224, 220, 207, 215),,,, Color.red, 1, 1, 2)
 
+      ' gl.Begin(Gl.POLYGON)
+      ' gl.Color4f(1, 0, 0, 0.15)
+      ' gl.Vertex2f(Me.SelStartXr, Me.SelStartYr)
+      '
+      ' gl.Vertex2f(Me.SelEndXr, Me.SelStartYr)
+      '
+      ' gl.Vertex2f(Me.SelEndXr, Me.SelEndyr)
+      '
+      ' gl.Vertex2f(Me.SelStartXr, Me.SelEndyr)
+      '
+      ' gl.End
     Else                                                            ' seleccion full, todos los puntos deben estar adentro
 
-      GLplus.Rectangle2D(Me.SelStartXr, Me.SelStartYr, Me.SelEndXr - Me.SelStartXr, Me.SelEndyr - Me.SelStartYr, Color.RGB(224, 220, 207, 215),,,, Color.Green, 1, 1, 2)
+      GLplus.Rectangle2D(Me.SelStartXr, Me.SelStartYr, Me.SelEndXr - Me.SelStartXr, Me.SelEndyr - Me.SelStartYr, Color.RGB(224, 220, 207, 215),,,, Color.Green, 1, 0, 2)
 
     End If
   Else

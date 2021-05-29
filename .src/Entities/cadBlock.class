@@ -1,6 +1,6 @@
 ' Gambas class file
 
-' GauchoCAD
+' m-designer
 ' A simple CAD made in Gambas
 '
 ' Copyright (C) Ing Martin P Cristia
@@ -64,11 +64,11 @@ Public Sub Draw(oE As Entity)
   ' en este caso necesitamos que esten seleccionadas dos o mas entidades
   If n < 2 Then
 
-    clsDrawingAids.ErrorMessage = ("Select two or mores entities first")
+    DrawingAids.ErrorMessage = ("Select two or mores entities first")
 
   Else
 
-    clsDrawingAids.HelperTrabajo = Str(n) & " entities selected, enter block name:"
+    DrawingAids.HelperTrabajo = Str(n) & " entities selected, enter block name:"
 
   Endif
   oE.DrawAble = True
@@ -117,8 +117,3 @@ Public Sub Finish(oE As Entity) As Boolean
   Next
 
 End
-
-' Importo los datos que puedo procesar de una coleccion y genero un Entity para ser agregado a un array
-' Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
-'
-' End

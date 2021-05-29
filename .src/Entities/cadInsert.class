@@ -1,6 +1,6 @@
 ' Gambas class file
 
-' GauchoCAD
+' m-designer
 ' A simple CAD made in Gambas
 '
 ' Copyright (C) Ing Martin P Cristia
@@ -40,19 +40,41 @@ Public Visible As Boolean = True            ' si esta entidad puede ser mostrada
 Public Finished As Boolean = False          ' colocar en true cuando se llegue a completar
 Public StepsDone As Integer                 ' esto lo cambia cls ElementBuilder durante la construccion
 
-' JSON and DXF Read/Export
-Public Const JSON_Reading As Boolean = True
-Public Const JSON_Export As Boolean = False
-
-Public Const DXF_Reading As Boolean = True
-Public Const DXF_Export As Boolean = True
-
 ' fParam helpers
 Public Const TotalParams As Integer = 4
 Public Const ipaEscX As Integer = 0
 Public Const ipaEscY As Integer = 1
 Public Const ipaEscZ As Integer = 2
 Public Const ipaRotacion As Integer = 3
+'Public Const ipaInsertion As Integer = 3
+
+' special vars
+
+Public CurrLType As Integer
+Public CurrColor As Integer
+Public CurrLwt As Float
+
+Public Const DXF_Export As Boolean = True
+
+'' Creates a new LWpolyline entity and prepares arrays
+Public Function NewEntity() As Entity
+
+  Dim e As New Entity
+
+  e.Gender = Me.Gender
+  e.ClassHandler = Me
+  e.fParam.Insert([0, 0, 0, 0])
+  e.P.Insert([0, 0])
+
+  ' this may fails on some scopes, but we should Try
+  Try e.pLayer = gcd.CurrentDrawing.CurrLayer
+  Try e.colour = gcd.CurrentDrawing.CurrColor
+  Try e.LineType = gcd.CurrentDrawing.CurrLineType
+  Try e.LineWidth = gcd.CurrentDrawing.CurrLineWt
+
+  Return e
+
+End
 
 Public Sub Translate(e As Entity, dX As Float, dY As Float, Optional OnlySelected As Boolean = False)
 
@@ -104,33 +126,51 @@ Public Sub Draw(oE As Entity)
   Dim pBlockToDraw As Block
 
   If Not oe.Finished Then Return
-  If UCase(Left(oe.Gender, 3)) <> "INS" Then
-    If Not IsNull(oe.pBlock) Then
-      pBlockToDraw = oe.pBlock
-    Else
-      i = clsEntities.FIndBlockIDbyHandle(oE.Block)
-      pBlockToDraw = gcd.CurrentDrawing.arrBlocks[i]
-    End If
-  Else
-    i = clsEntities.FIndBlockID(oE.Block)
-    Try pBlockToDraw = gcd.CurrentDrawing.arrBlocks[i]
-  End If
-  If i < 0 Then Return
+
+  ' gl.PushMatrix
+  ' If Relative Then gl.Translatef(fMain.pixels(oE.p[0]) / gcd.CurrDrawing.ScaleZoom, fMain.pixels(oE.p[1]) / gcd.CurrDrawing.ScaleZoom, 0)
+  ' gl.Rotatef(oE.fParam[Me.ipaRotacion], 0, 0, 1)
+  ' gl.Scalef(oE.fParam[Me.ipaEscX], oE.fParam[Me.ipaEscY], oE.fParam[Me.ipaEscZ])
+  If oe.pBlock Then Draw_List(oe.pBlock.entities, oe, oe.pBlock.AbsoluteCoords)
+
+End
+
+Public Sub Draw_List(eList As Entity[], eParent As Entity, Optional InsertionPlace As Integer = 0)
+  'insertion place:
+  ' 0 = entity.P[0],[1]
+  ' 1 = entity.pBlock.entities.P[0],[1]
+  ' 2 = entity.pBlock.x0,y0
+
+  Dim et As Entity
 
   gl.PushMatrix
-  gl.Translatef(APPMain.pixels(oE.p[0]) / gcd.CurrentDrawing.ScaleZoom, APPMain.pixels(oE.p[1]) / gcd.CurrentDrawing.ScaleZoom, 0)
-  gl.Rotatef(oE.fParam[Me.ipaRotacion], 0, 0, 1)
-  gl.Scalef(oE.fParam[Me.ipaEscX], oE.fParam[Me.ipaEscY], oE.fParam[Me.ipaEscZ])
+  If InsertionPlace = 0 Then
+    gl.Translatef(gcd.Pixels(eParent.p[0]) / gcd.CurrentDrawing.ScaleZoom, gcd.Pixels(eParent.p[1]) / gcd.CurrentDrawing.ScaleZoom, 0)
+  Else If InsertionPlace = 1 Then
+    ' absolute coordinate, so each entity has its own position
+    ' nothing to translate
+  Else If InsertionPlace = 2 Then
+    gl.Translatef(gcd.Pixels(eParent.pBlock.x0) / gcd.CurrentDrawing.ScaleZoom, gcd.Pixels(eParent.pBlock.y0) / gcd.CurrentDrawing.ScaleZoom, 0)
 
-  For Each ET In pBlockToDraw.entities
+  End If
+
+  gl.Rotatef(eParent.fParam[Me.ipaRotacion], 0, 0, 1)
+
+  gl.Scalef(eParent.fParam[Me.ipaEscX], eParent.fParam[Me.ipaEscY], eParent.fParam[Me.ipaEscZ])
+
+  For Each ET In eList
     et.visible = True
-    et.LineType = oe.LineType
-    et.colour = oe.colour
-    et.LineWidth = oe.LineWidth
-    'If et.Gender = "MText" Then Stop
-    et.ClassHandler.Draw(et)
+    et.LineType = eParent.LineType
+    et.colour = eParent.colour
+    et.LineWidth = eParent.LineWidth
 
-    'Debug et.Gender, et.LineType
+    If et.Gender = "Insert" Then
+
+      If et.pBlock Then Draw_List(et.pBlock.entities, et)
+    Else
+      et.ClassHandler.Draw(et)
+    End If
+
   Next
   gl.PopMatrix
 
@@ -143,9 +183,9 @@ Public Sub DrawSelected(oE As Entity)
   '
   ' ' FIXME this does not work for Inserts cointaining other inserst
   '
-  ' For i = oe.iInsert + 1 To gcd.CurrentDrawing.arrEntities.max
-  '   If gcd.CurrentDrawing.arrEntities[i].iInsert <> oe.iInsert Then Break
-  '   gcd.CurrentDrawing.arrEntities[i].ClassHandler.DrawSelected(gcd.CurrentDrawing.arrEntities[i])
+  ' For i = oe.iInsert + 1 To gcd.CurrDrawing.arrEntities.max
+  '   If gcd.CurrDrawing.arrEntities[i].iInsert <> oe.iInsert Then Break
+  '   gcd.CurrDrawing.arrEntities[i].ClassHandler.DrawSelected(gcd.CurrDrawing.arrEntities[i])
   '
   ' Next
 
@@ -156,11 +196,12 @@ Public Sub DrawRemark(oE As Entity)
 
   Dim ET As Entity, i As Integer
 
-  For i = oe.iInsert + 1 To gcd.CurrentDrawing.arrEntities.max
-    If gcd.CurrentDrawing.arrEntities[i].iInsert = -1 Then Break
-    gcd.CurrentDrawing.arrEntities[i].ClassHandler.DrawRemark(gcd.CurrentDrawing.arrEntities[i])
-
-  Next
+  ' DEPRECADO
+  ' For i = oe.iInsert + 1 To gcd.CurrDrawing.arrEntities.max
+  '     If gcd.CurrDrawing.arrEntities[i].iInsert = -1 Then Break
+  '     gcd.CurrDrawing.arrEntities[i].ClassHandler.DrawRemark(gcd.CurrDrawing.arrEntities[i])
+  '
+  ' Next
 
 End
 
@@ -173,11 +214,11 @@ End
 '   If i < 0 Then Return
 '
 '   gl.PushMatrix
-'   gl.Translatef(appmain.pixels(oE.p[0]) / gcd.CurrentDrawing.ScaleZoom, appmain.pixels(oE.p[1]) / gcd.CurrentDrawing.ScaleZoom, 0)
+'   gl.Translatef(fMain.pixels(oE.p[0]) / gcd.CurrDrawing.ScaleZoom, fMain.pixels(oE.p[1]) / gcd.CurrDrawing.ScaleZoom, 0)
 '   gl.Rotatef(oE.fParam[2], 0, 0, 1)
 '   gl.Scalef(oE.fParam[0], oE.fParam[1], 1)
 '
-'   For Each ET In gcd.CurrentDrawing.arrBlocks[i].entities
+'   For Each ET In gcd.CurrDrawing.arrBlocks[i].entities
 '     et.visible = True
 '     et.ClassHandler.DrawRemark(et)
 '   Next
@@ -191,11 +232,11 @@ Public Function Draw2(oE As Entity)
   '
   ' Dim ET As Entity, i As Integer
   ' paint.save
-  ' paint.Translate(appmain.pixels(oE.p[0]) / gcd.CurrentDrawing.ScaleZoom, appmain.pixels(oE.p[1]) / gcd.CurrentDrawing.ScaleZoom)
+  ' paint.Translate(fMain.pixels(oE.p[0]) / gcd.CurrDrawing.ScaleZoom, fMain.pixels(oE.p[1]) / gcd.CurrDrawing.ScaleZoom)
   ' paint.Scale(oE.fParam[0], oE.fParam[1])
   ' paint.Rotate(oE.fParam[2])
   ' gcd.ScaleLines = (Abs(oE.fParam[0]) + Abs(oE.fParam[1])) / 2
-  ' For Each ET In gcd.CurrentDrawing.arrBlocks[i].entities
+  ' For Each ET In gcd.CurrDrawing.arrBlocks[i].entities
   '   et.Draw
   ' Next
   ' gcd.ScaleLines = 1
@@ -211,11 +252,23 @@ Public Function BuildPOI(oE As Entity, Optional arrIndex As Integer = -1) As Int
 
   oe.PoiPoints.Clear
   oe.PoiType.Clear
+  oe.Polygon.Clear
 
   ' points
   oe.poiPoints.insert([oE.p[0], oE.p[1]])
   oe.poiType.Add(gcd.poiBasePoint)
   'oe.poiEntities.Add(arrIndex)
+
+  ' polygon
+  Dim fLimits As Float[]
+  If IsNull(oe.pBlock) Then Return ' Stop
+  fLimits = clsEntities.ComputeLimits(oe.pBlock.entities)
+  If IsNull(fLimits) Then Return
+  oe.Polygon.Insert([fLimits[0], fLimits[1], fLimits[2], fLimits[1], fLimits[2], fLimits[3], fLimits[0], fLimits[3]])
+  puntos.Scale(oe.Polygon, oe.fParam[cadInsert.ipaEscX], oe.fParam[cadInsert.ipaEscY])
+  puntos.Rotate(oe.Polygon, oe.fParam[cadInsert.ipaRotacion] * Pi / 180) ' TODO: verificar orden de esta y la siguiente linea
+  puntos.Translate(oe.Polygon, oe.P[0], oe.P[1])
+  'If oe.fParam[cadInsert.ipaRotacion] <> 0 Then Stop
 
 End
 
@@ -223,14 +276,13 @@ End
 ' True means all is good, False will instruct the clsEntityBuilder to delete it
 Public Sub Finish(oE As Entity) As Boolean
 
-  Dim ET As Entity, i, iInsert As Integer
+  Dim ET As Entity, i As Integer
 
   'Print "Finish en EntityBase"
 
-  BuildPOI(oe)
+  '  BuildPOI(oe)
 
   ' busco el tipo de linea, si hace falta
-  If oE.LineTypeName = "Dashed" Then oE.LineType = 1
 
   oE.psel.resize(oE.p.count / 2)
 
@@ -238,33 +290,59 @@ Public Sub Finish(oE As Entity) As Boolean
   oE.Selected = False
   oE.Finished = True
 
-  i = clsEntities.FIndBlockID(oE.Block)
-  If i < 0 Then Return
+End
+'
 
-  ' en este momento la ultima entidad es este Insert, guardo el numero
-  iInsert = gcd.CurrentDrawing.arrEntities.Max
+Public Sub ExportDXFCol(e As Entity, ByRef cExport As Collection) As Boolean
 
-  ' hay un caso particular: cuando un bloque contiene un Insert, debo prevenir esta situacion
-  If iInsert >= 0 Then
+  cExport.Add("INSERT", dxf.codEntity)
+  clsEntities.DXFExportCommonCol(e, cExport)
+  cExport.Add("AcDbBlockReference", "100")
+  cExport.Add(e.pBlock.name, dxf.codName)
+  cExport.Add(CStr(e.p[0]), dxf.codX0)
+  cExport.Add(CStr(e.p[1]), dxf.codY0)
+  cExport.Add("0", dxf.codZ0)
 
-    ' esta linea no haria falta
-    'gcd.CurrentDrawing.arrEntities.Last.iInsert = iInsert
-    For Each ET In gcd.CurrentDrawing.arrBlocks[i].entities
-      gcd.CurrentDrawing.arrEntities.Add(clsEntities.ClonEntity(et))
-      et.LineType = oe.LineType
-      et.colour = oe.colour
-      et.LineWidth = oe.LineWidth
-      'gcd.CurrentDrawing.arrEntities.Last.Block = oe.block
-      gcd.CurrentDrawing.arrEntities.Last.iInsert = iInsert
+  cExport.Add(CStr(e.fParam[Me.ipaEscX]), "40")           ' X scale factor
+  cExport.Add(CStr(e.fParam[Me.ipaEscY]), "41")           ' Y scale factor
+  cExport.Add(CStr(e.fParam[Me.ipaEscZ]), "42")           ' Z scale factor
+  cExport.Add(CStr(e.fParam[Me.ipaRotacion]), "50")       ' rotation
 
-      ' ------------------------------ ERROR TODO: verificar esto, lo puse para evitar recursividad infinita
-      gcd.CurrentDrawing.arrEntities.Last.ClassHandler.finish(gcd.CurrentDrawing.arrEntities.Last)
+  cExport.Add("1", "70")
+  cExport.Add("1", "71")
+  cExport.Add("0", "44")
+  cExport.Add("0", "45")
 
-      gcd.CurrentDrawing.arrEntities.Last.ClassHandler.Scale(gcd.CurrentDrawing.arrEntities.Last, oe.fParam[Me.ipaEscX], oE.fParam[Me.ipaEscY])
-      gcd.CurrentDrawing.arrEntities.Last.ClassHandler.Rotate(gcd.CurrentDrawing.arrEntities.Last, oE.fParam[Me.ipaRotacion] * Pi / 180)
-      gcd.CurrentDrawing.arrEntities.Last.ClassHandler.Translate(gcd.CurrentDrawing.arrEntities.Last, oE.p[0], oE.p[1])
-    Next
-  End If
+End
+
+Public Function ImportDXF(e As Entity, sClaves As String[], sValues As String[]) As Boolean
+
+  Dim i As Integer
+
+  ' tengo q presuponer que las escalas son = 1
+  e.fParam[Me.ipaEscX] = 1    ' esc X
+  e.fParam[Me.ipaEscY] = 1    ' esc Y
+  e.fParam[Me.ipaEscZ] = 1    ' esc Z
+
+  For i = 0 To sClaves.Max
+
+    If sClaves[i] = "2" Then e.pBlock = clsEntities.FIndBlock(sValues[i])
+    If sClaves[i] = "10" Then e.P[0] = (CFloat(sValues[i]))         ' X
+    If sClaves[i] = "20" Then e.P[1] = (CFloat(sValues[i]))         ' Y
+    If sClaves[i] = "41" Then e.fParam[Me.ipaEscX] = CFloat(sValues[i])         ' esc X
+    If sClaves[i] = "42" Then e.fParam[Me.ipaEscY] = CFloat(sValues[i])         ' esc Y
+    If sClaves[i] = "43" Then e.fParam[Me.ipaEscZ] = CFloat(sValues[i])         ' esc Z
+    If sClaves[i] = "50" Then e.fParam[Me.ipaRotacion] = CFloat(sValues[i])      ' rotacion
+  Next
+
+  If e.fParam[Me.ipaEscZ] = 0 Then e.fParam[Me.ipaEscZ] = 1    ' esc Z
+  ' esc Z
+
+  Return True
+
+  '' catch
+
+  Return False
 
 End
 
@@ -318,58 +396,5 @@ Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
 Catch
 
   Return False
-
-End
-
-Public Sub ExportDXF(e As Entity, hFile As File)
-
-  Print #hFIle, "  0"
-  Print #hFIle, "INSERT"
-  clsEntities.DXFExportCommon(e, hFile)
-  Print #hFIle, "100"
-  Print #hFIle, "AcDbBlockReference"
-  Print #hFIle, "  2"
-  Print #hFIle, e.Block
-  Print #hFIle, " 10"                      ' X0
-  Print #hFIle, CStr(e.p[0])
-  Print #hFIle, " 20"                      ' Y0
-  Print #hFIle, CStr(e.p[1])
-  Print #hFIle, " 30"                      ' Z0
-  Print #hFIle, "0"
-  Print #hFIle, " 41"                      ' X scale factor
-  Print #hFIle, CStr(e.fParam[Me.ipaEscX])
-  Print #hFIle, " 42"                      ' Y scale factor
-  Print #hFIle, CStr(e.fParam[Me.ipaEscY])
-  Print #hFIle, " 43"                      ' Z scale factor
-  Print #hFIle, CStr(e.fParam[Me.ipaEscZ])
-  Print #hFIle, " 50"                      ' rotation angle deg
-  Print #hFIle, CStr(e.fParam[Me.ipaRotacion])
-  Print #hFIle, " 70"                      ' row count
-  Print #hFIle, "1" 'CStr(RowCol[0])
-  Print #hFIle, " 71"                      ' column count
-  Print #hFIle, "1" ' CStr(RowCol[1])
-  Print #hFIle, " 44"                      ' row spacing
-  Print #hFIle, "0" ' CStr(RowColSpacing[2])
-  Print #hFIle, " 45"                      ' column spacing
-  Print #hFIle, "0" 'CStr(RowColSpacing[3])
-
-End
-
-Public Function ImportDXF(e As Entity, sClaves As String[], sValues As String[]) As Boolean
-
-  Dim i As Integer
-
-  e.fParam.Resize(Me.TotalParams)
-
-  For i = 0 To sClaves.Max
-
-    If sClaves[i] = "2" Then e.Block = sValues[i]
-    If sClaves[i] = "10" Then e.P.Add(CFloat(sValues[i]))         ' X
-    If sClaves[i] = "20" Then e.P.Add(CFloat(sValues[i]))         ' Y
-    If sClaves[i] = "41" Then e.fParam[Me.ipaEscX] = CFloat(sValues[i])         ' esc X
-    If sClaves[i] = "42" Then e.fParam[Me.ipaEscY] = CFloat(sValues[i])         ' esc Y
-    If sClaves[i] = "43" Then e.fParam[Me.ipaEscZ] = CFloat(sValues[i])         ' esc Z
-    If sClaves[i] = "50" Then e.fParam[Me.ipaRotacion] = CFloat(sValues[i])      ' rotacion
-  Next
 
 End

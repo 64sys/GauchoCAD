@@ -22,14 +22,14 @@
 Create Static
 'Fast
 
-Public Const Gender As String = "Dummy"
+Public Const Gender As String = "EndBlk"
 Public Const DrawingOrder As Integer = 1        ' 1 = draws first
 Public Const HelperTrabajo As String = ("<empty>")
 Public Const ParamType As String = ""                             ' that is Point, Point; could be Color Text, etc
 Public Const ParamHelper As String = ""
-Public Const GAMBASCADENTITY As String = ""
-Public Const USEWITH As String = ""
-Public Const PointsToDraw As Integer = 0
+Public Const GAMBASCADENTITY As String = "EntityBase"
+Public Const USEWITH As String = "EntityBuilder"
+Public Const PointsToDraw As Integer = 0             ' minimal point requered for drawing something usefull
 Public Const OrthogonalIgnored As Boolean = False
 Public Const OrthogonalForced As Boolean = False
 Public Const ParamDefault As String = " "
@@ -40,6 +40,8 @@ Public DrawAble As Boolean = False          ' True si durante la construccion ya
 Public Visible As Boolean = True            ' si esta entidad puede ser mostrada independientmente
 Public Finished As Boolean = False          ' colocar en true cuando se llegue a completar
 Public StepsDone As Integer                 ' esto lo cambia cls ElementBuilder durante la construccion
+
+Public Const DXF_Export As Boolean = True
 
 '' Creates a new Line entity and prepares arrays
 
@@ -57,6 +59,10 @@ Public Function NewEntity() As Entity
   Try e.LineWidth = gcd.CurrentDrawing.CurrLineWt
 
   Return e
+
+End
+
+Public Function NewParameter(eBuild As Entity, vParam As Variant[], Optional Definitive As Boolean = False) As Boolean
 
 End
 
@@ -84,13 +90,9 @@ Public Sub DrawRemark(oE As Entity)
 
 End
 
-'' The paint version of the entity
 Public Function Draw2(oE As Entity)
 
 End
-
-'' Creo los puntos de interes
-'' Build point of interest
 
 Public Function BuildPOI(oE As Entity, Optional arrIndex As Integer = -1) As Integer
 
@@ -100,15 +102,19 @@ End
 ' True means all is good, False will instruct the clsEntityBuilder to delete it
 Public Sub Finish(oE As Entity) As Boolean
 
+  oE.DrawAble = True
+  oE.Selected = False
+  oE.Finished = True
+
 End
 
 Public Sub ExportDXFCol(e As Entity, ByRef cExport As Collection) As Boolean
 
-  Dim i As Integer
-
-  For i = 0 To e.fParam.Max
-    cExport.Add(e.StringData[i], CStr(e.fParam[i]))
-  Next
+  cExport.Add("AcDbBlockEnd", "100_1")
+  Try cExport.Remove(dxf.codColor)
+  Try cExport.Remove(dxf.codLType)
+  Try cExport.Remove(dxf.codLWht)
+  'cExport["330"] = e.HandleOwner
 
 End
 
@@ -116,15 +122,6 @@ Public Function ImportDXF(e As Entity, sClaves As String[], sValues As String[])
 
   Dim i As Integer
 
-  For i = 0 To sClaves.Max
-    e.fParam.Add(CInt(sClaves[i]))
-    e.StringData.Add(sValues[i])
-  Next
-
   Return True
-
-  ' catch
-
-  Return False
 
 End

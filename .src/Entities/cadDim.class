@@ -162,7 +162,7 @@ Public Function Start(Optional Mode As Integer = gcd.dimRadius)
   ' init arrays
   Select DimType
     Case -1                 ' tengo que pregunta que dim quiere
-      clsDrawingAids.HelperTrabajo = "DimType? Horizontal;Vertical;Aligned;aNgular;rOtated,Radial;Diameter"
+      DrawingAids.HelperTrabajo = "DimType? Horizontal;Vertical;Aligned;aNgular;rOtated,Radial;Diameter"
       NextParamType = "T"
 
     Case gcd.DimAligned
@@ -213,7 +213,7 @@ Public Function Start(Optional Mode As Integer = gcd.dimRadius)
 
   elem.layerid = appmain.CurrentLayer
 
-  clsDrawingAids.HelperTrabajo = elem.ClassHandler.HelperTrabajo
+  DrawingAids.HelperTrabajo = elem.ClassHandler.HelperTrabajo
 
 End
 
@@ -359,7 +359,7 @@ Finally
 Catch
 
   ' unexpected input
-  clsDrawingAids.ErrorMessage = ("Bad input" & ErrTxt)
+  DrawingAids.ErrorMessage = ("Bad input" & ErrTxt)
 
 End
 
@@ -389,7 +389,7 @@ Public Sub ReBuildBlock()
         Case "D"
           DimType = gcd.dimDiameter
         Case Else
-          clsDrawingAids.ErrorMessage = ("Bad input")
+          DrawingAids.ErrorMessage = ("Bad input")
           Return
       End Select
       ' good input
@@ -530,15 +530,15 @@ Public Function MouseMove(mouseX As Integer, mouseY As Integer) ' esta rutina es
   If NextParamType = "L" Then
 
     ' return the angle from horizontal to us
-    elem.fParam[iFloat] = puntos.distancia(puntos.Near(appmain.Xreal(mouseX)), puntos.Near(appmain.Yreal(mouseY)), elem.p[elem.p.max - 1], elem.p[elem.p.max])
+    elem.fParam[iFloat] = puntos.distancia(gcd.Near(appmain.Xreal(mouseX)), gcd.Near(appmain.Yreal(mouseY)), elem.p[elem.p.max - 1], elem.p[elem.p.max])
 
     appmain.redraw
     Return              ' nothing more to do here
   End If
 
   ' we are waiting for a point
-  ClickXr = puntos.Near(appmain.Xreal(mouseX))
-  ClickYr = puntos.Near(appmain.Yreal(mouseY))
+  ClickXr = gcd.Near(appmain.Xreal(mouseX))
+  ClickYr = gcd.Near(appmain.Yreal(mouseY))
 
   ' y si tengo enganche?
   If (gcd.CurrentDrawing.iEntity[2] >= 0) And (gcd.OrthogonalForced = False) Then
@@ -569,7 +569,7 @@ End
 
 Public Function MouseDown(mouseX As Integer, mouseY As Integer) ' esta rutina es llamada por FCAD en el evento DrawingArea_MouseDown
 
-  clsDrawingAids.ErrorMessage = ""
+  DrawingAids.ErrorMessage = ""
   If InStr("LAP", NextParamType) = 0 Then Return ' we are expecting a parameter
 
   ' if we expect a parameter, it will be passed
@@ -587,7 +587,7 @@ Public Function MouseDown(mouseX As Integer, mouseY As Integer) ' esta rutina es
   If NextParamType = "L" Then
 
     ' return the angle from horizontal to us
-    elem.fParam[iFloat] = puntos.distancia(puntos.Near(appmain.Xreal(mouseX)), puntos.Near(appmain.Yreal(mouseY)), elem.p[elem.p.max - 1], elem.p[elem.p.max])
+    elem.fParam[iFloat] = puntos.distancia(gcd.Near(appmain.Xreal(mouseX)), gcd.Near(appmain.Yreal(mouseY)), elem.p[elem.p.max - 1], elem.p[elem.p.max])
     Inc iFloat
     AdvanceStep
     Return              ' nothing more to do here
@@ -595,8 +595,8 @@ Public Function MouseDown(mouseX As Integer, mouseY As Integer) ' esta rutina es
 
   ' we are waiting for a point
 
-  ClickXr = puntos.Near(appmain.Xreal(mouseX))
-  ClickYr = puntos.Near(appmain.Yreal(mouseY))
+  ClickXr = gcd.Near(appmain.Xreal(mouseX))
+  ClickYr = gcd.Near(appmain.Yreal(mouseY))
 
   ' y si tengo enganche?
 
@@ -669,7 +669,7 @@ Public Sub Cancel()
   elem = Null
   gcd.clsJobPrevious = Me
   gcd.clsJob = clsDefaultJob
-  clsDrawingAids.CleanTexts
+  DrawingAids.CleanTexts
   appmain.redraw
 
 End

@@ -1,6 +1,6 @@
 ' Gambas class file
 
-' GauchoCAD
+' m-designer
 ' A simple CAD made in Gambas
 '
 ' Copyright (C) Ing Martin P Cristia
@@ -35,7 +35,7 @@ Public Function Start(Optional ElemToBuild As Variant, Optional _Mode As Integer
   Me.PointsDone = 0
   Me.PointsTotal = 1e10
 
-  clsDrawingAids.HelperTrabajo = "Protractor: " & ("mark first point")
+  DrawingAids.HelperTrabajo = "Protractor: " & ("mark first point")
   Poli.Add(0)
   Poli.Add(0)
 
@@ -50,14 +50,14 @@ Public Function MouseUp(mouseX As Integer, mouseY As Integer)
 
   Inc Me.PointsDone
 
-  Me.SelEndXr = puntos.Near(AppMain.Xreal(mousex))
-  Me.SelEndyr = puntos.Near(AppMain.Yreal(mouseY))
+  Me.SelEndXr = gcd.Near(gcd.Xreal(mousex))
+  Me.SelEndyr = gcd.Near(gcd.Yreal(mouseY))
 
   Poli[Poli.max - 1] = Me.SelEndXr
   Poli[Poli.max] = Me.SelEndYr
 
   If Me.PointsDone = 3 Then Me.Finish
-  If Me.PointsDone = 2 Then clsDrawingAids.HelperTrabajo = "Protractor: " & ("mark center")
+  If Me.PointsDone = 2 Then DrawingAids.HelperTrabajo = "Protractor: " & ("mark center")
 
   Poli.Add(Me.SelEndXr)
   Poli.Add(Me.SelEndYr)
@@ -69,8 +69,8 @@ Public Function MouseMove(mouseX As Integer, mouseY As Integer) ' called by FCAD
   Dim a1, a2, r As Float
 
   If Poli.Count = 0 Then Return
-  Me.SelEndXr = puntos.Near(AppMain.Xreal(mouseX))
-  Me.SelEndyr = puntos.Near(AppMain.Yreal(mouseY))
+  Me.SelEndXr = gcd.Near(gcd.Xreal(mouseX))
+  Me.SelEndyr = gcd.Near(gcd.Yreal(mouseY))
   Poli[Poli.max - 1] = Me.SelEndXr
   Poli[Poli.max] = Me.SelEndYr
 
@@ -82,16 +82,16 @@ Public Function MouseMove(mouseX As Integer, mouseY As Integer) ' called by FCAD
     If a2 < 0 Then a2 += 2 * Pi
     r = a2 - a1
     If r < 0 Then r += 2 * Pi
-    clsDrawingAids.HelperTrabajo = ("Angle") & " = " & Str(r * 180 / Pi)
+    DrawingAids.HelperTrabajo = ("Angle") & " = " & Str(r * 180 / Pi)
 
   Endif
 
-  appmain.redraw
-  ' appmain.regen
+  gcd.Redraw
+  ' fMain.regen
 
 End
 
-Public Sub Draw()               ' called by gcd.CurrentDrawing.drwArea_Draw
+Public Sub Draw()               ' called by gcd.CurrDrawing.drwArea_Draw
 
   glPlus.PolyLines(Poli, Color.DarkBlue, Color.RGB(0, 255, 100, 200))
 
@@ -105,9 +105,9 @@ Public Function KeyText(EnteredText As String) ' esta rutina es llamada por FCAD
 
   End If
 
-Catch
+  ' catch
 
-  clsDrawingAids.ErrorMessage = ("Bad input")
+  DrawingAids.ErrorMessage = ("Bad input")
 
 End
 
@@ -117,14 +117,14 @@ Public Sub Finish()
 
   If Me.PointsDone >= 2 Then
 
-    clsDrawingAids.HelperTrabajo = ("Angle") & " = " & Str(puntos.PoligonLength(poli, False))
+    DrawingAids.HelperTrabajo = ("Angle") & " = " & Str(puntos.PoligonLength(poli, False))
 
   Endif
 
   gcd.clsJobPrevious = Me
   gcd.clsJob = clsDefaultJob
   clsEntities.DeSelection()
-  appmain.regen
+  AppMain.regen
   Me.Active = False
   gcd.ToolActive = False
 

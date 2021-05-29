@@ -1,6 +1,6 @@
 ' Gambas class file
 
-' GauchoCAD
+' m-designer
 ' A simple CAD made in Gambas
 '
 ' Copyright (C) Ing Martin P Cristia
@@ -46,22 +46,46 @@ Public StepsDone As Integer                 ' esto lo cambia cls ElementBuilder 
 
 Private Const isOpen As Boolean = False
 
-' JSON and DXF Read/Export
-Public Const JSON_Reading As Boolean = True
-Public Const JSON_Export As Boolean = False
+' DXF Read/Export
 
 Public Const DXF_Reading As Boolean = True
 Public Const DXF_Export As Boolean = True
 
 ' fParam helpers
-Public Const TotalParams As Integer = 1
-Public Const ipaPolylineClosed As Integer = 0
+' Public Const TotalParams As Integer = 4
+' Public Const ipaPolylineClosed As Integer = 0
+' Public Const ipaBulged As Integer = 1
+' Public Const ipaReserved2 As Integer = 2
+' Public Const ipaBulges As Integer = 3  ' en adelante
+
+' iParam helpers
+Public Const iTotalParams As Integer = 2
+Public Const iiiPolylineClosed As Integer = 0
+Public Const iiiBulged As Integer = 1
+
+'' Creates a new LWpolyline entity and prepares arrays
+Public Function NewEntity() As Entity
+
+  Dim e As New Entity
+
+  e.Gender = Me.Gender
+  e.ClassHandler = Me
+  e.iParam.Insert([0, 0])
+  e.P.Insert([0, 0])
+
+  ' this may fails on some scopes, but we should Try
+  Try e.pLayer = gcd.CurrentDrawing.CurrLayer
+  Try e.colour = gcd.CurrentDrawing.CurrColor
+  Try e.LineType = gcd.CurrentDrawing.CurrLineType
+  Try e.LineWidth = gcd.CurrentDrawing.CurrLineWt
+
+  Return e
+
+End
 
 ' The entity handler receives a user action, and returns the number of expected parameter
 ' If definitive = true, means the parameter is set
 Public Function NewParameter(eBuild As Entity, vParam As Variant[], Optional Definitive As Boolean = False) As Boolean
-
-  If eBuild.fParam.Count = 0 Then eBuild.fParam.Add(0)
 
   If vParam[0] = "point" Then
     eBuild.DrawAble = True
@@ -133,18 +157,91 @@ Public Sub Draw(oE As Entity)
 
   If Not oE.Visible Then Return
 
-  oE.ColorToPaint = gcd.GetGBColor(oE.colour, oE.Layerid)
+  oE.ColorToPaint = gcd.GetGBColor(oE.colour, oE.pLayer)
 
   If oe.fParam.Count = 0 Then oe.fParam.Add(0)
 
-  GLplus.PolyLines(oE.p, oE.ColorToPaint, oE.LineWidth, oe.linetype, oe.fParam[Me.ipaPolylineClosed])
+  ' version con bulges
+  Dim ang1, mx, my, B, bx, by, Lt As Float
+  Dim i As Integer
+  Dim fArcParams As Float[]
+
+  If oe.iParam[Me.iiiBulged] Then
+    For i = 0 To oe.P.Count / 2 - 2
+
+      ' no todos los tramos pueden tener bulges
+      If Abs(oe.fParam[i]) > 0.001 Then
+        ang1 = Ang(oe.P[(i + 1) * 2] - oe.P[i * 2], oe.P[(i + 1) * 2 + 1] - oe.P[i * 2 + 1])    ' angulo del tramo
+        Lt = puntos.distancia(oe.P[i * 2], oe.P[i * 2 + 1], oe.P[(i + 1) * 2], oe.P[(i + 1) * 2 + 1])
+        If Lt = 0 Then Continue
+        mx = (oe.P[(i + 1) * 2] + oe.P[i * 2]) / 2          ' punto medio del tramo
+        my = (oe.P[(i + 1) * 2 + 1] + oe.P[i * 2 + 1]) / 2
+        B = oe.fParam[i] * Lt / 2
+        bx = mx + B * Sin(ang1)                             ' Tercer punto del Bulge
+        by = my - B * Cos(ang1)
+
+        ' gl.PointSize(2)
+        ' gl.Begin(gl.POINTS)
+        ' gl.Vertex2f(oe.P[i * 2], oe.P[i * 2 + 1])
+        ' gl.Vertex2f(bx, by)
+        ' gl.Vertex2f(oe.P[(i + 1) * 2], oe.P[(i + 1) * 2 + 1])
+
+        ' aqui podria usar una rutina de arco entre 3 puntos
+        fArcParams = puntos.Arc3Point(oe.P[i * 2], oe.P[i * 2 + 1], bx, by, oe.P[(i + 1) * 2], oe.P[(i + 1) * 2 + 1])
+        ' traslado el centro
+
+        ' gl.Vertex2f(fArcParams[0], fArcParams[1])
+        ' gl.End
+        gl.Translatef(fArcParams[0], fArcParams[1], 0)
+
+        ' verifico Start_Angle y End_Angle (esta parte esta intimamente ligada a Arc3Point)
+        ' las combinaciones de angulos son diversas, Arc3Point puede no funcionar bien en otra circunstancia
+
+        If fArcParams[3] > 0 And fArcParams[4] > 0 Then
+
+        Else If fArcParams[3] > 0 And fArcParams[4] < 0 Then
+
+          Swap fArcParams[3], fArcParams[4]
+          ' fArcParams[4] += 2 * Pi
+          '
+          ' fArcParams[3] = 0
+          ' fArcParams[4] = 0
+
+        Else If fArcParams[3] < 0 And fArcParams[4] < 0 Then
+          fArcParams[3] += 2 * Pi
+          fArcParams[4] += 2 * Pi
+
+        Else If fArcParams[3] < 0 And fArcParams[4] > 0 Then
+          fArcParams[3] += 2 * Pi
+
+        Endif
+
+        If fArcParams[3] > fArcParams[4] Then Swap fArcParams[3], fArcParams[4]
+
+        'Debug fArcParams[3], fArcParams[4]
+        'If fArcParams[3] > fArcParams[4] Then Stop
+        glPlus.Arc(fArcParams[2], fArcParams[3], fArcParams[4] - fArcParams[3], oE.ColorToPaint, oE.LineWidth, oe.linetype.Index)
+        gl.Translatef(-fArcParams[0], -fArcParams[1], 0)
+        fArcParams = Null
+
+      Else    ' dibujo la linea normalmente
+
+        glPlus.Lines([oe.P[i * 2], oe.P[i * 2 + 1], oe.P[(i + 1) * 2], oe.P[(i + 1) * 2 + 1]], oE.ColorToPaint, oE.LineWidth, oe.linetype.Index)
+      End If
+
+    Next
+  Else
+
+    GLplus.PolyLines(oE.p, oE.ColorToPaint, oE.LineWidth, oe.linetype.Index, oe.iParam[Me.iiiPolylineClosed])
+
+  End If
 
 End
 
 Public Sub DrawSelected(oE As Entity)
 
-  GLplus.PolyLines(oE.P, Starter.flgWindowBackColor, oE.LineWidth, gcd.stiDashed, oe.fParam[Me.ipaPolylineClosed])
-  GLplus.PolyLines(oE.P, gcd.ColorForSelected, oE.LineWidth, oE.LineType, oe.fParam[Me.ipaPolylineClosed])
+  GLplus.PolyLines(oE.P, gcd.flgWindowBackColor, oE.LineWidth, gcd.stiDashed, oe.iParam[Me.iiiPolylineClosed])
+  GLplus.PolyLines(oE.P, gcd.ColorForSelected, oE.LineWidth, oE.LineType.Index, oe.iParam[Me.iiiPolylineClosed])
 
 End
 
@@ -153,29 +250,21 @@ Public Sub DrawRemark(oE As Entity)
 
   If Not oE.Visible Then Return
 
-  '  GLplus.PolyLines(oE.p, Starter.flgWindowBackColor, oE.LineWidth, gcd.stiDashed)
+  '  GLplus.PolyLines(oE.p, gcd.flgWindowBackColor, oE.LineWidth, gcd.stiDashed)
   '  GLplus.PolyLines(oE.p, oE.ColorToPaint, oE.LineWidth + 2, oE.LineType)
   If oe.Selected Then
-    GLplus.PolyLines(oE.P, Starter.flgWindowBackColor, oE.LineWidth + 2, gcd.stiDashed)
-    GLplus.PolyLines(oE.P, gcd.ColorForSelected, oE.LineWidth + 2, oE.LineType)
+    GLplus.PolyLines(oE.P, gcd.flgWindowBackColor, oE.LineWidth + 2, gcd.stiDashed)
+    GLplus.PolyLines(oE.P, gcd.ColorForSelected, oE.LineWidth + 2, oe.linetype.index)
   Else
-    GLplus.PolyLines(oE.P, Starter.flgWindowBackColor, oE.LineWidth, gcd.stiDashed)
-    GLplus.PolyLines(oE.P, oE.ColorToPaint, oE.LineWidth + 2, oE.LineType)
+    GLplus.PolyLines(oE.P, gcd.flgWindowBackColor, oE.LineWidth, gcd.stiDashed)
+    GLplus.PolyLines(oE.P, oE.ColorToPaint, oE.LineWidth + 2, oe.linetype.index)
   Endif
 
 End
 
 Public Function Draw2(oE As Entity)
 
-  Dim i As Integer
-
-  paint.moveto(oE.p[0], oE.p[1])
-  For i = 2 To oE.P.Max Step 2
-    paint.lineto(oE.p[i], oE.p[i + 1])
-
-  Next
-
-  paint.Stroke
+  paintPlus.Lines(oe.p)
 
 End
 
@@ -204,9 +293,9 @@ Public Function BuildPOI(oE As Entity, Optional arrIndex As Integer = -1) As Int
     'oe.poiEntities.Add(arrIndex)
 
     ' line
-    'gcd.CurrentDrawing.poiLines.insert([oE.p[i], oE.p[i + 1], oE.p[i + 2], oE.p[i + 3]])
-    'gcd.CurrentDrawing.poiLinesEntities.Add(arrIndex)
-    ' gcd.CurrentDrawing.poiLinesRelPoint.Insert([i / 2, i / 2 + 1])
+    'gcd.CurrDrawing.poiLines.insert([oE.p[i], oE.p[i + 1], oE.p[i + 2], oE.p[i + 3]])
+    'gcd.CurrDrawing.poiLinesEntities.Add(arrIndex)
+    ' gcd.CurrDrawing.poiLinesRelPoint.Insert([i / 2, i / 2 + 1])
 
   Next
 
@@ -220,10 +309,10 @@ Public Sub Finish(oE As Entity) As Boolean
   'CreatePolygon(oe)
 
   If oe.fParam.Count = 0 Then oe.fParam.Add(0)
-  BuildPOI(oe)
+  '  BuildPOI(oe)
 
   ' busco el tipo de linea, si hace falta
-  If oE.LineTypeName = "Dashed" Then oE.LineType = 1
+
   ' tareas finales de armado del objeto
 
   oE.psel.resize(oE.p.count / 2)
@@ -231,6 +320,68 @@ Public Sub Finish(oE As Entity) As Boolean
   oE.DrawAble = True
   oE.Selected = False
   oE.Finished = True
+
+End
+
+Public Sub ExportDXFCol(e As Entity, ByRef cExport As Collection) As Boolean
+
+  Dim i, IMAX As Integer
+
+  cExport.Add("LWPOLYLINE", dxf.codEntity)
+  clsEntities.DXFExportCommonCol(e, cExport)
+  cExport.Add("AcDbPolyline", "100")
+  cExport.Add(e.P.Count / 2, "90")              ' n puntos
+  cExport.Add(CStr(e.iParam[Me.iiiPolylineClosed]), "70")      ' abierta =1 o cerrada =0
+  cExport.Add("0", "43")
+  imax = e.P.max
+  If e.iParam[Me.iiiPolylineClosed] Then imax -= 2
+  For i = 0 To e.p.Max Step 2
+    cExport.Add(CStr(e.p[i]), dxf.codX0 & "_" & CStr(i / 2))
+    cExport.Add(CStr(e.p[i + 1]), dxf.codY0 & "_" & CStr(i / 2))
+
+    If i / 2 <= e.fParam.max Then cExport.Add(CStr(e.fParam[i / 2]), "42" & "_" & CStr(i / 2))
+  Next
+
+End
+
+Public Function ImportDXF(e As Entity, sClaves As String[], sValues As String[]) As Boolean
+
+  Dim i As Integer
+  Dim FirstBulge As Boolean
+  Dim NewTrame As Boolean
+  Dim BulgeAdded As Boolean
+
+  e.P.Clear
+  For i = 0 To sClaves.Max
+
+    'If sClaves[i] = "90" Then mPolyLine.vertexcount = Val(sValues[i])
+    'If sClaves[i] = "70" Then e.fParam[Me.ipaPolylineClosed] = CInt(sValues[i])       ' 0 = abierta, 1 = cerrada
+    If sClaves[i] = "70" Then e.iParam[Me.iiiPolylineClosed] = CInt(sValues[i])        ' 0 = abierta, 1 = cerrada
+    If sClaves[i] = "10" Then
+      e.p.Add(CFloat(sValues[i]))
+
+      e.fParam.Add(0) ' faux bulge
+
+    End If
+    If sClaves[i] = "20" Then e.p.Add(CFloat(sValues[i]))
+
+    If sClaves[i] = "42" Then
+      e.iParam[Me.iiiBulged] = 1
+      e.fParam[E.fParam.Max] = CFloat(sValues[i])
+
+    End If
+  Next
+
+  If e.iParam[Me.iiiPolylineClosed] And e.p.Count > 0 Then ' agrego el primer punto de nuevo
+    e.p.Add(e.p[0])
+    e.p.Add(e.p[1])
+  End If
+
+  Return True
+
+  ' catch
+
+  Return False
 
 End
 
@@ -281,47 +432,3 @@ End
 ' ],
 ' "bulges": [ el panceado de la polilinea, se usan en las nubes de revision por ejemplo,
 ' es una lista de valores Float, uno por vertice
-
-Public Sub ExportDXF(e As Entity, hFile As File)
-
-  Dim i As Integer
-
-  Print #hFIle, "  0"                       ' Entity type
-  Print #hFIle, "LWPOLYLINE"
-  clsEntities.DXFExportCommon(e, hFile)
-  Print #hFIle, "100"                     ' Subclass marker
-  Print #hFIle, "AcDbPolyline"
-  Print #hFIle, " 90"                      ' cantidad de puntos
-  Print #hFIle, e.p.Count
-  Print #hFIle, " 70"                      ' 0 = abierta; 1 = cerrada
-  Print #hFIle, "0"
-  Print #hFIle, " 43"                      ' constant width  0 = constant
-  Print #hFIle, "0"
-  For i = 0 To e.p.Max Step 2
-    Print #hFIle, " 10"                      ' Xi
-    Print #hFIle, CStr(e.p[i])
-    Print #hFIle, " 20"                      ' Yi
-    Print #hFIle, CStr(e.p[i + 1])
-  Next
-
-End
-
-Public Function ImportDXF(e As Entity, sClaves As String[], sValues As String[]) As Boolean
-
-  Dim i As Integer
-
-  For i = 0 To sClaves.Max
-
-    'If sClaves[i] = "90" Then mPolyLine.vertexcount = Val(sValues[i])
-    If sClaves[i] = "70" Then e.fParam.Add(CInt(sValues[i]))       ' 0 = abierta, 1 = cerrada
-    If sClaves[i] = "10" Then e.p.Add(CFloat(sValues[i]))
-    If sClaves[i] = "20" Then e.p.Add(CFloat(sValues[i]))
-
-  Next
-  If e.fParam.Count = 0 Then e.fParam.Add(0)
-  If e.fParam[0] = 1 And e.p.Count > 0 Then ' agrego el primer punto de nuevo
-    e.p.Add(e.p[0])
-    e.p.Add(e.p[1])
-  End If
-
-End

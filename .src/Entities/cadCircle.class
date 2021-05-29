@@ -1,6 +1,6 @@
 ' Gambas class file
 
-' GauchoCAD
+' m-designer
 ' A simple CAD made in Gambas
 '
 ' Copyright (C) Ing Martin P Cristia
@@ -20,6 +20,7 @@
 ' Foundation, Inc., 51 Franklin St, Fifth Floor,
 ' Boston, MA  02110-1301  USA
 Create Static
+
 'Fast
 
 Public Const Gender As String = "Circle"
@@ -41,12 +42,30 @@ Public Visible As Boolean = True            ' si esta entidad puede ser mostrada
 Public Finished As Boolean = False          ' colocar en true cuando se llegue a completar
 Public StepsDone As Integer                 ' esto lo cambia cls ElementBuilder durante la construccion
 
-' JSON and DXF Read/Export
-Public Const JSON_Reading As Boolean = True
-Public Const JSON_Export As Boolean = False
+' DXF Read/Export
 
 Public Const DXF_Reading As Boolean = True
 Public Const DXF_Export As Boolean = True
+
+'' Creates a new LWpolyline entity and prepares arrays
+Public Function NewEntity() As Entity
+
+  Dim e As New Entity
+
+  e.Gender = Me.Gender
+  e.ClassHandler = Me
+  e.fParam.Insert([0])
+  e.P.Insert([0, 0])
+
+  ' this may fails on some scopes, but we should Try
+  Try e.pLayer = gcd.CurrentDrawing.CurrLayer
+  Try e.colour = gcd.CurrentDrawing.CurrColor
+  Try e.LineType = gcd.CurrentDrawing.CurrLineType
+  Try e.LineWidth = gcd.CurrentDrawing.CurrLineWt
+
+  Return e
+
+End
 
 ' The entity handler receives a user action, and returns the number of expected parameter
 ' If definitive = true, means the parameter is set
@@ -126,9 +145,19 @@ End
 
 Public Sub Draw(oE As Entity)
 
-  Dim x, y, theta, angle_increment As Float
-
   If Not oE.Visible Then Return
+
+  'gl.End
+
+  oE.ColorToPaint = gcd.GetGBColor(oE.colour, oE.pLayer)
+
+  glPlus.Circle(oE.p, oe.fParam[0], oe.ColorToPaint, False, oE.LineWidth, oE.LineType.index)
+
+End
+
+Public Sub makepolyline(oe As Entity)
+
+  Dim x, y, theta, angle_increment As Float
 
   oE.polyline.Clear
   'GL.Begin(gl.LINE_STRIP)
@@ -141,19 +170,14 @@ Public Sub Draw(oE As Entity)
     oE.polyline.Add(y)
 
   Next
-  'gl.End
-
-  oE.ColorToPaint = gcd.GetGBColor(oE.colour, oE.Layerid)
-
-  glPlus.Circle(oE.p, oe.fParam[0], oe.ColorToPaint, False, oe.LineWidth, oe.LineType)
 
 End
-
 '' A fat version of the entity
+
 Public Sub DrawSelected(oE As Entity)
 
-  GLplus.PolyLines(oE.PolyLine, Starter.flgWindowBackColor, oE.LineWidth, gcd.stiDashed)
-  GLplus.PolyLines(oE.PolyLine, gcd.ColorForSelected, oE.LineWidth, oE.LineType)
+  GLplus.PolyLines(oE.PolyLine, gcd.flgWindowBackColor, oE.LineWidth, gcd.stiDashed)
+  GLplus.PolyLines(oE.PolyLine, gcd.ColorForSelected, oE.LineWidth, oE.LineType.index)
 
 End
 
@@ -161,11 +185,11 @@ End
 Public Sub DrawRemark(oE As Entity)
 
   If oe.Selected Then
-    GLplus.PolyLines(oE.PolyLine, Starter.flgWindowBackColor, oE.LineWidth + 2, gcd.stiDashed)
-    GLplus.PolyLines(oE.PolyLine, gcd.ColorForSelected, oE.LineWidth + 2, oE.LineType)
+    GLplus.PolyLines(oE.PolyLine, gcd.flgWindowBackColor, oE.LineWidth + 2, gcd.stiDashed)
+    GLplus.PolyLines(oE.PolyLine, gcd.ColorForSelected, oE.LineWidth + 2, oe.linetype.index)
   Else
-    GLplus.PolyLines(oE.PolyLine, Starter.flgWindowBackColor, oE.LineWidth, gcd.stiDashed)
-    GLplus.PolyLines(oE.PolyLine, oE.ColorToPaint, oE.LineWidth + 2, oE.LineType)
+    GLplus.PolyLines(oE.PolyLine, gcd.flgWindowBackColor, oE.LineWidth, gcd.stiDashed)
+    GLplus.PolyLines(oE.PolyLine, oE.ColorToPaint, oE.LineWidth + 2, oe.linetype.index)
   Endif
 
 End
@@ -185,6 +209,7 @@ Public Function BuildPOI(oE As Entity) As Integer
 
   oe.PoiPoints.Clear
   oe.PoiType.Clear
+  oe.Polygon.Clear
 
   ' CENTER
   oe.poiPoints.insert([oE.p[0], oE.p[1]])
@@ -206,6 +231,8 @@ Public Function BuildPOI(oE As Entity) As Integer
   oe.poiPoints.insert([oE.p[0], oE.p[1] - oe.fParam[0]])
   oe.poiType.Add(gcd.poiQuadrant)
 
+  oe.Polygon.Insert(oe.PoiPoints)
+
 End
 ' This function will return False if the element couldn't be created for some reason: bad or incomple user input
 ' True means all is good, False will instruct the clsEntityBuilder to delete it
@@ -214,17 +241,51 @@ Public Sub Finish(oE As Entity) As Boolean
 
   'Print "Finish en EntityBase"
   'CreatePolygon(oe)
-  BuildPOI(oe)
+  '  BuildPOI(oe)
 
   ' busco el tipo de linea, si hace falta
-  If oE.LineTypeName = "Dashed" Then oE.LineType = 1
+
   ' tareas finales de armado del objeto
+  Me.makepolyline(oe)
 
   oE.psel.resize(oE.p.count / 2)
 
   oE.DrawAble = True
   oE.Selected = False
   oE.Finished = True
+
+End
+
+Public Sub ExportDXFCol(e As Entity, ByRef cExport As Collection) As Boolean
+
+  cExport.Add("CIRCLE", dxf.codEntity)
+  clsEntities.DXFExportCommonCol(e, cExport)
+  cExport.Add("AcDbCircle", "100")
+  cExport.Add(CStr(e.p[0]), dxf.codCenterX)
+  cExport.Add(CStr(e.p[1]), dxf.codCenterY)
+  cExport.Add(CStr(e.fParam[0]), dxf.codRadius)
+
+End
+
+Public Function ImportDXF(e As Entity, sClaves As String[], sValues As String[]) As Boolean
+
+  Dim i As Integer
+
+  e.P.Clear
+  For i = 0 To sClaves.Max
+    If sClaves[i] = "10" Then e.P.Add(CFloat(sValues[i]))
+    If sClaves[i] = "20" Then e.P.Add(CFloat(sValues[i]))
+    If sClaves[i] = "40" Then e.fParam[0] = (CFloat(sValues[i]))
+  Next
+
+  If e.fParam.Count = 0 Then Stop ' e.fParam.Add(0)  ' TODO: averiguar q pasa aca q algunas entidades CIRCLE
+  ' vienen sin el radio
+
+  Return True
+
+  ' catch
+
+  Return False
 
 End
 
@@ -242,38 +303,6 @@ Catch
   Return False
 
 End
-
-Public Sub ExportDXF(e As Entity, hFile As File)
-
-  Print #hFIle, "  0"
-  Print #hFIle, "CIRCLE"
-  clsEntities.DXFExportCommon(e, hFile)
-  Print #hFIle, "100"
-  Print #hFIle, "AcDbCircle"
-  Print #hFIle, " 10"                      ' X0
-  Print #hFIle, CStr(e.p[0])
-  Print #hFIle, " 20"                      ' Y0
-  Print #hFIle, CStr(e.P[1])
-  Print #hFIle, " 40"                      ' radious
-  Print #hFIle, CStr(e.fParam[0])
-
-End
-
-Public Function ImportDXF(e As Entity, sClaves As String[], sValues As String[]) As Boolean
-
-  Dim i As Integer
-
-  For i = 0 To sClaves.Max
-    If sClaves[i] = "10" Then e.P.Add(CFloat(sValues[i]))
-    If sClaves[i] = "20" Then e.P.Add(CFloat(sValues[i]))
-    If sClaves[i] = "40" Then e.fParam.Add(CFloat(sValues[i]))
-  Next
-
-  If e.fParam.Count = 0 Then Stop ' e.fParam.Add(0)  ' TODO: averiguar q pasa aca q algunas entidades CIRCLE
-  ' vienen sin el radio
-
-End
-
 '    "entity": "CIRCLE",
 '    "index": 401,
 '    "type": 18,

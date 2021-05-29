@@ -1,6 +1,6 @@
 ' Gambas class file
 
-' GauchoCAD
+' m-designer
 ' A simple CAD made in Gambas
 '
 ' Copyright (C) Ing Martin P Cristia
@@ -27,7 +27,7 @@ Public Const Gender As String = "Pan"
 
 Public Function Start(Optional ElemToBuild As Variant, Optional _Mode As Integer = 0) As Boolean
 
-  clsDrawingAids.HelperTrabajo = ("Panning")
+  DrawingAids.HelperTrabajo = ("Panning")
 
 End
 
@@ -35,14 +35,15 @@ Public Function MouseDown(mouseX As Integer, mouseY As Integer) ' called by FCAD
 
   Me.SelStartX = mouseX
   Me.SelStartY = mouseY
-  appmain.glarea1.Mouse = Mouse.SizeAll
+  AppMain.glarea1.Mouse = Mouse.SizeAll
   Me.active = True
 
 End
 
 Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' called by FCAD-> DrawingArea_MouseUp
 
-  appmain.glarea1.Mouse = Mouse.Cross
+  AppMain.glarea1.Mouse = Mouse.Cross
+  AppMain.flgNewPosition = True
   Me.active = False
 
 End
@@ -55,6 +56,6 @@ Public Function MouseMove(mouseX As Integer, mouseY As Integer) ' called by FCAD
 
   Me.SelStartX = mouseX
   Me.SelStartY = mouseY
-  appmain.redraw
+  gcd.Redraw
 
 End

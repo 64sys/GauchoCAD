@@ -61,6 +61,100 @@ Public LOD As Integer = 200
 Public g_points As New Float[]
 Public Knots As New Float[]
 
+'' Creates a new LWpolyline entity and prepares arrays
+Public Function NewEntity() As Entity
+
+  Dim e As New Entity
+
+  e.Gender = Me.Gender
+  e.ClassHandler = Me
+  e.fParam.Insert([0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+  e.P.Insert([0, 0])
+
+  ' this may fails on some scopes, but we should Try
+  Try e.pLayer = gcd.CurrentDrawing.CurrLayer
+  Try e.colour = gcd.CurrentDrawing.CurrColor
+  Try e.LineType = gcd.CurrentDrawing.CurrLineType
+  Try e.LineWidth = gcd.CurrentDrawing.CurrLineWt
+
+  Return e
+
+End
+
+Public Function NewParameter(eBuild As Entity, vParam As Variant[], Optional Definitive As Boolean = False) As Boolean
+
+  Dim fKnots As New Float[]
+
+  Dim i As Integer
+
+  If eBuild.fParam.Count = 0 Then
+
+  Endif
+  eBuild.fParam[Me.ipaFlag] = 8
+  ' 70' Spline flag(bit coded):
+  ' 1 = Closed spline
+  ' 2 = Periodic spline
+  ' 4 = Rational spline
+  ' 8 = Planar
+  ' 16 = Linear(planar bit Is Also set)
+  eBuild.fParam[Me.ipaDegree] = 2 'quadrtic; 3 = cubic
+  eBuild.fParam[Me.ipaKnotTolerance] = 0.0000001
+  eBuild.fParam[Me.ipaControlTolerance] = 0.0000001
+  eBuild.fParam[Me.ipaFitTolerance] = 0.0000000001
+
+  If vParam[0] = "point" Then
+    eBuild.DrawAble = True
+
+    eBuild.P[eBuild.P.Max - 1] = vParam[1]
+    eBuild.P[eBuild.P.Max] = vParam[2]
+    GoSub DoKnots
+    If definitive Then
+
+      eBuild.P.Insert(eBuild.P.Copy(eBuild.P.Max - 1, 2))
+      GoSub DoKnots
+      Return True
+    End If
+  Else If vParam[0] = "close" Then
+    If eBuild.P.Count > 4 Then eBuild.P.Remove(eBuild.P.Max - 1, 2)
+
+    Return True
+
+  Else If vParam[0] = "undo" Then
+    If eBuild.P.Count > 4 Then
+      eBuild.P.Remove(eBuild.P.Max - 1, 2)
+      GoSub DoKnots
+    End If
+
+    Return True
+
+  Endif
+
+DoKnots:
+
+  fKnots.Clear
+
+  fKnots.Add(0)
+  fKnots.Add(0)
+  fKnots.Add(0)
+
+  If eBuild.P.Count / 2 > 3 Then
+    For i = 1 To eBuild.P.count / 2 - 3
+      fKnots.Add(i / ((eBuild.P.count / 2 - 2)))
+    Next
+  End If
+  fKnots.Add(1)
+  fKnots.Add(1)
+  fKnots.Add(1)
+
+  eBuild.fParam.Remove(Me.TotalParams, eBuild.fParam.Count - Me.TotalParams)
+  eBuild.fParam.Insert(fKnots.Copy(), Me.TotalParams)
+
+  eBuild.fParam[Me.ipaTotalKnots] = fKnots.Count
+
+  Return
+
+End
+
 Public Sub Translate(e As Entity, dX As Float, dY As Float, Optional OnlySelected As Boolean = False)
 
   Dim i As Integer
@@ -102,6 +196,165 @@ Public Sub Scale(e As Entity, sX As Float, sY As Float)
 
 End
 
+'' A fat version of the entity
+Public Sub DrawSelected(oE As Entity)
+
+  GLplus.PolyLines(oE.PolyLine, gcd.flgWindowBackColor, oE.LineWidth, gcd.stiDashed)
+  GLplus.PolyLines(oE.PolyLine, gcd.ColorForSelected, oE.LineWidth, oE.LineType.index)
+
+End
+
+'' A fat version of the line
+Public Sub DrawRemark(oE As Entity)
+
+  If Not oE.Visible Then Return
+
+  '  GLplus.PolyLines(oE.p, gcd.flgWindowBackColor, oE.LineWidth, gcd.stiDashed)
+  '  GLplus.PolyLines(oE.p, oE.ColorToPaint, oE.LineWidth + 2, oE.LineType)
+  If oe.Selected Then
+    GLplus.PolyLines(oE.PolyLine, gcd.flgWindowBackColor, oE.LineWidth + 2, gcd.stiDashed)
+    GLplus.PolyLines(oE.PolyLine, gcd.ColorForSelected, oE.LineWidth + 2, oe.linetype.index)
+  Else
+    GLplus.PolyLines(oE.PolyLine, gcd.flgWindowBackColor, oE.LineWidth, gcd.stiDashed)
+    GLplus.PolyLines(oE.PolyLine, oE.ColorToPaint, oE.LineWidth + 2, oe.linetype.index)
+  Endif
+
+End
+
+Public Sub Draw2(oE As Entity)
+
+  paintPlus.Lines(oe.PolyLine)
+
+End
+'' Creo los puntos de interes
+'' Build point of interest
+
+Public Function BuildPOI(oE As Entity, Optional arrIndex As Integer = -1) As Integer
+
+  cadLWPolyline.BuildPOI(oe)
+
+End
+
+' This function will return False if the element couldn't be created for some reason: bad or incomple user input
+' True means all is good, False will instruct the clsEntityBuilder to delete it
+Public Sub Finish(oE As Entity) As Boolean
+
+  'Print "Finish en EntityBase"
+  'CreatePolygon(oe)
+  '  BuildPOI(oe)
+
+  ' busco el tipo de linea, si hace falta
+
+  ' tareas finales de armado del objeto
+
+  oE.psel.resize(oE.p.count / 2)
+
+  oE.DrawAble = True
+  oE.Selected = False
+  oE.Finished = True
+
+End
+
+Public Sub ExportDXFCol(e As Entity, ByRef cExport As Collection) As Boolean
+
+  Dim i As Integer
+
+  cExport.Add("SPLINE", dxf.codEntity)
+  clsEntities.DXFExportCommonCol(e, cExport)
+  cExport.Add("AcDbSpline", "100")
+  cExport.Add(CStr(e.fParam[Me.ipaFlag]), "70")
+  ' 70' Spline flag(bit coded):
+  ' 1 = Closed spline
+  ' 2 = Periodic spline
+  ' 4 = Rational spline
+  ' 8 = Planar
+  ' 16 = Linear(planar bit Is Also set)
+  cExport.Add(CStr(e.fParam[Me.ipaDegree]), "71")                 ' 2 = quadrtic; 3 = cubic
+  cExport.Add(CStr(e.fParam[Me.ipaTotalKnots]), "72")
+  cExport.Add(CStr(e.fParam[Me.ipaTotalControlPoints]), "73")
+  cExport.Add(CStr(e.fParam[Me.ipaTotalFitPoints]), "74")
+  cExport.Add(CStr(e.fParam[Me.ipaKnotTolerance]), "42")          ' 0.0000001
+  cExport.Add(CStr(e.fParam[Me.ipaControlTolerance]), "43")       ' 0.0000001
+  cExport.Add(CStr(e.fParam[Me.ipaFitTolerance]), "44")           ' 0.0000000001
+  For i = 1 To e.fParam[Me.ipaTotalKnots]
+    cExport.Add(CStr(e.fParam[Me.TotalParams + i - 1]), "40" & "_" & CStr(i))
+  Next
+  For i = 0 To e.p.Max Step 2
+    cExport.Add(CStr(e.p[i]), dxf.codX0 & "_" & CStr(i / 2))
+    cExport.Add(CStr(e.p[i + 1]), dxf.codY0 & "_" & CStr(i / 2))
+    cExport.Add("0", dxf.codZ0 & "_" & CStr(i / 2))
+  Next
+
+End
+
+Public Function ImportDXF(e As Entity, sClaves As String[], sValues As String[]) As Boolean
+
+  Dim i As Integer
+  Dim Pbase As New Float[]
+  Dim Ptang1 As New Float[]
+  Dim Ptang2 As New Float[]
+
+  e.P.Clear
+  For i = 0 To sClaves.Max
+
+    If sClaves[i] = "70" Then e.fParam[Me.ipaFlag] = CInt(sValues[i])
+    If sClaves[i] = "71" Then e.fParam[Me.ipaDegree] = CInt(sValues[i])
+    If sClaves[i] = "72" Then e.fParam[Me.ipaTotalKnots] = CInt(sValues[i])
+    If sClaves[i] = "73" Then e.fParam[Me.ipaTotalControlPoints] = CInt(sValues[i])
+    If sClaves[i] = "74" Then e.fParam[Me.ipaTotalFitPoints] = CInt(sValues[i])
+    If sClaves[i] = "42" Then e.fParam[Me.ipaKnotTolerance] = CFloat(sValues[i])
+    If sClaves[i] = "43" Then e.fParam[Me.ipaControlTolerance] = CFloat(sValues[i])
+    If sClaves[i] = "44" Then e.fParam[Me.ipaFitTolerance] = CFloat(sValues[i])
+
+    ' Los Knots estan en el indice me.TotalParams en adelante
+    If sClaves[i] = "40" Then e.fParam.Add(CFloat(sValues[i]))
+
+    ' por lo general hay fit points o controls points, pero no ambos, cargo lo que sea en P
+    ' Control points
+    If sClaves[i] = "10" Then Pbase.Add(CFloat(sValues[i]))
+    If sClaves[i] = "20" Then Pbase.Add(CFloat(sValues[i]))
+
+    ' Estos Fitting points no se usan en la construccion, tengo que verificar si los necesitan otros programas para guardarlos y reescribirlos
+    'If sClaves[i] = "11" Then Pbase.Add(CFloat(sValues[i]))
+    'If sClaves[i] = "21" Then Pbase.Add(CFloat(sValues[i]))
+
+    ' tangentes, no se usan DXF
+    If sClaves[i] = "12" Then Ptang1.Add(CFloat(sValues[i]))
+    If sClaves[i] = "22" Then Ptang1.Add(CFloat(sValues[i]))
+
+    If sClaves[i] = "13" Then Ptang2.Add(CFloat(sValues[i]))
+    If sClaves[i] = "23" Then Ptang2.Add(CFloat(sValues[i]))
+
+  Next
+
+  ' con todos los datos recabados, armo el array
+
+  ' If Ptang1.Count > 0 Then
+  '     e.fParam[Me.ipaTang1] = 1
+  '     e.P.Add(Ptang1[0])
+  '     e.P.Add(Ptang1[1])
+  ' End If
+  e.P.Insert(Pbase.Copy(), e.P.Max)
+  '
+  ' If Ptang2.Count > 0 Then
+  '
+  '     e.fParam[Me.ipaTang2] = 1
+  '     e.P.Add(Ptang2[0])
+  '     e.P.Add(Ptang2[1])
+  ' End If
+
+  ' If e.fParam.Count = 0 Then e.fParam.Add(0)
+  ' If e.fParam[0] = 1 And e.p.Count > 0 Then ' agrego el primer punto de nuevo
+  '   e.p.Add(e.p[0])
+  '   e.p.Add(e.p[1])
+  ' End IfPtang
+  Return True
+
+  ' catch
+
+  Return False
+
+End
 
 Private Function CoxDeBoor(u As Float, i As Float, k As Float) As Float
 
@@ -206,9 +459,9 @@ Public Sub Draw(oE As Entity)
     OutPoint[1] = 0
   Next
   'gl.End()
-  oE.ColorToPaint = gcd.GetGBColor(oE.colour, oE.Layerid)
 
-  glPlus.PolyLines(oe.PolyLine, oe.ColorToPaint, oE.LineWidth, oE.LineType)
+  oE.ColorToPaint = gcd.GetGBColor(oE.colour, oE.pLayer)
+  glPlus.PolyLines(oe.PolyLine, oe.ColorToPaint, oE.LineWidth, oE.LineType.index)
 
   ' This is to draw the Control Points
 
@@ -221,67 +474,6 @@ Public Sub Draw(oE As Entity)
   ' gl.End()
 
 End
-
-
-'' A fat version of the entity
-Public Sub DrawSelected(oE As Entity)
-
-  GLplus.PolyLines(oE.PolyLine, Starter.flgWindowBackColor, oE.LineWidth, gcd.stiDashed)
-  GLplus.PolyLines(oE.PolyLine, gcd.ColorForSelected, oE.LineWidth, oE.LineType)
-
-End
-
-'' A fat version of the line
-Public Sub DrawRemark(oE As Entity)
-
-  If Not oE.Visible Then Return
-
-  '  GLplus.PolyLines(oE.p, Starter.flgWindowBackColor, oE.LineWidth, gcd.stiDashed)
-  '  GLplus.PolyLines(oE.p, oE.ColorToPaint, oE.LineWidth + 2, oE.LineType)
-  If oe.Selected Then
-    GLplus.PolyLines(oE.PolyLine, Starter.flgWindowBackColor, oE.LineWidth + 2, gcd.stiDashed)
-    GLplus.PolyLines(oE.PolyLine, gcd.ColorForSelected, oE.LineWidth + 2, oE.LineType)
-  Else
-    GLplus.PolyLines(oE.PolyLine, Starter.flgWindowBackColor, oE.LineWidth, gcd.stiDashed)
-    GLplus.PolyLines(oE.PolyLine, oE.ColorToPaint, oE.LineWidth + 2, oE.LineType)
-  Endif
-
-End
-
-Public Sub Draw2(oE As Entity)
-
-  paintPlus.Lines(oe.PolyLine)
-
-End
-'' Creo los puntos de interes
-'' Build point of interest
-
-Public Function BuildPOI(oE As Entity, Optional arrIndex As Integer = -1) As Integer
-
-  cadLWPolyline.BuildPOI(oe)
-
-End
-
-' This function will return False if the element couldn't be created for some reason: bad or incomple user input
-' True means all is good, False will instruct the clsEntityBuilder to delete it
-Public Sub Finish(oE As Entity) As Boolean
-
-  'Print "Finish en EntityBase"
-  'CreatePolygon(oe)
-  BuildPOI(oe)
-
-  ' busco el tipo de linea, si hace falta
-  If oE.LineTypeName = "Dashed" Then oE.LineType = 1
-  ' tareas finales de armado del objeto
-
-  oE.psel.resize(oE.p.count / 2)
-
-  oE.DrawAble = True
-  oE.Selected = False
-  oE.Finished = True
-
-End
-
 
 ' Importo los datos que puedo procesar de una coleccion y genero un Entity para ser agregado a un array
 Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
@@ -326,7 +518,6 @@ Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
     e.fParam.Add(c["knots"].Copy())
     e.fParam[Me.ipaTotalKnots] = c["knots"].Count
   Else
-
 
     fKnots.Clear
 
@@ -373,8 +564,6 @@ Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
     e.P.Insert([e.P[e.P.Max - 1] - c["end_tan_vec"][0] * fTangLargo, e.P[e.P.Max] - c["end_tan_vec"][1] * fTangLargo], e.P.max - 1)
 
   Endif
-
-
 
   ' puede habre tangentes
 
@@ -515,5 +704,3 @@ End
 '          "z": 0.0
 '        }
 '      ]
-
-

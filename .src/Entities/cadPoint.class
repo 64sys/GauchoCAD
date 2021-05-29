@@ -1,6 +1,6 @@
 ' Gambas class file
 
-' GauchoCAD
+' m-designer
 ' A simple CAD made in Gambas
 '
 ' Copyright (C) Ing Martin P Cristia
@@ -41,12 +41,29 @@ Public Visible As Boolean = True            ' si esta entidad puede ser mostrada
 Public Finished As Boolean = False          ' colocar en true cuando se llegue a completar
 Public StepsDone As Integer                 ' esto lo cambia cls ElementBuilder durante la construccion
 
-' JSON and DXF Read/Export
-Public Const JSON_Reading As Boolean = True
-Public Const JSON_Export As Boolean = False
+' DXF Read/Export
 
 Public Const DXF_Reading As Boolean = True
 Public Const DXF_Export As Boolean = True
+
+'' Creates a new LWpolyline entity and prepares arrays
+Public Function NewEntity() As Entity
+
+  Dim e As New Entity
+
+  e.Gender = Me.Gender
+  e.ClassHandler = Me
+  e.P.Insert([0, 0])
+
+  ' this may fails on some scopes, but we should Try
+  Try e.pLayer = gcd.CurrentDrawing.CurrLayer
+  Try e.colour = gcd.CurrentDrawing.CurrColor
+  Try e.LineType = gcd.CurrentDrawing.CurrLineType
+  Try e.LineWidth = gcd.CurrentDrawing.CurrLineWt
+
+  Return e
+
+End
 
 ' The entity handler receives a user action, and returns the number of expected parameter
 ' If definitive = true, means the parameter is set
@@ -108,7 +125,7 @@ Public Sub Draw(oE As Entity)
 
   If Not oE.Visible Then Return
   If Not oE.DrawAble Then Return
-  oE.ColorToPaint = gcd.GetGBColor(oE.colour, oE.Layerid)
+  oE.ColorToPaint = gcd.GetGBColor(oE.colour, oE.pLayer)
   gl.PointSize(oe.LineWidth)
   gl.Begin(gl.POINTS)
   gl.Vertex2f(oe.P[0], oe.P[1])
@@ -156,10 +173,12 @@ Public Sub Finish(oE As Entity) As Boolean
 
   'Print "Finish en EntityBase"
   'CreatePolygon(oe)
-  BuildPOI(oe)
+  If oe.fParam.Count = 0 Then oe.fParam.Add(0)
+
+  '  BuildPOI(oe)
 
   ' busco el tipo de linea, si hace falta
-  If oE.LineTypeName = "Dashed" Then oE.LineType = 1
+
   ' tareas finales de armado del objeto
 
   oE.psel.resize(oE.p.count / 2)
@@ -167,6 +186,39 @@ Public Sub Finish(oE As Entity) As Boolean
   oE.DrawAble = True
   oE.Selected = False
   oE.Finished = True
+
+End
+
+Public Sub ExportDXFCol(e As Entity, ByRef cExport As Collection) As Boolean
+
+  cExport.Add("POINT", dxf.codEntity)
+  clsEntities.DXFExportCommonCol(e, cExport)
+  cExport.Add("AcDbPoint", "100")
+  cExport.Add(CStr(e.p[0]), dxf.codX0)
+  cExport.Add(CStr(e.p[1]), dxf.codY0)
+  cExport.Add("0", DXF.codZ0)
+  cExport.Add(CStr(e.fParam[0]), "39")
+
+End
+
+Public Function ImportDXF(e As Entity, sClaves As String[], sValues As String[]) As Boolean
+
+  Dim i As Integer
+
+  e.P.Clear
+  For i = 0 To sClaves.Max
+
+    If sClaves[i] = "10" Then e.P.Add(CFloat(sValues[i]))
+    If sClaves[i] = "20" Then e.P.Add(CFloat(sValues[i]))
+    'If sClaves[i] = "30" Then e.P.Add(CFloat(sValues[i]))
+    If sClaves[i] = "39" Then e.fParam.Add(CFloat(sValues[i]))
+
+  Next
+  Return True
+
+  ' catch
+
+  Return False
 
 End
 
@@ -206,81 +258,5 @@ Public Function ImportJsonCol(c As JSONCollection, e As Entity) As Boolean
 Catch
 
   Return False
-
-End
-
-' "entity": "POINT",
-'     "index": 250,
-'     "type": 27,
-'     "handle": [0, 2684],
-'     "size": 37,
-'     "bitsize": 230,
-'     "_subclass": "AcDbEntity",
-'     "prev_entity": [12, 1, 56, 2628],
-'     "next_entity": [10, 1, 112, 2796],
-'     "layer": [5, 2, 2686, 2686],
-'     "preview_exists": 0,
-'     "entmode": 2,
-'     "nolinks": 0,
-'     "color": 256,
-'     "ltype_scale": 1.0,
-'     "ltype_flags": 0,
-'     "plotstyle_flags": 0,
-'     "invisible": 0,
-'     "linewt": 29,
-'     "_subclass": "AcDbPoint",
-'     "x": 109.27186553743178,
-'     "y": 146.75640050278344,
-'     "z": 0.0,
-'     "thickness": 0.000000,
-'     "extrusion": [0.0, 0.0, 1.0],
-'     "x_ang": 0.0
-Public Sub ExportDXF(e As Entity, hFile As File)
-
-  Print #hFIle, "  0"                       ' Entity type
-  Print #hFIle, "POINT"
-  clsEntities.DXFExportCommon(e, hFile)
-  Print #hFIle, "100"                     ' Subclass marker
-  Print #hFIle, "AcDbLine"
-  Print #hFIle, " 10"                      ' X0
-  Print #hFIle, CStr(e.p[0])
-  Print #hFIle, " 20"                      ' Y0
-  Print #hFIle, CStr(e.p[1])
-  Print #hFIle, " 30"                      ' Z0
-  Print #hFIle, "0" 'CStr(e.p[2])
-  Print #hFIle, " 39"                      ' Thickness
-  If e.fParam.Count > 0 Then
-    Print #hFIle, CStr(e.fParam[0])
-  Else
-    Print #hFIle, "0"
-  End If
-
-End
-
-' 100 Subclass marker(AcDbPoint)
-'
-' 10 Point location( In WCS) DXF: X value; APP: 3 D point
-'
-' 20, 30 DXF: Y And Z values Of point location( In WCS)
-'
-' 39 Thickness(Optional ; Default = 0)
-'
-' 210 Extrusion direction(Optional ; Default = 0, 0, 1) DXF: X value; APP: 3 D vector
-'
-' 220, 230 DXF: Y And Z values Of extrusion direction(Optional )
-'
-' 50 Angle Of the X axis For the UCS In effect when the point was drawn(Optional , Default = 0); used when PDMODE Is Nonzero
-Public Function ImportDXF(e As Entity, sClaves As String[], sValues As String[]) As Boolean
-
-  Dim i As Integer
-
-  For i = 0 To sClaves.Max
-
-    If sClaves[i] = "10" Then e.P.Add(CFloat(sValues[i]))
-    If sClaves[i] = "20" Then e.P.Add(CFloat(sValues[i]))
-    'If sClaves[i] = "30" Then e.P.Add(CFloat(sValues[i]))
-    If sClaves[i] = "39" Then e.fParam.Add(CFloat(sValues[i]))
-
-  Next
 
 End

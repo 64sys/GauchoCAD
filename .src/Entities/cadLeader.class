@@ -1,6 +1,6 @@
 ' Gambas class file
 
-' GauchoCAD
+' m-designer
 ' A simple CAD made in Gambas
 '
 ' Copyright (C) Ing Martin P Cristia
@@ -39,6 +39,26 @@ Public DrawAble As Boolean = False          ' True si durante la construccion ya
 Public Visible As Boolean = True            ' si esta entidad puede ser mostrada independientmente
 Public Finished As Boolean = False          ' colocar en true cuando se llegue a completar
 Public StepsDone As Integer                 ' esto lo cambia cls ElementBuilder durante la construccion
+
+'' Creates a new LWpolyline entity and prepares arrays
+Public Function NewEntity() As Entity
+
+  Dim e As New Entity
+
+  e.Gender = Me.Gender
+  e.ClassHandler = Me
+  e.fParam.Insert([0])
+  e.P.Insert([0, 0])
+
+  ' this may fails on some scopes, but we should Try
+  Try e.pLayer = gcd.CurrentDrawing.CurrLayer
+  Try e.colour = gcd.CurrentDrawing.CurrColor
+  Try e.LineType = gcd.CurrentDrawing.CurrLineType
+  Try e.LineWidth = gcd.CurrentDrawing.CurrLineWt
+
+  Return e
+
+End
 
 ' The entity handler receives a user action, and returns the number of expected parameter
 ' If definitive = true, means the parameter is set
@@ -127,7 +147,7 @@ Public Sub Draw(oE As Entity)
   angle = Ang((oE.p[oE.p.max - 1] - oE.p[oE.p.max - 3]), (oE.p[oE.p.max] - oE.p[oE.p.max - 2]))
   glPlus.DrawText(oE.stringdata[0], (oE.p[oE.p.max - 1] + oE.p[oE.p.max - 3]) / 2 - tRect[0] / 2, (oE.p[oE.p.Max] + oE.p[oE.p.max - 2]) / 2 + tRect[1] / 2, Angle, oe.fParam[0], oE.ColorToPaint)
   ' TODO: arrow head cuando tengamos los parametros de Dim , como ser tamaño de la flecha, etc
-  GLplus.PolyLines(oE.p, oE.ColorToPaint, oE.LineWidth, oe.linetype)
+  GLplus.PolyLines(oE.p, oE.ColorToPaint, oE.LineWidth, oE.LineType.index)
 
 End
 
@@ -135,8 +155,8 @@ End
 Public Sub DrawSelected(oE As Entity)
 
   GLplus.Polygon(oE.Polygon, gcd.ColorForSelected, oE.LineWidth, gcd.stiDashed)
-  GLplus.PolyLines(oE.p, Starter.flgWindowBackColor, oE.LineWidth, gcd.stiDashed)
-  GLplus.PolyLines(oE.p, gcd.ColorForSelected, oE.LineWidth, oE.LineType)
+  GLplus.PolyLines(oE.p, gcd.flgWindowBackColor, oE.LineWidth, gcd.stiDashed)
+  GLplus.PolyLines(oE.p, gcd.ColorForSelected, oE.LineWidth, oE.LineType.index)
 
 End
 
@@ -146,9 +166,9 @@ Public Sub DrawRemark(oE As Entity)
   If Not oE.Visible Then Return
 
   GLplus.Polygon(oE.Polygon, oE.ColorToPaint, oE.LineWidth, gcd.stiDashed)
-  GLplus.PolyLines(oE.p, Starter.flgWindowBackColor, oE.LineWidth, gcd.stiDashed)
-  GLplus.PolyLines(oE.p, oE.ColorToPaint, oE.LineWidth + 2, oE.LineType)
-  GLplus.lines([oE.P[0], oE.P[1], (oE.P[0] + oE.P[2]) / 8, (oE.P[1] + oE.P[3]) / 8], oE.ColorToPaint, oE.ColorToPaint, oE.LineWidth * 3, oe.LineType)
+  GLplus.PolyLines(oE.p, gcd.flgWindowBackColor, oE.LineWidth, gcd.stiDashed)
+  GLplus.PolyLines(oE.p, oE.ColorToPaint, oE.LineWidth + 2, oe.linetype.index)
+  GLplus.lines([oE.P[0], oE.P[1], (oE.P[0] + oE.P[2]) / 8, (oE.P[1] + oE.P[3]) / 8], oE.ColorToPaint, oE.ColorToPaint, oE.LineWidth * 3, oe.linetype.index)
 
 End
 
@@ -202,10 +222,10 @@ Public Sub Finish(oE As Entity) As Boolean
 
   'Print "Finish en EntityBase"
   'CreatePolygon(oe)
-  BuildPOI(oe)
+  '  BuildPOI(oe)
 
   ' busco el tipo de linea, si hace falta
-  If oE.LineTypeName = "Dashed" Then oE.LineType = 1
+
   ' tareas finales de armado del objeto
 
   oE.psel.resize(oE.p.count / 2)
@@ -213,16 +233,5 @@ Public Sub Finish(oE As Entity) As Boolean
   oE.DrawAble = True
   oE.Selected = False
   oE.Finished = True
-
-End
-
-' Importo los datos que puedo procesar de una coleccion y genero un Entity para ser agregado a un array
-Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
-
-  If c = Null Then Return
-
-Catch
-
-  Return False
 
 End

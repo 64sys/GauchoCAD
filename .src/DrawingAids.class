@@ -114,7 +114,7 @@ Public Sub DibujaHelper()
 
   HelperDibujo = ""
   If gcd.Orthogonal Then HelperDibujo = "F8-Ortho"
-  If puntos.Gridactive Then HelperDibujo = HelperDibujo & "  F7-Grid = " & Format$(puntos.GridSpacing, "0.00 m")
+  If appmain.Gridactive Then HelperDibujo = HelperDibujo & "  F7-Grid = " & Format$(appmain.GridSpacing, "0.00 m")
   ' and so on...
 
   texting(HelperDibujo, 40, 10 - appmain.glarea1.h / 2, Starter.flgWindowInfoColor) ' Tincho - toma color de la configuración
@@ -131,7 +131,7 @@ Public Sub DrawCoordenadas()
   ' helpers
   Dim l As String, l2 As String, lEsc As String
 
-  l = Format$(puntos.Near(appmain.Xreal(appmain.cursorX)), "0.00") & "mts : " & Format$(puntos.Near(appmain.Yreal(appmain.cursorY)), "0.00") & "mts"
+  l = Format$(gcd.Near(gcd.Xreal(appmain.cursorX)), "0.00") & "mts : " & Format$(gcd.Near(gcd.Yreal(appmain.cursorY)), "0.00") & "mts"
 
   '    l2 = "Mouse: " & Str$(puntos.cursorX) & ": " & Str$(puntos.cursorY)
 
@@ -144,7 +144,7 @@ Public Sub DrawCoordenadas()
 
   Dim e As Float, z As Float
   e = 1080 / 0.29 ' pixeles por metro segun el tamaño real de la pantalla
-  z = appmain.Metros(1) ' metros por pixel segun la ampliacion del usuario (rueda del mouse)
+  z = gcd.Metros(1) ' metros por pixel segun la ampliacion del usuario (rueda del mouse)
   lEsc = "Esc 1:" & Format$(1 / gcd.CurrentDrawing.ScaleZoom * 100 * ScreenDensity, "0")
 
   Texting(l, 10 - appmain.glarea1.w / 2, appmain.glarea1.h / 2 - 15, Starter.flgWindowInfoColor)

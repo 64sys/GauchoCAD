@@ -1,6 +1,6 @@
 ' Gambas class file
 
-' GauchoCAD
+' m-designer
 ' A simple CAD made in Gambas
 '
 ' Copyright (C) Ing Martin P Cristia
@@ -46,7 +46,7 @@ Public Function Start(Optional ElemToBuild As Variant, Optional _Mode As Integer
 
   If Me.ChamferSize = 0 Then Me.ChamferSize = 1
 
-  clsDrawingAids.HelperTrabajo = "Chamfer: " & ("enter size") & "[" & Str(Me.ChamferSize) & "]"
+  DrawingAids.HelperTrabajo = "Chamfer: " & ("enter size") & "[" & Str(Me.ChamferSize) & "]"
 
   clsEntities.DeSelection()           ' elimino cualquier seleccion previa
 
@@ -59,9 +59,9 @@ Public Function KeyText(EnteredText As String) ' esta rutina es llamada por FCAD
     Try Me.ChamferSize = Val(EnteredText)
 
     If Me.ChamferSize = 0 Then
-      clsDrawingAids.ErrorMessage = ("Bad input")
+      DrawingAids.ErrorMessage = ("Bad input")
     Else
-      clsDrawingAids.HelperTrabajo = ("Select first line")
+      DrawingAids.HelperTrabajo = ("Select first line")
       Me.PointsDone = 1
     End If
   End If
@@ -75,8 +75,8 @@ Public Function MouseDown(mouseX As Integer, mouseY As Integer) ' esta rutina es
   GripPoint = -1
   Me.SelStartX = mouseX
   Me.SelStartY = mouseY
-  Me.SelStartXr = AppMain.Xreal(Me.SelStartX)
-  Me.SelStartYr = AppMain.Yreal(Me.SelStartY)
+  Me.SelStartXr = gcd.Xreal(Me.SelStartX)
+  Me.SelStartYr = gcd.Yreal(Me.SelStartY)
 
   dX = Me.SelStartXr
   dY = Me.SelStartYr
@@ -97,7 +97,7 @@ Public Function MouseDown(mouseX As Integer, mouseY As Integer) ' esta rutina es
 
         Me.iEntity1 = gcd.CurrentDrawing.iEntity[3]
         clsEntities.SelectElem(gcd.CurrentDrawing.iEntity[3])                 '   -> la selecciono
-        clsDrawingAids.HelperTrabajo = ("Select second line")
+        DrawingAids.HelperTrabajo = ("Select second line")
         Me.PointsDone = 2
         AppMain.SelectionRefresh()
         Me.Active = False
@@ -146,10 +146,10 @@ Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' esta rutina es l
     If Me.SelStartY < Me.SelEndy Then Swap Me.SelStartY, Me.SelEndy                     ' this is FLIPPED
 
     ' Paso a coordenadas reales
-    Me.SelStartXr = AppMain.Xreal(Me.SelStartX)
-    Me.SelStartYr = AppMain.Yreal(Me.SelStartY)
-    Me.SelEndXr = AppMain.Xreal(Me.SelEndX)
-    Me.SelEndyr = AppMain.Yreal(Me.SelEndy)
+    Me.SelStartXr = gcd.Xreal(Me.SelStartX)
+    Me.SelStartYr = gcd.Yreal(Me.SelStartY)
+    Me.SelEndXr = gcd.Xreal(Me.SelEndX)
+    Me.SelEndyr = gcd.Yreal(Me.SelEndy)
 
     ' veo si el rectangulo es suficientemente grande como para representar una seleccion por rectangulo
     If (Me.SelEndX - Me.SelStartX + (-Me.SelEndy + Me.SelStartY)) > 10 Then
@@ -171,12 +171,12 @@ Public Function MouseMove(mouseX As Integer, mouseY As Integer) ' esta rutina es
 
   Me.SelEndX = mouseX
   Me.SelEndy = mouseY
-  Me.SelEndXr = AppMain.Xreal(Me.SelEndX)
-  Me.SelEndyr = AppMain.Yreal(Me.SelEndy)
+  Me.SelEndXr = gcd.Xreal(Me.SelEndX)
+  Me.SelEndyr = gcd.Yreal(Me.SelEndy)
 
   If Me.Active Then
 
-    appmain.redraw
+    gcd.Redraw
   End If
 
 End
@@ -197,7 +197,7 @@ Public Sub Draw() ' esta rutina es llamada por FCAD en el evento DrawingArea_Dra
     End If
   Else
 
-    ' gl.CallList(gcd.CurrentDrawing.GlListSelectedEntities)
+    ' gl.CallList(gcd.CurrDrawing.GlListSelectedEntities)
     ' clsEntities.DrawPoiSymbolsAll
 
   End If
@@ -288,13 +288,11 @@ Public Function DoFillet() As Boolean
           eLine.ClassHandler = cadLine
           eLine.P.Insert([e1.P[2], e1.P[3], e2.P[2], e2.P[3]])
 
-          eLine.colour = appmain.CurrentColor
-          eLine.LineType = appmain.CurrentLtype
-          eLine.LayerId = appmain.CurrentLayer
+          eLine.colour = AppMain.CurrentColor
+          eLine.LineType = AppMain.CurrentLtype
+          eLine.pLayer = AppMain.CurrentLayer
           cadLine.Finish(eLine)
           gcd.CurrentDrawing.arrEntities.Add(eLine)
-
-          'gcd.Addline(gcd.CurrentDrawing.arrEntities, [e1.P[2], e1.P[3], e2.P[2], e2.P[3]], appmain.CurrentColor, appmain.CurrentLtype,, appmain.CurrentLayer)
 
           Me.Finish
 

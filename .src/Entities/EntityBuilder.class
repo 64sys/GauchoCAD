@@ -1,6 +1,6 @@
 ' Gambas class file
 
-' GauchoCAD
+' m-designer
 ' A simple CAD made in Gambas
 '
 ' Copyright (C) Ing Martin P Cristia
@@ -84,6 +84,9 @@ Public Function Start(Optional ElemToBuild As Variant, Optional Mode As Integer 
   ' D date
 
   ' limpiamos la seleccion
+
+  Dim IsSet As Boolean
+
   clsEntities.DeSelection()
 
   clsEntities.GLGenDrawListSel(0)
@@ -92,13 +95,11 @@ Public Function Start(Optional ElemToBuild As Variant, Optional Mode As Integer 
   If TypeOf(ElemToBuild) <> gb.Object Then                                            ' not Entity class given
 
     If LastEntity Then                                            ' we know the last element, try to create a new one
-      elem = New Entity
-      elem.ClassHandler = LastEntity.ClassHandler
-      elem.Gender = elem.ClassHandler.Gender
+      elem = LastEntity.ClassHandler.newentity()
 
     Else                                                                            ' the is no way to know what element was done last
 
-      clsDrawingAids.ErrorMessage = ("Can't create entity")
+      DrawingAids.ErrorMessage = ("Can't create entity")
       gcd.clsJob = clsDefaultJob                                               ' back to select mode
       gcd.clsJobPrevious = clsDefaultJob
       Return
@@ -107,16 +108,19 @@ Public Function Start(Optional ElemToBuild As Variant, Optional Mode As Integer 
 
   Else                                                                                ' Valid entity
     ' start building the element
-    elem = New Entity
-    elem.ClassHandler = elemtobuild
-    elem.Gender = elem.ClassHandler.Gender
-  End If
+    elem = elemtobuild.newentity()
 
-  clsEntities.FillEntity(elem)
+  End If
+  ' ' TODO LO DE ABAJO SE HACE EN LA CLASSHANDLER
+  ' clsEntities.FillEntity(elem)
+  ' IsSet = elem.ClassHandler.setEntity(elem)
+  ' If Not IsSet Then
+  '     clsEntities.setEntity(elem)
+  ' End If
   ' reset from previous element
   elem.ClassHandler.StepsDone = 0
 
-  'elem.gbcolor = appmain.CurrentColor
+  'elem.gbcolor = fMain.CurrentColor
 
   iPoints = 0
   iFloat = 0
@@ -130,22 +134,28 @@ Public Function Start(Optional ElemToBuild As Variant, Optional Mode As Integer 
   Try Paramdefault = Split(elem.ClassHandler.ParamDefault, ";")                        ' optional
 
   NextParamType = UCase(Mid(elem.ClassHandler.ParamType, elem.ClassHandler.StepsDone + 1, 1))
-  clsDrawingAids.HelperTrabajoNext = ParamHelperList[0]
+  DrawingAids.HelperTrabajoNext = ParamHelperList[0]
 
   ' instructions to FCAD
   gcd.OrthogonalIgnored = elem.ClassHandler.OrthogonalIgnored
+
   gcd.OrthogonalForced = elem.ClassHandler.OrthogonalForced
 
-  elem.layerid = appmain.CurrentLayer ' gcd.GetLayerID(appmain.CurrentLayer)
+  elem.pLayer = gcd.CurrentDrawing.CurrLayer
 
-  elem.colour = appmain.CurrentColor
-  elem.ColorToPaint = Starter.gColor[elem.colour]
+  elem.colour = gcd.CurrentDrawing.CurrColor
 
-  elem.LineType = appmain.CurrentLtype
+  'elem.ColorToPaint = gcd.gColor[elem.colour]
 
-  elem.LineWidth = appmain.CurrentWidth
+  elem.LineType = gcd.CurrentDrawing.CurrLineType
 
-  clsDrawingAids.HelperTrabajo = elem.ClassHandler.HelperTrabajo
+  elem.LineWidth = gcd.CurrentDrawing.CurrLineWt
+
+  ' new, and could fail in most entities so Try it
+
+  Try elem.iParam[elem.ClassHandler.iiiMode] = mode
+
+  DrawingAids.HelperTrabajo = elem.ClassHandler.HelperTrabajo
 
 End
 
@@ -240,14 +250,14 @@ Public Function KeyText(EnteredText As String) ' esta rutina es llamada por FCAD
 
   End Select
 
-Finally
-
-  Return
-
-Catch
-
-  ' unexpected input
-  clsDrawingAids.ErrorMessage = ("Bad input" & ErrTxt)
+  ' Finally
+  '
+  '   Return
+  '
+  ' ' catch
+  '
+  '   ' unexpected input
+  '   DrawingAids.ErrorMessage = ("Bad input" & ErrTxt)
 
 End
 
@@ -268,15 +278,13 @@ Public Sub AdvanceStep()
       NextParamType = "P"
     Endif
 
-    Try clsDrawingAids.HelperTrabajoNext = ParamHelperList[elem.ClassHandler.StepsDone]          ' try in case of lack of desciption or keep last
+    Try DrawingAids.HelperTrabajoNext = ParamHelperList[elem.ClassHandler.StepsDone]          ' try in case of lack of desciption or keep last
     If ParamDefault.Count > elem.ClassHandler.StepsDone Then                            ' not null
       ParamDefault[elem.ClassHandler.StepsDone] = Trim$(ParamDefault[elem.ClassHandler.StepsDone])
-      If ParamDefault[elem.ClassHandler.StepsDone] <> "" Then clsDrawingAids.HelperTrabajoNext &= "[" & ParamDefault[elem.ClassHandler.StepsDone] & "]"           ' try in case of lack of desciption or keep last
+      If ParamDefault[elem.ClassHandler.StepsDone] <> "" Then DrawingAids.HelperTrabajoNext &= "[" & ParamDefault[elem.ClassHandler.StepsDone] & "]"           ' try in case of lack of desciption or keep last
     End If
 
   Endif
-
-  appmain.redraw
 
 End
 
@@ -284,8 +292,8 @@ Public Function MouseMove(mouseX As Integer, mouseY As Integer) ' esta rutina es
 
   Dim X, Y, f As Float
 
-  X = puntos.Near(appmain.Xreal(mouseX))
-  Y = puntos.Near(appmain.Yreal(mouseY))
+  X = gcd.Near(gcd.Xreal(mouseX))
+  Y = gcd.Near(gcd.Yreal(mouseY))
 
   If InStr("LAPR", NextParamType) = 0 Then Return ' we are expecting a parameter
 
@@ -296,7 +304,7 @@ Public Function MouseMove(mouseX As Integer, mouseY As Integer) ' esta rutina es
   If NextParamType = "A" Then
 
     ' return the angle from horizontal to us
-    f = Ang(appmain.Xreal(mouseX) - Me.LastX, appmain.Yreal(mouseY) - Me.lastY)
+    f = Ang(gcd.Xreal(mouseX) - Me.LastX, gcd.Yreal(mouseY) - Me.lastY)
     f *= 180 / Pi
     elem.ClassHandler.NewParameter(elem, ["float", f])
 
@@ -307,14 +315,14 @@ Public Function MouseMove(mouseX As Integer, mouseY As Integer) ' esta rutina es
 
     elem.ClassHandler.NewParameter(elem, ["point", x, y])
 
-    'appmain.redraw
+    'fMain.redraw
     Return              ' nothing more to do here
   End If
 
   If NextParamType = "L" Then
 
     ' return the angle from horizontal to us
-    f = puntos.distancia(appmain.Xreal(mouseX), appmain.Yreal(mouseY), Me.LastX, Me.lastY)
+    f = puntos.distancia(gcd.Xreal(mouseX), gcd.Yreal(mouseY), Me.LastX, Me.lastY)
 
     elem.ClassHandler.NewParameter(elem, ["float", f])
 
@@ -348,22 +356,20 @@ Public Function MouseMove(mouseX As Integer, mouseY As Integer) ' esta rutina es
 
   elem.ClassHandler.NewParameter(elem, ["point", x, y])
 
-  appmain.redraw
-
 End
 
 Public Function MouseDown(mouseX As Integer, mouseY As Integer) ' esta rutina es llamada por FCAD en el evento DrawingArea_MouseDown
 
   Dim X, Y, f As Float
 
-  clsDrawingAids.ErrorMessage = ""
+  DrawingAids.ErrorMessage = ""
   If InStr("LAPR", NextParamType) = 0 Then Return ' we are expecting a parameter
 
   ' if we expect a parameter, it will be passed
   If NextParamType = "A" Then
 
     ' return the angle from horizontal to us
-    f = Ang(appmain.Xreal(mouseX) - Me.LastX, appmain.Yreal(mouseY) - Me.lastY)
+    f = Ang(gcd.Xreal(mouseX) - Me.LastX, gcd.Yreal(mouseY) - Me.lastY)
     f *= 180 / Pi
     If elem.ClassHandler.NewParameter(elem, ["float", f], True) Then AdvanceStep
     Return              ' nothing more to do here
@@ -371,11 +377,11 @@ Public Function MouseDown(mouseX As Integer, mouseY As Integer) ' esta rutina es
 
   If NextParamType = "R" Then
 
-    If elem.ClassHandler.NewParameter(elem, ["point", appmain.Xreal(mouseX), appmain.Yreal(mouseY)], True) Then
+    If elem.ClassHandler.NewParameter(elem, ["point", gcd.Xreal(mouseX), gcd.Yreal(mouseY)], True) Then
 
       ' last point
       gcd.CurrentDrawing.LastPoint.Clear
-      gcd.CurrentDrawing.LastPoint.Insert([appmain.Xreal(mouseX), appmain.Yreal(mouseY)])
+      gcd.CurrentDrawing.LastPoint.Insert([gcd.Xreal(mouseX), gcd.Yreal(mouseY)])
       AdvanceStep
     End If
     Return
@@ -384,7 +390,7 @@ Public Function MouseDown(mouseX As Integer, mouseY As Integer) ' esta rutina es
   If NextParamType = "L" Then
 
     ' return the angle from horizontal to us
-    f = puntos.distancia(appmain.Xreal(mouseX), appmain.Yreal(mouseY), Me.LastX, Me.lastY)
+    f = puntos.distancia(gcd.Xreal(mouseX), gcd.Yreal(mouseY), Me.LastX, Me.lastY)
 
     If elem.ClassHandler.NewParameter(elem, ["float", f], True) Then AdvanceStep
 
@@ -394,8 +400,8 @@ Public Function MouseDown(mouseX As Integer, mouseY As Integer) ' esta rutina es
 
   ' we are waiting for a point
 
-  X = puntos.Near(appmain.Xreal(mouseX))
-  Y = puntos.Near(appmain.Yreal(mouseY))
+  X = gcd.Near(gcd.Xreal(mouseX))
+  Y = gcd.Near(gcd.Yreal(mouseY))
 
   ' y si tengo enganche?
 
@@ -440,7 +446,7 @@ Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' esta rutina es l
 
 End
 
-Public Sub Draw()               ' called bygcd.CurrentDrawing.drwArea_Draw
+Public Sub Draw()               ' called bygcd.CurrDrawing.drwArea_Draw
 
   elem.ClassHandler.draw(elem)
 
@@ -448,22 +454,26 @@ End
 
 Public Sub Finish()
 
+  elem.Handle = gcd.NewHandle()
+  elem.HandleOwner = "1"
   gcd.CurrentDrawing.arrEntities.Add(elem)
+  gcd.CurrentDrawing.CurrLayer.Entities.Add(elem)
+  gcd.CurrentDrawing.arrVisibleEntities.add(gcd.CurrentDrawing.arrEntities.Max)
 
   elem.ClassHandler.Finish(elem)
 
   LastEntity = elem                                       ' save it to repeat on rigth click
 
-  gcd.UpdateModel
+  gcd.CurrentDrawing.RequiresSaving = True
 
   gcd.clsJobPrevious = Me
   gcd.clsJob = clsDefaultJob
   clsDefaultJob.PoiChecking = True
-  clsDrawingAids.CleanTexts
+  DrawingAids.CleanTexts
 
   clsEntities.GLGenDrawList
 
-  appmain.redraw
+  'fMain.redraw
 
 End
 
@@ -472,7 +482,7 @@ Public Sub Cancel()
   elem = Null
   gcd.clsJobPrevious = Me
   gcd.clsJob = clsDefaultJob
-  clsDrawingAids.CleanTexts
-  appmain.redraw
+  DrawingAids.CleanTexts
+  gcd.Redraw
 
 End

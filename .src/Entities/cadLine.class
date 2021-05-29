@@ -1,6 +1,6 @@
 ' Gambas class file
 
-' GauchoCAD
+' m-designer
 ' A simple CAD made in Gambas
 '
 ' Copyright (C) Ing Martin P Cristia
@@ -36,12 +36,32 @@ Public Const ParamDefault As String = " "
 Public Const StretchAble As Boolean = True           ' Si lo puedo deformar
 Public StepsDone As Integer                 ' esto lo cambia cls ElementBuilder durante la construccion
 
-' JSON and DXF Read/Export
-Public Const JSON_Reading As Boolean = True
+' DXF Read/Export
+
 Public Const JSON_Export As Boolean = True
 
 Public Const DXF_Reading As Boolean = True
 Public Const DXF_Export As Boolean = True
+
+'' Creates a new Line entity and prepares arrays
+
+Public Function NewEntity() As Entity
+
+  Dim e As New Entity
+
+  e.Gender = Me.Gender
+  e.ClassHandler = Me
+  e.P.Insert([0, 0, 0, 0])
+
+  ' this may fails on some scopes, but we should Try
+  Try e.pLayer = gcd.CurrentDrawing.CurrLayer
+  Try e.colour = gcd.CurrentDrawing.CurrColor
+  Try e.LineType = gcd.CurrentDrawing.CurrLineType
+  Try e.LineWidth = gcd.CurrentDrawing.CurrLineWt
+
+  Return e
+
+End
 
 ' The entity handler receives a user action, and returns the number of expected parameter
 ' If definitive = true, means the parameter is set
@@ -110,9 +130,9 @@ End
 
 Public Sub Draw(oE As Entity)
 
-  oE.ColorToPaint = gcd.GetGBColor(oE.colour, oE.Layerid)
+  oE.ColorToPaint = gcd.GetGBColor(oE.colour, oE.pLayer)
 
-  GLplus.Lines(oE.p, oE.ColorToPaint, oE.LineWidth, oE.LineType)
+  GLplus.Lines(oE.p, oE.ColorToPaint, oE.LineWidth, oE.LineType.index)
 
 End
 
@@ -122,11 +142,11 @@ Public Sub DrawSelected(oE As Entity)
   Dim i As Integer
   Dim iLineType As Integer
 
-  If oe.LineType = gcd.stiDashed Then iLineType = 0 Else iLineType = gcd.stiDashed
+  ' If oe.LineType = gcd.stiDashed Then iLineType = 0 Else iLineType = gcd.stiDashed
 
-  GLplus.Lines(oE.p, Starter.flgWindowBackColor, oE.LineWidth, iLineType)
+  GLplus.Lines(oE.p, gcd.flgWindowBackColor, oE.LineWidth, iLineType)
 
-  GLplus.Lines(oE.p, gcd.ColorForSelected, oE.LineWidth, oe.LineType)
+  GLplus.Lines(oE.p, gcd.ColorForSelected, oE.LineWidth, oE.LineType.index)
 
 End
 '' A fat version of the line
@@ -135,14 +155,14 @@ Public Sub DrawRemark(oE As Entity)
 
   If Not oE.Visible Then Return
 
-  'GLplus.Lines(oE.p, Starter.flgWindowBackColor, oE.LineWidth, gcd.stiDashed)
+  'GLplus.Lines(oE.p, gcd.flgWindowBackColor, oE.LineWidth, gcd.stiDashed)
   'GLplus.Lines(oE.p, oE.ColorToPaint, oE.LineWidth + 2, oE.LineType)
   If oe.Selected Then
-    GLplus.Lines(oE.P, Starter.flgWindowBackColor, oE.LineWidth + 2, gcd.stiDashed)
-    GLplus.Lines(oE.P, gcd.ColorForSelected, oE.LineWidth + 2, oE.LineType)
+    GLplus.Lines(oE.P, gcd.flgWindowBackColor, oE.LineWidth + 2, gcd.stiDashed)
+    GLplus.Lines(oE.P, gcd.ColorForSelected, oE.LineWidth + 2, oe.linetype.index)
   Else
-    GLplus.Lines(oE.P, Starter.flgWindowBackColor, oE.LineWidth, gcd.stiDashed)
-    GLplus.Lines(oE.P, oE.ColorToPaint, oE.LineWidth + 2, oE.LineType)
+    GLplus.Lines(oE.P, gcd.flgWindowBackColor, oE.LineWidth, gcd.stiDashed)
+    GLplus.Lines(oE.P, oE.ColorToPaint, oE.LineWidth + 2, oe.linetype.index)
   Endif
 
 End
@@ -150,9 +170,7 @@ End
 '' The paint version of the entity
 Public Function Draw2(oE As Entity)
 
-  paint.MoveTo(oE.p[0], oE.p[1])
-  paint.LineTo(oE.p[2], oE.p[3])
-  paint.Stroke
+  paintPlus.Lines(oE.p)
 
 End
 
@@ -172,16 +190,16 @@ Public Function BuildPOI(oE As Entity, Optional arrIndex As Integer = -1) As Int
 
   oe.poiPoints.insert([(oE.P[0] + oE.P[2]) / 2, (oE.P[1] + oE.P[3]) / 2])   ' mid
   oe.poiType.Add(gcd.poiMidPoint)
-  'gcd.CurrentDrawing.poiEntities.Add(arrIndex)
+  'gcd.CurrDrawing.poiEntities.Add(arrIndex)
 
   oe.poiPoints.insert([oE.p[2], oE.p[3]])
   oe.poiType.Add(gcd.poiEndPoint)
-  'gcd.CurrentDrawing.poiEntities.Add(arrIndex)
+  'gcd.CurrDrawing.poiEntities.Add(arrIndex)
 
   ' line
-  ' gcd.CurrentDrawing.poiLines.insert([oE.p[0], oE.p[1], oE.p[2], oE.p[3]])
-  ' gcd.CurrentDrawing.poiLinesEntities.Add(arrIndex)
-  'gcd.CurrentDrawing.poiLinesRelPoint.Insert([0, 1])
+  ' gcd.CurrDrawing.poiLines.insert([oE.p[0], oE.p[1], oE.p[2], oE.p[3]])
+  ' gcd.CurrDrawing.poiLinesEntities.Add(arrIndex)
+  'gcd.CurrDrawing.poiLinesRelPoint.Insert([0, 1])
 
 End
 
@@ -191,10 +209,10 @@ Public Sub Finish(oE As Entity) As Boolean
 
   'Print "Finish en EntityBase"
   'CreatePolygon(oe)
-  BuildPOI(oe)
+  '  BuildPOI(oe)
 
   ' busco el tipo de linea, si hace falta
-  If oE.LineTypeName = "Dashed" Then oE.LineType = 1
+
   ' tareas finales de armado del objeto
 
   oE.psel.resize(oE.p.count / 2)
@@ -205,11 +223,44 @@ Public Sub Finish(oE As Entity) As Boolean
 
 End
 
+Public Sub ExportDXFCol(e As Entity, ByRef cExport As Collection) As Boolean
+
+  cExport.Add("LINE", dxf.codEntity)
+  clsEntities.DXFExportCommonCol(e, cExport)
+  cExport.Add("AcDbLine", "100")
+  cExport.Add(CStr(e.p[0]), dxf.codX0)
+  cExport.Add(CStr(e.p[1]), dxf.codY0)
+  cExport.Add(CStr(e.p[2]), DXF.codX1)
+  cExport.Add(CStr(e.p[3]), dxf.codY1)
+
+End
+
+Public Function ImportDXF(e As Entity, sClaves As String[], sValues As String[]) As Boolean
+
+  Dim i As Integer
+
+  e.P.Clear
+  For i = 0 To sClaves.Max
+
+    If sClaves[i] = "10" Then e.P.Add(CFloat(sValues[i]))
+    If sClaves[i] = "20" Then e.P.Add(CFloat(sValues[i]))
+    If sClaves[i] = "11" Then e.P.Add(CFloat(sValues[i]))
+    If sClaves[i] = "21" Then e.P.Add(CFloat(sValues[i]))
+
+  Next
+  Return True
+
+  ' catch
+
+  Return False
+
+End
+
 ' Importo los datos que puedo procesar de una coleccion y genero un Entity para ser agregado a un array
 Public Function ImportJsonCol(c As JSONCollection, e As Entity) As Boolean
 
   'Common Pack
-  '   e.dwg = c
+  ' e.dwg = c
   ' e.dwg["index"] = c["index"]
   ' e.dwg["type"] = c["type"]
   ' e.dwg["handle"] = c["handle"]
@@ -243,108 +294,5 @@ Public Function ImportJsonCol(c As JSONCollection, e As Entity) As Boolean
 Catch
 
   Return False
-
-End
-
-' Exporto los datos de una Entity a una coleccion para ser guardados
-Public Sub ExportJsonCol(e As Entity, n As JSONCollection, Optional CreateNew As Boolean = False)
-
-  If CreateNew Then
-
-    n.Add("LINE", "entity")
-    n.Add(0, "index")
-    n.Add(19, "type")
-    n.Add([0, CInt(e.Handle)], "handle")
-    n.Add(43, "size")
-    n.Add(283, "bitsize")
-    n.Add([12, 1, 3, 48], "ownerhandle")
-    n.Add("AcDbEntity", "_subclass")
-    n.Add([8, 0, 0, 50], "prev_entity")
-    n.add([4, 0, 0, 0], "next_entity")
-    n.add([0, 0, 0, CInt(e.Layerid)], "layer")
-    n.add(0, "preview_exists")
-    n.add(0, "entmode")
-    n.add(0, "nolinks")
-    n.add(e.colour, "color")
-    n.add(1.0, "ltype_scale")
-    n.add(1, "ltype_flags")
-    n.add(0, "plotstyle_flags")
-    n.add(0, "invisible")
-    n.add(e.LineWidth, "linewt")
-    n.add("AcDbLine", "_subclass")
-    n.add(1, "z_is_zero")
-    'puntos
-    n.add([e.p[0], e.P[1]], "start")
-
-    n.add([e.p[2], e.p[3]], "end")
-    n.add(0.00000, "thickness")
-    n.add([0.0, 0.0, 1.0], "extrusion")
-
-  Else
-
-    n["entity"] = "LINE"
-    n["index"] = 44
-    n["type"] = 19
-    n["handle"] = [0, CInt(e.Handle)]
-    n["size"] = 43
-    n["bitsize"] = 283
-    n["ownerhandle"] = [12, 1, 3, 48]
-    n["_subclass"] = "AcDbEntity"
-    n["prev_entity"] = [8, 0, 0, 50]
-    n["next_entity"] = [4, 0, 0, 0]
-    n["layer"][3] = CInt(e.Layerid)
-    n["preview_exists"] = 0
-    n["entmode"] = 0
-    n["nolinks"] = 0
-    n["color"] = e.colour
-    n["ltype_scale"] = 1.0
-    n["ltype_flags"] = 1
-    n["plotstyle_flags"] = 0
-    n["invisible"] = 0
-    n["linewt"] = e.LineWidth
-    n["_subclass"] = "AcDbLine"
-    n["z_is_zero"] = 1
-    'puntos
-    n["start"][0] = e.P[0]
-    n["start"][1] = e.P[1]
-    n["end"][0] = e.P[2]
-    n["end"][1] = e.P[3]
-    n["thickness"] = 0.000000
-    n["extrusion"] = [0.0, 0.0, 1.0]
-
-  Endif
-
-End
-
-Public Sub ExportDXF(e As Entity, hFile As File)
-
-  Print #hFIle, "  0"                       ' Entity type
-  Print #hFIle, "LINE"
-  clsEntities.DXFExportCommon(e, hFile)
-  Print #hFIle, "100"                     ' Subclass marker
-  Print #hFIle, "AcDbLine"
-  Print #hFIle, " 10"                      ' X0
-  Print #hFIle, CStr(e.p[0])
-  Print #hFIle, " 20"                      ' Y0
-  Print #hFIle, CStr(e.p[1])
-  Print #hFIle, " 11"                      ' X1
-  Print #hFIle, CStr(e.p[2])
-  Print #hFIle, " 21"                      ' Y1
-  Print #hFIle, CStr(e.p[3])
-
-End
-
-Public Function ImportDXF(e As Entity, sClaves As String[], sValues As String[]) As Boolean
-
-  Dim i As Integer
-
-  For i = 0 To sClaves.Max
-
-    If sClaves[i] = "10" Then e.P.Add(CFloat(sValues[i]))
-    If sClaves[i] = "20" Then e.P.Add(CFloat(sValues[i]))
-    If sClaves[i] = "11" Then e.P.Add(CFloat(sValues[i]))
-    If sClaves[i] = "21" Then e.P.Add(CFloat(sValues[i]))
-
-  Next
 
 End

@@ -1,6 +1,6 @@
 ' Gambas class file
 
-' GauchoCAD
+' m-designer
 ' A simple CAD made in Gambas
 '
 ' Copyright (C) Ing Martin P Cristia
@@ -45,8 +45,8 @@ Public Function MouseDown(mouseX As Integer, mouseY As Integer) ' esta rutina es
     Me.SelEndX = Me.SelStartX
     Me.SelEndy = Me.SelStartY
 
-    Me.SelStartXr = AppMain.Xreal(mouseX)
-    Me.SelStartYr = AppMain.Yreal(mouseY)
+    Me.SelStartXr = gcd.Xreal(mouseX)
+    Me.SelStartYr = gcd.Yreal(mouseY)
 
     Me.Active = True
   End If
@@ -64,15 +64,15 @@ Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' esta rutina es l
   If Me.SelStartY < Me.SelEndy Then Swap Me.SelStartY, Me.SelEndy                     ' this is FLIPPED
 
   ' Paso a coordenadas reales
-  Me.SelStartXr = AppMain.Xreal(Me.SelStartX)
-  Me.SelStartYr = AppMain.Yreal(Me.SelStartY)
-  Me.SelEndXr = AppMain.Xreal(Me.SelEndX)
-  Me.SelEndyr = AppMain.Yreal(Me.SelEndy)
+  Me.SelStartXr = gcd.Xreal(Me.SelStartX)
+  Me.SelStartYr = gcd.Yreal(Me.SelStartY)
+  Me.SelEndXr = gcd.Xreal(Me.SelEndX)
+  Me.SelEndyr = gcd.Yreal(Me.SelEndy)
 
   ' veo si el rectangulo es suficientemente grande como para representar una seleccion por rectangulo
   If (Me.SelEndX - Me.SelStartX + (-Me.SelEndy + Me.SelStartY)) < 10 Then ' es un rectangulo minusculo
 
-    clsDrawingAids.ErrorMessage = ("Window is too small")
+    DrawingAids.ErrorMessage = ("Window is too small")
 
   Else
     ' engañamos a estas vars
@@ -96,10 +96,10 @@ Public Function MouseMove(mouseX As Integer, mouseY As Integer) ' esta rutina es
 
   Me.SelEndy = mouseY
 
-  Me.SelEndXr = AppMain.Xreal(mouseX)
-  Me.SelEndYr = AppMain.Yreal(mouseY)
+  Me.SelEndXr = gcd.Xreal(mouseX)
+  Me.SelEndYr = gcd.Yreal(mouseY)
 
-  appmain.redraw
+  gcd.Redraw
 
 End
 
@@ -119,10 +119,12 @@ Public Sub Finish()
   gcd.clsJob = gcd.clsJobPrevious
   gcd.clsJobPrevious = Me
 
-  clsDrawingAids.CleanTexts
+  DrawingAids.CleanTexts
 
   Me.Active = False
 
   gcd.ToolActive = True
+
+  AppMain.flgNewPosition = True
 
 End

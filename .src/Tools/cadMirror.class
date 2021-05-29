@@ -2,7 +2,7 @@
 
 ' Gambas class file
 
-' GauchoCAD
+' m-designer
 ' A simple CAD made in Gambas
 '
 ' Copyright (C) Ing Martin P Cristia
@@ -39,14 +39,14 @@ Public Function Start(Optional ElemToBuild As Variant, Optional _Mode As Integer
   Me.PointsDone = 0
   Me.PointsTotal = 3
 
-  clsDrawingAids.HelperTrabajo = ("Mirror") & " "
+  DrawingAids.HelperTrabajo = ("Mirror") & " "
 
   ' chequeamos si hubo seleccion previa
   Me.SelectionCount = clsEntities.GetSelectionCount()
 
   If Me.SelectionCount = 0 Then                                     ' we have no elements in the selection
 
-    clsDrawingAids.Helper.texto = clsDrawingAids.HelperTrabajo & ": " & ("Select entities")
+    DrawingAids.Helper.texto = DrawingAids.HelperTrabajo & ": " & ("Select entities")
 
     gcd.clsJobPrevious = Me
     gcd.clsJob = clsDefaultJob
@@ -54,8 +54,8 @@ Public Function Start(Optional ElemToBuild As Variant, Optional _Mode As Integer
   Else                                                                    ' need the first point
 
     Me.inxSelected.Clear
-    clsDrawingAids.Helper.texto = clsDrawingAids.HelperTrabajo & ": " & ("Base point")
-    clsDrawingAids.HelperTrabajo = clsDrawingAids.HelperTrabajo & Str(Me.SelectionCount) & " " & ("elements")
+    DrawingAids.Helper.texto = DrawingAids.HelperTrabajo & ": " & ("Base point")
+    DrawingAids.HelperTrabajo = DrawingAids.HelperTrabajo & Str(Me.SelectionCount) & " " & ("elements")
 
     For i = 0 To gcd.CurrentDrawing.arrEntities.Max                  ' recolecto las entidades a modificar
       If gcd.CurrentDrawing.arrEntities[i].selected Then Me.inxSelected.Add(i)                               ' y las meto en un  array
@@ -65,7 +65,7 @@ Public Function Start(Optional ElemToBuild As Variant, Optional _Mode As Integer
     ' genero drawing lists
 
     clsEntities.GLGenDrawListAll(False)
-    appmain.redraw
+    gcd.Redraw
 
   Endif
   Me.Active = True
@@ -82,11 +82,11 @@ Public Function MouseUp(mouseX As Integer, mouseY As Integer)
   If Me.PointsDone = 1 Then ' acabo de marcar el punto base
 
     ' ya tengo cosas seleccionadas
-    clsDrawingAids.Helper.texto = clsDrawingAids.HelperTrabajo & ": " & ("Angle") & " [90]"
+    DrawingAids.Helper.texto = DrawingAids.HelperTrabajo & ": " & ("Angle") & " [90]"
 
     ' punto real base
-    Me.SelStartXr = puntos.Near(appmain.Xreal(mousex))
-    Me.SelStartYr = puntos.Near(appmain.yreal(mouseY))
+    Me.SelStartXr = gcd.Near(gcd.Xreal(mousex))
+    Me.SelStartYr = gcd.Near(gcd.Yreal(mouseY))
 
     Me.glTranslate[0] = Me.SelStartXr
     Me.glTranslate[1] = Me.SelStartYr
@@ -102,13 +102,13 @@ Public Function MouseUp(mouseX As Integer, mouseY As Integer)
     gl.PopMatrix
 
     ' prevenir acciones tontas como hacer click en otro elemento antes de terminar con el actual
-    ' TODO: reparar -> gcd.CurrentDrawing.DesHabilitarBotones
+    ' TODO: reparar -> gcd.CurrDrawing.DesHabilitarBotones
   Else If Me.PointsDone = 2 Then ' acabo de marcar el punto destino
     '     ' permitir otros trabajos
-    '     ' TODO: reparar -> gcd.CurrentDrawing.HabilitarBotones
-    'Me.SelEndXr = puntos.Near(appmain.Xreal(mousex)
-    'Me.SelEndyr = puntos.Near(appmain.Yreal(mouseY))
-    clsDrawingAids.Helper.texto = clsDrawingAids.HelperTrabajo & ": " & ("Keep originals") & " (Y/N)[Y]"
+    '     ' TODO: reparar -> gcd.CurrDrawing.HabilitarBotones
+    'Me.SelEndXr = puntos.Near(fMain.Xreal(mousex)
+    'Me.SelEndyr = puntos.Near(fMain.Yreal(mouseY))
+    DrawingAids.Helper.texto = DrawingAids.HelperTrabajo & ": " & ("Keep originals") & " (Y/N)[Y]"
     'Radianes = Ang(Me.SelEndXr - Me.SelStartXr, Me.SelEndYr - Me.SelStartYr)
     '
     'Me.Finish()
@@ -125,8 +125,8 @@ Public Function MouseMove(mouseX As Integer, mouseY As Integer) ' called by FCAD
     '     ' could have being moved by the mouse wheel
     '
     '     ' new Real position is
-    Me.SelEndXr = puntos.Near(appmain.Xreal(mouseX))
-    Me.SelEndyr = puntos.Near(appmain.yreal(mouseY))
+    Me.SelEndXr = gcd.Near(gcd.Xreal(mouseX))
+    Me.SelEndyr = gcd.Near(gcd.Yreal(mouseY))
 
     Radianes = 2 * Ang(Me.SelEndXr - Me.SelStartXr, Me.SelEndYr - Me.SelStartYr)
 
@@ -136,7 +136,7 @@ Public Function MouseMove(mouseX As Integer, mouseY As Integer) ' called by FCAD
     Me.glScale[1] = -1
     Me.glScale[2] = 1
   End If
-  appmain.redraw
+  gcd.Redraw
 
 End
 
@@ -148,12 +148,12 @@ Public Function KeyText(EnteredText As String) ' esta rutina es llamada por FCAD
       Radianes = 90 / 180 * Pi
       Inc Me.PointsDone
 
-      clsDrawingAids.Helper.texto = clsDrawingAids.HelperTrabajo & ": " & ("Keep originals") & " (Y/N)[Y]"
+      DrawingAids.Helper.texto = DrawingAids.HelperTrabajo & ": " & ("Keep originals") & " (Y/N)[Y]"
 
     Else
       Radianes = CFloat(EnteredText) / 180 * Pi
       Inc Me.PointsDone
-      clsDrawingAids.Helper.texto = clsDrawingAids.HelperTrabajo & ": " & ("Keep originals") & " (Y/N)[Y]"
+      DrawingAids.Helper.texto = DrawingAids.HelperTrabajo & ": " & ("Keep originals") & " (Y/N)[Y]"
     End If
 
   Else If Me.PointsDone = 2 Then
@@ -169,9 +169,9 @@ Public Function KeyText(EnteredText As String) ' esta rutina es llamada por FCAD
 
   End If
 
-Catch
+  ' catch
 
-  clsDrawingAids.ErrorMessage = ("Bad input")
+  DrawingAids.ErrorMessage = ("Bad input")
 
 End
 
@@ -195,9 +195,9 @@ Public Sub Finish()
 
   gcd.clsJobPrevious = Me
   gcd.clsJob = clsDefaultJob
-  clsDrawingAids.CleanTexts
+  DrawingAids.CleanTexts
   clsEntities.DeSelection()
-  appmain.regen
+  AppMain.regen
   Me.Active = False
   gcd.ToolActive = False
 
