@@ -675,7 +675,7 @@ End
 
 Public Sub GLArea1_draw()
 
-  Dim iParent As Integer
+  Dim i, iParent As Integer
 
   'If Not gcd.DrawingReady Then Return
 
@@ -713,7 +713,9 @@ Public Sub GLArea1_draw()
 
   gcd.clsJob.Draw()
 
-  gl.CallList(gcd.CurrentDrawing.GlListAllEntities)                      ' si GL no tiene contexto, la lista no se genera. Es necesario que la instancia de FCAD este cargada.
+  For i = 0 To gcd.CurrentDrawing.arrLayers.Max
+    If gcd.CurrentDrawing.arrLayers[i].Visible Then gl.CallList(gcd.CurrentDrawing.arrLayers[i].glList)
+  Next
 
   ' POI dinamicos
   If gcd.CurrentDrawing.flgShowPOIinfo Then
@@ -979,48 +981,46 @@ Public Sub GLArea1_MouseUp()
 
 End
 
+' El objetivo es que el zoom dinamico se haga manteniendo el dibujo que esta en la pos del mouse
 Public Sub GLArea1_MouseWheel()
-  ' ex  Public Sub drwArea_MouseWheel()
 
-  Dim px, py, factor As Float
+  Dim px, py, dx, dy, factor As Float
   ' chequeamos si vale la pena seguir dibujando la grid, o sea, menos de 3 pixels
+  ' Inc flgWheelCounter
+  ' Debug "Mouse weel", flgWheelCounter
 
-  If gcd.Pixels(puntos.GridSpacing) < 5 Then puntos.Gridactive = False Else puntos.Gridactive = True
+  If gcd.Pixels(GridSpacing) < 5 Then GridActive = False Else GridActive = True
 
-  px = gcd.Xreal(GLArea1.w / 2)
-  py = gcd.Yreal(GLArea1.h / 2)
+  px = gcd.Xreal(Mouse.x) ' posicion real en donde esta el mouse, previo al zoom
+  py = gcd.Yreal(Mouse.y)
 
   ' TODO: , redondear para que la escala sea 1:100 1:75 1:50 etc
 
   factor = (1 + 0.075 * Mouse.Delta)
 
-  gcd.CurrentDrawing.ScaleZoom = gcd.CurrentDrawing.ScaleZoom * factor
+  gcd.currentDrawing.ScaleZoom = gcd.currentDrawing.ScaleZoom * factor
 
-  ' pero con ciertos limites
+  dx = gcd.Xreal(Mouse.x) ' posicion real en donde esta el mouse, posterior al zoom
+  dy = gcd.Yreal(Mouse.y)
+
+  ' pero con ciertos limites TODO: imponer
   ' If ScaleZoom < 0.001 Then ScaleZoom = 0.001
   ' If ScaleZoom > 50 Then ScaleZoom = 50
 
-  ' reacomodo el panning, pero solo si estoy en los limites del drwarea, sino es solo un zoom
-  ' pero tengo que reajustar la posicion de las cosas , porque tienden a alejarse
-  ' Supongamos que partimos de un Zoom = 1 y una posicion centrada, y hacemos zoom=2
-  ' la posicion de las cosas estara 2x mas alejado; yo quiero que lo que hay en el centro de la pantalla, siga ahi
-  ' entonces Pc = drwarea/2 anes del zoom, debera estar en el mismo lugar
+  ' nuevo metodo (el Pan esta en pixels)
+  gcd.currentDrawing.PanX += gcd.pixels(dx - px)
+  gcd.currentDrawing.PanY += gcd.pixels(dy - py)
 
-  gcd.CurrentDrawing.PanX = -gcd.Pixels(px)
-  If mouse.x < glarea1.w * 0.2 Then
-    gcd.CurrentDrawing.PanX -= gcd.CurrentDrawing.ScaleZoom * 5 * Mouse.Delta
-  Else If mouse.x > glarea1.w * 0.8 Then
-    gcd.CurrentDrawing.PanX += gcd.CurrentDrawing.ScaleZoom * 5 * Mouse.Delta
-  Endif
+  gcd.flgNewPosition = True
 
-  gcd.CurrentDrawing.PanY = -gcd.Pixels(py)
-  If mouse.y < glarea1.h * 0.2 Then
-    gcd.CurrentDrawing.PanY -= gcd.CurrentDrawing.ScaleZoom * 5 * Mouse.Delta
-  Else If mouse.y > glarea1.h * 0.8 Then
-    gcd.CurrentDrawing.PanY += gcd.CurrentDrawing.ScaleZoom * 5 * Mouse.Delta
-  Endif
+  gcd.redraw 'glarea1.Refresh
 
-  gcd.redraw
+  ' despues de actualizar la pantalla, recolectamos las entidades visibles
+
+  ' Dec flgWheelCounter
+
+  ' Test
+  ' Debug "Mouse tracking task ID", tskMouseTracking.Handle
 
 End
 
@@ -1268,60 +1268,60 @@ Public Sub gTask(sTask As String)
         f = fx[0]
         If Exist(f) Then
           If Stat(f).Type = gb.File Then
-            If Lower(File.Ext(f)) = "dxf" Then
-              gcd.CurrentDrawing.FileName = f
-
-              cadDxf.LoadFile(f, gcd.CurrentDrawing.arrEntities, False, False, False)
-              gcd.UpdateModel
-              gcd.regen
-              ' modelo recien cargado
-              cadZoomE.Start()                                ' por ahora mostramos el dibujo centrado, hasta q leamos el estado anterior
-
-              Me.Text = f
-
-              LoadMenu()
-
-            Endif
+            ' If Lower(File.Ext(f)) = "dxf" Then
+            '   gcd.CurrentDrawing.FileName = f
+            '
+            '   cadDxf.LoadFile(f, gcd.CurrentDrawing.arrEntities, False, False, False)
+            '   gcd.UpdateModel
+            '   gcd.regen
+            '   ' modelo recien cargado
+            '   cadZoomE.Start()                                ' por ahora mostramos el dibujo centrado, hasta q leamos el estado anterior
+            '
+            '   Me.Text = f
+            '
+            '   LoadMenu()
+            '
+            ' Endif
           Endif
         Endif
       Endif
 
     Case "export"
 
-      Dialog.Filter = ["*.dxf", "Drawing DXF"]
-      Dialog.SaveFile()
-      If Dialog.Path Then
-        f = Dialog.Path
-        If Exist(f) Then
-          If Message.Question(("The file exist"), ("Replace"), ("Cancel")) = 2 Then
-            f = ""
-          Endif
-        Endif
-      Else
-        f = ""
-      Endif
-
-      If f = "" Then
-        Print "Cancel"
-      Else
-        fbas = File.Dir(f) &/ File.BaseName(f)
-        If LCase(File.Ext(f)) <> "dxf" Then f &= ".dxf"
-
-        If Exist(f) Then
-          Shell "mv " & f & " " & fbas & ".bak" Wait
-          If Exist(t) Then
-            Shell "rm " & t Wait
-          Endif
-
-        Else  ' no existe
-          ' antes de guardar, actualizamos
-          gcd.UpdateLayers()
-
-          cadDxf.SaveFile(f)
-
-        Endif
-
-      Endif
+      ' Dialog.Filter = ["*.dxf", "Drawing DXF"]
+      ' Dialog.SaveFile()
+      ' If Dialog.Path Then
+      '   f = Dialog.Path
+      '   If Exist(f) Then
+      '     If Message.Question(("The file exist"), ("Replace"), ("Cancel")) = 2 Then
+      '       f = ""
+      '     Endif
+      '   Endif
+      ' Else
+      '   f = ""
+      ' Endif
+      '
+      ' If f = "" Then
+      '   Print "Cancel"
+      ' Else
+      '   fbas = File.Dir(f) &/ File.BaseName(f)
+      '   If LCase(File.Ext(f)) <> "dxf" Then f &= ".dxf"
+      '
+      '   If Exist(f) Then
+      '     Shell "mv " & f & " " & fbas & ".bak" Wait
+      '     If Exist(t) Then
+      '       Shell "rm " & t Wait
+      '     Endif
+      '
+      '   Else  ' no existe
+      '     ' antes de guardar, actualizamos
+      '     gcd.UpdateLayers()
+      '
+      '     cadDxf.SaveFile(f)
+      '
+      '   Endif
+      '
+      ' Endif
 
     Case "info"
       wtag = sTask
@@ -2946,7 +2946,8 @@ Public Sub TreeView1_Select()
             'GridView1[r, 5].Text = ""
 
             If TypeOf(v["color"]) = gb.Object Then
-              GridView1[r, 5].Text = v["color"][v["color"].Max]
+              ' tincho , tuve que poner un try porque se me colgaba con algunos dwg
+              Try GridView1[r, 5].Text = v["color"][v["color"].Max]
             Else
               If TypeOf(v["color"]) = gb.Integer Then
                 GridView1[r, 5].Text = v["color"]

@@ -113,6 +113,13 @@ Public flgSearchingPOI As Boolean
 Public flgShowingLayers As Boolean
 Public flgNewPosition As Boolean        ' seteada cuando hay un cambio en pan o zoom
 
+' 2021 pongo esto por compatibilidad
+Public flgWindowBackColor As Integer '= Color.Blac  '' Window backgrount color
+Public flgWindowTextColor As Integer   '' Window helper text color
+Public flgWindowCursorColor As Integer '' Window cursor color
+Public flgWhiteAndBlack As Integer     '' El color blanco/negro siempre sera distinto al
+Public flgOnScreenHelpColor As Integer = Color.LightGray    '' Tincho, esta es nueva
+
 ' Vars for entities edition
 Public arrUndo As New Entity[]             '' An array to put an unmodified copy of an entity before modifying it and then restoring it to the previous version.
 
@@ -245,6 +252,30 @@ Public Sub EntitiesTransfer2()
 
 End
 
+Public Function GetLayerByHandle(sHandle As String) As Layer
+
+  Dim Lay As Layer
+
+  For Each Lay In gcd.CurrentDrawing.arrLayers
+
+    If Lay.handle = sHandle Then Return Lay
+  Next
+  Return Null
+
+End
+
+Public Function GetLayer(LayerName As String) As Layer
+
+  Dim Lay As Layer
+
+  For Each Lay In gcd.CurrentDrawing.arrLayers
+
+    If Lay.Name = LayerName Then Return Lay
+  Next
+  Return Null
+
+End
+
 Public Sub Main()
 
   Select Starter.flgWindowBackColor
@@ -256,6 +287,20 @@ Public Sub Main()
       Starter.flgWhiteAndBlack = Color.Black
 
   End Select
+  Dim oLtype As New LType
+  gcd.CurrentDrawing.arrLTYpes.Add(oLtype)
+  gcd.CurrentDrawing.CurrLineType = oLtype
+
+  Dim oNewLayer As New Layer
+  gcd.CurrentDrawing.arrLayers.Add(oNewLayer)
+  gcd.CurrentDrawing.CurrLayer = oNewLayer
+
+  ' para compatibilidad
+  flgWindowBackColor = Starter.flgWindowBackColor
+  flgWindowTextColor = Starter.flgWindowTextColor
+  flgWindowCursorColor = Starter.flgWindowCursorColor
+  flgWhiteAndBlack = Starter.flgWhiteAndBlack
+  flgOnScreenHelpColor = Starter.flgOnScreenHelpColor
 
   'If WindowBackColor = 0 Then WhiteAndBlack = Color.White Else WhiteAndBlack = Color.Black
   ' ' armo el array de colores
@@ -357,11 +402,12 @@ Public Sub ImpEnty5(cEny As Collection, obx As Entity[])
 
   For Each e In cEny                                              ' Para cada Coleccion de datos de vrx
     If e.Exist("entity") Then                                     ' es una entidad?
-      entNueva = New Entity                                       ' entonces, creamos una nueva
 
       If InStr("POINT ATTDEF ATTRIB LINE LWPOLYLINE CIRCLE ELLIPSE ARC TEXT MTEXT SPLINE SOLID LEADER INSERT DIMENSION_LINEAR DIMENSION_DIAMETER DIMENSION_RADIUS DIMENSION_ANG3PT DIMENSION_ALIGNED DIMENSION_ORDINATE LARGE_RADIAL_DIMENSION ARC_DIMENSION", UCase(e["entity"])) = 0 Then Continue
+      entNueva = clsEntities.ImportJsonToEntity(e)
 
-      If clsEntities.ImportJsonToEntity(e, entNueva) Then         ' si esta implementada, llenamos los datos
+      If Not IsNull(entNueva) Then         ' si esta implementada, llenamos los datos
+
         If e.Exist("handle") Then
 
           obx.Add(entNueva)
@@ -447,7 +493,9 @@ End
 Public Function GetGBColor(CADcolor As Integer, Optional oLayer As Layer) As Integer
 
   Dim layerID As String
-  layerID = oLayer.Name
+
+  If Not IsNull(oLayer) Then layerID = oLayer.Name
+
   ' FIXME: reparar post layers
   If Not gcd.CurrentDrawing.cModel["LAYERS"].Exist(layerID) Then Return Starter.flgWhiteAndBlack
 
@@ -522,6 +570,8 @@ Public Function UpdateGraphics(Optional handles As String[] = [], DoRegen As Boo
   Dim cEntity As Collection, entNueva As Entity
 
   UpdateLayers
+  JSONReadLTypes()
+
   ImportBlocks(gcd.CurrentDrawing.cModel)
 
   If handles.Count = 0 Then                   ' Update all entities
@@ -547,6 +597,8 @@ Public Function UpdateGraphics(Optional handles As String[] = [], DoRegen As Boo
 
   End If
 
+  ReadEntities()
+
   If DoRegen Then Regen
 
 End
@@ -560,7 +612,6 @@ End
 '' Regenera las listas de OpenGL
 Public Sub Regen()
 
-  gcd.UpdateLayers
   clsEntities.glGenDrawList
   clsEntities.glGenDrawListSel
   redraw
@@ -573,7 +624,7 @@ Public Sub UpdateLayers()
   Dim CMLayer As Collection
   Dim newlayer As Layer
 
-  CurrentDrawing.Layers.Clear
+  CurrentDrawing.arrLayers.Clear
   For Each CMLayer In CurrentDrawing.cModel["LAYERS"]
     newlayer = New Layer
     If TypeOf(CMLayer["color"]) = gb.Object Then
@@ -584,7 +635,8 @@ Public Sub UpdateLayers()
     newlayer.Name = CMLayer["name"]
     newlayer.handle = CMLayer["handle"][1]
     newlayer.id = newlayer.handle
-    CurrentDrawing.Layers.Add(newlayer, newlayer.id)
+    newlayer.Visible = True
+    CurrentDrawing.arrLayers.Add(newlayer)
   Next
 
 End
@@ -681,5 +733,83 @@ Public Function Near(xyzReal As Float) As Float
   If r > 0.5 Then n += 1
 
   Return n * appmain.GridSpacing
+
+End
+
+'' Reads LTypes collection and puts data in arrLTypes
+Public Sub JSONReadLTypes()
+
+  Dim hlty As LType
+  Dim t, i As Integer
+  Dim fTrameLength As Float
+  Dim sNextKey As String
+
+  ' primero eliminamos lo q haya
+  CurrentDrawing.arrLTYpes.Clear
+  For Each c As JsonCollection In CurrentDrawing.cModel["LTYPES"]
+    hlty = New LType
+    hlty.Name = c["name"]
+    hlty.Description = c["description"]
+    hlty.handle = c["handle"][1]
+    ' hlty.nTrames = CInt(c["73"])
+    ' If hlty.nTrames > 0 Then hlty.Length = c["40"]
+    ' i = 0
+    ' For t = 1 To hlty.nTrames
+    '   Do
+    '     If t > 1 Then
+    '       sNextKey = "49_" & CStr(i)
+    '     Else
+    '       sNextKey = "49"
+    '     Endif
+    '     If c.Exist(sNextKey) Then
+    '       Inc i
+    '       hlty.TrameLength.Add(Abs(CFloat(c[sNextKey])) * 2.5) ' TODO: verificar este valor arbitrario
+    '       If hlty.TrameLength.Last = 0 Then hlty.TrameLength.Last = 1
+    '
+    '       Break
+    '     Endif
+    '     Inc i
+    '     If i = 1000 Then Return
+    '   Loop
+
+    'Next
+
+    CurrentDrawing.arrLTYpes.Add(hlty)
+
+  Next
+
+End
+
+Public Function FindLtIndex(sName As String) As Integer
+
+  Dim i As Integer
+
+  For i = 0 To gcd.CurrentDrawing.arrLTYpes.Max
+
+    If LCase(gcd.CurrentDrawing.arrLTYpes[i].Name) = LCase(sname) Then Return i
+
+  Next
+
+  Return -1
+
+End
+
+'' Reads entities and fill arrLayers
+Public Sub ReadEntities()
+
+  Dim hLay As Layer
+  Dim e As Entity
+
+  ' primero eliminamos lo q haya
+  For Each hLay In CurrentDrawing.arrLayers
+    hLay.Entities.Clear
+  Next
+
+  For Each e In CurrentDrawing.arrEntities
+    'e.pLayer = CurrDrawing.arrLayers[gcd.FindLaIndex(e.pLayer)]
+    e.pLayer.Entities.Add(e)
+  Next
+
+  currentDrawing.arrVisibleEntities.Resize(CurrentDrawing.arrEntities.Count)
 
 End

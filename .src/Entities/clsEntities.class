@@ -1629,3 +1629,53 @@ End
 '   Return newBlock.entities
 '
 ' End
+'' Imports data from a collection to an entity. True if the entity is handled by GauchoCAD at this version,
+'' False if entity couldn't be created for some reason.
+Public Function ImportJsonToEntity(c As JSONCollection, Optional IsDummy As Boolean = False) As Entity
+
+  Dim clsHandler As Object
+  Dim e As Entity
+
+  ' If Not c.Exist("entity") Then Return False
+  ' If Not c "entity") Then Return False
+  If IsDummy Then
+    clsHandler = cadDummy
+  Else
+    clsHandler = Object.New("cad" & c["entity"])  ' obtenemos el tipo de entidad y buscamos su clase. Si no manjemos esa entidad, esto de error.
+
+  End If
+
+  e = clsHandler.newEntity()
+  If clsHandler.ImportJSONCol(c, e) Then      ' le pedimos a la clase que arme un objeto Entity para agregar al Drawing actual
+    ' llenamos Common data:
+    e.player = gcd.GetLayerByHandle(c["layer"][3])  ' busco el layer por nombre
+    If e.pLayer = Null Then Stop
+    If TypeOf(c["color"]) = gb.Object Then
+      Try e.colour = c["color"]["index"]    ' FIXME: esto sigue dando error
+    Else
+      Try e.colour = c["color"]
+    Endif
+    e.LineWidth = c["linewt"] / 100
+    If e.LineWidth < 1 Then e.LineWidth = 1
+    If gcd.FindLtIndex(c["ltype_flags"]) >= 0 Then
+      e.LineType = gcd.CurrentDrawing.arrLTYpes[gcd.FindLtIndex(c[dxf.codLType])]
+    Else
+      e.LineType = gcd.CurrentDrawing.arrLTYpes.First
+    End If
+    e.Gender = clsHandler.Gender
+    e.ClassHandler = clsHandler
+    clsHandler.Finish(e)
+
+    Return e
+
+  Else
+
+    Return Null
+
+  End If
+
+  'Catch
+  'e.ClassHandler = cadDummy
+  Return False
+
+End

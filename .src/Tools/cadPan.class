@@ -43,7 +43,7 @@ End
 Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' called by FCAD-> DrawingArea_MouseUp
 
   AppMain.glarea1.Mouse = Mouse.Cross
-  AppMain.flgNewPosition = True
+  gcd.flgNewPosition = True
   Me.active = False
 
 End

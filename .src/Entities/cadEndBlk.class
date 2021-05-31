@@ -51,7 +51,6 @@ Public Function NewEntity() As Entity
 
   e.Gender = Me.Gender
   e.ClassHandler = Me
-
   ' this may fails on some scopes, but we should Try
   Try e.pLayer = gcd.CurrentDrawing.CurrLayer
   Try e.colour = gcd.CurrentDrawing.CurrColor

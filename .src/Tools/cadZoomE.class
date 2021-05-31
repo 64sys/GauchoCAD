@@ -76,6 +76,6 @@ Public Function Start(Optional ElemToBuild As Variant, _Mode As Integer = 0) As 
     gcd.CurrentDrawing.PanY = 0
   End If
 
-  AppMain.flgNewPosition = True
+  gcd.flgNewPosition = True
 
 End

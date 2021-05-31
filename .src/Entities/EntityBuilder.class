@@ -454,7 +454,7 @@ End
 
 Public Sub Finish()
 
-  elem.Handle = gcd.NewHandle()
+  elem.Handle = gcd.UUHandleUnique(gcd.CurrentDrawing) ' gcd.NewHandle()
   elem.HandleOwner = "1"
   gcd.CurrentDrawing.arrEntities.Add(elem)
   gcd.CurrentDrawing.CurrLayer.Entities.Add(elem)

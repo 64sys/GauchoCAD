@@ -283,15 +283,14 @@ Public Function ImportJsonCol(c As JSONCollection, e As Entity) As Boolean
   ' e.dwg["invisible"] = 0
   ' e.dwg["linewt"] = 30
 
-  e.ClassHandler = Me
-  e.P.Add(c["start"][0])
-  e.P.Add(c["start"][1])
-  e.P.Add(c["end"][0])
-  e.P.Add(c["end"][1])
+  e.P[0] = (c["start"][0])
+  e.P[1] = (c["start"][1])
+  e.P[2] = (c["end"][0])
+  e.P[3] = (c["end"][1])
 
   Return True
 
-Catch
+  'Catch
 
   Return False
 

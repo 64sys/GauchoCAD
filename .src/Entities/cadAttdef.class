@@ -90,17 +90,10 @@ End
 ' Importo los datos que puedo procesar de una coleccion y genero un Entity para ser agregado a un array
 Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
 
-  e.ClassHandler = Me
-  e.P.Add(c["ins_pt"][0])
-  e.P.Add(c["ins_pt"][1])
+  cadText.ImportJsonCol(c, e)
   e.StringData.Add(c["tag"])
   If Not IsNull(c["default_value"]) Then e.StringData.Add(c["default_value"]) Else e.StringData.Add("")
   e.StringData.Add(c["prompt"])
-
-  ' FIXME: reparar esto
-  e.fParam.Add(0) ' Angulo en grados
-
-  e.fParam.Add(c["height"])
 
   Return True
 

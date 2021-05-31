@@ -248,8 +248,7 @@ Public Function ImportJsonCol(c As JSONCollection, e As Entity) As Boolean
   ' e.dwg["plotstyle_flags"] = 0
   ' e.dwg["invisible"] = 0
   ' e.dwg["linewt"] = 30
-
-  e.ClassHandler = Me
+  e.P.Clear
   e.P.Add(c["x"])
   e.P.Add(c["y"])
 

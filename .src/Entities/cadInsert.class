@@ -374,6 +374,7 @@ Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
   '   "_subclass": "AcDbBlockReference",
 
   '   "ins_pt": [2897.47088581027083, 1635.43128744943124, 0.0],
+  e.P.Clear
   e.P.Add(c["ins_pt"][0])
   e.P.Add(c["ins_pt"][1])
 

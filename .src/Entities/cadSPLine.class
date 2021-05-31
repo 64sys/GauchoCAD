@@ -483,11 +483,10 @@ Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
   Dim fControlPoints As New Float[]
   Dim fFitPoint, fKnots As New Float[]
 
-  e.fParam.Resize(Me.TotalParams)
+  e.P.Clear
 
   If c.Exist("ctrl_pts") Then
 
-    e.fParam.Add(Me.TypeControls)
     For i = 0 To c["ctrl_pts"].Max
       e.P.Add(c["ctrl_pts"][i]["x"])
       e.P.Add(c["ctrl_pts"][i]["y"])
@@ -496,7 +495,6 @@ Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
 
   If c.Exist("fit_pts") Then
 
-    e.fParam.Add(Me.TypeTangent)
     For i = 0 To c["fit_pts"].Max
       e.P.Add(c["fit_pts"][i][0])
       e.P.Add(c["fit_pts"][i][1])
