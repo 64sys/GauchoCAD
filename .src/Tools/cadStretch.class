@@ -67,8 +67,8 @@ Public Function NewParameter(vParam As Variant[], Optional Definitive As Boolean
   If vParam[0] = "point" Then
 
     ' enganio al evento mouse
-    MouseMove(AppMain.XPix(vParam[1]), AppMain.YPix(vParam[2]))
-    MouseUp(AppMain.XPix(vParam[1]), AppMain.YPix(vParam[2]))
+    MouseMove(gcd.Xpix(vParam[1]), gcd.Ypix(vParam[2]))
+    MouseUp(gcd.Xpix(vParam[1]), gcd.Ypix(vParam[2]))
 
   Endif
 
@@ -175,7 +175,7 @@ Public Sub Finish()
   DrawingAids.CleanTexts
   clsEntities.DeSelection()
   gcd.DrawOriginals = False
-  AppMain.regen
+  gcd.regen
   Me.Active = False
   gcd.ToolActive = False
 

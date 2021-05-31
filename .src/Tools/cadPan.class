@@ -35,14 +35,14 @@ Public Function MouseDown(mouseX As Integer, mouseY As Integer) ' called by FCAD
 
   Me.SelStartX = mouseX
   Me.SelStartY = mouseY
-  AppMain.glarea1.Mouse = Mouse.SizeAll
+  gcd.MainGLArea.Mouse = Mouse.SizeAll
   Me.active = True
 
 End
 
 Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' called by FCAD-> DrawingArea_MouseUp
 
-  AppMain.glarea1.Mouse = Mouse.Cross
+  gcd.MainGLArea.Mouse = Mouse.Cross
   gcd.flgNewPosition = True
   Me.active = False
 

@@ -124,7 +124,7 @@ Public Sub Finish()
   gcd.clsJobPrevious = Me
   gcd.clsJob = clsDefaultJob
   clsEntities.DeSelection()
-  AppMain.regen
+  gcd.regen
   Me.Active = False
   gcd.ToolActive = False
 

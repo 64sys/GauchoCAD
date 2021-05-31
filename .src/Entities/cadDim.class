@@ -194,7 +194,7 @@ Public Function Start(Optional Mode As Integer = gcd.dimRadius)
 
   End Select
 
-  'elem.gbcolor = appmain.CurrentColor
+  'elem.gbcolor = gcd.CurrentDrawing.CurrColor
   elem.Block = newBlock.name
 
   iPoints = 0
@@ -211,7 +211,7 @@ Public Function Start(Optional Mode As Integer = gcd.dimRadius)
   gcd.OrthogonalIgnored = Me.OrthogonalIgnored
   gcd.OrthogonalForced = Me.OrthogonalForced
 
-  elem.layerid = appmain.CurrentLayer
+  elem.layerid = gcd.CurrentDrawing.CurrLayer
 
   DrawingAids.HelperTrabajo = elem.ClassHandler.HelperTrabajo
 

@@ -840,7 +840,7 @@ Public Sub GLArea1_DblClick()
               While EditingText = False
                 Wait 0.1
               Wend
-              APPMain.Regen
+              gcd.regen
               EditingText = False
             Endif
         End Select
@@ -1821,7 +1821,7 @@ Public Sub ChangeColorRefresh()
 
     If Changed = True Then
       gcd.CurrentDrawing.arrUndo.Add(te)
-      appmain.regen
+      gcd.regen
     Endif
 
   Next
@@ -1937,7 +1937,7 @@ Public Sub SelectionRefresh()
           '       While EditingText = False
           '         Wait 0.1
           '       Wend
-          '       appmain.regen
+          '       gcd.regen
           '       EditingText = False
           '     Endif
         Case Else
@@ -2064,7 +2064,7 @@ Public Sub PropSave()
 
     If Changed = True Then
       gcd.CurrentDrawing.arrUndo.Add(te)
-      appmain.regen
+      gcd.regen
     Endif
 
   Next
@@ -2607,7 +2607,7 @@ Public Sub Form_KeyPress()
                 Endif
               Next
             Endif
-            appmain.regen
+            gcd.regen
 
           Case Asc("z"), Asc("Z") ' Undo
 
@@ -2620,7 +2620,7 @@ Public Sub Form_KeyPress()
                   gcd.CurrentDrawing.arrEntities.Remove(imx, 1)
                   gcd.CurrentDrawing.arrEntities.Add(uEnty, imx)
                   gcd.CurrentDrawing.arrUndo.Remove(umx, 1)
-                  appmain.regen
+                  gcd.regen
                   'gcd.Redraw
                   Break
                 Endif

@@ -99,7 +99,7 @@ Public Function MouseDown(mouseX As Integer, mouseY As Integer) ' esta rutina es
         clsEntities.SelectElem(gcd.CurrentDrawing.iEntity[3])                 '   -> la selecciono
         DrawingAids.HelperTrabajo = ("Select second line")
         Me.PointsDone = 2
-        AppMain.SelectionRefresh()
+
         Me.Active = False
         clsEntities.GLGenDrawListSel(0)
 
@@ -159,7 +159,7 @@ Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' esta rutina es l
       Debug "Select parsing time ", Timer - t
 
       clsEntities.GLGenDrawListSel(0)
-      AppMain.SelectionRefresh()
+
 
     End If
 
@@ -311,9 +311,9 @@ Public Function DoFillet() As Boolean
           eArco.fParam.Add(Me.Radious)
           eArco.fParam.Add(StartAngle)
           eArco.fParam.Add(EndAngle)
-          eArco.colour = AppMain.CurrentColor
-          eArco.LineType = AppMain.CurrentLtype
-          eArco.pLayer = AppMain.CurrentLayer
+          eArco.colour = gcd.CurrentDrawing.CurrColor
+          eArco.LineType = gcd.CurrentDrawing.CurrLtype
+          eArco.pLayer = gcd.CurrentDrawing.CurrLayer
           cadArc.Finish(eArco)
           gcd.CurrentDrawing.arrEntities.Add(eArco)
 

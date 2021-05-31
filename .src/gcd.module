@@ -123,6 +123,8 @@ Public flgOnScreenHelpColor As Integer = Color.LightGray    '' Tincho, esta es n
 ' Vars for entities edition
 Public arrUndo As New Entity[]             '' An array to put an unmodified copy of an entity before modifying it and then restoring it to the previous version.
 
+Public MainGLArea As Control  ' this is for m-designer compatibility and point to main form GLArea
+
 '' This transfer layers from imported file, one collection actually, to the model collection
 
 Public Sub LayersTransfer()
@@ -277,6 +279,8 @@ Public Function GetLayer(LayerName As String) As Layer
 End
 
 Public Sub Main()
+
+  MainGLArea = appmain.GLArea1
 
   Select Starter.flgWindowBackColor
     Case Color.Black
@@ -837,5 +841,18 @@ Public Sub ReadEntities()
   Next
 
   currentDrawing.arrVisibleEntities.Resize(CurrentDrawing.arrEntities.Count)
+
+End
+
+Public Function ScreenWidth() As Integer
+
+  Return appmain.GLArea1.W
+
+End
+
+
+Public Function ScreenHeight() As Integer
+
+  Return appmain.GLArea1.h
 
 End

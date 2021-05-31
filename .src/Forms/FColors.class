@@ -129,7 +129,7 @@ Public Sub Color_Click()
   iCurrentColor = obj.Tag
 
   APPMain.SelectingColor = True
-  APPMain.CurrentColor = iCurrentColor
+  gcd.CurrentDrawing.CurrColor = iCurrentColor
 
   Me.Close
 

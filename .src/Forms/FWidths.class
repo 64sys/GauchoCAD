@@ -107,7 +107,7 @@ End
 ' Public Sub GridView1_MouseDown()
 '
 '   If GridView1.Row <> -1 Then
-'     APPMain.CurrentLtype = GridView1.Row
+'     gcd.CurrentDrawing.CurrLtype = GridView1.Row
 '     APPMain.SelectedLtype = True
 '     Print GridView1[GridView1.Row, 0].Text
 '     Print GridView1[GridView1.Row, 1].Text

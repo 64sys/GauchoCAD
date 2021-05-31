@@ -103,7 +103,7 @@ Public Function Start(Optional filename As Variant, Optional _mode As Integer = 
 
             entHatch.pLayer = gcd.CurrentDrawing.CurrLayer ' "0" 'gcd.GetpLayer(fMain.CurrentLayer)
 
-            entHatch.colour = AppMain.CurrentColor
+            entHatch.colour = gcd.CurrentDrawing.CurrColor
             entHatch.ColorToPaint = gcd.gColor[entHatch.colour]
 
             If gcd.CurrentDrawing.arrEntities[gcd.CurrentDrawing.arrSelecIndex[0]].Gender <> "LWPolyline" Then

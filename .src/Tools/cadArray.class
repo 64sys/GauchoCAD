@@ -220,7 +220,7 @@ Public Sub Finish()
   DrawingAids.CleanTexts
   clsEntities.DeSelection()
   gcd.DrawOriginals = False
-  AppMain.regen
+  gcd.regen
   Me.Active = False
   gcd.ToolActive = False
 

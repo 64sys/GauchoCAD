@@ -903,8 +903,8 @@ Public Function CollectVisibleEntities()
 
   x0 = gcd.Xreal(0)
   y1 = gcd.Yreal(0)                     ' el eje Y esta invertido en OpenGL
-  x1 = gcd.Xreal(AppMain.GLArea1.w)
-  y0 = gcd.Yreal(AppMain.GLArea1.h)
+  x1 = gcd.Xreal(gcd.ScreenWidth())
+  y0 = gcd.Yreal(gcd.ScreenHeight())
 
   If gcd.CurrentDrawing.arrEntities.Max > gcd.CurrentDrawing.arrVisibleEntities.Max Then gcd.CurrentDrawing.arrVisibleEntities.Resize(gcd.CurrentDrawing.arrEntities.Count)
 

@@ -173,6 +173,6 @@ Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' called by FCAD->
   AppMain.PanelBlockFit.Visible = False
   AppMain.ListView1.Visible = True
 
-  AppMain.regen
+  gcd.regen
 
 End

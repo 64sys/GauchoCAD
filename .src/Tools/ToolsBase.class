@@ -202,7 +202,7 @@ Public Sub Finish()
   gcd.DrawOriginals = False
   Me.Active = False
   gcd.ToolActive = False
-  AppMain.regen
+  gcd.regen
 
 End
 

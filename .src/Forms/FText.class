@@ -41,7 +41,7 @@ End
 
 Public Sub Form_Open()
 
-  txoEdit.Text = etx.StringData[0] 'APPMain.CurrentText
+  txoEdit.Text = etx.StringData[0] 'gcd.CurrentDrawing.CurrText
   vaoAngle.Value = etx.fParam[0]
   vaoHeight.Value = etx.fParam[1]
 
@@ -55,7 +55,7 @@ Public Sub Form_KeyPress()
   If ready = True Then
     Select Key.Code
       Case Key.Enter, Key.Return
-        'APPMain.CurrentText = txoEdit.Text
+        'gcd.CurrentDrawing.CurrText = txoEdit.Text
         etx.StringData[0] = txoEdit.Text
         etx.fParam[0] = vaoAngle.Value
         etx.fParam[1] = vaoHeight.Value
@@ -76,7 +76,7 @@ End
 
 Public Sub btnSave_Click()
 
-  'APPMain.CurrentText = txoEdit.Text
+  'gcd.CurrentDrawing.CurrText = txoEdit.Text
   etx.StringData[0] = txoEdit.Text
   etx.fParam[0] = vaoAngle.Value
   etx.fParam[1] = vaoHeight.Value
@@ -88,7 +88,7 @@ End
 
 Public Sub btnCancel_Click()
 
-  'APPMain.CurrentText = txoEdit.Text
+  'gcd.CurrentDrawing.CurrText = txoEdit.Text
   APPMain.EditingText = True
   Me.Close
 

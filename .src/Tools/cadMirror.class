@@ -197,7 +197,7 @@ Public Sub Finish()
   gcd.clsJob = clsDefaultJob
   DrawingAids.CleanTexts
   clsEntities.DeSelection()
-  AppMain.regen
+  gcd.regen
   Me.Active = False
   gcd.ToolActive = False
 

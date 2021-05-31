@@ -95,7 +95,7 @@ Public Function MouseDown(mouseX As Integer, mouseY As Integer) ' esta rutina es
         If GripPoint < 0 Then clsEntities.deSelectElem(gcd.CurrentDrawing.iEntity[3])               '   -> la deselecciono
       Else
         clsEntities.SelectElem(gcd.CurrentDrawing.iEntity[3])                 '   -> la selecciono
-        'fMain.SelectionRefresh()
+
       Endif
       Me.Active = False
 
@@ -152,7 +152,7 @@ Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' esta rutina es l
 
     End If
     clsEntities.GLGenDrawListSel(0)
-    'fMain.SelectionRefresh()
+
 
     DrawingAids.HelperTrabajo = ("Selected") & " " & Str$(Me.selectionCount) & " " & ("elements")
 
@@ -234,7 +234,7 @@ Public Function KeyText(EnteredText As String)
 
   Select Case LCase(EnteredText)
     Case "regen"
-      AppMain.Regen
+      gcd.regen
     Case "redraw"
       gcd.Redraw
     Case "save"

@@ -133,7 +133,7 @@ Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' called by FCAD->
       If (Me.SelEndX - Me.SelStartX + (-Me.SelEndy + Me.SelStartY)) > 10 Then
 
         Me.selectionCount = clsEntities.SelectionSquare(Me.SelStartXr, Me.SelStartYr, Me.SelEndXr, Me.SelEndyr,, crossing)
-        AppMain.regen
+        gcd.regen
 
       End If
 
