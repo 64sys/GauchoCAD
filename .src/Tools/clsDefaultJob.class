@@ -153,7 +153,6 @@ Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' esta rutina es l
     End If
     clsEntities.GLGenDrawListSel(0)
 
-
     DrawingAids.HelperTrabajo = ("Selected") & " " & Str$(Me.selectionCount) & " " & ("elements")
 
   Else If GripPoint >= 0 Then
@@ -225,6 +224,8 @@ Public Function MouseMove(mouseX As Integer, mouseY As Integer) ' esta rutina es
 End
 
 Public Function KeyText(EnteredText As String)
+
+  ' los comandos por teclado los maneja tincho
 
   ' in this case, we try to run the command wich is a class
   Dim o As Object, RunWith As String, c As Class

@@ -850,7 +850,6 @@ Public Function ScreenWidth() As Integer
 
 End
 
-
 Public Function ScreenHeight() As Integer
 
   Return appmain.GLArea1.h

@@ -141,18 +141,6 @@ Public Function Start(Optional ElemToBuild As Variant, Optional Mode As Integer 
 
   gcd.OrthogonalForced = elem.ClassHandler.OrthogonalForced
 
-  elem.pLayer = gcd.CurrentDrawing.CurrLayer
-
-  elem.colour = gcd.CurrentDrawing.CurrColor
-
-  'elem.ColorToPaint = gcd.gColor[elem.colour]
-
-  elem.LineType = gcd.CurrentDrawing.CurrLineType
-
-  elem.LineWidth = gcd.CurrentDrawing.CurrLineWt
-
-  ' new, and could fail in most entities so Try it
-
   Try elem.iParam[elem.ClassHandler.iiiMode] = mode
 
   DrawingAids.HelperTrabajo = elem.ClassHandler.HelperTrabajo

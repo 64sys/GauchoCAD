@@ -160,7 +160,6 @@ Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' esta rutina es l
 
       clsEntities.GLGenDrawListSel(0)
 
-
     End If
 
   End If
