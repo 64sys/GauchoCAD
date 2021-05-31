@@ -86,6 +86,8 @@ Public arrVisibleEntities As New Integer[]      ' set at view change
 Public VisibleEntitiesMax As Integer            ' para acelerar no redimensiono arrVis.. uso esto
 
 Public uUndo As New Undo
+Public arrTmp As New Entity[]               '' Temporal array to put a copy of an entity before change something in it
+Public arrUndo As New Entity[]              '' An array to put an unmodified copy of an entity before modifying it and then restoring it to the previous version.
 
 ' SELECTION
 Public arrSelecIndex As New Integer[]       '' List of indexes of selected entities with the mouse
@@ -106,7 +108,7 @@ Public poiPoligonEntities As New Integer[]      '' related entity
 
 ' interaccion del mouse en pantalla
 Public LastPoint As New Float[]                 '' ultimo punto marcado o null si no existe
-Public iEntity As New Single[]                  '' las coordenadas del punto encontrado y el tipo de punto
+Public iEntity As New Single[] '= [0, 0, -1, -1]                '' las coordenadas del punto encontrado y el tipo de punto
 Public iLastEntity As Integer                   '' ultima entidad encontrada
 
 Public flgShowPOIinfo As Boolean = True

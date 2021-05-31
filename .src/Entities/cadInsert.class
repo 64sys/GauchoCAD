@@ -349,8 +349,6 @@ End
 ' Importo los datos que puedo procesar de una coleccion y genero un Entity para ser agregado a un array
 Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
 
-  e.fParam.Resize(Me.TotalParams)
-
   '    MANEJADO EN clsEntities
   '============================
   '   "entity": "INSERT",
@@ -390,11 +388,12 @@ Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
   '   "extrusion": [0.0, 0.0, 1.0],
   '   "has_attribs": 0,
   '   "block_header": [5, 2, 606, 606]
-  e.Block = gcd.CurrentDrawing.cModel["BLOCKS"][c["block_header"][3]]["name"]
+  'e.Block = gcd.CurrentDrawing.cModel["BLOCKS"][c["block_header"][3]]["name"]
+  e.pBlock = clsEntities.FIndBlock(gcd.CurrentDrawing.cModel["BLOCKS"][c["block_header"][3]]["name"])
 
   Return True
 
-Catch
+  'Catch
 
   Return False
 

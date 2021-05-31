@@ -1805,10 +1805,11 @@ Public Sub ChangeColorRefresh()
     e = gcd.CurrentDrawing.arrEntities[i]
     gcd.CurrentDrawing.arrTmp.Clear
 
-    If e.Selected And e.iInsert = -1 Then
+    ' If e.Selected And e.iInsert = -1 Then  iInsert no existe mas
+    If e.Selected Then
       e = gcd.CurrentDrawing.arrEntities[i]
       te = clsEntities.ClonEntity(e)
-      te.Handle = e.Handle
+      ' te.Handle = e.Handle  ' no es necesario
       gcd.CurrentDrawing.arrTmp.Add(te)
       cProp["Color"] = CurrentColor
       If e.colour <> cProp["Color"] Then

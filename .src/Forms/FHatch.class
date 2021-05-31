@@ -35,7 +35,7 @@ Public Sub ComboBox1_Click()
 
   entyHatch.Clear
 
-  cadDxf.LoadFile(Application.Path &/ "patterns" &/ ComboBox1.Text & ".dxf", entyHatch, True, True, True)
+  Dxf.LoadFile(Application.Path &/ "patterns" &/ ComboBox1.Text & ".dxf", entyHatch, True, True, True)
 
   DrawingArea1.Refresh
 
@@ -98,9 +98,9 @@ Public Sub btnOK_Click()
 
   ' cadHatchBuilder.LastHatch = ComboBox1.Index
   ' cadHatchBuilder.LastHatchFile = Application.Path &/ "patterns" &/ ComboBox1.Text & ".dxf"
-  gcd.CurrentDrawing.LastAngle = modUtils.CPval(txtRotation.Text)
+  gcd.CurrentDrawing.LastAngle = utils.CPval(txtRotation.Text)
 
-  gcd.CurrentDrawing.LastScale = modUtils.CPval(txtScale.Text)
+  gcd.CurrentDrawing.LastScale = utils.CPval(txtScale.Text)
   If gcd.CurrentDrawing.LastScale = 0 Then gcd.CurrentDrawing.LastScale = 1
 
   Me.Close(3)

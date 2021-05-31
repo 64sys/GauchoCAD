@@ -387,7 +387,6 @@ Public Sub ImportBlocks(colData As Collection) ', obxEntities As Entity[]) As In
 
     End If
     gcd.CurrentDrawing.arrBlocks.Add(newBlock)
-    'ImportEntities2(colBlk["Entities"], newBlock.entities, newBlock.name)
 
   Next
   'Stop
@@ -490,45 +489,70 @@ Public Function GetLayerID(LayerName As String) As String
 
 End
 
-Public Function GetGBColor(CADcolor As Integer, Optional oLayer As Layer) As Integer
+' Public Function GetGBColor(CADcolor As Integer, Optional oLayer As Layer) As Integer
+'
+'   Dim layerID As String
+'
+'   If Not IsNull(oLayer) Then layerID = oLayer.Name
+'
+'   ' FIXME: reparar post layers
+'   If Not gcd.CurrentDrawing.cModel["LAYERS"].Exist(layerID) Then Return Starter.flgWhiteAndBlack
+'
+'   ' color
+'   If CADcolor = 256 Then          ' buscar color del layer
+'
+'     If TypeOf(gcd.CurrentDrawing.cModel["LAYERS"][layerID]["color"]) = gb.Object Then
+'       Return Starter.gColor[gcd.CurrentDrawing.cModel["LAYERS"][layerID]["color"]["index"]]
+'     Else
+'       Return Starter.gColor[gcd.CurrentDrawing.cModel["LAYERS"][layerID]["color"]]
+'     Endif
+'
+'     'Return Starter.gColor[11]
+'
+'   Else If CADcolor = 257 Then     ' buscar color del objeto
+'
+'     If TypeOf(gcd.CurrentDrawing.cModel["LAYERS"][layerID]["color"]) = gb.Object Then
+'       Return Starter.gColor[gcd.CurrentDrawing.cModel["LAYERS"][layerID]["color"]["index"]]
+'     Else
+'       Return Starter.gColor[gcd.CurrentDrawing.cModel["LAYERS"][layerID]["color"]]
+'     Endif
+'     'Return Starter.gColor[gcd.CurrentDrawing.cModel["LAYERS"][layerID]["color"]["index"]]    ' FIXME: cambiar esto
+'     'Return Starter.gColor[12]
+'
+'   Else If CADcolor = 0 Then       ' buscar color del bloque
+'     If TypeOf(gcd.CurrentDrawing.cModel["LAYERS"][layerID]["color"]) = gb.Object Then
+'       Return Starter.gColor[gcd.CurrentDrawing.cModel["LAYERS"][layerID]["color"]["index"]]
+'     Else
+'       Return Starter.gColor[gcd.CurrentDrawing.cModel["LAYERS"][layerID]["color"]]
+'     Endif
+'     'Return Starter.gColor[13]
+'     'Return Starter.gColor[gcd.CurrentDrawing.cModel["LAYERS"][layerID]["color"]["index"]]   ' FIXME: cambiar esto
+'
+'   Else
+'
+'     Return Starter.gColor[CADcolor]
+'
+'   Endif
+'
+' End
 
-  Dim layerID As String
-
-  If Not IsNull(oLayer) Then layerID = oLayer.Name
+Public Function GetGBColor(CADcolor As Integer, Optional pLayer As Layer) As Integer
 
   ' FIXME: reparar post layers
-  If Not gcd.CurrentDrawing.cModel["LAYERS"].Exist(layerID) Then Return Starter.flgWhiteAndBlack
-
+  'Return gcd.flgWhiteAndBlack
+  If IsNull(pLayer) Then Return Starter.gColor[CADcolor]
   ' color
   If CADcolor = 256 Then          ' buscar color del layer
 
-    If TypeOf(gcd.CurrentDrawing.cModel["LAYERS"][layerID]["color"]) = gb.Object Then
-      Return Starter.gColor[gcd.CurrentDrawing.cModel["LAYERS"][layerID]["color"]["index"]]
-    Else
-      Return Starter.gColor[gcd.CurrentDrawing.cModel["LAYERS"][layerID]["color"]]
-    Endif
-
-    'Return Starter.gColor[11]
+    Return Starter.gColor[player.Colour]
 
   Else If CADcolor = 257 Then     ' buscar color del objeto
 
-    If TypeOf(gcd.CurrentDrawing.cModel["LAYERS"][layerID]["color"]) = gb.Object Then
-      Return Starter.gColor[gcd.CurrentDrawing.cModel["LAYERS"][layerID]["color"]["index"]]
-    Else
-      Return Starter.gColor[gcd.CurrentDrawing.cModel["LAYERS"][layerID]["color"]]
-    Endif
-    'Return Starter.gColor[gcd.CurrentDrawing.cModel["LAYERS"][layerID]["color"]["index"]]    ' FIXME: cambiar esto
-    'Return Starter.gColor[12]
+    Return Starter.gColor[pLayer.Colour]
 
-  Else If CADcolor = 0 Then       ' buscar color del bloque
-    If TypeOf(gcd.CurrentDrawing.cModel["LAYERS"][layerID]["color"]) = gb.Object Then
-      Return Starter.gColor[gcd.CurrentDrawing.cModel["LAYERS"][layerID]["color"]["index"]]
-    Else
-      Return Starter.gColor[gcd.CurrentDrawing.cModel["LAYERS"][layerID]["color"]]
-    Endif
-    'Return Starter.gColor[13]
-    'Return Starter.gColor[gcd.CurrentDrawing.cModel["LAYERS"][layerID]["color"]["index"]]   ' FIXME: cambiar esto
-
+  Else If CADcolor = 0 Then
+    ' buscar color del bloque
+    Return Starter.gColor[pLayer.Colour]
   Else
 
     Return Starter.gColor[CADcolor]
@@ -638,6 +662,7 @@ Public Sub UpdateLayers()
     newlayer.Visible = True
     CurrentDrawing.arrLayers.Add(newlayer)
   Next
+  CurrentDrawing.CurrLayer = CurrentDrawing.arrLayers.First
 
 End
 
@@ -777,6 +802,7 @@ Public Sub JSONReadLTypes()
     CurrentDrawing.arrLTYpes.Add(hlty)
 
   Next
+  CurrentDrawing.CurrLineType = CurrentDrawing.arrLTYpes.First
 
 End
 
