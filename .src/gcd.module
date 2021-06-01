@@ -296,6 +296,7 @@ Public Sub Main()
   gcd.CurrentDrawing.CurrLineType = oLtype
 
   Dim oNewLayer As New Layer
+  oNewLayer.Visible = True
   gcd.CurrentDrawing.arrLayers.Add(oNewLayer)
   gcd.CurrentDrawing.CurrLayer = oNewLayer
 
