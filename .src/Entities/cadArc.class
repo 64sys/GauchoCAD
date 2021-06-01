@@ -188,7 +188,7 @@ Public Sub makepolyline(oe As Entity, Optional density As Integer = 36)
 
   ' si quiero tramos de 10 pixels como maximo...
   iTramos = LargoPixels / 10
-  
+
   If iTramos < 6 Then iTramos = 6
   If iTramos > density Then iTramos = density
   angle_increment = (fEnd - fStart) / iTramos

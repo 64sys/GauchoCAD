@@ -125,6 +125,6 @@ Public Sub Finish()
 
   gcd.ToolActive = True
 
-  AppMain.flgNewPosition = True
+  gcd.flgNewPosition = True
 
 End
