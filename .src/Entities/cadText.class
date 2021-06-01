@@ -32,7 +32,7 @@ Public Const ParamHelper As String = "Start point;Angle;Heigth;"      ' a little
 Public Const ParamDefault As String = " ; 0 ; 10 ; "
 
 ' fParam helpers
-Public Const TotalParams As Integer = 8
+Public Const TotalParams As Integer = 9
 Public Const ipaTextHeight As Integer = 0
 Public Const ipaTextAngle As Integer = 1
 Public Const ipaGenerationFlags As Integer = 2
@@ -41,7 +41,7 @@ Public Const ipaVertJustif As Integer = 4
 Public Const ipaRelativeFactor As Integer = 5
 Public Const ipaHorizAngle As Integer = 6
 Public Const ipaTextVisibility As Integer = 7
-
+Public Const ipaAtttchmPoint As Integer = 8
 ' stringdata helpers
 Public Const sdaTotalParams As Integer = 2
 Public Const sdaText As Integer = 0

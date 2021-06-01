@@ -197,40 +197,7 @@ Public Sub Finish()
 
     For i = 0 To Me.inxSelected.max
 
-      ' en todos los casos, roto los puntos
-      puntos.Translate(gcd.CurrentDrawing.arrEntities[Me.inxSelected[i]].p, -Me.SelStartXr, -Me.SelStartYr)  ' pero primero translado
-      puntos.Rotate(gcd.CurrentDrawing.arrEntities[Me.inxSelected[i]].p, Radianes)
-      puntos.Translate(gcd.CurrentDrawing.arrEntities[Me.inxSelected[i]].p, Me.SelStartXr, Me.SelStartYr)    ' y regreso
-
-      ' en algunos casos, algo mas
-      Select Case LCase$(gcd.CurrentDrawing.arrEntities[Me.inxSelected[i]].Gender)
-        Case "text", "mtext"
-          gcd.CurrentDrawing.arrEntities[Me.inxSelected[i]].fParam[0] += Radianes * 180 / Pi
-          If gcd.CurrentDrawing.arrEntities[Me.inxSelected[i]].fParam[0] >= 360 Then gcd.CurrentDrawing.arrEntities[Me.inxSelected[i]].fParam[0] -= 360
-
-        Case "insert"
-          gcd.CurrentDrawing.arrEntities[Me.inxSelected[i]].fParam[2] += Radianes * 180 / Pi
-          If gcd.CurrentDrawing.arrEntities[Me.inxSelected[i]].fParam[2] >= 360 Then gcd.CurrentDrawing.arrEntities[Me.inxSelected[i]].fParam[2] -= 360
-
-        Case "arc"
-          ' start
-          gcd.CurrentDrawing.arrEntities[Me.inxSelected[i]].fParam[1] += Radianes * 180 / Pi
-          If gcd.CurrentDrawing.arrEntities[Me.inxSelected[i]].fParam[1] >= 360 Then gcd.CurrentDrawing.arrEntities[Me.inxSelected[i]].fParam[1] -= 360
-
-          ' finish
-          gcd.CurrentDrawing.arrEntities[Me.inxSelected[i]].fParam[2] += Radianes * 180 / Pi
-          If gcd.CurrentDrawing.arrEntities[Me.inxSelected[i]].fParam[2] >= 360 Then gcd.CurrentDrawing.arrEntities[Me.inxSelected[i]].fParam[2] -= 360
-
-        Case "ellipse"
-          ' start
-          gcd.CurrentDrawing.arrEntities[Me.inxSelected[i]].fParam[1] += Radianes
-          If gcd.CurrentDrawing.arrEntities[Me.inxSelected[i]].fParam[1] >= 2 * Pi Then gcd.CurrentDrawing.arrEntities[Me.inxSelected[i]].fParam[1] -= 2 * Pi
-
-          ' finish
-          gcd.CurrentDrawing.arrEntities[Me.inxSelected[i]].fParam[2] += Radianes
-          If gcd.CurrentDrawing.arrEntities[Me.inxSelected[i]].fParam[2] >= 2 * Pi Then gcd.CurrentDrawing.arrEntities[Me.inxSelected[i]].fParam[2] -= 2 * Pi
-
-      End Select
+      gcd.CurrentDrawing.arrEntities[Me.inxSelected[i]].ClassHandler.Rotate(gcd.CurrentDrawing.arrEntities[Me.inxSelected[i]], radianes)
 
     Next
 

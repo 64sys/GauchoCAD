@@ -245,7 +245,7 @@ Public Function Draw2(oE As Entity)
 
 End
 
-Public Function BuildPOI(oE As Entity) As Integer
+Public Function BuildPOI(oE As Entity, Optional arrIndex As Integer = -1) As Integer
 
   oe.PoiPoints.Clear
   oe.PoiType.Clear
