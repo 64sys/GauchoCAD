@@ -1645,8 +1645,8 @@ Public Function ImportJsonToEntity(c As JSONCollection, Optional IsDummy As Bool
 
   End If
 
-  e = clsHandler.newEntity()
-  If clsHandler.ImportJSONCol(c, e) Then      ' le pedimos a la clase que arme un objeto Entity para agregar al Drawing actual
+  e = clsHandler.newEntity() ' le pedimos a la clase que arme un objeto Entity para agregar al Drawing actual
+  If clsHandler.ImportJSONCol(c, e) Then
     ' llenamos Common data:
     e.player = gcd.GetLayerByHandle(c["layer"][3])  ' busco el layer por nombre
     If e.pLayer = Null Then Stop
