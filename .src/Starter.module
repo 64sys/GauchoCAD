@@ -37,7 +37,7 @@ Public sTextures As String          '' Textures directory
 Public gColor As New Integer[]      '' Colors list
 'Tincho
 'Vars direct or derivated from config xml
-Public flgWindowBackColor As Integer '= Color.Blac  '' Window backgrount color
+Public flgWindowBackColor As Integer '= Color.Black  '' Window backgrount color
 Public flgWindowTextColor As Integer   '' Window helper text color
 Public flgWindowCursorColor As Integer '' Window cursor color
 Public flgWhiteAndBlack As Integer     '' El color blanco/negro siempre sera distinto al

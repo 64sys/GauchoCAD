@@ -42,11 +42,11 @@ Public FormatoCotas As String = "0.00"
 Public ColorForSelected As Integer = &H70E000
 Public ToolActive As Boolean
 
-Public HookSize As Integer = 16                       '' for use with poi
-Public Orthogonal As Boolean = False              '' idem Ortho F8 del CAD
+Public HookSize As Integer = 16                     '' for use with poi
+Public Orthogonal As Boolean = False                '' idem Ortho F8 del CAD
 Public OrthogonalForced As Boolean = False
 Public OrthogonalIgnored As Boolean = False
-Public SnapMode As Integer                      '' Bitwise: -1 Off ; 0 = Nearest; 1 = Endpoint; 2 = midpoint
+Public SnapMode As Integer                          '' Bitwise: -1 Off ; 0 = Nearest; 1 = Endpoint; 2 = midpoint
 
 Public clsJob As Object                             '' what I am doing now, thats either selecting or something else
 Public clsJobPrevious As Object                     '' what was doing before
@@ -61,7 +61,7 @@ Public Const drwOpenGLClass As Integer = 4
 
 Public LoadingFinished As Boolean = False
 Public FontList As New String[]                     '' esto deberia estar en otro lado
-Public TextureList As New String[]                     '' esto deberia estar en otro lado
+Public TextureList As New String[]                  '' esto deberia estar en otro lado
 Public FileName As String                           '' current work filename
 
 Public ShowInspector As Boolean = False ' TODO: Tincho, agregar a la configuracion y a un Toggle button
@@ -124,6 +124,14 @@ Public flgOnScreenHelpColor As Integer = Color.LightGray    '' Tincho, esta es n
 Public arrUndo As New Entity[]             '' An array to put an unmodified copy of an entity before modifying it and then restoring it to the previous version.
 
 Public MainGLArea As Control  ' this is for m-designer compatibility and point to main form GLArea
+
+'' Returns the next available handle
+Public Function NewHandle() As String
+
+  Inc currentDrawing.HandSeed             ' esta es la ultima handle utilizada, le sumo 1
+  Return Hex(currentDrawing.HandSeed)     ' devuelvo la Hex del numero
+
+End
 
 '' This transfer layers from imported file, one collection actually, to the model collection
 

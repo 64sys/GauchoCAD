@@ -125,3 +125,23 @@ Public Sub GridView1_LostFocus()
   Me.Close(True)
 
 End
+
+Public Sub GridView1_MouseMove()
+
+  Dim k As Integer
+
+  k = (GridView1.RowAt(Mouse.Y) * 9) + GridView1.ColumnAt(Mouse.X)
+
+  Select k
+    Case 0
+      Label5.Text = ("Color") & ": ByBlock [" & CStr(k) & "]"
+
+    Case 255
+      Label5.Text = ("Color") & ": ByLayer [" & CStr(k) & "]"
+
+    Case Else
+      Label5.Text = ("Color") & ": " & CStr(k)
+
+  End Select
+
+End
