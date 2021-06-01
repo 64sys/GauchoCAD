@@ -22,50 +22,14 @@
 Create Static
 
 'Fast
+Inherits EntityBase
 
 Public Const Gender As String = "Circle"
-Public Const PointsToDraw As Integer = 1             ' minimal point requered for drawing something usefull
 Public Const HelperTrabajo As String = ("Draw a circle")
 Public Const ParamType As String = "PL"                             ' that is Point, Point, Float; could be Color Text, etc
 Public Const ParamHelper As String = "Start point;Radious"      ' a little text that is shown at the prompt waiting for user input during build
 Public Const ParamDefault As String = " ; 1 "
-Public Const GAMBASCADENTITY As String = "EntityBase"
-Public Const USEWITH As String = "EntityBuilder"
-Public Const DrawingOrder As Integer = 0        ' 1 = draws first
-Public Const OrthogonalIgnored As Boolean = False
-Public Const OrthogonalForced As Boolean = False
-Public Const StretchAble As Boolean = True           ' Si lo puedo deformar
-Public Selected As Boolean
-
-Public DrawAble As Boolean = False          ' True si durante la construccion ya tiene suficientes elementos para poder hacer una representacion digna
-Public Visible As Boolean = True            ' si esta entidad puede ser mostrada independientmente
-Public Finished As Boolean = False          ' colocar en true cuando se llegue a completar
-Public StepsDone As Integer                 ' esto lo cambia cls ElementBuilder durante la construccion
-
-' DXF Read/Export
-
-Public Const DXF_Reading As Boolean = True
-Public Const DXF_Export As Boolean = True
-
-'' Creates a new LWpolyline entity and prepares arrays
-Public Function NewEntity() As Entity
-
-  Dim e As New Entity
-
-  e.Gender = Me.Gender
-  e.ClassHandler = Me
-  e.fParam.Insert([0])
-  e.P.Insert([0, 0])
-
-  ' this may fails on some scopes, but we should Try
-  Try e.pLayer = gcd.CurrentDrawing.CurrLayer
-  Try e.colour = gcd.CurrentDrawing.CurrColor
-  Try e.LineType = gcd.CurrentDrawing.CurrLineType
-  Try e.LineWidth = gcd.CurrentDrawing.CurrLineWt
-
-  Return e
-
-End
+Public Const TotalParams As Integer = 1
 
 ' The entity handler receives a user action, and returns the number of expected parameter
 ' If definitive = true, means the parameter is set
@@ -155,13 +119,13 @@ Public Sub Draw(oE As Entity)
 
 End
 
-Public Sub makepolyline(oe As Entity)
+Public Sub makepolyline(oe As Entity, Optional density As Integer = 36)
 
   Dim x, y, theta, angle_increment As Float
 
   oE.polyline.Clear
   'GL.Begin(gl.LINE_STRIP)
-  angle_increment = Pi * 2 / 360
+  angle_increment = Pi * 2 / 360 * density
   For theta = 0 To 2 * Pi Step angle_increment
     ' el punto considerando 0,0 al centro
     x = oE.p[0] + oE.fParam[0] * Cos(theta)
@@ -204,8 +168,7 @@ End
 '' Creo los puntos de interes
 '' Build point of interest
 
-'Public Function BuildPOI(oE As Entity, Optional arrIndex As Integer = -1) As Integer
-Public Function BuildPOI(oE As Entity) As Integer
+Public Function BuildPOI(oE As Entity, Optional arrIndex As Integer = -1) As Integer
 
   oe.PoiPoints.Clear
   oe.PoiType.Clear

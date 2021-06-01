@@ -240,7 +240,7 @@ Public Sub FillEntityWithHatch(entToFill As Entity)
 
             Case "Circle", "Arc", "Ellipse"
               ' estas entidades deben dibujarse primero
-              e.ClassHandler.MakePolyline(e)
+              e.ClassHandler.MakePolyline(e, 6)
               entToFill.PolyLine.Insert(puntos.PolyPolyIntersection(e.PolyLine, entToFill.p))
           End Select
 
@@ -258,113 +258,6 @@ Public Sub FillEntityWithHatch(entToFill As Entity)
   Next
 
 End
-
-' Public Sub FillEntityWithHatch(entToFill As Entity)
-'
-'     ' Parametros de la entidad:
-'
-'     ' P[]:        son los puntos de la polilinea que define el contorno del sombreado
-'     ' fParam[0]:  escala del sombreado
-'     ' fParam[1]:  angulo
-'     ' StringData[0]: nombre del patron del sombreado
-'
-'     Dim e As New Entity
-'     Dim fPAtternSide As Float
-'     Dim iPatternNx, iPatternNy As Integer
-'     Dim nx As Integer
-'     Dim ny As Integer
-'     Dim ie As Integer
-'     Dim flxPatternLimits As Float[]
-'     Dim iLoop As Integer
-'     Dim enxPattern As New Entity[]
-'     Dim cPattern As New Collection
-'     Dim enxPatternTotal As New Entity[]
-'     Dim eBorder As Entity
-'     Dim sPAtternFile As String
-'
-'     ' este valor intenta commpensar un problema de compatibilidad entre DWG y DXF
-'     ' para estar de acuerdo a LibreCAD, debe ser =1, pero algunos DWG se represetan
-'     ' con una densidad de relleno menor (mas disperso el relleno)
-'     Dim CorrectionScale As Float = 1 '0.01 ' 0.1
-'
-'     sPAtternFile = entToFill.StringData[cadHatch.sdaPaternFile]
-'
-'     ' verifico si tengo el pattern
-'     If Not Exist(sPAtternFile) Then ' lo reemplazo
-'
-'         sPAtternFile = Application.Path &/ "patterns" &/ "ansi31.dxf"
-'
-'     End If
-'
-'     ' cargo el sombreado en un array auxiliar
-'     Dxf.LoadFile(sPAtternFile, cPattern, True, True, True) ' lo cargo
-'     gcd.ImpEnty6(cPattern["ENTITIES"], enxPattern)
-'
-'     ' necesito saber cuanto mide el contorno para aplicar la escala y multiplicar hasta cubrir todo el contorno
-'
-'     flxPatternLimits = clsEntities.ComputeLimits(enxPattern)
-'
-'     ' los patrones son cuadrados, computo el lado
-'     fPatternSide = 100 ' flxPatternLimits[2] - flxPatternLimits[0]
-'
-'     For iLoop = 0 To entToFill.fParam[cadHatch.ipaTotalLoops] - 1
-'
-'         MakeBorder(entToFill, iLoop)
-'
-'         GetBoundLimits(entToFill)    ' veo los limites del contorno
-'
-'         ' vamos a mentir un poco
-'         ' xmenor -= 1
-'         ' ymenor -= 1
-'         ' Xmayor += 1
-'         ' ymayor += 1
-'
-'         ' calculo cuantos patrones necesito
-'         iPatternNx = (Xmayor - Xmenor) / fPAtternSide / entToFill.fParam[cadHatch.ipaScale] / CorrectionScale + 1
-'         iPatternNy = (ymayor - ymenor) / fPAtternSide / entToFill.fParam[cadHatch.ipaScale] / CorrectionScale + 1
-'
-'         ' creo un array para el sombreado total
-'
-'         For nx = 0 To iPatternNx - 1
-'             For ny = 0 To iPatternNy - 1
-'                 For ie = 0 To enxPattern.Max
-'                     enxPatternTotal.Add(clsEntities.ClonEntity(enxPattern[ie]))
-'
-'                     enxPatternTotal.Last.ClassHandler.scale(enxPatternTotal.Last, entToFill.fParam[cadHatch.ipaScale] * CorrectionScale, entToFill.fParam[cadHatch.ipaScale] * CorrectionScale)
-'
-'                     enxPatternTotal.Last.ClassHandler.translate(enxPatternTotal.Last, nx * fPAtternSide * entToFill.fParam[cadHatch.ipaScale] * CorrectionScale + Xmenor, ny * fPAtternSide * entToFill.fParam[cadHatch.ipaScale] * CorrectionScale + ymenor)
-'
-'                     enxPatternTotal.Last.ClassHandler.Finish(enxPatternTotal.Last)
-'                 Next
-'             Next
-'         Next
-'
-'         ' ahora tengo que filtrar las entidades que quedan fuera del contorno y generar lineas sueltas que forman
-'         ' el sombreado (por ahora seran solo lineas)
-'         ' esas lineas las acumulo en un array
-'
-'         For Each e In enxPatternTotal
-'
-'             Select Case e.Gender
-'                 Case "Line", "LWPolyline"
-'                     entToFill.PolyLine.Insert(puntos.PolyPolyIntersection(e.p, entToFill.p))
-'
-'                     ' this is test to see if the pattern is made correctly
-'                     'entToFill.PolyLine.Insert(e.p.Copy())
-'
-'                 Case "Circle", "Arc", "Ellipse"
-'                     ' estas entidades deben dibujarse primero
-'                     e.ClassHandler.Draw(e)
-'                     entToFill.PolyLine.Insert(puntos.PolyPolyIntersection(e.PolyLine, entToFill.p))
-'             End Select
-'
-'         Next
-'         ' en este momento tengo el hatch, tengo q guardar estas lineas en algun lugar
-'         ' (o no)
-'         ' op.PolyLine podria ser
-'     Next
-'
-' End
 
 Public Sub MakeBorder(entToFill As Entity, iLoopNumber As Integer)
 
@@ -384,19 +277,26 @@ Public Sub MakeBorder(entToFill As Entity, iLoopNumber As Integer)
           eborder = eFind
         End If
       End If
+      Select Case eBorder.ClassHandler.Gender
 
-      If eBorder.ClassHandler.Gender = cadLWPolyline.Gender Then
-        entToFill.P.Insert(eborder.P.Copy())
-        If eborder.iParam[cadLWPolyline.iiiPolylineClosed] Then ' agrego el punto inicial
-          entToFill.P.Insert(eborder.P.Copy(0, 2))
-        Endif
-      Else If eBorder.ClassHandler.Gender <> cadLine.Gender Then
-        eBorder.ClassHandler.MakePolyline(eborder)
-        entToFill.P.Insert(eborder.PolyLine.Copy())
-      Else
-        entToFill.P.Insert(eborder.P.Copy(2, 2))
-        ' entToFill.P.Insert(eborder.P.Copy())
-      Endif
+        Case cadLWPolyline.Gender
+          entToFill.P.Insert(eborder.P.Copy())
+          If eborder.iParam[cadLWPolyline.iiiPolylineClosed] Then ' agrego el punto inicial
+            entToFill.P.Insert(eborder.P.Copy(0, 2))
+          Endif
+        Case "Arc", "Circle", "Ellipse", "SPLine"
+          ' FIXME: puede haber entidades como Text como bordes
+          Try eBorder.ClassHandler.MakePolyline(eborder)
+          entToFill.P.Insert(eborder.PolyLine.Copy())
+
+        Case "Text", "MText"
+          ' FIXME: puede haber entidades como Text como bordes
+
+          entToFill.P.Insert(eborder.Polygon.Copy())
+        Case "Line"
+          entToFill.P.Insert(eborder.P.Copy(2, 2))
+          ' entToFill.P.Insert(eborder.P.Copy())
+      End Select
     End If
   Next
 

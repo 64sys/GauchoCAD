@@ -40,7 +40,7 @@
 '       |             ModelMatrix>Translate       |                                                 |
 '       |                                         |bottom                                           |gldrwArea.w,.h = Gl.Viewport = el area donde dibujo
 '       +-------------------------------------------------------------------------------------------+           = pixeles
-
+'Fast Unsafe
 ' una lbreria de funciones para pasar de Paint a OpenGL
 Library "libGL"
 
@@ -355,7 +355,7 @@ Public Sub Rectangle2D(x1 As Float, y1 As Float, w As Float, h As Float, Optiona
 End
 
 '' Dibuja un serie de lineas
-Public Function Lines(vertices As Float[], Optional colour As Integer = 0, LineWidth As Float = 1, dashes As Integer = 0)
+Fast Unsafe Public Function Lines(vertices As Float[], Optional colour As Integer = 0, LineWidth As Float = 1, dashes As Integer = 0)
 
   Dim i As Integer
 
@@ -384,7 +384,7 @@ Public Function Lines(vertices As Float[], Optional colour As Integer = 0, LineW
 End
 
 '' Dibuja un seria de polilinea
-Public Function PolygonFilled(vertices As Float[], Optional colour As Integer = 0, FillColor As Integer = 0, LineWidth As Float = 1, dashes As Integer)
+Fast Unsafe Public Function PolygonFilled(vertices As Float[], Optional colour As Integer = 0, FillColor As Integer = 0, LineWidth As Float = 1, dashes As Integer)
 
   Dim i As Integer
 
@@ -412,7 +412,7 @@ Public Function PolygonFilled(vertices As Float[], Optional colour As Integer = 
 End
 
 '' Dibuja un seria de polilinea
-Public Function Polygon(vertices As Float[], Optional colour As Integer = 0, LineWidth As Float = 1, dashes As Integer)
+Fast Unsafe Public Function Polygon(vertices As Float[], Optional colour As Integer = 0, LineWidth As Float = 1, dashes As Integer)
 
   Dim i As Integer
 
@@ -443,7 +443,7 @@ End
 '' Siempre gira en sentido anti-horario
 '' Las medidas de los angulo inicial y recorrido estan en RADIANES
 
-Public Function Arc(Optional radio As Float, start_angle As Float, length As Float, colour As Integer = 0, LineWidth As Float = 1, dashes As Integer)
+Fast Unsafe Public Function Arc(Optional radio As Float, start_angle As Float, length As Float, colour As Integer = 0, LineWidth As Float = 1, dashes As Integer)
 
   GL.Begin(gl.LINE_STRIP)
   Dim theta, angle_increment As Float
@@ -511,7 +511,7 @@ Public Sub Arrow(fBase As Float[], fPunta As Float[], Optional colour As Integer
 End
 '' Dibuja un seria de polilinea
 
-Public Function PolyLines(vertices As Float[], Optional colour As Integer = 0, LineWidth As Float = 1, dashes As Integer, Optional iClosed As Boolean = False)
+Fast Unsafe Public Function PolyLines(vertices As Float[], Optional colour As Integer = 0, LineWidth As Float = 1, dashes As Integer, Optional iClosed As Boolean = False)
 
   Dim i As Integer
 
@@ -562,7 +562,7 @@ Public Function PolyLines(vertices As Float[], Optional colour As Integer = 0, L
 
 End
 
-Public Function Triangles(vertices As Float[], Optional colour As Integer = 0, FillColor As Integer = 0, LineWidth As Float = 1, dashes As Integer)
+Fast Unsafe Public Function Triangles(vertices As Float[], Optional colour As Integer = 0, FillColor As Integer = 0, LineWidth As Float = 1, dashes As Integer)
 
   Dim i As Integer
 
@@ -590,7 +590,8 @@ Public Function Triangles(vertices As Float[], Optional colour As Integer = 0, F
 End
 
 '' Dibuja un circulo
-Public Function Circle(center As Float[], radious As Float, Optional colour As Integer = 0, Filled As Boolean = False, LineWidth As Float = 1, dashes As Integer = 0)
+
+Fast Unsafe Public Function Circle(center As Float[], radious As Float, Optional colour As Integer = 0, Filled As Boolean = False, LineWidth As Float = 1, dashes As Integer = 0)
 
   Dim x, y, theta, angle_increment As Float
 
@@ -622,7 +623,7 @@ Public Function Circle(center As Float[], radious As Float, Optional colour As I
 
 End
 
-Public Sub glColorRGB(gbColor As Integer)
+Fast Unsafe Public Sub glColorRGB(gbColor As Integer)
   ' set the color to GL
 
   Dim r, g, b, a As Float
@@ -636,7 +637,7 @@ Public Sub glColorRGB(gbColor As Integer)
 
 End
 
-Public Sub glColor4f(r As Float, g As Float, b As Float, Optional Alpha As Float = 1)
+Fast Unsafe Public Sub glColor4f(r As Float, g As Float, b As Float, Optional Alpha As Float = 1)
 
   gl.Color4f(r, g, b, Alpha)
 
@@ -783,7 +784,7 @@ Public Sub DibujarCargaPuntual3(punta As Punto3d, cola As Punto3d, colorflecha A
 
 End Sub
 
-Public Sub Vertex2D(x2d As Float, y2d As Float, Optional colour As Integer = Color.Red)
+Fast Unsafe Public Sub Vertex2D(x2d As Float, y2d As Float, Optional colour As Integer = Color.Red)
   '
   '
   '     '2020 el color va primero
@@ -799,7 +800,7 @@ Public Sub Vertex2D(x2d As Float, y2d As Float, Optional colour As Integer = Col
 
 End
 
-Public Sub Vertex3D(p As Punto3d, Optional colour4F As GLColorSt)
+Fast Unsafe Public Sub Vertex3D(p As Punto3d, Optional colour4F As GLColorSt)
   '
   '
   '     '2020 el color va primero
@@ -997,7 +998,7 @@ End
 '' Grafica un texto en el contexto actual de acuerdo a los parametros pasados
 '' Debe estar definida la Font con nombre y altura
 ''
-Public Function DrawText(UTFstring As String, posX As Float, posY As Float, Optional angle As Float = 0, textH As Float = 1, colour As Integer = -14, linewidth As Float = 1, rectW As Float = 0, rectH As Float = 0, alignHoriz As Integer = 0, alignVert As Integer = 0) As Boolean
+Fast Unsafe Public Function DrawText(UTFstring As String, posX As Float, posY As Float, Optional angle As Float = 0, textH As Float = 1, colour As Integer = -14, linewidth As Float = 1, rectW As Float = 0, rectH As Float = 0, alignHoriz As Integer = 0, alignVert As Integer = 0) As Boolean
 
   Dim i, iii, UTFcode, LetterIndex As Integer, Xadvance As Float
 
@@ -1028,7 +1029,7 @@ End
 '' Grafica un texto de varias lineas en el contexto actual de acuerdo a los parametros pasados
 '' Debe estar definida la Font con nombre y altura
 ''
-Public Function DrawMultilineText(UTFMultiString As String, posX As Float, posY As Float, Optional angle As Float = 0, textH As Float = 1, colour As Integer = -14, linewidth As Float = 1, rectW As Float = 0, rectH As Float = 0, alignHoriz As Integer = 0, alignVert As Integer = 0) As Boolean
+Fast Unsafe Public Function DrawMultilineText(UTFMultiString As String, posX As Float, posY As Float, Optional angle As Float = 0, textH As Float = 1, colour As Integer = -14, linewidth As Float = 1, rectW As Float = 0, rectH As Float = 0, alignHoriz As Integer = 0, alignVert As Integer = 0) As Boolean
 
   Dim i, iii, UTFcode, LetterIndex As Integer, Xadvance, xtotaladvance, Yadvance, ytotaladvance As Float
   Dim mLines As String[], dH As Float, tLine As String
@@ -1075,7 +1076,7 @@ End
 
 '' devuelve un rectangulo que contiene al texto
 '' [ancho,alto]
-Public Function TextExtends(UTFstring As String, textH As Float) As Float[]
+Fast Unsafe Public Function TextExtends(UTFstring As String, textH As Float) As Float[]
 
   Dim i, iii, UTFcode, LetterIndex As Integer, Xadvance As Float
   Dim tRect As New Float[]
@@ -1106,7 +1107,7 @@ End
 
 '' devuelve un rectangulo que contiene al texto
 '' [x,y,ancho,alto]
-Public Function MTextExtends(UTFMultiString As String, posX As Float, posY As Float, textH As Float) As Float[]
+Fast Unsafe Public Function MTextExtends(UTFMultiString As String, posX As Float, posY As Float, textH As Float) As Float[]
 
   Dim i, iii, UTFcode, LetterIndex As Integer, Yadvance, Xadvance, xtotaladvance, xmaxadvance As Float
   Dim mLines As String[], dH As Float, tLine As String, FirstYadvance As Boolean = False

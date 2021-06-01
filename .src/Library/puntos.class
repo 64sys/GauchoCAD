@@ -31,7 +31,7 @@
 
 Create Static
 Create Private
-' Fast Unsafe
+Fast Unsafe
 Public HookSize As Integer = 16                       ' for use with poi
 Public NumericTolerance As Float = 1e-7
 
@@ -177,6 +177,26 @@ Public Function PolygonTriangulation(fPolygon As Float[]) As Float[]
   Loop Until (fPoly.Count = 6) Or (iTramo * 2 + 4 > fPoly.Max) ' 3 vertices or error
 
   Triangles.Insert(fPoly.Copy())
+  Return Triangles
+
+End
+
+'' Returns n 2D trianlges x0,y0,x1,y1,x2,y2 , x0,y0,x1,y1,x2,y2 and so on
+Public Function ArcTriangulation(center As Float[], fPolygon As Float[]) As Float[]
+
+  'Dim UsedTracts As New Boolean[]
+  Dim Wasted As New Float[]
+  'Dim ExtraTract2 As New Integer[]
+  Dim fPoly As New Float[]
+  Dim Triangles As New Float[]
+  Dim TriangleTest As New Float[]
+  Dim i, iTramo, iCompare As Integer
+  Dim EsUtil, EsPrimero As Boolean
+
+  For i = 0 To fPolygon.count - 4 Step 2
+    Triangles.Insert([center[0], center[1], fPolygon[i], fPolygon[i + 1], fPolygon[i + 2], fPolygon[i + 3]])
+  Next
+
   Return Triangles
 
 End

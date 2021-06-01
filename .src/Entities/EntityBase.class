@@ -23,11 +23,11 @@ Create Static
 ' Fast
 
 Public Const Gender As String = ""
-Public Const PointsToDraw As Integer = 0             ' minimal point requered for drawing something usefull
 Public Const HelperTrabajo As String = ("EntityBase")
 Public Const ParamType As String = ""                             ' that is Point, Point, Float; could be Color Text, etc
 Public Const ParamHelper As String = ("<no action>")      ' a little text that is shown at the prompt waiting for user input during build
 Public Const ParamDefault As String = ""
+Public Const PointsToDraw As Integer = 1             ' minimal point requered for drawing something usefull
 Public Const GAMBASCADENTITY As String = "EntityBase"
 Public Const USEWITH As String = "EntityBuilder"
 Public Const DrawingOrder As Integer = 0        ' 1 = draws first
@@ -35,7 +35,10 @@ Public Const OrthogonalIgnored As Boolean = False
 Public Const OrthogonalForced As Boolean = False
 Public Const StretchAble As Boolean = True           ' Si lo puedo deformar
 Public StepsDone As Integer                 ' esto lo cambia cls ElementBuilder durante la construccion
-
+Public Const TotalPoints As Integer = 1
+Public Const TotalParams As Integer = 0
+Public Const iTotalParams As Integer = 0
+Public Const sdaTotalParams As Integer = 0
 Public Const DXF_Reading As Boolean = True
 Public Const DXF_Export As Boolean = True
 Public Const JSON_Export As Boolean = True
@@ -47,8 +50,10 @@ Public Function NewEntity() As Entity
 
   e.Gender = Me.Gender
   e.ClassHandler = Me
-  e.iParam.Insert([0, 0])
-  e.P.Insert([0, 0])
+  e.iParam.Resize(Me.iTotalParams)
+  e.fParam.Resize(Me.TotalParams)
+  e.StringData.Resize(Me.sdaTotalParams)
+  e.P.Resize(Me.TotalPoints * 2)
 
   ' this may fails on some scopes, but we should Try
   Try e.pLayer = gcd.CurrentDrawing.CurrLayer
@@ -63,28 +68,6 @@ End
 ' The entity handler receives a user action, and returns the number of expected parameter
 ' If definitive = true, means the parameter is set
 Public Function NewParameter(eBuild As Entity, vParam As Variant[], Optional Definitive As Boolean = False) As Boolean
-
-  If vParam[0] = "point" Then
-    eBuild.DrawAble = True
-
-    eBuild.P[eBuild.P.Max - 1] = vParam[1]
-    eBuild.P[eBuild.P.Max] = vParam[2]
-
-    If definitive Then
-      eBuild.P.Insert(eBuild.P.Copy(eBuild.P.Max - 1, 2))
-      Return True
-    End If
-  Else If vParam[0] = "close" Then
-    If eBuild.P.Count > 4 Then eBuild.P.Remove(eBuild.P.Max - 1, 2)
-    eBuild.fParam[0] = 1
-    Return True
-
-  Else If vParam[0] = "undo" Then
-    If eBuild.P.Count > 4 Then eBuild.P.Remove(eBuild.P.Max - 1, 2)
-    eBuild.fParam[0] = 0
-    Return True
-
-  Endif
 
 End
 

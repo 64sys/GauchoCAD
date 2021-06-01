@@ -369,7 +369,7 @@ Public Sub ImportBlocks(colData As Collection) ', obxEntities As Entity[]) As In
 
         End If
       Next
-      ImpEnty5(cEntyList, newBlock.entities)
+      ImpEntyFromJSON(cEntyList, newBlock.entities)
       cEntyList.Clear
 
     Else If colBlk.Exist("first_entity") Then
@@ -383,7 +383,7 @@ Public Sub ImportBlocks(colData As Collection) ', obxEntities As Entity[]) As In
 
         End If
       Next
-      ImpEnty5(cEntyList, newBlock.entities)
+      ImpEntyFromJSON(cEntyList, newBlock.entities)
       cEntyList.Clear
     Else
 
@@ -406,20 +406,70 @@ Public Sub ImpEnty5(cEny As Collection, obx As Entity[])
   For Each e In cEny                                              ' Para cada Coleccion de datos de vrx
     If e.Exist("entity") Then                                     ' es una entidad?
 
-      If InStr("POINT ATTDEF ATTRIB LINE LWPOLYLINE CIRCLE ELLIPSE ARC TEXT MTEXT SPLINE SOLID LEADER INSERT DIMENSION_LINEAR DIMENSION_DIAMETER DIMENSION_RADIUS DIMENSION_ANG3PT DIMENSION_ALIGNED DIMENSION_ORDINATE LARGE_RADIAL_DIMENSION ARC_DIMENSION", UCase(e["entity"])) = 0 Then Continue
-      entNueva = clsEntities.ImportJsonToEntity(e)
+      If InStr("POINT ATTDEF ATTRIB LINE LWPOLYLINE CIRCLE ELLIPSE ARC TEXT MTEXT SPLINE SOLID LEADER INSERT DIMENSION_LINEAR DIMENSION_DIAMETER DIMENSION_RADIUS DIMENSION_ANG3PT DIMENSION_ALIGNED DIMENSION_ORDINATE LARGE_RADIAL_DIMENSION ARC_DIMENSION", UCase(e["entity"])) = 0 Then
+        Print "Entidad no implementada:", e["entity"]
+      Else
 
-      If Not IsNull(entNueva) Then         ' si esta implementada, llenamos los datos
+        entNueva = clsEntities.ImportJsonToEntity(e)
 
-        If e.Exist("handle") Then
+        If Not IsNull(entNueva) Then         ' si esta implementada, llenamos los datos
 
-          obx.Add(entNueva)
-          entNueva = Null                                           ' limpiamos
-        Else                                                        ' no esta implementada
-          Print "Entidad no implementada o con errores:", e["entity"]
-        Endif
+          If e.Exist("handle") Then
+
+            obx.Add(entNueva)
+            entNueva = Null                                           ' limpiamos
+          Else                                                        ' no esta implementada
+            Print "Entidad no implementada o con errores:", e["entity"]
+          Endif
+        End If
       End If
     Endif
+  Next
+
+End
+'' Importa las cosas de manera descentralizada
+
+Public Sub ImpEntyFromJSON(cEny As Collection, obx As Entity[])
+
+  Dim e As Collection               ' current Entity
+  Dim entNueva As Entity
+  Dim flgIsPolyline, IsDummy As Boolean
+  Dim pBlockPolyline As Block
+
+  For Each e In cEny                                              ' Para cada Coleccion de datos de vrx
+    If e.Exist("entity") Then                                     ' es una entidad?
+      ' entonces, creamos una nueva
+      ' poner en minuscula para anular la entidad
+      If InStr("POLYLINE_2D VERTEX_2D POLYLINE ENDBLK SEQEND VERTEX POINT ATTDEF ATTRIB LINE LWPOLYLINE CIRCLE ELLIPSE ARC TEXT MTEXT SPLINE SOLID INSERT DIMENSION DIMENSION_LINEAR DIMENSION_DIAMETER DIMENSION_RADIUS DIMENSION_ANG3PT DIMENSION_ALIGNED DIMENSION_ORDINATE LARGE_RADIAL_DIMENSION ARC_DIMENSION", UCase(e["entity"])) = 0 Then
+        Print "Entidad no implementada:", e["entity"]
+      Else
+
+        entNueva = clsEntities.ImportJsonToEntity(e)
+
+        If Not IsNull(entNueva) Then         ' si esta implementada, llenamos los datos
+
+          If flgIsPolyline Then
+            pBlockPolyline.entities.Add(entNueva)
+          Else
+            obx.Add(entNueva)
+          End If
+
+          If (e["entity"] = "POLYLINE") Or (e["entity"] = "POLYLINE_2D") Then
+            flgIsPolyline = True
+            pBlockPolyline = New Block
+            pBlockPolyline.entities = New Entity[]
+            gcd.currentDrawing.arrPolyLines.Add(pBlockPolyline)
+            entNueva.pBlock = pBlockPolyline
+          End If
+          If e["entity"] = "SEQEND" And flgIsPolyline = True Then
+            flgIsPolyline = False
+            pBlockPolyline = Null
+          End If
+          entNueva = Null                                           ' limpiamos
+
+        End If
+      End If
+    End If
   Next
 
 End
@@ -604,7 +654,7 @@ Public Function UpdateGraphics(Optional handles As String[] = [], DoRegen As Boo
 
   If handles.Count = 0 Then                   ' Update all entities
 
-    gcd.ImpEnty5(gcd.CurrentDrawing.cModel["ENTITIES"], gcd.CurrentDrawing.arrEntities)
+    gcd.ImpEntyFromJSON(gcd.CurrentDrawing.cModel["ENTITIES"], gcd.CurrentDrawing.arrEntities)
 
   Else                                        ' Update only entities with handles provided
 

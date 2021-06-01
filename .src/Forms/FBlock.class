@@ -69,9 +69,7 @@ Public Sub ListBox1_Click()
 
   entyBlock.Clear
 
-  cadDxf.arrToFill = entyBlock
-
-  cadDxf.LoadFile(DirView1.Current &/ listBox1.Text & ".dxf")         ' cargo la entidad
+  Dxf.LoadFile(DirView1.Current &/ listBox1.Text & ".dxf")         ' cargo la entidad
 
   BlockName = listBox1.Text
 

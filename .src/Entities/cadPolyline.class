@@ -21,57 +21,11 @@
 ' Boston, MA  02110-1301  USA
 Create Static
 'Fast
+Inherits CadLWPolyline
 
 Public Const Gender As String = "Polyline"
 Public Const DrawingOrder As Integer = 1        ' 1 = draws first
 Public Const HelperTrabajo As String = ("a polyline of segments")
-Public Const ParamType As String = "P+"                             ' that is Point, Point; could be Color Text, etc
-Public Const ParamHelper As String = "Point"
-Public Const GAMBASCADENTITY As String = "EntityBase"
-Public Const USEWITH As String = "EntityBuilder"
-Public Const PointsToDraw As Integer = 1             ' minimal point requered for drawing something usefull
-Public Const OrthogonalIgnored As Boolean = False
-Public Const OrthogonalForced As Boolean = False
-Public Const ParamDefault As String = " "
-Public Const StretchAble As Boolean = True           ' Si lo puedo deformar
-Public Selected As Boolean
-
-Public DrawAble As Boolean = False          ' True si durante la construccion ya tiene suficientes elementos para poder hacer una representacion digna
-Public Visible As Boolean = True            ' si esta entidad puede ser mostrada independientmente
-Public Finished As Boolean = False          ' colocar en true cuando se llegue a completar
-Public StepsDone As Integer                 ' esto lo cambia cls ElementBuilder durante la construccion
-
-' DXF Read/Export
-
-Public Const DXF_Reading As Boolean = True
-Public Const DXF_Export As Boolean = True
-
-' iParam helpers
-Public Const iTotalParams As Integer = 3
-
-Public Const iiiClosed As Integer = 0
-Public Const iiiUnused1 As Integer = 1
-Public Const iiiUnused2 As Integer = 2
-
-'' Creates a new LWpolyline entity and prepares arrays
-Public Function NewEntity() As Entity
-
-  Dim e As New Entity
-
-  e.Gender = Me.Gender
-  e.ClassHandler = Me
-  e.iParam.Insert([0, 0, 0])
-  e.P.Insert([0, 0])
-
-  ' this may fails on some scopes, but we should Try
-  Try e.pLayer = gcd.CurrentDrawing.CurrLayer
-  Try e.colour = gcd.CurrentDrawing.CurrColor
-  Try e.LineType = gcd.CurrentDrawing.CurrLineType
-  Try e.LineWidth = gcd.CurrentDrawing.CurrLineWt
-
-  Return e
-
-End
 
 ' The entity handler receives a user action, and returns the number of expected parameter
 ' If definitive = true, means the parameter is set
@@ -88,47 +42,6 @@ Public Function NewParameter(eBuild As Entity, vParam As Variant[], Optional Def
 
 End
 
-Public Sub Translate(e As Entity, dX As Float, dY As Float, Optional OnlySelected As Boolean = False)
-
-  Dim i As Integer
-
-  If OnlySelected Then
-
-    For i = 0 To e.Psel.Max
-      If e.Psel[i] Then
-
-        e.P[i * 2] += dx
-        e.P[i * 2 + 1] += dy
-
-      Endif
-    Next
-
-  Else
-
-    puntos.Translate(e.p, dx, dy)
-  Endif
-
-End
-
-Public Sub Rotate(e As Entity, radians As Float)
-
-  puntos.Rotate(e.p, radians)
-
-End
-
-Public Sub Scale(e As Entity, sX As Float, sY As Float)
-
-  Dim i As Integer
-
-  For i = 0 To e.p.max Step 2
-
-    e.P[i] = e.P[i] * sX
-    e.P[i + 1] = e.P[i + 1] * sY
-
-  Next
-
-End
-
 Public Sub Draw(oE As Entity)
 
   Dim ePart As Entity
@@ -137,23 +50,23 @@ Public Sub Draw(oE As Entity)
   If Not oE.DrawAble Then Return
   oE.ColorToPaint = gcd.GetGBColor(oE.colour, oE.pLayer)
   ' construyo una poliliea
+  oe.PolyLine.Clear
   For Each ePart In oe.pBlock.entities
-    If ePart.Gender = "Vertex" Then
+    If ePart.Gender Like "Vertex*" Then
       oe.PolyLine.Add(ePart.P[0])
       oe.PolyLine.Add(ePart.P[1])
     End If
   Next
-  glPlus.PolyLines(oe.PolyLine, oe.ColorToPaint, oE.LineWidth, oE.LineType.index, oe.iParam[Me.iiiClosed])
-
-End
-
-'' A fat version of the line
-Public Sub DrawSelected(oE As Entity)
-
-End
-'' A fat version of the line
-
-Public Sub DrawRemark(oE As Entity)
+  ' If oe.PolyLine.Count > 0 Then
+  '   If (oe.PolyLine[oe.PolyLine.max] = oe.PolyLine[1]) And (oe.PolyLine[oe.PolyLine.max - 1] = oe.PolyLine[0]) Then
+  '
+  '     Print "Poly cerradita"
+  '   Else
+  '     Print "Poly abierta"
+  '
+  '   Endif
+  ' End If
+  glPlus.PolyLines(oe.PolyLine, oe.ColorToPaint, oE.LineWidth, oE.LineType.index, oe.iParam[Me.iiiPolylineClosed])
 
 End
 
@@ -177,27 +90,6 @@ Public Function BuildPOI(oE As Entity, Optional arrIndex As Integer = -1) As Int
   ' points: end-mid-end
   oe.poiPoints.insert([oE.p[0], oE.p[1]])
   oe.poiType.Add(gcd.poiEndPoint)
-
-End
-
-' This function will return False if the element couldn't be created for some reason: bad or incomple user input
-' True means all is good, False will instruct the clsEntityBuilder to delete it
-Public Sub Finish(oE As Entity) As Boolean
-
-  'Print "Finish en EntityBase"
-  'CreatePolygon(oe)
-
-  '  BuildPOI(oe)
-
-  ' busco el tipo de linea, si hace falta
-
-  ' tareas finales de armado del objeto
-
-  oE.psel.resize(oE.p.count / 2)
-
-  oE.DrawAble = True
-  oE.Selected = False
-  oE.Finished = True
 
 End
 
@@ -225,12 +117,29 @@ Public Function ImportDXF(e As Entity, sClaves As String[], sValues As String[])
     'If sClaves[i] = "30" Then e.P.Add(CFloat(sValues[i]))
     'If sClaves[i] = "39" Then e.fParam.Add(CFloat(sValues[i]))
 
-    If sClaves[i] = "70" Then e.iParam[Me.iiiClosed] = (CInt(sValues[i]) And 1)
+    If sClaves[i] = "70" Then e.iParam[Me.iiiPolylineClosed] = (CInt(sValues[i]) And 1)
 
   Next
   Return True
 
   ' catch
+
+  Return False
+
+End
+
+Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
+
+  Dim i As Integer
+
+  e.P.Clear
+
+  ' FIXME: esto indica si es abierta o cerrada
+  'If (CInt(c["flag"]) And 1) = 1 Then e.iParam[Me.iiiPolylineClosed] = 1
+
+  Return True
+
+  'Catch
 
   Return False
 
