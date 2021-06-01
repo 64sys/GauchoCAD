@@ -21,51 +21,20 @@
 ' Boston, MA  02110-1301  USA
 Create Static
 ' Fast
-
+Inherits EntityBase
 Public Const Gender As String = "Ellipse"
 Public Const PointsToDraw As Integer = 1             ' minimal point requered for drawing something usefull
 Public Const HelperTrabajo As String = ("Draw an ellipse")
 Public Const ParamType As String = "PPRRR"
 Public Const ParamHelper As String = "Start point;Major Radious;Minor/Major;Start;End"      ' a little text that is shown at the prompt waiting for user input during build
 Public Const ParamDefault As String = " ;  ;0.5;0;360"
-Public Const USEWITH As String = "EntityBuilder"
-Public Const DrawingOrder As Integer = 0        ' 1 = draws first
-Public Const OrthogonalIgnored As Boolean = False
-Public Const OrthogonalForced As Boolean = False
-Public Const StretchAble As Boolean = True           ' Si lo puedo deformar
-Public DrawAble As Boolean = False          ' True si durante la construccion ya tiene suficientes elementos para poder hacer una representacion digna
-Public Finished As Boolean = False          ' colocar en true cuando se llegue a completar
-Public StepsDone As Integer                 ' esto lo cambia cls ElementBuilder durante la construccion
 
 ' vars creadas en finish
 
 Public recorrido As Float
 Public angle As Float
-
-' DXF Read/Export
-
-Public Const DXF_Reading As Boolean = True
-Public Const DXF_Export As Boolean = True
-
-'' Creates a new LWpolyline entity and prepares arrays
-Public Function NewEntity() As Entity
-
-  Dim e As New Entity
-
-  e.Gender = Me.Gender
-  e.ClassHandler = Me
-  e.fParam.Insert([0, 0, 0])
-  e.P.Insert([0, 0, 0, 0])
-
-  ' this may fails on some scopes, but we should Try
-  Try e.pLayer = gcd.CurrentDrawing.CurrLayer
-  Try e.colour = gcd.CurrentDrawing.CurrColor
-  Try e.LineType = gcd.CurrentDrawing.CurrLineType
-  Try e.LineWidth = gcd.CurrentDrawing.CurrLineWt
-
-  Return e
-
-End
+Public Const TotalParams As Integer = 3
+Public Const TotalPoints As Integer = 2
 
 ' The entity handler receives a user action, and returns the number of expected parameter
 ' If definitive = true, means the parameter is set
@@ -132,28 +101,6 @@ Public Function NewParameter(eBuild As Entity, vParam As Variant[], Optional Def
   Else
     Return False
   End If
-
-End
-
-Public Sub Translate(e As Entity, dX As Float, dY As Float, Optional OnlySelected As Boolean = False)
-
-  Dim i As Integer
-
-  If OnlySelected Then
-
-    For i = 0 To e.Psel.Max
-      If e.Psel[i] Then
-
-        e.P[i * 2] += dx
-        e.P[i * 2 + 1] += dy
-
-      Endif
-    Next
-
-  Else
-
-    puntos.Translate(e.p, dx, dy)
-  Endif
 
 End
 

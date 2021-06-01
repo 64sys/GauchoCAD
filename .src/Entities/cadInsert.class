@@ -20,25 +20,12 @@
 ' Foundation, Inc., 51 Franklin St, Fifth Floor,
 ' Boston, MA  02110-1301  USA
 Create Static
-
+Inherits EntityBase
 Public Const Gender As String = "Insert"
 Public Const HelperTrabajo As String = ("Inserts a block")
 Public Const ParamType As String = "TPFFF"
 Public Const ParamHelper As String = "BlockName; Position ; X scale ; Y scale ; Rotation"
 Public Const ParamDefault As String = "<no name>; 0,0 ; 1 ;1 ; 0"
-Public Const GAMBASCADENTITY As String = "EntityBase"
-Public Const USEWITH As String = "EntityBuilder"
-Public Const DrawingOrder As Integer = 0        ' 1 = draws first
-Public Const PointsToDraw As Integer = 1             ' minimal point requered for drawing something usefull
-Public Const OrthogonalIgnored As Boolean = False
-Public Const OrthogonalForced As Boolean = False
-Public Const StretchAble As Boolean = True           ' Si lo puedo deformar
-Public Selected As Boolean
-
-Public DrawAble As Boolean = False          ' True si durante la construccion ya tiene suficientes elementos para poder hacer una representacion digna
-Public Visible As Boolean = True            ' si esta entidad puede ser mostrada independientmente
-Public Finished As Boolean = False          ' colocar en true cuando se llegue a completar
-Public StepsDone As Integer                 ' esto lo cambia cls ElementBuilder durante la construccion
 
 ' fParam helpers
 Public Const TotalParams As Integer = 4
@@ -53,50 +40,6 @@ Public Const ipaRotacion As Integer = 3
 Public CurrLType As Integer
 Public CurrColor As Integer
 Public CurrLwt As Float
-
-Public Const DXF_Export As Boolean = True
-
-'' Creates a new LWpolyline entity and prepares arrays
-Public Function NewEntity() As Entity
-
-  Dim e As New Entity
-
-  e.Gender = Me.Gender
-  e.ClassHandler = Me
-  e.fParam.Insert([0, 0, 0, 0])
-  e.P.Insert([0, 0])
-
-  ' this may fails on some scopes, but we should Try
-  Try e.pLayer = gcd.CurrentDrawing.CurrLayer
-  Try e.colour = gcd.CurrentDrawing.CurrColor
-  Try e.LineType = gcd.CurrentDrawing.CurrLineType
-  Try e.LineWidth = gcd.CurrentDrawing.CurrLineWt
-
-  Return e
-
-End
-
-Public Sub Translate(e As Entity, dX As Float, dY As Float, Optional OnlySelected As Boolean = False)
-
-  Dim i As Integer
-
-  If OnlySelected Then
-
-    For i = 0 To e.Psel.Max
-      If e.Psel[i] Then
-
-        e.P[i * 2] += dx
-        e.P[i * 2 + 1] += dy
-
-      Endif
-    Next
-
-  Else
-
-    puntos.Translate(e.p, dx, dy)
-  Endif
-
-End
 
 Public Sub Rotate(e As Entity, radians As Float)
 
@@ -205,27 +148,6 @@ Public Sub DrawRemark(oE As Entity)
 
 End
 
-'' A fat version of the entity
-' Public Sub DrawRemarkBackup(oE As Entity)
-'
-'   Dim ET As Entity, i As Integer
-'
-'   i = clsEntities.FIndBlockID(oE.Block)
-'   If i < 0 Then Return
-'
-'   gl.PushMatrix
-'   gl.Translatef(fMain.pixels(oE.p[0]) / gcd.CurrDrawing.ScaleZoom, fMain.pixels(oE.p[1]) / gcd.CurrDrawing.ScaleZoom, 0)
-'   gl.Rotatef(oE.fParam[2], 0, 0, 1)
-'   gl.Scalef(oE.fParam[0], oE.fParam[1], 1)
-'
-'   For Each ET In gcd.CurrDrawing.arrBlocks[i].entities
-'     et.visible = True
-'     et.ClassHandler.DrawRemark(et)
-'   Next
-'   gl.PopMatrix
-'
-' End
-
 Public Function Draw2(oE As Entity)
 
   ' If Not oE.Visible Then Return
@@ -272,25 +194,6 @@ Public Function BuildPOI(oE As Entity, Optional arrIndex As Integer = -1) As Int
 
 End
 
-' This function will return False if the element couldn't be created for some reason: bad or incomple user input
-' True means all is good, False will instruct the clsEntityBuilder to delete it
-Public Sub Finish(oE As Entity) As Boolean
-
-  Dim ET As Entity, i As Integer
-
-  'Print "Finish en EntityBase"
-
-  '  BuildPOI(oe)
-
-  ' busco el tipo de linea, si hace falta
-
-  oE.psel.resize(oE.p.count / 2)
-
-  oE.DrawAble = True
-  oE.Selected = False
-  oE.Finished = True
-
-End
 '
 
 Public Sub ExportDXFCol(e As Entity, ByRef cExport As Collection) As Boolean

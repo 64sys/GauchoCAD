@@ -21,24 +21,13 @@
 ' Boston, MA  02110-1301  USA
 Create Static
 ' Fast
-
+Inherits EntityBase
 Public Const Gender As String = "Leader"
 Public Const PointsToDraw As Integer = 0             ' minimal point requered for drawing something usefull
 Public Const HelperTrabajo As String = ("Leader")
 Public Const ParamType As String = "TFP+"
 Public Const ParamHelper As String = "Text; Height; Next Point"     ' a little text that is shown at the prompt waiting for user input during build
 Public Const ParamDefault As String = "<title> ;20; <enter>"
-Public Const USEWITH As String = "EntityBuilder"
-Public Const DrawingOrder As Integer = 0        ' 1 = draws first
-Public Const OrthogonalIgnored As Boolean = False
-Public Const OrthogonalForced As Boolean = False
-Public Const StretchAble As Boolean = True           ' Si lo puedo deformar
-Public Selected As Boolean
-
-Public DrawAble As Boolean = False          ' True si durante la construccion ya tiene suficientes elementos para poder hacer una representacion digna
-Public Visible As Boolean = True            ' si esta entidad puede ser mostrada independientmente
-Public Finished As Boolean = False          ' colocar en true cuando se llegue a completar
-Public StepsDone As Integer                 ' esto lo cambia cls ElementBuilder durante la construccion
 
 '' Creates a new LWpolyline entity and prepares arrays
 Public Function NewEntity() As Entity

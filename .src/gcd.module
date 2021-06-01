@@ -300,6 +300,10 @@ Public Sub Main()
   gcd.CurrentDrawing.arrLayers.Add(oNewLayer)
   gcd.CurrentDrawing.CurrLayer = oNewLayer
 
+  Dim oDimtyle As New Styles
+  gcd.CurrentDrawing.arrStyles.Add(oDimtyle)
+  CurrentDrawing.CurrDimStyle = oDimtyle
+
   ' para compatibilidad
   flgWindowBackColor = Starter.flgWindowBackColor
   flgWindowTextColor = Starter.flgWindowTextColor

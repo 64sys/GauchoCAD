@@ -21,76 +21,14 @@
 ' Boston, MA  02110-1301  USA
 Create Static
 'Fast
-
+Inherits CadLine
 Public Const Gender As String = "Ray"
 Public Const DrawingOrder As Integer = 1        ' 1 = draws first
 Public Const HelperTrabajo As String = ("an infinite ray")
 Public Const ParamType As String = "PP"                             ' that is Point, Point; could be Color Text, etc
 Public Const ParamHelper As String = "Start point;Ray direction"
-Public Const GAMBASCADENTITY As String = "EntityBase"
-Public Const USEWITH As String = "EntityBuilder"
-Public Const PointsToDraw As Integer = 1             ' minimal point requered for drawing something usefull
-Public Const OrthogonalIgnored As Boolean = False
-Public Const OrthogonalForced As Boolean = False
-Public Const ParamDefault As String = " "
-Public Const StretchAble As Boolean = True           ' Si lo puedo deformar
-Public Selected As Boolean
-
-Public DrawAble As Boolean = False          ' True si durante la construccion ya tiene suficientes elementos para poder hacer una representacion digna
-Public Visible As Boolean = True            ' si esta entidad puede ser mostrada independientmente
-Public Finished As Boolean = False          ' colocar en true cuando se llegue a completar
-Public StepsDone As Integer                 ' esto lo cambia cls ElementBuilder durante la construccion
 
 Private p2 As New Float[]
-
-' DXF Read/Export
-
-Public Const DXF_Reading As Boolean = True
-Public Const DXF_Export As Boolean = True
-
-'' Creates a new LWpolyline entity and prepares arrays
-Public Function NewEntity() As Entity
-
-  Dim e As New Entity
-
-  e.Gender = Me.Gender
-  e.ClassHandler = Me
-  e.fParam.Insert([0])
-  e.P.Insert([0, 0, 0, 0])
-
-  ' this may fails on some scopes, but we should Try
-  Try e.pLayer = gcd.CurrentDrawing.CurrLayer
-  Try e.colour = gcd.CurrentDrawing.CurrColor
-  Try e.LineType = gcd.CurrentDrawing.CurrLineType
-  Try e.LineWidth = gcd.CurrentDrawing.CurrLineWt
-
-  Return e
-
-End
-
-' The entity handler receives a user action, and returns the number of expected parameter
-' If definitive = true, means the parameter is set
-Public Function NewParameter(eBuild As Entity, vParam As Variant[], Optional Definitive As Boolean = False) As Boolean
-
-  ' la linea solo recibe puntos
-
-  If vParam[0] <> "point" Then Return False
-
-  If Me.StepsDone = 0 Then
-    Try eBuild.P[0] = vParam[1]
-    Try eBuild.P[1] = vParam[2]
-    eBuild.P[2] = eBuild.P[0]
-    eBuild.P[3] = eBuild.P[1]
-    If definitive Then Return True
-  Else If Me.StepsDone = 1 Then
-    eBuild.DrawAble = True
-    Try eBuild.P[2] = vParam[1]
-    Try eBuild.P[3] = vParam[2]
-    If definitive Then Return True
-
-  Endif
-
-End
 
 Private Sub MakeRay(p As Float[])
 
@@ -107,47 +45,6 @@ Private Sub MakeRay(p As Float[])
 
   p2.Add((P[2] - p[0]) * -1e10)
   p2.Add((P[3] - p[1]) * -1e10)
-
-End
-
-Public Sub Translate(e As Entity, dX As Float, dY As Float, Optional OnlySelected As Boolean = False)
-
-  Dim i As Integer
-
-  If OnlySelected Then
-
-    For i = 0 To e.Psel.Max
-      If e.Psel[i] Then
-
-        e.P[i * 2] += dx
-        e.P[i * 2 + 1] += dy
-
-      Endif
-    Next
-
-  Else
-
-    puntos.Translate(e.p, dx, dy)
-  Endif
-
-End
-
-Public Sub Rotate(e As Entity, radians As Float)
-
-  puntos.Rotate(e.p, radians)
-
-End
-
-Public Sub Scale(e As Entity, sX As Float, sY As Float)
-
-  Dim i As Integer
-
-  For i = 0 To e.p.max Step 2
-
-    e.P[i] = e.P[i] * sX
-    e.P[i + 1] = e.P[i + 1] * sY
-
-  Next
 
 End
 
@@ -232,42 +129,6 @@ Public Function BuildPOI(oE As Entity, Optional arrIndex As Integer = -1) As Int
 
 End
 
-' This function will return False if the element couldn't be created for some reason: bad or incomple user input
-' True means all is good, False will instruct the clsEntityBuilder to delete it
-Public Sub Finish(oE As Entity) As Boolean
-
-  'Print "Finish en EntityBase"
-  'CreatePolygon(oe)
-
-  ' If Abs(oe.P[2]) < 1e10 Then oe.p[2] *= 1e10
-  ' If Abs(oe.P[3]) < 1e10 Then oe.p[3] *= 1e10
-  ' If oe.P.Count < 4 Then
-  '   oe.P.Add(oe.P[0])
-  '   oe.P.Add(oe.P[1])
-  '
-  '   oe.P.Add(oe.P[2] * -1e10)
-  '   oe.P.Add(oe.P[3] * -1e10)
-  ' Else
-  '    If Abs(oe.P[6]) < 1e10 Then oe.p[6] *= 1e10
-  '    If Abs(oe.P[7]) < 1e10 Then oe.p[7] *= 1e10
-  '
-  '
-  ' Endif
-
-  '  BuildPOI(oe)
-
-  ' busco el tipo de linea, si hace falta
-
-  ' tareas finales de armado del objeto
-
-  oE.psel.resize(oE.p.count / 2)
-
-  oE.DrawAble = True
-  oE.Selected = False
-  oE.Finished = True
-
-End
-
 Public Sub ExportDXFCol(e As Entity, ByRef cExport As Collection) As Boolean
 
   cExport.Add("RAY", dxf.codEntity)
@@ -277,28 +138,6 @@ Public Sub ExportDXFCol(e As Entity, ByRef cExport As Collection) As Boolean
   cExport.Add(CStr(e.p[1]), dxf.codY0)
   cExport.Add(CStr(e.p[2]), DXF.codX1)  ' End
   cExport.Add(CStr(e.p[3]), dxf.codY1)
-
-End
-
-Public Function ImportDXF(e As Entity, sClaves As String[], sValues As String[]) As Boolean
-
-  Dim i As Integer
-
-  e.P.Clear
-  For i = 0 To sClaves.Max
-
-    If sClaves[i] = "10" Then e.P.Add(CFloat(sValues[i]))
-    If sClaves[i] = "20" Then e.P.Add(CFloat(sValues[i]))
-    If sClaves[i] = "11" Then e.P.Add(CFloat(sValues[i]))
-    If sClaves[i] = "21" Then e.P.Add(CFloat(sValues[i]))
-
-  Next
-
-  Return True
-
-  ' catch
-
-  Return False
 
 End
 

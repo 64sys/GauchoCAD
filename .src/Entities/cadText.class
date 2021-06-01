@@ -31,7 +31,6 @@ Public Const ParamType As String = "PAFT"
 Public Const ParamHelper As String = "Start point;Angle;Heigth;"      ' a little text that is shown at the prompt waiting for user input during build
 Public Const ParamDefault As String = " ; 0 ; 10 ; "
 
-
 ' fParam helpers
 Public Const TotalParams As Integer = 8
 Public Const ipaTextHeight As Integer = 0
@@ -47,29 +46,7 @@ Public Const ipaTextVisibility As Integer = 7
 Public Const sdaTotalParams As Integer = 2
 Public Const sdaText As Integer = 0
 Public Const sdaStyle As Integer = 1
-
-Public Const DXF_Export As Boolean = True
-
-'' Creates a new Text entity and prepares arrays
-Public Function NewEntity() As Entity
-
-  Dim e As New Entity
-
-  e.Gender = Me.Gender
-  e.ClassHandler = Me
-  e.fParam.Insert([0, 0, 0, 0, 0, 0, 0, 0])
-  e.P.Insert([0, 0, 0, 0])
-  e.StringData.Insert(["", ""])
-
-  ' this may fails on some scopes, but we should Try
-  Try e.pLayer = gcd.CurrentDrawing.CurrLayer
-  Try e.colour = gcd.CurrentDrawing.CurrColor
-  Try e.LineType = gcd.CurrentDrawing.CurrLineType
-  Try e.LineWidth = gcd.CurrentDrawing.CurrLineWt
-
-  Return e
-
-End
+Public Const TotalPoints As Integer = 2
 
 ' The entity handler receives a user action, and returns the number of expected parameter
 ' If definitive = true, means the parameter is set
@@ -257,7 +234,6 @@ Public Function BuildPOI(oE As Entity, Optional arrIndex As Integer = -1) As Int
   oe.Polygon.Insert(poli)
 
 End
-
 
 Public Sub ExportDXFCol(e As Entity, ByRef cExport As Collection) As Boolean
 

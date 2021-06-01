@@ -24,7 +24,6 @@ Create Static
 Inherits CadInsert
 
 Public Const Gender As String = "Dimension"
-
 Public Const USEWITH As String = "EntityBuilder"
 
 Public TextEntry As String
@@ -48,7 +47,7 @@ Public DimExtension As Float = 0.5       ' la continuacion de esas lineas
 Public extension As Float
 Public iBloque As Integer
 
-Public TotalPoints As Integer = 6
+Public Const TotalPoints As Integer = 6
 
 ' fParam helpers
 Public Const TotalParams As Integer = 12
@@ -89,9 +88,6 @@ Public pointCenter As New Punto2d
 
 Public StyleOverride As New Styles
 
-' DXF Read/Export
-
-Public Const DXF_Reading As Boolean = True
 Public Const DXF_Export As Boolean = False
 
 '' Creates a new Text entity and prepares arrays
@@ -112,6 +108,7 @@ Public Function NewEntity() As Entity
   Try e.colour = gcd.CurrentDrawing.CurrColor
   Try e.LineType = gcd.CurrentDrawing.CurrLineType
   Try e.LineWidth = gcd.CurrentDrawing.CurrLineWt
+  Try e.pStyle = gcd.CurrentDrawing.CurrDimStyle
 
   Return e
 

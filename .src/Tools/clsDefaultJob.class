@@ -242,7 +242,7 @@ Public Function KeyText(EnteredText As String)
       AppMain.gTask("save")
 
     Case Else
-
+      'o = cadDimension ' a test
       gcd.clsJobPrevious = gcd.clsJob
 
       o = Object.New("cad" & EnteredText)

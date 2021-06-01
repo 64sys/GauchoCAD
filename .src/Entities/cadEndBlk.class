@@ -24,12 +24,6 @@ Create Static
 Inherits EntityBase
 Public Const Gender As String = "EndBlk"
 
-'' Creates a new Line entity and prepares arrays
-
-Public Function NewParameter(eBuild As Entity, vParam As Variant[], Optional Definitive As Boolean = False) As Boolean
-
-End
-
 Public Sub ExportDXFCol(e As Entity, ByRef cExport As Collection) As Boolean
 
   cExport.Add("AcDbBlockEnd", "100_1")
