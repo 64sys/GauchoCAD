@@ -45,9 +45,9 @@ Public Function Start(Optional ElemToBuild As Variant, Optional _Mode As Integer
 
   Else                                                                    ' EXPLOTA !!!
 
-    For i = 0 To gcd.CurrentDrawing.arrEntities.Max
+    For i = 0 To gcd.CurrentDrawing.oEntities
 
-      e = gcd.CurrentDrawing.arrEntities[i]
+      e = gcd.CurrentDrawing.oEntities[i]
       If e.Selected Then
         Select e.Gender
           Case "Insert", "Dimension"
@@ -125,7 +125,7 @@ Public Sub Explode_List(eList As Entity[], eParent As Entity, Optional Insertion
 
         etnew.ClassHandler.Finish(etnew)
 
-        gcd.CurrentDrawing.arrEntities.Add(etnew)
+        gcd.CurrentDrawing.oEntities.Add(etnew)
       End If
     End If
 

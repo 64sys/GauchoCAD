@@ -69,7 +69,7 @@ Public Function Start(Optional filename As Variant, Optional _mode As Integer = 
 
       nSel = clsEntities.GetSelectionCount()
       If nsel = 0 Then Return
-      If (gcd.CurrentDrawing.arrEntities[gcd.CurrentDrawing.arrSelecIndex[0]].Gender <> "LWPolyline") And (gcd.CurrentDrawing.arrEntities[gcd.CurrentDrawing.arrSelecIndex[0]].PolyLine.Count < 6) Then
+      If (gcd.CurrentDrawing.oEntities[gcd.CurrentDrawing.arrSelecIndex[0]].Gender <> "LWPolyline") And (gcd.CurrentDrawing.oEntities[gcd.CurrentDrawing.arrSelecIndex[0]].PolyLine.Count < 6) Then
         Message("El contorno esta mal definido")
 
       Else
@@ -106,18 +106,18 @@ Public Function Start(Optional filename As Variant, Optional _mode As Integer = 
             entHatch.colour = gcd.CurrentDrawing.CurrColor
             entHatch.ColorToPaint = gcd.gColor[entHatch.colour]
 
-            If gcd.CurrentDrawing.arrEntities[gcd.CurrentDrawing.arrSelecIndex[0]].Gender <> "LWPolyline" Then
-              If gcd.CurrentDrawing.arrEntities[gcd.CurrentDrawing.arrSelecIndex[0]].PolyLine.Count >= 6 Then
-                entHatch.P.Insert(gcd.CurrentDrawing.arrEntities[gcd.CurrentDrawing.arrSelecIndex[0]].PolyLine.Copy())
+            If gcd.CurrentDrawing.oEntities[gcd.CurrentDrawing.arrSelecIndex[0]].Gender <> "LWPolyline" Then
+              If gcd.CurrentDrawing.oEntities[gcd.CurrentDrawing.arrSelecIndex[0]].PolyLine.Count >= 6 Then
+                entHatch.P.Insert(gcd.CurrentDrawing.oEntities[gcd.CurrentDrawing.arrSelecIndex[0]].PolyLine.Copy())
               Endif
 
             Else
 
-              entHatch.P.Insert(gcd.CurrentDrawing.arrEntities[gcd.CurrentDrawing.arrSelecIndex[0]].p.Copy())
+              entHatch.P.Insert(gcd.CurrentDrawing.oEntities[gcd.CurrentDrawing.arrSelecIndex[0]].p.Copy())
 
             Endif
 
-            gcd.CurrentDrawing.arrEntities.Add(entHatch)
+            gcd.CurrentDrawing.oEntities.Add(entHatch)
 
             entHatch.ClassHandler.Finish(entHatch, entHatch.ClassHandler.StepsDone)
 

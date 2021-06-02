@@ -72,18 +72,18 @@ Public Sub DoUndo()
     Select Case iType
       Case Me.TypeModify
         indice = CInt(cLastUndo.Key)
-        NewRedo.Add(gcd.CurrentDrawing.arrEntities[indice], cLastUndo.Key)
-        gcd.CurrentDrawing.arrEntities[indice] = c
+        NewRedo.Add(gcd.CurrentDrawing.oEntities[indice], cLastUndo.Key)
+        gcd.CurrentDrawing.oEntities[indice] = c
 
       Case Me.TypeCreate
         indice = CInt(cLastUndo.Key)
-        NewRedo.Add(gcd.CurrentDrawing.arrEntities[indice], cLastUndo.Key)
-        gcd.CurrentDrawing.arrEntities.Remove(indice)
+        NewRedo.Add(gcd.CurrentDrawing.oEntities[indice], cLastUndo.Key)
+        gcd.CurrentDrawing.oEntities.Remove(indice)
 
       Case Me.TypeDelete
         indice = CInt(cLastUndo.Key)
         NewRedo.Add("nothing", cLastUndo.Key)
-        gcd.CurrentDrawing.arrEntities.Add(c, indice)
+        gcd.CurrentDrawing.oEntities.Add(c, indice)
 
     End Select
 
@@ -117,8 +117,8 @@ Public Sub DoRedo()
     Select Case iType
       Case Me.TypeModify
         indice = CInt(cLastRedo.Key)
-        NewUndo.Add(gcd.CurrentDrawing.arrEntities[indice], cLastRedo.Key)
-        gcd.CurrentDrawing.arrEntities[indice] = c
+        NewUndo.Add(gcd.CurrentDrawing.oEntities[indice], cLastRedo.Key)
+        gcd.CurrentDrawing.oEntities[indice] = c
 
     End Select
 

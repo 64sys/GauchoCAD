@@ -45,7 +45,7 @@ Public Function Start(Optional ElemToBuild As Variant, _Mode As Integer = 0) As 
     gcd.CurrentDrawing.xmayor = limits[2]
     gcd.CurrentDrawing.ymayor = limits[3]
   End If
-  If gcd.CurrentDrawing.arrEntities.Count = 0 Then Return
+  If gcd.CurrentDrawing.oEntities.Count = 0 Then Return
 
   Dim SZx As Float
   ' ahora calculo donde estaria el centro de este dibujo

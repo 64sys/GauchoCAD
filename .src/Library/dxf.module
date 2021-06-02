@@ -443,7 +443,7 @@ Private Sub Load4Blocks(cBlocks As Collection)
     Endif
   Loop
 
-  Print "DXF: Leidos", gcd.CurrentDrawing.arrBlocks.Count, " bloques"
+  Print "DXF: Leidos", gcd.CurrentDrawing.oBlocks.Count, " bloques"
 
 End
 
@@ -610,14 +610,14 @@ Public Function SaveFile(sName As String, cData As Collection) As Integer
   If Save1HeadersAndVars(cData["HEADER"]) Then Return False
   If Save2Classes(cData["CLASSES"]) Then Return False
   If Save3Tables(cData["TABLES"]) Then Return False
-  If Save4BlocksDirect(gcd.CurrentDrawing.arrBlocks) Then Return False
+  If Save4BlocksDirect(gcd.CurrentDrawing.oBlocks) Then Return False
   'If Save4Blocks(cData["BLOCKS"]) Then Return False
   'If Save5Entities(cData["ENTITIES"]) Then Return False
-  If Save5EntitiesDirect(gcd.CurrentDrawing.arrEntities) Then Return False
+  If Save5EntitiesDirect(gcd.CurrentDrawing.oEntities) Then Return False
   If Save6Objects(cData["OBJECTS"]) Then Return False
   If Save7ThumbNail(cData["THUMBNAILIMAGE"]) Then Return False
   hFile.Close
-  Return gcd.CurrentDrawing.arrEntities.Count
+  Return gcd.CurrentDrawing.oEntities.Count
   'Catch
   hFile.Close
   Message.Error(("Error saving file"))
@@ -714,7 +714,7 @@ Private Function Save3Tables(cTables As Collection) As Integer
       Print #hFIle, CStr(cTable.Count)
     End If
     If sTableName = "BLOCK_RECORD" Then
-      save31BlockRecord(gcd.CurrentDrawing.arrBlocks)
+      save31BlockRecord(gcd.CurrentDrawing.oBlocks)
 
     Else
 

@@ -59,7 +59,7 @@ Public Function Start(Optional ElemToBuild As Variant, Optional _Mode As Integer
 
     gcd.CurrentDrawing.uUndo.OpenUndoStage("Move entities", Undo.TypeModify)
     For i = 0 To gcd.CurrentDrawing.arrSelecIndex.Max
-      gcd.CurrentDrawing.uUndo.AddUndoItem(gcd.CurrentDrawing.arrSelecIndex[i], clsEntities.ClonEntity(gcd.CurrentDrawing.arrEntities[gcd.CurrentDrawing.arrSelecIndex[i]], False))
+      gcd.CurrentDrawing.uUndo.AddUndoItem(gcd.CurrentDrawing.arrSelecIndex[i], clsEntities.ClonEntity(gcd.CurrentDrawing.oEntities[gcd.CurrentDrawing.arrSelecIndex[i]], False))
 
     Next
     gcd.Redraw

@@ -160,7 +160,6 @@ Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' esta rutina es l
 
       clsEntities.GLGenDrawListSel(0)
 
-
     End If
 
   End If
@@ -217,8 +216,8 @@ Public Function DoFillet() As Boolean
   Dim EndAngle As Float
 
   ' intenta hacer el fillet entre las dos entidades seleccionadas, devuelve True si tiene exito
-  e1 = gcd.CurrentDrawing.arrEntities[Me.iEntity1]
-  e2 = gcd.CurrentDrawing.arrEntities[Me.iEntity2]
+  e1 = gcd.CurrentDrawing.oEntities[Me.iEntity1]
+  e2 = gcd.CurrentDrawing.oEntities[Me.iEntity2]
 
   Select Case e1.Gender
     Case "Line"
@@ -292,7 +291,7 @@ Public Function DoFillet() As Boolean
           eLine.LineType = gcd.CurrentDrawing.CurrLtype
           eLine.pLayer = gcd.CurrentDrawing.CurrLayer
           cadLine.Finish(eLine)
-          gcd.CurrentDrawing.arrEntities.Add(eLine)
+          gcd.CurrentDrawing.oEntities.Add(eLine)
 
           Me.Finish
 

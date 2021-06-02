@@ -48,7 +48,7 @@ Public Function FIndBlock(BlockName As String) As Block
 
   Dim b As Block
 
-  For Each b In gcd.CurrentDrawing.arrBlocks
+  For Each b In gcd.CurrentDrawing.oBlocks
     If b.name = BlockName Then Return b
   Next
   Return
@@ -84,22 +84,22 @@ Public Function ReconstruirBloques() As Boolean
 
   Print "Recostruyendo bloques"
 
-  For i = 0 To gcd.CurrentDrawing.arrEntities.Max
-    DrawingAids.HelperTrabajo = ("Loading blocks ") & Format$(i / gcd.CurrentDrawing.arrEntities.Max, "0.00%")
+  For i = 0 To gcd.CurrentDrawing.oEntities
+    DrawingAids.HelperTrabajo = ("Loading blocks ") & Format$(i / gcd.CurrentDrawing.oEntities, "0.00%")
     Wait 0.0001
-    If gcd.CurrentDrawing.arrEntities[i].gender = "Block" Then
+    If gcd.CurrentDrawing.oEntities[i].gender = "Block" Then
       Dim newBlock As New Block
-      newBlock.name = gcd.CurrentDrawing.arrEntities[i].block
-      newBlock.x = gcd.CurrentDrawing.arrEntities[i].p[0]
-      newBlock.y = gcd.CurrentDrawing.arrEntities[i].p[1]
+      newBlock.name = gcd.CurrentDrawing.oEntities[i].block
+      newBlock.x = gcd.CurrentDrawing.oEntities[i].p[0]
+      newBlock.y = gcd.CurrentDrawing.oEntities[i].p[1]
       newBlock.entities = New Entity[]
       ' busco los objetos de este bloque y los reconstruyo
-      For i2 = iStart To gcd.CurrentDrawing.arrEntities.max
-        If gcd.CurrentDrawing.arrEntities[i2].block = newBlock.name And gcd.CurrentDrawing.arrEntities[i2].gender <> "Block" Then ' sin recursividad en bloques
-          If gcd.CurrentDrawing.arrEntities[i2].block = newBlock.name And gcd.CurrentDrawing.arrEntities[i2].gender <> "Insert" Then 'no quiero insertarme a mi mismo
+      For i2 = iStart To gcd.CurrentDrawing.oEntities
+        If gcd.CurrentDrawing.oEntities[i2].block = newBlock.name And gcd.CurrentDrawing.oEntities[i2].gender <> "Block" Then ' sin recursividad en bloques
+          If gcd.CurrentDrawing.oEntities[i2].block = newBlock.name And gcd.CurrentDrawing.oEntities[i2].gender <> "Insert" Then 'no quiero insertarme a mi mismo
             PartesEncontradas = True
             Dim o2 As Entity
-            o2 = ClonEntity(gcd.CurrentDrawing.arrEntities[i2])
+            o2 = ClonEntity(gcd.CurrentDrawing.oEntities[i2])
 
             o2.ClassHandler.finish(o2)
             newBlock.entities.Add(o2)
@@ -155,21 +155,21 @@ End
 
 '' Genera las listas GL de cada entidad individual, y la version seleccionada
 '' Borra la lista anterior y genera una nueva
-Public Sub glGenDrawList(Optional iEntity As Integer = -1)
+Public Sub glGenDrawList(Optional eEntity As Entity = Null)
 
   Dim idDrawing As Integer ' la instancia de dibujo en la que estamos
-  Dim i As Integer
+  Dim i As Integer, e As Entity
 
-  If iEntity >= 0 Then
+  If eEntity Then
 
-    If Not gl.islist(gcd.CurrentDrawing.arrEntities[iEntity].glDrwList) Then gcd.CurrentDrawing.arrEntities[iEntity].glDrwList = gl.GenLists(1)
-    gl.NewList(gcd.CurrentDrawing.arrEntities[iEntity].glDrwList, gl.COMPILE)
-    gcd.CurrentDrawing.arrEntities[iEntity].ClassHandler.Draw(gcd.CurrentDrawing.arrEntities[iEntity])
+    If Not gl.islist(eEntity.glDrwList) Then eEntity.glDrwList = gl.GenLists(1)
+    gl.NewList(eEntity.glDrwList, gl.COMPILE)
+    eEntity.ClassHandler.Draw(eEntity)
     gl.EndList
 
-    If Not gl.islist(gcd.CurrentDrawing.arrEntities[iEntity].glDrwListSel) Then gcd.CurrentDrawing.arrEntities[iEntity].glDrwListSel = gl.GenLists(1)
-    gl.NewList(gcd.CurrentDrawing.arrEntities[iEntity].glDrwListSel, gl.COMPILE)
-    gcd.CurrentDrawing.arrEntities[iEntity].ClassHandler.DrawSelected(gcd.CurrentDrawing.arrEntities[iEntity])
+    If Not gl.islist(eEntity.glDrwListSel) Then eEntity.glDrwListSel = gl.GenLists(1)
+    gl.NewList(eEntity.glDrwListSel, gl.COMPILE)
+    eEntity.ClassHandler.DrawSelected(eEntity)
     gl.EndList
 
   Else
@@ -177,20 +177,20 @@ Public Sub glGenDrawList(Optional iEntity As Integer = -1)
     ' If Not gl.islist(gcd.CurrDrawing.GlListAllEntities) Then gcd.CurrDrawing.GlListAllEntities = gl.GenLists(1)
     Dim t As Float = Timer
     ' listas de entidades
-    For i = 0 To gcd.CurrentDrawing.arrEntities.Max
+    For Each e In gcd.CurrentDrawing.oEntities
 
-      If Not gl.islist(gcd.CurrentDrawing.arrEntities[i].glDrwList) Then gcd.CurrentDrawing.arrEntities[i].glDrwList = gl.GenLists(1)
-      gl.NewList(gcd.CurrentDrawing.arrEntities[i].glDrwList, gl.COMPILE)
-      gcd.CurrentDrawing.arrEntities[i].ClassHandler.Draw(gcd.CurrentDrawing.arrEntities[i])
+      If Not gl.islist(e.glDrwList) Then e.glDrwList = gl.GenLists(1)
+      gl.NewList(e.glDrwList, gl.COMPILE)
+      e.ClassHandler.Draw(e)
       gl.EndList
 
     Next
 
     ' lista de entidaes seleccionadas
-    For i = 0 To gcd.CurrentDrawing.arrEntities.Max
-      If Not gl.islist(gcd.CurrentDrawing.arrEntities[i].glDrwListSel) Then gcd.CurrentDrawing.arrEntities[i].glDrwListSel = gl.GenLists(1)
-      gl.NewList(gcd.CurrentDrawing.arrEntities[i].glDrwListSel, gl.COMPILE)
-      gcd.CurrentDrawing.arrEntities[i].ClassHandler.DrawSelected(gcd.CurrentDrawing.arrEntities[i])
+    For Each e In gcd.CurrentDrawing.oEntities
+      If Not gl.islist(e.glDrwListSel) Then e.glDrwListSel = gl.GenLists(1)
+      gl.NewList(e.glDrwListSel, gl.COMPILE)
+      e.ClassHandler.DrawSelected(e)
       gl.EndList
     Next
 
@@ -208,18 +208,18 @@ End
 Public Sub glGenDrawListSel(Optional mode As Integer = 0)
 
   Dim idDrawing As Integer ' la instancia de dibujo en la que estamos
-  Dim i As Integer
+  Dim i As Integer, e As Entity
 
   If Not gl.islist(gcd.CurrentDrawing.GlListSelectedEntities) Then gcd.CurrentDrawing.GlListSelectedEntities = gl.GenLists(1)
 
   gl.NewList(gcd.CurrentDrawing.GlListSelectedEntities, gl.COMPILE)
 
-  For i = 0 To gcd.CurrentDrawing.arrEntities.Max
+  For Each e In gcd.CurrentDrawing.oSelected
 
-    If gcd.CurrentDrawing.arrEntities[i].Selected Then
-      If mode = 0 Then gl.CallList(gcd.CurrentDrawing.arrEntities[i].glDrwListSel)
-      If mode = 1 Then gl.CallList(gcd.CurrentDrawing.arrEntities[i].glDrwList)
-    End If
+    'If gcd.CurrentDrawing.arrEntities[i].Selected Then
+    If mode = 0 Then gl.CallList(e.glDrwListSel)
+    If mode = 1 Then gl.CallList(e.glDrwList)
+    'End If
   Next
 
   gl.EndList
@@ -230,23 +230,23 @@ End
 '' Mode: 0=Selected version 1=Normal version
 Public Sub glGenDrawListAll(Optional ExcludeSelected As Boolean = False)
 
-  Dim i As Integer
+  Dim i As Integer, e As Entity
 
   gl.NewList(gcd.CurrentDrawing.GlListAllEntities, gl.COMPILE)
 
-  For i = 0 To gcd.CurrentDrawing.arrEntities.max
-    If Not (gcd.CurrentDrawing.arrEntities[i].Selected And ExcludeSelected) Then gl.CallList(gcd.CurrentDrawing.arrEntities[i].glDrwList)
+  For Each e In gcd.CurrentDrawing.oEntities
+    If Not (e.Selected And ExcludeSelected) Then gl.CallList(e.glDrwList)
 
   Next
 
   gl.EndList
 
-  For i = 0 To gcd.CurrentDrawing.arrLayers.max
-    If Not gl.islist(gcd.CurrentDrawing.arrLayers[i].glList) Then gcd.CurrentDrawing.arrLayers[i].glList = gl.GenLists(1)
-    gl.NewList(gcd.CurrentDrawing.arrLayers[i].glList, gl.COMPILE)
+  For Each L As Layer In gcd.CurrentDrawing.oLayers
+    If Not gl.islist(L.glList) Then L.glList = gl.GenLists(1)
+    gl.NewList(L.glList, gl.COMPILE)
   Next
-  For i = 0 To gcd.CurrentDrawing.arrEntities.max
-    If Not (gcd.CurrentDrawing.arrEntities[i].Selected And ExcludeSelected) Then gl.CallList(gcd.CurrentDrawing.arrEntities[i].glDrwList)
+  For Each e In gcd.CurrentDrawing.oEntities
+    If Not (e.Selected And ExcludeSelected) Then gl.CallList(e.glDrwList)
 
   Next
 
@@ -265,7 +265,7 @@ Public Sub glGenDrawListLAyers(Optional aLayer As Layer)
 
     If Not gl.islist(aLayer.glList) Then aLayer.glList = gl.GenLists(1)
     gl.NewList(aLayer.glList, gl.COMPILE)
-    For Each e In gcd.CurrentDrawing.arrEntities
+    For Each e In gcd.CurrentDrawing.oEntities
 
       If e.pLayer = aLayer Then gl.CallList(e.glDrwList)
 
@@ -274,10 +274,10 @@ Public Sub glGenDrawListLAyers(Optional aLayer As Layer)
 
   Else
 
-    For Each aLayer In gcd.CurrentDrawing.arrLayers
+    For Each aLayer In gcd.CurrentDrawing.oLayers
       If Not gl.islist(aLayer.glList) Then aLayer.glList = gl.GenLists(1)
       gl.NewList(aLayer.glList, gl.COMPILE)
-      For Each e In gcd.CurrentDrawing.arrEntities
+      For Each e In gcd.CurrentDrawing.oEntities
 
         If e.pLayer = aLayer Then e.ClassHandler.Draw(e)
 
@@ -301,7 +301,7 @@ Public Sub glGenDrawListLAyers2(Optional aLayer As Layer)
 
     If Not gl.islist(aLayer.glList) Then aLayer.glList = gl.GenLists(1)
     gl.NewList(aLayer.glList, gl.COMPILE)
-    For Each e In gcd.CurrentDrawing.arrEntities
+    For Each e In gcd.CurrentDrawing.oEntities
 
       If e.pLayer = aLayer Then gl.CallList(e.glDrwList)
 
@@ -310,7 +310,7 @@ Public Sub glGenDrawListLAyers2(Optional aLayer As Layer)
 
   Else
 
-    For Each aLayer In gcd.CurrentDrawing.arrLayers
+    For Each aLayer In gcd.CurrentDrawing.oLayers
       If Not gl.islist(aLayer.glList) Then aLayer.glList = gl.GenLists(1)
       gl.NewList(aLayer.glList, gl.COMPILE)
       For Each e In aLayer.Entities
@@ -329,12 +329,12 @@ Public Sub DrawPoiSymbolsAll()
 
   Dim i, total As Integer
 
-  For i = 0 To gcd.CurrentDrawing.arrEntities.Max
+  For Each e As Entity In gcd.CurrentDrawing.oEntities
 
-    If gcd.CurrentDrawing.arrEntities[i].Selected Then
+    If e.Selected Then
 
-      If (gcd.CurrentDrawing.arrEntities[i].Gender = "Insert") Then
-        DrawPoiSymbols(gcd.CurrentDrawing.arrEntities[i])
+      If (e.Gender = "Insert") Then
+        DrawPoiSymbols(e)
         Inc total
       End If
     End If
@@ -375,12 +375,12 @@ Public Sub Finish(Optional selected As Boolean = True)
   ' creo copias de cada elemento seleccionado
   Dim m As Integer, i As Integer
 
-  m = gcd.CurrentDrawing.arrEntities.Max
+  m = gcd.CurrentDrawing.oEntities
   For i = 0 To m
     If selected Then                                                    ' apply to only the selected ones
-      If gcd.CurrentDrawing.arrEntities[i].Selected Then gcd.CurrentDrawing.arrEntities[i].ClassHandler.Finish(gcd.CurrentDrawing.arrEntities[i])
+      If gcd.CurrentDrawing.oEntities[i].Selected Then gcd.CurrentDrawing.oEntities[i].ClassHandler.Finish(gcd.CurrentDrawing.oEntities[i])
     Else                                                                ' apply to all
-      gcd.CurrentDrawing.arrEntities[i].ClassHandler.Finish(gcd.CurrentDrawing.arrEntities[i])
+      gcd.CurrentDrawing.oEntities[i].ClassHandler.Finish(gcd.CurrentDrawing.oEntities[i])
     End If
 
   Next
@@ -402,9 +402,9 @@ Public Sub ClonElements(Optional selected As Boolean = True)
     '         gcd.CurrDrawing.arrEntities.Last.ClassHandler.finish(gcd.CurrDrawing.arrEntities.Last)
     '     End If
     ' Else
-    gcd.CurrentDrawing.arrEntities.Add(ClonEntity(gcd.CurrentDrawing.arrEntities[iIndex]))
-    gcd.CurrentDrawing.arrEntities.Last.ClassHandler.finish(gcd.CurrentDrawing.arrEntities.Last)
-    gcd.CurrentDrawing.CurrLayer.Entities.Add(gcd.CurrentDrawing.arrEntities.Last)
+    gcd.CurrentDrawing.oEntities.Add(ClonEntity(gcd.CurrentDrawing.oEntities[iIndex]))
+    gcd.CurrentDrawing.oEntities.Last.ClassHandler.finish(gcd.CurrentDrawing.oEntities.Last)
+    gcd.CurrentDrawing.CurrLayer.Entities.Add(gcd.CurrentDrawing.oEntities.Last)
     ' Endif
 
     'End If
@@ -445,11 +445,11 @@ Public Function DeSelection(Optional elementos As String = "todo", Accion As Str
   elementos = LCase(elementos)
 
   '   primero vacio la seleccion anterior
-  gcd.CurrentDrawing.arrSelecIndex.Clear
+  gcd.CurrentDrawing.oSelected.Clear
 
-  For iii = 0 To gcd.CurrentDrawing.arrEntities.Max
+  For Each eTesting As Entity In gcd.CurrentDrawing.oEntities
 
-    clase = gcd.CurrentDrawing.arrEntities[iii].Gender
+    clase = eTesting.Gender
 
     Select Case accion
 
@@ -457,26 +457,26 @@ Public Function DeSelection(Optional elementos As String = "todo", Accion As Str
 
         If SelFull() And (elementos = "todo" Or elementos = clase) Then
 
-          gcd.CurrentDrawing.arrSelecIndex.Add(iii)
-          SelectElem(iii)
+          gcd.CurrentDrawing.oSelected.Add(eTesting, eTesting.handle)
+          SelectElem(eTesting)
           Inc i
 
         Else
 
-          DeSelectElem(iii)
+          DeSelectElem(eTesting)
 
         End If
 
       Case "estirar" ' necesito que dos puntos contiguos esten seleccionados
 
         If SelPArtial() And (elementos = "todo" Or elementos = clase) Then
-          gcd.CurrentDrawing.arrSelecIndex.Add(iii)
-          SelectElem(iii, False) ' dont touch the points
+          gcd.CurrentDrawing.oSelected.Add(eTesting, eTesting.handle)
+          SelectElem(eTesting, False) ' dont touch the points
           Inc i
 
         Else
 
-          DeSelectElem(iii)
+          DeSelectElem(eTesting)
 
         End If
 
@@ -485,7 +485,7 @@ Public Function DeSelection(Optional elementos As String = "todo", Accion As Str
         If (elementos = "todo" Or elementos = clase) Then
 
           Inc i
-          DeSelectElem(iii)
+          DeSelectElem(eTesting)
 
         End If
 
@@ -499,16 +499,16 @@ End
 
 Public Function GetSelectionCount() As Integer
 
-  Dim i, ii As Integer
+  Dim e As Entity
 
-  gcd.CurrentDrawing.arrSelecIndex.Clear
-  For i = 0 To gcd.CurrentDrawing.arrEntities.Max
-    If gcd.CurrentDrawing.arrEntities[i].Selected Then
-      Inc ii
-      gcd.CurrentDrawing.arrSelecIndex.Add(i)
+  gcd.CurrentDrawing.oSelected.Clear
+  For Each e In gcd.CurrentDrawing.oEntities
+    If e.Selected Then
+
+      gcd.CurrentDrawing.oSelected.Add(e, e.handle)
     End If
   Next
-  Return ii
+  Return gcd.CurrentDrawing.oSelected.Count
 
 End Function
 
@@ -519,17 +519,17 @@ Public Function DeleteSelected() As Integer
 
   '  Purgue will also delete those with .ForDeletion = true
 
-  For i = gcd.CurrentDrawing.arrEntities.Max To 0 Step -1
+  For i = gcd.CurrentDrawing.oEntities To 0 Step -1
 
-    If gcd.CurrentDrawing.arrEntities[i].Selected Then
-      gcd.CurrentDrawing.arrEntities.Remove(i)
+    If gcd.CurrentDrawing.oEntities[i].Selected Then
+      gcd.CurrentDrawing.oEntities.Remove(i)
       Inc c
     End If
 
   Next
 
   '   we also need to regenerate the drawing list
-  For Each lay In gcd.CurrentDrawing.arrLayers
+  For Each lay In gcd.CurrentDrawing.oLayers
     If lay.Visible Then glGenDrawListLayers(lay)
   Next
 
@@ -546,17 +546,17 @@ Public Function SelectFromPoint(Xr As Float, Zr As Float, Optional Autoselect As
 
   Dim i As Integer
 
-  For i = gcd.CurrentDrawing.arrEntities.Max To 0 Step -1
+  For i = gcd.CurrentDrawing.oEntities To 0 Step -1
     ' last elements are drawn last so the click belongs to them
-    If gcd.CurrentDrawing.arrEntities[i].pointClick(Xr, Zr) Then
+    If gcd.CurrentDrawing.oEntities[i].pointClick(Xr, Zr) Then
       If Autoselect Then
-        If Not gcd.CurrentDrawing.arrEntities[i].Selected Then
-          SelectElem(gcd.CurrentDrawing.arrEntities[i])
+        If Not gcd.CurrentDrawing.oEntities[i].Selected Then
+          SelectElem(gcd.CurrentDrawing.oEntities[i])
         Else
-          DeSelectElem(gcd.CurrentDrawing.arrEntities[i])
+          DeSelectElem(gcd.CurrentDrawing.oEntities[i])
         End If
       End If
-      Return gcd.CurrentDrawing.arrEntities[i]
+      Return gcd.CurrentDrawing.oEntities[i]
     End If
 
   Next
@@ -651,7 +651,7 @@ End
 '
 ' End
 
-Public Sub SelectElem(iEntity As Integer, Optional AndItsPoints As Boolean = True)
+Public Sub SelectElem(eEntity As Entity, Optional AndItsPoints As Boolean = True)
 
   Dim i, ii As Integer
 
@@ -686,10 +686,10 @@ Public Sub SelectElem(iEntity As Integer, Optional AndItsPoints As Boolean = Tru
   '         End If
   '     Else                                                        ' no, simplemente deselecciono esta entidad
 
-  gcd.CurrentDrawing.arrEntities[iEntity].selected = True
+  eEntity.selected = True
   If AndItsPoints Then
-    For i = 0 To gcd.CurrentDrawing.arrEntities[iEntity].Psel.Max
-      gcd.CurrentDrawing.arrEntities[iEntity].Psel[i] = True
+    For i = 0 To eEntity.Psel.Max
+      eEntity.Psel[i] = True
     Next
 
   End If
@@ -699,7 +699,7 @@ Public Sub SelectElem(iEntity As Integer, Optional AndItsPoints As Boolean = Tru
 
 End
 
-Public Sub DeSelectElem(iEntity As Integer, Optional AndItsPoints As Boolean = True)
+Public Sub DeSelectElem(eEntity As Entity, Optional AndItsPoints As Boolean = True)
 
   ' deselect all points and myself
 
@@ -736,10 +736,10 @@ Public Sub DeSelectElem(iEntity As Integer, Optional AndItsPoints As Boolean = T
   '         End If
   '     Else                                                        ' no, simplemente deselecciono esta entidad
 
-  gcd.CurrentDrawing.arrEntities[iEntity].selected = False
+  eEntity.selected = False
   If AndItsPoints Then
-    For i = 0 To gcd.CurrentDrawing.arrEntities[iEntity].Psel.Max
-      gcd.CurrentDrawing.arrEntities[iEntity].Psel[i] = False
+    For i = 0 To eEntity.Psel.Max
+      eEntity.Psel[i] = False
     Next
 
   End If
@@ -792,7 +792,7 @@ Public Sub Move(dX As Float, dY As Float, Optional OnlySelected As Boolean = Fal
   ' crea un backup de todos los puntos
   Dim e As Entity, i As Integer
 
-  For Each e In gcd.CurrentDrawing.arrEntities
+  For Each e In gcd.CurrentDrawing.oEntities
     If (e.selected And OnlySelected) Or Not OnlySelected Then
 
       e.ClassHandler.Translate(e, dX, dY, OnlyPointSelected)
@@ -808,7 +808,7 @@ Public Sub Rotate(degAngle As Float, Optional OnlySelected As Boolean = False, O
   ' crea un backup de todos los puntos
   Dim e As Entity, i As Integer
 
-  For Each e In gcd.CurrentDrawing.arrEntities
+  For Each e In gcd.CurrentDrawing.oEntities
     If (e.selected And OnlySelected) Or Not OnlySelected Then
 
       e.ClassHandler.Rotate(e, degAngle)
@@ -824,7 +824,7 @@ Public Sub Scale(sX As Float, sY As Float, Optional sZ As Float = 1, OnlySelecte
   ' crea un backup de todos los puntos
   Dim e As Entity, i As Integer
 
-  For Each e In gcd.CurrentDrawing.arrEntities
+  For Each e In gcd.CurrentDrawing.oEntities
     If (e.selected And OnlySelected) Or Not OnlySelected Then
 
       e.ClassHandler.Scale(e, sX, sY)
@@ -843,41 +843,41 @@ Public Function SelectionSquare(X1real As Float, Y1real As Float, X2real As Floa
   NuevaSumaResta = LCase$(NuevaSumaResta)
 
   If NuevaSumaResta = "nueva" Then ' nueva seleccion
-    For i = 0 To gcd.CurrentDrawing.arrEntities.Max
-      gcd.CurrentDrawing.arrEntities[i].selected = False
-      For i2 = 0 To gcd.CurrentDrawing.arrEntities[i].Psel.max
-        gcd.CurrentDrawing.arrEntities[i].Psel[i2] = False
+    For Each e In gcd.CurrentDrawing.oEntities
+      e.selected = False
+      For i2 = 0 To e.Psel.max
+        e.Psel[i2] = False
       Next
     Next
     TotalSeleccionados = 0
   End If
 
-  For i = 0 To gcd.CurrentDrawing.arrEntities.Max
+  For Each e In gcd.CurrentDrawing.oEntities
     ' cada entidad debe decidir si esta seleccionada o no
     If crossing Then
-      If SelPArtial(i, X1real, Y1real, X2real, Y2real) Then
+      If SelPArtial(e, X1real, Y1real, X2real, Y2real) Then
         ' el punto esta en el recuadro
         If NuevaSumaResta <> "resta" Then
           Inc TotalSeleccionados
-          Me.SelectElem(i, False)
+          Me.SelectElem(e, False)
 
         Else If NuevaSumaResta = "resta" Then
           Dec TotalSeleccionados
-          Me.DeSelectElem(i, False)
+          Me.DeSelectElem(e, False)
 
         End If
 
       Endif
     Else
-      If SelFull(i, X1real, Y1real, X2real, Y2real) Then
+      If SelFull(e, X1real, Y1real, X2real, Y2real) Then
         ' el punto esta en el recuadro
         If NuevaSumaResta <> "resta" Then
           Inc TotalSeleccionados
-          Me.SelectElem(i, False)
+          Me.SelectElem(e, False)
 
         Else If NuevaSumaResta = "resta" Then
           Dec TotalSeleccionados
-          Me.DeSelectElem(i, False)
+          Me.DeSelectElem(e, False)
 
         End If
 
@@ -887,7 +887,8 @@ Public Function SelectionSquare(X1real As Float, Y1real As Float, X2real As Floa
   Next
   GetSelectionCount()
 
-  GetSelectionHandles(gcd.CurrentDrawing.hSelection)
+  ' deprecada
+  ' GetSelectionHandles(gcd.CurrentDrawing.hSelection)
 
   Return TotalSeleccionados
 
@@ -906,10 +907,10 @@ Public Function CollectVisibleEntities()
   x1 = gcd.Xreal(gcd.ScreenWidth())
   y0 = gcd.Yreal(gcd.ScreenHeight())
 
-  If gcd.CurrentDrawing.arrEntities.Max > gcd.CurrentDrawing.arrVisibleEntities.Max Then gcd.CurrentDrawing.arrVisibleEntities.Resize(gcd.CurrentDrawing.arrEntities.Count)
+  If gcd.CurrentDrawing.oEntities > gcd.CurrentDrawing.arrVisibleEntities.Max Then gcd.CurrentDrawing.arrVisibleEntities.Resize(gcd.CurrentDrawing.oEntities.Count)
 
-  For i = 0 To gcd.CurrentDrawing.arrEntities.Max
-    If gcd.CurrentDrawing.arrEntities[i].pLayer.Visible Then
+  For i = 0 To gcd.CurrentDrawing.oEntities
+    If gcd.CurrentDrawing.oEntities[i].pLayer.Visible Then
 
       If SelPArtial(i, x0, y0, x1, y1) Then
 
@@ -931,9 +932,9 @@ Public Function GetSelectionHandles(sHandles As String[]) As Integer
 
   sHandles.Clear
   'sHandles.Resize
-  For i = 0 To gcd.CurrentDrawing.arrEntities.Max
-    If gcd.CurrentDrawing.arrEntities[i].Selected Then
-      sHandles.Add(gcd.CurrentDrawing.arrEntities[i].Handle)
+  For i = 0 To gcd.CurrentDrawing.oEntities
+    If gcd.CurrentDrawing.oEntities[i].Selected Then
+      sHandles.Add(gcd.CurrentDrawing.oEntities[i].Handle)
       Inc itotal
     End If
   Next
@@ -1073,7 +1074,7 @@ Public Sub BuildPoi(Optional entities As Entity[], OnlyVisibles As Boolean = Tru
   Dim e As Entity, i As Integer
   Dim entGroup As Entity[]
 
-  If Not entities Then entGroup = gcd.CurrentDrawing.arrEntities Else entGroup = Entities
+  If Not entities Then entGroup = gcd.CurrentDrawing.oEntities Else entGroup = Entities
 
   If entGroup.Count = 0 Then Return
 
@@ -1086,15 +1087,15 @@ Public Sub BuildPoi(Optional entities As Entity[], OnlyVisibles As Boolean = Tru
 End
 'Return bound limits for all verices in the array of entities
 
-Public Function ComputeLimits(Optional entities As Entity[], OnlyVisibles As Boolean = True) As Float[]
+Public Function ComputeLimits(Optional entities As Collection, OnlyVisibles As Boolean = True) As Float[]
 
   Dim e As Entity, i As Integer
-  Dim entGroup As Entity[]
+  Dim entGroup As Collection
   Dim Xmenor As Float = 1e10, Ymenor As Float = 1e10, Xmayor As Float = -1e10, Ymayor As Float = -1e10
   Dim newLimits As New Float[]
   Dim IsVisible As Boolean
 
-  If Not entities Then entGroup = gcd.CurrentDrawing.arrEntities Else entGroup = Entities
+  If Not entities Then entGroup = gcd.CurrentDrawing.oEntities Else entGroup = Entities
 
   If entGroup.Count = 0 Then Return Null
 
@@ -1194,38 +1195,38 @@ End
 
 '' Determines if the entity was selected by a rectanle surrounding al points
 '' by default, if ALL points are selected, it can.
-Public Function SelFull(i As Integer, X1real As Float, Y1real As Float, X2real As Float, Y2real As Float) As Boolean
+Public Function SelFull(eTesting As Entity, X1real As Float, Y1real As Float, X2real As Float, Y2real As Float) As Boolean
 
   Dim ii As Integer, puedo As Boolean
 
-  Select Case gcd.CurrentDrawing.arrEntities[i].Gender
+  Select Case eTesting.Gender
 
     Case Else
 
       ' Si tengo un bounding poligon, entonces verifico que todos los puntos esten dentro
-      If gcd.CurrentDrawing.arrEntities[i].Polygon.Count > 0 Then
+      If eTesting.Polygon.Count > 0 Then
 
-        Return puntos.IsPoligonInsideRect(gcd.CurrentDrawing.arrEntities[i].Polygon, X1real, Y1real, X2real, Y2real)
+        Return puntos.IsPoligonInsideRect(eTesting.Polygon, X1real, Y1real, X2real, Y2real)
 
       Else    ' no tengo un poligono, entonces verifico que todos los puntos definitorios de al entidad esten dentro
 
         puedo = True                     ' supongamos que puedo, por ahora
-        For ii = 0 To gcd.CurrentDrawing.arrEntities[i].p.max Step 2
-          If ii + 1 > gcd.CurrentDrawing.arrEntities[i].p.max Then Break
-          If Not (gcd.CurrentDrawing.arrEntities[i].p[ii] >= X1real And gcd.CurrentDrawing.arrEntities[i].p[ii] <= X2real) And (gcd.CurrentDrawing.arrEntities[i].p[ii + 1] >= Y1real And gcd.CurrentDrawing.arrEntities[i].p[ii + 1] <= Y2real) Then
+        For ii = 0 To eTesting.p.max Step 2
+          If ii + 1 > eTesting.p.max Then Break
+          If Not (eTesting.p[ii] >= X1real And eTesting.p[ii] <= X2real) And (eTesting.p[ii + 1] >= Y1real And eTesting.p[ii + 1] <= Y2real) Then
             puedo = False
           End If
         Next
 
         If puedo Then
-          For ii = 0 To gcd.CurrentDrawing.arrEntities[i].PSel.Max
-            gcd.CurrentDrawing.arrEntities[i].PSel[ii] = True
+          For ii = 0 To eTesting.PSel.Max
+            eTesting.PSel[ii] = True
           Next
 
           Return True
         Else
-          For ii = 0 To gcd.CurrentDrawing.arrEntities[i].PSel.Max
-            gcd.CurrentDrawing.arrEntities[i].PSel[ii] = False
+          For ii = 0 To eTesting.PSel.Max
+            eTesting.PSel[ii] = False
           Next
 
           Return False
@@ -1238,22 +1239,22 @@ End
 ' '' Determines if the entity
 ' '' by default, if ANY point is selected, it can.
 
-Public Function SelPartial(i As Integer, X1real As Float, Y1real As Float, X2real As Float, Y2real As Float) As Boolean
+Public Function SelPartial(eTesting As Entity, X1real As Float, Y1real As Float, X2real As Float, Y2real As Float) As Boolean
 
   Dim ii As Integer, puedo As Boolean = False
 
-  Select Case gcd.CurrentDrawing.arrEntities[i].Gender
+  Select Case eTesting.Gender
 
     Case Else
 
       ' Si tengo un bounding poligon, entonces verifico que alguna linea lo cruce
-      puedo = puntos.IsPoligonCrossingRect(gcd.CurrentDrawing.arrEntities[i].Polygon, X1real, Y1real, X2real, Y2real)
+      puedo = puntos.IsPoligonCrossingRect(eTesting.Polygon, X1real, Y1real, X2real, Y2real)
 
-      For Ii = 0 To gcd.CurrentDrawing.arrEntities[i].p.max Step 2
-        If ii + 1 > gcd.CurrentDrawing.arrEntities[i].p.max Then Break
-        If ii / 2 > gcd.CurrentDrawing.arrEntities[i].Psel.Max Then Break
-        If (gcd.CurrentDrawing.arrEntities[i].p[iI] >= X1real And gcd.CurrentDrawing.arrEntities[i].p[Ii] <= X2real) And (gcd.CurrentDrawing.arrEntities[i].p[iI + 1] >= Y1real And gcd.CurrentDrawing.arrEntities[i].p[iI + 1] <= Y2real) Then
-          gcd.CurrentDrawing.arrEntities[i].PSel[iI / 2] = True
+      For Ii = 0 To eTesting.p.max Step 2
+        If ii + 1 > eTesting.p.max Then Break
+        If ii / 2 > eTesting.Psel.Max Then Break
+        If (eTesting.p[iI] >= X1real And eTesting.p[Ii] <= X2real) And (eTesting.p[iI + 1] >= Y1real And eTesting.p[iI + 1] <= Y2real) Then
+          eTesting.PSel[iI / 2] = True
           puedo = True
         End If
       Next
@@ -1333,12 +1334,12 @@ Public Function DXFImportToEntity(c As Collection, Optional IsDummy As Boolean =
   If e.LineWidth < 1 Then e.LineWidth = 1
   If c.Exist(dxf.codLType) Then
     If gcd.FindLtIndex(c[dxf.codLType]) >= 0 Then
-      e.LineType = gcd.CurrentDrawing.arrLTYpes[gcd.FindLtIndex(c[dxf.codLType])]
+      e.LineType = gcd.CurrentDrawing.oLTypes[gcd.FindLtIndex(c[dxf.codLType])]
     Else
-      e.LineType = gcd.CurrentDrawing.arrLTYpes.First
+      e.LineType = gcd.CurrentDrawing.oLTypes.First
     End If
   Else
-    e.LineType = gcd.CurrentDrawing.arrLTYpes.First
+    e.LineType = gcd.CurrentDrawing.oLTypes.First
 
   End If
   If clsHandler.ImportDXF(e, sClave, sValue) Then
@@ -1364,9 +1365,9 @@ Public Function GetEntityIndex(dDrawing As Drawing, sHandle As String, Optional 
 
   Dim i As Integer
 
-  For i = iStart To dDrawing.arrEntities.Max
+  For i = iStart To dDrawing.oEntities
 
-    If dDrawing.arrEntities[i].Handle = sHandle Then Return i
+    If dDrawing.oEntities[i].Handle = sHandle Then Return i
 
   Next
 
@@ -1649,6 +1650,7 @@ Public Function ImportJsonToEntity(c As JSONCollection, Optional IsDummy As Bool
   If clsHandler.ImportJSONCol(c, e) Then
     ' llenamos Common data:
     e.player = gcd.GetLayerByHandle(c["layer"][3])  ' busco el layer por nombre
+    e.Handle = c["handle"][1]
     If e.pLayer = Null Then Stop
     If TypeOf(c["color"]) = gb.Object Then
       Try e.colour = c["color"]["index"]    ' FIXME: esto sigue dando error
@@ -1657,13 +1659,12 @@ Public Function ImportJsonToEntity(c As JSONCollection, Optional IsDummy As Bool
     Endif
     e.LineWidth = c["linewt"] / 100
     If e.LineWidth < 1 Then e.LineWidth = 1
-    If gcd.FindLtIndex(c["ltype_flags"]) >= 0 Then
-      e.LineType = gcd.CurrentDrawing.arrLTYpes[gcd.FindLtIndex(c[dxf.codLType])]
+    If gcd.FindLtIndex(c["ltype_flags"]) Then
+      e.LineType = gcd.FindLtIndex(c["ltype_flags"])
     Else
-      e.LineType = gcd.CurrentDrawing.arrLTYpes.First
+      e.LineType = gcd.CurrentDrawing.oLTypes[gcd.CurrentDrawing.oLTypes.First]
     End If
-    e.Gender = clsHandler.Gender
-    e.ClassHandler = clsHandler
+
     clsHandler.Finish(e)
 
     Return e

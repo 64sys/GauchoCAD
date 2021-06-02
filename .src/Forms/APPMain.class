@@ -623,9 +623,9 @@ Public Sub locks_Click()
 
     Case "grid"
       If Last.Value Then
-        puntos.Gridactive = True
+        Me.Gridactive = True
       Else
-        puntos.Gridactive = False
+        Me.Gridactive = False
       Endif
 
     Case "ortho"
@@ -697,13 +697,13 @@ Public Sub GLArea1_draw()
   If gcd.DrawBounds Then DrawingAids.DrawPolygons
 
   ' entidad resaltada
-  If gcd.CurrentDrawing.iEntity[3] >= 0 And gcd.CurrentDrawing.iEntity[3] < gcd.CurrentDrawing.arrEntities.Count Then
+  If gcd.CurrentDrawing.iEntity[3] >= 0 And gcd.CurrentDrawing.iEntity[3] < gcd.CurrentDrawing.oEntities.Count Then
 
     ' si no esta seleccionada, la resalto
     'If Not arrEntities[iEntity[3]].Selected Then
     'iParent = clsEntities.GetParentBlock(gcd.CurrentDrawing.iEntity[3]) ' esto verifica si tiene que resaltar el bloque completo
     iParent = gcd.CurrentDrawing.iEntity[3]
-    gcd.CurrentDrawing.arrEntities[iParent].ClassHandler.DrawRemark(gcd.CurrentDrawing.arrEntities[iParent])
+    gcd.CurrentDrawing.oEntities[iParent].ClassHandler.DrawRemark(gcd.CurrentDrawing.oEntities[iParent])
     'End If
 
   End If
@@ -713,8 +713,8 @@ Public Sub GLArea1_draw()
 
   gcd.clsJob.Draw()
 
-  For i = 0 To gcd.CurrentDrawing.arrLayers.Max
-    If gcd.CurrentDrawing.arrLayers[i].Visible Then gl.CallList(gcd.CurrentDrawing.arrLayers[i].glList)
+  For Each oLayer As Layer In gcd.CurrentDrawing.oLayers
+    If oLayer.Visible Then gl.CallList(oLayer.glList)
   Next
 
   ' POI dinamicos
@@ -827,7 +827,7 @@ Public Sub GLArea1_DblClick()
         ' I comment the abobe line because its stop my tool also. What is the idea whit stop?
         ' TINCHO aca podes lanzar tu editor de texto u otras propiedades
         k = gcd.CurrentDrawing.iEntity[3]
-        e = gcd.CurrentDrawing.arrEntities[k]
+        e = gcd.CurrentDrawing.oEntities[k]
 
         Select e.Gender
           Case "Text"
@@ -890,7 +890,7 @@ Public Sub GLArea1_MouseMove()
 
         If gcd.CurrentDrawing.iEntity[3] >= 0 Then
 
-          FInspector.Run(gcd.CurrentDrawing.arrEntities[gcd.CurrentDrawing.iEntity[3]])
+          FInspector.Run(gcd.CurrentDrawing.oEntities[gcd.CurrentDrawing.iEntity[3]])
         Else
           FInspector.Close
 
@@ -1383,7 +1383,7 @@ Public Sub Printer1_Draw()
 
   Printer1.FullPage = True
 
-  flxLimits = clsEntities.ComputeLimits(gcd.CurrentDrawing.arrEntities, True)
+  flxLimits = clsEntities.ComputeLimits(gcd.CurrentDrawing.oEntities, True)
 
   Debug "Printing"
 
@@ -1487,7 +1487,7 @@ Public Sub Printer1_Draw()
 
   Endif
 
-  For Each e As Entity In gcd.CurrentDrawing.arrEntities
+  For Each e As Entity In gcd.CurrentDrawing.oEntities
     If e.LineWidth = 0 Then e.LineWidth = 1
     If jPrint.Exist("Monochrome") Then
       If jPrint["Monochrome"] Then
@@ -1800,14 +1800,12 @@ Public Sub ChangeColorRefresh()
   Dim Changed As Boolean
   Dim te As Entity
 
-  For i = 0 To gcd.CurrentDrawing.arrEntities.Max
+  For Each e In gcd.CurrentDrawing.oEntities
     Changed = False
-    e = gcd.CurrentDrawing.arrEntities[i]
+
     gcd.CurrentDrawing.arrTmp.Clear
 
-    ' If e.Selected And e.iInsert = -1 Then  iInsert no existe mas
     If e.Selected Then
-      e = gcd.CurrentDrawing.arrEntities[i]
       te = clsEntities.ClonEntity(e)
       ' te.Handle = e.Handle  ' no es necesario
       gcd.CurrentDrawing.arrTmp.Add(te)
@@ -1895,8 +1893,8 @@ Public Sub SelectionRefresh()
   cProp.Clear
   TableView1.Clear
 
-  For i = 0 To gcd.CurrentDrawing.arrEntities.Max
-    e = gcd.CurrentDrawing.arrEntities[i]
+  For Each e In gcd.CurrentDrawing.oEntities
+
     If e.Selected Then
       If etype.Exist(e.Gender) = False Then
         etype.Add(e.Gender)
@@ -1919,8 +1917,8 @@ Public Sub SelectionRefresh()
       'Aca se puede poner en off el panel de seleccion ya que no hay entidades seleccionadas
       'skip
     Case 1
-      For i = 0 To gcd.CurrentDrawing.arrEntities.Max
-        e = gcd.CurrentDrawing.arrEntities[i]
+      For Each e In gcd.CurrentDrawing.oEntities
+
         If e.Selected Then
           Break
         Endif
@@ -1973,14 +1971,13 @@ Public Sub PropSave()
 
   lay = gcd.CurrentDrawing.cModel["Layers"]
 
-  For i = 0 To gcd.CurrentDrawing.arrEntities.Max
+  For Each e In gcd.CurrentDrawing.oEntities
     Changed = False
-    e = gcd.CurrentDrawing.arrEntities[i]
+
     gcd.CurrentDrawing.arrTmp.Clear
 
     If e.Selected Then
       'Copio la entidad en una lista temportal
-      e = gcd.CurrentDrawing.arrEntities[i]
 
       te = clsEntities.ClonEntity(e)
       te.Handle = e.Handle
@@ -2091,8 +2088,8 @@ Public Sub LoadPropertiesList(eFilter As String)
   TableView1.Clear
   TableView3.Clear
 
-  For i = 0 To gcd.CurrentDrawing.arrEntities.Max
-    e = gcd.CurrentDrawing.arrEntities[i]
+  For Each e In gcd.CurrentDrawing.oEntities
+
     If e.Selected Then
       If cRaw.Count = 0 Then
         xC = Classes["Entity"]
@@ -2452,6 +2449,29 @@ Public Sub Form_KeyPress()
       KeysAccumulator = ""
 
     Case Key.f2
+      ' test
+      Dim cEntys As New Collection
+      For Each e As Entity In gcd.CurrentDrawing.oEntities
+        cEntys.Add(e, gcd.NewHandle())
+
+      Next
+
+      t = Timer
+
+      ' recorro el array
+      For Each e As Entity In gcd.CurrentDrawing.oEntities
+        If e.handle = "EEEE" Then Print "Encontre un EEE"
+
+      Next
+      Print "Tiempo para array", Timer - t
+
+      t = Timer
+      ' recorro la coleccion
+      For Each c As Entity In cEntys
+        If e.handle = "EEEE" Then Print "Encontre un EEE"
+
+      Next
+      Print "Tiempo para recorrer la coleccion", Timer - t
 
     Case Key.f6
 
@@ -2587,7 +2607,7 @@ Public Sub Form_KeyPress()
 
           Case Asc("a"), Asc("A") ' Select/Unselect All
             SelectMode = True
-            For Each aEnty In gcd.CurrentDrawing.arrEntities
+            For Each aEnty In gcd.CurrentDrawing.oEntities
               If aEnty.Selected Then
                 SelectMode = False
                 Break
@@ -2595,13 +2615,13 @@ Public Sub Form_KeyPress()
             Next
 
             If SelectMode Then
-              For Each aEnty In gcd.CurrentDrawing.arrEntities
+              For Each aEnty In gcd.CurrentDrawing.oEntities
                 If aEnty.Selected = False Then
                   aEnty.Selected = True
                 Endif
               Next
             Else
-              For Each aEnty In gcd.CurrentDrawing.arrEntities
+              For Each aEnty In gcd.CurrentDrawing.oEntities
                 If aEnty.Selected Then
                   aEnty.Selected = False
                 Endif
@@ -2615,10 +2635,10 @@ Public Sub Form_KeyPress()
               umx = gcd.CurrentDrawing.arrUndo.Max
 
               uEnty = gcd.CurrentDrawing.arrUndo[umx]
-              For Each aEnty In gcd.CurrentDrawing.arrEntities
+              For Each aEnty In gcd.CurrentDrawing.oEntities
                 If aEnty.Handle = uEnty.Handle Then
-                  gcd.CurrentDrawing.arrEntities.Remove(imx, 1)
-                  gcd.CurrentDrawing.arrEntities.Add(uEnty, imx)
+                  gcd.CurrentDrawing.oEntities.Remove(imx, 1)
+                  gcd.CurrentDrawing.oEntities.Add(uEnty, imx)
                   gcd.CurrentDrawing.arrUndo.Remove(umx, 1)
                   gcd.regen
                   'gcd.Redraw
@@ -2647,7 +2667,7 @@ End
 Public Sub TransferToCollections()
 
   gcd.ExportBlocks(gcd.CurrentDrawing.cModel)
-  gcd.ExportEntities(gcd.CurrentDrawing.cModel["Entities"], gcd.CurrentDrawing.arrEntities)
+  gcd.ExportEntities(gcd.CurrentDrawing.cModel["Entities"], gcd.CurrentDrawing.oEntities)
 
 End
 ' Public Sub tmr500_Timer()
@@ -3056,7 +3076,7 @@ Public Sub LoadDrawingMap2()
 
   ctn.Add(gcd.CurrentDrawing.cModel, "model")
   ctn.Add(gcd.CurrentDrawing.cImport, "import")
-  ctn.Add(gcd.CurrentDrawing.arrEntities, "entities")
+  ctn.Add(gcd.CurrentDrawing.oEntities, "entities")
 
   For Each dra In ctn
 

@@ -63,7 +63,7 @@ Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' called by FCAD->
   If Me.PointsDone = 1 Then ' estoy intentando seleccionar una entidad
 
     If gcd.CurrentDrawing.iEntity[3] >= 0 Then
-      Select Case gcd.CurrentDrawing.arrEntities[gcd.CurrentDrawing.iEntity[3]].Gender
+      Select Case gcd.CurrentDrawing.oEntities[gcd.CurrentDrawing.iEntity[3]].Gender
         Case "Line", "LWPolyline", "Circle", "Arc", "Ellipse", "Spline"
           Me.iEntitySelected = gcd.CurrentDrawing.iEntity[3]
           clsEntities.SelectElem(Me.iEntitySelected)
@@ -83,10 +83,10 @@ Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' called by FCAD->
     Me.SelEndXr = gcd.Xreal(mousex)
     Me.SelEndYr = gcd.Yreal(mouseY)
 
-    e = gcd.CurrentDrawing.arrEntities[Me.iEntitySelected]
+    e = gcd.CurrentDrawing.oEntities[Me.iEntitySelected]
     ' creo una nueva entidad en el mismo lugar
-    gcd.CurrentDrawing.arrEntities.Add(clsEntities.ClonEntity(e))
-    e = gcd.CurrentDrawing.arrEntities.Last
+    gcd.CurrentDrawing.oEntities.Add(clsEntities.ClonEntity(e))
+    e = gcd.CurrentDrawing.oEntities.Last
     e.ClassHandler.Finish(e)
 
     Select Case e.Gender

@@ -42,9 +42,9 @@ Public Function PoiTotalPoints() As Integer
 
   Dim i, t As Integer
 
-  For i = 0 To gcd.CurrentDrawing.arrEntities.Max
+  For i = 0 To gcd.CurrentDrawing.oEntities
 
-    t += gcd.CurrentDrawing.arrEntities[i].PoiType.Count
+    t += gcd.CurrentDrawing.oEntities[i].PoiType.Count
   Next
   Return t
 
@@ -69,21 +69,21 @@ Public Sub ReBuildPOIPoints()
   gcd.CurrentDrawing.poiEntities.Resize(iTotalPoints)
   gcd.CurrentDrawing.poiPoints.Resize(iTotalPoints * 2)
 
-  For e = 0 To gcd.CurrentDrawing.arrEntities.Max
+  For e = 0 To gcd.CurrentDrawing.oEntities
 
-    For i = 0 To gcd.CurrentDrawing.arrEntities[e].PoiType.Max
-      gcd.CurrentDrawing.poiType[ii] = gcd.CurrentDrawing.arrEntities[e].PoiType[i]
+    For i = 0 To gcd.CurrentDrawing.oEntities[e].PoiType.Max
+      gcd.CurrentDrawing.poiType[ii] = gcd.CurrentDrawing.oEntities[e].PoiType[i]
       gcd.CurrentDrawing.poiEntities[ii] = e
-      gcd.CurrentDrawing.poiPoints[ii * 2] = gcd.CurrentDrawing.arrEntities[e].PoiPoints[i]
-      gcd.CurrentDrawing.poiPoints[ii * 2 + 1] = gcd.CurrentDrawing.arrEntities[e].PoiPoints[i + 1]
+      gcd.CurrentDrawing.poiPoints[ii * 2] = gcd.CurrentDrawing.oEntities[e].PoiPoints[i]
+      gcd.CurrentDrawing.poiPoints[ii * 2 + 1] = gcd.CurrentDrawing.oEntities[e].PoiPoints[i + 1]
       Inc ii
     Next
 
   Next
   Debug "POI points built in ", Timer - t
 
-  For e = 1 To gcd.CurrentDrawing.arrEntities.Max
-    If e = gcd.CurrentDrawing.arrEntities.Max Then t = Timer
+  For e = 1 To gcd.CurrentDrawing.oEntities
+    If e = gcd.CurrentDrawing.oEntities Then t = Timer
 
     RebuilIntersections(e)
 
@@ -101,18 +101,18 @@ Public Sub RebuilIntersections(iEntity As Integer)
   Dim t As Float = Timer
   Dim e As Entity
 
-  e = gcd.CurrentDrawing.arrEntities[iEntity]
+  e = gcd.CurrentDrawing.oEntities[iEntity]
 
   ' veo cada caso en particular
   Select Case e.Gender
     Case "Line"
       For i2 = iEntity - 1 To 0 Step -1
 
-        Select Case gcd.CurrentDrawing.arrEntities[i2].Gender
+        Select Case gcd.CurrentDrawing.oEntities[i2].Gender
 
           Case "Line"
-            If puntos.doIntersect(e.P[0], e.P[1], e.P[2], e.P[3], gcd.CurrentDrawing.arrEntities[i2].P[0], gcd.CurrentDrawing.arrEntities[i2].P[1], gcd.CurrentDrawing.arrEntities[i2].P[2], gcd.CurrentDrawing.arrEntities[i2].P[3]) Then
-              gcd.CurrentDrawing.poiPoints.Insert(puntos.lineLineIntersection([e.P[0], e.P[1]], [e.P[2], e.P[3]], [gcd.CurrentDrawing.arrEntities[i2].P[0], gcd.CurrentDrawing.arrEntities[i2].P[1]], [gcd.CurrentDrawing.arrEntities[i2].P[2], gcd.CurrentDrawing.arrEntities[i2].P[3]]))
+            If puntos.doIntersect(e.P[0], e.P[1], e.P[2], e.P[3], gcd.CurrentDrawing.oEntities[i2].P[0], gcd.CurrentDrawing.oEntities[i2].P[1], gcd.CurrentDrawing.oEntities[i2].P[2], gcd.CurrentDrawing.oEntities[i2].P[3]) Then
+              gcd.CurrentDrawing.poiPoints.Insert(puntos.lineLineIntersection([e.P[0], e.P[1]], [e.P[2], e.P[3]], [gcd.CurrentDrawing.oEntities[i2].P[0], gcd.CurrentDrawing.oEntities[i2].P[1]], [gcd.CurrentDrawing.oEntities[i2].P[2], gcd.CurrentDrawing.oEntities[i2].P[3]]))
               gcd.CurrentDrawing.poiEntities.Add(iEntity)
               gcd.CurrentDrawing.poiType.Add(gcd.poiIntersection)
 
@@ -144,30 +144,30 @@ Public Sub ReBuildPOI()
   gcd.CurrentDrawing.poiPoligonStartIndex.Clear
   gcd.CurrentDrawing.poiType.Clear
 
-  For e = 0 To gcd.CurrentDrawing.arrEntities.Max
+  For e = 0 To gcd.CurrentDrawing.oEntities
 
-    Select Case gcd.CurrentDrawing.arrEntities[e].Gender
+    Select Case gcd.CurrentDrawing.oEntities[e].Gender
 
       Case "Line"
 
-        gcd.CurrentDrawing.poiLines.insert([gcd.CurrentDrawing.arrEntities[e].p[0], gcd.CurrentDrawing.arrEntities[e].p[1], gcd.CurrentDrawing.arrEntities[e].p[2], gcd.CurrentDrawing.arrEntities[e].p[3]])
+        gcd.CurrentDrawing.poiLines.insert([gcd.CurrentDrawing.oEntities[e].p[0], gcd.CurrentDrawing.oEntities[e].p[1], gcd.CurrentDrawing.oEntities[e].p[2], gcd.CurrentDrawing.oEntities[e].p[3]])
         gcd.CurrentDrawing.poiLinesEntities.Add(e)
 
       Case "LWPolyline"
-        For i = 0 To gcd.CurrentDrawing.arrEntities[e].P.count - 4 Step 2
-          gcd.CurrentDrawing.poiLines.insert([gcd.CurrentDrawing.arrEntities[e].p[i], gcd.CurrentDrawing.arrEntities[e].p[i + 1], gcd.CurrentDrawing.arrEntities[e].p[i + 2], gcd.CurrentDrawing.arrEntities[e].p[i + 3]])
+        For i = 0 To gcd.CurrentDrawing.oEntities[e].P.count - 4 Step 2
+          gcd.CurrentDrawing.poiLines.insert([gcd.CurrentDrawing.oEntities[e].p[i], gcd.CurrentDrawing.oEntities[e].p[i + 1], gcd.CurrentDrawing.oEntities[e].p[i + 2], gcd.CurrentDrawing.oEntities[e].p[i + 3]])
         Next
-        For i = 0 To gcd.CurrentDrawing.arrEntities[e].P.Count / 4
+        For i = 0 To gcd.CurrentDrawing.oEntities[e].P.Count / 4
           gcd.CurrentDrawing.poiLinesEntities.Add(e)
         Next
       Case "Circle", "Arc", "Ellipse"
-        gcd.CurrentDrawing.poiLines.insert(gcd.CurrentDrawing.arrEntities[e].PolyLine)
-        For i = 0 To gcd.CurrentDrawing.arrEntities[e].PolyLine.Count / 4
+        gcd.CurrentDrawing.poiLines.insert(gcd.CurrentDrawing.oEntities[e].PolyLine)
+        For i = 0 To gcd.CurrentDrawing.oEntities[e].PolyLine.Count / 4
           gcd.CurrentDrawing.poiLinesEntities.Add(e)
         Next
       Case "Solid", "Text", "MText"
 
-        gcd.CurrentDrawing.poiPoligons.insert(gcd.CurrentDrawing.arrEntities[e].Polygon)
+        gcd.CurrentDrawing.poiPoligons.insert(gcd.CurrentDrawing.oEntities[e].Polygon)
         gcd.CurrentDrawing.poiLinesEntities.Add(e)
 
     End Select
@@ -205,42 +205,42 @@ Public Function CheckAboveEntity(xr As Float, Yr As Float, tolerance As Float) A
 
     If e = clsDefaultJob.iEntityForEdit Then Continue
 
-    Select Case gcd.CurrentDrawing.arrEntities[e].Gender
+    Select Case gcd.CurrentDrawing.oEntities[e].Gender
 
       Case "Line"
 
-        If puntos.doIntersect(xr - tolerance, yr, xr + tolerance, yr, gcd.CurrentDrawing.arrEntities[e].P[0], gcd.CurrentDrawing.arrEntities[e].P[1], gcd.CurrentDrawing.arrEntities[e].P[2], gcd.CurrentDrawing.arrEntities[e].P[3]) Or puntos.doIntersect(xr, yr - tolerance, xr, yr + tolerance, gcd.CurrentDrawing.arrEntities[e].P[0], gcd.CurrentDrawing.arrEntities[e].P[1], gcd.CurrentDrawing.arrEntities[e].P[2], gcd.CurrentDrawing.arrEntities[e].P[3]) Then Break
+        If puntos.doIntersect(xr - tolerance, yr, xr + tolerance, yr, gcd.CurrentDrawing.oEntities[e].P[0], gcd.CurrentDrawing.oEntities[e].P[1], gcd.CurrentDrawing.oEntities[e].P[2], gcd.CurrentDrawing.oEntities[e].P[3]) Or puntos.doIntersect(xr, yr - tolerance, xr, yr + tolerance, gcd.CurrentDrawing.oEntities[e].P[0], gcd.CurrentDrawing.oEntities[e].P[1], gcd.CurrentDrawing.oEntities[e].P[2], gcd.CurrentDrawing.oEntities[e].P[3]) Then Break
 
       Case "LWPolyline"
 
-        For i = 0 To gcd.CurrentDrawing.arrEntities[e].P.count - 4 Step 2
-          If puntos.doIntersect(xr - tolerance, Yr, Xr + tolerance, Yr, gcd.CurrentDrawing.arrEntities[e].P[i + 0], gcd.CurrentDrawing.arrEntities[e].P[i + 1], gcd.CurrentDrawing.arrEntities[e].P[i + 2], gcd.CurrentDrawing.arrEntities[e].P[i + 3]) Or puntos.doIntersect(xr, Yr - tolerance, Xr, Yr + tolerance, gcd.CurrentDrawing.arrEntities[e].P[i + 0], gcd.CurrentDrawing.arrEntities[e].P[i + 1], gcd.CurrentDrawing.arrEntities[e].P[i + 2], gcd.CurrentDrawing.arrEntities[e].P[i + 3]) Then Goto ExitSearch
+        For i = 0 To gcd.CurrentDrawing.oEntities[e].P.count - 4 Step 2
+          If puntos.doIntersect(xr - tolerance, Yr, Xr + tolerance, Yr, gcd.CurrentDrawing.oEntities[e].P[i + 0], gcd.CurrentDrawing.oEntities[e].P[i + 1], gcd.CurrentDrawing.oEntities[e].P[i + 2], gcd.CurrentDrawing.oEntities[e].P[i + 3]) Or puntos.doIntersect(xr, Yr - tolerance, Xr, Yr + tolerance, gcd.CurrentDrawing.oEntities[e].P[i + 0], gcd.CurrentDrawing.oEntities[e].P[i + 1], gcd.CurrentDrawing.oEntities[e].P[i + 2], gcd.CurrentDrawing.oEntities[e].P[i + 3]) Then Goto ExitSearch
         Next
 
       Case "Polyline"
 
-        For i = 0 To gcd.CurrentDrawing.arrEntities[e].PolyLine.count - 4 Step 2
-          If puntos.doIntersect(xr - tolerance, Yr, Xr + tolerance, Yr, gcd.CurrentDrawing.arrEntities[e].PolyLine[i + 0], gcd.CurrentDrawing.arrEntities[e].PolyLine[i + 1], gcd.CurrentDrawing.arrEntities[e].PolyLine[i + 2], gcd.CurrentDrawing.arrEntities[e].PolyLine[i + 3]) Or puntos.doIntersect(xr, Yr - tolerance, Xr, Yr + tolerance, gcd.CurrentDrawing.arrEntities[e].PolyLine[i + 0], gcd.CurrentDrawing.arrEntities[e].PolyLine[i + 1], gcd.CurrentDrawing.arrEntities[e].PolyLine[i + 2], gcd.CurrentDrawing.arrEntities[e].PolyLine[i + 3]) Then Goto ExitSearch
+        For i = 0 To gcd.CurrentDrawing.oEntities[e].PolyLine.count - 4 Step 2
+          If puntos.doIntersect(xr - tolerance, Yr, Xr + tolerance, Yr, gcd.CurrentDrawing.oEntities[e].PolyLine[i + 0], gcd.CurrentDrawing.oEntities[e].PolyLine[i + 1], gcd.CurrentDrawing.oEntities[e].PolyLine[i + 2], gcd.CurrentDrawing.oEntities[e].PolyLine[i + 3]) Or puntos.doIntersect(xr, Yr - tolerance, Xr, Yr + tolerance, gcd.CurrentDrawing.oEntities[e].PolyLine[i + 0], gcd.CurrentDrawing.oEntities[e].PolyLine[i + 1], gcd.CurrentDrawing.oEntities[e].PolyLine[i + 2], gcd.CurrentDrawing.oEntities[e].PolyLine[i + 3]) Then Goto ExitSearch
         Next
 
       Case "Circle"
 
-        If Abs(puntos.distancia(xr, yr, gcd.CurrentDrawing.arrEntities[e].P[0], gcd.CurrentDrawing.arrEntities[e].P[1]) - gcd.CurrentDrawing.arrEntities[e].fParam[0]) < tolerance Then Break
-        If puntos.Around(xr, yr, gcd.CurrentDrawing.arrEntities[e].P[0], gcd.CurrentDrawing.arrEntities[e].P[1], tolerance) Then Break
+        If Abs(puntos.distancia(xr, yr, gcd.CurrentDrawing.oEntities[e].P[0], gcd.CurrentDrawing.oEntities[e].P[1]) - gcd.CurrentDrawing.oEntities[e].fParam[0]) < tolerance Then Break
+        If puntos.Around(xr, yr, gcd.CurrentDrawing.oEntities[e].P[0], gcd.CurrentDrawing.oEntities[e].P[1], tolerance) Then Break
 
       Case "Arc"
 
-        If puntos.Around(xr, yr, gcd.CurrentDrawing.arrEntities[e].P[0], gcd.CurrentDrawing.arrEntities[e].P[1], tolerance) Then Break
+        If puntos.Around(xr, yr, gcd.CurrentDrawing.oEntities[e].P[0], gcd.CurrentDrawing.oEntities[e].P[1], tolerance) Then Break
 
-        If Abs(puntos.distancia(xr, yr, gcd.CurrentDrawing.arrEntities[e].P[0], gcd.CurrentDrawing.arrEntities[e].P[1]) - gcd.CurrentDrawing.arrEntities[e].fParam[0]) < tolerance Then
+        If Abs(puntos.distancia(xr, yr, gcd.CurrentDrawing.oEntities[e].P[0], gcd.CurrentDrawing.oEntities[e].P[1]) - gcd.CurrentDrawing.oEntities[e].fParam[0]) < tolerance Then
 
           ' tengo que ver si esa en la porcion
-          angle = Ang(xr - gcd.CurrentDrawing.arrEntities[e].P[0], yr - gcd.CurrentDrawing.arrEntities[e].P[1]) * 180 / Pi
+          angle = Ang(xr - gcd.CurrentDrawing.oEntities[e].P[0], yr - gcd.CurrentDrawing.oEntities[e].P[1]) * 180 / Pi
           If angle < 0 Then angle += 360
-          If gcd.CurrentDrawing.arrEntities[e].fParam[1] <= gcd.CurrentDrawing.arrEntities[e].fParam[2] Then
-            If angle >= gcd.CurrentDrawing.arrEntities[e].fParam[1] And angle <= gcd.CurrentDrawing.arrEntities[e].fParam[2] Then Break
+          If gcd.CurrentDrawing.oEntities[e].fParam[1] <= gcd.CurrentDrawing.oEntities[e].fParam[2] Then
+            If angle >= gcd.CurrentDrawing.oEntities[e].fParam[1] And angle <= gcd.CurrentDrawing.oEntities[e].fParam[2] Then Break
           Else
-            If angle >= gcd.CurrentDrawing.arrEntities[e].fParam[1] Or angle <= gcd.CurrentDrawing.arrEntities[e].fParam[2] Then Break
+            If angle >= gcd.CurrentDrawing.oEntities[e].fParam[1] Or angle <= gcd.CurrentDrawing.oEntities[e].fParam[2] Then Break
           End If
 
         End If
@@ -248,19 +248,19 @@ Public Function CheckAboveEntity(xr As Float, Yr As Float, tolerance As Float) A
       Case "Ellipse"
 
         ' necesito determinar el radio en el angulo del punto que estaria sobre la elipse
-        angle = Ang(xr - gcd.CurrentDrawing.arrEntities[e].P[0], yr - gcd.CurrentDrawing.arrEntities[e].P[1]) ' * 180 / Pi
+        angle = Ang(xr - gcd.CurrentDrawing.oEntities[e].P[0], yr - gcd.CurrentDrawing.oEntities[e].P[1]) ' * 180 / Pi
 
         ' el radio en este agulo viene dado por
 
-        major = Sqr((gcd.CurrentDrawing.arrEntities[e].p[2] - gcd.CurrentDrawing.arrEntities[e].p[0]) ^ 2 + (gcd.CurrentDrawing.arrEntities[e].p[3] - gcd.CurrentDrawing.arrEntities[e].p[1]) ^ 2)
-        Minor = major * gcd.CurrentDrawing.arrEntities[e].fParam[0]
-        angle2 = Ang(gcd.CurrentDrawing.arrEntities[e].p[2] - gcd.CurrentDrawing.arrEntities[e].p[0], gcd.CurrentDrawing.arrEntities[e].p[3] - gcd.CurrentDrawing.arrEntities[e].p[1])
+        major = Sqr((gcd.CurrentDrawing.oEntities[e].p[2] - gcd.CurrentDrawing.oEntities[e].p[0]) ^ 2 + (gcd.CurrentDrawing.oEntities[e].p[3] - gcd.CurrentDrawing.oEntities[e].p[1]) ^ 2)
+        Minor = major * gcd.CurrentDrawing.oEntities[e].fParam[0]
+        angle2 = Ang(gcd.CurrentDrawing.oEntities[e].p[2] - gcd.CurrentDrawing.oEntities[e].p[0], gcd.CurrentDrawing.oEntities[e].p[3] - gcd.CurrentDrawing.oEntities[e].p[1])
 
         ' x = gcd.CurrDrawing.arrEntities[e].p[0] + major * Cos(angle) * Cos(angle2) - minor * Sin(angle) * Sin(angle2)
         ' y = gcd.CurrDrawing.arrEntities[e].p[1] + major * Cos(angle) * Sin(angle2) + minor * Sin(angle) * Cos(angle2)
 
-        x = gcd.CurrentDrawing.arrEntities[e].p[0] + major * Cos(angle) * Cos(angle2) - minor * Sin(angle) * Sin(angle2)
-        y = gcd.CurrentDrawing.arrEntities[e].p[1] + major * Cos(angle) * Sin(angle2) + minor * Sin(angle) * Cos(angle2)
+        x = gcd.CurrentDrawing.oEntities[e].p[0] + major * Cos(angle) * Cos(angle2) - minor * Sin(angle) * Sin(angle2)
+        y = gcd.CurrentDrawing.oEntities[e].p[1] + major * Cos(angle) * Sin(angle2) + minor * Sin(angle) * Cos(angle2)
 
         ' veo si en esa posicion esta cerca de la elipse
         'If Abs(puntos.distancia(xr, yr, x, y)) < tolerance Then
@@ -279,14 +279,14 @@ Public Function CheckAboveEntity(xr As Float, Yr As Float, tolerance As Float) A
         y = major * Cos(angle) * Sin(angle2) + minor * Sin(angle) * Cos(angle2)
 
         ' veo si en esa posicion esta cerca de la elipse
-        If Abs(puntos.distancia(xr, yr, gcd.CurrentDrawing.arrEntities[e].P[0], gcd.CurrentDrawing.arrEntities[e].P[1]) - Sqr(x * x + y * y)) < tolerance Then
+        If Abs(puntos.distancia(xr, yr, gcd.CurrentDrawing.oEntities[e].P[0], gcd.CurrentDrawing.oEntities[e].P[1]) - Sqr(x * x + y * y)) < tolerance Then
           ' tengo que ver si esa en la porcion
           angle = Angle * 180 / Pi
           If angle < 0 Then angle += 360
-          If gcd.CurrentDrawing.arrEntities[e].fParam[1] <= gcd.CurrentDrawing.arrEntities[e].fParam[2] Then
-            If angle >= gcd.CurrentDrawing.arrEntities[e].fParam[1] And angle <= gcd.CurrentDrawing.arrEntities[e].fParam[2] Then Break
+          If gcd.CurrentDrawing.oEntities[e].fParam[1] <= gcd.CurrentDrawing.oEntities[e].fParam[2] Then
+            If angle >= gcd.CurrentDrawing.oEntities[e].fParam[1] And angle <= gcd.CurrentDrawing.oEntities[e].fParam[2] Then Break
           Else
-            If angle >= gcd.CurrentDrawing.arrEntities[e].fParam[1] Or angle <= gcd.CurrentDrawing.arrEntities[e].fParam[2] Then Break
+            If angle >= gcd.CurrentDrawing.oEntities[e].fParam[1] Or angle <= gcd.CurrentDrawing.oEntities[e].fParam[2] Then Break
           End If
           'Break
 
@@ -294,16 +294,16 @@ Public Function CheckAboveEntity(xr As Float, Yr As Float, tolerance As Float) A
 
         ' ademas verifico si esta sobre el centro
 
-        If puntos.Around(xr, yr, gcd.CurrentDrawing.arrEntities[e].P[0], gcd.CurrentDrawing.arrEntities[e].P[1], tolerance) Then Break
+        If puntos.Around(xr, yr, gcd.CurrentDrawing.oEntities[e].P[0], gcd.CurrentDrawing.oEntities[e].P[1], tolerance) Then Break
 
       Case "Solid", "Text", "MText", "Insert"
 
         ' Text, MText, Solid y otros
-        If puntos.isInside(gcd.CurrentDrawing.arrEntities[e].Polygon, xr, yr) Then Break
+        If puntos.isInside(gcd.CurrentDrawing.oEntities[e].Polygon, xr, yr) Then Break
 
       Case "Hatch"
 
-        If puntos.isInside(gcd.CurrentDrawing.arrEntities[e].P, xr, yr) Then Break
+        If puntos.isInside(gcd.CurrentDrawing.oEntities[e].P, xr, yr) Then Break
 
     End Select
 
@@ -386,7 +386,7 @@ Public Sub CheckPOI(xr As Float, Yr As Float) As Float[]
   rdata.Insert([0, 0, -1, -1])
 
   If indexEntity >= 0 Then                                               ' ofrezco opciones de enganche
-    e = gcd.CurrentDrawing.arrEntities[indexEntity]
+    e = gcd.CurrentDrawing.oEntities[indexEntity]
     'Debug "Encontrada entidad ", e.Gender, " en ", Timer - t
 
     Select Case e.Gender
@@ -440,12 +440,12 @@ Public Sub CheckPOI(xr As Float, Yr As Float) As Float[]
         End If
 
         ' busco tambien intersecciones
-        For i2 = 0 To gcd.CurrentDrawing.arrEntities.Max
-          Select Case gcd.CurrentDrawing.arrEntities[i2].Gender
+        For i2 = 0 To gcd.CurrentDrawing.oEntities
+          Select Case gcd.CurrentDrawing.oEntities[i2].Gender
 
             Case "Line"
-              If puntos.doIntersect(e.P[0], e.P[1], e.P[2], e.P[3], gcd.CurrentDrawing.arrEntities[i2].P[0], gcd.CurrentDrawing.arrEntities[i2].P[1], gcd.CurrentDrawing.arrEntities[i2].P[2], gcd.CurrentDrawing.arrEntities[i2].P[3]) Then
-                pInter = puntos.lineLineIntersection([e.P[0], e.P[1]], [e.P[2], e.P[3]], [gcd.CurrentDrawing.arrEntities[i2].P[0], gcd.CurrentDrawing.arrEntities[i2].P[1]], [gcd.CurrentDrawing.arrEntities[i2].P[2], gcd.CurrentDrawing.arrEntities[i2].P[3]])
+              If puntos.doIntersect(e.P[0], e.P[1], e.P[2], e.P[3], gcd.CurrentDrawing.oEntities[i2].P[0], gcd.CurrentDrawing.oEntities[i2].P[1], gcd.CurrentDrawing.oEntities[i2].P[2], gcd.CurrentDrawing.oEntities[i2].P[3]) Then
+                pInter = puntos.lineLineIntersection([e.P[0], e.P[1]], [e.P[2], e.P[3]], [gcd.CurrentDrawing.oEntities[i2].P[0], gcd.CurrentDrawing.oEntities[i2].P[1]], [gcd.CurrentDrawing.oEntities[i2].P[2], gcd.CurrentDrawing.oEntities[i2].P[3]])
                 If pInter.Count > 0 Then ' puede no haber intersaeccion
                   DistInter = puntos.distancia(xr, yr, pInter[0], pInter[1])
                 Else

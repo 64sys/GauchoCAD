@@ -266,7 +266,7 @@ Public Function GetLayerByHandle(sHandle As String) As Layer
 
   Dim Lay As Layer
 
-  For Each Lay In gcd.CurrentDrawing.arrLayers
+  For Each Lay In gcd.CurrentDrawing.oLayers
 
     If Lay.handle = sHandle Then Return Lay
   Next
@@ -278,7 +278,7 @@ Public Function GetLayer(LayerName As String) As Layer
 
   Dim Lay As Layer
 
-  For Each Lay In gcd.CurrentDrawing.arrLayers
+  For Each Lay In gcd.CurrentDrawing.oLayers
 
     If Lay.Name = LayerName Then Return Lay
   Next
@@ -300,16 +300,16 @@ Public Sub Main()
 
   End Select
   Dim oLtype As New LType
-  gcd.CurrentDrawing.arrLTYpes.Add(oLtype)
+  gcd.CurrentDrawing.oLTYpes.Add(oLtype, gcd.NewHandle())
   gcd.CurrentDrawing.CurrLineType = oLtype
 
   Dim oNewLayer As New Layer
   oNewLayer.Visible = True
-  gcd.CurrentDrawing.arrLayers.Add(oNewLayer)
+  gcd.CurrentDrawing.oLayers.Add(oNewLayer, gcd.NewHandle())
   gcd.CurrentDrawing.CurrLayer = oNewLayer
 
   Dim oDimtyle As New Styles
-  gcd.CurrentDrawing.arrStyles.Add(oDimtyle)
+  gcd.CurrentDrawing.oStyles.Add(oDimtyle, gcd.NewHandle())
   CurrentDrawing.CurrDimStyle = oDimtyle
 
   ' para compatibilidad
@@ -362,7 +362,7 @@ Public Sub ImportBlocks(colData As Collection) ', obxEntities As Entity[]) As In
   For Each colBlk In colData["BLOCKS"]
     Dim newBlock As New Block
     hBlock = colBlk["block_entity"][3]
-    newBlock.entities = New Entity[]
+    newBlock.entities = New Collection
     newBlock.name = colBlk["name"]
     If colData["ENTITIES"].Exist(hBlock) Then
       newBlock.handle = colData["ENTITIES"][hBlock]["handle"][1]
@@ -403,7 +403,7 @@ Public Sub ImportBlocks(colData As Collection) ', obxEntities As Entity[]) As In
       Debug "Error loading block", newBlock.name
 
     End If
-    gcd.CurrentDrawing.arrBlocks.Add(newBlock)
+    gcd.CurrentDrawing.oBlocks.Add(newBlock, newBlock.handle)
 
   Next
   'Stop
@@ -442,7 +442,7 @@ Public Sub ImpEnty5(cEny As Collection, obx As Entity[])
 End
 '' Importa las cosas de manera descentralizada
 
-Public Sub ImpEntyFromJSON(cEny As Collection, obx As Entity[])
+Public Sub ImpEntyFromJSON(cEny As Collection, obx As Collection)
 
   Dim e As Collection               ' current Entity
   Dim entNueva As Entity
@@ -464,7 +464,7 @@ Public Sub ImpEntyFromJSON(cEny As Collection, obx As Entity[])
           If flgIsPolyline Then
             pBlockPolyline.entities.Add(entNueva)
           Else
-            obx.Add(entNueva)
+            obx.Add(entNueva, entNueva.Handle)
           End If
 
           If (e["entity"] = "POLYLINE") Or (e["entity"] = "POLYLINE_2D") Then
@@ -497,7 +497,7 @@ Public Function ApplyLayerProperties(Optional mode As Integer = 0)
 
   Print "Aplicando propiedades del Layers"
 
-  For Each e In gcd.CurrentDrawing.arrEntities
+  For Each e In gcd.CurrentDrawing.oEntities
 
     If mode = 1 Then
       ' reconstruyo el ID del layer en la entidad, para ello busco en la lista cual coincide con su nombre
@@ -667,7 +667,7 @@ Public Function UpdateGraphics(Optional handles As String[] = [], DoRegen As Boo
 
   If handles.Count = 0 Then                   ' Update all entities
 
-    gcd.ImpEntyFromJSON(gcd.CurrentDrawing.cModel["ENTITIES"], gcd.CurrentDrawing.arrEntities)
+    gcd.ImpEntyFromJSON(gcd.CurrentDrawing.cModel["ENTITIES"], gcd.CurrentDrawing.oEntities)
 
   Else                                        ' Update only entities with handles provided
 
@@ -678,7 +678,7 @@ Public Function UpdateGraphics(Optional handles As String[] = [], DoRegen As Boo
         entNueva = New Entity                                       ' entonces, creamos una nueva
         If clsEntities.ImportJsonToEntity(gcd.CurrentDrawing.cModel["ENTITIES"][sHandle], entNueva) Then         ' si esta implementada, llenamos los datos
 
-          gcd.CurrentDrawing.arrEntities.Add(entNueva)
+          gcd.CurrentDrawing.oEntities.Add(entNueva)
           entNueva = Null                                           ' limpiamos
 
         Endif
@@ -715,7 +715,7 @@ Public Sub UpdateLayers()
   Dim CMLayer As Collection
   Dim newlayer As Layer
 
-  CurrentDrawing.arrLayers.Clear
+  CurrentDrawing.oLayers.Clear
   For Each CMLayer In CurrentDrawing.cModel["LAYERS"]
     newlayer = New Layer
     If TypeOf(CMLayer["color"]) = gb.Object Then
@@ -727,9 +727,9 @@ Public Sub UpdateLayers()
     newlayer.handle = CMLayer["handle"][1]
     newlayer.id = newlayer.handle
     newlayer.Visible = True
-    CurrentDrawing.arrLayers.Add(newlayer)
+    CurrentDrawing.oLayers.Add(newlayer, newlayer.handle)
   Next
-  CurrentDrawing.CurrLayer = CurrentDrawing.arrLayers.First
+  CurrentDrawing.CurrLayer = CurrentDrawing.oLayers[CurrentDrawing.oLayers.First]
 
 End
 
@@ -741,7 +741,7 @@ Public Sub UpdateModel()
   'Dim sNewHandle As String
   Dim iHandle As Integer
 
-  For Each ent In CurrentDrawing.arrEntities
+  For Each ent In CurrentDrawing.oEntities
 
     JSONExporting = False               ' Supongo que la clase todvia no esta lista
 
@@ -837,7 +837,7 @@ Public Sub JSONReadLTypes()
   Dim sNextKey As String
 
   ' primero eliminamos lo q haya
-  CurrentDrawing.arrLTYpes.Clear
+  CurrentDrawing.oLTypes.Clear
   For Each c As JsonCollection In CurrentDrawing.cModel["LTYPES"]
     hlty = New LType
     hlty.Name = c["name"]
@@ -866,24 +866,24 @@ Public Sub JSONReadLTypes()
 
     'Next
 
-    CurrentDrawing.arrLTYpes.Add(hlty)
+    CurrentDrawing.oLTypes.Add(hlty, hlty.handle)
 
   Next
-  CurrentDrawing.CurrLineType = CurrentDrawing.arrLTYpes.First
+  CurrentDrawing.CurrLineType = CurrentDrawing.oLTypes[CurrentDrawing.oLTypes.First]
 
 End
 
-Public Function FindLtIndex(sName As String) As Integer
+Public Function FindLtIndex(sName As String) As LType
 
-  Dim i As Integer
+  Dim lt As LType
 
-  For i = 0 To gcd.CurrentDrawing.arrLTYpes.Max
+  For Each lt In gcd.CurrentDrawing.oLTypes
 
-    If LCase(gcd.CurrentDrawing.arrLTYpes[i].Name) = LCase(sname) Then Return i
+    If LCase(lt.Name) = LCase(sname) Then Return lt
 
   Next
 
-  Return -1
+  Return Null
 
 End
 
@@ -894,16 +894,16 @@ Public Sub ReadEntities()
   Dim e As Entity
 
   ' primero eliminamos lo q haya
-  For Each hLay In CurrentDrawing.arrLayers
+  For Each hLay In CurrentDrawing.oLayers
     hLay.Entities.Clear
   Next
 
-  For Each e In CurrentDrawing.arrEntities
+  For Each e In CurrentDrawing.oEntities
     'e.pLayer = CurrDrawing.arrLayers[gcd.FindLaIndex(e.pLayer)]
     e.pLayer.Entities.Add(e)
   Next
-
-  currentDrawing.arrVisibleEntities.Resize(CurrentDrawing.arrEntities.Count)
+  ' Esto ya no es posible con Colecciones
+  'currentDrawing.oVisibleEntities.Resize(CurrentDrawing.oEntities.Count)
 
 End
 

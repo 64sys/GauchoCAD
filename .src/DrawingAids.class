@@ -233,7 +233,7 @@ Public Sub DrawPolygons() ' and other debugging stuff
 
   If gcd.clsJob.gender = "Builder" Then Return
 
-  For Each e In gcd.CurrentDrawing.arrEntities
+  For Each e In gcd.CurrentDrawing.oEntities
 
     If e.Polygon.count > 0 Then glPlus.Polygon(e.Polygon, Color.Blue, 1)
 

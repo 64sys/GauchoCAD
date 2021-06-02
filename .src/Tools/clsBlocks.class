@@ -143,7 +143,7 @@ Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' called by FCAD->
   End If
   ' ahora creo el insert
 
-  gcd.CurrentDrawing.arrEntities.Add(entInsert)
+  gcd.CurrentDrawing.oEntities.Add(entInsert)
   entInsert.pBlock = eBlock
   entInsert.Handle = gcd.NewHandle()
   entInsert.HandleOwner = "1"

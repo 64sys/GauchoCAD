@@ -75,23 +75,31 @@ Public HandSeed As Integer      '' Last available handle for this drawing
 ' GRAPHICS
 ' ===============================================================================================================================
 
-Public arrLTYpes As New LType[]                 ' de objetos LTypes
-Public arrLayers As New Layer[]                 ' de objetos Layer
-Public arrExtras As New Entity[]                ' For entities
-Public arrBlocks As New Block[]                 ' bloques de este grafico
-Public arrStyles As New Styles[]                ' estilos de texto del grafico
-Public arrPolyLines As New Block[]              ' mmmmmmmm
-Public arrEntities As New Entity[]              ' were al elements live
-Public arrVisibleEntities As New Integer[]      ' set at view change
+' Public arrLTYpes As New LType[]                 ' de objetos LTypes
+' Public arrLayers As New Layer[]                 ' de objetos Layer
+' Public arrExtras As New Entity[]                ' For entities
+' Public arrBlocks As New Block[]                 ' bloques de este grafico
+' Public arrStyles As New Styles[]                ' estilos de texto del grafico
+' Public arrPolyLines As New Block[]              ' mmmmmmmm
+' Public arrEntities As New Entity[]              ' were al elements live
+' Public arrVisibleEntities As New Integer[]      ' set at view change
 Public VisibleEntitiesMax As Integer            ' para acelerar no redimensiono arrVis.. uso esto
 
+Public oLTYpes As New Collection                ' de objetos LTypes
+Public oLayers As New Collection              ' de objetos Layer
+Public oExtras As New Collection                ' For entities
+Public oBlocks As New Collection                ' bloques de este grafico
+Public oStyles As New Collection               ' estilos de texto del grafico
+Public oPolyLines As New Collection              ' mmmmmmmm
+Public oEntities As New Collection              ' were al elements live
+Public oVisibleEntities As New Collection     ' set at view change
+
 Public uUndo As New Undo
-Public arrTmp As New Entity[]               '' Temporal array to put a copy of an entity before change something in it
-Public arrUndo As New Entity[]              '' An array to put an unmodified copy of an entity before modifying it and then restoring it to the previous version.
+Public arrTmp As New Collection               '' Temporal array to put a copy of an entity before change something in it
+Public arrUndo As New Collection              '' An array to put an unmodified copy of an entity before modifying it and then restoring it to the previous version.
 
 ' SELECTION
-Public arrSelecIndex As New Integer[]       '' List of indexes of selected entities with the mouse
-Public hSelection As New String[]           '' List of handles of selected entities with the mouse
+Public oSelected As New Collection       '' List of selected entities
 
 ' point of interests, lines, areas and entities: all this is generated n the entity creation
 Public poiPoints As New Float[]                 '' xy pairs of points
@@ -108,7 +116,9 @@ Public poiPoligonEntities As New Integer[]      '' related entity
 
 ' interaccion del mouse en pantalla
 Public LastPoint As New Float[]                 '' ultimo punto marcado o null si no existe
-Public iEntity As New Single[] '= [0, 0, -1, -1]                '' las coordenadas del punto encontrado y el tipo de punto
+Public iEntity As New Single[] '             '' las coordenadas del punto encontrado y el tipo de punto
+Public HoveredEntity As Entity
+
 Public iLastEntity As Integer                   '' ultima entidad encontrada
 
 Public flgShowPOIinfo As Boolean = True

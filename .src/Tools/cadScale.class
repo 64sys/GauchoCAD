@@ -96,8 +96,8 @@ Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' called by FCAD->
     gl.PushMatrix
     gl.NewList(gcd.CurrentDrawing.GlListSelectedEntities, gl.COMPILE)                      ' genero los graficos dentro de la lista
     gl.Translatef(-Me.SelStartXr, -Me.SelStartYr, 0)
-    For i = 0 To gcd.CurrentDrawing.arrEntities.Max 'Me.inxSelected.Max
-      If gcd.CurrentDrawing.arrEntities[i].selected Then gl.CallList(gcd.CurrentDrawing.arrEntities[i].glDrwList)
+    For i = 0 To gcd.CurrentDrawing.oEntities 'Me.inxSelected.Max
+      If gcd.CurrentDrawing.oEntities[i].selected Then gl.CallList(gcd.CurrentDrawing.oEntities[i].glDrwList)
     Next
     gl.EndList
     gl.PopMatrix

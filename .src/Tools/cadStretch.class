@@ -144,7 +144,7 @@ Public Sub Draw()               ' called by gcd.CurrDrawing.drwArea_Draw
 
   For i = 0 To gcd.CurrentDrawing.arrSelecIndex.Max
 
-    gcd.CurrentDrawing.arrEntities[gcd.CurrentDrawing.arrSelecIndex[i]].ClassHandler.Draw(gcd.CurrentDrawing.arrEntities[gcd.CurrentDrawing.arrSelecIndex[i]])
+    gcd.CurrentDrawing.oEntities[gcd.CurrentDrawing.arrSelecIndex[i]].ClassHandler.Draw(gcd.CurrentDrawing.oEntities[gcd.CurrentDrawing.arrSelecIndex[i]])
 
   Next
 
