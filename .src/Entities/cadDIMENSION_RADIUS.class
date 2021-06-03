@@ -112,7 +112,7 @@ Public Function NewParameter(eBuild As Entity, vParam As Variant[], Optional Def
 
 End
 
-Public Sub ReBuildBlock(ELEM As Entity) As Block
+Public Sub ReBuildBlock(E As Entity) As Block
 
   Dim d As Float, flxTextExt As Float[]
   Dim fRotXY As Float[]

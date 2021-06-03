@@ -142,7 +142,7 @@ Public Function NewParameter(eBuild As Entity, vParam As Variant[], Optional Def
 
 End
 
-Public Sub ReBuildBlock(ELEM As Entity, Optional Stage As Integer) As Block
+Public Sub ReBuildBlock(E As Entity, Optional Stage As Integer) As Block
 
   ' Stage lo uso para cuando estoy creando la dimension
 
