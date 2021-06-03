@@ -124,10 +124,11 @@ End
 '' Creo los puntos de interes
 '' Build point of interest
 
-Public Function BuildPOI(oE As Entity, Optional arrIndex As Integer = -1) As Integer
+Public Function BuildPOI(oE As Entity) As Integer
 
-  If arrIndex < 0 Then arrIndex = gcd.CurrentDrawing.oEntities       ' si este valor no es provisto , estos POI son de la ultima entidad
+  ' si este valor no es provisto , estos POI son de la ultima entidad
   Dim i As Integer
+
   Return
   oe.PoiPoints.Clear
   oe.poiPoints.insert([oE.P[0], oE.P[1]])
@@ -236,7 +237,7 @@ Public Function ImportDXF(e As Entity, sClaves As String[], sValues As String[])
 
   ' vamos a agrupar las entidades que forman el contorno en un bloque
   e.pBlock = New Block
-  e.pBlock.entities = New Entity[]
+  e.pBlock.entities = New Collection
 
   'For i = 0 To sClaves.Max
   i = -1
@@ -277,7 +278,7 @@ Public Function ImportDXF(e As Entity, sClaves As String[], sValues As String[])
             ' a esta entidad que es un borde le etiquetamos el loop al que pertenece
             eContour.Group = iLoop
 
-            e.pBlock.entities.Add(eContour)
+            e.pBlock.entities.Add(eContour, CStr(i))
             Select Case EdgeType
               Case 0  ' invalido
 

@@ -105,7 +105,7 @@ Public Sub ReBuildBlock(ELEM As Entity) As Block
   Dim newBlock As New Block
   Dim f1, f2 As New Float[]
 
-  newBlock.entities = New Entity[]
+  newBlock.entities = New Collection
 
   ' para definir este bloque necesito 6 entidades
   Dim eLineaPpal As Entity

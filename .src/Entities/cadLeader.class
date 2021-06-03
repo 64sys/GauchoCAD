@@ -30,7 +30,7 @@ Public Const ParamHelper As String = "Text; Height; Next Point"     ' a little t
 Public Const ParamDefault As String = "<title> ;20; <enter>"
 
 '' Creates a new LWpolyline entity and prepares arrays
-Public Function NewEntity() As Entity
+Public Function NewEntity(Optional fPoints As Float[]) As Entity
 
   Dim e As New Entity
 
@@ -178,7 +178,7 @@ End
 '' Creo los puntos de interes
 '' Build point of interest
 
-Public Function BuildPOI(oE As Entity, Optional arrIndex As Integer = -1) As Integer
+Public Function BuildPOI(oE As Entity) As Integer
 
   cadLWPolyline.BuildPOI(oe)
 

@@ -24,7 +24,7 @@ Inherits ToolsBase
 Create Static
 Public Const Gender As String = "Trim"
 
-Public arrTijeras As New Integer[]
+Public Tijeras As Collection
 Public eRecortar As Entity
 
 Public Function Start(Optional ElemToBuild As Variant, Optional _Mode As Integer = 0) As Boolean
@@ -38,11 +38,8 @@ Public Function Start(Optional ElemToBuild As Variant, Optional _Mode As Integer
   DrawingAids.HelperTrabajo = ("Trim") & " "
   gcd.clsJob.EntityChecking = True
 
-  ' chequeamos si hubo seleccion previa
-  Me.SelectionCount = clsEntities.GetSelectionCount()
+  If gcd.CurrentDrawing.oSelected.Count = 0 Then                                     ' we have no elements in the selection
 
-  If Me.SelectionCount = 0 Then                                     ' we have no elements in the selection
-    arrTijeras.Clear
     DrawingAids.Helper.texto = DrawingAids.HelperTrabajo & ": " & ("Select cutting edges")
 
     gcd.clsJobPrevious = Me
@@ -51,9 +48,8 @@ Public Function Start(Optional ElemToBuild As Variant, Optional _Mode As Integer
   Else                                                               ' TENEMOS QUE PEDIR MAS ENTIDADES PARA CORTAR
 
     ' recolecto las tijeras
-    For i = 0 To gcd.CurrentDrawing.oEntities
-      If gcd.CurrentDrawing.oEntities[i].selected Then arrTijeras.Add(i)
-    Next
+
+    Tijeras = gcd.CurrentDrawing.oSelected
 
     '
     DrawingAids.Helper.texto = DrawingAids.HelperTrabajo & ": " & ("entities to cut")
@@ -73,7 +69,7 @@ Public Function MouseDown(mouseX As Integer, mouseY As Integer)
   Me.SelEndyr = gcd.Yreal(mouseY)
   If Mouse.Left Then
 
-    If gcd.CurrentDrawing.iEntity[3] >= 0 Then
+    If gcd.CurrentDrawing.HoveredEntity Then
 
       DoTrim
 
@@ -85,7 +81,7 @@ End
 '' Esta sub recorta una linea con otras cosas
 Public Sub DoTrim()
 
-  Me.eRecortar = gcd.CurrentDrawing.oEntities[gcd.CurrentDrawing.iEntity[3]]
+  Me.eRecortar = gcd.CurrentDrawing.HoveredEntity
   Select Case eRecortar.Gender
     Case "Line"
       DoTrimLine
@@ -183,8 +179,7 @@ Public Sub DoTrimLine()
   C2x = eRecortar.p[2]
   C2y = eRecortar.p[3]
 
-  For iii = 0 To Me.arrTijeras.Max
-    eTijera = gcd.CurrentDrawing.oEntities[iii]
+  For Each eTijera In gcd.CurrentDrawing.oSelected
     Select Case eTijera.Gender
       Case "Line"
         If puntos.doIntersect(eRecortar.p[0], eRecortar.p[1], eRecortar.p[2], eRecortar.p[3], eTijera.p[0], eTijera.p[1], eTijera.p[2], eTijera.p[3]) Then
@@ -393,8 +388,7 @@ Public Sub DoTrimPline()
     T2x = eRecortar.p[t + 2]
     T2y = eRecortar.p[t + 3]
 
-    For iii = 0 To Me.arrTijeras.Max
-      eTijera = gcd.CurrentDrawing.oEntities[arrTijeras[iii]]
+    For Each eTijera In gcd.CurrentDrawing.oSelected
       Select Case eTijera.Gender
         Case "Line"
           If puntos.doIntersect(T1x, T1y, T2x, T2y, eTijera.p[0], eTijera.p[1], eTijera.p[2], eTijera.p[3]) Then
@@ -627,9 +621,7 @@ Public Sub DoTrimCircle()
     T2x = eRecortar.p[0] + eRecortar.fParam[0] * Cos(theta)
     T2y = eRecortar.p[1] + eRecortar.fParam[0] * Sin(theta)
 
-    For iii = 0 To Me.arrTijeras.Max
-      eTijera = gcd.CurrentDrawing.oEntities[arrTijeras[iii]]
-
+    For Each eTijera In gcd.CurrentDrawing.oSelected
       Select Case eTijera.Gender
         Case "Line"
           If puntos.doIntersect(T1x, T1y, T2x, T2y, eTijera.p[0], eTijera.p[1], eTijera.p[2], eTijera.p[3]) Then
@@ -755,9 +747,7 @@ Public Sub DoTrimArc()
 
     End If
 
-    For iii = 0 To Me.arrTijeras.Max
-      eTijera = gcd.CurrentDrawing.oEntities[arrTijeras[iii]]
-
+    For Each eTijera In gcd.CurrentDrawing.oSelected
       Select Case eTijera.Gender
         Case "Line"
           If puntos.doIntersect(T1x, T1y, T2x, T2y, eTijera.p[0], eTijera.p[1], eTijera.p[2], eTijera.p[3]) Then

@@ -23,10 +23,10 @@ Public Const TypeModify As Integer = 1
 Public Const TypeCreate As Integer = 2
 Public Const TypeDelete As Integer = 3
 
-Public Function AddUndoItem(iIndex As Integer, oItem As Object)
+Public Function AddUndoItem(oItem As Object)
 
   ' agrego un item a la coleccion activa, si no hay instancia activa, la creo
-  cUndo.Last.Add(oItem, CStr(iIndex))
+  cUndo.Last.Add(oItem, oItem.handle)
 
 End
 

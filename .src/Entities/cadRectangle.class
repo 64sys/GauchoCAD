@@ -37,7 +37,7 @@ Public Const ParamDefault As String = " "
 Public Const StretchAble As Boolean = True           ' Si lo puedo deformar
 
 '' Creates a new LWpolyline entity and prepares arrays
-Public Function NewEntity() As Entity
+Public Function NewEntity(Optional fPoints As Float[]) As Entity
 
   Dim e As New Entity
 

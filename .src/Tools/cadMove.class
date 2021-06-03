@@ -29,7 +29,7 @@ Public Function Start(Optional ElemToBuild As Variant, Optional _Mode As Integer
   ' Llamada por FCAD al inicio de la aplicacion de esta herramienta
 
   ' Aprovechamos para establecer los helpers (comentarios de ayuda en pantalla)
-  Dim i As Integer
+  Dim i As Integer, E As Entity
 
   Me.PointsDone = 0
   Me.PointsTotal = 2
@@ -37,10 +37,7 @@ Public Function Start(Optional ElemToBuild As Variant, Optional _Mode As Integer
   DrawingAids.HelperTrabajo = ("Move ")
   ' this affects the gl Drawing list
 
-  ' chequeamos si hubo seleccion previa
-  Me.SelectionCount = clsEntities.GetSelectionCount()
-
-  If Me.SelectionCount = 0 Then                                     ' we have no elements in the selection
+  If gcd.CurrentDrawing.oSelected.Count = 0 Then                                     ' we have no elements in the selection
 
     DrawingAids.Helper.texto = DrawingAids.HelperTrabajo & ": " & ("Select entities")
 
@@ -58,9 +55,8 @@ Public Function Start(Optional ElemToBuild As Variant, Optional _Mode As Integer
     clsEntities.GLGenDrawListAll(True)
 
     gcd.CurrentDrawing.uUndo.OpenUndoStage("Move entities", Undo.TypeModify)
-    For i = 0 To gcd.CurrentDrawing.arrSelecIndex.Max
-      gcd.CurrentDrawing.uUndo.AddUndoItem(gcd.CurrentDrawing.arrSelecIndex[i], clsEntities.ClonEntity(gcd.CurrentDrawing.oEntities[gcd.CurrentDrawing.arrSelecIndex[i]], False))
-
+    For Each E In gcd.CurrentDrawing.oSelected
+      gcd.CurrentDrawing.uUndo.AddUndoItem(clsEntities.ClonEntity(E, False))
     Next
     gcd.Redraw
 

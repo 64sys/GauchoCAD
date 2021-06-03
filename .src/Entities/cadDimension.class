@@ -92,7 +92,7 @@ Public Const DXF_Export As Boolean = False
 
 '' Creates a new Text entity and prepares arrays
 
-Public Function NewEntity() As Entity
+Public Function NewEntity(Optional fPoints As Float[]) As Entity
 
   Dim e As New Entity
 

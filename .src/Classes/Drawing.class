@@ -88,6 +88,7 @@ Public VisibleEntitiesMax As Integer            ' para acelerar no redimensiono 
 Public oLTYpes As New Collection                ' de objetos LTypes
 Public oLayers As New Collection              ' de objetos Layer
 Public oExtras As New Collection                ' For entities
+Public oBlockRecord As New Collection                ' bloques de este grafico
 Public oBlocks As New Collection                ' bloques de este grafico
 Public oStyles As New Collection               ' estilos de texto del grafico
 Public oPolyLines As New Collection              ' mmmmmmmm

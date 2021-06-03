@@ -157,9 +157,9 @@ Public Sub FillEntityWithHatch(entToFill As Entity)
   Dim ie As Integer
   Dim flxPatternLimits As Float[]
   Dim iLoop As Integer
-  Dim enxPattern As New Entity[]
+  Dim enxPattern As New Collection
   Dim cPattern As New Collection
-  Dim enxPatternScaled As New Entity[]
+  Dim enxPatternScaled As New Collection
   Dim eBorder As Entity
   Dim sPAtternFile As String
 
@@ -179,7 +179,7 @@ Public Sub FillEntityWithHatch(entToFill As Entity)
 
   ' cargo el sombreado en un array auxiliar
   Dxf.LoadFile(sPAtternFile, cPattern, True, True, True) ' lo cargo
-  gcd.ImpEnty6(cPattern["ENTITIES"], enxPattern)
+  gcd.ImpEnty6(cPattern["ENTITIES"], enxPattern, True)
 
   ' necesito saber cuanto mide el contorno para aplicar la escala y multiplicar hasta cubrir todo el contorno
 

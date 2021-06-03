@@ -212,7 +212,8 @@ End
 '' Creo los puntos de interes
 '' Build point of interest
 
-Public Function BuildPOI(oE As Entity, Optional arrIndex As Integer = -1) As Integer
+Public Function BuildPOI(oE As Entity) As Integer
+
   ' points
 
   oe.PoiPoints.Clear

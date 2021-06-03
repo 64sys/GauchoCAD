@@ -915,7 +915,7 @@ Public Sub GLArea1_MouseMove()
       End If
 
       If gcd.clsJob.EntityChecking Then
-        If Not clsMouseTracking.flgSearchingEntity Then
+        If Not gcd.flgSearchingEntity Then
           gcd.CurrentDrawing.iEntity[3] = clsMouseTracking.CheckAboveEntity(gcd.Xreal(mouse.x), gcd.Yreal(mouse.Y), gcd.metros(8))
         End If
       End If

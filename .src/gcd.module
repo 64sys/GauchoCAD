@@ -873,6 +873,20 @@ Public Sub JSONReadLTypes()
 
 End
 
+Public Function FindLType(sName As String) As LType
+
+  Dim LT As LType
+
+  For Each LT In gcd.currentDrawing.oLTYpes
+
+    If LCase(LT.Name) = LCase(sname) Then Return LT
+
+  Next
+
+  Return Null
+
+End
+
 Public Function FindLtIndex(sName As String) As LType
 
   Dim lt As LType

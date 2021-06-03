@@ -25,7 +25,7 @@ Create Static
 Public Const Gender As String = "Divide"
 
 Public Offset As Float
-Public iEntitySelected As Integer
+Public EntitySelected As Entity
 ' Workflow
 '   1 Select entity
 '   2 If entity is valid to offset, select point to split it
@@ -41,9 +41,8 @@ Public Function Start(Optional ElemToBuild As Variant, Optional _Mode As Integer
   DrawingAids.HelperTrabajo = ("Divide") & " "
 
   ' chequeamos si hubo seleccion previa
-  Me.SelectionCount = clsEntities.GetSelectionCount()
 
-  If Me.SelectionCount <> 1 Then
+  If gcd.CurrentDrawing.oSelected.Count <> 1 Then
     clsEntities.DeSelection()
     DrawingAids.Helper.texto = DrawingAids.HelperTrabajo & ": " & ("Select only one entity")
     gcd.clsJobPrevious = Me
@@ -51,15 +50,15 @@ Public Function Start(Optional ElemToBuild As Variant, Optional _Mode As Integer
 
   Else
     ' verificamos si la entidad puede ser partida
-    Me.iEntitySelected = gcd.CurrentDrawing.arrSelecIndex[0]
+    Me.EntitySelected = gcd.CurrentDrawing.oSelected[gcd.CurrentDrawing.oSelected.First]
 
-    Select gcd.CurrentDrawing.oEntities[Me.iEntitySelected].Gender
+    Select Me.EntitySelected.Gender
       Case "Line", "LWPolyline", "Circle", "Arc", "Ellipse", "Spline"
-        clsEntities.SelectElem(Me.iEntitySelected)
+        clsEntities.SelectElem(Me.EntitySelected)
         DrawingAids.Helper.texto = ("First breakpoint of entity")
         Me.PointsDone = 1
       Case Else
-        Me.iEntitySelected = -1
+        Me.EntitySelected = Null
         DrawingAids.ErrorMessage = ("Can't break that entity")
     End Select
 
@@ -74,14 +73,14 @@ Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' called by FCAD->
   Dim e, e2 As Entity
 
   ' si llegue aca es porque ya tengo una entidad seleccionada
-  e = gcd.CurrentDrawing.oEntities[Me.iEntitySelected]       ' esto lo hago para reducir el largo del codigo
+  e = Me.EntitySelected       ' esto lo hago para reducir el largo del codigo
 
   ' verifico que este sobre la entidad a romper
   If Me.PointsDone = 1 Then ' marco el primer punto
     Me.SelStartXr = gcd.Xreal(mousex)
     Me.SelStartYr = gcd.Yreal(mouseY)
 
-    If gcd.CurrentDrawing.iEntity[3] <> Me.iEntitySelected Then ' el mouse se fue de la entidad a romper
+    If gcd.CurrentDrawing.HoveredEntity <> Me.EntitySelected Then ' el mouse se fue de la entidad a romper
       DrawingAids.ErrorMessage = ("Invalid breakpoint")
       Return
     End If
@@ -95,14 +94,14 @@ Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' called by FCAD->
         Me.PointsDone = 2
 
       Case Else
-        Me.iEntitySelected = -1
+        Me.iEntitySelected = Null
         DrawingAids.ErrorMessage = ("Can't offset that entity")
     End Select
 
   Else If Me.PointsDone = 2 Then ' acabo de marcar el segundo punto
     Me.SelendXr = gcd.Xreal(mousex)
     Me.SelEndYr = gcd.Yreal(mouseY)
-    If gcd.CurrentDrawing.iEntity[3] <> Me.iEntitySelected Then ' el mouse se fue de la entidad a romper
+    If gcd.CurrentDrawing.HoveredEntity <> Me.EntitySelected Then ' el mouse se fue de la entidad a romper
       DrawingAids.ErrorMessage = ("Invalid breakpoint")
       Return
     End If
@@ -119,7 +118,7 @@ Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' called by FCAD->
         '     Return
         ' Endif
         ' entonces parto la entidad
-        e2 = clsEntities.ClonEntity(e)          ' primero la clono
+        e2 = clsEntities.ClonEntity(e, True)          ' primero la clono
 
         ' veo cual esta mas cerca del punto inicial
         If puntos.distancia(e.P[0], e.P[1], Me.SelStartXr, Me.SelStartYr) > puntos.distancia(e.P[0], e.P[1], Me.SelendXr, Me.SelEndYr) Then
@@ -140,17 +139,17 @@ Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' called by FCAD->
 
         ' tareas finales en las entidades
         e2.ClassHandler.finish(e2)
-        gcd.CurrentDrawing.oEntities.Add(e2)       ' la agrego al dibujo
+        gcd.CurrentDrawing.oEntities.Add(e2, e2.Handle)       ' la agrego al dibujo
         e.ClassHandler.finish(e)                ' para regenerar los POI
 
         ' regenro las listas openGL de ambas entidades
-        clsEntities.glGenDrawList(Me.iEntitySelected)
+        clsEntities.glGenDrawList(Me.EntitySelected)
         clsEntities.glGenDrawList(gcd.CurrentDrawing.oEntities)
 
         Me.Finish
 
       Case Else
-        Me.iEntitySelected = -1
+        Me.iEntitySelected = Null
         DrawingAids.ErrorMessage = ("Can't offset that entity")
     End Select
   End If

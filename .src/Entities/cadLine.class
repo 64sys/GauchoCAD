@@ -28,33 +28,7 @@ Public Const DrawingOrder As Integer = 1        ' 1 = draws first
 Public Const HelperTrabajo As String = ("a line")
 Public Const ParamType As String = "PP"                             ' that is Point, Point; could be Color Text, etc
 Public Const ParamHelper As String = "Start point;End point"
-Public Const GAMBASCADENTITY As String = "EntityBase"
-Public Const USEWITH As String = "EntityBuilder"
-Public Const PointsToDraw As Integer = 1             ' minimal point requered for drawing something usefull
-Public Const OrthogonalIgnored As Boolean = False
-Public Const OrthogonalForced As Boolean = False
-Public Const ParamDefault As String = " "
-Public Const StretchAble As Boolean = True           ' Si lo puedo deformar
-
-'' Creates a new Line entity and prepares arrays
-
-Public Function NewEntity() As Entity
-
-  Dim e As New Entity
-
-  e.Gender = Me.Gender
-  e.ClassHandler = Me
-  e.P.Insert([0, 0, 0, 0])
-
-  ' this may fails on some scopes, but we should Try
-  Try e.pLayer = gcd.CurrentDrawing.CurrLayer
-  Try e.colour = gcd.CurrentDrawing.CurrColor
-  Try e.LineType = gcd.CurrentDrawing.CurrLineType
-  Try e.LineWidth = gcd.CurrentDrawing.CurrLineWt
-
-  Return e
-
-End
+Public Const TotalPoints As Integer = 2
 
 ' The entity handler receives a user action, and returns the number of expected parameter
 ' If definitive = true, means the parameter is set
@@ -129,9 +103,9 @@ End
 '' Creo los puntos de interes
 '' Build point of interest
 
-Public Function BuildPOI(oE As Entity, Optional arrIndex As Integer = -1) As Integer
+Public Function BuildPOI(oE As Entity) As Integer
 
-  If arrIndex < 0 Then arrIndex = gcd.CurrentDrawing.oEntities       ' si este valor no es provisto , estos POI son de la ultima entidad
+  ' si este valor no es provisto , estos POI son de la ultima entidad
 
   oe.PoiPoints.Clear
   oe.PoiType.Clear
@@ -215,10 +189,11 @@ Public Function ImportJsonCol(c As JSONCollection, e As Entity) As Boolean
   ' e.dwg["invisible"] = 0
   ' e.dwg["linewt"] = 30
 
-  e.P[0] = (c["start"][0])
-  e.P[1] = (c["start"][1])
-  e.P[2] = (c["end"][0])
-  e.P[3] = (c["end"][1])
+  e.P.Clear
+  e.P.Add(c["start"][0])
+  e.P.Add(c["start"][1])
+  e.P.Add(c["end"][0])
+  e.P.Add(c["end"][1])
 
   Return True
 
