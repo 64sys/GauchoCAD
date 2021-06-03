@@ -148,26 +148,32 @@ Public Sub ReBuildBlock(E As Entity) As Block
 
   ' Comun para Horiz y Vert
   ' -> el bloque
+
   E.fParam[cadInsert.ipaEscX] = 1      ' ScaleX del inserto
   E.fParam[cadInsert.ipaEscY] = 1      ' ScaleY del inserto
   E.fParam[cadInsert.ipaEscZ] = 1      ' ScaleY del inserto
   E.Visible = True
   ' lineas de demarcacion
-  clsEntities.AddLine(newBlock.entities, [0, 0, 0, E.P[9] - E.P[7]], E.colour, E.LineWidth, E.LineType.Index, E.pLayer)
-  eExtension2 = newBlock.entities.Last
+  eExtension2 = cAdLine.NewEntity([0, 0, 0, E.P[9] - E.P[7]])
+
   ' puntos base
-  clsEntities.AddPoint(newBlock.entities, [0.0, 0.0], E.colour, E.LineWidth, E.LineType.Index, E.pLayer)
+  ePoint2 = cadPoint.NewEntity([E.P[0], E.P[1]])
 
   ' flechas
   ' la flecha va rotada 90*
   f2.Insert([Me.DimExtension, 0, Me.DimExtension - Me.DimArrowWidth, -Me.DimArrowSize, Me.DimExtension + Me.DimArrowWidth, -Me.DimArrowSize, Me.DimExtension, 0])
 
-  clsEntities.Addsolid(newBlock.entities, f2, E.colour, E.LineWidth, E.LineType.Index, E.pLayer)
+  eOblique2 = cAdsolid.NewEntity(f2)
 
-  eOblique2 = newBlock.entities.Last
   ' texto
-  clsEntities.AddMText(newBlock.entities, [E.p[2] - E.p[6], E.p[3] - E.p[7], 0.0, 0.0], 0, Me.DimTextHeight, "0.00", E.colour, E.LineWidth, E.LineType.Index, E.pLayer)
-  eText = newBlock.entities.Last
+  eText = cAdMText.NewEntity([E.p[2] - E.p[6], E.p[3] - E.p[7]])
+  eText.fParam[cadMText.ipaTextHeight] = Me.DimTextHeight
+
+  ' agrego todo al bloque
+  newBlock.entities.Add(eExtension2, gcd.NewHandle())
+  newBlock.entities.Add(eOblique2, gcd.NewHandle())
+  newBlock.entities.Add(ePoint2, gcd.NewHandle())
+  newBlock.entities.Add(eText, gcd.NewHandle())
 
   ' Armo directamente de acuerdo a lo que necesito
   If E.fParam[Me.ipaHorizAngle] = 1 Then                               ' Ordenada X Horizontal (texto y lineas verticales)
@@ -175,7 +181,6 @@ Public Sub ReBuildBlock(E As Entity) As Block
 
     ' esto no cambia la posicion, ya sea mayor o menor que cero
     ' lineas de demarcacion
-    eExtension2.P[3] = E.P[9] - E.P[7]
 
     'If elem.fParam[cadDimension.ipaRealMeasure] >= 0 Then
 
@@ -188,6 +193,7 @@ Public Sub ReBuildBlock(E As Entity) As Block
     eText.fParam[cadMText.ipaTextAngle] = 90
 
     flxTextExt = glPlus.MTextExtends(eText.StringData[cadMText.sdaText], 0, 0, eText.fParam[cadMText.ipaTextHeight])
+    eExtension2.P[3] = E.P[9] - E.P[7] + flxTextExt[2] / 2
 
     eOblique2.ClassHandler.rotate(eOblique2, -Pi / 2 * IIf(E.fParam[cadDimension.ipaRealMeasure] >= 0, 1, -1))
     eOblique2.ClassHandler.translate(eOblique2, 0, 3 * Me.DimExtension * IIf(E.fParam[cadDimension.ipaRealMeasure] >= 0, 1, -1))
@@ -195,13 +201,13 @@ Public Sub ReBuildBlock(E As Entity) As Block
     'End If
   Else ' es vertical
     E.fParam[cadDimension.ipaRealMeasure] = E.P[7] - E.P[1]
-    eExtension2.P[2] = E.P[8] - E.P[6]
+
     eText.StringData[cadMText.sdaText] = "\\A1;" & Format(E.fParam[cadDimension.ipaRealMeasure], Me.DimFormat)
     ' esta ordenada es vertical, entonces el texto no se rota
     eText.fParam[cadMText.ipaTextAngle] = 0
 
     flxTextExt = glPlus.MTextExtends(eText.StringData[cadMText.sdaText], 0, 0, eText.fParam[cadMText.ipaTextHeight])
-
+    eExtension2.P[2] = E.P[8] - E.P[6] + flxTextExt[2] / 2
     eOblique2.ClassHandler.rotate(eOblique2, Pi * IIf(E.fParam[cadDimension.ipaRealMeasure] >= 0, 0, 1))
     eOblique2.ClassHandler.translate(eOblique2, Me.DimExtension * IIf(E.fParam[cadDimension.ipaRealMeasure] >= 0, 1, -1), 0)
 

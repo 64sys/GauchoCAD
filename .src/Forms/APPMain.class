@@ -2435,50 +2435,50 @@ Public Sub Form_KeyPress()
   Select Key.Code
 
     Case Key.Enter, Key.Return
-      Debug KeysAccumulator
-
-      For Each com In Starter.cCommandsList
-        If com.count = 2 Then
-          If com[1] = KeysAccumulator Then
-            KeysAccumulator = com[0]
-          Endif
-        Endif
-      Next
-      Form_Activate()
+      ' Debug KeysAccumulator
+      '
+      ' For Each com In Starter.cCommandsList
+      '   If com.count = 2 Then
+      '     If com[1] = KeysAccumulator Then
+      '       KeysAccumulator = com[0]
+      '     Endif
+      '   Endif
+      ' Next
+      ' Form_Activate()
 
       gcd.clsJob.KeyText(KeysAccumulator)
       KeysAccumulator = ""
 
     Case Key.f2 ' for runing tests
-      Dim cEntys As New Collection
-      For Each e As Entity In gcd.CurrentDrawing.oEntities
-        cEntys.Add(e, gcd.NewHandle())
-
-      Next
-
-      t = Timer
-
-      ' recorro el array
-      For Each e As Entity In gcd.CurrentDrawing.oEntities
-        If e.handle = "EEEE" Then Print "Encontre un EEE"
-
-      Next
-      Print "Tiempo para array", Timer - t
-
-      t = Timer
-      ' recorro la coleccion
-      For Each c As Entity In cEntys
-        If e.handle = "EEEE" Then Print "Encontre un EEE"
-
-      Next
-      Print "Tiempo para recorrer la coleccion", Timer - t
-
-      e = cadDIMENSION_LINEAR.NewEntity([10, 10, 12, 10.5, 0, 0, 10, 8, 14, 8])
-      e.pBlock = cadDIMENSION_LINEAR.ReBuildBlock(e)
-      cadDIMENSION_LINEAR.Finish(e)
-      gcd.CurrentDrawing.oEntities.Add(e, gcd.NewHandle())
-      gcd.ReadEntities
-      gcd.Regen
+      ' Dim cEntys As New Collection
+      ' For Each e As Entity In gcd.CurrentDrawing.oEntities
+      '   cEntys.Add(e, gcd.NewHandle())
+      '
+      ' Next
+      '
+      ' t = Timer
+      '
+      ' ' recorro el array
+      ' For Each e As Entity In gcd.CurrentDrawing.oEntities
+      '   If e.handle = "EEEE" Then Print "Encontre un EEE"
+      '
+      ' Next
+      ' Print "Tiempo para array", Timer - t
+      '
+      ' t = Timer
+      ' ' recorro la coleccion
+      ' For Each c As Entity In cEntys
+      '   If e.handle = "EEEE" Then Print "Encontre un EEE"
+      '
+      ' Next
+      ' Print "Tiempo para recorrer la coleccion", Timer - t
+      '
+      ' e = cadDIMENSION_LINEAR.NewEntity([10, 10, 12, 10.5, 0, 0, 10, 8, 14, 8])
+      ' e.pBlock = cadDIMENSION_LINEAR.ReBuildBlock(e)
+      ' cadDIMENSION_LINEAR.Finish(e)
+      ' gcd.CurrentDrawing.oEntities.Add(e, gcd.NewHandle())
+      ' gcd.ReadEntities
+      ' gcd.Regen
 
     Case Key.f6
 

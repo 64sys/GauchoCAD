@@ -63,34 +63,6 @@ Public Function NewParameter(eBuild As Entity, vParam As Variant[], Optional Def
 
 End
 
-Public Sub Translate(e As Entity, dX As Float, dY As Float, Optional OnlySelected As Boolean = False)
-
-  Dim i As Integer
-
-  If OnlySelected Then
-
-    For i = 0 To e.Psel.Max
-      If e.Psel[i] Then
-
-        e.P[i * 2] += dx
-        e.P[i * 2 + 1] += dy
-
-      Endif
-    Next
-
-  Else
-
-    puntos.Translate(e.p, dx, dy)
-  Endif
-
-End
-
-Public Sub Rotate(e As Entity, radians As Float)
-
-  puntos.Rotate(e.p, radians)
-
-End
-
 Public Sub Scale(e As Entity, sX As Float, sY As Float)
 
   Dim i As Integer
@@ -169,7 +141,6 @@ End
 '' Build point of interest
 
 Public Function BuildPOI(oE As Entity) As Integer
-
 
   oe.PoiPoints.Clear
   oe.PoiType.Clear

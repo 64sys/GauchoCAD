@@ -160,8 +160,8 @@ Public Sub ReBuildBlock(E As Entity, Optional Stage As Integer) As Block
   Dim eOblique2 As Entity
   Dim eExtension1 As Entity
   Dim eExtension2 As Entity
-  Dim eDot1 As Entity
-  Dim eDot2 As Entity
+  Dim ePoint1 As Entity
+
   Dim eText As Entity
   Dim ePoint2 As Entity
 
@@ -171,41 +171,31 @@ Public Sub ReBuildBlock(E As Entity, Optional Stage As Integer) As Block
   Me.DimArrowWidth = Me.DimArrowSize / 3
 
   ' linea principal
-  clsEntities.AddLine(newBlock.entities, [E.P[0], E.P[1], E.P[0] + E.P[6] - E.P[4], E.P[1] + E.P[5] - E.P[7]], E.colour, E.LineWidth, E.LineType.Index, E.pLayer)
-  eLineaPpal = newBlock.entities.Last
+  eLineaPpal = cadLine.NewEntity([E.P[0], E.P[1], E.P[0] + E.P[6] - E.P[4], E.P[1] + E.P[5] - E.P[7]])  ' el 2do punto lo tengo que determinar, el primero esta en la posicion final
 
   ' lineas de demarcacion
-  clsEntities.AddLine(newBlock.entities, [0, Me.DimExtension, 0, -Me.DimExtension], E.colour, E.LineWidth, E.LineType.Index, E.pLayer)
-  eExtension1 = newBlock.entities.Last
+  eExtension1 = cadLine.NewEntity([0, Me.DimExtension, 0, -Me.DimExtension])
+  eExtension2 = cadLine.NewEntity([0, Me.DimExtension, 0, -Me.DimExtension])
 
-  clsEntities.AddLine(newBlock.entities, [0, Me.DimExtension, 0, -Me.DimExtension], E.colour, E.LineWidth, E.LineType.Index, E.pLayer)
-
-  eExtension2 = newBlock.entities.Last
-
-  ' puntos base
-
-  clsEntities.AddPoint(newBlock.entities, [E.P[6], E.P[7]], E.colour, E.LineWidth, E.LineType.Index, E.pLayer)
-
-  clsEntities.AddPoint(newBlock.entities, [E.P[8], E.P[9]], E.colour, E.LineWidth, E.LineType.Index, E.pLayer)
-  ePoint2 = newBlock.entities.Last
+  ' puntos base, ya en las ubicaciones finales (coinciden con los clicks)
+  ePoint1 = cadPoint.NewEntity([e.P[6], e.P[7]])
+  ePoint2 = cadPoint.NewEntity([e.P[8], e.P[9]])
 
   ' flechas
-
-  f1.Insert([0, 0, Me.DimArrowSize, Me.DimArrowWidth, Me.DimArrowSize, -Me.DimArrowWidth, 0, 0])
-  f2.Insert([0, 0, -Me.DimArrowSize, Me.DimArrowWidth, -Me.DimArrowSize, -Me.DimArrowWidth, 0, 0])
-
-  clsEntities.Addsolid(newBlock.entities, f1, E.colour, E.LineWidth, E.LineType.Index, E.pLayer)
-  eOblique1 = newBlock.entities.Last
-
-  clsEntities.Addsolid(newBlock.entities, f2, E.colour, E.LineWidth, E.LineType.Index, E.pLayer)
-  eOblique2 = newBlock.entities.Last
+  eOblique1 = cadSolid.NewEntity([0, 0, Me.DimArrowSize, Me.DimArrowWidth, Me.DimArrowSize, -Me.DimArrowWidth, 0, 0])
+  eOblique2 = cadSolid.NewEntity([0, 0, -Me.DimArrowSize, Me.DimArrowWidth, -Me.DimArrowSize, -Me.DimArrowWidth, 0, 0])
 
   ' texto
+  eText = cadMText.NewEntity([e.P[2], e.P[3]])  ' si leo un archivo, esta es la posicion final
+  eText.fParam[cadMText.ipaAttchmPoint] = 8
 
-  clsEntities.AddMText(newBlock.entities, [0.0, 0.0, 0.0, 0.0], 0, Me.DimTextHeight, "0.00", E.colour, E.LineWidth, E.LineType.Index, E.pLayer)
-  eText = newBlock.entities.Last
-  eText.fParam[cadMText.ipaAttchmPoint] = E.iParam[cadDimension.iiiAtatchPoint]
-
+  ' agrego todo al bloque
+  newBlock.entities.Add(eLineaPpal, gcd.NewHandle())
+  newBlock.entities.Add(eExtension1, gcd.NewHandle())
+  newBlock.entities.Add(eExtension2, gcd.NewHandle())
+  newBlock.entities.Add(ePoint1, gcd.NewHandle())
+  newBlock.entities.Add(ePoint2, gcd.NewHandle())
+  newBlock.entities.Add(eText, gcd.NewHandle())
   ' -> el bloque
 
   E.fParam[cadInsert.ipaEscX] = 1      ' ScaleX del inserto

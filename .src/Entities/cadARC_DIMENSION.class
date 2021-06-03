@@ -55,6 +55,9 @@ Public Function ImportDXF(e As Entity, sClaves As String[], sValues As String[])
   ' TODO: cuando este terminada la entidad, sacar eso
   e.pBlock.AbsoluteCoords = True
 
+  ' y poner esto
+  ' e.pBlock = Me.ReBuildBlock(e)
+
   Return True
 
   '' catch
@@ -119,7 +122,7 @@ Public Sub ReBuildBlock(E As Entity) As Block
   Dim f1, f2 As New Float[]
 
   newBlock.entities = New Collection
-
+  Return newBlock
   ' para definir este bloque necesito 6 entidades
   Dim eLineaPpal As Entity
   Dim eOblique1 As Entity       ' tambien pueden ser flechas Solid

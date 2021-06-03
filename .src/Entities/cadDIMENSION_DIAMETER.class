@@ -61,7 +61,15 @@ Public Function ImportDXF(e As Entity, sClaves As String[], sValues As String[])
   e.P.Add(Me.pointTextMidPoint.x)
   e.P.Add(Me.pointTextMidPoint.y)
 
-  e.pBlock = Me.ReBuildBlock(e)
+  ' TODO: cuando este terminada la entidad, sacar eso
+  ' tengo q presuponer que las escalas son = 1
+  e.fParam[Me.ipaEscX] = 1    ' esc X
+  e.fParam[Me.ipaEscY] = 1    ' esc Y
+  e.fParam[Me.ipaEscZ] = 1    ' esc Z
+  e.pBlock.AbsoluteCoords = True
+
+  ' y poner esto
+  ' e.pBlock = Me.ReBuildBlock(e)
 
   Return True
 
@@ -106,6 +114,8 @@ Public Sub ReBuildBlock(E As Entity) As Block
   Dim f1, f2 As New Float[]
 
   newBlock.entities = New Collection
+
+  Return newBlock
 
   ' para definir este bloque necesito 6 entidades
   Dim eLineaPpal As Entity

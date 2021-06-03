@@ -43,6 +43,13 @@ Public Function Start(Optional ElemToBuild As Variant, Optional _mode As Integer
   Me.PointsDone = 0
   Me.PointsTotal = 2                 ' orto: Punto base + Nx + Dx + Ny + Dy   , polar = Punto base + N + angulo
 
+  ny = 1
+  nx = 1
+  np = 1
+  dx = 0
+  dy = 0
+  dp = 0
+
   Me.mode = _mode
   DrawingAids.HelperTrabajo = ("Array") & " "
 
@@ -56,9 +63,10 @@ Public Function Start(Optional ElemToBuild As Variant, Optional _mode As Integer
     gcd.clsJobPrevious = Me
     gcd.clsJob = clsDefaultJob
 
-  Else                                                                    ' need the first point
-
-    DrawingAids.Helper.texto = DrawingAids.HelperTrabajo & ": " & ("Base point")
+  Else
+    '    DrawingAids.Helper.texto = DrawingAids.HelperTrabajo & ": " & ("Base point")
+    DrawingAids.Helper.texto = DrawingAids.HelperTrabajo & ": " & ("Orthogonal or polar") & " [o]"
+    Inc Me.PointsDone
     DrawingAids.HelperTrabajo = DrawingAids.HelperTrabajo & Str(Me.SelectionCount) & ("elements")
 
   Endif
@@ -69,8 +77,6 @@ Public Function Start(Optional ElemToBuild As Variant, Optional _mode As Integer
 End
 
 Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' called by FCAD-> DrawingArea_MouseUp
-
-  ' solo nos interesa el punto base, luego los clicks no importan
 
   If Me.PointsDone = 0 Then
     ' punto real base
@@ -88,7 +94,7 @@ Public Function KeyText(EnteredText As String) ' esta rutina es llamada por FCAD
 
   If Me.PointsDone = 1 Then                     ' estamos esperando que nos responda si quere Ortogonal o Polar
 
-    If EnteredText = "" Then                        ' enter es Ortogonal
+    If (EnteredText = "") Or (Left$(UCase$(EnteredText), 1) = "O") Then                        ' enter es Ortogonal
 
       Me.mode = 1
       Inc Me.PointsDone
@@ -105,11 +111,13 @@ Public Function KeyText(EnteredText As String) ' esta rutina es llamada por FCAD
   Else If Me.PointsDone = 2 Then
 
     If Me.mode = 1 Then                             ' ortog->Nx
-      Nx = CInt(EnteredText)
+      Try Nx = CInt(EnteredText)
+      If Nx = 0 Then nx = 1
       Inc Me.PointsDone
       DrawingAids.Helper.texto = DrawingAids.HelperTrabajo & ": " & ("Distance") & " X=[0]"
     Else                                         ' polar -> N
-      Np = CInt(EnteredText)
+      Try Np = CInt(EnteredText)
+      If np = 0 Then np = 1
       Inc Me.PointsDone
       DrawingAids.Helper.texto = DrawingAids.HelperTrabajo & ": " & ("Angle") & " [45]"
     End If
@@ -117,32 +125,33 @@ Public Function KeyText(EnteredText As String) ' esta rutina es llamada por FCAD
   Else If Me.PointsDone = 3 Then
 
     If Me.mode = 1 Then                             ' ortog->Dx
-      Dx = CFloat(EnteredText)
+      Try Dx = CFloat(EnteredText)
       Inc Me.PointsDone
       DrawingAids.Helper.texto = DrawingAids.HelperTrabajo & ": " & ("Rows") & " [1]"
     Else                                         ' polar -> N
-      Dp = CFloat(EnteredText) * Pi / 180
+      Try Dp = CFloat(EnteredText) * Pi / 180
       Me.Finish
 
     End If
   Else If Me.PointsDone = 4 Then
 
     ' ortog->Ny
-    Ny = CInt(EnteredText)
+    Try Ny = CInt(EnteredText)
+    If Ny = 0 Then ny = 1
     Inc Me.PointsDone
     DrawingAids.Helper.texto = DrawingAids.HelperTrabajo & ": " & ("Distance") & " Y=[0]"
 
   Else If Me.PointsDone = 5 Then
 
     ' ortog->Dy
-    Dy = CFloat(EnteredText)
+    Try Dy = CFloat(EnteredText)
     Inc Me.PointsDone
     Me.Finish
 
   End If
 
   ' catch
-
+  gcd.redraw
   DrawingAids.ErrorMessage = ("Bad input")
 
 End
@@ -153,28 +162,24 @@ Public Sub Finish()
 
   If Me.mode = 1 And Me.PointsDone = 6 Then               ' me.mode orto finished correctly
 
-    For Rx = 1 To Nx
+    For Rx = 0 To Nx - 1
 
-      For rY = 1 To Ny
+      For rY = 0 To Ny - 1
 
-        If rx = 1 And ry = 1 Then Continue  ' evitamos duplicar la entidad inicial
+        If rx = 0 And ry = 0 Then Continue  ' evitamos duplicar la entidad inicial
 
-        For Each o In gcd.CurrentDrawing.oEntities
-          If o.selected Then
-            newO = clsEntities.ClonEntity(o)               ' devuelve una entidad en exactamente la misma posicion
+        For Each o In gcd.CurrentDrawing.oSelected
 
-            newO.ClassHandler.traslate(newO, dx, dy)
-            gcd.CurrentDrawing.oEntities.Add(newO)
+          newO = clsEntities.ClonEntity(o)               ' devuelve una entidad en exactamente la misma posicion
 
-            newO = Null
-          Endif
+          newO.ClassHandler.translate(newO, dx * rx, dy * ry)
+          newO.ClassHandler.Finish(newo)
+          gcd.CurrentDrawing.oEntities.Add(newO, newO.Handle)
 
         Next
       Next
 
     Next
-
-    clsEntities.Finish
 
   End If
 
@@ -184,22 +189,22 @@ Public Sub Finish()
     For rY = 2 To Np
 
       For Each o In gcd.CurrentDrawing.oEntities
-        If o.selected Then
-          newO = clsEntities.ClonEntity(o)               ' devuelve una entidad en exactamente la misma posicion
-          newO.classhandler.translate(newO, -Me.SelStartXr, -Me.SelStartYr)
-          newO.ClassHandler.rotate(newO, dp * (ry - 1))
-          newO.classhandler.translate(newO, Me.SelStartXr, Me.SelStartYr)
-          gcd.CurrentDrawing.oEntities.Add(newO)
+        newO = clsEntities.ClonEntity(o)               ' devuelve una entidad en exactamente la misma posicion
+        newO.classhandler.translate(newO, -Me.SelStartXr, -Me.SelStartYr)
+        newO.ClassHandler.rotate(newO, dp * (ry - 1))
+        newO.classhandler.translate(newO, Me.SelStartXr, Me.SelStartYr)
+        newO.ClassHandler.Finish(newo)
+        gcd.CurrentDrawing.oEntities.Add(newO, newO.Handle)
 
-          newO = Null
-        Endif
       Next
 
     Next
 
-    clsEntities.Finish
-
   End If
+
+  ' TODO: optimizar para solo la seleccion
+
+  gcd.ReadEntities()
 
   gcd.clsJobPrevious = Me
   gcd.clsJob = clsDefaultJob
