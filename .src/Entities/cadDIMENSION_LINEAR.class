@@ -182,22 +182,22 @@ Public Sub ReBuildBlock(E As Entity) As Block
   'newBlock.AbsoluteCoords = True
 
   ' linea principal
-  eLineaPpal = cadLine.NewEntity([0.0, 0.0, 0.0, 0.0])
+  eLineaPpal = cadLine.NewEntity([e.P[0], e.P[1], 0.0, 0.0])  ' el 2do punto lo tengo que determinar, el primero esta en la posicion final
 
   ' lineas de demarcacion
   eExtension1 = cadLine.NewEntity([0, Me.DimExtension, 0, -Me.DimExtension])
   eExtension2 = cadLine.NewEntity([0, Me.DimExtension, 0, -Me.DimExtension])
 
-  ' puntos base
-  ePoint1 = cadPoint.NewEntity([e.P[6], e.P[7])
-  ePoint2 = cadPoint.NewEntity([e.P[8], e.P[9])
+  ' puntos base, ya en las ubicaciones finales (coinciden con los clicks)
+  ePoint1 = cadPoint.NewEntity([e.P[6], e.P[7]])
+  ePoint2 = cadPoint.NewEntity([e.P[8], e.P[9]])
 
   ' flechas
   eOblique1 = cadSolid.NewEntity([0, 0, Me.DimArrowSize, Me.DimArrowWidth, Me.DimArrowSize, -Me.DimArrowWidth, 0, 0])
   eOblique2 = cadSolid.NewEntity([0, 0, -Me.DimArrowSize, Me.DimArrowWidth, -Me.DimArrowSize, -Me.DimArrowWidth, 0, 0])
 
   ' texto
-  eText = cadMText.NewEntity(e.P[2], e.P[3])
+  eText = cadMText.NewEntity([e.P[2], e.P[3]])  ' si leo un archivo, esta es la posicion final
   eText.fParam[cadMText.ipaAttchmPoint] = 8
 
   ' agrego todo al bloque
@@ -214,7 +214,6 @@ Public Sub ReBuildBlock(E As Entity) As Block
   E.fParam[cadInsert.ipaEscZ] = 1      ' ScaleY del inserto
   E.Visible = True
 
-  ' con este click calculo el angulo para el inserto
   E.fParam[cadInsert.ipaRotacion] = CFloat(E.iParam[Me.iiiMode]) / 1000
 
   ' el largo de la linea principal viene dado por la distancia entre ambos puntos
@@ -225,27 +224,24 @@ Public Sub ReBuildBlock(E As Entity) As Block
   a1 = Abs(a1) / 180 * Pi
   d = Cos(a1) * puntos.distancia(E.P[0], E.P[1], E.P[2], E.P[3])
 
-  ' verifico el armado
-  If E.P[2] < E.P[0] Then
-    ' Swap elem.P[2], elem.P[0]
-    ' Swap elem.p[3], elem.P[1]
-    invertida = -1
-
-  Endif
-
-  If E.P[2] = E.P[0] Then
-    If E.P[1] > E.P[3] Then
-      ' Swap elem.P[2], elem.P[0]
-      ' Swap elem.p[3], elem.P[1]
-      invertida = -1
-
-    End If
-  Endif
-
+  ' ' verifico el armado
+  ' If E.P[2] < E.P[0] Then
+  '   ' Swap elem.P[2], elem.P[0]
+  '   ' Swap elem.p[3], elem.P[1]
+  '   invertida = -1
+  '
+  ' Endif
+  '
+  ' If E.P[2] = E.P[0] Then
+  '   If E.P[1] > E.P[3] Then
+  '     ' Swap elem.P[2], elem.P[0]
+  '     ' Swap elem.p[3], elem.P[1]
+  '     invertida = -1
+  '
+  '   End If
+  ' Endif
+  '
   ' la primer entidad del bloque es la linea principal
-  eLineaPpal.P[0] = 0           ' X0
-  eLineaPpal.P[1] = 0           ' Y0
-
   eLineaPpal.P[2] = d '* invertida           ' X1
   eLineaPpal.P[3] = 0           ' Y1
 
@@ -260,10 +256,8 @@ Public Sub ReBuildBlock(E As Entity) As Block
 
   ' la tercera es la segunda linea de demarcacion
   eExtension2.P[0] = d '* invertida           ' X0
-  'eExtension2.P[1] = 0           ' Y0
 
   eExtension2.P[2] = d '* invertida          ' X1
-  'eExtension2.P[3] = 0           ' Y1
 
   E.fParam[cadDimension.ipaRealMeasure] = Abs(d)
   If E.StringData[Me.sdaTextOverride] <> "" Then
@@ -273,7 +267,6 @@ Public Sub ReBuildBlock(E As Entity) As Block
   Endif
   ' el texto
   eText.StringData[cadMText.sdaText] = "\\A1;" & sDim
-
   flxTextExt = glPlus.MTextExtends(sDim, 0, 0, eText.fParam[cadMText.ipaTextHeight])
 
   ' la cuarta y quinta son las flechas , tengo que verificar si entran, o el texto

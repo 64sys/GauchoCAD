@@ -886,19 +886,18 @@ Public Function CollectVisibleEntities()
   x1 = gcd.Xreal(gcd.ScreenWidth())
   y0 = gcd.Yreal(gcd.ScreenHeight())
 
-  If gcd.CurrentDrawing.oEntities > gcd.CurrentDrawing.arrVisibleEntities.Max Then gcd.CurrentDrawing.arrVisibleEntities.Resize(gcd.CurrentDrawing.oEntities.Count)
+  'If gcd.CurrentDrawing.oEntities > gcd.CurrentDrawing.arrVisibleEntities.Max Then gcd.CurrentDrawing.arrVisibleEntities.Resize(gcd.CurrentDrawing.oEntities.Count)
 
-  For i = 0 To gcd.CurrentDrawing.oEntities
-    If gcd.CurrentDrawing.oEntities[i].pLayer.Visible Then
+  For Each e In gcd.CurrentDrawing.oEntities
+    If e.pLayer.Visible Then
 
-      If SelPArtial(i, x0, y0, x1, y1) Then
+      If SelPArtial(e, x0, y0, x1, y1) Then
 
-        gcd.CurrentDrawing.arrVisibleEntities[tot] = i
-        Inc tot
+        gcd.CurrentDrawing.oVisibleEntities.Add(e, e.Handle)
+
       End If
     End If
   Next
-  gcd.CurrentDrawing.VisibleEntitiesMax = tot - 1
 
 End
 

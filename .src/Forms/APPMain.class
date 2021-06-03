@@ -2427,6 +2427,7 @@ Public Sub Form_KeyPress()
   Dim aEnty As Entity    '' Actual entity
   Dim imx As Integer     '' Index in Entities array
   Dim SelectMode As Boolean
+  Dim e As Entity
 
   Print Key.Code
   Dim t As Float = Timer
@@ -2448,8 +2449,7 @@ Public Sub Form_KeyPress()
       gcd.clsJob.KeyText(KeysAccumulator)
       KeysAccumulator = ""
 
-    Case Key.f2
-      ' test
+    Case Key.f2 ' for runing tests
       Dim cEntys As New Collection
       For Each e As Entity In gcd.CurrentDrawing.oEntities
         cEntys.Add(e, gcd.NewHandle())
@@ -2472,6 +2472,13 @@ Public Sub Form_KeyPress()
 
       Next
       Print "Tiempo para recorrer la coleccion", Timer - t
+
+      e = cadDIMENSION_LINEAR.NewEntity([10, 10, 12, 10.5, 0, 0, 10, 8, 14, 8])
+      e.pBlock = cadDIMENSION_LINEAR.ReBuildBlock(e)
+      cadDIMENSION_LINEAR.Finish(e)
+      gcd.CurrentDrawing.oEntities.Add(e, gcd.NewHandle())
+      gcd.ReadEntities
+      gcd.Regen
 
     Case Key.f6
 

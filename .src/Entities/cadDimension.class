@@ -90,30 +90,6 @@ Public StyleOverride As New Styles
 
 Public Const DXF_Export As Boolean = False
 
-'' Creates a new Text entity and prepares arrays
-
-Public Function NewEntity(Optional fPoints As Float[]) As Entity
-
-  Dim e As New Entity
-
-  e.Gender = Me.Gender
-  e.ClassHandler = Me
-  e.fParam.Insert([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
-  e.iParam.Insert([0, 0, 0])
-  e.P.Insert([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
-  e.StringData.Insert(["", ""])
-
-  ' this may fails on some scopes, but we should Try
-  Try e.pLayer = gcd.CurrentDrawing.CurrLayer
-  Try e.colour = gcd.CurrentDrawing.CurrColor
-  Try e.LineType = gcd.CurrentDrawing.CurrLineType
-  Try e.LineWidth = gcd.CurrentDrawing.CurrLineWt
-  Try e.pStyle = gcd.CurrentDrawing.CurrDimStyle
-
-  Return e
-
-End
-
 ' ESTA CLASE SE USA SOLAMENTE PARA IMPORT/EXPORT DXF
 
 Public Function ImportDXF(e As Entity, sClaves As String[], sValues As String[]) As Boolean

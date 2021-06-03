@@ -128,12 +128,12 @@ Public Sub ReBuildBlock(ELEM As Entity) As Block
   Dim ePoint2 As Entity
 
   ' vemos los estilos
-  If elem.fParam[Me.ipaStyleTextHeigth] > 0 Then Me.DimTextHeight = elem.fParam[Me.ipaStyleTextHeigth] Else Me.DimTextHeight = elem.pStyle.fTxtHeight_140
-  If elem.fParam[Me.ipaStyleArrowSize] > 0 Then Me.DimArrowSize = elem.fParam[Me.ipaStyleArrowSize] Else Me.DimArrowSize = elem.pStyle.fArrowSize_41
+  If E.fParam[Me.ipaStyleTextHeigth] > 0 Then Me.DimTextHeight = E.fParam[Me.ipaStyleTextHeigth] Else Me.DimTextHeight = E.pStyle.fTxtHeight_140
+  If E.fParam[Me.ipaStyleArrowSize] > 0 Then Me.DimArrowSize = E.fParam[Me.ipaStyleArrowSize] Else Me.DimArrowSize = E.pStyle.fArrowSize_41
   Me.DimArrowWidth = Me.DimArrowSize / 3
 
   ' linea principal
-  clsEntities.AddLine(newBlock.entities, [0.0, 0.0, 0.0, 0.0], elem.colour, elem.LineWidth, elem.LineType.Index, elem.pLayer)
+  clsEntities.AddLine(newBlock.entities, [0.0, 0.0, 0.0, 0.0], E.colour, E.LineWidth, E.LineType.Index, E.pLayer)
   eLineaPpal = newBlock.entities.Last
 
   ' flechas
@@ -141,29 +141,29 @@ Public Sub ReBuildBlock(ELEM As Entity) As Block
   f1.Insert([0, 0, Me.DimArrowSize, Me.DimArrowWidth, Me.DimArrowSize, -Me.DimArrowWidth, 0, 0])
   f2.Insert([0, 0, -Me.DimArrowSize, Me.DimArrowWidth, -Me.DimArrowSize, -Me.DimArrowWidth, 0, 0])
 
-  clsEntities.Addsolid(newBlock.entities, f2, elem.colour, elem.LineWidth, elem.LineType.Index, elem.pLayer)
+  clsEntities.Addsolid(newBlock.entities, f2, E.colour, E.LineWidth, E.LineType.Index, E.pLayer)
   eOblique2 = newBlock.entities.Last
 
   ' texto
-  clsEntities.AddMText(newBlock.entities, [0.0, 0.0, 0.0, 0.0], 0, Me.DimTextHeight, "0.00", elem.colour, elem.LineWidth, elem.LineType.Index, elem.pLayer)
+  clsEntities.AddMText(newBlock.entities, [0.0, 0.0, 0.0, 0.0], 0, Me.DimTextHeight, "0.00", E.colour, E.LineWidth, E.LineType.Index, E.pLayer)
   eText = newBlock.entities.Last
 
   ' -> el bloque
 
-  elem.fParam[cadInsert.ipaEscX] = 1      ' ScaleX del inserto
-  elem.fParam[cadInsert.ipaEscY] = 1      ' ScaleY del inserto
-  elem.fParam[cadInsert.ipaEscZ] = 1      ' ScaleY del inserto
+  E.fParam[cadInsert.ipaEscX] = 1      ' ScaleX del inserto
+  E.fParam[cadInsert.ipaEscY] = 1      ' ScaleY del inserto
+  E.fParam[cadInsert.ipaEscZ] = 1      ' ScaleY del inserto
 
   '  If stage = 0 Then     ' marco el primer punto
 
   '    Else If stage = 1 Then ' marco el segundo punto, lo que modifica los parametros del bloque
-  elem.Visible = True
+  E.Visible = True
 
   ' el largo de la linea principal viene dado por la distancia entre ambos puntos
-  d = puntos.distancia(elem.P[0], elem.P[1], elem.P[2], elem.P[3])
+  d = puntos.distancia(E.P[0], E.P[1], E.P[2], E.P[3])
 
   ' con este click calculo el angulo
-  elem.fParam[cadInsert.ipaRotacion] = Ang(elem.p[2] - elem.P[0], elem.p[3] - elem.P[1]) * 180 / Pi
+  E.fParam[cadInsert.ipaRotacion] = Ang(E.p[2] - E.P[0], E.p[3] - E.P[1]) * 180 / Pi
 
   ' la primer entidad del bloque es la linea principal
   eLineaPpal.P[0] = 0           ' X0
@@ -173,10 +173,10 @@ Public Sub ReBuildBlock(ELEM As Entity) As Block
   eLineaPpal.P[3] = 0           ' Y1
 
   ' el largo de la linea principal viene dado por la distancia entre ambos puntos
-  d = puntos.distancia(elem.P[0], elem.P[1], elem.P[2], elem.P[3])
+  d = puntos.distancia(E.P[0], E.P[1], E.P[2], E.P[3])
 
   ' con este click calculo el angulo
-  elem.fParam[cadInsert.ipaRotacion] = Ang(elem.p[2] - elem.P[0], elem.p[3] - elem.P[1]) * 180 / Pi
+  E.fParam[cadInsert.ipaRotacion] = Ang(E.p[2] - E.P[0], E.p[3] - E.P[1]) * 180 / Pi
 
   ' la primer entidad del bloque es la linea principal
   eLineaPpal.P[0] = 0           ' X0
@@ -188,7 +188,7 @@ Public Sub ReBuildBlock(ELEM As Entity) As Block
   ' el texto
   eText.StringData[cadMText.sdaText] = "R " & Format(d, Me.DimFormat)
 
-  elem.fParam[cadDimension.ipaRealMeasure] = d
+  E.fParam[cadDimension.ipaRealMeasure] = d
 
   flxTextExt = glPlus.MTextExtends(eText.StringData[0], 0, 0, eText.fParam[1])
 
