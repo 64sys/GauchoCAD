@@ -2428,6 +2428,11 @@ Public Sub Form_KeyPress()
   Dim imx As Integer     '' Index in Entities array
   Dim SelectMode As Boolean
   Dim e As Entity
+  Dim i As Integer
+  Dim flxLimits As New Float[]
+  Dim scaleX, scale, scaleY As Float
+  Dim jPrint As New JSONCollection
+
 
   Print Key.Code
   Dim t As Float = Timer
@@ -2450,35 +2455,58 @@ Public Sub Form_KeyPress()
       KeysAccumulator = ""
 
     Case Key.f2 ' for runing tests
-      ' Dim cEntys As New Collection
-      ' For Each e As Entity In gcd.CurrentDrawing.oEntities
-      '   cEntys.Add(e, gcd.NewHandle())
-      '
-      ' Next
-      '
-      ' t = Timer
-      '
-      ' ' recorro el array
-      ' For Each e As Entity In gcd.CurrentDrawing.oEntities
-      '   If e.handle = "EEEE" Then Print "Encontre un EEE"
-      '
-      ' Next
-      ' Print "Tiempo para array", Timer - t
-      '
-      ' t = Timer
-      ' ' recorro la coleccion
-      ' For Each c As Entity In cEntys
-      '   If e.handle = "EEEE" Then Print "Encontre un EEE"
-      '
-      ' Next
-      ' Print "Tiempo para recorrer la coleccion", Timer - t
-      '
-      ' e = cadDIMENSION_LINEAR.NewEntity([10, 10, 12, 10.5, 0, 0, 10, 8, 14, 8])
-      ' e.pBlock = cadDIMENSION_LINEAR.ReBuildBlock(e)
-      ' cadDIMENSION_LINEAR.Finish(e)
-      ' gcd.CurrentDrawing.oEntities.Add(e, gcd.NewHandle())
-      ' gcd.ReadEntities
-      ' gcd.Regen
+      '==============================ACTUAL PRINT==========================================
+      Dim svgTopaint As New SvgImage(297, 210)
+
+      'SvgImage = New SvgImage(297 * 150, 210 * 150)
+      flxLimits = clsEntities.ComputeLimits(gcd.CurrentDrawing.oEntities, True)
+
+      Paint.Begin(svgTopaint)
+      Paint.Reset ' vuelvo escalas y traslados a cero
+      Paint.Translate(Paint.W / 2, Paint.H / 2) ' centro el dibujo
+      ' trato de meter centrado
+      scaleX = Paint.w / (flxLimits[2] - flxLimits[0])
+      scaleY = Paint.H / (flxLimits[3] - flxLimits[1])
+
+      If scaleX < scaleY Then Scale = scaleX Else Scale = scaley
+      Paint.Scale(scale * 0.85, -scale * 0.85)
+
+      ' centro el dibujo
+      Paint.Translate(-(flxLimits[2] + flxLimits[0]) / 2, -(flxLimits[3] + flxLimits[1]) / 2)
+
+      If Exist(FPrint.sConfig) Then
+        jPrint = JSON.FromString(File.Load(FPrint.sConfig), True)
+
+      Endif
+
+      For Each e As Entity In gcd.CurrentDrawing.oEntities
+        If e.LineWidth = 0 Then e.LineWidth = 1
+        If jPrint.Exist("Monochrome") Then
+          If jPrint["Monochrome"] Then
+            e.colour = 255
+          Endif
+        Endif
+        Paint.Brush = Paint.Color(Color.Black)
+
+        ' TODO: aplicar las puntas segun color de la entidad
+        Paint.LineWidth = e.LineWidth / scale
+
+        Paint.Save  ' guardamos la matriz de transformacion por si la entidad la modifica
+        e.ClassHandler.draw2(e)
+        Paint.Restore ' restauramos la matriz
+      Next
+
+      Paint.End
+
+      Dim s As String
+
+      s = User.Home &/ "tincho.svg"
+
+      Try Kill s
+
+      svgTopaint.Save(s)
+
+      Debug "Print done"
 
     Case Key.f6
 

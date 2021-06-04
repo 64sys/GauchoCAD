@@ -132,9 +132,16 @@ End
 
 Public Function Draw2(oE As Entity)
 
-  paint.Arc(oE.p[0], oE.p[1], oE.fParam[0])
+  If gcd.UseCairo Then
 
-  paint.Stroke
+    cairo.Arc(oE.p[0], oE.p[1], oE.fParam[0])
+
+    cairo.Stroke
+  Else
+    paint.Arc(oE.p[0], oE.p[1], oE.fParam[0])
+
+    paint.Stroke
+  End If
 
 End
 '' Creo los puntos de interes

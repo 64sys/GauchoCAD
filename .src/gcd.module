@@ -28,6 +28,8 @@
 ' Based on an example called MuchosCirculos by JGuardon y MrShell
 ' XML Load/Save by Tincho
 
+Public UseCairo As Boolean '' Chequeado por Draw2 para ver si usa Paint o Cairo
+
 Public ScreenDensity As Float = 1080 / 29.5  '' pixele by cm wich gives a 1:100 scale in my monitor
 
 ' Filtros del dibujo

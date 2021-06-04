@@ -52,12 +52,12 @@ Public Function NewParameter(eBuild As Entity, vParam As Variant[], Optional Def
     End If
   Else If vParam[0] = "close" Then
     If eBuild.P.Count > 4 Then eBuild.P.Remove(eBuild.P.Max - 1, 2)
-    eBuild.fParam[0] = 1
+    eBuild.iParam[0] = 1
     Return True
 
   Else If vParam[0] = "undo" Then
     If eBuild.P.Count > 4 Then eBuild.P.Remove(eBuild.P.Max - 1, 2)
-    eBuild.fParam[0] = 0
+    eBuild.iParam[0] = 0
     Return True
 
   Endif
@@ -171,12 +171,26 @@ Public Sub DrawRemark(oE As Entity)
 
 End
 
+
 Public Function Draw2(oE As Entity)
 
-  paintPlus.Lines(oe.p)
+  Dim i As Integer
+
+  If gcd.UseCairo Then
+
+    cairo.moveto(oe.P[0], oe.P[1])
+    For i = 2 To oe.P.Max Step 2
+      Cairo.lineto(oe.P[i], oe.P[i + 1])
+
+    Next
+
+    cairo.Stroke
+  Else
+
+    paintPlus.Lines(oE.p)
+  End If
 
 End
-
 '' Creo los puntos de interes
 '' Build point of interest
 
