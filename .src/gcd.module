@@ -133,159 +133,6 @@ Public Function NewHandle() As String
 
 End
 
-'' This transfer layers from imported file, one collection actually, to the model collection
-
-Public Sub LayersTransfer()
-
-  Dim tLay As New Collection
-  Dim i As Integer
-  Dim il As Variant
-  Dim ml As Variant
-  Dim prop As String
-  Dim iLay As Collection
-  Dim mLay As Collection
-  Dim r As Integer
-
-  If CurrentDrawing.cImport.Count > 0 Then
-    If CurrentDrawing.cImport.Exist("Layers") Then
-      iLay = CurrentDrawing.cImport["Layers"]
-      If CurrentDrawing.cModel.Exist("Layers") Then
-        mLay = CurrentDrawing.cModel["LAYERS"]
-
-        For Each il In iLay
-          r = 0
-          For Each ml In mLay
-            If ml["name"] = il["name"] Then
-              r = -1
-              Break
-            Else
-              Inc r
-            Endif
-          Next
-
-          If r > -1 Then
-            tLay.Add(Format(r, "0"), "id")
-            tLay.Add("layer", "type")
-            For Each prop In ["name", "show", "frozen", "locked", "color", "style", "width", "print"]
-              tLay.Add(il[prop], prop)
-            Next
-            mLay.Add(tLay.copy(), Format(r, "0"))
-            tLay.Clear
-          Endif
-
-        Next
-      Else
-        For Each il In iLay
-          tLay.Add(Format(i, "0"), "id")
-          tLay.Add("layer", "type")
-
-          For Each prop In ["name", "show", "frozen", "locked", "color", "style", "width", "print"]
-            tLay.Add(iLay[prop], prop)
-          Next
-
-          mLay.Add(tLay.copy(), Format(i, "0"))
-          tLay.Clear
-          Inc i
-        Next
-      Endif
-    Endif
-  Endif
-
-End
-
-Public Sub BlocksTransfer()
-
-  Dim iEnt As Collection
-  Dim mEnt As Collection
-  Dim grp As Collection
-  Dim e As Variant
-  Dim mGrp As Collection
-
-  If CurrentDrawing.cImport.Count > 0 Then
-    If CurrentDrawing.cImport.Exist("Blocks") Then
-      iEnt = CurrentDrawing.cImport["Blocks"]
-      If CurrentDrawing.cModel.Exist("Blocks") Then
-        mEnt = CurrentDrawing.cModel["Blocks"]
-
-        For Each grp In iEnt
-          If mEnt.Exist(iEnt.Key) = False Then
-            mEnt.Add(grp.Copy(), iEnt.Key)
-          Else
-            mGrp = mEnt[iEnt.Key]
-            For Each e In grp
-              mGrp.Add(e, grp.Key)
-            Next
-
-          Endif
-
-        Next
-      Else
-
-        CurrentDrawing.cModel.Add(iEnt.Copy(), "Blocks")
-
-      Endif
-    Endif
-  Endif
-
-End
-
-Public Sub EntitiesTransfer2()
-
-  Dim iEnt As Collection
-  Dim mEnt As Collection
-  Dim grp As Collection
-  Dim e As Variant
-  Dim mGrp As Collection
-
-  If CurrentDrawing.cImport.Count > 0 Then
-    If CurrentDrawing.cImport.Exist("Entities") Then
-      iEnt = CurrentDrawing.cImport["Entities"]
-      If CurrentDrawing.cModel.Exist("Entities") Then
-        mEnt = CurrentDrawing.cModel["Entities"]
-
-        For Each grp In iEnt
-          If mEnt.Exist(iEnt.Key) = False Then
-            mEnt.Add(grp.Copy(), iEnt.Key)
-          Else
-            mGrp = mEnt[iEnt.Key]
-            For Each e In grp
-              mGrp.Add(e, grp.Key)
-            Next
-
-          Endif
-
-        Next
-
-      Endif
-    Endif
-  Endif
-
-End
-
-Public Function GetLayerByHandle(sHandle As String) As Layer
-
-  Dim Lay As Layer
-
-  For Each Lay In gcd.CurrentDrawing.oLayers
-
-    If Lay.handle = sHandle Then Return Lay
-  Next
-  Return Null
-
-End
-
-Public Function GetLayer(LayerName As String) As Layer
-
-  Dim Lay As Layer
-
-  For Each Lay In gcd.CurrentDrawing.oLayers
-
-    If Lay.Name = LayerName Then Return Lay
-  Next
-  Return Null
-
-End
-
 Public Sub Main()
 
   MainGLArea = appmain.GLArea1
@@ -346,11 +193,7 @@ Public Sub Main()
 
 End
 
-Public Sub ExportBlocks(colData As Collection) ', obxEntities As Entity[]) As Integer
-
-End
-
-Public Sub ImportBlocks(colData As Collection) ', obxEntities As Entity[]) As Integer
+Public Sub JSONtoBlocks(colData As Collection) ', obxEntities As Entity[]) As Integer
 
   Dim iTotalEntities As Integer, colent, colBlk As Collection, flxPoints As New Float[], P As Float[]
   Dim hBlock As String
@@ -382,7 +225,7 @@ Public Sub ImportBlocks(colData As Collection) ', obxEntities As Entity[]) As In
 
         End If
       Next
-      ImpEntyFromJSON(cEntyList, newBlock.entities)
+      JSONtoEntity(cEntyList, newBlock.entities)
       cEntyList.Clear
 
     Else If colBlk.Exist("first_entity") Then
@@ -396,7 +239,7 @@ Public Sub ImportBlocks(colData As Collection) ', obxEntities As Entity[]) As In
 
         End If
       Next
-      ImpEntyFromJSON(cEntyList, newBlock.entities)
+      JSONtoEntity(cEntyList, newBlock.entities)
       cEntyList.Clear
     Else
 
@@ -410,46 +253,15 @@ Public Sub ImportBlocks(colData As Collection) ', obxEntities As Entity[]) As In
 
 End
 
-'' Importa las cosas de manera descentralizada
-Public Sub ImpEnty5(cEny As Collection, obx As Entity[])
-
-  Dim e As Collection               ' Current Entity
-  Dim entNueva As Entity
-
-  For Each e In cEny                                              ' Para cada Coleccion de datos de vrx
-    If e.Exist("entity") Then                                     ' es una entidad?
-
-      If InStr("POINT ATTDEF ATTRIB LINE LWPOLYLINE CIRCLE ELLIPSE ARC TEXT MTEXT SPLINE SOLID LEADER INSERT DIMENSION_LINEAR DIMENSION_DIAMETER DIMENSION_RADIUS DIMENSION_ANG3PT DIMENSION_ALIGNED DIMENSION_ORDINATE LARGE_RADIAL_DIMENSION ARC_DIMENSION", UCase(e["entity"])) = 0 Then
-        Print "Entidad no implementada:", e["entity"]
-      Else
-
-        entNueva = clsEntities.ImportJsonToEntity(e)
-
-        If Not IsNull(entNueva) Then         ' si esta implementada, llenamos los datos
-
-          If e.Exist("handle") Then
-
-            obx.Add(entNueva)
-            entNueva = Null                                           ' limpiamos
-          Else                                                        ' no esta implementada
-            Print "Entidad no implementada o con errores:", e["entity"]
-          Endif
-        End If
-      End If
-    Endif
-  Next
-
-End
-'' Importa las cosas de manera descentralizada
-
-Public Sub ImpEntyFromJSON(cEny As Collection, obx As Collection)
+'' Recibe una coleccion de entidades JSON y devuelve una coleccion de Entity
+Public Sub JSONtoEntity(cJsonEntities As Collection, obcEntity As Collection)
 
   Dim e As Collection               ' current Entity
   Dim entNueva As Entity
   Dim flgIsPolyline, IsDummy As Boolean
   Dim pBlockPolyline As Block
 
-  For Each e In cEny                                              ' Para cada Coleccion de datos de vrx
+  For Each e In cJsonEntities                                              ' Para cada Coleccion de datos de vrx
     If e.Exist("entity") Then                                     ' es una entidad?
       ' entonces, creamos una nueva
       ' poner en minuscula para anular la entidad
@@ -464,7 +276,7 @@ Public Sub ImpEntyFromJSON(cEny As Collection, obx As Collection)
           If flgIsPolyline Then
             pBlockPolyline.entities.Add(entNueva)
           Else
-            obx.Add(entNueva, entNueva.Handle)
+            obcEntity.Add(entNueva, entNueva.Handle)
           End If
 
           If (e["entity"] = "POLYLINE") Or (e["entity"] = "POLYLINE_2D") Then
@@ -486,122 +298,6 @@ Public Sub ImpEntyFromJSON(cEny As Collection, obx As Collection)
   Next
 
 End
-
-'' Aplica los cambios en los Layers a las entidades
-'' Si mode = 1, primero recontruye el layerID (para ser usado luego de abrir un archivo)
-
-Public Function ApplyLayerProperties(Optional mode As Integer = 0)
-
-  Dim e As Entity, cLayer As Collection
-  'Dim LayerName As String
-
-  Print "Aplicando propiedades del Layers"
-
-  For Each e In gcd.CurrentDrawing.oEntities
-
-    If mode = 1 Then
-      ' reconstruyo el ID del layer en la entidad, para ello busco en la lista cual coincide con su nombre
-      For Each cLayer In gcd.CurrentDrawing.cModel["LAYERS"]
-        If e.layer = cLayer["name"] Then
-          e.layerID = cLayer["id"]
-          Break
-        Endif
-      Next
-
-    Endif
-
-    ' nombre, el que pudo haber cambiado (exepto el "0")
-    e.layer = gcd.CurrentDrawing.cModel["LAYERS"][e.layerID]["name"]
-
-    ' visibiliad
-    If gcd.CurrentDrawing.cModel["LAYERS"][e.layerID]["show"] Then e.visible = True Else e.visible = False
-
-  Next
-
-End
-
-'' Aplica los cambios en los Layers a las entidades
-'' Si mode = 1, primero recontruye el layerID (para ser usado luego de abrir un archivo)
-Public Function ApplyLayerPropertieToEntity(e As Entity)
-
-  Dim cLayer As Collection
-  'Dim LayerName As String
-
-  ' reconstruyo el ID del layer en la entidad, para ello busco en la lista cual coincide con su nombre
-  For Each cLayer In gcd.CurrentDrawing.cModel["LAYERS"]
-    If e.layer = cLayer["name"] Then
-      e.layerID = cLayer["id"]
-      Break
-    Endif
-  Next
-
-  ' nombre, el que pudo haber cambiado (exepto el "0")
-  e.layer = gcd.CurrentDrawing.cModel["LAYERS"][e.layerID]["name"]
-
-  ' visibiliad
-  If gcd.CurrentDrawing.cModel["LAYERS"][e.layerID]["show"] Then e.visible = True Else e.visible = False
-
-End
-
-Public Function GetLayerID(LayerName As String) As String
-
-  Dim cLayer As Collection
-
-  ' FIXME: reparar post layers
-  Return "0"
-
-  For Each cLayer In gcd.CurrentDrawing.cModel["LAYERS"]
-    If cLayer["name"] = LayerName Then Return cLayer["id"]
-  Next
-
-End
-
-' Public Function GetGBColor(CADcolor As Integer, Optional oLayer As Layer) As Integer
-'
-'   Dim layerID As String
-'
-'   If Not IsNull(oLayer) Then layerID = oLayer.Name
-'
-'   ' FIXME: reparar post layers
-'   If Not gcd.CurrentDrawing.cModel["LAYERS"].Exist(layerID) Then Return Starter.flgWhiteAndBlack
-'
-'   ' color
-'   If CADcolor = 256 Then          ' buscar color del layer
-'
-'     If TypeOf(gcd.CurrentDrawing.cModel["LAYERS"][layerID]["color"]) = gb.Object Then
-'       Return Starter.gColor[gcd.CurrentDrawing.cModel["LAYERS"][layerID]["color"]["index"]]
-'     Else
-'       Return Starter.gColor[gcd.CurrentDrawing.cModel["LAYERS"][layerID]["color"]]
-'     Endif
-'
-'     'Return Starter.gColor[11]
-'
-'   Else If CADcolor = 257 Then     ' buscar color del objeto
-'
-'     If TypeOf(gcd.CurrentDrawing.cModel["LAYERS"][layerID]["color"]) = gb.Object Then
-'       Return Starter.gColor[gcd.CurrentDrawing.cModel["LAYERS"][layerID]["color"]["index"]]
-'     Else
-'       Return Starter.gColor[gcd.CurrentDrawing.cModel["LAYERS"][layerID]["color"]]
-'     Endif
-'     'Return Starter.gColor[gcd.CurrentDrawing.cModel["LAYERS"][layerID]["color"]["index"]]    ' FIXME: cambiar esto
-'     'Return Starter.gColor[12]
-'
-'   Else If CADcolor = 0 Then       ' buscar color del bloque
-'     If TypeOf(gcd.CurrentDrawing.cModel["LAYERS"][layerID]["color"]) = gb.Object Then
-'       Return Starter.gColor[gcd.CurrentDrawing.cModel["LAYERS"][layerID]["color"]["index"]]
-'     Else
-'       Return Starter.gColor[gcd.CurrentDrawing.cModel["LAYERS"][layerID]["color"]]
-'     Endif
-'     'Return Starter.gColor[13]
-'     'Return Starter.gColor[gcd.CurrentDrawing.cModel["LAYERS"][layerID]["color"]["index"]]   ' FIXME: cambiar esto
-'
-'   Else
-'
-'     Return Starter.gColor[CADcolor]
-'
-'   Endif
-'
-' End
 
 Public Function GetGBColor(CADcolor As Integer, Optional pLayer As Layer) As Integer
 
@@ -660,25 +356,24 @@ Public Function UpdateGraphics(Optional handles As String[] = [], DoRegen As Boo
 
   Dim cEntity As Collection, entNueva As Entity
 
-  UpdateLayers
-  JSONReadLTypes()
-
-  ImportBlocks(gcd.CurrentDrawing.cModel)
+  JSONtoLayers()
+  JSONtoLTypes()
+  JSONtoBlocks(CurrentDrawing.cModel)
 
   If handles.Count = 0 Then                   ' Update all entities
 
-    gcd.ImpEntyFromJSON(gcd.CurrentDrawing.cModel["ENTITIES"], gcd.CurrentDrawing.oEntities)
+    gcd.JSONtoEntity(CurrentDrawing.cModel["ENTITIES"], CurrentDrawing.oEntities)
 
   Else                                        ' Update only entities with handles provided
 
     For Each sHandle As String In handles
 
-      If gcd.CurrentDrawing.cModel["ENTITIES"].Exist(sHandle) Then  ' la actualizo
+      If CurrentDrawing.cModel["ENTITIES"].Exist(sHandle) Then  ' la actualizo
 
         entNueva = New Entity                                       ' entonces, creamos una nueva
-        If clsEntities.ImportJsonToEntity(gcd.CurrentDrawing.cModel["ENTITIES"][sHandle], entNueva) Then         ' si esta implementada, llenamos los datos
+        If clsEntities.ImportJsonToEntity(CurrentDrawing.cModel["ENTITIES"][sHandle], entNueva) Then         ' si esta implementada, llenamos los datos
 
-          gcd.CurrentDrawing.oEntities.Add(entNueva)
+          CurrentDrawing.oEntities.Add(entNueva)
           entNueva = Null                                           ' limpiamos
 
         Endif
@@ -688,11 +383,12 @@ Public Function UpdateGraphics(Optional handles As String[] = [], DoRegen As Boo
 
   End If
 
-  ReadEntities()
+  clsEntities.FillLayersWithEntities(CurrentDrawing)
 
   If DoRegen Then Regen
 
 End
+'' Fuerza a openGL a redibujar
 
 Public Sub redraw()
 
@@ -710,7 +406,7 @@ Public Sub Regen()
 End
 
 '' Pasa los layers de cModel a los graficos
-Public Sub UpdateLayers()
+Public Sub JSONtoLayers()
 
   Dim CMLayer As Collection
   Dim newlayer As Layer
@@ -732,8 +428,9 @@ Public Sub UpdateLayers()
   CurrentDrawing.CurrLayer = CurrentDrawing.oLayers[CurrentDrawing.oLayers.First]
 
 End
+'' Convierte una coleccion de Entity en otra de JSON de LibreCAD
 
-Public Sub UpdateModel()
+Public Sub EntityToJSON(obcEntity As Collection, objJson As Collection)
 
   Dim ent As Entity
   Dim JSONExporting As Boolean
@@ -741,7 +438,7 @@ Public Sub UpdateModel()
   'Dim sNewHandle As String
   Dim iHandle As Integer
 
-  For Each ent In CurrentDrawing.oEntities
+  For Each ent In obcEntity
 
     JSONExporting = False               ' Supongo que la clase todvia no esta lista
 
@@ -751,25 +448,25 @@ Public Sub UpdateModel()
     If JSONExporting Then               ' La clase esta lista para crear/editar JSON
 
       ' Verifico si la entidad ya existe en cModel, o fue creada por el usuario graficamente
-      If CurrentDrawing.cModel["ENTITIES"].Exist(ent.Handle) Then
+      If objJson.Exist(ent.Handle) Then
 
         ' Ya existe
 
-        ent.ClassHandler.ExportJsonCol(ent, CurrentDrawing.cModel["ENTITIES"][ent.Handle], False)
+        ent.ClassHandler.ExportJsonCol(ent, objJson[ent.Handle], False)
 
       Else
         ' No existe, debemos crear la entrada
         jscNewEntity = New JSONCollection
         'sNewHandle = GetNewHandle(CurrentDrawing.cModel["ENTITIES"])
         iHandle = CurrentDrawing.cModel["AuxHeader"]["HANDSEED"]
-        CurrentDrawing.cModel["ENTITIES"].Add(jscNewEntity, CStr(iHandle + 1))
+        objJson.Add(jscNewEntity, CStr(iHandle + 1))
         ent.Handle = CStr(iHandle + 1) 'sNewHandle
 
         ' ahora metemos los datos communes
         ' clsEntities.JSON_Export(ent, CurrentDrawing.cModel["ENTITIES"][ent.Handle])
 
         ' y los datos particulares
-        ent.ClassHandler.ExportJsonCol(ent, CurrentDrawing.cModel["ENTITIES"][ent.Handle], True)
+        ent.ClassHandler.ExportJsonCol(ent, objJson[ent.Handle], True)
 
         CurrentDrawing.cModel["AuxHeader"]["HANDSEED"] = iHandle + 1
 
@@ -828,8 +525,8 @@ Public Function Near(xyzReal As Float) As Float
 
 End
 
-'' Reads LTypes collection and puts data in arrLTypes
-Public Sub JSONReadLTypes()
+'' Reads LTypes collection and puts data in oLTypes
+Public Sub JSONtoLTypes()
 
   Dim hlty As LType
   Dim t, i As Integer
@@ -873,59 +570,14 @@ Public Sub JSONReadLTypes()
 
 End
 
-Public Function FindLType(sName As String) As LType
-
-  Dim LT As LType
-
-  For Each LT In gcd.currentDrawing.oLTYpes
-
-    If LCase(LT.Name) = LCase(sname) Then Return LT
-
-  Next
-
-  Return Null
-
-End
-
-Public Function FindLtIndex(sName As String) As LType
-
-  Dim lt As LType
-
-  For Each lt In gcd.CurrentDrawing.oLTypes
-
-    If LCase(lt.Name) = LCase(sname) Then Return lt
-
-  Next
-
-  Return Null
-
-End
-
-'' Reads entities and fill arrLayers
-Public Sub ReadEntities()
-
-  Dim hLay As Layer
-  Dim e As Entity
-
-  ' primero eliminamos lo q haya
-  For Each hLay In CurrentDrawing.oLayers
-    hLay.Entities.Clear
-  Next
-
-  For Each e In CurrentDrawing.oEntities
-    'e.pLayer = CurrDrawing.arrLayers[gcd.FindLaIndex(e.pLayer)]
-    e.pLayer.Entities.Add(e)
-  Next
-  ' Esto ya no es posible con Colecciones
-  'currentDrawing.oVisibleEntities.Resize(CurrentDrawing.oEntities.Count)
-
-End
+'' Esta funcion es para compatibilidad entre GauchoCAD y m-designer
 
 Public Function ScreenWidth() As Integer
 
   Return appmain.GLArea1.W
 
 End
+'' Esta funcion es para compatibilidad entre GauchoCAD y m-designer
 
 Public Function ScreenHeight() As Integer
 

@@ -400,7 +400,7 @@ Public Sub LTask(lTask As String)
       Next
 
       'cVars["clayer"] = currLayer
-      gcd.ApplyLayerProperties
+      ' gcd.ApplyLayerProperties Tincho no es mas necesario
       clsEntities.GLGenDrawList
 
       APPMain.SelectingLayer = True

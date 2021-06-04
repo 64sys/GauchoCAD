@@ -1315,7 +1315,7 @@ Public Sub gTask(sTask As String)
       '
       '   Else  ' no existe
       '     ' antes de guardar, actualizamos
-      '     gcd.UpdateLayers()
+      '     gcd.JSONtoLayers()
       '
       '     cadDxf.SaveFile(f)
       '

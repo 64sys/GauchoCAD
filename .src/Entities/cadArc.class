@@ -88,28 +88,6 @@ Public Sub Stretch(e As Entity, dX As Float, dY As Float)
 
 End
 
-Public Sub Translate(e As Entity, dX As Float, dY As Float, Optional OnlySelected As Boolean = False)
-
-  Dim i As Integer
-
-  If OnlySelected Then
-
-    For i = 0 To e.Psel.Max
-      If e.Psel[i] Then
-
-        e.P[i * 2] += dx
-        e.P[i * 2 + 1] += dy
-
-      Endif
-    Next
-
-  Else
-
-    puntos.Translate(e.p, dx, dy)
-  Endif
-
-End
-
 Public Sub Rotate(e As Entity, radians As Float)
 
   puntos.Rotate(e.p, radians)
@@ -141,13 +119,13 @@ Public Sub Scale(e As Entity, sX As Float, sY As Float)
   If sx < 0 Then
     E.fParam[1] = 180 - E.fParam[1]
     E.fParam[2] = 180 - E.fParam[2]
-    e.iParam[0] *= -1
+
   Endif
 
   If sy < 0 Then
     E.fParam[1] = 360 - E.fParam[1]
     E.fParam[2] = 360 - E.fParam[2]
-    e.iParam[0] *= -1
+
   Endif
 
   'If e.fParam[1] > e.fParam[2] Then Swap e.fParam[1], e.fParam[2]

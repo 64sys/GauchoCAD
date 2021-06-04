@@ -204,7 +204,7 @@ Public Sub Finish()
 
   ' TODO: optimizar para solo la seleccion
 
-  gcd.ReadEntities()
+  clsEntities.FillLayersWithEntities()
 
   gcd.clsJobPrevious = Me
   gcd.clsJob = clsDefaultJob

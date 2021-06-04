@@ -134,6 +134,7 @@ End
 
 Public Function KeyText(EnteredText As String) ' esta rutina es llamada por FCAD en el evento FCAD_KeyPress cuando recibe una texto + <Enter>
 
+  EnteredText = Trim(LCase(EnteredText))
   If Me.PointsDone = 1 Then
 
     If EnteredText = "" Then
@@ -149,11 +150,11 @@ Public Function KeyText(EnteredText As String) ' esta rutina es llamada por FCAD
     End If
 
   Else If Me.PointsDone = 2 Then
-    If LCase$(Left$(EnteredText, 1)) = "y" Then
+    If (EnteredText = "") Or (Left$(EnteredText, 1) = "y") Then
       KeepOriginal = True
       Inc Me.PointsDone
       Me.Finish
-    Else If LCase$(Left$(EnteredText, 1)) = "n" Then
+    Else If Left$(EnteredText, 1) = "n" Then
       KeepOriginal = False
       Inc Me.PointsDone
       Me.Finish

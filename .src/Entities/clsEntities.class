@@ -115,33 +115,6 @@ Public Sub _new()
 
 End
 
-Public Sub FillEntity(o As Entity)
-
-  '  ' lets add the points, if number of points is not determined (like a poli-line) at least we need one
-  '  ' make all arrays acording to param list
-  Dim n As Integer
-
-  For n = 1 To Len(o.ClassHandler.ParamType)
-    Select Case UCase(Mid(o.ClassHandler.ParamType, n, 1))
-      Case "P"
-        o.p.add(0)
-        o.p.add(0)
-
-        o.psel.add(0)
-      Case "F", "A", "M", "L", "R"
-        o.fParam.Add(0)
-
-      Case "T"
-        o.StringData.Add("")
-
-      Case "C"
-
-    End Select
-
-  Next
-
-End
-
 '' Genera las listas GL de cada entidad individual, y la version seleccionada
 '' Borra la lista anterior y genera una nueva
 Public Sub glGenDrawList(Optional eEntity As Entity = Null)
@@ -396,8 +369,9 @@ Public Sub ClonEntity(e As Entity, Optional GetNewHandle As Boolean = True) As E
   ' copia todos sus elementos
   ' llama a las rutinas de reconstruccion del contorno y de los POI
 
-  Dim o As New Entity
+  Dim o As Entity
 
+  o = e.ClassHandler.newEntity()
   CopyElemData(e, o)                              ' copy all values
   o.ClassHandler.BuildPoi(o)
   If GetNewHandle Then o.Handle = gcd.NewHandle()
@@ -1305,14 +1279,14 @@ Public Function DXFImportToEntity(c As Collection, Optional IsDummy As Boolean =
   Next
   e = clsHandler.newEntity()
   ' llenamos Common data:
-  e.pLayer = gcd.GetLayer(c[dxf.codLayer])
+  e.pLayer = GetLayerByName(c[dxf.codLayer])
   e.Handle = c[dxf.codHandle]
   e.HandleOwner = c[dxf.codHandleOwner]
   Try e.colour = c[dxf.codColor]            ' no es obligatorio
   Try e.LineWidth = c[dxf.codLWht] / 100    ' por eso el try
   If e.LineWidth < 1 Then e.LineWidth = 1
   If c.Exist(dxf.codLType) Then
-    LT = gcd.FindLType(c[dxf.codLType])
+    LT = GetLTypeByName(c[dxf.codLType])
     If LT Then
       e.LineType = LT
     Else
@@ -1387,7 +1361,7 @@ Public Function ImportJsonToEntity(c As JSONCollection, Optional IsDummy As Bool
   e = clsHandler.newEntity() ' le pedimos a la clase que arme un objeto Entity para agregar al Drawing actual
   If clsHandler.ImportJSONCol(c, e) Then
     ' llenamos Common data:
-    e.player = gcd.GetLayerByHandle(c["layer"][3])  ' busco el layer por nombre
+    e.player = GetLayerByHandle(c["layer"][3])  ' busco el layer por nombre
     e.Handle = c["handle"][1]
     If e.pLayer = Null Then Stop
     If TypeOf(c["color"]) = gb.Object Then
@@ -1397,9 +1371,8 @@ Public Function ImportJsonToEntity(c As JSONCollection, Optional IsDummy As Bool
     Endif
     e.LineWidth = c["linewt"] / 100
     If e.LineWidth < 1 Then e.LineWidth = 1
-    If gcd.FindLtIndex(c["ltype_flags"]) Then
-      e.LineType = gcd.FindLtIndex(c["ltype_flags"])
-    Else
+    e.LineType = GetLTypeByIndex(c["ltype_flags"])
+    If Not e.LineType Then
       e.LineType = gcd.CurrentDrawing.oLTypes[gcd.CurrentDrawing.oLTypes.First]
     End If
 
@@ -1416,5 +1389,77 @@ Public Function ImportJsonToEntity(c As JSONCollection, Optional IsDummy As Bool
   'Catch
   'e.ClassHandler = cadDummy
   Return False
+
+End
+
+Public Function GetLTypeByName(sName As String) As LType
+
+  Dim LT As LType
+
+  For Each LT In gcd.currentDrawing.oLTYpes
+
+    If LCase(LT.Name) = LCase(sname) Then Return LT
+
+  Next
+
+  Return Null
+
+End
+
+Public Function GetLTypeByIndex(sName As String) As LType
+
+  Dim lt As LType
+
+  For Each lt In gcd.CurrentDrawing.oLTypes
+
+    If LCase(lt.Name) = LCase(sname) Then Return lt
+
+  Next
+
+  Return Null
+
+End
+
+Public Function GetLayerByHandle(sHandle As String) As Layer
+
+  Dim Lay As Layer
+
+  For Each Lay In gcd.CurrentDrawing.oLayers
+
+    If Lay.handle = sHandle Then Return Lay
+  Next
+  Return Null
+
+End
+
+Public Function GetLayerByName(LayerName As String) As Layer
+
+  Dim Lay As Layer
+
+  For Each Lay In gcd.CurrentDrawing.oLayers
+
+    If Lay.Name = LayerName Then Return Lay
+  Next
+  Return Null
+
+End
+
+'' Reads entities and fill arrLayers
+Public Sub FillLayersWithEntities(oDrawing As Drawing)
+
+  Dim hLay As Layer
+  Dim e As Entity
+
+  ' primero eliminamos lo q haya
+  For Each hLay In oDrawing.oLayers
+    hLay.Entities.Clear
+  Next
+
+  For Each e In oDrawing.oEntities
+    'e.pLayer = CurrDrawing.arrLayers[gcd.FindLaIndex(e.pLayer)]
+    e.pLayer.Entities.Add(e)
+  Next
+  ' Esto ya no es posible con Colecciones
+  'currentDrawing.oVisibleEntities.Resize(CurrentDrawing.oEntities.Count)
 
 End

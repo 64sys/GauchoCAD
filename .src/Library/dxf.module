@@ -382,7 +382,7 @@ Private Sub Load31Table(cVars As Collection, iEntries As Integer)
 
   Loop
 
-  'gcd.UpdateLayers
+  'gcd.JSONtoLayers
 
   Try Print "DXF: Leidas", gcd.CurrentDrawing.cModel["LAYERS"].count, " tablas"
 

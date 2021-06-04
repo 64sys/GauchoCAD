@@ -237,7 +237,7 @@ Public Sub LMenu_Click()
       Dim t As Float = Timer                              ' IGNORAR: estos Timers y Debug son para monitorear el tiempo de actualizacion
 
       ' aplicamos los parametros de los layers a las entidades
-      gcd.ApplyLayerProperties
+      ' gcd.ApplyLayerProperties Tincho no es mas necesario
       Debug "apply properties time ", Timer - t           ' IGNORAR: estos Timers y Debug son para monitorear el tiempo de actualizacion
       t = Timer                                           ' IGNORAR: estos Timers y Debug son para monitorear el tiempo de actualizacion
 
