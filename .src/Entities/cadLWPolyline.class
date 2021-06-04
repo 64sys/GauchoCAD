@@ -306,8 +306,21 @@ Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
     e.P.Add(c["points"][i][1])
   Next
 
+  e.fParam.Clear
+  For i = 0 To c["bulges"].Max
+    e.fParam.Add(c["bulges"][i])
+
+  Next
+
   ' FIXME: esto indica si es abierta o cerrada
   If c["flag"] > 0 Then e.iParam[Me.iiiPolylineClosed] = 1
+
+  If e.iParam[Me.iiiPolylineClosed] And e.p.Count > 0 Then ' agrego el primer punto de nuevo
+    e.p.Add(e.p[0])
+    e.p.Add(e.p[1])
+  End If
+
+  If e.fParam.Count > 0 Then e.iParam[Me.iiiBulged] = 1
 
   Return True
 

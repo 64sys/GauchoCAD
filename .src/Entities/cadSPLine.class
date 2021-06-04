@@ -198,7 +198,6 @@ End
 
 Public Function BuildPOI(oE As Entity) As Integer
 
-
   cadLWPolyline.BuildPOI(oe)
 
 End

@@ -619,10 +619,11 @@ Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
   e.StringData[Me.sdaText] = c["text"]
 
   ' FIXME: reparar esto
-  e.fParam[Me.ipaTextAngle] = 0  ' Angulo en grados
+  e.fParam[Me.ipaTextAngle] = Ang(CFloat(c["x_axis_dir"][0]), CFloat(c["x_axis_dir"][1])) * 180 / Pi ' Angulo en grados
 
   e.fParam[Me.ipaTextHeight] = CFloat(c["text_height"])
 
+  e.fParam[Me.ipaAttchmPoint] = CFloat(c["attachment"])
   Return True
 
   'Catch
