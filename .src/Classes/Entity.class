@@ -22,9 +22,9 @@
 
 Public Gender As String = ""
 Public P As New Float[]                     '' X,Y pairs
-Public StringData As New String[]           '' Split with "|" separator if neccesary, that's is Entity specific.
+Public StringData As New String[]           '' Array of Strings
 Public fParam As New Float[]                '' Array of floats
-Public iParam As New Integer[]                '' Array of integers
+Public iParam As New Integer[]              '' Array of integers
 Public colour As Integer                    '' CAD color code
 Public ColorToPaint As Integer              '' actual Gb color
 Public LineWidth As Float = 1               '' This is it
@@ -38,7 +38,6 @@ Public Selected As Boolean                  '' The entity is selected in drawing
 Public DrawAble As Boolean = False          '' True si durante la construccion ya tiene suficientes elementos para poder hacer una representacion digna
 Public Visible As Boolean = True            '' Si esta entidad puede ser mostrada independientmente
 Public Finished As Boolean = False          '' Colocar en true cuando se llegue a completar
-
 Public Flags As Integer = 0                 '' Flags de estado, bit wise
 ' 1=Selected 2=Drawable 4=Visible 8=finished
 ' Se pueden consultar, por ejemplo, clsEntites.IsVisible(entity)

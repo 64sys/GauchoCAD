@@ -43,7 +43,7 @@ Public Const ipaTang2 As Integer = 9
 Public g_num_cvs As Integer
 Public g_degree As Integer
 Public g_order As Integer
-Public LOD As Integer = 200
+Public LOD As Integer = 100
 
 Public g_points As New Float[]
 Public Knots As New Float[]
@@ -64,7 +64,7 @@ Public Function NewParameter(eBuild As Entity, vParam As Variant[], Optional Def
   ' 4 = Rational spline
   ' 8 = Planar
   ' 16 = Linear(planar bit Is Also set)
-  eBuild.fParam[Me.ipaDegree] = 2 'quadrtic; 3 = cubic
+  eBuild.fParam[Me.ipaDegree] = 2 'quadrtic 3 = cubic
   eBuild.fParam[Me.ipaKnotTolerance] = 0.0000001
   eBuild.fParam[Me.ipaControlTolerance] = 0.0000001
   eBuild.fParam[Me.ipaFitTolerance] = 0.0000000001
@@ -216,7 +216,7 @@ Public Sub ExportDXFCol(e As Entity, ByRef cExport As Collection) As Boolean
   ' 4 = Rational spline
   ' 8 = Planar
   ' 16 = Linear(planar bit Is Also set)
-  cExport.Add(CStr(e.fParam[Me.ipaDegree]), "71")                 ' 2 = quadrtic; 3 = cubic
+  cExport.Add(CStr(e.fParam[Me.ipaDegree]), "71")                 ' 2 = quadrtic 3 = cubic
   cExport.Add(CStr(e.fParam[Me.ipaTotalKnots]), "72")
   cExport.Add(CStr(e.fParam[Me.ipaTotalControlPoints]), "73")
   cExport.Add(CStr(e.fParam[Me.ipaTotalFitPoints]), "74")
@@ -355,6 +355,41 @@ Public Sub GetOutpoint(t As Float, OutPoint As Float[])
 
 End
 
+Public Sub DrawTest(oE As Entity)
+
+  Dim OutPoint As New Float[]
+  Dim i As Integer
+  Dim t As Float
+
+  If oe.P.Count = 2 Then Return
+
+  If oe.P.Count = 4 Then
+    cadLine.Draw(oe)
+    Return
+  End If
+  oe.PolyLine.Clear
+
+  For i = 0 To LOD - 1    ' LOD es el nummero de tramos
+
+    't = Knots[Knots.Max] * i / (LOD - 1)
+    t = i / (LOD - 1)
+    'If (i = LOD - 1) Then t -= 0.001
+
+    OutPoint = interpolate2(t, oe.fParam[Me.ipaDegree], oe.p, oe.fParam.Copy(10, oe.fParam.Count - 10))
+
+    'gl.Vertex3f(Outpoint[0], Outpoint[1], Outpoint[2])
+
+    oe.PolyLine.Add(Outpoint[0])
+    oe.PolyLine.Add(Outpoint[1])
+
+  Next
+  'gl.End()
+
+  oE.ColorToPaint = gcd.GetGBColor(oE.colour, oE.pLayer)
+  glPlus.PolyLines(oe.PolyLine, oe.ColorToPaint, oE.LineWidth, oE.LineType.index)
+
+End
+
 Public Sub Draw(oE As Entity)
 
   ' This routine is based on the work of:
@@ -367,6 +402,8 @@ Public Sub Draw(oE As Entity)
   Dim i As Integer
   Dim t As Float
 
+  DrawTest(oe)
+  Return
   If oe.P.Count = 2 Then Return
 
   If oe.P.Count = 4 Then
@@ -458,29 +495,6 @@ Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
   Try e.fParam[Me.ipaControlTolerance] = CFloat(c["ctrl_tol"])
   Try e.fParam[Me.ipaFitTolerance] = CFloat(c["fit_tol"])
 
-  ' Los Knots estan en el indice me.TotalParams en adelante
-  If c.Exist("knots") Then
-    e.fParam.Add(c["knots"].Copy())
-    e.fParam[Me.ipaTotalKnots] = c["knots"].Count
-  Else
-
-    fKnots.Clear
-
-    fKnots.Add(0)
-    fKnots.Add(0)
-    fKnots.Add(0)
-
-    If e.P.Count / 2 > 3 Then
-      For i = 1 To e.P.count / 2 - 3 + 4
-        fKnots.Add(i / ((e.P.count / 2 - 2)))
-      Next
-    End If
-    fKnots.Add(1)
-    fKnots.Add(1)
-    fKnots.Add(1)
-    e.fParam.insert(fKnots.Copy())
-  End If
-
   ' i = 2
   ' Do
   '
@@ -497,18 +511,43 @@ Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
   '
   '
   If c.Exist("beg_tan_vec") Then
-    fTangLargo = puntos.distancia(e.P[0], e.P[1], e.P[2], e.P[3]) / 2
+    fTangLargo = puntos.distancia(e.P[0], e.P[1], e.P[2], e.P[3]) / 5
     'fTangLargo = 1
     e.P.Insert([e.P[0] + c["beg_tan_vec"][0] * fTangLargo, e.P[1] + c["beg_tan_vec"][1] * fTangLargo], 2)
 
   Endif
 
   If c.Exist("end_tan_vec") Then
-    fTangLargo = puntos.distancia(e.P[e.P.Max - 3], e.P[e.P.Max - 2], e.P[e.P.Max - 1], e.P[e.P.Max]) / 2
+    fTangLargo = puntos.distancia(e.P[e.P.Max - 3], e.P[e.P.Max - 2], e.P[e.P.Max - 1], e.P[e.P.Max]) / 5
     'fTangLargo = 1
     e.P.Insert([e.P[e.P.Max - 1] - c["end_tan_vec"][0] * fTangLargo, e.P[e.P.Max] - c["end_tan_vec"][1] * fTangLargo], e.P.max - 1)
 
   Endif
+  ' Los Knots estan en el indice me.TotalParams en adelante
+  If c.Exist("knots") Then
+    e.fParam.Add(c["knots"].Copy())
+    e.fParam[Me.ipaTotalKnots] = c["knots"].Count
+  Else
+
+    fKnots.Clear
+    Dim initknot As Float = 3
+
+    fKnots.Add(initknot)
+    fKnots.Add(initknot)
+    fKnots.Add(initknot)
+
+    Dim factorknot As Float = 1
+
+    'If e.P.Count / 2 > 3 Then
+    For i = 0 To e.P.count / 2 - e.fParam[Me.ipaDegree]
+      fKnots.Add(i / factorknot + initknot)
+    Next
+    'End If
+    fKnots.Add((e.P.count / 2 - e.fParam[Me.ipaDegree]) / factorknot + initknot)
+    fKnots.Add((e.P.count / 2 - e.fParam[Me.ipaDegree]) / factorknot + initknot)
+    fKnots.Add((e.P.count / 2 - e.fParam[Me.ipaDegree]) / factorknot + initknot)
+    e.fParam.insert(fKnots.Copy())
+  End If
 
   ' puede habre tangentes
 
@@ -649,3 +688,174 @@ End
 '          "z": 0.0
 '        }
 '      ]
+
+Public Function interpolate(t As Float, degree As Integer, points As Float[], Optional knots As Float[], weights As Float[]) As Float[]
+
+  Dim i, j, s, l As Integer ' function - scoped iteration variables
+  Dim d As Integer = 2 ' 2d o 3d o mas dimensiones
+  Dim Resultado As New Float[]
+  Dim n As Integer = points.Count / d ' numero de puntos
+
+  If (degree < 1) Then Stop ' Error( 'degree must be at least 1 (linear)')
+  If (degree > (n - 1)) Then Stop ' Error( 'degree must be less than or equal to point count - 1')
+
+  ' Genero los pesos de cada punto para el caso que no sean provistos
+  If Not weights Then
+    ' build weight vector Of length[n]
+    weights = New Float[]
+    weights.Add(1)
+    weights.Add(1)
+    For i = 1 To n - 3
+      weights.Add(1)
+    Next
+    weights.Add(1)
+    weights.Add(1)
+  Endif
+
+  ' genero los nudos
+  If Not knots Then
+    ' build knot vector Of length[n + degree + 1]
+    knots = New Float[]
+    For i = 0 To n + degree
+      knots.Add(i)
+    Next
+  Else ' lo verifico
+    If (knots.Count <> n + degree + 1) Then Stop  'Error( 'bad knot vector length')
+  Endif
+
+  Dim domain As New Float[]
+  domain.Insert([degree, knots.count - 1 - degree])
+
+  ' remap t To the domain where the spline Is Defined
+  Dim low As Float = knots[domain[0]]
+  Dim high As Float = knots[domain[1]]
+  t = t * (high - low) + low
+
+  If (t < low) Or (t > high) Then Stop ' Error( 'out of bounds')
+
+  ' find s(the spline segment) For the[t]value provided
+  For s = domain[0] To domain[1] - 1
+    If (t >= knots[s]) And (t <= knots[s + 1]) Then
+      Break
+    Endif
+  Next
+
+  Debug "S=", s
+
+  ' convert points To homogeneous coordinates (gana una dimension mas)
+  Dim v As New Float[]   ' v=[x1,y1,w1,x2,y2,w2.....] w=weigth
+  For i = 0 To n - 1
+    For j = 0 To d - 1
+      v.Add(points[i * d + j] * weights[i])
+    Next
+    ' esto no se
+    v.Add(weights[i])
+  Next
+
+  ' l(level)goes From 1 To the curve degree + 1
+  Dim alpha As Float
+  For l = 1 To degree + 1
+    ' build level l Of the pyramid
+    For i = s To s - degree + l Step -1
+      alpha = (t - knots[i]) / (knots[i + degree + 1 - l] - knots[i])
+      ' interpolo cada dimension
+      For j = 0 To d
+        v[i * (d + 1) + j] = (1 - alpha) * v[(i - 1) * (d + 1) + j] + alpha * v[i * (d + 1) + j]
+      Next
+    Next
+  Next
+
+  ' convert back To cartesian And Return
+  For i = 0 To d - 1
+    Resultado.Add(v[s * (d + 1) + i] / v[s * (d + 1) + d])
+  Next
+
+  Return Resultado
+
+End
+
+Public Function interpolate2(t As Float, degree As Integer, points As Float[], Optional knots As Float[], weights As Float[]) As Float[]
+
+  Dim i, j, s, l As Integer ' function - scoped iteration variables
+  Dim d As Integer = 2 ' 2d o 3d o mas dimensiones
+  Dim Resultado As New Float[]
+  Dim n As Integer = points.Count / d ' numero de puntos
+
+  If (degree < 1) Then Stop ' Error( 'degree must be at least 1 (linear)')
+  If (degree > (n - 1)) Then Stop ' Error( 'degree must be less than or equal to point count - 1')
+
+  ' Genero los pesos de cada punto para el caso que no sean provistos
+  If Not weights Then
+    ' build weight vector Of length[n]
+    weights = New Float[]
+    weights.Add(1)
+    weights.Add(1)
+    For i = 1 To n - 3
+      weights.Add(1)
+    Next
+    weights.Add(1)
+    weights.Add(1)
+  Endif
+
+  ' genero los nudos
+  If Not knots Then
+    ' build knot vector Of length[n + degree + 1]
+    knots = New Float[]
+    For i = 0 To n + degree
+      knots.Add(i)
+    Next
+  Else ' lo verifico
+    If (knots.Count <> n + degree + 1) Then Stop  'Error( 'bad knot vector length')
+  Endif
+
+  Dim domain As New Float[]
+  domain.Insert([degree, knots.count - 1 - degree])
+
+  ' remap t To the domain where the spline Is Defined
+  Dim low As Float = knots[domain[0]]
+  Dim high As Float = knots[domain[1]]
+  t = t * (high - low) + low
+
+  If (t < low) Or (t > high) Then Stop ' Error( 'out of bounds')
+
+  ' find s(the spline segment) For the[t]value provided
+  For s = domain[0] To domain[1] - 1
+    If (t >= knots[s]) And (t <= knots[s + 1]) Then
+      Break
+    Endif
+  Next
+
+  Debug "S=", s
+
+  ' convert points To homogeneous coordinates (gana una dimension mas)
+  Dim v As New Float[][]   ' v=[x1,y1,w1,x2,y2,w2.....] w=weigth
+  For i = 0 To n - 1
+    v.Add([])
+    For j = 0 To d - 1
+      v[i].Add(points[i * d + j] * weights[i])
+    Next
+    ' esto no se
+    v[i].Add(weights[i])
+  Next
+
+  ' l(level)goes From 1 To the curve degree + 1
+  Dim alpha As Float
+  For l = 1 To degree + 1
+    ' build level l Of the pyramid
+    For i = s To s - degree + l Step -1
+      alpha = (t - knots[i]) / (knots[i + degree + 1 - l] - knots[i])
+      ' interpolo cada dimension
+      For j = 0 To d
+        v[i][j] = (1 - alpha) * v[(i - 1)][j] + alpha * v[i][j]
+      Next
+    Next
+  Next
+
+  ' convert back To cartesian And Return
+  For i = 0 To d - 1
+    Resultado.Add(v[s][i] / v[s][d])
+  Next
+
+  Return Resultado
+
+End

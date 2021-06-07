@@ -463,3 +463,165 @@ Public Function ImportDXF(e As Entity, sClaves As String[], sValues As String[])
 LoopImport:
 
 End
+
+' Importo los datos que puedo procesar de una coleccion y genero un Entity para ser agregado a un array
+Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
+
+  Dim i, iLoop, iPoints, iBorderObjects, iBoundaryObject As Integer
+  Dim LoopToRead As Integer
+  Dim LoopType As Integer
+  Dim EdgesToRead As Integer
+  Dim EdgeType As Integer
+  Dim eContour As Entity
+  Dim edge As Integer
+  Dim oNewPAth As Boundary
+
+  ' for test
+  Dim sclaves, sValues As New String[]
+  Dim eNewSeg As Entity
+
+  'If e.Handle = "60FA9" Then Stop
+
+  ' vamos a agrupar las entidades que forman el contorno en un bloque
+  e.pBlock = New Block
+  e.pBlock.oBoundaryPath = New Boundary[]
+  e.pBlock.entities = New Collection
+
+  e.P.Clear
+  '============General, manejado por clsEntities=======================
+  '  {
+  '       "entity": "HATCH",
+  '       "index": 248,
+  '       "type": 78,
+  '       "handle": [0, 2628],
+  '       "size": 264,
+  '       "bitsize": 2043,
+  '       "eed": [
+  '         {
+  '           "size": 25,
+  '           "handle": [5, 23],
+  '           "code": 10,
+  '           "value": [ 0.0, 0.0, 0.0 ]
+  '         }
+  '       ],
+  '       "_subclass": "AcDbEntity",
+  '       "prev_entity": [12, 1, 123, 2505],
+  '       "next_entity": [10, 1, 56, 2684],
+  '       "layer": [5, 2, 2629, 2629],
+  '       "preview_exists": 0,
+  '       "entmode": 2,
+  '       "nolinks": 0,
+  '       "color": 256,
+  '       "ltype_scale": 1.0,
+  '       "ltype_flags": 0,
+  '       "plotstyle_flags": 0,
+  '       "invisible": 0,
+  '       "linewt": 29,
+  '       "_subclass": "AcDbHatch",
+  '       "elevation": 0.0,
+  '       "extrusion": [ 0.0, 0.0, 1.0 ],
+
+  '============Parametros particulares===================
+  '       "name": "ANSI31",
+  e.StringData[Me.sdaPattern] = c["name"]
+  '       "is_solid_fill": 0,
+  e.fParam[Me.ipaSolid] = c["is_solid_fill"]
+  If e.fParam[Me.ipaSolid] Then
+    e.StringData[Me.sdaPaternFile] = "Solid"
+  Else
+    e.StringData[Me.sdaPaternFile] = Application.Path &/ "patterns" &/ LCase(e.StringData[Me.sdaPattern]) & ".dxf"
+  End If
+
+  '       "is_associative": 0,
+  e.fParam[Me.ipaAsociativity] = CInt(c["is_associative"])
+
+  '       "paths": [
+  For Each jscPath As JSONCollection In c["paths"]
+    oNewPAth = New Boundary
+    e.pBlock.oBoundaryPath.Add(oNewPAth)
+    oNewPAth.Flag = CInt(jscPath["flag"])
+    oNewPAth.eSegments = New Entity[]
+    For Each vSeg As JSONCollection In jscPath["segs"]
+
+      Select Case vSeg["curve_type"]
+        Case "1"
+          eNewSeg = cadLine.NewEntity()
+          eNewSeg.P.Clear
+          eNewSeg.P.Insert(vSeg["first_endpoint"])
+          eNewSeg.P.Insert(vSeg["second_endpoint"])
+      End Select
+      oNewPAth.eSegments.Add(eNewSeg)
+    Next
+  Next
+
+  '         {
+  '           "flag": 1,
+
+  '           "segs": [
+  '             {
+  '               "curve_type": 1,
+  '               "first_endpoint": [ 31.81250471810391, 17.06738345547637 ],
+  '               "second_endpoint": [ 130.43342411352171, 17.06738345547637 ]
+  '             },
+  '             {
+  '               "curve_type": 1,
+  '               "first_endpoint": [ 130.43342411352171, 17.06738345547637 ],
+  '               "second_endpoint": [ 130.43342411352171, 60.8547319733965 ]
+  '             },
+  '             {
+  '               "curve_type": 1,
+  '               "first_endpoint": [ 130.43342411352171, 60.8547319733965 ],
+  '               "second_endpoint": [ 31.81250471810392, 60.8547319733965 ]
+  '             },
+  '             {
+  '               "curve_type": 1,
+  '               "first_endpoint": [ 31.81250471810391, 60.8547319733965 ],
+  '               "second_endpoint": [ 31.81250471810391, 17.06738345547637 ]
+  '             }
+  '           ],
+  '           "boundary_handles": [
+  '
+  '           ]
+  '         }
+  '       ],
+  '       "style": 0,
+  e.fParam[Me.ipaParity] = CInt(c["style"])
+  '       "pattern_type": 1,
+  e.fParam[Me.ipaPatternType] = CInt(c["pattern_type"])
+
+  '       "angle": 0.0,
+  e.fParam[Me.ipaRotation] = CFloat(c["angle"])
+  '       "scale_spacing": 100.0,
+  e.fParam[Me.ipaScale] = CFloat(c["scale_spacing"])
+  '       "double_flag": 0,
+  '       "deflines": [
+  '         {
+  '           "angle": 0.78539816339745,
+  '           "pt0": [ -20.60504680697467, -22.67847848134647 ],
+  '           "offset": [ -8.83883476483184, 8.83883476483184 ],
+  '           "dashes": [
+  '
+  '           ]
+  '         }
+  '       ],
+  '       "seeds": [
+  '         [ -20.60504680697467, -22.67847848134647 ]
+  '       ]
+  '     },
+
+  ' ' TODO: this is a debug
+  ' e.StringData[Me.sdaPaternFile] = "Ansi31"
+
+  Return True
+
+  ' catch
+
+  Return False
+
+  Return True
+
+  'Catch
+
+  Return False
+
+End

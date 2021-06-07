@@ -191,11 +191,7 @@ Public Function Draw2(oE As Entity)
   Dim angulo As Float, hText As New PaintExtents, lText As String
   Dim FontScalePrev As Float, ctex As New CairoTextExtents
 
-
-
   angulo = oE.fParam[Me.ipaTextAngle] / 180 * Pi    ' ojo OPENGL--> GRADOS, GAMBAS-->RADIANESDXF
-
-
 
   If gcd.UseCairo Then
     ctex = Cairo.TextExtents(oe.StringData[Me.sdaText])
