@@ -59,6 +59,7 @@ Public Sub Draw(oE As Entity)
 
   Dim iLoop, iStart As Integer
   Dim fBorder As New Float[]
+  Dim oLoop As Boundary
 
   If Not oE.Visible Then Return
 
@@ -72,13 +73,13 @@ Public Sub Draw(oE As Entity)
     ' para solidos, tengo que hacer una llamada para cada loop de borde
     ' tengo q ver cuantos puntos tiene cada loop
     ' Ojo con LibreCAD
-    For iLoop = 0 To oe.fParam[cadHatch.ipaTotalLoops] - 1
+    For Each oLoop In oe.pBlock.oBoundaryPath '= 0 To oe.fParam[cadHatch.ipaTotalLoops] - 1
       ' obtengo el poligono de bordes
-      fBorder.Clear
-      fBorder.Insert(oe.PolyLine.Copy(iStart, oe.iParam[iLoop]))
-      iStart += fBorder.Count
+      ' fBorder.Clear
+      ' fBorder.Insert(oLoop.e.PolyLine.Copy(iStart, oe.iParam[iLoop]))
+      ' iStart += fBorder.Count
 
-      glPlus.TRIANGLES(puntos.PolygonTriangulation(fBorder), oE.ColorToPaint, oE.ColorToPaint)
+      glPlus.TRIANGLES(puntos.PolygonTriangulation(oLoop.Polyline), oE.ColorToPaint, oE.ColorToPaint)
 
     Next
 
@@ -167,19 +168,19 @@ Public Sub Finish(oE As Entity) As Boolean
   ' busco el tipo de linea, si hace falta
 
   ' tareas finales de armado del objeto
-  Dim iLoop As Integer
+  Dim oLoop As Boundary
 
   If LCase(oe.StringData[Me.sdaPattern]) <> "solid" Then
-    cadHatchBuilder.FillEntityWithHatch(oe)
+    cadHatchBuilder.FillEntityWithHatch2(oe)
   Else
     ' esto es un poco mas complejo
     ' tengo q ver cuantos puntos tiene cada loop
-    For iLoop = 0 To oe.fParam[cadHatch.ipaTotalLoops] - 1
-      cadHatchBuilder.MakeBorder(oe, iLoop)
+    For Each oLoop In oe.pBlock.oBoundaryPath '= 0 To oe.fParam[cadHatch.ipaTotalLoops] - 1
+      oLoop.Polyline = cadHatchBuilder.MakeBorder2(oLoop)
       ' en P ahora estan los puntos que definen el borde
-      oe.iParam.Add(oe.P.Count)
-      oe.PolyLine.insert(oe.P.Copy())
-      oe.P.Clear
+      'oe.iParam.Add(oe.P.Count)
+      'oe.PolyLine.insert(oe.P.Copy())
+      'oe.P.Clear
 
     Next
 
@@ -232,12 +233,14 @@ Public Function ImportDXF(e As Entity, sClaves As String[], sValues As String[])
   Dim EdgeType As Integer
   Dim eContour As Entity
   Dim edge As Integer
+  Dim oNewPAth As Boundary
+  Dim jscPath, vSeg As JSONCollection
 
   'If e.Handle = "60FA9" Then Stop
 
   ' vamos a agrupar las entidades que forman el contorno en un bloque
   e.pBlock = New Block
-  e.pBlock.entities = New Collection
+  e.pBlock.oBoundaryPath = New Boundary[]
 
   'For i = 0 To sClaves.Max
   i = -1
@@ -257,10 +260,16 @@ Public Function ImportDXF(e As Entity, sClaves As String[], sValues As String[])
       ' If LoopToRead = 21 Then Stop
 
       For iLoop = 0 To LoopToRead - 1
+
+        oNewPAth = New Boundary
+        e.pBlock.oBoundaryPath.Add(oNewPAth)
+
+        oNewPAth.eSegments = New Entity[]
         Dec LoopToRead
         ' estas claves definen el borde
 
         i = dxf.ReadCode(92, sClaves, sValues, ByRef LoopType, i)
+        oNewPAth.Flag = LoopType
         If i = True Then Stop
         If (LoopType And 2) <> 2 Then ' otherwise is a polyline
           Inc i
@@ -278,7 +287,7 @@ Public Function ImportDXF(e As Entity, sClaves As String[], sValues As String[])
             ' a esta entidad que es un borde le etiquetamos el loop al que pertenece
             eContour.Group = iLoop
 
-            e.pBlock.entities.Add(eContour, CStr(i))
+            oNewPAth.eSegments.Add(eContour, CStr(i))
             Select Case EdgeType
               Case 0  ' invalido
 
@@ -352,8 +361,7 @@ Public Function ImportDXF(e As Entity, sClaves As String[], sValues As String[])
               ' a esta entidad que es un borde le etiquetamos el loop al que pertenece
               eContour.Group = iLoop
               i = dxf.ReadCode(330, sClaves, sValues, ByRef eContour.Handle, i)
-              e.pBlock.entities.Add(eContour)
-
+              oNewPAth.eSegments.Add(eContour)
             Next
           End If
 
@@ -365,7 +373,7 @@ Public Function ImportDXF(e As Entity, sClaves As String[], sValues As String[])
           ' a esta entidad que es un borde le etiquetamos el loop al que pertenece
           eContour.Group = iLoop
 
-          e.pBlock.entities.Add(eContour)
+          oNewPAth.eSegments.Add(eContour)
 
           Inc i
           ' leo si tiene bulges
@@ -451,9 +459,6 @@ Public Function ImportDXF(e As Entity, sClaves As String[], sValues As String[])
     e.StringData[Me.sdaPaternFile] = Application.Path &/ "patterns" &/ LCase(e.StringData[Me.sdaPattern]) & ".dxf"
   End If
 
-  ' ' TODO: this is a debug
-  ' e.StringData[Me.sdaPaternFile] = "Ansi31"
-
   Return True
 
   ' catch
@@ -475,6 +480,7 @@ Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
   Dim eContour As Entity
   Dim edge As Integer
   Dim oNewPAth As Boundary
+  Dim jscPath, vSeg As JSONCollection
 
   ' for test
   Dim sclaves, sValues As New String[]
@@ -536,22 +542,46 @@ Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
   e.fParam[Me.ipaAsociativity] = CInt(c["is_associative"])
 
   '       "paths": [
-  For Each jscPath As JSONCollection In c["paths"]
+  For Each jscPath In c["paths"]
     oNewPAth = New Boundary
     e.pBlock.oBoundaryPath.Add(oNewPAth)
     oNewPAth.Flag = CInt(jscPath["flag"])
     oNewPAth.eSegments = New Entity[]
-    For Each vSeg As JSONCollection In jscPath["segs"]
+    If jscPath.Exist("segs") Then
+      For Each vSeg In jscPath["segs"]
 
-      Select Case vSeg["curve_type"]
-        Case "1"
-          eNewSeg = cadLine.NewEntity()
-          eNewSeg.P.Clear
-          eNewSeg.P.Insert(vSeg["first_endpoint"])
-          eNewSeg.P.Insert(vSeg["second_endpoint"])
-      End Select
-      oNewPAth.eSegments.Add(eNewSeg)
-    Next
+        Select Case vSeg["curve_type"]
+          Case "1"
+            eNewSeg = cadLine.NewEntity()
+            eNewSeg.P.Clear
+            eNewSeg.P.Insert(vSeg["first_endpoint"])
+            eNewSeg.P.Insert(vSeg["second_endpoint"])
+          Case "2"
+            eNewSeg = cadArc.NewEntity()
+
+            eNewSeg.P[0] = (vSeg["center"][0])
+            eNewSeg.P[1] = (vSeg["center"][1])
+            eNewSeg.fParam[0] = vSeg["radius"]
+            eNewSeg.fParam[1] = vSeg["start_angle"]
+            eNewSeg.fParam[2] = vSeg["end_angle"]
+
+        End Select
+        oNewPAth.eSegments.Add(eNewSeg)
+      Next
+    End If
+    If jscPath.Exist("polyline_path") Then
+      For Each vSeg In jscPath["polyline_path"]
+        Select Case jscPath.Key
+          Case "point"
+            eNewSeg = cadLine.NewEntity()
+            eNewSeg.P.Clear
+            eNewSeg.P.Insert(vSeg[0])
+            eNewSeg.P.Insert(vSeg[1])
+        End Select
+        oNewPAth.eSegments.Add(eNewSeg)
+      Next
+    End If
+
   Next
 
   '         {
@@ -590,9 +620,9 @@ Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
   e.fParam[Me.ipaPatternType] = CInt(c["pattern_type"])
 
   '       "angle": 0.0,
-  e.fParam[Me.ipaRotation] = CFloat(c["angle"])
+  Try e.fParam[Me.ipaRotation] = CFloat(c["angle"]) ' no existe para SOLID
   '       "scale_spacing": 100.0,
-  e.fParam[Me.ipaScale] = CFloat(c["scale_spacing"])
+  Try e.fParam[Me.ipaScale] = CFloat(c["scale_spacing"]) ' no existe para SOLID
   '       "double_flag": 0,
   '       "deflines": [
   '         {

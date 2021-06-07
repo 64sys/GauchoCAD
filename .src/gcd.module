@@ -267,7 +267,7 @@ Public Sub JSONtoEntity(cJsonEntities As Collection, obcEntity As Collection)
     If e.Exist("entity") Then                                     ' es una entidad?
       ' entonces, creamos una nueva
       ' poner en minuscula para anular la entidad
-      If InStr("HATCh POLYLINE_2D VERTEX_2D POLYLINE ENDBLK SEQEND VERTEX POINT ATTDEF ATTRIB LINE LWPOLYLINE CIRCLE ELLIPSE ARC TEXT MTEXT SPLINE SOLID INSERT DIMENSION DIMENSION_LINEAR DIMENSION_DIAMETER DIMENSION_RADIUS DIMENSION_ANG3PT DIMENSION_ALIGNED DIMENSION_ORDINATE LARGE_RADIAL_DIMENSION ARC_DIMENSION", UCase(e["entity"])) = 0 Then
+      If InStr("HATCH POLYLINE_2D VERTEX_2D POLYLINE ENDBLK SEQEND VERTEX POINT ATTDEF ATTRIB LINE LWPOLYLINE CIRCLE ELLIPSE ARC TEXT MTEXT SPLINE SOLID INSERT DIMENSION DIMENSION_LINEAR DIMENSION_DIAMETER DIMENSION_RADIUS DIMENSION_ANG3PT DIMENSION_ALIGNED DIMENSION_ORDINATE LARGE_RADIAL_DIMENSION ARC_DIMENSION", UCase(e["entity"])) = 0 Then
         Print "Entidad no implementada:", e["entity"]
       Else
 
@@ -295,6 +295,62 @@ Public Sub JSONtoEntity(cJsonEntities As Collection, obcEntity As Collection)
           entNueva = Null                                           ' limpiamos
 
         End If
+      End If
+    End If
+  Next
+
+End
+
+'' Importa las cosas de manera descentralizada
+Public Sub DXFtoEntity(cEny As Collection, obx As Collection, Optional NewHandles As Boolean = True)
+
+  Dim e As Collection               ' current Entity
+  Dim entNueva As Entity
+  Dim flgIsPolyline, IsDummy As Boolean
+  Dim pBlockPolyline As Block
+  Dim sHandle As String
+
+  For Each e In cEny                                              ' Para cada Coleccion de datos de vrx
+    If e.Exist(dxf.codEntity) Then                                     ' es una entidad?
+      ' entonces, creamos una nueva
+      ' poner en minuscula para anular la entidad
+      If InStr("HATCH POLYLINE ENDBLK SEQEND VERTEX POINT ATTDEF ATTRIB LINE LWPOLYLINE CIRCLE ELLIPSE ARC TEXT MTEXT SPLINE SOLID INSERT DIMENSION DIMENSION_LINEAR DIMENSION_DIAMETEr DIMENSION_RADIUs DIMENSION_ANG3Pt DIMENSION_ALIGNED DIMENSION_ORDINATE LARGE_RADIAL_DIMENSION ARC_DIMENSION", UCase(e[dxf.codEntity])) = 0 Then IsDummy = True Else IsDummy = False
+      'If UCase(e[dxf.codEntity]) = "INSERT" Then Stop
+
+      entNueva = clsEntities.DXFImportToEntity(e, IsDummy)
+      If IsDummy Then
+        ' no esta implementada
+        Print "Entidad no implementada o con errores:", e[dxf.codHandle], e[dxf.codEntity]
+
+      Else
+
+        If Not IsNull(entNueva) Then         ' si esta implementada, llenamos los datos
+          If NewHandles Or (entNueva.Handle = "") Then
+            sHandle = Me.NewHandle()
+            entNueva.Handle = sHandle
+          Else
+            sHandle = entNueva.Handle
+          End If
+          If flgIsPolyline Then
+            pBlockPolyline.entities.Add(entNueva, sHandle)
+          Else
+            obx.Add(entNueva, sHandle)
+          End If
+
+          If e[dxf.codEntity] = "POLYLINE" Then
+            flgIsPolyline = True
+            pBlockPolyline = New Block
+            pBlockPolyline.entities = New Entity[]
+            gcd.currentDrawing.arrPolyLines.Add(pBlockPolyline)
+            entNueva.pBlock = pBlockPolyline
+          End If
+          If e[dxf.codEntity] = "SEQEND" And flgIsPolyline = True Then
+            flgIsPolyline = False
+            pBlockPolyline = Null
+          End If
+          entNueva = Null                                           ' limpiamos
+
+        Endif
       End If
     End If
   Next

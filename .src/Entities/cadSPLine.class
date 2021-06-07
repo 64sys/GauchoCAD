@@ -525,7 +525,7 @@ Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
   Endif
   ' Los Knots estan en el indice me.TotalParams en adelante
   If c.Exist("knots") Then
-    e.fParam.Add(c["knots"].Copy())
+    e.fParam.insert(c["knots"].Copy())
     e.fParam[Me.ipaTotalKnots] = c["knots"].Count
   Else
 
@@ -816,7 +816,7 @@ Public Function interpolate2(t As Float, degree As Integer, points As Float[], O
   Dim high As Float = knots[domain[1]]
   t = t * (high - low) + low
 
-  If (t < low) Or (t > high) Then Stop ' Error( 'out of bounds')
+  If (t < low) Or (t > high) Then Debug "Stop Error(out of bounds)"
 
   ' find s(the spline segment) For the[t]value provided
   For s = domain[0] To domain[1] - 1
@@ -824,8 +824,9 @@ Public Function interpolate2(t As Float, degree As Integer, points As Float[], O
       Break
     Endif
   Next
+  If s > domain[1] - 1 Then s = domain[1] - 1
 
-  Debug "S=", s
+  'Debug "S=", s
 
   ' convert points To homogeneous coordinates (gana una dimension mas)
   Dim v As New Float[][]   ' v=[x1,y1,w1,x2,y2,w2.....] w=weigth
@@ -843,7 +844,11 @@ Public Function interpolate2(t As Float, degree As Integer, points As Float[], O
   For l = 1 To degree + 1
     ' build level l Of the pyramid
     For i = s To s - degree + l Step -1
-      alpha = (t - knots[i]) / (knots[i + degree + 1 - l] - knots[i])
+      If (knots[i + degree + 1 - l] - knots[i]) <> 0 Then
+        alpha = (t - knots[i]) / (knots[i + degree + 1 - l] - knots[i])
+      Else
+        alpha = 1 'or 0
+      End If
       ' interpolo cada dimension
       For j = 0 To d
         v[i][j] = (1 - alpha) * v[(i - 1)][j] + alpha * v[i][j]
