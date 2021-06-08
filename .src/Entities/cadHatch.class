@@ -65,9 +65,10 @@ Public Sub Draw(oE As Entity)
 
   oE.ColorToPaint = gcd.GetGBColor(oE.colour, oE.pLayer)
 
-  If oe.StringData[1] <> "Solid" Then
-
+  If LCase(oe.StringData[Me.sdaPattern]) <> "solid" Then
+    cadHatchBuilder.FillEntityWithHatch2(oe)
     GLplus.Lines(oE.PolyLine, oE.ColorToPaint, oE.LineWidth, oE.LineType.index)
+
   Else
 
     ' para solidos, tengo que hacer una llamada para cada loop de borde
@@ -79,7 +80,8 @@ Public Sub Draw(oE As Entity)
       ' fBorder.Insert(oLoop.e.PolyLine.Copy(iStart, oe.iParam[iLoop]))
       ' iStart += fBorder.Count
 
-      glPlus.TRIANGLES(puntos.PolygonTriangulation(oLoop.Polyline), oE.ColorToPaint, oE.ColorToPaint)
+      oLoop.Polyline = cadHatchBuilder.MakeBorder2(oLoop)
+      glPlus.TRIANGLES(puntos.PolygonTriangulation3(oLoop.Polyline), oE.ColorToPaint, oE.ColorToPaint)
 
     Next
 
@@ -168,23 +170,6 @@ Public Sub Finish(oE As Entity) As Boolean
   ' busco el tipo de linea, si hace falta
 
   ' tareas finales de armado del objeto
-  Dim oLoop As Boundary
-
-  If LCase(oe.StringData[Me.sdaPattern]) <> "solid" Then
-    cadHatchBuilder.FillEntityWithHatch2(oe)
-  Else
-    ' esto es un poco mas complejo
-    ' tengo q ver cuantos puntos tiene cada loop
-    For Each oLoop In oe.pBlock.oBoundaryPath '= 0 To oe.fParam[cadHatch.ipaTotalLoops] - 1
-      oLoop.Polyline = cadHatchBuilder.MakeBorder2(oLoop)
-      ' en P ahora estan los puntos que definen el borde
-      'oe.iParam.Add(oe.P.Count)
-      'oe.PolyLine.insert(oe.P.Copy())
-      'oe.P.Clear
-
-    Next
-
-  End If
 
   oE.psel.resize(oE.p.count / 2)
 
@@ -235,6 +220,7 @@ Public Function ImportDXF(e As Entity, sClaves As String[], sValues As String[])
   Dim edge As Integer
   Dim oNewPAth As Boundary
   Dim jscPath, vSeg As JSONCollection
+  Dim RefObjHandle As String
 
   'If e.Handle = "60FA9" Then Stop
 
@@ -265,6 +251,7 @@ Public Function ImportDXF(e As Entity, sClaves As String[], sValues As String[])
         e.pBlock.oBoundaryPath.Add(oNewPAth)
 
         oNewPAth.eSegments = New Entity[]
+        oNewPAth.sHandles = New String[]
         Dec LoopToRead
         ' estas claves definen el borde
 
@@ -351,17 +338,17 @@ Public Function ImportDXF(e As Entity, sClaves As String[], sValues As String[])
             End Select
           Next
 
-          ' cuando termino de leer los datos del Edge, puede venir Boundary Object
-
+          ' cuando termino de leer los datos del Edge, puede venir REference Boundary Object
+          ' estas son las entidades de donde se obtuvo el contorno, puede ignrarse
           Inc i
           If sClaves[i] = "97" Then
             For iBoundaryObject = 1 To CInt(sValues[i])
               Inc i
-              eContour = New Entity
+
               ' a esta entidad que es un borde le etiquetamos el loop al que pertenece
-              eContour.Group = iLoop
-              i = dxf.ReadCode(330, sClaves, sValues, ByRef eContour.Handle, i)
-              oNewPAth.eSegments.Add(eContour)
+
+              i = dxf.ReadCode(330, sClaves, sValues, ByRef RefObjHandle, i)
+              oNewPAth.sHandles.Add(RefObjHandle)
             Next
           End If
 
@@ -372,7 +359,7 @@ Public Function ImportDXF(e As Entity, sClaves As String[], sValues As String[])
           eContour = cadLWPolyline.NewEntity()
           ' a esta entidad que es un borde le etiquetamos el loop al que pertenece
           eContour.Group = iLoop
-
+          ' Debug "PolyLine loop en un hatch"
           oNewPAth.eSegments.Add(eContour)
 
           Inc i
@@ -415,6 +402,12 @@ Public Function ImportDXF(e As Entity, sClaves As String[], sValues As String[])
               Inc i ' ignoro el bulge
             Endif
           Next
+
+          ' If eContour.iParam[cadLWPolyline.iiiPolylineClosed] = 1 Then
+          '   eContour.P.Add(eContour.P[0])
+          '   eContour.P.Add(eContour.P[1])
+          '
+          ' Endif
 
         Endif
         ' despues del loop hay un 97

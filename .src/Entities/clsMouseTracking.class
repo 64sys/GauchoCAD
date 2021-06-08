@@ -147,7 +147,7 @@ Public Sub ReBuildPOI()
 End
 
 '' Veo si estoy sobre una entidad y la devuelvo
-Public Function CheckAboveEntity(xr As Float, Yr As Float, tolerance As Float) As Integer
+Public Function CheckAboveEntity(xr As Float, Yr As Float, tolerance As Float) As Entity
 
   Dim rData As New Float[], angle, angle2 As Float
   Dim e, i, iVisible, breathe, iPoligon, iLine, iPoint As Integer
@@ -158,14 +158,16 @@ Public Function CheckAboveEntity(xr As Float, Yr As Float, tolerance As Float) A
   Dim T As Float = Timer
 
   gcd.flgSearchingEntity = True
+  Dec iVisible
+  Found = True
   For Each eVisible In gcd.CurrentDrawing.oVisibleEntities
     Inc iVisible
-    If iVisible > gcd.CurrentDrawing.VisibleEntitiesMax Then                 ' limito la busqueda a 1000 entidades
-      'If (iVisible = 1000) Or (iVisible > gcd.CurrDrawing.VisibleEntitiesMax) Then                 ' limito la busqueda a 1000 entidades
-      iVisible = gcd.CurrentDrawing.oVisibleEntities.Count
-      'Debug "Alcanzado el limite de MouseTracking", Format(Now, "ss")
-      Break
-    End If
+    'If iVisible > gcd.CurrentDrawing.VisibleEntitiesMax Then                 ' limito la busqueda a 1000 entidades
+    'If (iVisible = 1000) Or (iVisible > gcd.CurrDrawing.VisibleEntitiesMax) Then                 ' limito la busqueda a 1000 entidades
+    'iVisible = gcd.CurrentDrawing.oVisibleEntities.Count
+    'Debug "Alcanzado el limite de MouseTracking", Format(Now, "ss")
+    '  Break
+    'End If
 
     ' TODO: fix this
     ' If e = clsDefaultJob.iEntityForEdit Then Continue
@@ -174,7 +176,7 @@ Public Function CheckAboveEntity(xr As Float, Yr As Float, tolerance As Float) A
 
       Case "Line"
 
-        If puntos.doIntersect(xr - tolerance, yr, xr + tolerance, yr, eVisible.P[0], eVisible.P[1], eVisible.P[2], eVisible.P[3]) Or puntos.doIntersect(xr, yr - tolerance, xr, yr + tolerance, eVisible.P[0], eVisible.P[1], eVisible.P[2], eVisible.P[3]) Then Break
+        If puntos.doIntersect(xr - tolerance, yr, xr + tolerance, yr, eVisible.P[0], eVisible.P[1], eVisible.P[2], eVisible.P[3]) Or puntos.doIntersect(xr, yr - tolerance, xr, yr + tolerance, eVisible.P[0], eVisible.P[1], eVisible.P[2], eVisible.P[3]) Then Goto ExitSearch
 
       Case "LWPolyline"
 
@@ -190,12 +192,12 @@ Public Function CheckAboveEntity(xr As Float, Yr As Float, tolerance As Float) A
 
       Case "Circle"
 
-        If Abs(puntos.distancia(xr, yr, eVisible.P[0], eVisible.P[1]) - eVisible.fParam[0]) < tolerance Then Break
-        If puntos.Around(xr, yr, eVisible.P[0], eVisible.P[1], tolerance) Then Break
+        If Abs(puntos.distancia(xr, yr, eVisible.P[0], eVisible.P[1]) - eVisible.fParam[0]) < tolerance Then Goto ExitSearch
+        If puntos.Around(xr, yr, eVisible.P[0], eVisible.P[1], tolerance) Then Goto ExitSearch
 
       Case "Arc"
 
-        If puntos.Around(xr, yr, eVisible.P[0], eVisible.P[1], tolerance) Then Break
+        If puntos.Around(xr, yr, eVisible.P[0], eVisible.P[1], tolerance) Then Goto ExitSearch
 
         If Abs(puntos.distancia(xr, yr, eVisible.P[0], eVisible.P[1]) - eVisible.fParam[0]) < tolerance Then
 
@@ -203,9 +205,9 @@ Public Function CheckAboveEntity(xr As Float, Yr As Float, tolerance As Float) A
           angle = Ang(xr - eVisible.P[0], yr - eVisible.P[1]) * 180 / Pi
           If angle < 0 Then angle += 360
           If eVisible.fParam[1] <= eVisible.fParam[2] Then
-            If angle >= eVisible.fParam[1] And angle <= eVisible.fParam[2] Then Break
+            If angle >= eVisible.fParam[1] And angle <= eVisible.fParam[2] Then Goto ExitSearch
           Else
-            If angle >= eVisible.fParam[1] Or angle <= eVisible.fParam[2] Then Break
+            If angle >= eVisible.fParam[1] Or angle <= eVisible.fParam[2] Then Goto ExitSearch
           End If
 
         End If
@@ -249,9 +251,9 @@ Public Function CheckAboveEntity(xr As Float, Yr As Float, tolerance As Float) A
           angle = Angle * 180 / Pi
           If angle < 0 Then angle += 360
           If eVisible.fParam[1] <= eVisible.fParam[2] Then
-            If angle >= eVisible.fParam[1] And angle <= eVisible.fParam[2] Then Break
+            If angle >= eVisible.fParam[1] And angle <= eVisible.fParam[2] Then Goto ExitSearch
           Else
-            If angle >= eVisible.fParam[1] Or angle <= eVisible.fParam[2] Then Break
+            If angle >= eVisible.fParam[1] Or angle <= eVisible.fParam[2] Then Goto ExitSearch
           End If
           'Break
 
@@ -259,24 +261,21 @@ Public Function CheckAboveEntity(xr As Float, Yr As Float, tolerance As Float) A
 
         ' ademas verifico si esta sobre el centro
 
-        If puntos.Around(xr, yr, eVisible.P[0], eVisible.P[1], tolerance) Then Break
+        If puntos.Around(xr, yr, eVisible.P[0], eVisible.P[1], tolerance) Then Goto ExitSearch
 
       Case "Solid", "Text", "Insert"
 
         ' Text, MText, Solid y otros
-        If puntos.isInside(eVisible.Polygon, xr, yr) Then Break
+        If puntos.isInside(eVisible.Polygon, xr, yr) Then Goto ExitSearch
 
       Case "MText"
 
         ' Text, MText, Solid y otros
-        If puntos.isInside(eVisible.Polygon, xr, yr) Then
-
-          Break
-        End If
+        If puntos.isInside(eVisible.Polygon, xr, yr) Then Goto ExitSearch
 
       Case "Hatch"
 
-        If puntos.isInside(eVisible.P, xr, yr) Then Break
+        If puntos.isInside(eVisible.Polygon, xr, yr) Then Goto ExitSearch
 
     End Select
 
@@ -284,18 +283,20 @@ Public Function CheckAboveEntity(xr As Float, Yr As Float, tolerance As Float) A
 
   Next
 
+  Found = False
+
 ExitSearch:
 
   gcd.flgSearchingEntity = False
-  ' Debug "Above entity en ", Timer - t
-  If iVisible = gcd.CurrentDrawing.oVisibleEntities.Count Then
+  ' ' Debug "Above entity en ", Timer - t
+  ' If iVisible = gcd.CurrentDrawing.oVisibleEntities.Count Then
+  '
+  '   Return Null
+  ' Else
+  '   ' Debug "Encontre una entidad " & gcd.CurrDrawing.arrEntities[e].Gender, "en", Timer - t
+  If Found Then Return eVisible Else Return Null
 
-    Return -1
-  Else
-    ' Debug "Encontre una entidad " & gcd.CurrDrawing.arrEntities[e].Gender, "en", Timer - t
-    Return eVisible
-
-  End If
+  ' End If
 
 End
 
@@ -303,7 +304,7 @@ End
 '' and its called form there
 Public Sub CheckPOI(xr As Float, Yr As Float) As Float[]
 
-  Dim rData As New Float[], e As Entity
+  Dim rData As New Float[], e, e2 As Entity
   Dim indexEntity, i, i2, iPoligon, iLine, iPoint As Integer
   Dim pend1, base1, pend2, base2 As Float ' vars para las ecuacionesde las rectas
   Dim puntoB, puntoA, pInter As New Float[]
@@ -352,14 +353,14 @@ Public Sub CheckPOI(xr As Float, Yr As Float) As Float[]
   ' Return rdata
   'Debug "total poi check time ", Timer - t, gcd.CurrDrawing.poiPoligons.Count + gcd.CurrDrawing.poiLines.Count + gcd.CurrDrawing.poiPoints.Count, " points parsed"
 
-  indexEntity = CheckAboveEntity(xr, yr, tolerance)
+  e = CheckAboveEntity(xr, yr, tolerance)
 
   ' If iLine > 0 Then e = gcd.CurrDrawing.arrEntities[gcd.CurrDrawing.poiLinesEntities[iLine]]
   ' If iPoligon > 0 Then e = gcd.CurrDrawing.arrEntities[iPoligon]
   rdata.Insert([0, 0, -1, -1])
 
-  If indexEntity >= 0 Then                                               ' ofrezco opciones de enganche
-    e = gcd.CurrentDrawing.oEntities[indexEntity]
+  If e Then                                               ' ofrezco opciones de enganche
+    ' e = gcd.CurrentDrawing.oEntities[indexEntity]
     'Debug "Encontrada entidad ", e.Gender, " en ", Timer - t
 
     Select Case e.Gender
@@ -413,12 +414,12 @@ Public Sub CheckPOI(xr As Float, Yr As Float) As Float[]
         End If
 
         ' busco tambien intersecciones
-        For i2 = 0 To gcd.CurrentDrawing.oEntities
-          Select Case gcd.CurrentDrawing.oEntities[i2].Gender
+        For Each e2 In gcd.CurrentDrawing.oEntities
+          Select Case e2.Gender
 
             Case "Line"
-              If puntos.doIntersect(e.P[0], e.P[1], e.P[2], e.P[3], gcd.CurrentDrawing.oEntities[i2].P[0], gcd.CurrentDrawing.oEntities[i2].P[1], gcd.CurrentDrawing.oEntities[i2].P[2], gcd.CurrentDrawing.oEntities[i2].P[3]) Then
-                pInter = puntos.lineLineIntersection([e.P[0], e.P[1]], [e.P[2], e.P[3]], [gcd.CurrentDrawing.oEntities[i2].P[0], gcd.CurrentDrawing.oEntities[i2].P[1]], [gcd.CurrentDrawing.oEntities[i2].P[2], gcd.CurrentDrawing.oEntities[i2].P[3]])
+              If puntos.doIntersect(e.P[0], e.P[1], e.P[2], e.P[3], e2.P[0], e2.P[1], e2.P[2], e2.P[3]) Then
+                pInter = puntos.lineLineIntersection([e.P[0], e.P[1]], [e.P[2], e.P[3]], [e2.P[0], e2.P[1]], [e2.P[2], e2.P[3]])
                 If pInter.Count > 0 Then ' puede no haber intersaeccion
                   DistInter = puntos.distancia(xr, yr, pInter[0], pInter[1])
                 Else

@@ -72,7 +72,15 @@ Public Function ImportDXF(e As Entity, sClaves As String[], sValues As String[])
 
   e.fParam[cadDimension.ipaExtension] = -puntos.distancia(Me.pointDefPoint0.x, Me.pointDefPoint0.y, Me.pointDefPoint2.x, Me.pointDefPoint2.y)
 
-  e.pBlock = Me.ReBuildBlock(e)
+  ' TODO: cuando este terminada la entidad, sacar eso
+  ' tengo q presuponer que las escalas son = 1
+  e.fParam[Me.ipaEscX] = 1    ' esc X
+  e.fParam[Me.ipaEscY] = 1    ' esc Y
+  e.fParam[Me.ipaEscZ] = 1    ' esc Z
+  e.pBlock.AbsoluteCoords = True
+
+  ' y poner esto
+  ' e.pBlock = Me.ReBuildBlock(e)
 
   Return True
 

@@ -276,7 +276,7 @@ Public Sub JSONtoEntity(cJsonEntities As Collection, obcEntity As Collection)
         If Not IsNull(entNueva) Then         ' si esta implementada, llenamos los datos
 
           If flgIsPolyline Then
-            pBlockPolyline.entities.Add(entNueva)
+            pBlockPolyline.entities.Add(entNueva, entNueva.Handle)
           Else
             obcEntity.Add(entNueva, entNueva.Handle)
           End If
@@ -284,8 +284,8 @@ Public Sub JSONtoEntity(cJsonEntities As Collection, obcEntity As Collection)
           If (e["entity"] = "POLYLINE") Or (e["entity"] = "POLYLINE_2D") Then
             flgIsPolyline = True
             pBlockPolyline = New Block
-            pBlockPolyline.entities = New Entity[]
-            gcd.currentDrawing.arrPolyLines.Add(pBlockPolyline)
+            pBlockPolyline.entities = New Collection
+            gcd.currentDrawing.oPolyLines.Add(pBlockPolyline, entNueva.Handle)
             entNueva.pBlock = pBlockPolyline
           End If
           If e["entity"] = "SEQEND" And flgIsPolyline = True Then

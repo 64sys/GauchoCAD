@@ -865,7 +865,7 @@ Public Sub GLArea1_MouseMove()
         If gcd.clsJob.iEntityForEdit < 0 Then
           If Not gcd.flgSearchingEntity Then
             gcd.CurrentDrawing.iEntity[2] = -1
-            gcd.CurrentDrawing.iEntity[3] = clsMouseTracking.CheckAboveEntity(gcd.Xreal(mouse.x), gcd.Yreal(mouse.Y), gcd.metros(8))
+            'gcd.h = clsMouseTracking.CheckAboveEntity(gcd.Xreal(mouse.x), gcd.Yreal(mouse.Y), gcd.metros(8))
             If gcd.CurrentDrawing.iEntity[3] <> gcd.CurrentDrawing.iLastEntity Then
               gcd.CurrentDrawing.iLastEntity = gcd.CurrentDrawing.iEntity[3]
 
@@ -2419,7 +2419,7 @@ Public Sub TableView1_Save(Row As Integer, Column As Integer, Value As String)
 
 End
 
-Public Sub Form_KeyPress()
+Public Sub Form_KeyRelease()
 
   Dim com As Variant
   Dim umx As Integer     '' Index in undo array
@@ -2432,7 +2432,6 @@ Public Sub Form_KeyPress()
   Dim flxLimits As New Float[]
   Dim scaleX, scale, scaleY As Float
   Dim jPrint As New JSONCollection
-
 
   Print Key.Code
   Dim t As Float = Timer
