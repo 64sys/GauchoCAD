@@ -533,13 +533,10 @@ Public Sub DrawPoint(x As Float, y As Float, Optional colour As Integer = -1, Op
 
 End
 
-
-
 Public Sub SelectElem(eEntity As Entity, Optional AndItsPoints As Boolean = True)
 
   Dim i, ii As Integer
 
- 
   eEntity.selected = True
   If AndItsPoints Then
     For i = 0 To eEntity.Psel.Max
@@ -559,7 +556,6 @@ Public Sub DeSelectElem(eEntity As Entity, Optional AndItsPoints As Boolean = Tr
 
   Dim i, ii As Integer
 
- 
   eEntity.selected = False
   If AndItsPoints Then
     For i = 0 To eEntity.Psel.Max
@@ -765,7 +761,6 @@ Public Function GetSelectionHandles(sHandles As String[]) As Integer
   Return itotal
 
 End
-
 
 'Return bound limits for all verices in the array of entities
 Public Sub BuildPoi(Optional entities As Collection, OnlyVisibles As Boolean = True)

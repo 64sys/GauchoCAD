@@ -97,6 +97,7 @@ Public Function PolygonTriangulation3(fPolygon As Float[]) As Float[]
   ' La idea es tomar un tramo, comparar ambos puntos a la derecha e izquierda y
   ' chequear si el triangulo formado esta dentro del poligono, en ese caso elimino el punto
   ' pivot
+  If fPoly.Count <= 6 Then Return fPoly
 
   ' verifico que no haya puntos coincidentes
   For i = 0 To fPoly.Count / 2 - 2
@@ -118,7 +119,6 @@ Public Function PolygonTriangulation3(fPolygon As Float[]) As Float[]
 
     Endif
   Endif
-
   If fPoly.Count <= 6 Then Return fPoly
 
   wasted.Clear

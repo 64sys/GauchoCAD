@@ -74,32 +74,6 @@ Public Sub Draw(oE As Entity)
 
   oE.ColorToPaint = gcd.GetGBColor(oE.colour, oE.pLayer)
 
-  If Not oe.Finished Then
-    If Me.StepsDone < 1 Then
-
-      oE.P[2] = oE.P[0]
-      oE.P[3] = oE.P[1]
-
-      glPlus.Lines(oE.p, oE.ColorToPaint, oE.LineWidth)
-
-    End If
-
-    If Me.StepsDone < 2 Then
-
-      oE.P[4] = oE.P[2]
-      oE.P[5] = oE.P[3]
-
-    End If
-
-    If Me.StepsDone < 3 Then
-
-      oE.P[6] = oE.P[4]
-      oE.P[7] = oE.P[5]
-
-    Endif
-
-  End If
-
   If oe.P.Count < 2 Then Return
   'GLplus.PolygonFilled(oE.p, oE.ColorToPaint, oE.ColorToPaint, oE.LineWidth, oE.LineType.index)
   GLplus.Triangles(puntos.PolygonTriangulation(oE.p), oE.ColorToPaint, oE.LineWidth, oE.LineType.index)
