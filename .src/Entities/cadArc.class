@@ -54,7 +54,6 @@ Public Function NewParameter(eBuild As Entity, vParam As Variant[], Optional Def
 
     If vParam[0] <> "float" Then Return False
 
-    eBuild.DrawAble = True
     eBuild.fParam[0] = vParam[1]
     eBuild.fParam[1] = 0
     eBuild.fParam[2] = 360
@@ -64,7 +63,6 @@ Public Function NewParameter(eBuild As Entity, vParam As Variant[], Optional Def
   Else If Me.StepsDone = 2 Then ' recibimos el angulo inicial
 
     If vParam[0] <> "float" Then Return False
-    eBuild.DrawAble = True
 
     eBuild.fParam[1] = vParam[1]
 
@@ -217,7 +215,6 @@ Public Sub Draw(oE As Entity)
   Dim LargoPixels, LargoReal, EscalaTramos As Float
 
   If Not oE.Visible Then Return
-  If Not oE.DrawAble Then Return
 
   If oE.fParam[2] = oE.fParam[1] Then Return
 
@@ -307,23 +304,6 @@ Public Function BuildPOI(oE As Entity) As Integer
   ' ' quadrant
   ' oe.poiPoints.insert([oE.p[0], oE.p[1] - oe.fParam[0]])
   ' oe.poiType.Add(gcd.poiQuadrant)
-
-End
-
-' This function will return False if the element couldn't be created for some reason: bad or incomple user input
-' True means all is good, False will instruct the clsEntityBuilder to delete it
-Public Sub Finish(oE As Entity) As Boolean
-
-  ' calculo el recorrido del arco como
-
-  ' tareas finales de armado del objeto
-
-  oE.psel.resize(oE.p.count / 2)
-  Me.makepolyline(oe)
-
-  oE.DrawAble = True
-  oE.Selected = False
-  oE.Finished = True
 
 End
 

@@ -90,7 +90,6 @@ Public Function NewParameter(eBuild As Entity, vParam As Variant[], Optional Def
   Else If Me.StepsDone = 3 Then    ' texto
 
     If vParam[0] <> "text" Then Return False
-    eBuild.DrawAble = True
 
     eBuild.StringData[0] = vParam[1]
 

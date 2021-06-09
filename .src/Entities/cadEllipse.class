@@ -57,7 +57,6 @@ Public Function NewParameter(eBuild As Entity, vParam As Variant[], Optional Def
 
     If vParam[0] <> "point" Then Return False
 
-    eBuild.DrawAble = True
     Try eBuild.P[2] = vParam[1]
     Try eBuild.P[3] = vParam[2]
     eBuild.fParam[0] = 0.5
@@ -286,9 +285,7 @@ Public Sub Finish(oE As Entity) As Boolean
   oE.psel.resize(oE.p.count / 2)
   Me.makepolyline(oe)
 
-  oE.DrawAble = True
   oE.Selected = False
-  oE.Finished = True
 
   If oE.fParam[2] < oE.fParam[1] Then oE.fParam[2] += 360
 

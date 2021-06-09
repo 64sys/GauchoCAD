@@ -101,7 +101,6 @@ Public Function NewParameter(eBuild As Entity, vParam As Variant[], Optional Def
 
     If vParam[0] <> "text" Then Return False
 
-    eBuild.DrawAble = True
     eBuild.stringdata[Me.sdaText] = vParam[1]
 
     If definitive Then Return True

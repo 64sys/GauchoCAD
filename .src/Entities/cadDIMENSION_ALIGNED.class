@@ -116,8 +116,7 @@ Public Function NewParameter(eBuild As Entity, vParam As Variant[], Optional Def
     eBuild.P[3] = eBuild.P[1]
     If definitive Then Return True
   Else If Me.StepsDone = 1 Then
-    eBuild.DrawAble = True
-    eBuild.Finished = True
+
     Try eBuild.P[2] = vParam[1]
     Try eBuild.P[3] = vParam[2]
     eBuild.pBlock = ReBuildBlock(eBuild)

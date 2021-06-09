@@ -51,7 +51,7 @@ End
 Public Sub Draw(oE As Entity)
 
   If Not oE.Visible Then Return
-  If Not oE.DrawAble Then Return
+
   oE.ColorToPaint = gcd.GetGBColor(oE.colour, oE.pLayer)
 
   MakeRay(oe.p)

@@ -32,7 +32,7 @@ Public Const HelperTrabajo As String = ("a polyline of segments")
 Public Function NewParameter(eBuild As Entity, vParam As Variant[], Optional Definitive As Boolean = False) As Boolean
 
   If Me.StepsDone = 0 Then
-    eBuild.DrawAble = True
+
     Try eBuild.P[0] = vParam[1]
     Try eBuild.P[1] = vParam[2]
 
@@ -47,7 +47,7 @@ Public Sub Draw(oE As Entity)
   Dim ePart As Entity
 
   If Not oE.Visible Then Return
-  If Not oE.DrawAble Then Return
+
   oE.ColorToPaint = gcd.GetGBColor(oE.colour, oE.pLayer)
   ' construyo una poliliea
   oe.PolyLine.Clear

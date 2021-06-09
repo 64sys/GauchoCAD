@@ -70,7 +70,6 @@ Public Function NewParameter(eBuild As Entity, vParam As Variant[], Optional Def
   eBuild.fParam[Me.ipaFitTolerance] = 0.0000000001
 
   If vParam[0] = "point" Then
-    eBuild.DrawAble = True
 
     eBuild.P[eBuild.P.Max - 1] = vParam[1]
     eBuild.P[eBuild.P.Max] = vParam[2]

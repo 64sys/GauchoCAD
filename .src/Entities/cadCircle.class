@@ -52,7 +52,6 @@ Public Function NewParameter(eBuild As Entity, vParam As Variant[], Optional Def
 
     If vParam[0] <> "float" Then Return False
 
-    eBuild.DrawAble = True
     eBuild.fParam[0] = vParam[1]
 
     If definitive Then Return True
@@ -192,9 +191,7 @@ Public Sub Finish(oE As Entity) As Boolean
 
   oE.psel.resize(oE.p.count / 2)
 
-  oE.DrawAble = True
   oE.Selected = False
-  oE.Finished = True
 
 End
 

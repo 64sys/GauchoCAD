@@ -68,8 +68,6 @@ Public Sub Draw(oE As Entity)
   Dim ET As Entity, i As Integer
   Dim pBlockToDraw As Block
 
-  If Not oe.Finished Then Return
-
   ' gl.PushMatrix
   ' If Relative Then gl.Translatef(fMain.pixels(oE.p[0]) / gcd.CurrDrawing.ScaleZoom, fMain.pixels(oE.p[1]) / gcd.CurrDrawing.ScaleZoom, 0)
   ' gl.Rotatef(oE.fParam[Me.ipaRotacion], 0, 0, 1)

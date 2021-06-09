@@ -173,9 +173,7 @@ Public Sub Finish(oE As Entity) As Boolean
 
   oE.psel.resize(oE.p.count / 2)
 
-  oE.DrawAble = True
   oE.Selected = False
-  oE.Finished = True
 
 End
 

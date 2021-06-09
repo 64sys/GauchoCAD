@@ -41,7 +41,6 @@ Public Const iiiBulged As Integer = 1
 Public Function NewParameter(eBuild As Entity, vParam As Variant[], Optional Definitive As Boolean = False) As Boolean
 
   If vParam[0] = "point" Then
-    eBuild.DrawAble = True
 
     eBuild.P[eBuild.P.Max - 1] = vParam[1]
     eBuild.P[eBuild.P.Max] = vParam[2]
@@ -171,7 +170,6 @@ Public Sub DrawRemark(oE As Entity)
 
 End
 
-
 Public Function Draw2(oE As Entity)
 
   Dim i As Integer
@@ -241,9 +239,7 @@ Public Sub Finish(oE As Entity) As Boolean
 
   oE.psel.resize(oE.p.count / 2)
 
-  oE.DrawAble = True
   oE.Selected = False
-  oE.Finished = True
 
 End
 

@@ -36,7 +36,6 @@ Public Function NewParameter(eBuild As Entity, vParam As Variant[], Optional Def
   If eBuild.fParam.Count = 0 Then eBuild.fParam.Add(0)
 
   If vParam[0] = "point" Then
-    eBuild.DrawAble = True
 
     eBuild.P[eBuild.P.Max - 1] = vParam[1]
     eBuild.P[eBuild.P.Max] = vParam[2]
@@ -199,8 +198,6 @@ Public Sub Finish(oE As Entity) As Boolean
 
   oE.psel.resize(oE.p.count / 2)
 
-  oE.DrawAble = True
   oE.Selected = False
-  oE.Finished = True
 
 End

@@ -189,9 +189,9 @@ Public Sub Finish(oE As Entity) As Boolean
 
   oE.psel.resize(oE.p.count / 2)
 
-  oE.DrawAble = True
+  Try oe.MakePolyLine(oe)
+
   oE.Selected = False
-  oE.Finished = True
 
 End
 
