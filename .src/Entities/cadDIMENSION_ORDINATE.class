@@ -60,7 +60,15 @@ Public Function ImportDXF(e As Entity, sClaves As String[], sValues As String[])
   ' y dejar esto
   If e.fParam[Me.ipaStyleTextHeigth] > 0 Then Me.DimTextHeight = e.fParam[Me.ipaStyleTextHeigth]
   Debug "cadDimension.DimTextHeight", cadDimension.DimTextHeight
-  e.pBlock = ReBuildBlock(e)
+  ' TODO: cuando este terminada la entidad, sacar eso
+  ' tengo q presuponer que las escalas son = 1
+  e.fParam[Me.ipaEscX] = 1    ' esc X
+  e.fParam[Me.ipaEscY] = 1    ' esc Y
+  e.fParam[Me.ipaEscZ] = 1    ' esc Z
+  e.pBlock.AbsoluteCoords = True
+
+  ' y poner esto
+  ' e.pBlock = Me.ReBuildBlock(e)
 
   Return True
 

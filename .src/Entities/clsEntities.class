@@ -467,15 +467,15 @@ End Function
 
 Public Function DeleteSelected() As Integer
 
-  Dim i As Integer, c As Integer
+  Dim E As Entity, c As Integer
   Dim lay As Layer
 
   '  Purgue will also delete those with .ForDeletion = true
 
-  For i = gcd.CurrentDrawing.oEntities To 0 Step -1
+  For Each E In gcd.CurrentDrawing.oEntities
 
-    If gcd.CurrentDrawing.oEntities[i].Selected Then
-      gcd.CurrentDrawing.oEntities.Remove(i)
+    If E.Selected Then
+      gcd.CurrentDrawing.oEntities.Remove(gcd.CurrentDrawing.oEntities.Key)
       Inc c
     End If
 

@@ -199,7 +199,7 @@ Public Sub CreatePolygon(oE As Entity)
   ' tRect = glPlus.MTextExtends(oE.stringdata[Me.sdaText], oE.p[0], oE.p[1], oE.fParam[Me.ipaTextHeight])
 
   ' armo el poligono , que ya tiene la escala
-
+  If Abs(Me.MyPolygon[0]) > 1e9 Then Return
   oE.Polygon.Insert([Me.MyPolygon[0], Me.MyPolygon[1]])
   oE.Polygon.Insert([Me.MyPolygon[0], Me.MyPolygon[3]])
   oE.Polygon.Insert([Me.MyPolygon[2], Me.MyPolygon[3]])
@@ -247,6 +247,11 @@ Public Sub Draw(oE As Entity)
 
   MyPolygon.Clear
   MyPolygon.insert([1e10, 1e10, -1e10, -1e10])
+
+  ' https://ezdxf.readthedocs.io/en/stable/tutorials/mtext.html
+  ' https://ezdxf.readthedocs.io/en/stable/dxfentities/mtext.html#mtext-inline-codes
+
+  ' MTEXT tiene in-line formatting, ver esa web
   ProcessText(oE.stringdata[Me.sdaText])
 
   CreatePolygon(oe)
@@ -276,6 +281,41 @@ Public Sub ProcessText(RTF As String)
   Else
     ProcessPart(rtf)
   Endif
+  ' Code   Description
+  ' \L   Start underline
+  ' \l   Stop underline
+  ' \O   Start overline
+  ' \o   Stop overline
+  ' \K   Start strike-through
+  ' \k   Stop strike-through
+  ' \P   New paragraph (new line)
+  ' \p   Paragraphs properties: indentation, alignment, tabulator stops
+  ' \X   Paragraph wrap on the dimension line (only in dimensions)
+  ' \Q   Slanting (oblique) text by angle - e.g. \Q30;
+  ' \H   Text height - e.g. relative \H3x; absolut \H3;
+  ' \W   Text width - e.g. relative \W0.8x; absolut \W0.8;
+  ' \T   Tracking, character spacing - e.g. relative \T0.5x; absolut \T2;
+  ' \F   Font selection e.g. \Fgdt;o - GDT-tolerance
+  ' \S   Stacking, fractions e.g. \SA^ B; space after “^” is required to avoid caret decoding, \SX/Y; \S1#4;
+  ' \A   Alignment
+  '
+  '     \A0; = bottom
+  '     \A1; = center
+  '     \A2; = top
+  '
+  ' \C   Color change
+  '
+  '     \C1; = red
+  '     \C2; = yellow
+  '     \C3; = green
+  '     \C4; = cyan
+  '     \C5; = blue
+  '     \C6; = magenta
+  '     \C7; = white
+  '
+  ' \~   Non breaking space
+  ' {}   Braces - define the text area influenced by the code, codes and braces can be nested up to 8 levels deep
+  ' \   Escape character - e.g. \{ = “{”
 
 End
 
@@ -322,7 +362,7 @@ Public Sub ProcessPart(s As String)
 
         If Len(s2) > 0 Then ProcessPart(s2)
 
-      Case "P"            ' esta indicado un cambio en la fuente
+      Case "P"            ' New line
         CurrentTextPosY -= glPlus.TextExtends("XXX", CurrentTextHeigth)[1] * 1.2
         s2 = Mid(s2, 2)
         If Len(s2) > 0 Then ProcessPart(s2)
@@ -361,6 +401,24 @@ Public Sub ProcessPart(s As String)
 
         End If
         If Len(s2) > 0 Then ProcessPart(s2)
+      Case "H"            ' no se que significa esto, suele venir \W12.55;
+
+        p2 = InStr(s2, ";", p1)
+        s3 = Mid(s2, 2, p2 - 2)
+        If InStr(s3, "x") > 0 Then
+          CurrentTextHeigth *= CFloat(Left(s3, -1))
+        Else
+          CurrentTextHeigth = CFloat(s3)
+        Endif
+        s2 = Mid(s2, p2 + 1)
+
+        If Len(s2) > 0 Then ProcessPart(s2)
+
+      Case Else            ' codigo no imprementado, lo paso de largo;
+        p2 = InStr(s2, ";", p1)
+        s2 = Mid(s2, p2 + 1)
+        If Len(s2) > 0 Then ProcessPart(s2)
+
     End Select
   Else     ' es un texto, pero puede terminar en un scape
     p2 = InStr(s2, "\\")
