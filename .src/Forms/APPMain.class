@@ -2432,9 +2432,9 @@ Public Sub Form_KeyRelease()
   Dim flxLimits As New Float[]
   Dim scaleX, scale, scaleY As Float
   Dim jPrint As New JSONCollection
+  Dim t As Float = Timer
 
   Print Key.Code
-  Dim t As Float = Timer
 
   Select Key.Code
 
