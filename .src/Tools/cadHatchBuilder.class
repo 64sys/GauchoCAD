@@ -140,9 +140,6 @@ Public Function Start(Optional filename As Variant, Optional _mode As Integer = 
 
 End
 
-
-
-
 Public Sub MakeBorder2(oPath As Boundary) As Float[]
 
   Dim eBorder, eFind As Entity
@@ -320,7 +317,6 @@ Public Sub FillEntityWithHatch2(entToFill As Entity)
   Next
 
 End
-
 
 Public Sub GetBoundLimits2(fxlPoints As Float[])
 

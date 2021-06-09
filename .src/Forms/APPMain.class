@@ -697,13 +697,13 @@ Public Sub GLArea1_draw()
   If gcd.DrawBounds Then DrawingAids.DrawPolygons
 
   ' entidad resaltada
-  If gcd.CurrentDrawing.iEntity[3] >= 0 And gcd.CurrentDrawing.iEntity[3] < gcd.CurrentDrawing.oEntities.Count Then
+  If gcd.CurrentDrawing.HoveredEntity Then
 
     ' si no esta seleccionada, la resalto
     'If Not arrEntities[iEntity[3]].Selected Then
     'iParent = clsEntities.GetParentBlock(gcd.CurrentDrawing.iEntity[3]) ' esto verifica si tiene que resaltar el bloque completo
-    iParent = gcd.CurrentDrawing.iEntity[3]
-    gcd.CurrentDrawing.oEntities[iParent].ClassHandler.DrawRemark(gcd.CurrentDrawing.oEntities[iParent])
+
+    gcd.CurrentDrawing.HoveredEntity.ClassHandler.DrawRemark(gcd.CurrentDrawing.HoveredEntity)
     'End If
 
   End If
@@ -865,9 +865,9 @@ Public Sub GLArea1_MouseMove()
         If gcd.clsJob.iEntityForEdit < 0 Then
           If Not gcd.flgSearchingEntity Then
             gcd.CurrentDrawing.iEntity[2] = -1
-            'gcd.h = clsMouseTracking.CheckAboveEntity(gcd.Xreal(mouse.x), gcd.Yreal(mouse.Y), gcd.metros(8))
-            If gcd.CurrentDrawing.iEntity[3] <> gcd.CurrentDrawing.iLastEntity Then
-              gcd.CurrentDrawing.iLastEntity = gcd.CurrentDrawing.iEntity[3]
+            gcd.CurrentDrawing.HoveredEntity = clsMouseTracking.CheckAboveEntity(gcd.Xreal(mouse.x), gcd.Yreal(mouse.Y), gcd.metros(8))
+            If gcd.CurrentDrawing.HoveredEntity <> gcd.CurrentDrawing.eLastEntity Then
+              gcd.CurrentDrawing.eLastEntity = gcd.CurrentDrawing.HoveredEntity
 
             End If
           End If
@@ -879,7 +879,6 @@ Public Sub GLArea1_MouseMove()
             gcd.CurrentDrawing.iEntity[0] = gcd.Xreal(mouse.x)
             gcd.CurrentDrawing.iEntity[1] = gcd.Yreal(mouse.y)
             gcd.CurrentDrawing.iEntity[2] = -1                 ' POI type
-            gcd.CurrentDrawing.iEntity[3] = -1                 ' Hooked entity
 
           End If
         End If
@@ -888,9 +887,9 @@ Public Sub GLArea1_MouseMove()
 
       If gcd.ShowInspector Then
 
-        If gcd.CurrentDrawing.iEntity[3] >= 0 Then
+        If gcd.CurrentDrawing.HoveredEntity Then
 
-          FInspector.Run(gcd.CurrentDrawing.oEntities[gcd.CurrentDrawing.iEntity[3]])
+          FInspector.Run(gcd.CurrentDrawing.HoveredEntity)
         Else
           FInspector.Close
 
@@ -908,7 +907,6 @@ Public Sub GLArea1_MouseMove()
           gcd.CurrentDrawing.iEntity[0] = gcd.Xreal(mouse.x)
           gcd.CurrentDrawing.iEntity[1] = gcd.Yreal(mouse.y)
           gcd.CurrentDrawing.iEntity[2] = -1                 ' POI type
-          gcd.CurrentDrawing.iEntity[3] = -1                 ' Hooked entity
 
         End If
 
@@ -916,7 +914,7 @@ Public Sub GLArea1_MouseMove()
 
       If gcd.clsJob.EntityChecking Then
         If Not gcd.flgSearchingEntity Then
-          gcd.CurrentDrawing.iEntity[3] = clsMouseTracking.CheckAboveEntity(gcd.Xreal(mouse.x), gcd.Yreal(mouse.Y), gcd.metros(8))
+          gcd.CurrentDrawing.HoveredEntity = clsMouseTracking.CheckAboveEntity(gcd.Xreal(mouse.x), gcd.Yreal(mouse.Y), gcd.metros(8))
         End If
       End If
 
