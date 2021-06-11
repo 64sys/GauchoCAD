@@ -193,6 +193,8 @@ Public Sub Main()
   'texturelist = glPlus.LoadTextures(Application.Path &/ "Textures")
   texturelist = glPlus.LoadTextures(Starter.sTextures)
 
+  Me.DrawingReady = True
+
 End
 
 Public Sub JSONtoBlocks(colData As Collection) ', obxEntities As Entity[]) As Integer

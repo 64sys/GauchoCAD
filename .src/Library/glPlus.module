@@ -989,6 +989,8 @@ Public Function GetCodeIndex(LaFont As FontSt, UTFcode As Integer) As Integer
 
   Dim i As Integer
 
+  If Not LaFont Then Return 0
+
   For i = 0 To LaFont.Letter.Max
     If LaFont.Letter[i].Code = UTFcode Then Return i
 
@@ -999,7 +1001,7 @@ End
 '' Grafica un texto en el contexto actual de acuerdo a los parametros pasados
 '' Debe estar definida la Font con nombre y altura
 ''
-Fast Unsafe Public Function DrawText(UTFstring As String, posX As Float, posY As Float, Optional angle As Float = 0, textH As Float = 1, colour As Integer = -14, linewidth As Float = 1, rectW As Float = 0, rectH As Float = 0, alignHoriz As Integer = 0, alignVert As Integer = 0) As Boolean
+Public Function DrawText(UTFstring As String, posX As Float, posY As Float, Optional angle As Float = 0, textH As Float = 1, colour As Integer = -14, linewidth As Float = 1, rectW As Float = 0, rectH As Float = 0, alignHoriz As Integer = 0, alignVert As Integer = 0) As Boolean
 
   Dim i, iii, UTFcode, LetterIndex As Integer, Xadvance As Float
 

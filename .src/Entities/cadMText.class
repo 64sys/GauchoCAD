@@ -59,6 +59,8 @@ Private CurrentTextCrossed As Boolean
 Private CurrentTextAngle As Float
 Private CurrentTextColor As Integer
 
+Private LastTextLengh As Integer
+
 ' to create the contour
 
 Public MyPolygon As New Float[]
@@ -321,155 +323,176 @@ End
 Public Sub ProcessPart(s As String)
   ' aca viene lo que esta ente {}, sin esos simbolos
 
-  Dim s2, sFont, s3, s4 As String
+  Dim s2, sFont, s3, s4, sTab As String
   Dim p1, p2, p3, p4 As Integer
   Dim fAlign, fAlignR, fRect As New Float[]
 
   s2 = s
-  If Left$(s2, 1) = "\\" Then
-    s2 = Mid(s2, 2)
-    Select Case Mid$(s2, 1, 1)
-      Case "f"            ' esta indicado un cambio en la fuente
-        '  \fVerdana|b0|i0|cxxx|p34;
-        p1 = InStr(s2, "|")
-        CurrentTextFont = Mid$(s2, 2, p1 - 2)
-        p1 = InStr(s2, "|b")
-        If p1 > 0 Then
-          CurrentTextBold = Mid$(s2, p1 + 2, 1) = "1"
-        End If
-        p1 = InStr(s2, "|i")
-        If p1 > 0 Then
+  'If Left$(s2, 1) = "\\" Then
+  's2 = Mid(s2, 2)
+  Select Case Mid$(s2, 1, 2)
 
-          CurrentTextItalic = Mid$(s2, p1 + 2, 1) = "1"
-        End If
-        p1 = InStr(s2, "|c")
-        If p1 > 0 Then
+    Case "\\f"            ' esta indicado un cambio en la fuente
+      '  \fVerdana|b0|i0|cxxx|p34;
+      p1 = InStr(s2, "|")
+      CurrentTextFont = Mid$(s2, 2, p1 - 2)
+      p1 = InStr(s2, "|b")
+      If p1 > 0 Then
+        CurrentTextBold = Mid$(s2, p1 + 2, 1) = "1"
+      End If
+      p1 = InStr(s2, "|i")
+      If p1 > 0 Then
 
-          p2 = InStr(s2, "|", p1 + 1)
-          Try CurrentTextColor = Mid$(s2, p1 + 2, p2 - p1 - 1) = "1"
-        End If
-        p1 = p2 + 1
+        CurrentTextItalic = Mid$(s2, p1 + 2, 1) = "1"
+      End If
+      p1 = InStr(s2, "|c")
+      If p1 > 0 Then
 
-        p1 = InStr(s2, "|p")
-        p2 = InStr(s2, ";", p1)
-        If p1 > 0 Then
+        p2 = InStr(s2, "|", p1 + 1)
+        Try CurrentTextColor = Mid$(s2, p1 + 2, p2 - p1 - 1) = "1"
+      End If
+      p1 = p2 + 1
 
-          CurrentTextHeigth = CFloat(Mid$(s2, p1 + 2, p2 - p1 - 2)) / 100
-        End If
+      p1 = InStr(s2, "|p")
+      p2 = InStr(s2, ";", p1)
+      If p1 > 0 Then
 
+        'CurrentTextHeigth = CFloat(Mid$(s2, p1 + 2, p2 - p1 - 2)) / 100
+      End If
+
+      s2 = Mid(s2, p2 + 1)
+
+      If Len(s2) > 0 Then ProcessPart(s2)
+    Case "\\C"            ' cambio de color
+      CurrentTextColor = CInt(Mid(s2, 3, 1))
+
+      p2 = InStr(s2, ";", p1)
+
+      s2 = Mid(s2, p2 + 1)
+
+      If Len(s2) > 0 Then ProcessPart(s2)
+
+    Case "\\P"            ' New line
+      CurrentTextPosY -= glPlus.TextExtends("XXX", CurrentTextHeigth)[1] * 1.2
+      s2 = Mid(s2, 3)
+      If Len(s2) > 0 Then ProcessPart(s2)
+
+    Case "\\p"            ' no se que significa esto, suele venir \p12.55;
+      p2 = InStr(s2, ";", p1)
+      s2 = Mid(s2, p2 + 1)
+      If Len(s2) > 0 Then ProcessPart(s2)
+    Case "\\t"            ' tab avanzo 4-texto anterior
+      ' TODO: verificar sin Tab=4 espacios
+      If LastTextLengh > 4 Then sTab = "    " Else sTab = Space(4 - LastTextLengh)
+      s2 = stab & Mid(s2, 3)
+      If Len(s2) > 0 Then ProcessPart(s2)
+
+    Case "\\W"            ' no se que significa esto, suele venir \W12.55;
+      p2 = InStr(s2, ";", p1)
+      CurrentTextPosX += CFloat(Mid(s2, 3, p2 - 3))
+      s2 = Mid(s2, p2 + 1)
+      If Len(s2) > 0 Then ProcessPart(s2)
+    Case "\\A"            ' no se que significa esto, parece Aligment, suele venir \A1;
+      ' veo q tipo de alineacion
+
+      If Mid(s2, 3, 1) = "1" Then ' es mid
+
+        ' If TextAngle <> 0 Then
+        '     Debug s2, TextAngle
+        ' Endif
+        fAlign = glPlus.TextExtends(s2, CurrentTextHeigth)
+        fAlign[0] *= -1
+        'fAlign[0] *= -1
+        puntos.Rotate(fAlign, TextAngle)
+        CurrentTextPosX += fAlign[0] * 0.5
+
+        ' alineo Y
+        CurrentTextPosY += fAlign[1] * 0.5
+
+        ' pero , y si esta rotado el texto???
+
+      End If
+      p2 = InStr(s2, ";", p1)
+
+      s2 = Mid(s2, p2 + 1)
+
+      If Len(s2) > 0 Then ProcessPart(s2)
+    Case "\\H"            ' no se que significa esto, suele venir \W12.55;
+
+      p2 = InStr(s2, ";", p1)
+      s3 = Mid(s2, 3, p2 - 3)
+      If InStr(s3, "x") > 0 Then
+        CurrentTextHeigth *= CFloat(Left(s3, -1))
+      Else
+        CurrentTextHeigth = CFloat(s3)
+      Endif
+      s2 = Mid(s2, p2 + 1)
+
+      If Len(s2) > 0 Then ProcessPart(s2)
+
+    Case Like "\\*"            ' codigo no imprementado, lo paso de largo;
+      p2 = InStr(s2, ";", p1)
+      s2 = Mid(s2, p2 + 1)
+      If Len(s2) > 0 Then ProcessPart(s2)
+    Case Else ' es texto
+
+      ' es un texto, pero puede terminar en un scape
+      p2 = InStr(s2, "\\")
+
+      If p2 = 1 Then ' es un escape desconocido
+        p2 = InStr(s2, ";")
         s2 = Mid(s2, p2 + 1)
-
         If Len(s2) > 0 Then ProcessPart(s2)
 
-      Case "P"            ' New line
-        CurrentTextPosY -= glPlus.TextExtends("XXX", CurrentTextHeigth)[1] * 1.2
-        s2 = Mid(s2, 2)
-        If Len(s2) > 0 Then ProcessPart(s2)
+      Else If p2 > 0 Then
 
-      Case "p"            ' no se que significa esto, suele venir \p12.55;
-        p2 = InStr(s2, ";", p1)
-        s2 = Mid(s2, p2 + 1)
-        If Len(s2) > 0 Then ProcessPart(s2)
+        If CurrentTextFont <> "" Then glPlus.SelectFont(CurrentTextFont)
+        LastTextLengh = Len(Mid(s2, 1, p2 - 1))
+        glPlus.DrawText(Mid(s2, 1, p2 - 1), CurrentTextPosX, CurrentTextPosY, CurrentTextangle, CurrentTextHeigth, CurrentTextColor)
+        If Printing Then
+          Paint.save
+          paint.Translate(CurrentTextPosX, CurrentTextPosY)
+          paint.Rotate(-CurrentTextangle)
+          paint.Scale(1, -1)
+          Paint.DrawText(Mid(s2, 1, p2 - 1))
+          Paint.Stroke
+          Paint.Restore
 
-      Case "W"            ' no se que significa esto, suele venir \W12.55;
-        p2 = InStr(s2, ";", p1)
-        CurrentTextPosX += CFloat(Mid(s2, 2, p2 - 2))
-        s2 = Mid(s2, p2 + 1)
-        If Len(s2) > 0 Then ProcessPart(s2)
-      Case "A"            ' no se que significa esto, parece Aligment, suele venir \A1;
-        ' veo q tipo de alineacion
-
-        If Mid(s2, 2, 1) = "1" Then ' es mid
-
-          p2 = InStr(s2, ";", p1)
-
-          s2 = Mid(s2, p2 + 1)
-          ' If TextAngle <> 0 Then
-          '     Debug s2, TextAngle
-          ' Endif
-          fAlign = glPlus.TextExtends(s2, CurrentTextHeigth)
-          fAlign[0] *= -1
-          'fAlign[0] *= -1
-          puntos.Rotate(fAlign, TextAngle)
-          CurrentTextPosX += fAlign[0] * 0.5
-
-          ' alineo Y
-          CurrentTextPosY += fAlign[1] * 0.5
-
-          ' pero , y si esta rotado el texto???
-
-        End If
-        If Len(s2) > 0 Then ProcessPart(s2)
-      Case "H"            ' no se que significa esto, suele venir \W12.55;
-
-        p2 = InStr(s2, ";", p1)
-        s3 = Mid(s2, 2, p2 - 2)
-        If InStr(s3, "x") > 0 Then
-          CurrentTextHeigth *= CFloat(Left(s3, -1))
-        Else
-          CurrentTextHeigth = CFloat(s3)
         Endif
-        s2 = Mid(s2, p2 + 1)
 
-        If Len(s2) > 0 Then ProcessPart(s2)
+        fRect = glPlus.TextExtends(Mid(s2, 1, p2 - 1), CurrentTextHeigth)
+        puntos.Rotate(fRect, CurrentTextAngle)
+        If Me.MyPolygon[0] > (CurrentTextPosX) Then Me.MyPolygon[0] = (CurrentTextPosX)
+        If Me.MyPolygon[1] > (CurrentTextPosY) Then Me.MyPolygon[1] = (CurrentTextPosY)
+        If Me.MyPolygon[2] < (CurrentTextPosX + fRect[0]) Then Me.MyPolygon[2] = (CurrentTextPosX + fRect[0])
+        If Me.MyPolygon[3] < (CurrentTextPosY + fRect[1]) Then Me.MyPolygon[3] = (CurrentTextPosY + fRect[1])
 
-      Case Else            ' codigo no imprementado, lo paso de largo;
-        p2 = InStr(s2, ";", p1)
-        s2 = Mid(s2, p2 + 1)
-        If Len(s2) > 0 Then ProcessPart(s2)
+        ProcessPart(Mid(s2, p2))
+      Else
 
-    End Select
-  Else     ' es un texto, pero puede terminar en un scape
-    p2 = InStr(s2, "\\")
-    If p2 > 0 Then
+        If CurrentTextFont <> "" Then glPlus.SelectFont(CurrentTextFont)
+        glPlus.DrawText(s2, CurrentTextPosX, CurrentTextPosY, CurrentTextAngle, CurrentTextHeigth, CurrentTextColor)
+        If Printing Then
+          Paint.save
+          paint.Translate(CurrentTextPosX, CurrentTextPosY)
+          paint.Rotate(-CurrentTextangle)
+          paint.Scale(1, -1)
 
-      If CurrentTextFont <> "" Then glPlus.SelectFont(CurrentTextFont)
+          Paint.DrawText(s2)
+          Paint.Stroke
+          Paint.Restore
+        Endif
 
-      glPlus.DrawText(Mid(s2, 1, p2 - 1), CurrentTextPosX, CurrentTextPosY, CurrentTextangle, CurrentTextHeigth, CurrentTextColor)
-      If Printing Then
-        Paint.save
-        paint.Translate(CurrentTextPosX, CurrentTextPosY)
-        paint.Rotate(-CurrentTextangle)
-        paint.Scale(1, -1)
-        Paint.DrawText(Mid(s2, 1, p2 - 1))
-        Paint.Stroke
-        Paint.Restore
+        fRect = glPlus.TextExtends(s2, CurrentTextHeigth)
+        puntos.Rotate(fRect, CurrentTextAngle)
+        If Me.MyPolygon[0] > (CurrentTextPosX) Then Me.MyPolygon[0] = (CurrentTextPosX)
+        If Me.MyPolygon[1] > (CurrentTextPosY) Then Me.MyPolygon[1] = (CurrentTextPosY)
+        If Me.MyPolygon[2] < (CurrentTextPosX + fRect[0]) Then Me.MyPolygon[2] = (CurrentTextPosX + fRect[0])
+        If Me.MyPolygon[3] < (CurrentTextPosY + fRect[1]) Then Me.MyPolygon[3] = (CurrentTextPosY + fRect[1])
 
       Endif
 
-      fRect = glPlus.TextExtends(Mid(s2, p2), CurrentTextHeigth)
-      puntos.Rotate(fRect, CurrentTextAngle)
-      If Me.MyPolygon[0] > (CurrentTextPosX) Then Me.MyPolygon[0] = (CurrentTextPosX)
-      If Me.MyPolygon[1] > (CurrentTextPosY) Then Me.MyPolygon[1] = (CurrentTextPosY)
-      If Me.MyPolygon[2] < (CurrentTextPosX + fRect[0]) Then Me.MyPolygon[2] = (CurrentTextPosX + fRect[0])
-      If Me.MyPolygon[3] < (CurrentTextPosY + fRect[1]) Then Me.MyPolygon[3] = (CurrentTextPosY + fRect[1])
-
-      ProcessPart(Mid(s2, p2))
-    Else
-
-      If CurrentTextFont <> "" Then glPlus.SelectFont(CurrentTextFont)
-      glPlus.DrawText(s2, CurrentTextPosX, CurrentTextPosY, CurrentTextAngle, CurrentTextHeigth, CurrentTextColor)
-      If Printing Then
-        Paint.save
-        paint.Translate(CurrentTextPosX, CurrentTextPosY)
-        paint.Rotate(-CurrentTextangle)
-        paint.Scale(1, -1)
-
-        Paint.DrawText(s2)
-        Paint.Stroke
-        Paint.Restore
-      Endif
-
-      fRect = glPlus.TextExtends(s2, CurrentTextHeigth)
-      puntos.Rotate(fRect, CurrentTextAngle)
-      If Me.MyPolygon[0] > (CurrentTextPosX) Then Me.MyPolygon[0] = (CurrentTextPosX)
-      If Me.MyPolygon[1] > (CurrentTextPosY) Then Me.MyPolygon[1] = (CurrentTextPosY)
-      If Me.MyPolygon[2] < (CurrentTextPosX + fRect[0]) Then Me.MyPolygon[2] = (CurrentTextPosX + fRect[0])
-      If Me.MyPolygon[3] < (CurrentTextPosY + fRect[1]) Then Me.MyPolygon[3] = (CurrentTextPosY + fRect[1])
-
-    Endif
-
-  End If
+  End Select
   ' primero separo en diferentes partes
 
 End
