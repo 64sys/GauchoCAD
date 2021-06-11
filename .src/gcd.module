@@ -195,6 +195,9 @@ Public Sub Main()
 
   Me.DrawingReady = True
 
+  Debug Utils.ProcessTabs("Acatbab^Iluego^I123^I2")
+
+
 End
 
 Public Sub JSONtoBlocks(colData As Collection) ', obxEntities As Entity[]) As Integer

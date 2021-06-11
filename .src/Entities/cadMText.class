@@ -381,13 +381,15 @@ Public Sub ProcessPart(s As String)
       p2 = InStr(s2, ";", p1)
       s2 = Mid(s2, p2 + 1)
       If Len(s2) > 0 Then ProcessPart(s2)
-    Case "\\t"            ' tab avanzo 4-texto anterior
-      ' TODO: verificar sin Tab=4 espacios
-      If LastTextLengh > 4 Then sTab = "    " Else sTab = Space(4 - LastTextLengh)
-      s2 = stab & Mid(s2, 3)
-      If Len(s2) > 0 Then ProcessPart(s2)
 
-    Case "\\W"            ' no se que significa esto, suele venir \W12.55;
+    ' Case "\\t", "^I"            ' tab avanzo 4-texto anterior
+    '   ' TODO: verificar sin Tab=4 espacios
+    '   If LastTextLengh > 4 Then sTab = "    " Else sTab = Space(4 - LastTextLengh)
+    '   s2 = stab & Mid(s2, 3)
+    '   If Len(s2) > 0 Then ProcessPart(s2)
+    '   LastTextLengh = 0
+    '
+  Case "\\W"            ' no se que significa esto, suele venir \W12.55;
       p2 = InStr(s2, ";", p1)
       CurrentTextPosX += CFloat(Mid(s2, 3, p2 - 3))
       s2 = Mid(s2, p2 + 1)
@@ -438,7 +440,10 @@ Public Sub ProcessPart(s As String)
 
       ' es un texto, pero puede terminar en un scape
       p2 = InStr(s2, "\\")
-
+      ' p3 = InStr(s2, "^I")
+      '
+      ' If (p3 > 0) And (p3 < p2) Then p2 = p3
+      '
       If p2 = 1 Then ' es un escape desconocido
         p2 = InStr(s2, ";")
         s2 = Mid(s2, p2 + 1)
@@ -446,9 +451,10 @@ Public Sub ProcessPart(s As String)
 
       Else If p2 > 0 Then
 
+        s4 = Utils.ProcessTabs(Mid(s2, 1, p2 - 1))
         If CurrentTextFont <> "" Then glPlus.SelectFont(CurrentTextFont)
-        LastTextLengh = Len(Mid(s2, 1, p2 - 1))
-        glPlus.DrawText(Mid(s2, 1, p2 - 1), CurrentTextPosX, CurrentTextPosY, CurrentTextangle, CurrentTextHeigth, CurrentTextColor)
+
+        glPlus.DrawText(s4, CurrentTextPosX, CurrentTextPosY, CurrentTextangle, CurrentTextHeigth, CurrentTextColor)
         If Printing Then
           Paint.save
           paint.Translate(CurrentTextPosX, CurrentTextPosY)
@@ -460,7 +466,7 @@ Public Sub ProcessPart(s As String)
 
         Endif
 
-        fRect = glPlus.TextExtends(Mid(s2, 1, p2 - 1), CurrentTextHeigth)
+        fRect = glPlus.TextExtends(s4, CurrentTextHeigth)
         puntos.Rotate(fRect, CurrentTextAngle)
         If Me.MyPolygon[0] > (CurrentTextPosX) Then Me.MyPolygon[0] = (CurrentTextPosX)
         If Me.MyPolygon[1] > (CurrentTextPosY) Then Me.MyPolygon[1] = (CurrentTextPosY)
@@ -470,6 +476,8 @@ Public Sub ProcessPart(s As String)
         ProcessPart(Mid(s2, p2))
       Else
 
+
+        s2 = Utils.ProcessTabs(s2)
         If CurrentTextFont <> "" Then glPlus.SelectFont(CurrentTextFont)
         glPlus.DrawText(s2, CurrentTextPosX, CurrentTextPosY, CurrentTextAngle, CurrentTextHeigth, CurrentTextColor)
         If Printing Then
