@@ -206,7 +206,8 @@ Public Sub Resize(drwContext As Object) ' only glArea for now
 
   gl.MatrixMode(gl.PROJECTION)
   gl.LoadIdentity
-  Glu.Ortho2D(-drwContext.w / 2, drwContext.w / 2, -drwContext.h / 2, drwContext.h / 2)
+  'Glu.Ortho2D(-drwContext.w / 2, drwContext.w / 2, -drwContext.h / 2, drwContext.h / 2)
+  Gl.Ortho(-drwContext.w / 2, drwContext.w / 2, -drwContext.h / 2, drwContext.h / 2, 1, -1)
 
   gl.MatrixMode(gl.MODELVIEW)
   gl.LoadIdentity
@@ -835,8 +836,8 @@ Public Sub Get2DpointFrom3Dworld(p1 As Punto3d, ByRef x2 As Float, ByRef y2 As F
   modelMatrix = gl.GetFloatv(GL.MODELVIEW_MATRIX)
   projMatrix = gl.GetFloatv(GL.PROJECTION_MATRIX)
   vp = gl.GetIntegerv(GL.VIEWPORT_)
-
-  p2 = glu.Project(p1.x, p1.y, p1.z, modelMatrix, projMatrix, vp)
+  ' Fixme: glu does not work anymore
+  ' p2 = glu.Project(p1.x, p1.y, p1.z, modelMatrix, projMatrix, vp)
 
   If IsNull(p2) Then Return
 
@@ -864,8 +865,8 @@ Public Sub Get3DpointFromScreen(Xscreen As Integer, Yscreen As Integer) As Float
   modelMatrix = gl.GetFloatv(GL.MODELVIEW_MATRIX)
   projMatrix = gl.GetFloatv(GL.PROJECTION_MATRIX)
   vp = gl.GetIntegerv(GL.VIEWPORT_)
-
-  p2 = glu.UnProject(Xscreen, Yscreen, 0, modelMatrix, projMatrix, vp)
+  ' FIXME: glu dont work
+  ' p2 = glu.UnProject(Xscreen, Yscreen, 0, modelMatrix, projMatrix, vp)
 
   If IsNull(p2) Then Return
 

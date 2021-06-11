@@ -249,7 +249,7 @@ Public Sub Draw(oE As Entity)
 
   ' https://ezdxf.readthedocs.io/en/stable/tutorials/mtext.html
   ' https://ezdxf.readthedocs.io/en/stable/dxfentities/mtext.html#mtext-inline-codes
-
+  If oe.Handle = "7BD36" Then Stop
   ' MTEXT tiene in-line formatting, ver esa web
   ProcessText(oE.stringdata[Me.sdaText])
 

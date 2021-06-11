@@ -645,18 +645,18 @@ Public Sub Form_Open()
   Dim b As Integer
   Dim x As Integer
 
-  For n = 0 To Screens.Count - 1
-    If Screens[n].AvailableWidth > b Then
-      b = Screens[n].AvailableWidth
-      x = n
-    Endif
-  Next
-
-  Me.x = Screens[x].AvailableX
-  Me.y = Screens[x].AvailableY
+  ' For n = 0 To Screens.Count - 1
+  '   If Screens[n].AvailableWidth > b Then
+  '     b = Screens[n].AvailableWidth
+  '     x = n
+  '   Endif
+  ' Next
+  '
+  ' Me.x = Screens[x].AvailableX
+  ' Me.y = Screens[x].AvailableY
 
   gTask("new")
-
+  
   Me.Maximized = True
 
 End

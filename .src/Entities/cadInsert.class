@@ -178,7 +178,7 @@ Public Function BuildPOI(oE As Entity) As Integer
   oe.poiPoints.insert([oE.p[0], oE.p[1]])
   oe.poiType.Add(gcd.poiBasePoint)
   'oe.poiEntities.Add(arrIndex)
-  If oe.Handle = "78193" Then Stop
+  'If oe.Handle = "78193" Then Stop
 
   ' polygon
   Dim fLimits As Float[]
