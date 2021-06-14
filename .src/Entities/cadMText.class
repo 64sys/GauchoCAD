@@ -274,7 +274,7 @@ Public Sub ProcessText(RTF As String)
   Dim p1, p2 As Integer
 
   'Debug rtf
-
+  If InStr(LCase(rtf), "plano de instalacion electrica") > 0 Then Stop
   p1 = InStr(rtf, "{")
   If p1 > 0 Then
     p2 = InStr(rtf, "}")
@@ -348,11 +348,12 @@ Public Sub ProcessPart(s As String)
 
         CurrentTextItalic = Mid$(s2, p1 + 2, 1) = "1"
       End If
-      p1 = InStr(s2, "|c")
+
+      p1 = InStr(s2, "|c")    ' esto para no ser el color
       If p1 > 0 Then
 
         p2 = InStr(s2, "|", p1 + 1)
-        Try CurrentTextColor = Mid$(s2, p1 + 2, p2 - p1 - 1) = "1"
+        ' Try CurrentTextColor = Mid$(s2, p1 + 2, p2 - p1 - 1) = "1"
       End If
       p1 = p2 + 1
 
@@ -367,9 +368,10 @@ Public Sub ProcessPart(s As String)
 
       If Len(s2) > 0 Then ProcessPart(s2)
     Case "\\C"            ' cambio de color
-      CurrentTextColor = CInt(Mid(s2, 3, 1))
 
       p2 = InStr(s2, ";", p1)
+
+      CurrentTextColor = gcd.GetGBColor(CInt(Mid(s2, 3, p2 - 3)))
 
       s2 = Mid(s2, p2 + 1)
 
