@@ -197,7 +197,6 @@ Public Sub Main()
 
   Debug Utils.ProcessTabs("Acatbab^Iluego^I123^I2")
 
-
 End
 
 Public Sub JSONtoBlocks(colData As Collection) ', obxEntities As Entity[]) As Integer
@@ -645,5 +644,11 @@ End
 Public Function ScreenHeight() As Integer
 
   Return appmain.GLArea1.h
+
+End
+
+Public Function CurrentColor() As Integer
+
+  Return appmain.CurrentColor
 
 End

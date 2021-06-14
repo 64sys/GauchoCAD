@@ -120,7 +120,7 @@ Public Function Start(Optional ElemToBuild As Variant, Optional Mode As Integer 
   ' reset from previous element
   elem.ClassHandler.StepsDone = 0
 
-  'elem.gbcolor = fMain.CurrentColor
+  Try elem.colour = gcd.CurrentColor()
 
   iPoints = 0
   iFloat = 0

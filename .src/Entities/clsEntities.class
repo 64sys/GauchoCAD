@@ -241,7 +241,7 @@ Public Sub glGenDrawListLAyers(Optional aLayer As Layer)
       gl.NewList(aLayer.glList, gl.COMPILE)
       For Each e In gcd.CurrentDrawing.oEntities
 
-        If e.pLayer = aLayer Then e.ClassHandler.Draw(e)
+        If e.pLayer = aLayer Then gl.CallList(e.glDrwList)
 
       Next
       gl.EndList
@@ -276,7 +276,7 @@ Public Sub glGenDrawListLAyers2(Optional aLayer As Layer)
       If Not gl.islist(aLayer.glList) Then aLayer.glList = gl.GenLists(1)
       gl.NewList(aLayer.glList, gl.COMPILE)
       For Each e In aLayer.Entities
-        e.ClassHandler.Draw(e)
+        gl.CallList(e.glDrwList)
 
       Next
       gl.EndList
@@ -598,7 +598,6 @@ Public Sub CopyElemData(origen As Entity, destino As Entity)
   destino.pBlock = origen.pBlock
   destino.Group = origen.Group
   destino.colour = origen.colour
-  destino.ColorToPaint = origen.ColorToPaint
   destino.LineType = origen.LineType
   destino.LineWidth = origen.LineWidth
   destino.Handle = origen.Handle

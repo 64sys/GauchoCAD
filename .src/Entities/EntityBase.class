@@ -137,7 +137,7 @@ Public Sub DrawRemark(oE As Entity)
     GLplus.Lines(oE.PolyLine, gcd.ColorForSelected, oE.LineWidth + 2, oe.linetype.index)
   Else
     GLplus.Lines(oE.PolyLine, gcd.flgWindowBackColor, oE.LineWidth, gcd.stiDashed)
-    GLplus.Lines(oE.PolyLine, oE.ColorToPaint, oE.LineWidth + 2, oe.linetype.index)
+    GLplus.Lines(oE.PolyLine, gcd.GetGBColor(oE.Colour, oe.pLayer), oE.LineWidth + 2, oe.linetype.index)
   Endif
 
 End

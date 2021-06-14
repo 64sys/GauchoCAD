@@ -84,9 +84,7 @@ Public Sub Draw(oE As Entity)
 
   'gl.End
 
-  oE.ColorToPaint = gcd.GetGBColor(oE.colour, oE.pLayer)
-
-  glPlus.Circle(oE.p, oe.fParam[0], oe.ColorToPaint, False, oE.LineWidth, oE.LineType.index)
+  glPlus.Circle(oE.p, oe.fParam[0], gcd.GetGBColor(oE.Colour, oe.pLayer), False, oE.LineWidth, oE.LineType.index)
 
 End
 
@@ -124,7 +122,7 @@ Public Sub DrawRemark(oE As Entity)
     GLplus.PolyLines(oE.PolyLine, gcd.ColorForSelected, oE.LineWidth + 2, oe.linetype.index)
   Else
     GLplus.PolyLines(oE.PolyLine, gcd.flgWindowBackColor, oE.LineWidth, gcd.stiDashed)
-    GLplus.PolyLines(oE.PolyLine, oE.ColorToPaint, oE.LineWidth + 2, oe.linetype.index)
+    GLplus.PolyLines(oE.PolyLine, gcd.GetGBColor(oE.Colour, oe.pLayer), oE.LineWidth + 2, oe.linetype.index)
   Endif
 
 End

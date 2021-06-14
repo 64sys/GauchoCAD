@@ -352,7 +352,6 @@ Public Sub copiaraportapapeles(rejilla As GridView) ''Copia los datos del gridvi
 
 End
 
-
 Public Function ProcessTabs(s As String, Optional lTab As Integer = 6) As String
 
   ' reconstruye la string teniendo en cuenta los tabuladfores
@@ -374,7 +373,7 @@ Public Function ProcessTabs(s As String, Optional lTab As Integer = 6) As String
       End If
       iAnterior = i - 1
       sRespuesta &= Mid$(sResto, 1, i - 1) & sEspacios
-      sResto = Mid$(sResto, i + 2)
+      sResto = Mid$(sResto, i + 1)
     Else
       sRespuesta &= sResto
       Break

@@ -206,8 +206,8 @@ Public Sub Resize(drwContext As Object) ' only glArea for now
 
   gl.MatrixMode(gl.PROJECTION)
   gl.LoadIdentity
-  'Glu.Ortho2D(-drwContext.w / 2, drwContext.w / 2, -drwContext.h / 2, drwContext.h / 2)
-  Gl.Ortho(-drwContext.w / 2, drwContext.w / 2, -drwContext.h / 2, drwContext.h / 2, 1, -1)
+  Glu.Ortho2D(-drwContext.w / 2, drwContext.w / 2, -drwContext.h / 2, drwContext.h / 2)
+  'Gl.Ortho(-drwContext.w / 2, drwContext.w / 2, -drwContext.h / 2, drwContext.h / 2, 1, -1)
 
   gl.MatrixMode(gl.MODELVIEW)
   gl.LoadIdentity

@@ -18,6 +18,7 @@ Component=gb.form.stock
 Component=gb.gui.opengl
 Component=gb.opengl
 Component=gb.logging
+Component=gb.opengl.glu
 Component=gb.pcre
 Component=gb.xml
 Description="GauchoCAD is a free CAD program written in the Gambas language"
