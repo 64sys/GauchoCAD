@@ -229,7 +229,7 @@ End
 Public Sub Draw(oE As Entity)
 
   If Not oE.Visible Then Return
-  If oe.Handle = "7BD36" Then Stop
+  'If oe.Handle = "7BD36" Then Stop
   TextAngle = oe.fParam[Me.ipaTextAngle]
   ' voy a procesar texto
   CurrentTextPosX = oE.p[0]
@@ -274,7 +274,7 @@ Public Sub ProcessText(RTF As String)
   Dim p1, p2 As Integer
 
   'Debug rtf
-  If InStr(LCase(rtf), "plano de instalacion electrica") > 0 Then Stop
+  'If InStr(LCase(rtf), "plano de instalacion electrica") > 0 Then Stop
   p1 = InStr(rtf, "{")
   If p1 > 0 Then
     p2 = InStr(rtf, "}")
@@ -451,7 +451,11 @@ Public Sub ProcessPart(s As String)
       '
       If p2 = 1 Then ' es un escape desconocido
         p2 = InStr(s2, ";")
-        s2 = Mid(s2, p2 + 1)
+        If p2 = 0 Then
+          s2 = Mid(s2, 3)
+        Else
+          s2 = Mid(s2, p2 + 1)
+        End If
         If Len(s2) > 0 Then ProcessPart(s2)
 
       Else If p2 > 0 Then

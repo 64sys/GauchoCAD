@@ -150,12 +150,14 @@ Public Sub MakeBorder2(oPath As Boundary) As Float[]
 
   For Each eBorder In oPath.eSegments
 
+    If Not eBorder Then Continue 'por si es Null
+
     If eBorder.Gender = "" Then
       ' eFind = gcd.FindEntity(eborder.Handle, True)
       ' If IsNull(eFind) Then
       '
-      '   Debug "Borde de hatch no encntrado", eborder.Handle
-      '   Continue
+      Debug "Borde de hatch no encntrado", eborder.Handle
+      Continue
       Stop
       '
       ' Else
