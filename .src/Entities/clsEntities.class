@@ -148,7 +148,7 @@ Public Sub glGenDrawList(Optional eEntity As Entity = Null)
 
     Next
 
-    ' lista de entidaes seleccionadas
+    ' lista de entidaes en modo seleccionada
     For Each e In gcd.CurrentDrawing.oEntities
       If Not gl.islist(e.glDrwListSel) Then e.glDrwListSel = gl.GenLists(1)
       gl.NewList(e.glDrwListSel, gl.COMPILE)
@@ -188,37 +188,36 @@ Public Sub glGenDrawListSel(Optional mode As Integer = 0)
 
 End
 
-'' Generates a GL list for the selected
-'' Mode: 0=Selected version 1=Normal version
-Public Sub glGenDrawListAll(Optional ExcludeSelected As Boolean = False)
+' '' Generates a GL list for the selected
+' '' Mode: 0=Selected version 1=Normal version
+' Public Sub glGenDrawListAll(Optional ExcludeSelected As Boolean = False)
+'
+'   Dim i As Integer, e As Entity
+'
+'   gl.NewList(gcd.CurrentDrawing.GlListAllEntities, gl.COMPILE)
+'
+'   For Each e In gcd.CurrentDrawing.oEntities
+'     If Not (e.Selected And ExcludeSelected) Then gl.CallList(e.glDrwList)
+'
+'   Next
+'
+'   gl.EndList
+'
+'   For Each L As Layer In gcd.CurrentDrawing.oLayers
+'     If Not gl.islist(L.glList) Then L.glList = gl.GenLists(1)
+'     gl.NewList(L.glList, gl.COMPILE)
+'   Next
+'   For Each e In gcd.CurrentDrawing.oEntities
+'     If Not (e.Selected And ExcludeSelected) Then gl.CallList(e.glDrwList)
+'
+'   Next
+'
+'   gl.EndList
+'
+' End
 
-  Dim i As Integer, e As Entity
-
-  gl.NewList(gcd.CurrentDrawing.GlListAllEntities, gl.COMPILE)
-
-  For Each e In gcd.CurrentDrawing.oEntities
-    If Not (e.Selected And ExcludeSelected) Then gl.CallList(e.glDrwList)
-
-  Next
-
-  gl.EndList
-
-  For Each L As Layer In gcd.CurrentDrawing.oLayers
-    If Not gl.islist(L.glList) Then L.glList = gl.GenLists(1)
-    gl.NewList(L.glList, gl.COMPILE)
-  Next
-  For Each e In gcd.CurrentDrawing.oEntities
-    If Not (e.Selected And ExcludeSelected) Then gl.CallList(e.glDrwList)
-
-  Next
-
-  gl.EndList
-
-End
-
-'' Generates a GL list for the selected
-'' Mode: 0=Selected version 1=Normal version
-Public Sub glGenDrawListLAyers(Optional aLayer As Layer)
+'' Genera la lista de dibujado segun Layer, o para un Layer en particular
+Public Sub glGenDrawListLayers(Optional aLayer As Layer)
 
   Dim i As Integer
   Dim e As Entity
@@ -252,40 +251,40 @@ Public Sub glGenDrawListLAyers(Optional aLayer As Layer)
 
 End
 
-'' Generates a GL list for the selected
-'' Mode: 0=Selected version 1=Normal version
-Public Sub glGenDrawListLAyers2(Optional aLayer As Layer)
-
-  Dim i As Integer
-  Dim e As Entity
-
-  If aLayer Then
-
-    If Not gl.islist(aLayer.glList) Then aLayer.glList = gl.GenLists(1)
-    gl.NewList(aLayer.glList, gl.COMPILE)
-    For Each e In gcd.CurrentDrawing.oEntities
-
-      If e.pLayer = aLayer Then gl.CallList(e.glDrwList)
-
-    Next
-    gl.EndList
-
-  Else
-
-    For Each aLayer In gcd.CurrentDrawing.oLayers
-      If Not gl.islist(aLayer.glList) Then aLayer.glList = gl.GenLists(1)
-      gl.NewList(aLayer.glList, gl.COMPILE)
-      For Each e In aLayer.Entities
-        gl.CallList(e.glDrwList)
-
-      Next
-      gl.EndList
-
-    Next
-
-  Endif
-
-End
+' '' Generates a GL list for the selected
+' '' Mode: 0=Selected version 1=Normal version
+' Public Sub glGenDrawListLAyers2(Optional aLayer As Layer)
+'
+'   Dim i As Integer
+'   Dim e As Entity
+'
+'   If aLayer Then
+'
+'     If Not gl.islist(aLayer.glList) Then aLayer.glList = gl.GenLists(1)
+'     gl.NewList(aLayer.glList, gl.COMPILE)
+'     For Each e In gcd.CurrentDrawing.oEntities
+'
+'       If e.pLayer = aLayer Then gl.CallList(e.glDrwList)
+'
+'     Next
+'     gl.EndList
+'
+'   Else
+'
+'     For Each aLayer In gcd.CurrentDrawing.oLayers
+'       If Not gl.islist(aLayer.glList) Then aLayer.glList = gl.GenLists(1)
+'       gl.NewList(aLayer.glList, gl.COMPILE)
+'       For Each e In aLayer.Entities
+'         gl.CallList(e.glDrwList)
+'
+'       Next
+'       gl.EndList
+'
+'     Next
+'
+'   Endif
+'
+' End
 
 Public Sub DrawPoiSymbolsAll()
 

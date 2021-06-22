@@ -20,7 +20,7 @@
 ' Foundation, Inc., 51 Franklin St, Fifth Floor,
 ' Boston, MA  02110-1301  USA
 Create Static
-'Fast
+'Fast Unsafe
 Inherits EntityBase
 
 Public Const Gender As String = "Line"
@@ -212,5 +212,11 @@ Public Function ImportJsonCol(c As JSONCollection, e As Entity) As Boolean
   'Catch
 
   Return False
+
+End
+
+Fast Unsafe Public Function MouseOverMe(E As Entity, Xr As Float, Yr As Float, tol As Float) As Boolean
+
+  If puntos.PointToLineDistance([xr, yr], e.p) >= tol Then Return True Else Return False
 
 End

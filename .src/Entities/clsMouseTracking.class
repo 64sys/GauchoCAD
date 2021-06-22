@@ -156,6 +156,7 @@ Public Function CheckAboveEntity(xr As Float, Yr As Float, tolerance As Float) A
   Dim x, y, theta, angle_increment As Float
   Dim eVisible As Entity
   Dim T As Float = Timer
+  Dim oBo As Boundary
 
   gcd.flgSearchingEntity = True
   Dec iVisible
@@ -275,7 +276,9 @@ Public Function CheckAboveEntity(xr As Float, Yr As Float, tolerance As Float) A
 
       Case "Hatch"
 
-        If puntos.isInside(eVisible.Polygon, xr, yr) Then Goto ExitSearch
+        For Each oBo In eVisible.pBlock.oBoundaryPath
+          If puntos.isInside(oBo.Polyline, x, r) Then Goto ExitSearch
+        Next
 
     End Select
 

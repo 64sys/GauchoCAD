@@ -29,9 +29,9 @@
 
 ' Operations on the element's vertices
 
-Create Static
-Create Private
-'Fast Unsafe
+Create Static       ' This two preposition are the same as creating a module instead of a
+Create Private      ' class in Gambas.
+Fast Unsafe        ' TODO: alwways set this after debugging
 Public HookSize As Integer = 16                       ' for use with poi
 Public NumericTolerance As Float = 1e-7
 
@@ -877,6 +877,30 @@ Public Function PolyPolyIntersection(flxPolyOpen As Float[], flxPolyClosed As Fl
   Next
 
   Return flxRta
+
+End
+
+'' Determines if the point is over the line within a tolerance. Optimized for perfomance
+Public Function PointOverLine(Px As Float, Py As Float, Lx1 As Float, Ly1 As Float, Lx2 As Float, Ly2 As Float, Optional fTolerance As Float) As Float
+
+  Dim E As Float[]
+
+  Dim CE, angE As Float
+
+  ' veo los casos mas simples
+  If Not InBetween(px, lx2, lx1) Then Return
+
+  If Not InBetween(py, ly2, ly1) Then Return
+
+  If px = 0 Then
+
+    If px <> 0 Then
+      If (Ly2 - Ly1 - fTolerance) / (Lx2 - Lx1) <= py / px And (Ly2 - Ly1) / (Lx2 - Lx1 + fTolerance) >= py - px Then
+
+      Endif
+
+    Endif
+  End If
 
 End
 
