@@ -118,9 +118,9 @@ Public Function ImportDXF(e As Entity, sClaves As String[], sValues As String[])
     If sClaves[i] = "3" Then e.pStyle = gcd.FindStyle(sValues[i])
 
     ' For DEbug
-    ' If sClaves[i] = "42" Then
-    '     If sValues[i] Like "39.46*" Then Stop
-    ' End If
+    If sClaves[i] = "42" Then
+      If sValues[i] Like "0.46*" Then Stop
+    End If
 
     If sClaves[i] = "70" Then ' Dimension type:
 

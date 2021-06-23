@@ -22,6 +22,8 @@
 
 ' Tool maintained by Terco
 Create Static
+Create Private
+
 Public Const USEWITH As String = ""
 ' Add more if needed
 
@@ -49,6 +51,8 @@ Public Active As Boolean = False
 Public PoiChecking As Boolean = False
 Public EntityChecking As Boolean = False
 Public Mode As Integer
+
+Public MenuRightClick As String
 
 Public inxSelected As New Integer[]
 
@@ -78,6 +82,10 @@ Public Function MouseDown(mouseX As Integer, mouseY As Integer) ' dummy
 End
 
 Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' dummy
+
+End
+
+Public Function MouseRightUp(mouseX As Integer, mouseY As Integer) ' dummy
 
 End
 

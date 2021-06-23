@@ -29,17 +29,6 @@ Public LastEntry As String
 Public Const DoEventsTime As Float = 0.25
 Public itsTime As Boolean
 
-Public Struct punto3d
-  x As Float
-  Y As Float
-  z As Float
-End Struct
-
-Public Struct punto2d
-  x As Float
-  Y As Float
-End Struct
-
 Public Function TempDir() As String
 
   Dim sTmpFile As String

@@ -277,7 +277,7 @@ Public Function CheckAboveEntity(xr As Float, Yr As Float, tolerance As Float) A
       Case "Hatch"
 
         For Each oBo In eVisible.pBlock.oBoundaryPath
-          If puntos.isInside(oBo.Polyline, x, r) Then Goto ExitSearch
+          If puntos.isInside(oBo.Polyline, xr, yr) Then Goto ExitSearch
         Next
 
     End Select
