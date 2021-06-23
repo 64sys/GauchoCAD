@@ -364,3 +364,16 @@ End
 ' ],
 ' "bulges": [ el panceado de la polilinea, se usan en las nubes de revision por ejemplo,
 ' es una lista de valores Float, uno por vertice
+
+'' Return if that position is over the entity within the tolerance
+Public Function OverMe(e As Entity, Xr As Float, Yr As Float, tolerance As Float) As Boolean
+
+  Dim i As Integer
+
+  For i = 0 To E.P.count - 4 Step 2
+    If puntos.doIntersect(xr - tolerance, Yr, Xr + tolerance, Yr, E.P[i + 0], E.P[i + 1], E.P[i + 2], E.P[i + 3]) Or puntos.doIntersect(xr, Yr - tolerance, Xr, Yr + tolerance, E.P[i + 0], E.P[i + 1], E.P[i + 2], E.P[i + 3]) Then Return True
+  Next
+
+  Return False
+
+End

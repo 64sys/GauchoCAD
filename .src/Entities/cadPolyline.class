@@ -143,3 +143,16 @@ Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
   Return False
 
 End
+
+'' Return if that position is over the entity within the tolerance
+Public Function OverMe(e As Entity, Xr As Float, Yr As Float, tolerance As Float) As Boolean
+
+  Dim i As Integer
+
+  For i = 0 To E.PolyLine.count - 4 Step 2
+    If puntos.doIntersect(xr - tolerance, Yr, Xr + tolerance, Yr, E.PolyLine[i + 0], E.PolyLine[i + 1], E.PolyLine[i + 2], E.PolyLine[i + 3]) Or puntos.doIntersect(xr, Yr - tolerance, Xr, Yr + tolerance, E.PolyLine[i + 0], E.PolyLine[i + 1], E.PolyLine[i + 2], E.PolyLine[i + 3]) Then Return True
+  Next
+
+  Return False
+
+End

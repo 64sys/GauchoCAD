@@ -331,6 +331,10 @@ Public Sub ProcessPart(s As String)
   'If Left$(s2, 1) = "\\" Then
   's2 = Mid(s2, 2)
   Select Case Mid$(s2, 1, 2)
+
+    Case "\\U" ' ej \U+0045
+
+
     Case "\\U" ' ej \U+0045
 
       ' es un caracter utf
@@ -393,14 +397,23 @@ Public Sub ProcessPart(s As String)
       '   s2 = stab & Mid(s2, 3)
       '   If Len(s2) > 0 Then ProcessPart(s2)
       '   LastTextLengh = 0
-      '
-    Case "\\W"            ' no se que significa esto, suele venir \W12.55;
+
+    Case "\\T" 'Adjusts the space between characters. Valid values range from a minimum of .75 to 4 times the original spacing between characters.
+
+    Case "\\Q"  '\Qangle; changes obliquing angle
+
+    Case "\\O"  '\O changes to overline
+
+    Case "\\L"  '\O changes to underline
+
+    Case "\\W"            ' \Wvalue; changes width factor To produce wide text
       p2 = InStr(s2, ";", p1)
       CurrentTextPosX += CFloat(Mid(s2, 3, p2 - 3))
       s2 = Mid(s2, p2 + 1)
       If Len(s2) > 0 Then ProcessPart(s2)
-    Case "\\A"            ' no se que significa esto, parece Aligment, suele venir \A1;
-      ' veo q tipo de alineacion
+
+    Case "\\A"            ' Sets the alignment value; valid values: 0, 1, 2(bottom, center, top)
+
 
       If Mid(s2, 3, 1) = "1" Then ' es mid
 
@@ -424,11 +437,11 @@ Public Sub ProcessPart(s As String)
       s2 = Mid(s2, p2 + 1)
 
       If Len(s2) > 0 Then ProcessPart(s2)
-    Case "\\H"            ' no se que significa esto, suele venir \W12.55;
+    Case "\\H"            ' cambia la altura del texto
 
       p2 = InStr(s2, ";", p1)
       s3 = Mid(s2, 3, p2 - 3)
-      If InStr(s3, "x") > 0 Then
+      If InStr(s3, "x") > 0 Then  ' cambia x veces la altura actual
         CurrentTextHeigth *= CFloat(Left(s3, -1))
       Else
         CurrentTextHeigth = CFloat(s3)
@@ -487,6 +500,8 @@ Public Sub ProcessPart(s As String)
 
         s2 = Utils.ProcessTabs(s2)
         If CurrentTextFont <> "" Then glPlus.SelectFont(CurrentTextFont)
+        If Left(s2, 2) = "24" Then Stop
+
         glPlus.DrawText(s2, CurrentTextPosX, CurrentTextPosY, CurrentTextAngle, CurrentTextHeigth, CurrentTextColor)
         If Printing Then
           Paint.save

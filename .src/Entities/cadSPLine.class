@@ -868,3 +868,11 @@ Public Function interpolate2(t As Float, degree As Integer, points As Float[], O
   Return Resultado
 
 End
+
+
+'' Return if that position is over the entity within the tolerance
+Public Function OverMe(e As Entity, Xr As Float, Yr As Float, tolerance As Float) As Boolean
+
+  Return cadPolyline.OverMe(e, xr, yr, tolerance)
+
+End

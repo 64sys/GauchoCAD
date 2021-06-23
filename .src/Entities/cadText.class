@@ -392,3 +392,10 @@ End
 '   "width_factor": 0.8,
 '   "text_value": "FECHA",
 '   "style": [5, 2, 1466, 1466]
+
+'' Return if that position is over the entity within the tolerance
+Public Function OverMe(e As Entity, Xr As Float, Yr As Float, tolerance As Float) As Boolean
+
+  Return False
+
+End

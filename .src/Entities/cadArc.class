@@ -389,3 +389,27 @@ End
 ' "_subclass": "AcDbArc",
 ' "start_angle": 0.0,
 ' "end_angle": 1.5707963267949
+
+'' Return if that position is over the entity within the tolerance
+Public Function OverMe(E As Entity, Xr As Float, Yr As Float, tolerance As Float) As Boolean
+
+  Dim angle As Float
+
+  If puntos.Around(xr, yr, E.P[0], E.P[1], tolerance) Then Return True
+
+  If Abs(puntos.distancia(xr, yr, E.P[0], E.P[1]) - E.fParam[0]) < tolerance Then
+
+    ' tengo que ver si esa en la porcion
+    angle = Ang(xr - E.P[0], yr - E.P[1]) * 180 / Pi
+    If angle < 0 Then angle += 360
+    If E.fParam[1] <= E.fParam[2] Then
+      If angle >= E.fParam[1] And angle <= E.fParam[2] Then Return True
+    Else
+      If angle >= E.fParam[1] Or angle <= E.fParam[2] Then Return True
+    End If
+
+  End If
+
+  Return False
+
+End

@@ -380,3 +380,61 @@ End
 ' "axis_ratio": 0.49999997319111,
 ' "start_angle": 4.64635013554486,
 ' "end_angle": 7.92002047881431
+
+'' Return if that position is over the entity within the tolerance
+Public Function OverMe(e As Entity, Xr As Float, Yr As Float, tolerance As Float) As Boolean
+
+  Dim angle, major, minor, angle2, x, y As Float
+
+  ' necesito determinar el radio en el angulo del punto que estaria sobre la elipse
+  angle = Ang(xr - E.P[0], yr - E.P[1]) ' * 180 / Pi
+
+  ' el radio en este agulo viene dado por
+
+  major = Sqr((E.p[2] - E.p[0]) ^ 2 + (E.p[3] - E.p[1]) ^ 2)
+  Minor = major * E.fParam[0]
+  angle2 = Ang(E.p[2] - E.p[0], E.p[3] - E.p[1])
+
+  ' x = gcd.CurrDrawing.arrEntities[e].p[0] + major * Cos(angle) * Cos(angle2) - minor * Sin(angle) * Sin(angle2)
+  ' y = gcd.CurrDrawing.arrEntities[e].p[1] + major * Cos(angle) * Sin(angle2) + minor * Sin(angle) * Cos(angle2)
+
+  x = E.p[0] + major * Cos(angle) * Cos(angle2) - minor * Sin(angle) * Sin(angle2)
+  y = E.p[1] + major * Cos(angle) * Sin(angle2) + minor * Sin(angle) * Cos(angle2)
+
+  ' veo si en esa posicion esta cerca de la elipse
+  'If Abs(puntos.distancia(xr, yr, x, y)) < tolerance Then
+
+  ' If Abs(puntos.distancia(xr, yr, gcd.CurrDrawing.arrEntities[e].P[0], gcd.CurrDrawing.arrEntities[e].P[1]) - Sqr(x * x + y * y)) < tolerance Then
+  '   ' tengo que ver si esa en la porcion
+  '   angle = Angle * 180 / Pi
+  '   If angle < 0 Then angle += 360
+  '   If gcd.CurrDrawing.arrEntities[e].fParam[1] <= gcd.CurrDrawing.arrEntities[e].fParam[2] Then
+  '     If angle >= gcd.CurrDrawing.arrEntities[e].fParam[1] And angle <= gcd.CurrDrawing.arrEntities[e].fParam[2] Then Break
+  '   Else
+  '     If angle >= gcd.CurrDrawing.arrEntities[e].fParam[1] Or angle <= gcd.CurrDrawing.arrEntities[e].fParam[2] Then Break
+  '   End If
+  'Break
+  x = major * Cos(angle) * Cos(angle2) - minor * Sin(angle) * Sin(angle2)
+  y = major * Cos(angle) * Sin(angle2) + minor * Sin(angle) * Cos(angle2)
+
+  ' veo si en esa posicion esta cerca de la elipse
+  If Abs(puntos.distancia(xr, yr, E.P[0], E.P[1]) - Sqr(x * x + y * y)) < tolerance Then
+    ' tengo que ver si esa en la porcion
+    angle = Angle * 180 / Pi
+    If angle < 0 Then angle += 360
+    If E.fParam[1] <= E.fParam[2] Then
+      If angle >= E.fParam[1] And angle <= E.fParam[2] Then Return True
+    Else
+      If angle >= E.fParam[1] Or angle <= E.fParam[2] Then Return True
+    End If
+    'Break
+
+  End If
+
+  ' ademas verifico si esta sobre el centro
+
+  If puntos.Around(xr, yr, E.P[0], E.P[1], tolerance) Then Return True
+
+  Return False
+
+End

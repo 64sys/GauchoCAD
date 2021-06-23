@@ -21,7 +21,7 @@
 ' Boston, MA  02110-1301  USA
 Create Static
 ' Fast
-Inherits EntityBase
+Inherits CadLWPolyline
 Public Const Gender As String = "Solid"
 Public Const PointsToDraw As Integer = 0             ' minimal point requered for drawing something usefull
 Public Const HelperTrabajo As String = ("Solid")
