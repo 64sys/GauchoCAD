@@ -31,7 +31,7 @@
 
 Create Static       ' This two preposition are the same as creating a module instead of a
 Create Private      ' class in Gambas.
-Fast Unsafe        ' TODO: alwways set this after debugging
+' Fast Unsafe        ' TODO: alwways set this after debugging
 Public HookSize As Integer = 16                       ' for use with poi
 Public NumericTolerance As Float = 1e-7
 
@@ -81,7 +81,7 @@ Public Function PolygonTriangulation3(fPolygon As Float[]) As Float[]
 
   'Dim UsedTracts As New Boolean[]
   Dim Wasted As New Float[]
-  'Dim ExtraTract2 As New Integer[]
+  Dim Intersec As New Float[]
   Dim fPoly As New Float[]
   Dim Triangles As New Float[]
   Dim TriangleTest As New Float[]
@@ -146,16 +146,10 @@ Public Function PolygonTriangulation3(fPolygon As Float[]) As Float[]
       MidY = (fPoly[PivotIzq * 2 + 1] + fPoly[TestPoint * 2 + 1]) / 2
 
       If Me.isInside(fPoly, MidX, MidY) Then ' cumple la primer condicion
-        EsUtil = True
-        For i2 = 0 To fPoly.Max Step 2
-          If (i2 / 2 <> PivotDer) And (i2 / 2 <> PivotIzq) And (i2 / 2 <> TestPoint) Then
-            If Me.IsPointInTri([fPoly[PivotIzq * 2], fPoly[PivotIzq * 2 + 1]], [fPoly[PivotDer * 2], fPoly[PivotDer * 2 + 1]], [fPoly[TestPoint * 2], fPoly[TestPoint * 2 + 1]], [fPoly[i2], fPoly[i2 + 1]]) Then
-              EsUtil = False
-            Endif
-          End If
-        Next
 
-        If EsUtil Then ' cumple la segunda
+        Intersec = Me.LinePolyIntersection2([fPoly[PivotIzq * 2], fPoly[PivotIzq * 2 + 1], fPoly[TestPoint * 2], fPoly[TestPoint * 2 + 1]], fPoly)
+
+        If Intersec.Count = 0 Then ' cumple la segunda
           ' se cumplen ambas condiciones, agrego el triangulo
           Triangles.Insert([fPoly[PivotIzq * 2], fPoly[PivotIzq * 2 + 1], fPoly[PivotDer * 2], fPoly[PivotDer * 2 + 1], fPoly[TestPoint * 2], fPoly[TestPoint * 2 + 1]])
 
@@ -173,16 +167,14 @@ Public Function PolygonTriangulation3(fPolygon As Float[]) As Float[]
       MidY = (fPoly[PivotDer * 2 + 1] + fPoly[TestPoint * 2 + 1]) / 2
 
       If Me.isInside(fPoly, MidX, MidY) Then ' cumple la primer condicion
-        EsUtil = True
 
-        For i2 = 0 To fPoly.Max Step 2
-          If (i2 / 2 <> PivotDer) And (i2 / 2 <> PivotIzq) And (i2 / 2 <> TestPoint) Then
-            If Me.IsPointInTri([fPoly[PivotIzq * 2], fPoly[PivotIzq * 2 + 1]], [fPoly[PivotDer * 2], fPoly[PivotDer * 2 + 1]], [fPoly[TestPoint * 2], fPoly[TestPoint * 2 + 1]], [fPoly[i2], fPoly[i2 + 1]]) Then
-              EsUtil = False
-            Endif
-          End If
-        Next
-        If EsUtil Then ' cumple la segunda
+        Intersec = Me.LinePolyIntersection2([fPoly[PivotDer * 2], fPoly[PivotDer * 2 + 1], fPoly[TestPoint * 2], fPoly[TestPoint * 2 + 1]], fPoly)
+
+        If Intersec.Count = 0 Then ' cumple la segunda
+
+          ' se cumplen ambas condiciones, agrego el triangulo
+          Triangles.Insert([fPoly[PivotIzq * 2], fPoly[PivotIzq * 2 + 1], fPoly[PivotDer * 2], fPoly[PivotDer * 2 + 1], fPoly[TestPoint * 2], fPoly[TestPoint * 2 + 1]])
+
 
           ' Elimino el pivote izq
           NoUsados.Remove(i)
@@ -767,6 +759,57 @@ Public Function lineLineIntersection2(Ax As Float, Ay As Float, Bx As Float, By 
     Dim y As Float = (a1 * c2 - a2 * c1) / determinant
     Return [x, y]
   End If
+
+End
+
+' Devuelve el punto de intersecion de una linea con una polilinea cerrada
+Public Function LinePolyIntersection2(flxLine As Float[], flxPoly As Float[]) As Float[]
+
+  ' la polylinea se considera cerrada y de mas de 3 puntos, caso contrario se devuelve la linea sin cambios
+  ' la linea es de dos puntos , si esta afuera de la polilinea, se devuelve un array vacio
+  ' Chequeos previos:
+
+  Dim GotIt As Boolean
+  Dim i As Integer
+  Dim flxRta As New Float[]
+
+  If flxLine.Count <> 4 Then Return []
+
+
+  ' fuera de los casos triviales, entonces armo el array de intersecciones
+  Dim flxIntersections As New Float[]
+
+  ' busco todas las intersecciones de la linea con la polilinea
+  For i = 0 To flxPoly.count - 4 Step 2
+    ' verifico que ningun punto coincida
+    If (flxLine[0] = flxPoly[i + 0]) And (flxLine[1] = flxPoly[i + 1]) Then Continue
+    If (flxLine[0] = flxPoly[i + 2]) And (flxLine[1] = flxPoly[i + 3]) Then Continue
+    If (flxLine[2] = flxPoly[i + 0]) And (flxLine[3] = flxPoly[i + 1]) Then Continue
+    If (flxLine[2] = flxPoly[i + 2]) And (flxLine[3] = flxPoly[i + 3]) Then Continue
+
+
+    If puntos.doIntersect(flxLine[0], flxLine[1], flxLine[2], flxLine[3], flxPoly[i + 0], flxPoly[i + 1], flxPoly[i + 2], flxPoly[i + 3]) Then
+      flxIntersections.Insert(puntos.lineLineIntersection2(flxLine[0], flxLine[1], flxLine[2], flxLine[3], flxPoly[i + 0], flxPoly[i + 1], flxPoly[i + 2], flxPoly[i + 3]))
+      Return flxIntersections
+
+    Endif
+  Next
+
+  ' verifico que ningun punto coincida
+  If (flxLine[0] = flxPoly[flxPoly.Max - 1]) And (flxLine[1] = flxPoly[flxPoly.Max]) Then Return []
+  If (flxLine[0] = flxPoly[0]) And (flxLine[1] = flxPoly[1]) Then Return []
+  If (flxLine[2] = flxPoly[flxPoly.Max - 1]) And (flxLine[3] = flxPoly[flxPoly.Max]) Then Return []
+  If (flxLine[2] = flxPoly[0]) And (flxLine[3] = flxPoly[1]) Then Return []
+
+
+  ' y el cierre de la poly
+  If puntos.doIntersect(flxLine[0], flxLine[1], flxLine[2], flxLine[3], flxPoly[flxPoly.Max - 1], flxPoly[flxPoly.Max], flxPoly[0], flxPoly[1]) Then
+    flxIntersections.Insert(puntos.lineLineIntersection2(flxLine[0], flxLine[1], flxLine[2], flxLine[3], flxPoly[flxPoly.Max - 1], flxPoly[flxPoly.Max], flxPoly[0], flxPoly[1]))
+  Endif
+
+  ' si el primer punto esta adentro, pero no se da el caso particular que coincide con parte de la polilinea, lo agrego
+
+  Return flxIntersections
 
 End
 

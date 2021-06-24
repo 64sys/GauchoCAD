@@ -346,7 +346,7 @@ Public Function MouseMove(mouseX As Integer, mouseY As Integer) ' esta rutina es
 
 End
 
-Public Function MouseDown(mouseX As Integer, mouseY As Integer) ' esta rutina es llamada por FCAD en el evento DrawingArea_MouseDown
+Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' esta rutina es llamada por FCAD en el evento DrawingArea_MouseDown
 
   Dim X, Y, f As Float
 
@@ -428,7 +428,7 @@ Public Function MouseDown(mouseX As Integer, mouseY As Integer) ' esta rutina es
 
 End
 
-Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' esta rutina es llamada por FCAD en el evento DrawingArea_MouseUp
+Public Function MouseDown(mouseX As Integer, mouseY As Integer) ' esta rutina es llamada por FCAD en el evento DrawingArea_MouseUp
 
   'Debug elem.P.Count
 

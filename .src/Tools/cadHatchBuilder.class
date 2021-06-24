@@ -40,6 +40,7 @@ Public Function Start(Optional filename As Variant, Optional _mode As Integer = 
   Dim xf As String[]
   Dim f As String
   Dim iREt, nsel As Integer
+  Dim eBorder As Entity
 
   ' desde el grafico entramos siempre a esta parte de la clase
   ' yo tengo q saber el estado de la comunicacion con el user
@@ -69,7 +70,7 @@ Public Function Start(Optional filename As Variant, Optional _mode As Integer = 
 
       nSel = clsEntities.GetSelectionCount()
       If nsel = 0 Then Return
-      If (gcd.CurrentDrawing.oEntities[gcd.CurrentDrawing.arrSelecIndex[0]].Gender <> "LWPolyline") And (gcd.CurrentDrawing.oEntities[gcd.CurrentDrawing.arrSelecIndex[0]].PolyLine.Count < 6) Then
+      If (gcd.CurrentDrawing.oSelected[gcd.CurrentDrawing.oSelected.First].Gender <> "LWPolyline") And (gcd.CurrentDrawing.oSelected[gcd.CurrentDrawing.oSelected.First].PolyLine.Count < 6) Then
         Message("El contorno esta mal definido")
 
       Else
@@ -91,7 +92,7 @@ Public Function Start(Optional filename As Variant, Optional _mode As Integer = 
 
           Case 3 ' confirma el Hatch
 
-            entHatch = New Entity
+            entHatch = cadHatch.NewEntity()
             entHatch.Gender = "Hatch"
             entHatch.ClassHandler = cadHatch
 
@@ -103,23 +104,35 @@ Public Function Start(Optional filename As Variant, Optional _mode As Integer = 
 
             entHatch.pLayer = gcd.CurrentDrawing.CurrLayer ' "0" 'gcd.GetpLayer(fMain.CurrentLayer)
 
-            entHatch.colour = gcd.CurrentDrawing.CurrColor
-            entHatch.ColorToPaint = gcd.gColor[entHatch.colour]
+            entHatch.pBlock = New Block
+            entHatch.pBlock.oBoundaryPath = New Boundary[]
 
-            If gcd.CurrentDrawing.oEntities[gcd.CurrentDrawing.arrSelecIndex[0]].Gender <> "LWPolyline" Then
-              If gcd.CurrentDrawing.oEntities[gcd.CurrentDrawing.arrSelecIndex[0]].PolyLine.Count >= 6 Then
-                entHatch.P.Insert(gcd.CurrentDrawing.oEntities[gcd.CurrentDrawing.arrSelecIndex[0]].PolyLine.Copy())
-              Endif
+            Dim oBound As New Boundary
+            entHatch.pBlock.oBoundaryPath.Add(oBound)
 
-            Else
+            oBound.eSegments = New Entity[]
 
-              entHatch.P.Insert(gcd.CurrentDrawing.oEntities[gcd.CurrentDrawing.arrSelecIndex[0]].p.Copy())
 
-            Endif
 
-            gcd.CurrentDrawing.oEntities.Add(entHatch)
 
-            entHatch.ClassHandler.Finish(entHatch, entHatch.ClassHandler.StepsDone)
+            For Each eBorder In gcd.CurrentDrawing.oSelected
+              Select Case eBorder.Gender  ' veo si me sirve de borde
+                Case "Line"
+
+                  oBound.eSegments.Add(eBorder)
+                Case "LWPolyline"
+                  oBound.eSegments.Add(eBorder)
+                Case Else
+
+
+              End Select
+
+
+            Next
+
+            gcd.CurrentDrawing.oEntities.Add(entHatch, entHatch.Handle)
+            gcd.CurrentDrawing.CurrLayer.Entities.Add(entHatch)
+            entHatch.ClassHandler.Finish(entHatch)
 
             'LastEntity = entHatch                                       ' save it to repeat on rigth click
 
@@ -128,9 +141,10 @@ Public Function Start(Optional filename As Variant, Optional _mode As Integer = 
             clsDefaultJob.PoiChecking = True
             DrawingAids.CleanTexts
 
-            clsEntities.GLGenDrawList
+            'clsEntities.GLGenDrawList
 
-            gcd.Redraw
+            gcd.Regen()
+
 
         End Select
 
