@@ -643,3 +643,19 @@ Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
   Return False
 
 End
+
+'' Return if that position is over the entity within the tolerance
+Public Function OverMe(e As Entity, Xr As Float, Yr As Float, tolerance As Float) As Boolean
+
+  Dim oBound As Boundary
+
+  For Each oBound In e.pBlock.oBoundaryPath
+
+    If oBound.Polyline Then
+      If puntos.isInside(oBound.Polyline, xr, yr, tolerance) Then Return True
+    End If
+  Next
+
+  Return False
+
+End

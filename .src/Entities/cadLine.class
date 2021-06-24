@@ -219,6 +219,6 @@ End
 
 Public Function OverMe(e As Entity, Xr As Float, Yr As Float, tolerance As Float) As Boolean
 
-  If puntos.PointToLineDistance([xr, yr], e.p) >= tolerance Then Return True Else Return False
+  If Abs(puntos.PointToLineDistance([xr, yr], e.p)) <= tolerance Then Return True Else Return False
 
 End
