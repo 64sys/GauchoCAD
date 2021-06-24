@@ -2416,7 +2416,14 @@ Public Sub TableView1_Save(Row As Integer, Column As Integer, Value As String)
 
 End
 
-Public Sub Form_KeyRelease()
+Public Sub GLArea1_KeyPress()
+
+  ' Este evento sin nada tiene que estar para prevenir que se dispare dos veces el Form_KeryPress()
+  ' Debug "GLArea", Key.Text
+
+End
+
+Public Sub Form_KeyPress()
 
   Dim com As Variant
   Dim umx As Integer     '' Index in undo array
