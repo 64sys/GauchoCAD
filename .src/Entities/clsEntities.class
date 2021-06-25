@@ -934,8 +934,16 @@ End
 Public Function SelPartial(eTesting As Entity, X1real As Float, Y1real As Float, X2real As Float, Y2real As Float) As Boolean
 
   Dim ii As Integer, puedo As Boolean = False
+  Dim oborder As Boundary
 
   Select Case eTesting.Gender
+
+    Case "Hatch"
+
+      For Each oborder In eTesting.pBlock.oBoundaryPath
+        puedo = puntos.IsPoligonCrossingRect(oborder.Polyline, X1real, Y1real, X2real, Y2real)
+        If puedo Then Return True
+      Next
 
     Case Else
 

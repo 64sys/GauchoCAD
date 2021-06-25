@@ -175,7 +175,6 @@ Public Function PolygonTriangulation3(fPolygon As Float[]) As Float[]
           ' se cumplen ambas condiciones, agrego el triangulo
           Triangles.Insert([fPoly[PivotIzq * 2], fPoly[PivotIzq * 2 + 1], fPoly[PivotDer * 2], fPoly[PivotDer * 2 + 1], fPoly[TestPoint * 2], fPoly[TestPoint * 2 + 1]])
 
-
           ' Elimino el pivote izq
           NoUsados.Remove(i)
 
@@ -775,7 +774,6 @@ Public Function LinePolyIntersection2(flxLine As Float[], flxPoly As Float[]) As
 
   If flxLine.Count <> 4 Then Return []
 
-
   ' fuera de los casos triviales, entonces armo el array de intersecciones
   Dim flxIntersections As New Float[]
 
@@ -786,7 +784,6 @@ Public Function LinePolyIntersection2(flxLine As Float[], flxPoly As Float[]) As
     If (flxLine[0] = flxPoly[i + 2]) And (flxLine[1] = flxPoly[i + 3]) Then Continue
     If (flxLine[2] = flxPoly[i + 0]) And (flxLine[3] = flxPoly[i + 1]) Then Continue
     If (flxLine[2] = flxPoly[i + 2]) And (flxLine[3] = flxPoly[i + 3]) Then Continue
-
 
     If puntos.doIntersect(flxLine[0], flxLine[1], flxLine[2], flxLine[3], flxPoly[i + 0], flxPoly[i + 1], flxPoly[i + 2], flxPoly[i + 3]) Then
       flxIntersections.Insert(puntos.lineLineIntersection2(flxLine[0], flxLine[1], flxLine[2], flxLine[3], flxPoly[i + 0], flxPoly[i + 1], flxPoly[i + 2], flxPoly[i + 3]))
@@ -800,7 +797,6 @@ Public Function LinePolyIntersection2(flxLine As Float[], flxPoly As Float[]) As
   If (flxLine[0] = flxPoly[0]) And (flxLine[1] = flxPoly[1]) Then Return []
   If (flxLine[2] = flxPoly[flxPoly.Max - 1]) And (flxLine[3] = flxPoly[flxPoly.Max]) Then Return []
   If (flxLine[2] = flxPoly[0]) And (flxLine[3] = flxPoly[1]) Then Return []
-
 
   ' y el cierre de la poly
   If puntos.doIntersect(flxLine[0], flxLine[1], flxLine[2], flxLine[3], flxPoly[flxPoly.Max - 1], flxPoly[flxPoly.Max], flxPoly[0], flxPoly[1]) Then

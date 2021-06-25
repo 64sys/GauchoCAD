@@ -124,7 +124,6 @@ Public LineStippleScales As New Integer[]
 
 Public Sub Resize(drwContext As Object) ' only glArea for now
 
-
   ' establecemos adonde vamos a dibujar, porque puede ser en algun lugar mas chico de la misma glDrawingArea
   ' pero en general sera en todo el control
   gl.Viewport(0, 0, drwContext.W, drwContext.h)
@@ -164,7 +163,6 @@ Public Sub Init(drwContext As Object) ' only glArea for now
 
   Resize(drwContext)
 
-
   ' con este color limpiamos la pantalla
   If gcd.flgWindowBackColor = 0 Then
     gl.ClearColor(0, 0, 0, 1)
@@ -194,8 +192,6 @@ Public Sub Init(drwContext As Object) ' only glArea for now
   ' Divide
   LineStipples.Add(&X00000000000000000011001100111111)
   LineStippleScales.Add(1)
-
-
 
   ' Fin de la inicializacion de openGL
 

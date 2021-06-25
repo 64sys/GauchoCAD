@@ -60,6 +60,7 @@ Public Sub Draw(oE As Entity)
   Dim iLoop, iStart As Integer
   Dim fBorder As New Float[]
   Dim oLoop As Boundary
+  Dim E2 As Entity
 
   If Not oE.Visible Then Return
 
@@ -79,6 +80,9 @@ Public Sub Draw(oE As Entity)
       ' iStart += fBorder.Count
 
       oLoop.Polyline = cadHatchBuilder.MakeBorder2(oLoop)
+
+      glPlus.Polygon(oLoop.Polyline, Color.Yellow, 2)
+
       glPlus.TRIANGLES(puntos.PolygonTriangulation3(oLoop.Polyline), gcd.GetGBColor(oE.Colour, oe.pLayer), gcd.GetGBColor(oE.Colour, oe.pLayer))
 
     Next
