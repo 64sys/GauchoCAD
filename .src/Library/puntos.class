@@ -140,7 +140,16 @@ Public Function PolygonTriangulation3(fPolygon As Float[]) As Float[]
       PivotDer = NoUsados[i + 1]
 
       ' pruebo a la derecha
-      TestPoint = NoUsados[i + 2]
+
+      If NoUsados.Count = 4 And PivotIzq = 16 Then Stop
+
+      If i + 2 > NoUsados.max Then
+
+        TestPoint = NoUsados[0]
+      Else
+        TestPoint = NoUsados[i + 2]
+      End If
+
 
       MidX = (fPoly[PivotIzq * 2] + fPoly[TestPoint * 2]) / 2
       MidY = (fPoly[PivotIzq * 2 + 1] + fPoly[TestPoint * 2 + 1]) / 2
@@ -161,6 +170,7 @@ Public Function PolygonTriangulation3(fPolygon As Float[]) As Float[]
       End If
 
       ' pruebo a la izq
+    TestIzq:
       If i - 1 < 0 Then TestPoint = NoUsados[NoUsados.Max] Else TestPoint = NoUsados[i - 1]
 
       MidX = (fPoly[PivotDer * 2] + fPoly[TestPoint * 2]) / 2
@@ -183,14 +193,16 @@ Public Function PolygonTriangulation3(fPolygon As Float[]) As Float[]
       End If
       Inc i
 
-    Loop Until i = NoUsados.max - 1
+
+
+    Loop Until i = NoUsados.max
 
     If iAnterior = NoUsados.Count Then Break ' no podemos formar triangulos
 
   Loop Until NoUsados.Count = 3
 
   ' agrego el ultimo triangulo
-  Triangles.Insert([fPoly[NoUsados[0] * 2], fPoly[NoUsados[0] * 2 + 1], fPoly[NoUsados[1] * 2], fPoly[NoUsados[1] * 2 + 1], fPoly[NoUsados[2] * 2], fPoly[NoUsados[2] * 2 + 1]])
+  If NoUsados.Count = 3 Then Triangles.Insert([fPoly[NoUsados[0] * 2], fPoly[NoUsados[0] * 2 + 1], fPoly[NoUsados[1] * 2], fPoly[NoUsados[1] * 2 + 1], fPoly[NoUsados[2] * 2], fPoly[NoUsados[2] * 2 + 1]])
 
   Return Triangles
 
@@ -586,10 +598,10 @@ End
 
 ' Returns True If the point p lies
 ' inside the polygon[] With n vertices
-Public Function isInside(polygon As Float[], px As Float, py As Float, Optional StartIndex As Integer = 0, Vertices As Integer = 0) As Boolean
+Public Function isInside(fPolygon As Float[], px As Float, py As Float, Optional StartIndex As Integer = 0, Vertices As Integer = 0) As Boolean
 
   ' There must be at least 3 vertices In polygon[]
-  If vertices = 0 Then vertices = polygon.Count / 2
+  If vertices = 0 Then vertices = fPolygon.Count / 2
 
   If (Vertices < 3) Then
     Return False
@@ -608,20 +620,20 @@ Public Function isInside(polygon As Float[], px As Float, py As Float, Optional 
   For i = StartIndex To vertices * 2 - 1 Step 2
 
     Next1 = i + 2
-    If i = polygon.max - 1 Then next1 = 0
+    If i = fPolygon.max - 1 Then next1 = 0
 
     ' Check If the Line segment From 'p' to
     ' 'extreme' intersects with the line
     ' segment From 'polygon[i]' to 'polygon[next]'
 
-    If (doIntersect(polygon[i], polygon[i + 1], polygon[Next1], polygon[Next1 + 1], px, py, extremeX, extremeY)) Then
+    If (doIntersect(fPolygon[i], fPolygon[i + 1], fPolygon[Next1], fPolygon[Next1 + 1], px, py, extremeX, extremeY)) Then
       ' If the point 'p' is colinear with line
       ' segment 'i-next', then check if it lies
       ' On segment.If it lies, Return True, otherwise False
 
-      If (orientation(polygon[i], polygon[i + 1], px, py, polygon[Next1], polygon[next1 + 1]) = 0) Then
+      If (orientation(fPolygon[i], fPolygon[i + 1], px, py, fPolygon[Next1], fPolygon[next1 + 1]) = 0) Then
 
-        Return onSegment(polygon[i], polygon[i + 1], px, py, polygon[Next1], polygon[next1 + 1])
+        Return onSegment(fPolygon[i], fPolygon[i + 1], px, py, fPolygon[Next1], fPolygon[next1 + 1])
 
       Endif
 
@@ -1084,6 +1096,7 @@ Public Function IsPoligonInsideRect(poligon As Float[], x0 As Float, y0 As Float
 
   Dim i As Integer
 
+  If Not poligon Then Return False
   Dec TotalElements
   If totalelements < 0 Then TotalElements = poligon.Max
 
