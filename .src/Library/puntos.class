@@ -31,7 +31,7 @@
 
 Create Static       ' This two preposition are the same as creating a module instead of a
 Create Private      ' class in Gambas.
-' Fast Unsafe        ' TODO: alwways set this after debugging
+Fast Unsafe        ' TODO: alwways set this after debugging
 Public HookSize As Integer = 16                       ' for use with poi
 Public NumericTolerance As Float = 1e-7
 
@@ -150,7 +150,6 @@ Public Function PolygonTriangulation3(fPolygon As Float[]) As Float[]
         TestPoint = NoUsados[i + 2]
       End If
 
-
       MidX = (fPoly[PivotIzq * 2] + fPoly[TestPoint * 2]) / 2
       MidY = (fPoly[PivotIzq * 2 + 1] + fPoly[TestPoint * 2 + 1]) / 2
 
@@ -193,8 +192,6 @@ Public Function PolygonTriangulation3(fPolygon As Float[]) As Float[]
       End If
       Inc i
 
-
-
     Loop Until i = NoUsados.max
 
     If iAnterior = NoUsados.Count Then Break ' no podemos formar triangulos
@@ -203,6 +200,132 @@ Public Function PolygonTriangulation3(fPolygon As Float[]) As Float[]
 
   ' agrego el ultimo triangulo
   If NoUsados.Count = 3 Then Triangles.Insert([fPoly[NoUsados[0] * 2], fPoly[NoUsados[0] * 2 + 1], fPoly[NoUsados[1] * 2], fPoly[NoUsados[1] * 2 + 1], fPoly[NoUsados[2] * 2], fPoly[NoUsados[2] * 2 + 1]])
+
+  Return Triangles
+
+End
+
+'' Returns n 2D trianlges x0,y0,x1,y1,x2,y2 , x0,y0,x1,y1,x2,y2 and so on
+Public Function PolygonTriangulation4(fPolygon As Float[]) As Float[]
+
+  'Dim UsedTracts As New Boolean[]
+  Dim Wasted As New Float[]
+  Dim Intersec As New Float[]
+  Dim fPoly As New Float[]
+  Dim Triangles As New Float[]
+  Dim TriangleTest As New Float[]
+  Dim i, i2, iCompare, iAnterior As Integer
+  Dim PivotIzq, PivotDer, TestPoint As Integer
+  Dim EsUtil, EsPrimero As Boolean
+  Dim NoUsados As New Integer[]
+  Dim MidX, MidY As Float
+
+  fPoly.Insert(fPolygon.Copy()) ' copio la fuente para no alterarla
+
+  ' el poligono va a tener Count/2 -1 tramos
+  ' La idea es tomar un tramo, comparar ambos puntos a la derecha e izquierda y
+  ' chequear si el triangulo formado esta dentro del poligono, en ese caso elimino el punto
+  ' pivot
+  If fPoly.Count <= 6 Then Return fPoly
+
+  ' verifico que no haya puntos coincidentes
+  For i = 0 To fPoly.Count / 2 - 2
+    If i >= fPoly.Count / 2 - 2 Then Break
+    If fPoly[i * 2] = fPoly[(i + 1) * 2] Then
+      If fPoly[i * 2 + 1] = fPoly[(i + 1) * 2 + 1] Then
+        'puntos coincidente
+        wasted = fPoly.Extract(i * 2, 2)
+      Endif
+    Endif
+  Next
+
+  ' verifico punto inicial y final
+  If fPoly[0] = fPoly[fPoly.Max - 1] Then
+    If fPoly[1] = fPoly[fPoly.Max] Then
+
+      'puntos coincidente
+      wasted = fPoly.Extract(fPoly.Max - 1, 2)
+
+    Endif
+  Endif
+  If fPoly.Count <= 6 Then Return fPoly
+
+  wasted.Clear
+
+  Do
+
+    iAnterior = fPoly.Count
+
+    i = 0
+    Do ' testeo
+      ' Tomo el primer tramo
+
+      PivotIzq = i
+      PivotDer = i + 1
+
+      ' pruebo a la derecha
+
+      'If fpoly.Count = 8 Then Stop
+
+      If (i + 2) * 2 > fPoly.max Then
+
+        TestPoint = 0
+      Else
+        TestPoint = i + 2
+      End If
+
+      MidX = (fPoly[PivotIzq * 2] + fPoly[TestPoint * 2]) / 2
+      MidY = (fPoly[PivotIzq * 2 + 1] + fPoly[TestPoint * 2 + 1]) / 2
+
+      If Me.isInside(fPoly, MidX, MidY) Then ' cumple la primer condicion
+
+        Intersec = Me.LinePolyIntersection2([fPoly[PivotIzq * 2], fPoly[PivotIzq * 2 + 1], fPoly[TestPoint * 2], fPoly[TestPoint * 2 + 1]], fPoly)
+
+        If Intersec.Count = 0 Then ' cumple la segunda
+          ' se cumplen ambas condiciones, agrego el triangulo
+          Triangles.Insert([fPoly[PivotIzq * 2], fPoly[PivotIzq * 2 + 1], fPoly[PivotDer * 2], fPoly[PivotDer * 2 + 1], fPoly[TestPoint * 2], fPoly[TestPoint * 2 + 1]])
+
+          ' Elimino el pivote derecho
+          'NoUsados.Remove(i + 1)
+          fPoly.Remove((i + 1) * 2, 2)
+
+          Break
+        End If
+      End If
+
+      ' pruebo a la izq
+    TestIzq:
+      If i - 1 < 0 Then TestPoint = fPoly.Count / 2 - 1 Else TestPoint = i - 1
+
+      MidX = (fPoly[PivotDer * 2] + fPoly[TestPoint * 2]) / 2
+      MidY = (fPoly[PivotDer * 2 + 1] + fPoly[TestPoint * 2 + 1]) / 2
+
+      If Me.isInside(fPoly, MidX, MidY) Then ' cumple la primer condicion
+
+        Intersec = Me.LinePolyIntersection2([fPoly[PivotDer * 2], fPoly[PivotDer * 2 + 1], fPoly[TestPoint * 2], fPoly[TestPoint * 2 + 1]], fPoly)
+
+        If Intersec.Count = 0 Then ' cumple la segunda
+
+          ' se cumplen ambas condiciones, agrego el triangulo
+          Triangles.Insert([fPoly[PivotIzq * 2], fPoly[PivotIzq * 2 + 1], fPoly[PivotDer * 2], fPoly[PivotDer * 2 + 1], fPoly[TestPoint * 2], fPoly[TestPoint * 2 + 1]])
+
+          ' Elimino el pivote izq
+          'NoUsados.Remove(i)
+          fPoly.Remove(i * 2, 2)
+
+          Break
+        End If
+      End If
+      Inc i
+
+    Loop Until i = fPoly.Count / 2 - 1
+
+    If iAnterior = fPoly.Count Then Break ' no podemos formar triangulos
+
+  Loop ' Until fpoly.Count <= 8
+
+  ' agrego el ultimo triangulo
+  If fpoly.Count = 6 Then Triangles.Insert(fPoly.Copy())
 
   Return Triangles
 
@@ -599,8 +722,12 @@ End
 ' Returns True If the point p lies
 ' inside the polygon[] With n vertices
 Public Function isInside(fPolygon As Float[], px As Float, py As Float, Optional StartIndex As Integer = 0, Vertices As Integer = 0) As Boolean
+  ' Algorithm improved by:
+  ' https://web.cs.ucdavis.edu/~okreylos/TAship/Spring2000/PointInPolygon.html
 
   ' There must be at least 3 vertices In polygon[]
+  Dim OneEqual As Integer
+
   If vertices = 0 Then vertices = fPolygon.Count / 2
 
   If (Vertices < 3) Then
@@ -609,7 +736,7 @@ Public Function isInside(fPolygon As Float[], px As Float, py As Float, Optional
 
   ' Create a point For Line segment From p To infinite
   Dim extremeX, extremeY As Float   '= New Point(INF, p.y)
-
+  Dim fInter As New Float[]
   extremeX = 10E10
   extremeY = py
 
@@ -626,17 +753,17 @@ Public Function isInside(fPolygon As Float[], px As Float, py As Float, Optional
     ' 'extreme' intersects with the line
     ' segment From 'polygon[i]' to 'polygon[next]'
 
+    ' Primer verificacion
+    If (fPolygon[i] < px) And (fPolygon[Next1] < px) Then Continue ' ambos a la izq
+
+    If (fPolygon[i + 1] < py) And (fPolygon[Next1 + 1] < py) Then Continue 'ambos abajo
+
+    If (fPolygon[i + 1] >= py) And (fPolygon[Next1 + 1] >= py) Then Continue 'ambos arriba
+
     If (doIntersect(fPolygon[i], fPolygon[i + 1], fPolygon[Next1], fPolygon[Next1 + 1], px, py, extremeX, extremeY)) Then
       ' If the point 'p' is colinear with line
       ' segment 'i-next', then check if it lies
       ' On segment.If it lies, Return True, otherwise False
-
-      If (orientation(fPolygon[i], fPolygon[i + 1], px, py, fPolygon[Next1], fPolygon[next1 + 1]) = 0) Then
-
-        Return onSegment(fPolygon[i], fPolygon[i + 1], px, py, fPolygon[Next1], fPolygon[next1 + 1])
-
-      Endif
-
       Inc count
 
     Endif
@@ -645,6 +772,13 @@ Public Function isInside(fPolygon As Float[], px As Float, py As Float, Optional
 
   ' Return True If count Is Odd, False otherwise
   Return (count Mod 2 = 1) ' Same As (count % 2 = 1)
+
+End
+
+'' Converts values to Single and returns if they are equal. This is to prevent false negatives with FLoat mantissa.
+Public Function Equal(v1 As Single, v2 As Single) As Boolean
+
+  Return (v1 = v2)
 
 End
 

@@ -81,19 +81,18 @@ Public Sub Draw(oE As Entity)
 
       oLoop.Polyline = cadHatchBuilder.MakeBorder2(oLoop)
 
-      glPlus.Polygon(oLoop.Polyline, Color.Yellow, 2)
-
+      'glPlus.Polygon(oLoop.Polyline, Color.Yellow, 2)
 
       If puntos.IsPoligonSelfIntersecting(oLoop.Polyline) Then
 
         Debug "A polygon in HATCH is self intersecting"
       Endif
 
-      For iLoop = 0 To oLoop.Polyline.Max Step 2
-        glPlus.Circle([oLoop.Polyline[iLoop], oLoop.Polyline[iLoop + 1]], gcd.Metros(4), Color.red, True)
-      Next
-
-      glPlus.TRIANGLES(puntos.PolygonTriangulation3(oLoop.Polyline), gcd.GetGBColor(oE.Colour, oe.pLayer), gcd.GetGBColor(oE.Colour, oe.pLayer))
+      ' For iLoop = 0 To oLoop.Polyline.Max Step 2
+      '   glPlus.Circle([oLoop.Polyline[iLoop], oLoop.Polyline[iLoop + 1]], gcd.Metros(4), Color.red, True)
+      ' Next
+      '
+      glPlus.TRIANGLES(puntos.PolygonTriangulation4(oLoop.Polyline), gcd.GetGBColor(oE.Colour, oe.pLayer), gcd.GetGBColor(oE.Colour, oe.pLayer))
 
     Next
 
