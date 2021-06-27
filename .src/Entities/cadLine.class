@@ -95,21 +95,7 @@ End
 '' The paint version of the entity
 Public Function Draw2(oE As Entity)
 
-  Dim i As Integer
-
-  If gcd.UseCairo Then
-
-    cairo.moveto(oe.P[0], oe.P[1])
-    For i = 2 To oe.P.Max Step 2
-      Cairo.lineto(oe.P[i], oe.P[i + 1])
-
-    Next
-
-    cairo.Stroke
-  Else
-
-    paintPlus.Lines(oE.p)
-  End If
+  paintPlus.Lines(oE.p)
 
 End
 

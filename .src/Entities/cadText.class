@@ -190,31 +190,17 @@ Public Function Draw2(oE As Entity)
 
   angulo = oE.fParam[Me.ipaTextAngle] / 180 * Pi    ' ojo OPENGL--> GRADOS, GAMBAS-->RADIANESDXF
 
-  If gcd.UseCairo Then
-    ctex = Cairo.TextExtents(oe.StringData[Me.sdaText])
-    Cairo.Save
-    cairo.Translate(oE.p[0], oE.p[1])
-    cairo.Rotate(-angulo)
-    cairo.Scale(1, -1)
-    Cairo.Font.Size = oe.fParam[Me.ipaTextHeight]
-    Cairo.DrawText(oe.StringData[Me.sdaText])
+  htext = paint.TextExtents(oe.StringData[Me.sdaText])
+  paint.save
+  paint.Translate(oE.p[0], oE.p[1])
+  paint.Rotate(-angulo)
+  paint.Scale(1, -1)
+  Paint.Font.Size = oe.fParam[Me.ipaTextHeight] / gcd.PrintingScale * 2
+  paint.DrawText(oe.StringData[Me.sdaText])
 
-    cairo.fill
-  Else
-    htext = paint.TextExtents(oe.StringData[Me.sdaText])
-    paint.save
-    paint.Translate(oE.p[0], oE.p[1])
-    paint.Rotate(-angulo)
-    paint.Scale(1, -1)
-    Paint.Font.Size = oe.fParam[Me.ipaTextHeight]
+  paint.Stroke
 
-    paint.DrawText(oe.StringData[Me.sdaText])
-
-    paint.Stroke
-
-    paint.Restore
-
-  Endif
+  paint.Restore
 
 End
 

@@ -186,6 +186,7 @@ End
 Public Sub Finish(oE As Entity) As Boolean
 
   ' tareas finales de armado del objeto
+  Me.BuildGeometry(oe)
 
   oE.psel.resize(oE.p.count / 2)
 
@@ -220,5 +221,10 @@ Public Function OverMe(e As Entity, Xr As Float, Yr As Float, tolerance As Float
   End If
 
   Return False
+
+End
+
+'' Builds the geometry of the entity wthout drwing it
+Public Function BuildGeometry(E As Entity, Optional density As Float)
 
 End

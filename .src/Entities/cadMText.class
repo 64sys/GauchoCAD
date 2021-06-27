@@ -235,6 +235,7 @@ Public Sub Draw(oE As Entity)
   CurrentTextPosX = oE.p[0]
   CurrentTextPosY = oE.p[1]
   CurrentTextHeigth = oE.fParam[Me.ipaTextHeight]
+  If CurrentTextHeigth = 0 Then CurrentTextHeigth = 1
   If oe.fParam[Me.ipaAttchmPoint] <= 3 Then
     CurrentTextPosY -= CurrentTextHeigth
   Else If oe.fParam[Me.ipaAttchmPoint] <= 6 Then
@@ -323,9 +324,12 @@ End
 Public Sub ProcessPart(s As String)
   ' aca viene lo que esta ente {}, sin esos simbolos
 
-  Dim s2, sFont, s3, s4, sTab As String
+  Dim s2, sFont, s3, s4, sTab, sPrint As String
   Dim p1, p2, p3, p4 As Integer
   Dim fAlign, fAlignR, fRect As New Float[]
+
+  Dim angulo As Float, hText As New PaintExtents, lText As String
+  Dim FontScalePrev As Float, ctex As New CairoTextExtents
 
   s2 = s
   'If Left$(s2, 1) = "\\" Then
@@ -333,7 +337,6 @@ Public Sub ProcessPart(s As String)
   Select Case Mid$(s2, 1, 2)
 
     Case "\\U" ' ej \U+0045
-
 
     Case "\\U" ' ej \U+0045
 
@@ -414,7 +417,6 @@ Public Sub ProcessPart(s As String)
 
     Case "\\A"            ' Sets the alignment value; valid values: 0, 1, 2(bottom, center, top)
 
-
       If Mid(s2, 3, 1) = "1" Then ' es mid
 
         ' If TextAngle <> 0 Then
@@ -478,15 +480,9 @@ Public Sub ProcessPart(s As String)
 
         glPlus.DrawText(s4, CurrentTextPosX, CurrentTextPosY, CurrentTextangle, CurrentTextHeigth, CurrentTextColor)
         If Printing Then
-          Paint.save
-          paint.Translate(CurrentTextPosX, CurrentTextPosY)
-          paint.Rotate(-CurrentTextangle)
-          paint.Scale(1, -1)
-          Paint.DrawText(Mid(s2, 1, p2 - 1))
-          Paint.Stroke
-          Paint.Restore
-
-        Endif
+          sPrint = s4
+          GoSub PrintText
+        End If
 
         fRect = glPlus.TextExtends(s4, CurrentTextHeigth)
         puntos.Rotate(fRect, CurrentTextAngle)
@@ -500,19 +496,13 @@ Public Sub ProcessPart(s As String)
 
         s2 = Utils.ProcessTabs(s2)
         If CurrentTextFont <> "" Then glPlus.SelectFont(CurrentTextFont)
-        If Left(s2, 2) = "24" Then Stop
+        'If Left(s2, 2) = "24" Then Stop
 
         glPlus.DrawText(s2, CurrentTextPosX, CurrentTextPosY, CurrentTextAngle, CurrentTextHeigth, CurrentTextColor)
         If Printing Then
-          Paint.save
-          paint.Translate(CurrentTextPosX, CurrentTextPosY)
-          paint.Rotate(-CurrentTextangle)
-          paint.Scale(1, -1)
-
-          Paint.DrawText(s2)
-          Paint.Stroke
-          Paint.Restore
-        Endif
+          sPrint = s2
+          GoSub PrintText
+        End If
 
         fRect = glPlus.TextExtends(s2, CurrentTextHeigth)
         puntos.Rotate(fRect, CurrentTextAngle)
@@ -525,6 +515,22 @@ Public Sub ProcessPart(s As String)
 
   End Select
   ' primero separo en diferentes partes
+
+  Return
+
+PrintText:
+
+  htext = paint.TextExtents(sPrint)
+  paint.save
+  paint.Translate(CurrentTextPosX, CurrentTextPosY)
+  paint.Rotate(-CurrentTextangle * Pi / 180)
+  paint.Scale(1, -1)
+  Paint.Font.Size = CurrentTextHeigth / gcd.PrintingScale * 2
+  paint.DrawText(sPrint)
+  paint.Stroke
+  paint.Restore
+
+  Return
 
 End
 

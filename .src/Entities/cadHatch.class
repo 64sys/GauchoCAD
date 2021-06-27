@@ -54,6 +54,31 @@ Public Const sdaPaternFile As Integer = 1
 ' fParam[0]:  escala del sombreado
 ' fParam[1]:  angulo
 ' StringData[0]: nombre del patron del sombreado
+'' Builds the geometry of the entity wthout drwing it
+Public Function BuildGeometry(E As Entity, Optional density As Float)
+
+  Dim oloop As Boundary
+
+  If LCase(e.StringData[Me.sdaPattern]) <> "solid" Then
+
+    cadHatchBuilder.FillEntityWithHatch2(e)
+
+  Else
+
+    ' para solidos, tengo que hacer una llamada para cada loop de borde
+    ' tengo q ver cuantos puntos tiene cada loop
+    ' Ojo con LibreCAD
+    For Each oLoop In e.pBlock.oBoundaryPath '= 0 To oe.fParam[cadHatch.ipaTotalLoops] - 1
+
+      oLoop.Polyline = cadHatchBuilder.MakeBorder2(oLoop)
+
+      oLoop.Triangles = puntos.PolygonTriangulation4(oLoop.Polyline)
+
+    Next
+
+  End If
+
+End
 
 Public Sub Draw(oE As Entity)
 
@@ -64,8 +89,10 @@ Public Sub Draw(oE As Entity)
 
   If Not oE.Visible Then Return
 
+  'BuildGeometry(oe)
+
   If LCase(oe.StringData[Me.sdaPattern]) <> "solid" Then
-    cadHatchBuilder.FillEntityWithHatch2(oe)
+
     GLplus.Lines(oE.PolyLine, gcd.GetGBColor(oE.Colour, oe.pLayer), oE.LineWidth, oE.LineType.index)
 
   Else
@@ -79,8 +106,6 @@ Public Sub Draw(oE As Entity)
       ' fBorder.Insert(oLoop.e.PolyLine.Copy(iStart, oe.iParam[iLoop]))
       ' iStart += fBorder.Count
 
-      oLoop.Polyline = cadHatchBuilder.MakeBorder2(oLoop)
-
       'glPlus.Polygon(oLoop.Polyline, Color.Yellow, 2)
 
       If puntos.IsPoligonSelfIntersecting(oLoop.Polyline) Then
@@ -88,11 +113,7 @@ Public Sub Draw(oE As Entity)
         Debug "A polygon in HATCH is self intersecting"
       Endif
 
-      ' For iLoop = 0 To oLoop.Polyline.Max Step 2
-      '   glPlus.Circle([oLoop.Polyline[iLoop], oLoop.Polyline[iLoop + 1]], gcd.Metros(4), Color.red, True)
-      ' Next
-      '
-      glPlus.TRIANGLES(puntos.PolygonTriangulation4(oLoop.Polyline), gcd.GetGBColor(oE.Colour, oe.pLayer), gcd.GetGBColor(oE.Colour, oe.pLayer))
+      glPlus.TRIANGLES(oloop.Triangles, gcd.GetGBColor(oE.Colour, oe.pLayer), gcd.GetGBColor(oE.Colour, oe.pLayer))
 
     Next
 
@@ -165,35 +186,6 @@ Public Function BuildPOI(oE As Entity) As Integer
     ' gcd.CurrDrawing.poiLinesRelPoint.Insert([i / 2, i / 2 + 1])
 
   Next
-
-End
-
-' This function will return False if the element couldn't be created for some reason: bad or incomple user input
-' True means all is good, False will instruct the clsEntityBuilder to delete it
-Public Sub Finish(oE As Entity) As Boolean
-
-  'Print "Finish en EntityBase"
-
-  'CreatePolygon(oe)
-
-  '  BuildPOI(oe)
-
-  ' busco el tipo de linea, si hace falta
-
-  ' tareas finales de armado del objeto
-
-  oE.psel.resize(oE.p.count / 2)
-
-  oE.Selected = False
-
-End
-
-Public Sub Cancel()
-
-  gcd.clsJobPrevious = Me
-  gcd.clsJob = clsDefaultJob
-  DrawingAids.CleanTexts
-  '''fMain.redraw
 
 End
 

@@ -86,18 +86,10 @@ Public Sub Draw(oE As Entity)
         bx = mx + B * Sin(ang1)                             ' Tercer punto del Bulge
         by = my - B * Cos(ang1)
 
-        ' gl.PointSize(2)
-        ' gl.Begin(gl.POINTS)
-        ' gl.Vertex2f(oe.P[i * 2], oe.P[i * 2 + 1])
-        ' gl.Vertex2f(bx, by)
-        ' gl.Vertex2f(oe.P[(i + 1) * 2], oe.P[(i + 1) * 2 + 1])
-
         ' aqui podria usar una rutina de arco entre 3 puntos
         fArcParams = puntos.Arc3Point(oe.P[i * 2], oe.P[i * 2 + 1], bx, by, oe.P[(i + 1) * 2], oe.P[(i + 1) * 2 + 1])
         ' traslado el centro
 
-        ' gl.Vertex2f(fArcParams[0], fArcParams[1])
-        ' gl.End
         gl.Translatef(fArcParams[0], fArcParams[1], 0)
 
         ' verifico Start_Angle y End_Angle (esta parte esta intimamente ligada a Arc3Point)
@@ -108,10 +100,6 @@ Public Sub Draw(oE As Entity)
         Else If fArcParams[3] > 0 And fArcParams[4] < 0 Then
 
           Swap fArcParams[3], fArcParams[4]
-          ' fArcParams[4] += 2 * Pi
-          '
-          ' fArcParams[3] = 0
-          ' fArcParams[4] = 0
 
         Else If fArcParams[3] < 0 And fArcParams[4] < 0 Then
           fArcParams[3] += 2 * Pi
@@ -124,8 +112,6 @@ Public Sub Draw(oE As Entity)
 
         If fArcParams[3] > fArcParams[4] Then Swap fArcParams[3], fArcParams[4]
 
-        'Debug fArcParams[3], fArcParams[4]
-        'If fArcParams[3] > fArcParams[4] Then Stop
         glPlus.Arc(fArcParams[2], fArcParams[3], fArcParams[4] - fArcParams[3], gcd.GetGBColor(oE.Colour, oe.pLayer), oE.LineWidth, oe.linetype.Index)
         gl.Translatef(-fArcParams[0], -fArcParams[1], 0)
         fArcParams = Null
@@ -170,21 +156,7 @@ End
 
 Public Function Draw2(oE As Entity)
 
-  Dim i As Integer
-
-  If gcd.UseCairo Then
-
-    cairo.moveto(oe.P[0], oe.P[1])
-    For i = 2 To oe.P.Max Step 2
-      Cairo.lineto(oe.P[i], oe.P[i + 1])
-
-    Next
-
-    cairo.Stroke
-  Else
-
-    paintPlus.Lines(oE.p)
-  End If
+  paintPlus.Lines(oE.p)
 
 End
 '' Creo los puntos de interes

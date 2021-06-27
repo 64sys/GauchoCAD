@@ -129,16 +129,9 @@ End
 
 Public Function Draw2(oE As Entity)
 
-  If gcd.UseCairo Then
+  paint.Arc(oE.p[0], oE.p[1], oE.fParam[0])
 
-    cairo.Arc(oE.p[0], oE.p[1], oE.fParam[0])
-
-    cairo.Stroke
-  Else
-    paint.Arc(oE.p[0], oE.p[1], oE.fParam[0])
-
-    paint.Stroke
-  End If
+  paint.Stroke
 
 End
 '' Creo los puntos de interes
@@ -271,7 +264,6 @@ Public Function OverMe(e As Entity, Xr As Float, Yr As Float, tolerance As Float
 
   If Abs(puntos.distancia(xr, yr, E.P[0], E.P[1]) - E.fParam[0]) < tolerance Then Return True
   If puntos.Around(xr, yr, E.P[0], E.P[1], tolerance) Then Return True
-
 
   Return False
 
