@@ -1,15 +1,15 @@
 # Gambas Form File 3.0
 
 { Form Form
-  MoveScaled(0,0,65,61)
+  MoveScaled(0,0,65,64)
   Arrangement = Arrange.Vertical
   Margin = True
   { Panel1 Panel
-    MoveScaled(1,1,63,52)
+    MoveScaled(1,1,63,55)
     Expand = True
     Arrangement = Arrange.Horizontal
     { Panel2 Panel
-      MoveScaled(0,0,32,48)
+      MoveScaled(0,0,32,52)
       Expand = True
       Arrangement = Arrange.Vertical
       Spacing = True
@@ -21,6 +21,7 @@
           MoveScaled(0,0,24,4)
           Tag = "gray"
           Text = ("Gray scale")
+          Value = True
         }
         { radMono RadioButton
           MoveScaled(0,4,24,4)
@@ -43,6 +44,7 @@
         MoveScaled(2,21,24,4)
         Tag = "geometry"
         Text = ("Geometry")
+        Value = True
       }
       { radAll2 RadioButton mprint
         Name = "radAll2"
@@ -68,15 +70,28 @@
         Tag = "fit"
         Text = ("Fit to paper size")
       }
+      { Panel6 Panel
+        MoveScaled(2,43,29,4)
+        Arrangement = Arrange.Horizontal
+        { chkScale CheckBox mprint
+          Name = "chkScale"
+          MoveScaled(0,0,13,4)
+          Tag = "scalelines"
+          Text = ("Scale")
+        }
+        { TextBox1 TextBox
+          MoveScaled(14,0,15,4)
+        }
+      }
       { chkScaleLines CheckBox mprint
         Name = "chkScaleLines"
-        MoveScaled(2,43,24,4)
+        MoveScaled(2,47,24,4)
         Tag = "scalelines"
         Text = ("Scale line weight")
       }
     }
     { Panel3 Panel
-      MoveScaled(32,0,32,48)
+      MoveScaled(32,0,32,52)
       Expand = True
       Arrangement = Arrange.Vertical
       Spacing = True
@@ -86,6 +101,7 @@
         MoveScaled(2,1,24,4)
         Tag = "landscape"
         Text = ("Landscape")
+        Value = True
       }
       { radPortait RadioButton mprint
         Name = "radPortait"
@@ -107,7 +123,7 @@
     }
   }
   { Panel4 Panel
-    MoveScaled(8,54,50,6)
+    MoveScaled(8,58,50,6)
     Arrangement = Arrange.Horizontal
     Spacing = True
     Margin = True
