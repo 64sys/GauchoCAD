@@ -41,6 +41,7 @@
 '       |                                         |bottom                                           |gldrwArea.w,.h = Gl.Viewport = el area donde dibujo
 '       +-------------------------------------------------------------------------------------------+           = pixeles
 'Fast Unsafe
+' una lbreria de funciones para pasar de Paint a OpenGL
 
 Public Struct letterSt
 
@@ -78,17 +79,6 @@ End Struct
 
 Public glTextures As New TextureSt[]
 
-Public Struct punto3d
-  x As Float
-  Y As Float
-  z As Float
-End Struct
-
-Public Struct punto2d
-  x As Float
-  Y As Float
-End Struct
-
 Public Struct GLColorSt
 
   r As Float
@@ -122,6 +112,33 @@ Public GLDrwListEditing As New Integer[]                ' all entities on edit b
 Public LineStipples As New Integer[]
 Public LineStippleScales As New Integer[]
 
+' modo inmediato o programado
+Public InmediateMode As Boolean = True
+Public InmediateModeRequired As Boolean
+Public VBO_present As Boolean = False   ' si tenemos VBO que dibujar
+
+' VBO
+Public VBO_lines As New Single[]
+Public VBO_vertex As New Single[]
+Public VBO_colors As New Single[]
+Public VBO_normals As New Single[]
+Public VBO_pixels As New Single[]
+
+'' Clears the VBO from memory
+Public Sub VBOFlush()
+
+  VBO_vertex.Clear
+  VBO_colors.Clear
+  VBO_normals.Clear
+  VBO_pixels.Clear
+
+  VBO_vertex = New Single[]
+  VBO_colors.Clear
+  VBO_normals.Clear
+  VBO_pixels.Clear
+
+End
+
 Public Sub Resize(drwContext As Object) ' only glArea for now
 
   ' establecemos adonde vamos a dibujar, porque puede ser en algun lugar mas chico de la misma glDrawingArea
@@ -151,8 +168,8 @@ Public Sub Resize(drwContext As Object) ' only glArea for now
 
   gl.MatrixMode(gl.PROJECTION)
   gl.LoadIdentity
-  Glu.Ortho2D(-drwContext.w / 2, drwContext.w / 2, -drwContext.h / 2, drwContext.h / 2)
-  'Gl.Ortho(-drwContext.w / 2, drwContext.w / 2, -drwContext.h / 2, drwContext.h / 2, 1, -1)
+  'Glu.Ortho2D(-drwContext.w / 2, drwContext.w / 2, -drwContext.h / 2, drwContext.h / 2)
+  Gl.Ortho(-drwContext.w / 2, drwContext.w / 2, -drwContext.h / 2, drwContext.h / 2, 1, -1)
 
   gl.MatrixMode(gl.MODELVIEW)
   gl.LoadIdentity
@@ -161,15 +178,22 @@ End
 
 Public Sub Init(drwContext As Object) ' only glArea for now
 
-  Resize(drwContext)
+  Dim sExt As String
+  Dim bREt As Boolean
 
-  ' con este color limpiamos la pantalla
-  If gcd.flgWindowBackColor = 0 Then
-    gl.ClearColor(0, 0, 0, 1)
-  Else
-    gl.ClearColor(1, 1, 1, 1)
+  'Resize(drwContext)
 
-  Endif
+  Dim gbcolor As Integer
+  Dim r, g, b, a As Float
+
+  gbcolor = drwContext.background
+
+  a = 1 - Color.GetAlpha(gbColor) / 255
+  r = (Shr(gbColor, 16) And 255) / 255
+  g = (Shr(gbColor, 8) And 255) / 255
+  b = (gbColor And 255) / 255
+
+  gl.ClearColor(r, g, b, a)
 
   ' line stipples
 
@@ -192,8 +216,16 @@ Public Sub Init(drwContext As Object) ' only glArea for now
   ' Divide
   LineStipples.Add(&X00000000000000000011001100111111)
   LineStippleScales.Add(1)
+  Print "Support VBO?", gl.CheckExtensions("GL_ARB_vertex_buffer_object")
+  Print "Support GLSL?", gl.CheckExtensions("GL_ARB_vertex_program")
+  Print "Shading version", GL.GetString(gl.SHADING_LANGUAGE_VERSION)
+  Print "GL version", GL.GetString(gl.VERSION)
+  Print "Chipset vendor", GL.GetString(gl.VENDOR)
+  'Print "Extensions", GL.GetString(gl.EXTENSIONS)
 
-  ' Fin de la inicializacion de openGL
+  ' lets make shaders
+  'Me.shaderProgram = Me.LoadShader("VertexShader1.txt", "FragmentShader1.txt")
+  ' Print "Shader loading result:", gl.GetShaderInfoLog(Me.shaderProgram)
 
 End
 
@@ -256,31 +288,55 @@ Public Sub Rectangle2D(x1 As Float, y1 As Float, w As Float, h As Float, Optiona
 End
 
 '' Dibuja un serie de lineas
-Fast Unsafe Public Function Lines(vertices As Float[], Optional colour As Integer = 0, LineWidth As Float = 1, dashes As Integer = 0)
+Public Function Lines(vertices As Float[], Optional colour As Integer = 0, LineWidth As Float = 1, dashes As Integer = 0)
 
   Dim i As Integer
+  Dim r As Float, g As Float, b As Float
 
-  'glColorRGB(colour)
-  gl.LineWidth(LineWidth) ' obsoleto en WebGL
-  If dashes > 0 Then
-    gl.LineStipple(LineStippleScales[dashes], LineStipples[dashes])
-    gl.Enable(GL.LINE_STIPPLE)
-  Else
+  'If gbcolor > 0 Then Stop
+  r = (Shr(Colour, 16) And 255) / 256
+  g = (Shr(Colour, 8) And 255) / 256
+  b = (Colour And 255) / 256
 
-    gl.Disable(GL.LINE_STIPPLE)
+  If InmediateMode Then
+    'glColorRGB(colour)
+    gl.LineWidth(LineWidth) ' obsoleto en WebGL
+    If dashes > 0 Then
+      gl.LineStipple(LineStippleScales[dashes], LineStipples[dashes])
+      gl.Enable(GL.LINE_STIPPLE)
+    Else
 
-  Endif
+      gl.Disable(GL.LINE_STIPPLE)
 
-  gl.Begin(gl.Lines)
+    Endif
 
-  For i = 0 To vertices.Max Step 2
-    glColorRGB(colour)
-    gl.Vertex2f(vertices[i], vertices[i + 1])
+    gl.Begin(gl.Lines)
 
-  Next
-  gl.end
+    For i = 0 To vertices.Max Step 2
+      glColorRGB(colour)
+      gl.Vertex2f(vertices[i], vertices[i + 1])
 
-  If dashes > 0 Then gl.Disable(GL.LINE_STIPPLE)
+    Next
+    gl.end
+
+    If dashes > 0 Then gl.Disable(GL.LINE_STIPPLE)
+  Else ' we as writing to an array
+    For i = 0 To vertices.Max Step 2
+      VBO_vertex.Add(vertices[i])         'X
+      VBO_vertex.Add(vertices[i + 1])     'Y
+      VBO_vertex.Add(0)                   'Z
+
+      VBO_colors.Add(r)                    'R
+      VBO_colors.Add(g)                    'G
+      VBO_colors.Add(b)                    'B
+
+      VBO_normals.Add(0)                    'Normales apuntan al user
+      VBO_normals.Add(0)                    '
+      VBO_normals.Add(1)                    '
+
+    Next
+
+  End If
 
 End
 
@@ -358,7 +414,7 @@ Fast Unsafe Public Function Arc(Optional radio As Float, start_angle As Float, l
 
   For theta = 0 To length Step angle_increment
 
-    GLplus.Vertex2D(radio * Cos(start_angle + theta), radio * Sin(start_angle + theta), colour)
+    Vertex2D(radio * Cos(start_angle + theta), radio * Sin(start_angle + theta), colour)
   Next
 
   GL.End
@@ -517,7 +573,7 @@ Fast Unsafe Public Function Circle(center As Float[], radious As Float, Optional
     ' el punto considerando 0,0 al centro
     x = center[0] + radious * Cos(theta)
     y = center[1] + radious * Sin(theta)
-    GLplus.Vertex2D(x, y, Colour)
+    Vertex2D(x, y, Colour)
   Next
   gl.End
   If dashes > 0 Then gl.Disable(GL.LINE_STIPPLE)
@@ -533,14 +589,7 @@ Fast Unsafe Public Sub glColorRGB(gbColor As Integer)
   r = (Shr(gbColor, 16) And 255) / 255
   g = (Shr(gbColor, 8) And 255) / 255
   b = (gbColor And 255) / 255
-  glColor4f(r, g, b, a)
-  'Debug r, g, b, a
-
-End
-
-Fast Unsafe Public Sub glColor4f(r As Float, g As Float, b As Float, Optional Alpha As Float = 1)
-
-  gl.Color4f(r, g, b, Alpha)
+  gl.Color4f(r, g, b, a)
 
 End
 
@@ -901,7 +950,7 @@ End
 '' Grafica un texto en el contexto actual de acuerdo a los parametros pasados
 '' Debe estar definida la Font con nombre y altura
 ''
-Public Function DrawText(UTFstring As String, posX As Float, posY As Float, Optional angle As Float = 0, textH As Float = 1, colour As Integer = -14, linewidth As Float = 1, rectW As Float = 0, rectH As Float = 0, alignHoriz As Integer = 0, alignVert As Integer = 0) As Boolean
+Fast Unsafe Public Function DrawText(UTFstring As String, posX As Float, posY As Float, Optional angle As Float = 0, textH As Float = 1, colour As Integer = -14, linewidth As Float = 1, rectW As Float = 0, rectH As Float = 0, alignHoriz As Integer = 0, alignVert As Integer = 0) As Boolean
 
   Dim i, iii, UTFcode, LetterIndex As Integer, Xadvance As Float
 
@@ -932,50 +981,50 @@ End
 '' Grafica un texto de varias lineas en el contexto actual de acuerdo a los parametros pasados
 '' Debe estar definida la Font con nombre y altura
 ''
-' Fast Unsafe Public Function DrawMultilineText(UTFMultiString As String, posX As Float, posY As Float, Optional angle As Float = 0, textH As Float = 1, colour As Integer = -14, linewidth As Float = 1, rectW As Float = 0, rectH As Float = 0, alignHoriz As Integer = 0, alignVert As Integer = 0) As Boolean
-'
-'   Dim i, iii, UTFcode, LetterIndex As Integer, Xadvance, xtotaladvance, Yadvance, ytotaladvance As Float
-'   Dim mLines As String[], dH As Float, tLine As String
-'   Dim tRect As New Float[]
-'
-'   tRect.Insert([0.0, 0.0])
-'   mlines = Split(UTFMultiString, gb.CrLf & gb.Cr & gb.lf)
-'
-'   gl.PushMatrix                                                               ' para evitar peleas, guardo la matriz de trnasformacion
-'   gl.Translatef(posX, posY, 0)
-'   gl.Rotatef(angle, 0, 0, 1)
-'   gl.Scalef(textH * FontScale, textH * FontScale, 1)
-'   If colour <> -14 Then Me.glColorRGB(colour)
-'   For Each tLine In mLines
-'
-'     For i = 1 To Len(tLine)                                                 ' para cada letra
-'       UTFcode = String.Code(tLine, i)                                     ' obtengo el UTF code
-'       If UTFcode = 32 Then                                                    ' es un espacio
-'         gl.Translatef(ActualFont.LetterSpacing, 0, 0)                       ' muevo el puntero a la siguiente posicion
-'         xtotaladvance += ActualFont.LetterSpacing
-'       Else
-'         LetterIndex = GetCodeIndex(ActualFont, UTFcode)                     ' obtengo el indice de la letra
-'         Lines(ActualFont.Letter[LetterIndex].FontGlyps, colour)                     ' la dibujo
-'         For iii = 0 To ActualFont.Letter[LetterIndex].FontGlyps.Max Step 2  ' calculo cuanto tiene que avanzar el puntero
-'           If ActualFont.Letter[LetterIndex].FontGlyps[iii] > Xadvance Then Xadvance = ActualFont.Letter[LetterIndex].FontGlyps[iii]
-'           If ActualFont.Letter[LetterIndex].FontGlyps[iii + 1] > tRect[1] Then tRect[1] = ActualFont.Letter[LetterIndex].FontGlyps[iii + 1]
-'         Next
-'         tRect[0] += (Xadvance + ActualFont.LetterSpacing) * textH * FontScale
-'         gl.Translatef(Xadvance + ActualFont.LetterSpacing, 0, 0)                                       ' muevo el puntero a la siguiente posicion
-'
-'         xtotaladvance += Xadvance + ActualFont.LetterSpacing
-'         'Debug Xadvance
-'         Xadvance = 0
-'       End If
-'     Next
-'
-'     gl.Translatef(-xtotaladvance, -(ActualFont.WordSpacing + tRect[1]), 0)
-'     xtotaladvance = 0
-'   Next
-'
-'   gl.PopMatrix
-'
-' End
+Fast Unsafe Public Function DrawMultilineText(UTFMultiString As String, posX As Float, posY As Float, Optional angle As Float = 0, textH As Float = 1, colour As Integer = -14, linewidth As Float = 1, rectW As Float = 0, rectH As Float = 0, alignHoriz As Integer = 0, alignVert As Integer = 0) As Boolean
+
+  Dim i, iii, UTFcode, LetterIndex As Integer, Xadvance, xtotaladvance, Yadvance, ytotaladvance As Float
+  Dim mLines As String[], dH As Float, tLine As String
+  Dim tRect As New Float[]
+
+  tRect.Insert([0.0, 0.0])
+  mlines = Split(UTFMultiString, gb.CrLf & gb.Cr & gb.lf)
+
+  gl.PushMatrix                                                               ' para evitar peleas, guardo la matriz de trnasformacion
+  gl.Translatef(posX, posY, 0)
+  gl.Rotatef(angle, 0, 0, 1)
+  gl.Scalef(textH * FontScale, textH * FontScale, 1)
+  If colour <> -14 Then Me.glColorRGB(colour)
+  For Each tLine In mLines
+
+    For i = 1 To String.Len(tLine)                                                 ' para cada letra
+      UTFcode = String.Code(tLine, i)                                     ' obtengo el UTF code
+      If UTFcode = 32 Then                                                    ' es un espacio
+        gl.Translatef(ActualFont.LetterSpacing, 0, 0)                       ' muevo el puntero a la siguiente posicion
+        xtotaladvance += ActualFont.LetterSpacing
+      Else
+        LetterIndex = GetCodeIndex(ActualFont, UTFcode)                     ' obtengo el indice de la letra
+        Lines(ActualFont.Letter[LetterIndex].FontGlyps, colour)                     ' la dibujo
+        For iii = 0 To ActualFont.Letter[LetterIndex].FontGlyps.Max Step 2  ' calculo cuanto tiene que avanzar el puntero
+          If ActualFont.Letter[LetterIndex].FontGlyps[iii] > Xadvance Then Xadvance = ActualFont.Letter[LetterIndex].FontGlyps[iii]
+          If ActualFont.Letter[LetterIndex].FontGlyps[iii + 1] > tRect[1] Then tRect[1] = ActualFont.Letter[LetterIndex].FontGlyps[iii + 1]
+        Next
+        tRect[0] += (Xadvance + ActualFont.LetterSpacing) * textH * FontScale
+        gl.Translatef(Xadvance + ActualFont.LetterSpacing, 0, 0)                                       ' muevo el puntero a la siguiente posicion
+
+        xtotaladvance += Xadvance + ActualFont.LetterSpacing
+        'Debug Xadvance
+        Xadvance = 0
+      End If
+    Next
+
+    gl.Translatef(-xtotaladvance, -(ActualFont.WordSpacing + tRect[1]), 0)
+    xtotaladvance = 0
+  Next
+
+  gl.PopMatrix
+
+End
 
 '' devuelve un rectangulo que contiene al texto
 '' [ancho,alto]
@@ -986,7 +1035,7 @@ Fast Unsafe Public Function TextExtends(UTFstring As String, textH As Float) As 
 
   tRect.Insert([0.0, 0.0])
 
-  For i = 1 To string.Len(UTFstring)                                                 ' para cada letra
+  For i = 1 To String.Len(UTFstring)                                                 ' para cada letra
     UTFcode = String.Code(UTFstring, i)                                     ' obtengo el UTF code
     If UTFcode = 32 Then                                                    ' es un espacio
       tRect[0] += ActualFont.LetterSpacing * textH * FontScale

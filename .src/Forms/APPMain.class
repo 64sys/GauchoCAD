@@ -707,9 +707,9 @@ Public Sub GLArea1_draw()
     'End If
 
   End If
-  DrawingAids.DrawCoordenadas
-
-  DrawingAids.DibujaHelper
+  ' DrawingAids.DrawCoordenadas
+  '
+  ' DrawingAids.DibujaHelper
 
   gcd.clsJob.Draw()
 

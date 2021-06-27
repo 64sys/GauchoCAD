@@ -22,6 +22,47 @@
 
 Create Static
 
+Public inxBuffersID As New Integer[]
+
+Public Sub DrawArrays()
+
+  Dim iError, vOffset, nOffset, cOffset, tOffset As Integer
+
+  If inxBuffersID.Count = 0 Then Return
+
+  glx.glBindBuffer(glc.ARRAY_BUFFER, inxBuffersID[0])
+
+  iError = glx.glGetError()
+  If iError <> 0 Then Print "GL Error:", iError
+  glx.glEnableClientState(glc.VERTEX_ARRAY)
+  glx.glEnableClientState(glc.NORMAL_ARRAY)
+  glx.glEnableClientState(glc.COLOR_ARRAY)
+
+  iError = glx.glGetError()
+  If iError <> 0 Then Print "GL Error:", iError
+
+  vOffset = 0
+  nOffset = glPlus.VBO_vertex.Count * SizeOf(gb.Single)
+  cOffset = nOffset + glPlus.VBO_normals.Count * SizeOf(glPlus.VBO_normals.Type)
+  'tOffset = cOffset + sizeof colors
+
+  glx.glVertexPointer(3, glc.FLOAT, 0, vOffset)
+  glx.glNormalPointer(glc.FLOAT, 0, nOffset)
+  glx.glColorPointer(3, glc.FLOAT, 0, cOffset)
+
+  iError = glx.glGetError()
+  If iError <> 0 Then Print "GL Error:", iError
+
+  glx.glDrawArrays(glc.LINES, 0, glPlus.VBO_vertex.Count * 3)
+
+  glx.gldisableClientState(glc.VERTEX_ARRAY)
+  glx.gldisableClientState(glc.NORMAL_ARRAY)
+  glx.gldisableClientState(glc.COLOR_ARRAY)
+
+  glx.glBindBuffer(glc.ARRAY_BUFFER, 0)
+
+End
+
 Public Function FIndBlockIDbyHandle(BlockHandle As String) As Block
 
   Dim B As Block
@@ -117,6 +158,95 @@ End
 
 '' Genera las listas GL de cada entidad individual, y la version seleccionada
 '' Borra la lista anterior y genera una nueva
+Public Sub glGenBuffers(Optional eEntity As Entity = Null)
+
+  Dim idDrawing As Integer ' la instancia de dibujo en la que estamos
+  Dim i, iVbo As Integer, e As Entity
+
+  If eEntity Then
+
+    ' If Not gl.islist(eEntity.glDrwList) Then eEntity.glDrwList = gl.GenLists(1)
+    ' gl.NewList(eEntity.glDrwList, gl.COMPILE)
+    ' eEntity.ClassHandler.Draw(eEntity)
+    ' gl.EndList
+    '
+    ' If Not gl.islist(eEntity.glDrwListSel) Then eEntity.glDrwListSel = gl.GenLists(1)
+    ' gl.NewList(eEntity.glDrwListSel, gl.COMPILE)
+    ' eEntity.ClassHandler.DrawSelected(eEntity)
+    ' gl.EndList
+
+  Else
+
+    ' If Not gl.islist(gcd.CurrDrawing.GlListAllEntities) Then gcd.CurrDrawing.GlListAllEntities = gl.GenLists(1)
+    Dim t As Float = Timer
+    Dim iError As Integer
+    ' listas de entidades
+    glPlus.VBOFlush
+    'glPlus.InmediateMode = False
+
+    If gcd.CurrentDrawing.oEntities.Count = 0 Then Return
+    For Each e In gcd.CurrentDrawing.oEntities
+
+      'If Not gl.islist(e.glDrwList) Then e.glDrwList = gl.GenLists(1)
+      'gl.NewList(e.glDrwList, gl.COMPILE)
+      e.ClassHandler.Draw(e)
+      'gl.EndList
+
+    Next
+    glPlus.InmediateMode = True
+
+    Dim oneBufferID As Integer
+    inxBuffersID.Resize(3)
+
+    iError = glx.glGetError()
+    If iError <> 0 Then Print "GL Error:", Hex(iError)
+
+    'glx.glGenBuffers(1, VarPtr(oneBufferID))
+    glx.glGenBuffers(3, inxBuffersID.Data)                      ' genero un buffer ID
+    iError = glx.glGetError()
+    If iError <> 0 Then Print "GL Error:", Hex(iError)
+    glx.glBindBuffer(glc.ARRAY_BUFFER, inxBuffersID[0])      ' lo conecto como Vertex Buffer
+    iError = glx.glGetError()
+    If iError <> 0 Then Print "GL Error:", Hex(iError)
+    Dim BytesTotales As Integer
+    BytesTotales = glPlus.VBO_vertex.Count + glPlus.VBO_normals.Count + glPlus.VBO_colors.Count
+    BytesTotales *= SizeOf(gb.Single)
+
+    ' Reservo espacio. 0 significa que despues le mando la data
+    glx.glBufferData(glc.ARRAY_BUFFER, BytesTotales, 0, glc.STATIC_DRAW)
+    iError = glx.glGetError()
+    If iError <> 0 Then Print "GL Error:", Hex(iError)
+    ' mando vertices
+    glx.glBufferSubData(glc.ARRAY_BUFFER, 0, glPlus.VBO_vertex.Count * SizeOf(gb.Single), glPlus.VBO_vertex.Data)
+
+    ' mando normales
+    glx.glBufferSubData(glc.ARRAY_BUFFER, glPlus.VBO_vertex.Count * SizeOf(gb.Single), glPlus.VBO_normals.Count * SizeOf(gb.Single), glPlus.VBO_normals.Data)
+
+    ' mando colores
+    glx.glBufferSubData(glc.ARRAY_BUFFER, (glPlus.VBO_vertex.Count + glPlus.VBO_normals.Count) * SizeOf(gb.Single), glPlus.VBO_colors.Count * SizeOf(gb.Single), glPlus.VBO_colors.Data)
+    iError = glx.glGetError()
+    If iError <> 0 Then Print "GL Error:", Hex(iError)
+    glx.glBindBuffer(glc.ARRAY_BUFFER, 0)      ' finlizo transferencia de datos a la GPU
+
+    ' ' lista de entidaes seleccionadas
+    ' For Each e In gcd.CurrentDrawing.oEntities
+    '     If Not gl.islist(e.glDrwListSel) Then e.glDrwListSel = gl.GenLists(1)
+    '     gl.NewList(e.glDrwListSel, gl.COMPILE)
+    '     e.ClassHandler.DrawSelected(e)
+    '     gl.EndList
+    ' Next
+    '
+    ' ' lista de todas las entidades
+    ' t = Timer
+    ' glGenDrawListLAyers
+    '
+    ' Debug "GLlista de todas generada en  ", Timer - t
+  End If
+
+End
+
+'' Genera las listas GL de cada entidad individual, y la version seleccionada
+'' Borra la lista anterior y genera una nueva
 Public Sub glGenDrawList(Optional eEntity As Entity = Null)
 
   Dim idDrawing As Integer ' la instancia de dibujo en la que estamos
@@ -148,7 +278,7 @@ Public Sub glGenDrawList(Optional eEntity As Entity = Null)
 
     Next
 
-    ' lista de entidaes en modo seleccionada
+    ' lista de entidaes seleccionadas
     For Each e In gcd.CurrentDrawing.oEntities
       If Not gl.islist(e.glDrwListSel) Then e.glDrwListSel = gl.GenLists(1)
       gl.NewList(e.glDrwListSel, gl.COMPILE)
@@ -188,36 +318,37 @@ Public Sub glGenDrawListSel(Optional mode As Integer = 0)
 
 End
 
-' '' Generates a GL list for the selected
-' '' Mode: 0=Selected version 1=Normal version
-' Public Sub glGenDrawListAll(Optional ExcludeSelected As Boolean = False)
-'
-'   Dim i As Integer, e As Entity
-'
-'   gl.NewList(gcd.CurrentDrawing.GlListAllEntities, gl.COMPILE)
-'
-'   For Each e In gcd.CurrentDrawing.oEntities
-'     If Not (e.Selected And ExcludeSelected) Then gl.CallList(e.glDrwList)
-'
-'   Next
-'
-'   gl.EndList
-'
-'   For Each L As Layer In gcd.CurrentDrawing.oLayers
-'     If Not gl.islist(L.glList) Then L.glList = gl.GenLists(1)
-'     gl.NewList(L.glList, gl.COMPILE)
-'   Next
-'   For Each e In gcd.CurrentDrawing.oEntities
-'     If Not (e.Selected And ExcludeSelected) Then gl.CallList(e.glDrwList)
-'
-'   Next
-'
-'   gl.EndList
-'
-' End
+'' Generates a GL list for the selected
+'' Mode: 0=Selected version 1=Normal version
+Public Sub glGenDrawListAll(Optional ExcludeSelected As Boolean = False)
 
-'' Genera la lista de dibujado segun Layer, o para un Layer en particular
-Public Sub glGenDrawListLayers(Optional aLayer As Layer)
+  Dim i As Integer, e As Entity
+
+  gl.NewList(gcd.CurrentDrawing.GlListAllEntities, gl.COMPILE)
+
+  For Each e In gcd.CurrentDrawing.oEntities
+    If Not (e.Selected And ExcludeSelected) Then gl.CallList(e.glDrwList)
+
+  Next
+
+  gl.EndList
+
+  For Each L As Layer In gcd.CurrentDrawing.oLayers
+    If Not gl.islist(L.glList) Then L.glList = gl.GenLists(1)
+    gl.NewList(L.glList, gl.COMPILE)
+  Next
+  For Each e In gcd.CurrentDrawing.oEntities
+    If Not (e.Selected And ExcludeSelected) Then gl.CallList(e.glDrwList)
+
+  Next
+
+  gl.EndList
+
+End
+
+'' Generates a GL list for the selected
+'' Mode: 0=Selected version 1=Normal version
+Public Sub glGenDrawListLAyers(Optional aLayer As Layer)
 
   Dim i As Integer
   Dim e As Entity
@@ -251,40 +382,40 @@ Public Sub glGenDrawListLayers(Optional aLayer As Layer)
 
 End
 
-' '' Generates a GL list for the selected
-' '' Mode: 0=Selected version 1=Normal version
-' Public Sub glGenDrawListLAyers2(Optional aLayer As Layer)
-'
-'   Dim i As Integer
-'   Dim e As Entity
-'
-'   If aLayer Then
-'
-'     If Not gl.islist(aLayer.glList) Then aLayer.glList = gl.GenLists(1)
-'     gl.NewList(aLayer.glList, gl.COMPILE)
-'     For Each e In gcd.CurrentDrawing.oEntities
-'
-'       If e.pLayer = aLayer Then gl.CallList(e.glDrwList)
-'
-'     Next
-'     gl.EndList
-'
-'   Else
-'
-'     For Each aLayer In gcd.CurrentDrawing.oLayers
-'       If Not gl.islist(aLayer.glList) Then aLayer.glList = gl.GenLists(1)
-'       gl.NewList(aLayer.glList, gl.COMPILE)
-'       For Each e In aLayer.Entities
-'         gl.CallList(e.glDrwList)
-'
-'       Next
-'       gl.EndList
-'
-'     Next
-'
-'   Endif
-'
-' End
+'' Generates a GL list for the selected
+'' Mode: 0=Selected version 1=Normal version
+Public Sub glGenDrawListLAyers2(Optional aLayer As Layer)
+
+  Dim i As Integer
+  Dim e As Entity
+
+  If aLayer Then
+
+    If Not gl.islist(aLayer.glList) Then aLayer.glList = gl.GenLists(1)
+    gl.NewList(aLayer.glList, gl.COMPILE)
+    For Each e In gcd.CurrentDrawing.oEntities
+
+      If e.pLayer = aLayer Then gl.CallList(e.glDrwList)
+
+    Next
+    gl.EndList
+
+  Else
+
+    For Each aLayer In gcd.CurrentDrawing.oLayers
+      If Not gl.islist(aLayer.glList) Then aLayer.glList = gl.GenLists(1)
+      gl.NewList(aLayer.glList, gl.COMPILE)
+      For Each e In aLayer.Entities
+        gl.CallList(e.glDrwList)
+
+      Next
+      gl.EndList
+
+    Next
+
+  Endif
+
+End
 
 Public Sub DrawPoiSymbolsAll()
 
@@ -726,7 +857,7 @@ Public Function CollectVisibleEntities()
   y0 = gcd.Yreal(gcd.ScreenHeight())
 
   'If gcd.CurrentDrawing.oEntities > gcd.CurrentDrawing.arrVisibleEntities.Max Then gcd.CurrentDrawing.arrVisibleEntities.Resize(gcd.CurrentDrawing.oEntities.Count)
-
+  gcd.CurrentDrawing.oVisibleEntities.Clear
   For Each e In gcd.CurrentDrawing.oEntities
     If e.pLayer.Visible Then
 
@@ -934,15 +1065,19 @@ End
 Public Function SelPartial(eTesting As Entity, X1real As Float, Y1real As Float, X2real As Float, Y2real As Float) As Boolean
 
   Dim ii As Integer, puedo As Boolean = False
-  Dim oborder As Boundary
+  Dim oLoop As Boundary
 
   Select Case eTesting.Gender
 
     Case "Hatch"
 
-      For Each oborder In eTesting.pBlock.oBoundaryPath
-        puedo = puntos.IsPoligonCrossingRect(oborder.Polyline, X1real, Y1real, X2real, Y2real)
-        If puedo Then Return True
+      For Each oLoop In eTesting.pBlock.oBoundaryPath
+
+        puedo = puntos.IsPoligonInsideRect(oLoop.Polyline, X1real, Y1real, X2real, Y2real)
+        If puedo Then Break
+
+        puedo = puntos.IsPoligonCrossingRect(oLoop.Polyline, X1real, Y1real, X2real, Y2real)
+        If puedo Then Break
       Next
 
     Case Else
@@ -959,14 +1094,14 @@ Public Function SelPartial(eTesting As Entity, X1real As Float, Y1real As Float,
         End If
       Next
 
-      If puedo Then
-
-        Return True
-      Else
-        Return False
-      End If
-
   End Select
+
+  If puedo Then
+
+    Return True
+  Else
+    Return False
+  End If
 
 End
 
@@ -1029,6 +1164,10 @@ Public Function DXFImportToEntity(c As Collection, Optional IsDummy As Boolean =
   ' llenamos Common data:
   e.pLayer = GetLayerByName(c[dxf.codLayer])
   e.Handle = c[dxf.codHandle]
+
+  ' for testing FIXME: ojo con esto!!!
+  ' If e.handle <> "804AC" Then Return Null
+
   e.HandleOwner = c[dxf.codHandleOwner]
   Try e.colour = c[dxf.codColor]            ' no es obligatorio
   Try e.LineWidth = c[dxf.codLWht] / 100    ' por eso el try
