@@ -18,13 +18,12 @@ Component=gb.form.stock
 Component=gb.gui.opengl
 Component=gb.opengl
 Component=gb.logging
-Component=gb.opengl.glsl
 Component=gb.opengl.glu
 Component=gb.pcre
 Component=gb.xml
 Description="GauchoCAD is a free CAD program written in the Gambas language"
 Authors="Terco\nTincho"
-Environment="GB_JIT_DEBUG=1"
+Environment="GB_GUI=gb.qt5"
 TabSize=2
 Translate=1
 Language=en

@@ -90,7 +90,6 @@ Public Function NewParameter(eBuild As Entity, vParam As Variant[], Optional Def
   Else If Me.StepsDone = 3 Then    ' texto
 
     If vParam[0] <> "text" Then Return False
-    eBuild.DrawAble = True
 
     eBuild.StringData[0] = vParam[1]
 
@@ -160,11 +159,9 @@ Public Sub Draw(oE As Entity)
 
   If Not oE.Visible Then Return
 
-  oE.ColorToPaint = gcd.GetGBColor(oE.colour, oE.pLayer)
-
   ' Debug oE.stringdata[0]
 
-  glPlus.DrawText(oE.stringdata[Me.sdaText], oE.p[0], oE.p[1], oE.fParam[Me.ipaTextAngle], oE.fParam[Me.ipaTextHeight], oE.ColorToPaint)
+  glPlus.DrawText(oE.stringdata[Me.sdaText], oE.p[0], oE.p[1], oE.fParam[Me.ipaTextAngle], oE.fParam[Me.ipaTextHeight], gcd.GetGBColor(oE.Colour, oe.pLayer))
 
 End
 
@@ -180,7 +177,7 @@ Public Sub DrawRemark(oE As Entity)
 
   If Not oE.Visible Then Return
 
-  GLplus.Polygon(oE.Polygon, oE.ColorToPaint, oE.LineWidth, gcd.stiDashed)
+  GLplus.Polygon(oE.Polygon, gcd.GetGBColor(oE.Colour, oe.pLayer), oE.LineWidth, gcd.stiDashed)
 
 End
 
@@ -193,31 +190,17 @@ Public Function Draw2(oE As Entity)
 
   angulo = oE.fParam[Me.ipaTextAngle] / 180 * Pi    ' ojo OPENGL--> GRADOS, GAMBAS-->RADIANESDXF
 
-  If gcd.UseCairo Then
-    ctex = Cairo.TextExtents(oe.StringData[Me.sdaText])
-    Cairo.Save
-    cairo.Translate(oE.p[0], oE.p[1])
-    cairo.Rotate(-angulo)
-    cairo.Scale(1, -1)
-    Cairo.Font.Size = oe.fParam[Me.ipaTextHeight]
-    Cairo.DrawText(oe.StringData[Me.sdaText])
+  htext = paint.TextExtents(oe.StringData[Me.sdaText])
+  paint.save
+  paint.Translate(oE.p[0], oE.p[1])
+  paint.Rotate(-angulo)
+  paint.Scale(1, -1)
+  Paint.Font.Size = oe.fParam[Me.ipaTextHeight] / gcd.PrintingScale * 2
+  paint.DrawText(oe.StringData[Me.sdaText])
 
-    cairo.fill
-  Else
-    htext = paint.TextExtents(oe.StringData[Me.sdaText])
-    paint.save
-    paint.Translate(oE.p[0], oE.p[1])
-    paint.Rotate(-angulo)
-    paint.Scale(1, -1)
-    Paint.Font.Size = oe.fParam[Me.ipaTextHeight]
+  paint.Stroke
 
-    paint.DrawText(oe.StringData[Me.sdaText])
-
-    paint.Stroke
-
-    paint.Restore
-
-  Endif
+  paint.Restore
 
 End
 
@@ -395,3 +378,10 @@ End
 '   "width_factor": 0.8,
 '   "text_value": "FECHA",
 '   "style": [5, 2, 1466, 1466]
+
+'' Return if that position is over the entity within the tolerance
+Public Function OverMe(e As Entity, Xr As Float, Yr As Float, tolerance As Float) As Boolean
+
+  Return False
+
+End

@@ -1,5 +1,7 @@
 ' Gambas class file
 
+' This Class is needed for file import serialization!!!!!
+
 Inherits CadPolyline
 
 Public Const Gender As String = "Polyline_2D"

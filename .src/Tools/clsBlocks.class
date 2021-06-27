@@ -77,7 +77,6 @@ Public Sub Draw()
 
     et.pLayer = gcd.CurrentDrawing.CurrLayer
     et.colour = gcd.CurrentDrawing.CurrColor
-    et.ColorToPaint = gcd.gColor[et.colour]
 
     et.LineType = gcd.CurrentDrawing.CurrLineType
 

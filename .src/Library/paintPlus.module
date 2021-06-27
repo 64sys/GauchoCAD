@@ -1,6 +1,5 @@
 ' Gambas module file
 
-
 Public Function picCirculito(iRadio As Integer, iColorRelleno As Integer, Optional iColorBorder As Integer = -1, iColorBackGround As Integer = -1) As Picture
 
   Dim imgCirculito As Image
@@ -45,26 +44,13 @@ Public Sub Lines(flxPoints As Float[])
 
   Dim i As Integer
 
-  If gcd.UseCairo Then
-    If flxPoints.Count < 3 Then Return
-    cairo.moveto(flxPoints[0], flxPoints[1])
-    For i = 2 To flxPoints.Max Step 2
-      Cairo.lineto(flxPoints[i], flxPoints[i + 1])
+  If flxPoints.Count < 3 Then Return
+  paint.moveto(flxPoints[0], flxPoints[1])
+  For i = 2 To flxPoints.Max Step 2
+    paint.lineto(flxPoints[i], flxPoints[i + 1])
 
-    Next
+  Next
 
-    cairo.Stroke
-  Else
-
-    If flxPoints.Count < 3 Then Return
-    paint.moveto(flxPoints[0], flxPoints[1])
-    For i = 2 To flxPoints.Max Step 2
-      paint.lineto(flxPoints[i], flxPoints[i + 1])
-
-    Next
-
-    paint.Stroke
-  End If
+  paint.Stroke
 
 End
-

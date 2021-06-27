@@ -11,3 +11,8 @@ Public Frozen As Boolean
 Public Locked As Boolean
 Public glList As Integer
 Public Entities As New Entity[]
+
+' For entity tracking
+Public PoiPoints As Float[]     ' center
+Public PoiLines As Float[]      ' any line from entity
+Public PoiPolygons As Float[]   ' areas

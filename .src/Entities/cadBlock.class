@@ -46,7 +46,6 @@ Public Sub Draw(oE As Entity)
     DrawingAids.HelperTrabajo = Str(n) & " entities selected, enter block name:"
 
   Endif
-  oE.DrawAble = True
 
 End
 
@@ -75,7 +74,6 @@ Public Sub Finish(oE As Entity) As Boolean
 
   '''iBlock = clsEntities.GetFreeBlockNumber()
   'oE.fParam.add(iBlock)
-  oE.Finished = True
 
   For Each e In gcd.CurrentDrawing.oEntities
     If e.Selected Then                      ' parto of this

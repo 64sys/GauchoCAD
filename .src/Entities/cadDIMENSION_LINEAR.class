@@ -110,8 +110,7 @@ Public Function NewParameter(eBuild As Entity, vParam As Variant[], Optional Def
     ' Me.pointDefPoint2.y = Me.pointDefPoint1.y
     If definitive Then Return True
   Else If Me.StepsDone = 1 Then
-    eBuild.DrawAble = True
-    eBuild.Finished = True
+
     Try eBuild.p[2] = vParam[1]
     Try eBuild.p[3] = vParam[2]
     eBuild.p[4] = eBuild.p[2]

@@ -32,7 +32,7 @@ Public Const ParamHelper As String = "Point"
 Public Function NewParameter(eBuild As Entity, vParam As Variant[], Optional Definitive As Boolean = False) As Boolean
 
   If Me.StepsDone = 0 Then
-    eBuild.DrawAble = True
+
     Try eBuild.P[0] = vParam[1]
     Try eBuild.P[1] = vParam[2]
 
@@ -45,8 +45,7 @@ End
 Public Sub Draw(oE As Entity)
 
   If Not oE.Visible Then Return
-  If Not oE.DrawAble Then Return
-  oE.ColorToPaint = gcd.GetGBColor(oE.colour, oE.pLayer)
+
   gl.PointSize(oe.LineWidth)
   gl.Begin(gl.POINTS)
   gl.Vertex2f(oe.P[0], oe.P[1])
@@ -57,7 +56,7 @@ End
 '' The paint version of the entity
 Public Function Draw2(oE As Entity)
 
-  Paint.Arc(oE.p[0], oE.p[1], 1)
+  Paint.Arc(oE.p[0], oE.p[1], 1 / gcd.PrintingScale)
   paint.Stroke
 
 End
@@ -144,6 +143,15 @@ Public Function ImportJsonCol(c As JSONCollection, e As Entity) As Boolean
   Return True
 
 Catch
+
+  Return False
+
+End
+
+'' Return if that position is over the entity within the tolerance
+Public Function OverMe(e As Entity, Xr As Float, Yr As Float, tolerance As Float) As Boolean
+
+  If puntos.Around(xr, yr, E.P[0], E.P[1], tolerance) Then Return True
 
   Return False
 

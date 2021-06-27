@@ -117,11 +117,11 @@ Public Function ImportDXF(e As Entity, sClaves As String[], sValues As String[])
 
     If sClaves[i] = "3" Then e.pStyle = gcd.FindStyle(sValues[i])
 
-    ' For DEbug
+    ' ' For DEbug
     ' If sClaves[i] = "42" Then
-    '     If sValues[i] Like "39.46*" Then Stop
+    '   If sValues[i] Like "0.46*" Then Stop
     ' End If
-
+    '
     If sClaves[i] = "70" Then ' Dimension type:
 
       e.iParam[Me.iiiDimType] = CInt(sValues[i])
@@ -193,7 +193,7 @@ Public Function ImportDXF(e As Entity, sClaves As String[], sValues As String[])
   e.fParam[Me.ipaEscY] = 1    ' esc Y
   e.fParam[Me.ipaEscZ] = 1    ' esc Z
 
-  If Not e.pStyle Then e.pStyle = gcd.CurrentDrawing.arrStyles.First
+  If Not e.pStyle Then e.pStyle = gcd.CurrentDrawing.oStyles[gcd.CurrentDrawing.oStyles.First]
   If StyleOverride.fArrowSize_41 > 0 Then Me.DimArrowSize = StyleOverride.fArrowSize_41 Else Me.DimArrowSize = e.pStyle.fArrowSize_41
 
   ' pero puede haber un Style Override que anula el estilo y propone nuevos valores

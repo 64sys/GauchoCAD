@@ -65,15 +65,6 @@ End
 
 Public Sub Draw(oE As Entity)
 
-  Dim ET As Entity, i As Integer
-  Dim pBlockToDraw As Block
-
-  If Not oe.Finished Then Return
-
-  ' gl.PushMatrix
-  ' If Relative Then gl.Translatef(fMain.pixels(oE.p[0]) / gcd.CurrDrawing.ScaleZoom, fMain.pixels(oE.p[1]) / gcd.CurrDrawing.ScaleZoom, 0)
-  ' gl.Rotatef(oE.fParam[Me.ipaRotacion], 0, 0, 1)
-  ' gl.Scalef(oE.fParam[Me.ipaEscX], oE.fParam[Me.ipaEscY], oE.fParam[Me.ipaEscZ])
   If oe.pBlock Then Draw_List(oe.pBlock.entities, oe, oe.pBlock.AbsoluteCoords)
 
 End
@@ -87,6 +78,7 @@ Public Sub Draw_List(eList As Collection, eParent As Entity, Optional InsertionP
   Dim et As Entity
 
   gl.PushMatrix
+
   If InsertionPlace = 0 Then
     gl.Translatef(gcd.Pixels(eParent.p[0]) / gcd.CurrentDrawing.ScaleZoom, gcd.Pixels(eParent.p[1]) / gcd.CurrentDrawing.ScaleZoom, 0)
   Else If InsertionPlace = 1 Then
@@ -150,19 +142,49 @@ End
 
 Public Function Draw2(oE As Entity)
 
-  ' If Not oE.Visible Then Return
-  '
-  ' Dim ET As Entity, i As Integer
-  ' paint.save
-  ' paint.Translate(fMain.pixels(oE.p[0]) / gcd.CurrDrawing.ScaleZoom, fMain.pixels(oE.p[1]) / gcd.CurrDrawing.ScaleZoom)
-  ' paint.Scale(oE.fParam[0], oE.fParam[1])
-  ' paint.Rotate(oE.fParam[2])
-  ' gcd.ScaleLines = (Abs(oE.fParam[0]) + Abs(oE.fParam[1])) / 2
-  ' For Each ET In gcd.CurrDrawing.arrBlocks[i].entities
-  '   et.Draw
-  ' Next
-  ' gcd.ScaleLines = 1
-  ' paint.Restore
+  If oe.pBlock Then Draw_List2(oe.pBlock.entities, oe, oe.pBlock.AbsoluteCoords)
+
+End
+
+Public Sub Draw_List2(eList As Collection, eParent As Entity, Optional InsertionPlace As Integer = 0)
+  'insertion place:
+  ' 0 = entity.P[0],[1]
+  ' 1 = entity.pBlock.entities.P[0],[1]
+  ' 2 = entity.pBlock.x0,y0
+
+  Dim et As Entity
+
+  Paint.Save
+
+  If InsertionPlace = 0 Then
+    Paint.Translate(gcd.Pixels(eParent.p[0]) / gcd.CurrentDrawing.ScaleZoom, gcd.Pixels(eParent.p[1]) / gcd.CurrentDrawing.ScaleZoom)
+  Else If InsertionPlace = 1 Then
+    ' absolute coordinate, so each entity has its own position
+    ' nothing to translate
+  Else If InsertionPlace = 2 Then
+    Paint.translate(gcd.Pixels(eParent.pBlock.x0) / gcd.CurrentDrawing.ScaleZoom, gcd.Pixels(eParent.pBlock.y0) / gcd.CurrentDrawing.ScaleZoom)
+
+  End If
+
+  Paint.Rotate(eParent.fParam[Me.ipaRotacion] * Pi / 180)
+
+  Paint.Scale(eParent.fParam[Me.ipaEscX], eParent.fParam[Me.ipaEscY])
+
+  For Each ET In eList
+    et.visible = True
+    ' et.LineType = eParent.LineType
+    ' et.colour = eParent.colour
+    ' et.LineWidth = eParent.LineWidth
+    '
+    If et.Gender = "Insert" Then
+
+      If et.pBlock Then Draw_List2(et.pBlock.entities, et)
+    Else
+      et.ClassHandler.Draw2(et)
+    End If
+
+  Next
+  Paint.Restore
 
 End
 '' Creo los puntos de interes
@@ -180,7 +202,7 @@ Public Function BuildPOI(oE As Entity) As Integer
   oe.poiPoints.insert([oE.p[0], oE.p[1]])
   oe.poiType.Add(gcd.poiBasePoint)
   'oe.poiEntities.Add(arrIndex)
-  If oe.Handle = "78193" Then Stop
+  'If oe.Handle = "78193" Then Stop
 
   ' polygon
   Dim fLimits As Float[]

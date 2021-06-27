@@ -120,7 +120,7 @@ Public Function Start(Optional ElemToBuild As Variant, Optional Mode As Integer 
   ' reset from previous element
   elem.ClassHandler.StepsDone = 0
 
-  'elem.gbcolor = fMain.CurrentColor
+  Try elem.colour = gcd.CurrentColor()
 
   iPoints = 0
   iFloat = 0
@@ -346,7 +346,7 @@ Public Function MouseMove(mouseX As Integer, mouseY As Integer) ' esta rutina es
 
 End
 
-Public Function MouseDown(mouseX As Integer, mouseY As Integer) ' esta rutina es llamada por FCAD en el evento DrawingArea_MouseDown
+Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' esta rutina es llamada por FCAD en el evento DrawingArea_MouseDown
 
   Dim X, Y, f As Float
 
@@ -428,21 +428,23 @@ Public Function MouseDown(mouseX As Integer, mouseY As Integer) ' esta rutina es
 
 End
 
-Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' esta rutina es llamada por FCAD en el evento DrawingArea_MouseUp
+Public Function MouseDown(mouseX As Integer, mouseY As Integer) ' esta rutina es llamada por FCAD en el evento DrawingArea_MouseUp
 
   'Debug elem.P.Count
 
 End
 
-Public Sub Draw()               ' called bygcd.CurrDrawing.drwArea_Draw
+Public Sub Draw()               ' called by fMain.GLArea1_Draw
 
   elem.ClassHandler.draw(elem)
 
 End
 
+'' LLamada cuando se termina de dibujar una nueva entidad.
 Public Sub Finish()
 
-  elem.Handle = gcd.UUHandleUnique(gcd.CurrentDrawing) ' gcd.NewHandle()
+  ' La entidad se crea sin handle
+  If elem.Handle = "" Then elem.Handle = gcd.NewHandle()
   elem.HandleOwner = "1"
   gcd.CurrentDrawing.oEntities.Add(elem, elem.Handle)
   gcd.CurrentDrawing.CurrLayer.Entities.Add(elem)
@@ -459,9 +461,11 @@ Public Sub Finish()
   clsDefaultJob.PoiChecking = True
   DrawingAids.CleanTexts
 
-  clsEntities.GLGenDrawList
+  ' Genero la lista de dibujado de OpenGL de esta entidad en particular
+  clsEntities.GLGenDrawList(elem)
 
-  'fMain.redraw
+  ' y renuevo la lista para este layer
+  clsEntities.glGenDrawListLayers(elem.pLayer)
 
 End
 

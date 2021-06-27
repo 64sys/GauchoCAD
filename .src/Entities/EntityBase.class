@@ -137,7 +137,7 @@ Public Sub DrawRemark(oE As Entity)
     GLplus.Lines(oE.PolyLine, gcd.ColorForSelected, oE.LineWidth + 2, oe.linetype.index)
   Else
     GLplus.Lines(oE.PolyLine, gcd.flgWindowBackColor, oE.LineWidth, gcd.stiDashed)
-    GLplus.Lines(oE.PolyLine, oE.ColorToPaint, oE.LineWidth + 2, oe.linetype.index)
+    GLplus.Lines(oE.PolyLine, gcd.GetGBColor(oE.Colour, oe.pLayer), oE.LineWidth + 2, oe.linetype.index)
   Endif
 
 End
@@ -186,12 +186,13 @@ End
 Public Sub Finish(oE As Entity) As Boolean
 
   ' tareas finales de armado del objeto
+  Me.BuildGeometry(oe)
 
   oE.psel.resize(oE.p.count / 2)
 
-  oE.DrawAble = True
+  Try oe.MakePolyLine(oe)
+
   oE.Selected = False
-  oE.Finished = True
 
 End
 
@@ -209,5 +210,21 @@ End
 Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
 
   Return False
+
+End
+
+'' Return if that position is over the entity within the tolerance
+Public Function OverMe(e As Entity, Xr As Float, Yr As Float, tolerance As Float) As Boolean
+
+  If e.Polygon Then
+    If puntos.isInside(e.Polygon, xr, yr) Then Return True
+  End If
+
+  Return False
+
+End
+
+'' Builds the geometry of the entity wthout drwing it
+Public Function BuildGeometry(E As Entity, Optional density As Float)
 
 End

@@ -137,11 +137,11 @@ End
 
 Public Sub Draw()               ' called by gcd.CurrDrawing.drwArea_Draw
 
-  Dim i As Integer
+  Dim E As Entity
 
-  For i = 0 To gcd.CurrentDrawing.arrSelecIndex.Max
+  For Each E In gcd.CurrentDrawing.oSelected
 
-    gcd.CurrentDrawing.oEntities[gcd.CurrentDrawing.arrSelecIndex[i]].ClassHandler.Draw(gcd.CurrentDrawing.oEntities[gcd.CurrentDrawing.arrSelecIndex[i]])
+    E.ClassHandler.Draw(E)
 
   Next
 
@@ -149,7 +149,7 @@ Public Sub Draw()               ' called by gcd.CurrDrawing.drwArea_Draw
   gl.Translatef(Me.glTranslate[0], Me.glTranslate[1], Me.glTranslate[2])
   gl.Rotatef(Me.glAngle, Me.glRotate[0], Me.glRotate[1], Me.glRotate[2])
   gl.Scalef(Me.glScale[0], Me.glScale[1], Me.glScale[2])
-  gl.CallList(gcd.CurrentDrawing.GlListSelectedEntities)                      ' si GL no tiene contexto, la lista no se genera. Es necesario que la instancia de FCAD este cargada.
+  gl.CallList(gcd.CurrentDrawing.GlListSelectedEntities)
   gl.PopMatrix
 
 End

@@ -54,20 +54,46 @@ Public Const sdaPaternFile As Integer = 1
 ' fParam[0]:  escala del sombreado
 ' fParam[1]:  angulo
 ' StringData[0]: nombre del patron del sombreado
+'' Builds the geometry of the entity wthout drwing it
+Public Function BuildGeometry(E As Entity, Optional density As Float)
+
+  Dim oloop As Boundary
+
+  If LCase(e.StringData[Me.sdaPattern]) <> "solid" Then
+
+    cadHatchBuilder.FillEntityWithHatch2(e)
+
+  Else
+
+    ' para solidos, tengo que hacer una llamada para cada loop de borde
+    ' tengo q ver cuantos puntos tiene cada loop
+    ' Ojo con LibreCAD
+    For Each oLoop In e.pBlock.oBoundaryPath '= 0 To oe.fParam[cadHatch.ipaTotalLoops] - 1
+
+      oLoop.Polyline = cadHatchBuilder.MakeBorder2(oLoop)
+
+      oLoop.Triangles = puntos.PolygonTriangulation4(oLoop.Polyline)
+
+    Next
+
+  End If
+
+End
 
 Public Sub Draw(oE As Entity)
 
   Dim iLoop, iStart As Integer
   Dim fBorder As New Float[]
   Dim oLoop As Boundary
+  Dim E2 As Entity
 
   If Not oE.Visible Then Return
 
-  oE.ColorToPaint = gcd.GetGBColor(oE.colour, oE.pLayer)
+  'BuildGeometry(oe)
 
   If LCase(oe.StringData[Me.sdaPattern]) <> "solid" Then
-    cadHatchBuilder.FillEntityWithHatch2(oe)
-    GLplus.Lines(oE.PolyLine, oE.ColorToPaint, oE.LineWidth, oE.LineType.index)
+
+    GLplus.Lines(oE.PolyLine, gcd.GetGBColor(oE.Colour, oe.pLayer), oE.LineWidth, oE.LineType.index)
 
   Else
 
@@ -80,8 +106,14 @@ Public Sub Draw(oE As Entity)
       ' fBorder.Insert(oLoop.e.PolyLine.Copy(iStart, oe.iParam[iLoop]))
       ' iStart += fBorder.Count
 
-      oLoop.Polyline = cadHatchBuilder.MakeBorder2(oLoop)
-      glPlus.TRIANGLES(puntos.PolygonTriangulation3(oLoop.Polyline), oE.ColorToPaint, oE.ColorToPaint)
+      'glPlus.Polygon(oLoop.Polyline, Color.Yellow, 2)
+
+      If puntos.IsPoligonSelfIntersecting(oLoop.Polyline) Then
+
+        Debug "A polygon in HATCH is self intersecting"
+      Endif
+
+      glPlus.TRIANGLES(oloop.Triangles, gcd.GetGBColor(oE.Colour, oe.pLayer), gcd.GetGBColor(oE.Colour, oe.pLayer))
 
     Next
 
@@ -105,7 +137,7 @@ Public Sub DrawRemark(oE As Entity)
   If Not oE.Visible Then Return
 
   GLplus.Lines(oE.PolyLine, gcd.flgWindowBackColor, oE.LineWidth, gcd.stiDashed)
-  GLplus.Lines(oE.PolyLine, oE.ColorToPaint, oE.LineWidth + 2, oe.linetype.index)
+  GLplus.Lines(oE.PolyLine, gcd.GetGBColor(oE.Colour, oe.pLayer), oE.LineWidth + 2, oe.linetype.index)
 
 End
 
@@ -154,37 +186,6 @@ Public Function BuildPOI(oE As Entity) As Integer
     ' gcd.CurrDrawing.poiLinesRelPoint.Insert([i / 2, i / 2 + 1])
 
   Next
-
-End
-
-' This function will return False if the element couldn't be created for some reason: bad or incomple user input
-' True means all is good, False will instruct the clsEntityBuilder to delete it
-Public Sub Finish(oE As Entity) As Boolean
-
-  'Print "Finish en EntityBase"
-
-  'CreatePolygon(oe)
-
-  '  BuildPOI(oe)
-
-  ' busco el tipo de linea, si hace falta
-
-  ' tareas finales de armado del objeto
-
-  oE.psel.resize(oE.p.count / 2)
-
-  oE.DrawAble = True
-  oE.Selected = False
-  oE.Finished = True
-
-End
-
-Public Sub Cancel()
-
-  gcd.clsJobPrevious = Me
-  gcd.clsJob = clsDefaultJob
-  DrawingAids.CleanTexts
-  '''fMain.redraw
 
 End
 
@@ -272,7 +273,6 @@ Public Function ImportDXF(e As Entity, sClaves As String[], sValues As String[])
             ' forma el contorno
             eContour = New Entity
             ' a esta entidad que es un borde le etiquetamos el loop al que pertenece
-            eContour.Group = iLoop
 
             oNewPAth.eSegments.Add(eContour, CStr(i))
             Select Case EdgeType
@@ -358,7 +358,7 @@ Public Function ImportDXF(e As Entity, sClaves As String[], sValues As String[])
           ' forma el contorno
           eContour = cadLWPolyline.NewEntity()
           ' a esta entidad que es un borde le etiquetamos el loop al que pertenece
-          eContour.Group = iLoop
+
           ' Debug "PolyLine loop en un hatch"
           oNewPAth.eSegments.Add(eContour)
 
@@ -644,6 +644,22 @@ Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
   Return True
 
   'Catch
+
+  Return False
+
+End
+
+'' Return if that position is over the entity within the tolerance
+Public Function OverMe(e As Entity, Xr As Float, Yr As Float, tolerance As Float) As Boolean
+
+  Dim oBound As Boundary
+
+  For Each oBound In e.pBlock.oBoundaryPath
+
+    If oBound.Polyline Then
+      If puntos.isInside(oBound.Polyline, xr, yr) Then Return True
+    End If
+  Next
 
   Return False
 

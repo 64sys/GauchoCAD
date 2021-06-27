@@ -48,7 +48,7 @@ Public Function FindStyle(sName As String) As Style
 
   Dim b As Style
 
-  For Each b In gcd.CurrentDrawing.arrStyles
+  For Each b In gcd.CurrentDrawing.oStyles
     If b.name = sName Then Return b
   Next
   Return
@@ -148,7 +148,7 @@ Public Sub glGenDrawList(Optional eEntity As Entity = Null)
 
     Next
 
-    ' lista de entidaes seleccionadas
+    ' lista de entidaes en modo seleccionada
     For Each e In gcd.CurrentDrawing.oEntities
       If Not gl.islist(e.glDrwListSel) Then e.glDrwListSel = gl.GenLists(1)
       gl.NewList(e.glDrwListSel, gl.COMPILE)
@@ -188,37 +188,36 @@ Public Sub glGenDrawListSel(Optional mode As Integer = 0)
 
 End
 
-'' Generates a GL list for the selected
-'' Mode: 0=Selected version 1=Normal version
-Public Sub glGenDrawListAll(Optional ExcludeSelected As Boolean = False)
+' '' Generates a GL list for the selected
+' '' Mode: 0=Selected version 1=Normal version
+' Public Sub glGenDrawListAll(Optional ExcludeSelected As Boolean = False)
+'
+'   Dim i As Integer, e As Entity
+'
+'   gl.NewList(gcd.CurrentDrawing.GlListAllEntities, gl.COMPILE)
+'
+'   For Each e In gcd.CurrentDrawing.oEntities
+'     If Not (e.Selected And ExcludeSelected) Then gl.CallList(e.glDrwList)
+'
+'   Next
+'
+'   gl.EndList
+'
+'   For Each L As Layer In gcd.CurrentDrawing.oLayers
+'     If Not gl.islist(L.glList) Then L.glList = gl.GenLists(1)
+'     gl.NewList(L.glList, gl.COMPILE)
+'   Next
+'   For Each e In gcd.CurrentDrawing.oEntities
+'     If Not (e.Selected And ExcludeSelected) Then gl.CallList(e.glDrwList)
+'
+'   Next
+'
+'   gl.EndList
+'
+' End
 
-  Dim i As Integer, e As Entity
-
-  gl.NewList(gcd.CurrentDrawing.GlListAllEntities, gl.COMPILE)
-
-  For Each e In gcd.CurrentDrawing.oEntities
-    If Not (e.Selected And ExcludeSelected) Then gl.CallList(e.glDrwList)
-
-  Next
-
-  gl.EndList
-
-  For Each L As Layer In gcd.CurrentDrawing.oLayers
-    If Not gl.islist(L.glList) Then L.glList = gl.GenLists(1)
-    gl.NewList(L.glList, gl.COMPILE)
-  Next
-  For Each e In gcd.CurrentDrawing.oEntities
-    If Not (e.Selected And ExcludeSelected) Then gl.CallList(e.glDrwList)
-
-  Next
-
-  gl.EndList
-
-End
-
-'' Generates a GL list for the selected
-'' Mode: 0=Selected version 1=Normal version
-Public Sub glGenDrawListLAyers(Optional aLayer As Layer)
+'' Genera la lista de dibujado segun Layer, o para un Layer en particular
+Public Sub glGenDrawListLayers(Optional aLayer As Layer)
 
   Dim i As Integer
   Dim e As Entity
@@ -241,7 +240,7 @@ Public Sub glGenDrawListLAyers(Optional aLayer As Layer)
       gl.NewList(aLayer.glList, gl.COMPILE)
       For Each e In gcd.CurrentDrawing.oEntities
 
-        If e.pLayer = aLayer Then e.ClassHandler.Draw(e)
+        If e.pLayer = aLayer Then gl.CallList(e.glDrwList)
 
       Next
       gl.EndList
@@ -252,40 +251,40 @@ Public Sub glGenDrawListLAyers(Optional aLayer As Layer)
 
 End
 
-'' Generates a GL list for the selected
-'' Mode: 0=Selected version 1=Normal version
-Public Sub glGenDrawListLAyers2(Optional aLayer As Layer)
-
-  Dim i As Integer
-  Dim e As Entity
-
-  If aLayer Then
-
-    If Not gl.islist(aLayer.glList) Then aLayer.glList = gl.GenLists(1)
-    gl.NewList(aLayer.glList, gl.COMPILE)
-    For Each e In gcd.CurrentDrawing.oEntities
-
-      If e.pLayer = aLayer Then gl.CallList(e.glDrwList)
-
-    Next
-    gl.EndList
-
-  Else
-
-    For Each aLayer In gcd.CurrentDrawing.oLayers
-      If Not gl.islist(aLayer.glList) Then aLayer.glList = gl.GenLists(1)
-      gl.NewList(aLayer.glList, gl.COMPILE)
-      For Each e In aLayer.Entities
-        e.ClassHandler.Draw(e)
-
-      Next
-      gl.EndList
-
-    Next
-
-  Endif
-
-End
+' '' Generates a GL list for the selected
+' '' Mode: 0=Selected version 1=Normal version
+' Public Sub glGenDrawListLAyers2(Optional aLayer As Layer)
+'
+'   Dim i As Integer
+'   Dim e As Entity
+'
+'   If aLayer Then
+'
+'     If Not gl.islist(aLayer.glList) Then aLayer.glList = gl.GenLists(1)
+'     gl.NewList(aLayer.glList, gl.COMPILE)
+'     For Each e In gcd.CurrentDrawing.oEntities
+'
+'       If e.pLayer = aLayer Then gl.CallList(e.glDrwList)
+'
+'     Next
+'     gl.EndList
+'
+'   Else
+'
+'     For Each aLayer In gcd.CurrentDrawing.oLayers
+'       If Not gl.islist(aLayer.glList) Then aLayer.glList = gl.GenLists(1)
+'       gl.NewList(aLayer.glList, gl.COMPILE)
+'       For Each e In aLayer.Entities
+'         gl.CallList(e.glDrwList)
+'
+'       Next
+'       gl.EndList
+'
+'     Next
+'
+'   Endif
+'
+' End
 
 Public Sub DrawPoiSymbolsAll()
 
@@ -533,111 +532,9 @@ Public Sub DrawPoint(x As Float, y As Float, Optional colour As Integer = -1, Op
 
 End
 
-' Public Sub SelectElem(iEntity As Integer, Optional AndItsPoints As Boolean = True)
-'
-'   ' select all points and myself
-'
-'   Dim i As Integer
-'
-'   If gcd.CurrDrawing.arrEntities[iEntity].iInsert >= 0 Then
-'     ' es parte de un bloque, lo selecciono completo
-'     i = GetParentBlock(iEntity)
-'     SelectAllElemFromBlock(iEntity, AndItsPoints)
-'     Return
-'   Endif
-'
-'   If AndItsPoints Then
-'     For i = 0 To gcd.CurrDrawing.arrEntities[iEntity].Psel.Max
-'       gcd.CurrDrawing.arrEntities[iEntity].Psel[i] = True
-'     Next
-'
-'   End If
-'   gcd.CurrDrawing.arrEntities[iEntity].selected = True
-'
-' End
-
-' Public Sub SelectAllElemFromBlock(iBlock As Integer, Optional AndItsPoints As Boolean = True)
-'
-'   ' select all elements from a block
-'
-'   Dim i, ii, iii As Integer
-'
-'   gcd.CurrDrawing.arrEntities[iBlock].selected = True                                                   ' seleccionamos el insert
-'
-'   For i = gcd.CurrDrawing.arrEntities[iBlock].iInsert + 1 To gcd.CurrDrawing.arrEntities.max             ' y sus entidades
-'
-'     If gcd.CurrDrawing.arrEntities[i].iInsert <> gcd.CurrDrawing.arrEntities[iBlock].iInsert Then Break
-'
-'     If AndItsPoints Then
-'       For ii = 0 To gcd.CurrDrawing.arrEntities[i].Psel.Max
-'         gcd.CurrDrawing.arrEntities[i].Psel[ii] = True                                      ' y sus puntos
-'       Next
-'
-'     End If
-'
-'     gcd.CurrDrawing.arrEntities[i].selected = True
-'
-'   Next
-'
-' End
-
-' Public Sub DeSelectAllElemFromBlock(iBlock As Integer, Optional AndItsPoints As Boolean = True)
-'
-'   ' deselect all elements from a block
-'
-'   Dim i, ii, iii As Integer
-'
-'   For i = iBlock + 1 To gcd.CurrDrawing.arrEntities.max             ' y sus entidades
-'
-'     If gcd.CurrDrawing.arrEntities[i].iInsert <> iBlock Then Break
-'
-'     If AndItsPoints Then
-'       For ii = 0 To gcd.CurrDrawing.arrEntities[i].Psel.Max
-'         gcd.CurrDrawing.arrEntities[i].Psel[ii] = False                                      ' y sus puntos
-'       Next
-'
-'     End If
-'
-'     gcd.CurrDrawing.arrEntities[i].selected = False
-'
-'   Next
-'
-' End
-
 Public Sub SelectElem(eEntity As Entity, Optional AndItsPoints As Boolean = True)
 
   Dim i, ii As Integer
-
-  ' If gcd.CurrDrawing.arrEntities[iEntity].Gender = "Insert" Then          ' es un inserto
-  '     If gcd.CurrDrawing.arrEntities[iEntity].iInsert >= 0 Then             ' esta dentro de otro insert?
-  '         If Not gcd.CurrDrawing.arrEntities[iEntity].selected Then               ' si estaba seleccionada
-  '             SelectElem(gcd.CurrDrawing.arrEntities[iEntity].iInsert, AndItsPoints)  ' llamo recursivamente
-  '         End If
-  '     Else                                                                ' no, deselecciono hasta encontrar un -1
-  '         gcd.CurrDrawing.arrEntities[iEntity].selected = True
-  '         For i = iEntity + 1 To gcd.CurrDrawing.arrEntities.max              ' y sus entidades
-  '
-  '             If gcd.CurrDrawing.arrEntities[i].iInsert = -1 Then Break
-  '
-  '             gcd.CurrDrawing.arrEntities[i].selected = True
-  '
-  '             If AndItsPoints Then
-  '                 For ii = 0 To gcd.CurrDrawing.arrEntities[i].Psel.Max
-  '                     gcd.CurrDrawing.arrEntities[i].Psel[ii] = True                                      ' y sus puntos
-  '                 Next
-  '
-  '             End If
-  '
-  '         Next
-  '     End If
-  ' Else                                                          ' no es un inserto, pero es parte de uno?
-  '
-  '     If gcd.CurrDrawing.arrEntities[iEntity].iInsert >= 0 Then     ' si, llamo recursivamente
-  '         If Not gcd.CurrDrawing.arrEntities[iEntity].selected Then       ' pero solo si estaba seleccionada
-  '             SelectElem(gcd.CurrDrawing.arrEntities[iEntity].iInsert, AndItsPoints)
-  '             Return
-  '         End If
-  '     Else                                                        ' no, simplemente deselecciono esta entidad
 
   eEntity.selected = True
   If AndItsPoints Then
@@ -657,37 +554,6 @@ Public Sub DeSelectElem(eEntity As Entity, Optional AndItsPoints As Boolean = Tr
   ' deselect all points and myself
 
   Dim i, ii As Integer
-
-  ' If gcd.CurrDrawing.arrEntities[iEntity].Gender = "Insert" Then          ' es un inserto
-  '     If gcd.CurrDrawing.arrEntities[iEntity].iInsert >= 0 Then             ' esta dentro de otro insert?
-  '         If gcd.CurrDrawing.arrEntities[iEntity].selected Then               ' si estaba seleccionada
-  '             DeSelectElem(gcd.CurrDrawing.arrEntities[iEntity].iInsert, AndItsPoints)  ' llamo recursivamente
-  '         End If
-  '     Else                                                                ' no, deselecciono hasta encontrar un -1
-  '         gcd.CurrDrawing.arrEntities[iEntity].selected = False
-  '         For i = iEntity + 1 To gcd.CurrDrawing.arrEntities.max              ' y sus entidades
-  '
-  '             If gcd.CurrDrawing.arrEntities[i].iInsert = -1 Then Break
-  '
-  '             gcd.CurrDrawing.arrEntities[i].selected = False
-  '
-  '             If AndItsPoints Then
-  '                 For ii = 0 To gcd.CurrDrawing.arrEntities[i].Psel.Max
-  '                     gcd.CurrDrawing.arrEntities[i].Psel[ii] = False                                      ' y sus puntos
-  '                 Next
-  '
-  '             End If
-  '
-  '         Next
-  '     End If
-  ' Else                                                          ' no es un inserto, pero es parte de uno?
-  '
-  '     If gcd.CurrDrawing.arrEntities[iEntity].iInsert >= 0 Then     ' si, llamo recursivamente
-  '         If gcd.CurrDrawing.arrEntities[iEntity].selected Then       ' pero solo si estaba seleccionada
-  '             DeSelectElem(gcd.CurrDrawing.arrEntities[iEntity].iInsert, AndItsPoints)
-  '             Return
-  '         End If
-  '     Else                                                        ' no, simplemente deselecciono esta entidad
 
   eEntity.selected = False
   If AndItsPoints Then
@@ -731,7 +597,6 @@ Public Sub CopyElemData(origen As Entity, destino As Entity)
   destino.pBlock = origen.pBlock
   destino.Group = origen.Group
   destino.colour = origen.colour
-  destino.ColorToPaint = origen.ColorToPaint
   destino.LineType = origen.LineType
   destino.LineWidth = origen.LineWidth
   destino.Handle = origen.Handle
@@ -894,131 +759,6 @@ Public Function GetSelectionHandles(sHandles As String[]) As Integer
   Return itotal
 
 End
-
-' Public Function SelectionSquare2(X1real As Float, Y1real As Float, X2real As Float, Y2real As Float, Optional NuevaSumaResta As String = "nueva", crossing As Boolean) As Integer
-'
-'     ' Veo que accion estoy tomando
-'     Dim e As Entity, i, i2, CurrentEntityIndex, TotalSeleccionados As Integer, Todos As Boolean
-'     Dim t As Float = Timer
-'
-'     NuevaSumaResta = LCase$(NuevaSumaResta)
-'
-'     If NuevaSumaResta = "nueva" Then
-'         For i = 0 To gcd.CurrDrawing.arrEntities.Max
-'             gcd.CurrDrawing.arrEntities[i].selected = False
-'             For i2 = 0 To gcd.CurrDrawing.arrEntities[i].Psel.max
-'                 gcd.CurrDrawing.arrEntities[i].Psel[i2] = False
-'             Next
-'         Next
-'     End If
-'     Debug "Deselect time ", Timer - t
-'
-'     ' reviso los poligonos
-'     For i = 0 To gcd.CurrDrawing.poiPoligonEntities.Max
-'
-'         If crossing Then
-'             If puntos.IsPoligonCrossingRect(gcd.CurrDrawing.poiPoligons, X1real, Y1real, X2real, Y2real, gcd.CurrDrawing.poiPoligonStartIndex[i], gcd.CurrDrawing.poiPoligonElements[i]) Then
-'                 ' el punto esta en el recuadro
-'                 If NuevaSumaResta <> "resta" Then
-'                     Inc TotalSeleccionados
-'                     gcd.CurrDrawing.arrEntities[i].selected = True
-'
-'                 Else If NuevaSumaResta = "resta" Then
-'                     Dec TotalSeleccionados
-'                     gcd.CurrDrawing.arrEntities[i].selected = False
-'
-'                 End If
-'
-'             Endif
-'         Else
-'             If puntos.IsPoligonInsideRect(gcd.CurrDrawing.poiPoligons, X1real, Y1real, X2real, Y2real, gcd.CurrDrawing.poiPoligonStartIndex[i], gcd.CurrDrawing.poiPoligonElements[i]) Then
-'                 ' el punto esta en el recuadro
-'                 If NuevaSumaResta <> "resta" Then
-'                     Inc TotalSeleccionados
-'                     gcd.CurrDrawing.arrEntities[i].selected = True
-'
-'                 Else If NuevaSumaResta = "resta" Then
-'                     Dec TotalSeleccionados
-'                     gcd.CurrDrawing.arrEntities[i].selected = False
-'
-'                 End If
-'
-'             Endif
-'
-'         End If
-'     Next
-'
-'     ' reviso las lineas
-'     If crossing Then
-'         For i = 0 To gcd.CurrDrawing.poiLines.Max Step 2                                                                                                  ' para cada punto
-'             If puntos.InBetween(gcd.CurrDrawing.poiLines[i], X1real, X2real) And puntos.InBetween(gcd.CurrDrawing.poiLines[i + 1], Y1real, Y2real) Then     ' esta dentro
-'                 ' el punto esta en el recuadro
-'                 If NuevaSumaResta <> "resta" Then
-'                     Inc TotalSeleccionados
-'                     gcd.CurrDrawing.arrEntities[gcd.CurrDrawing.poiLinesEntities[i / 4]].selected = True
-'                     gcd.CurrDrawing.arrEntities[gcd.CurrDrawing.poiLinesEntities[i / 4]].Psel[gcd.CurrDrawing.poiLinesRelPoint[i / 2]] = True
-'                 Else If NuevaSumaResta = "resta" Then
-'                     Dec TotalSeleccionados
-'                     gcd.CurrDrawing.arrEntities[gcd.CurrDrawing.poiLinesEntities[i / 4]].selected = False
-'                     gcd.CurrDrawing.arrEntities[gcd.CurrDrawing.poiLinesEntities[i / 4]].Psel[gcd.CurrDrawing.poiLinesRelPoint[i / 2]] = False
-'
-'                 End If
-'
-'             Endif
-'
-'         Next
-'
-'     Else    ' full selection
-'         ' hago un crossing primero y luego me fijo si estan todos
-'         For i = 0 To gcd.CurrDrawing.poiLines.Max Step 2                                                                                                  ' para cada punto
-'             If puntos.InBetween(gcd.CurrDrawing.poiLines[i], X1real, X2real) And puntos.InBetween(gcd.CurrDrawing.poiLines[i + 1], Y1real, Y2real) Then     ' esta dentro
-'                 ' el punto esta en el recuadro
-'                 If NuevaSumaResta <> "resta" Then
-'                     Inc TotalSeleccionados
-'                     gcd.CurrDrawing.arrEntities[gcd.CurrDrawing.poiLinesEntities[i / 4]].selected = True
-'                     gcd.CurrDrawing.arrEntities[gcd.CurrDrawing.poiLinesEntities[i / 4]].Psel[gcd.CurrDrawing.poiLinesRelPoint[i / 2]] = True
-'                 Else If NuevaSumaResta = "resta" Then
-'                     Dec TotalSeleccionados
-'                     gcd.CurrDrawing.arrEntities[gcd.CurrDrawing.poiLinesEntities[i / 4]].selected = False
-'                     gcd.CurrDrawing.arrEntities[gcd.CurrDrawing.poiLinesEntities[i / 4]].Psel[gcd.CurrDrawing.poiLinesRelPoint[i / 2]] = False
-'
-'                 End If
-'
-'             Endif
-'
-'         Next
-'
-'         CurrentEntityIndex = 0
-'         For i = 0 To gcd.CurrDrawing.arrEntities.Max
-'
-'             If gcd.CurrDrawing.arrEntities[i].Selected Then 'chequeo si todos estan seleccionados
-'                 todos = True
-'                 For i2 = 0 To gcd.CurrDrawing.arrEntities[i].Psel.Max
-'                     If gcd.CurrDrawing.arrEntities[i].Psel = False Then
-'                         todos = False
-'                         Break
-'                     Endif
-'                 Next
-'
-'                 If (todos And NuevaSumaResta = "resta") Or Not todos Then
-'                     Dec TotalSeleccionados
-'                     gcd.CurrDrawing.arrEntities[i].selected = False
-'                     For i2 = 0 To gcd.CurrDrawing.arrEntities[i].Psel.Max
-'                         gcd.CurrDrawing.arrEntities[i].Psel = False
-'
-'                     Next
-'
-'                 End If
-'
-'             Endif
-'
-'         Next
-'
-'     Endif
-'
-'     Return TotalSeleccionados
-'
-' End
 
 'Return bound limits for all verices in the array of entities
 Public Sub BuildPoi(Optional entities As Collection, OnlyVisibles As Boolean = True)
@@ -1194,8 +934,16 @@ End
 Public Function SelPartial(eTesting As Entity, X1real As Float, Y1real As Float, X2real As Float, Y2real As Float) As Boolean
 
   Dim ii As Integer, puedo As Boolean = False
+  Dim oborder As Boundary
 
   Select Case eTesting.Gender
+
+    Case "Hatch"
+
+      For Each oborder In eTesting.pBlock.oBoundaryPath
+        puedo = puntos.IsPoligonCrossingRect(oborder.Polyline, X1real, Y1real, X2real, Y2real)
+        If puedo Then Return True
+      Next
 
     Case Else
 

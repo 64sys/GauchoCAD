@@ -52,7 +52,6 @@ Public Function NewParameter(eBuild As Entity, vParam As Variant[], Optional Def
 
     If vParam[0] <> "float" Then Return False
 
-    eBuild.DrawAble = True
     eBuild.fParam[0] = vParam[1]
 
     If definitive Then Return True
@@ -85,9 +84,7 @@ Public Sub Draw(oE As Entity)
 
   'gl.End
 
-  oE.ColorToPaint = gcd.GetGBColor(oE.colour, oE.pLayer)
-
-  glPlus.Circle(oE.p, oe.fParam[0], oe.ColorToPaint, False, oE.LineWidth, oE.LineType.index)
+  glPlus.Circle(oE.p, oe.fParam[0], gcd.GetGBColor(oE.Colour, oe.pLayer), False, oE.LineWidth, oE.LineType.index)
 
 End
 
@@ -125,23 +122,16 @@ Public Sub DrawRemark(oE As Entity)
     GLplus.PolyLines(oE.PolyLine, gcd.ColorForSelected, oE.LineWidth + 2, oe.linetype.index)
   Else
     GLplus.PolyLines(oE.PolyLine, gcd.flgWindowBackColor, oE.LineWidth, gcd.stiDashed)
-    GLplus.PolyLines(oE.PolyLine, oE.ColorToPaint, oE.LineWidth + 2, oe.linetype.index)
+    GLplus.PolyLines(oE.PolyLine, gcd.GetGBColor(oE.Colour, oe.pLayer), oE.LineWidth + 2, oe.linetype.index)
   Endif
 
 End
 
 Public Function Draw2(oE As Entity)
 
-  If gcd.UseCairo Then
+  paint.Arc(oE.p[0], oE.p[1], oE.fParam[0])
 
-    cairo.Arc(oE.p[0], oE.p[1], oE.fParam[0])
-
-    cairo.Stroke
-  Else
-    paint.Arc(oE.p[0], oE.p[1], oE.fParam[0])
-
-    paint.Stroke
-  End If
+  paint.Stroke
 
 End
 '' Creo los puntos de interes
@@ -192,9 +182,7 @@ Public Sub Finish(oE As Entity) As Boolean
 
   oE.psel.resize(oE.p.count / 2)
 
-  oE.DrawAble = True
   oE.Selected = False
-  oE.Finished = True
 
 End
 
@@ -270,3 +258,13 @@ End
 '    "radius": 0.06602049323089,
 '    "thickness": 0.000000,
 '    "extrusion": [0.0, 0.0, 1.0]
+
+'' Return if that position is over the entity within the tolerance
+Public Function OverMe(e As Entity, Xr As Float, Yr As Float, tolerance As Float) As Boolean
+
+  If Abs(puntos.distancia(xr, yr, E.P[0], E.P[1]) - E.fParam[0]) < tolerance Then Return True
+  If puntos.Around(xr, yr, E.P[0], E.P[1], tolerance) Then Return True
+
+  Return False
+
+End

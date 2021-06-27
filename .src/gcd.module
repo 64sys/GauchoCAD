@@ -28,8 +28,7 @@
 ' Based on an example called MuchosCirculos by JGuardon y MrShell
 ' XML Load/Save by Tincho
 
-Public UseCairo As Boolean '' Chequeado por Draw2 para ver si usa Paint o Cairo
-
+Public PrintingScale As Float '' This is needed by some clases, like Text and MText.
 Public ScreenDensity As Float = 1080 / 29.5  '' pixele by cm wich gives a 1:100 scale in my monitor
 
 ' Filtros del dibujo
@@ -192,6 +191,10 @@ Public Sub Main()
 
   'texturelist = glPlus.LoadTextures(Application.Path &/ "Textures")
   texturelist = glPlus.LoadTextures(Starter.sTextures)
+
+  Me.DrawingReady = True
+
+  Debug Utils.ProcessTabs("Acatbab^Iluego^I123^I2")
 
 End
 
@@ -365,7 +368,8 @@ Public Function GetGBColor(CADcolor As Integer, Optional pLayer As Layer) As Int
   ' color
   If CADcolor = 256 Then          ' buscar color del layer
 
-    Return Starter.gColor[player.Colour]
+    If pLayer Then Return Starter.gColor[player.Colour]
+    Return gcd.flgWhiteAndBlack
 
   Else If CADcolor = 257 Then     ' buscar color del objeto
 
@@ -640,5 +644,11 @@ End
 Public Function ScreenHeight() As Integer
 
   Return appmain.GLArea1.h
+
+End
+
+Public Function CurrentColor() As Integer
+
+  Return appmain.CurrentColor
 
 End

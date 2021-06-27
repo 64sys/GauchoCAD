@@ -32,7 +32,7 @@ Public Const HelperTrabajo As String = ("a polyline of segments")
 Public Function NewParameter(eBuild As Entity, vParam As Variant[], Optional Definitive As Boolean = False) As Boolean
 
   If Me.StepsDone = 0 Then
-    eBuild.DrawAble = True
+
     Try eBuild.P[0] = vParam[1]
     Try eBuild.P[1] = vParam[2]
 
@@ -47,8 +47,7 @@ Public Sub Draw(oE As Entity)
   Dim ePart As Entity
 
   If Not oE.Visible Then Return
-  If Not oE.DrawAble Then Return
-  oE.ColorToPaint = gcd.GetGBColor(oE.colour, oE.pLayer)
+
   ' construyo una poliliea
   oe.PolyLine.Clear
   For Each ePart In oe.pBlock.entities
@@ -66,7 +65,7 @@ Public Sub Draw(oE As Entity)
   '
   '   Endif
   ' End If
-  glPlus.PolyLines(oe.PolyLine, oe.ColorToPaint, oE.LineWidth, oE.LineType.index, oe.iParam[Me.iiiPolylineClosed])
+  glPlus.PolyLines(oe.PolyLine, gcd.GetGBColor(oE.Colour, oe.pLayer), oE.LineWidth, oE.LineType.index, oe.iParam[Me.iiiPolylineClosed])
 
 End
 
@@ -140,6 +139,19 @@ Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
   Return True
 
   'Catch
+
+  Return False
+
+End
+
+'' Return if that position is over the entity within the tolerance
+Public Function OverMe(e As Entity, Xr As Float, Yr As Float, tolerance As Float) As Boolean
+
+  Dim i As Integer
+
+  For i = 0 To E.PolyLine.count - 4 Step 2
+    If puntos.doIntersect(xr - tolerance, Yr, Xr + tolerance, Yr, E.PolyLine[i + 0], E.PolyLine[i + 1], E.PolyLine[i + 2], E.PolyLine[i + 3]) Or puntos.doIntersect(xr, Yr - tolerance, Xr, Yr + tolerance, E.PolyLine[i + 0], E.PolyLine[i + 1], E.PolyLine[i + 2], E.PolyLine[i + 3]) Then Return True
+  Next
 
   Return False
 

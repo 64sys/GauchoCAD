@@ -213,6 +213,8 @@ Private Sub SetEnvironmentVars()
   gcolor[0] = flgWhiteAndBlack
   gcolor[7] = flgWhiteAndBlack
   gcolor[255] = flgWhiteAndBlack
+  gcolor[256] = flgWhiteAndBlack
+  gcolor[257] = flgWhiteAndBlack
 
 End
 
