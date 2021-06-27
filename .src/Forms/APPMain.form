@@ -410,141 +410,141 @@
     Expand = True
     Arrangement = Arrange.Vertical
     { PanEdit1 Panel
-      MoveScaled(1,1,149,70)
+      MoveScaled(1,1,149,76)
       Expand = True
-      Arrangement = Arrange.Horizontal
+      Arrangement = Arrange.Vertical
       Spacing = True
       Margin = True
-      { Panel3 Panel
-        MoveScaled(1,2,20,67)
-        Arrangement = Arrange.Vertical
-        { pnlIcons Panel
-          MoveScaled(0,3,21,33)
+      { Panel15 Panel
+        MoveScaled(0,0,124,6)
+        Arrangement = Arrange.Row
+        Spacing = True
+        { btnSelectionMode ToolButton locks
+          Name = "btnSelectionMode"
+          MoveScaled(2,1,5,5)
+          #Translate = False
+          Tag = "selection"
+          ToolTip = "Selection mode"
+          Border = True
+          Toggle = True
+        }
+        { btnMenuShow ToolButton
+          MoveScaled(9,1,5,5)
+          #Translate = False
+          Tag = "showmenu"
+          Picture = Picture["icon:/24/menu"]
+          Border = True
+          Toggle = True
+        }
+        { pnlFile Panel
+          MoveScaled(17,1,7,5)
           Expand = True
-          Arrangement = Arrange.Vertical
-          { pnlEntities Panel
-            MoveScaled(0,0,21,18)
-            Expand = True
-            Arrangement = Arrange.Row
-            Spacing = True
-            { lblEntities Label
-              MoveScaled(1,0,18,3)
-              Visible = False
-              Text = ("Entities")
-              Alignment = Align.Center
-            }
-          }
-          { pnlTools Panel
-            MoveScaled(0,19,21,18)
+          Arrangement = Arrange.Horizontal
+          Spacing = True
+        }
+        { btnLtypes Button
+          MoveScaled(25,1,15,5)
+        }
+        { btnLayers Button
+          MoveScaled(41,1,15,5)
+          Background = Color.Yellow
+        }
+        { btnColors Button
+          MoveScaled(57,1,5,5)
+          Background = Color.Yellow
+        }
+        { btnWidths Button
+          MoveScaled(64,1,15,5)
+        }
+        { Panel16 Panel
+          MoveScaled(81,1,23,5)
+          Arrangement = Arrange.Horizontal
+          Margin = True
+          { ProgressBar1 ProgressBar
+            MoveScaled(3,0,19,5)
             Visible = False
             Expand = True
-            Arrangement = Arrange.Row
-            Spacing = True
-            { lblTools Label
-              MoveScaled(0,0,20,3)
-              Text = ("Tools")
-              Alignment = Align.Center
-            }
           }
         }
-        { pnlProperties Panel
-          MoveScaled(0,38,21,26)
-          Visible = False
+        { cboDrawing ComboBox
+          MoveScaled(105,1,17,5)
           Expand = True
-          Arrangement = Arrange.Vertical
-          Spacing = True
-          Margin = True
-          { btnRefresh Button
-            MoveScaled(1,2,16,4)
-            Text = ("Refresh")
-          }
-          { ComboBox1 ComboBox
-            MoveScaled(1,7,16,4)
-            ReadOnly = True
-          }
-          { TableView1 TableView
-            MoveScaled(1,12,16,8)
-            Expand = True
-            Border = False
-            Mode = Select.Single
-          }
-          { btnSave Button
-            MoveScaled(1,21,16,4)
-            Text = ("Save")
-          }
+          ReadOnly = True
+        }
+        { Panel10 Panel
+          MoveScaled(0,2,1,3)
         }
       }
       { Panel2 Panel
-        MoveScaled(22,2,126,67)
+        MoveScaled(2,9,146,66)
         Expand = True
         Arrangement = Arrange.Vertical
         Spacing = True
-        { Panel15 Panel
-          MoveScaled(1,1,124,6)
-          Arrangement = Arrange.Row
-          Spacing = True
-          { btnSelectionMode ToolButton locks
-            Name = "btnSelectionMode"
-            MoveScaled(2,1,5,5)
-            #Translate = False
-            Tag = "selection"
-            ToolTip = "Selection mode"
-            Border = True
-            Toggle = True
-          }
-          { btnMenuShow ToolButton
-            MoveScaled(9,1,5,5)
-            #Translate = False
-            Tag = "showmenu"
-            Picture = Picture["icon:/24/menu"]
-            Border = True
-            Toggle = True
-          }
-          { pnlFile Panel
-            MoveScaled(17,1,7,5)
-            Expand = True
-            Arrangement = Arrange.Horizontal
-            Spacing = True
-          }
-          { btnLtypes Button
-            MoveScaled(25,1,15,5)
-          }
-          { btnLayers Button
-            MoveScaled(41,1,15,5)
-            Background = Color.Yellow
-          }
-          { btnColors Button
-            MoveScaled(57,1,5,5)
-            Background = Color.Yellow
-          }
-          { btnWidths Button
-            MoveScaled(64,1,15,5)
-          }
-          { Panel16 Panel
-            MoveScaled(81,1,23,5)
-            Arrangement = Arrange.Horizontal
-            Margin = True
-            { ProgressBar1 ProgressBar
-              MoveScaled(3,0,19,5)
-              Visible = False
-              Expand = True
-            }
-          }
-          { cboDrawing ComboBox
-            MoveScaled(105,1,17,5)
-            Expand = True
-            ReadOnly = True
-          }
-          { Panel10 Panel
-            MoveScaled(0,2,1,3)
-          }
-        }
         { Panel4 Panel
-          MoveScaled(1,9,124,41)
+          MoveScaled(1,1,143,58)
           Expand = True
           Arrangement = Arrange.Horizontal
+          { Panel3 Panel
+            MoveScaled(0,0,20,67)
+            Arrangement = Arrange.Vertical
+            { pnlIcons Panel
+              MoveScaled(0,3,21,33)
+              Expand = True
+              Arrangement = Arrange.Vertical
+              { pnlEntities Panel
+                MoveScaled(0,0,21,18)
+                Expand = True
+                Arrangement = Arrange.Row
+                Spacing = True
+                { lblEntities Label
+                  MoveScaled(1,0,18,3)
+                  Visible = False
+                  Alignment = Align.Center
+                  Text = ("Entities")
+                }
+              }
+              { pnlTools Panel
+                MoveScaled(0,19,21,18)
+                Visible = False
+                Expand = True
+                Arrangement = Arrange.Row
+                Spacing = True
+                { lblTools Label
+                  MoveScaled(0,0,20,3)
+                  Alignment = Align.Center
+                  Text = ("Tools")
+                }
+              }
+            }
+            { pnlProperties Panel
+              MoveScaled(0,38,21,26)
+              Visible = False
+              Expand = True
+              Arrangement = Arrange.Vertical
+              Spacing = True
+              Margin = True
+              { btnRefresh Button
+                MoveScaled(1,2,16,4)
+                Text = ("Refresh")
+              }
+              { ComboBox1 ComboBox
+                MoveScaled(1,7,16,4)
+                ReadOnly = True
+              }
+              { TableView1 TableView
+                MoveScaled(1,12,16,8)
+                Expand = True
+                Border = False
+                Mode = Select.Single
+              }
+              { btnSave Button
+                MoveScaled(1,21,16,4)
+                Text = ("Save")
+              }
+            }
+          }
           { PanEdit2 Panel
-            MoveScaled(1,2,80,38)
+            MoveScaled(21,3,80,38)
             Expand = True
             Arrangement = Arrange.Horizontal
             { Panel7 Panel
@@ -609,12 +609,12 @@
             }
           }
           { pnlBlocks Panel
-            MoveScaled(84,2,9,38)
+            MoveScaled(102,3,9,38)
             Visible = False
             Arrangement = Arrange.Vertical
           }
           { pnlDebug Panel
-            MoveScaled(94,2,9,38)
+            MoveScaled(112,3,9,38)
             Visible = False
             Arrangement = Arrange.Vertical
             { pnlSmart Panel
@@ -624,8 +624,8 @@
               { lblSmart Label
                 MoveScaled(0,1,20,3)
                 Visible = False
-                Text = (" Smart entities")
                 Alignment = Align.Center
+                Text = (" Smart entities")
               }
             }
             { txaDebug TextArea
@@ -635,7 +635,7 @@
             }
           }
           { pnlBlock Panel
-            MoveScaled(104,2,9,38)
+            MoveScaled(122,3,9,38)
             Visible = False
             { TableView2 TableView
               MoveScaled(2,17,6,18)
@@ -644,7 +644,7 @@
             }
           }
           { pnlRaw Panel
-            MoveScaled(114,2,9,38)
+            MoveScaled(132,3,9,38)
             Visible = False
             Arrangement = Arrange.Vertical
             { TableView3 TableView
@@ -655,7 +655,7 @@
           }
         }
         { Panel5 Panel
-          MoveScaled(1,51,124,5)
+          MoveScaled(1,60,124,5)
           Arrangement = Arrange.Horizontal
           { !lblCommand Label
             MoveScaled(1,0,45,5)
@@ -671,14 +671,14 @@
             { Label1 Label
               MoveScaled(4,0,24,2)
               Font = Font["-1"]
-              Text = ("coords 1")
               Alignment = Align.Right
+              Text = ("coords 1")
             }
             { Label2 Label
               MoveScaled(4,2,24,2)
               Font = Font["-1"]
-              Text = ("coords 2")
               Alignment = Align.Right
+              Text = ("coords 2")
             }
           }
           { pnlLocks Panel
@@ -737,16 +737,16 @@
             MoveScaled(115,1,1,3)
           }
         }
-        { !Printer1 #Printer
-          #MoveScaled(104,58)
-          #Public = True
-        }
       }
-    }
-    { tmr500 #Timer
-      #MoveScaled(137,61)
-      Enabled = True
-      Delay = 500
+      { !Printer1 #Printer
+        #MoveScaled(133,1)
+        #Public = True
+      }
+      { tmr500 #Timer
+        #MoveScaled(140,1)
+        Enabled = True
+        Delay = 500
+      }
     }
   }
 }
