@@ -1112,10 +1112,14 @@ Public Function ImportJsonToEntity(c As JSONCollection, Optional IsDummy As Bool
     e.player = GetLayerByHandle(c["layer"][3])  ' busco el layer por nombre
     e.Handle = c["handle"][1]
     If e.pLayer = Null Then Stop
-    If TypeOf(c["color"]) = gb.Object Then
-      Try e.colour = c["color"]["index"]    ' FIXME: esto sigue dando error
+
+    If c["color"].Exist("index") Then
+      e.Colour = c["color"]["index"]
+    Else If c["color"].Exist("rgb") Then
+      e.colour = e.pLayer.Colour
     Else
-      Try e.colour = c["color"]
+      e.Colour = 256  'by layer
+
     Endif
     e.LineWidth = c["linewt"] / 100
     If e.LineWidth < 1 Then e.LineWidth = 1

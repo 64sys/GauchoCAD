@@ -155,6 +155,8 @@ Public Function MouseUp(mouseX As Integer, mouseY As Integer) ' esta rutina es l
 
     DrawingAids.HelperTrabajo = ("Selected") & " " & Str$(Me.selectionCount) & " " & ("elements")
 
+    If gcd.clsJobCallBack Then gcd.clsJobCallBack.run()
+
   Else If GripPoint >= 0 Then
 
     EntityForEdit.ClassHandler.buildpoi(EntityForEdit)

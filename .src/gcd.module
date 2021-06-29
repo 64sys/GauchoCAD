@@ -53,6 +53,8 @@ Public clsJob As Object                             '' what I am doing now, that
 Public clsJobPrevious As Object                     '' what was doing before
 Public clsJobPreZoom As Object                      '' what was doing before Zooming or Panning
 Public clsJobPreviousParam As Integer               '' a param to pass to clsJob.Start( param )
+Public clsJobCallBack As Object                     '' An object to call back after finishing something (like selecting). Must have .Run() sub
+
 
 'Public gColor As New Integer[]
 
