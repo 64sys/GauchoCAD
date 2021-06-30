@@ -54,7 +54,7 @@
       }
       { radAll3 RadioButton mprint
         Name = "radAll3"
-        MoveScaled(2,31,24,4)
+        MoveScaled(2,31,28,4)
         Tag = "rectangle"
         Text = ("Rectangle")
       }

@@ -72,7 +72,7 @@ Public Function BuildGeometry(E As Entity, Optional density As Float)
 
       oLoop.Polyline = cadHatchBuilder.MakeBorder2(oLoop)
 
-      oLoop.Triangles = puntos.PolygonTriangulation4(oLoop.Polyline)
+      oLoop.Triangles = puntos.PolygonTriangulation(oLoop.Polyline)
 
     Next
 

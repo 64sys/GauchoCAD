@@ -5,6 +5,20 @@ Public sConfig As String
 Public jConfig As New JSONCollection
 Private jPaper As New JSONCollection
 
+Private Rectangle As New Float[4]
+
+Public Sub Run()
+
+  Me.Show()
+  Rectangle[0] = clsDefaultJob.SelStartXr
+  Rectangle[1] = clsDefaultJob.SelStartYr
+  Rectangle[2] = clsDefaultJob.SelEndXr
+  Rectangle[3] = clsDefaultJob.SelEndyr
+  radAll3.Text = "Rect: " & Format(clsDefaultJob.SelStartXr, "0.00") & ";" & Format(clsDefaultJob.SelStartYr, "0.00") & " : " & Format(clsDefaultJob.SelendXr, "0.00") & ";" & Format(clsDefaultJob.SelendYr, "0.00")
+
+End
+
+
 Public Sub Form_Open()
 
   Me.Text = ("Print configuration")
@@ -188,6 +202,15 @@ Public Sub mprint_Click()
     Case "fit"
 
     Case "scalelines"
+
+    Case "rectangle"
+
+      Me.Hide
+      gcd.clsJobCallBack = Me ' necesitamos volver aca luego de que marque un area
+      gcd.clsJob = clsDefaultJob
+
+
+
 
   End Select
 
