@@ -47,7 +47,7 @@ Public Function Start(Optional ElemToBuild As Variant, Optional _Mode As Integer
     clsEntities.DeSelection()
     DrawingAids.Helper.texto = DrawingAids.HelperTrabajo & ": " & ("Select only one entity")
     gcd.clsJobPrevious = Me
-    gcd.clsJob = clsDefaultJob
+    gcd.clsJob = cadSelection
 
   Else
     ' verificamos si la entidad puede ser partida

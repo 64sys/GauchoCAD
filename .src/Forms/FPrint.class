@@ -10,14 +10,13 @@ Private Rectangle As New Float[4]
 Public Sub Run()
 
   Me.Show()
-  Rectangle[0] = clsDefaultJob.SelStartXr
-  Rectangle[1] = clsDefaultJob.SelStartYr
-  Rectangle[2] = clsDefaultJob.SelEndXr
-  Rectangle[3] = clsDefaultJob.SelEndyr
-  radAll3.Text = "Rect: " & Format(clsDefaultJob.SelStartXr, "0.00") & ";" & Format(clsDefaultJob.SelStartYr, "0.00") & " : " & Format(clsDefaultJob.SelendXr, "0.00") & ";" & Format(clsDefaultJob.SelendYr, "0.00")
+  Rectangle[0] = cadSelection.SelStartXr
+  Rectangle[1] = cadSelection.SelStartYr
+  Rectangle[2] = cadSelection.SelEndXr
+  Rectangle[3] = cadSelection.SelEndyr
+  radAll3.Text = "Rect: " & Format(cadSelection.SelStartXr, "0.00") & ";" & Format(cadSelection.SelStartYr, "0.00") & " : " & Format(cadSelection.SelendXr, "0.00") & ";" & Format(cadSelection.SelendYr, "0.00")
 
 End
-
 
 Public Sub Form_Open()
 
@@ -208,9 +207,6 @@ Public Sub mprint_Click()
       Me.Hide
       gcd.clsJobCallBack = Me ' necesitamos volver aca luego de que marque un area
       gcd.clsJob = clsDefaultJob
-
-
-
 
   End Select
 

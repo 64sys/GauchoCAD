@@ -122,7 +122,7 @@ Public Sub Finish()
   Endif
 
   gcd.clsJobPrevious = Me
-  gcd.clsJob = clsDefaultJob
+  gcd.clsJob = cadSelection
   clsEntities.DeSelection()
   gcd.regen
   Me.Active = False

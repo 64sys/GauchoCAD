@@ -37,7 +37,7 @@ Public Function Start(Optional ElemToBuild As Variant, Optional _Mode As Integer
 
     DrawingAids.Helper.texto = DrawingAids.HelperTrabajo & ": " & ("Select entities")
     gcd.clsJobPrevious = Me
-    gcd.clsJob = clsDefaultJob
+    gcd.clsJob = cadSelection
 
   Else
     ' just delete them

@@ -61,7 +61,7 @@ Public Function Start(Optional ElemToBuild As Variant, Optional _mode As Integer
     DrawingAids.Helper.texto = DrawingAids.HelperTrabajo & ": " & ("Select entities")
 
     gcd.clsJobPrevious = Me
-    gcd.clsJob = clsDefaultJob
+    gcd.clsJob = cadSelection
 
   Else
     '    DrawingAids.Helper.texto = DrawingAids.HelperTrabajo & ": " & ("Base point")
@@ -207,7 +207,7 @@ Public Sub Finish()
   clsEntities.FillLayersWithEntities()
 
   gcd.clsJobPrevious = Me
-  gcd.clsJob = clsDefaultJob
+  gcd.clsJob = cadSelection
   DrawingAids.CleanTexts
   clsEntities.DeSelection()
   gcd.DrawOriginals = False

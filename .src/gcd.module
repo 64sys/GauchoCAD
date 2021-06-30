@@ -55,7 +55,6 @@ Public clsJobPreZoom As Object                      '' what was doing before Zoo
 Public clsJobPreviousParam As Integer               '' a param to pass to clsJob.Start( param )
 Public clsJobCallBack As Object                     '' An object to call back after finishing something (like selecting). Must have .Run() sub
 
-
 'Public gColor As New Integer[]
 
 Public drwDrawingClass As Integer = 0 '' 0 = Paint, 1 = OpenGL
@@ -179,10 +178,10 @@ Public Sub Main()
   ' gcolor[255] = WhiteAndBlack
 
   ' this is what we are doing now
-  clsJob = clsDefaultJob
+  clsJob = cadSelection
   clsJob.start()
-  clsJobPrevious = clsDefaultJob
-  clsJobPreZoom = clsDefaultJob
+  clsJobPrevious = cadSelection
+  clsJobPreZoom = cadSelection
   clsJobPreviousParam = 0
 
   'FileName = User.Home &/ "autosaveV5.xml"

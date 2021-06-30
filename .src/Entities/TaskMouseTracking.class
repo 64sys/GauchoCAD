@@ -203,7 +203,7 @@ Public Function CheckAboveEntity(xr As Float, Yr As Float, tolerance As Float) A
     'If Not gcd.CurrDrawing.arrEntities[e].pLayer.Visible Then Continue
     ' En el caso que la entidad sea la que estoy editando desde los grips, tengo que evitarla
 
-    If e = clsDefaultJob.iEntityForEdit Then Continue
+    If e = cadSelection.iEntityForEdit Then Continue
 
     Select Case gcd.CurrentDrawing.oEntities[e].Gender
 

@@ -952,7 +952,7 @@ Public Sub GLArea1_MouseUp()
 
       gcd.clsJob.finish
       gcd.clsJobPrevious = gcd.clsJob
-      gcd.clsJob = clsDefaultJob
+      gcd.clsJob = cadSelection
 
     Endif
 
@@ -1033,7 +1033,7 @@ Public Sub entity_Click()
   Else ' If gcd.clsJob = clsEntityBuilder Then ' esoy dibjando algo, debo cancelar
 
     gcd.clsJob.Cancel()
-    gcd.clsJob = clsDefaultJob
+    gcd.clsJob = cadSelection
     gcd.clsJob.KeyText(Last.Tag)
 
   End If
@@ -1619,7 +1619,7 @@ Public Sub KillJob() ' no funciona bien
 
   gcd.clsJob.Finish()
   gcd.clsJobPrevious = gcd.clsJob
-  gcd.clsJob = clsDefaultJob
+  gcd.clsJob = cadSelection
 
 End
 
@@ -2570,7 +2570,7 @@ Public Sub Form_KeyPress()
 
         gcd.clsJob.finish
         gcd.clsJobPrevious = gcd.clsJob
-        gcd.clsJob = clsDefaultJob
+        gcd.clsJob = cadSelection
 
       Endif
 

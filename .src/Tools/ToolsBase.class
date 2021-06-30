@@ -204,7 +204,7 @@ Public Sub Finish()
   gcd.CurrentDrawing.iEntity.Clear
   gcd.CurrentDrawing.iEntity.Insert([0, 0, -1, -1])
   gcd.clsJobPrevious = Me
-  gcd.clsJob = clsDefaultJob
+  gcd.clsJob = cadSelection
   DrawingAids.CleanTexts
   clsEntities.DeSelection()
   gcd.DrawOriginals = False
@@ -217,7 +217,7 @@ End
 Public Sub Cancel()
 
   gcd.clsJobPrevious = Me
-  gcd.clsJob = clsDefaultJob
+  gcd.clsJob = cadSelection
   DrawingAids.CleanTexts
   gcd.Redraw
 

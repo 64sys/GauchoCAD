@@ -44,7 +44,7 @@ Public Function Start(Optional ElemToBuild As Variant, Optional _Mode As Integer
     DrawingAids.Helper.texto = DrawingAids.HelperTrabajo & ": " & ("Select entities")
 
     gcd.clsJobPrevious = Me
-    gcd.clsJob = clsDefaultJob
+    gcd.clsJob = cadSelection
 
   Else                                                                    ' need the first point
 
@@ -196,7 +196,7 @@ Public Sub Finish()
 
   gl.DeleteLists(glSelectedList, 1)
   gcd.clsJobPrevious = Me
-  gcd.clsJob = clsDefaultJob
+  gcd.clsJob = cadSelection
   DrawingAids.CleanTexts
   clsEntities.DeSelection()
   gcd.regen
