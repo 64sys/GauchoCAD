@@ -1252,14 +1252,20 @@ Public Function ImportJsonToEntity(c As JSONCollection, Optional IsDummy As Bool
     e.Handle = c["handle"][1]
     If e.pLayer = Null Then Stop
 
-    If c["color"].Exist("index") Then
-      e.Colour = c["color"]["index"]
-    Else If c["color"].Exist("rgb") Then
-      e.colour = e.pLayer.Colour
-    Else
-      e.Colour = 256  'by layer
-
-    Endif
+    ' =================================Color===========================
+    ' el manejo del color no esta bien estandarizado por parte de libredwg y puede venir de diversas formas
+    e.Colour = -1
+    Try e.Colour = c["color"]
+    If e.Colour = -1 Then
+      If c["color"].Exist("index") Then
+        e.Colour = c["color"]["index"]
+      Else If c["color"].Exist("rgb") Then
+        e.colour = e.pLayer.Colour
+      Else
+        e.Colour = 256  'by layer
+      Endif
+    End If
+    '======================================================================
     e.LineWidth = c["linewt"] / 100
     If e.LineWidth < 1 Then e.LineWidth = 1
     e.LineType = GetLTypeByIndex(c["ltype_flags"])

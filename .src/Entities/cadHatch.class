@@ -632,8 +632,6 @@ Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
   '       ]
   '     },
 
-  ' ' TODO: this is a debug
-  ' e.StringData[Me.sdaPaternFile] = "Ansi31"
 
   Return True
 
@@ -641,11 +639,7 @@ Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
 
   Return False
 
-  Return True
 
-  'Catch
-
-  Return False
 
 End
 

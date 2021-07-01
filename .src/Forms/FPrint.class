@@ -206,7 +206,7 @@ Public Sub mprint_Click()
 
       Me.Hide
       gcd.clsJobCallBack = Me ' necesitamos volver aca luego de que marque un area
-      gcd.clsJob = clsDefaultJob
+      gcd.clsJob = cadSelection
 
   End Select
 

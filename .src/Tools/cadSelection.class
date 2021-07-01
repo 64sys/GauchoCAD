@@ -247,7 +247,13 @@ Public Function KeyText(EnteredText As String)
       'o = cadDimension ' a test
       gcd.clsJobPrevious = gcd.clsJob
 
-      o = Object.New("cad" & EnteredText)
+      Try o = Object.New("cad" & EnteredText)
+
+      If IsNull(o) Then
+        DrawingAids.ErrorMessage = "Command not recognized"
+        Return
+      Endif
+
 
       ' check if the class needs to be run trough other
       If o.usewith = "" Then                        ' its a tool

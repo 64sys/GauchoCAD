@@ -614,8 +614,8 @@ Public Function SaveFile(sName As String, cData As Collection) As Integer
   'If Save4Blocks(cData["BLOCKS"]) Then Return False
   'If Save5Entities(cData["ENTITIES"]) Then Return False
   If Save5EntitiesDirect(gcd.CurrentDrawing.oEntities) Then Return False
-  If Save6Objects(cData["OBJECTS"]) Then Return False
-  If Save7ThumbNail(cData["THUMBNAILIMAGE"]) Then Return False
+  'If Save6Objects(cData["OBJECTS"]) Then Return False
+  'If Save7ThumbNail(cData["THUMBNAILIMAGE"]) Then Return False
   hFile.Close
   Return gcd.CurrentDrawing.oEntities.Count
   'Catch

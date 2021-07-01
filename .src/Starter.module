@@ -77,7 +77,7 @@ Public Sub Run()
   SetEnvironmentVars()
   SetExternalApps()
   SetCommandsList()
-
+  'SetCommandsList2()
   '' Bandera de indicacion de formulario cargado
   'ldd = True
   cEntities = cad.DWGEntityList()
@@ -261,6 +261,55 @@ Private Sub SetCommandsList()
   cCommandsList.Add(["layers", "lk"], "layers")
 
 End
+
+
+
+Private Sub SetCommandsClasses()
+
+  ' trato de cargar dinamicamente las classes
+  cCommandsList.Add(cadChamfer, "chamfer")
+  cCommandsList.Add(["copy", "c"], "copy")
+  cCommandsList.Add(["divide", "dx"], "divide")
+  cCommandsList.Add(["erase", "de"], "erase")
+  cCommandsList.Add(["extend", "e"], "extend")
+  cCommandsList.Add(["fillet", "f"], "fillet")
+  cCommandsList.Add(["mirror", "mn"], "mirror")
+  cCommandsList.Add(["move", "m"], "move")
+  cCommandsList.Add(["offset", "fg"], "offset")
+  cCommandsList.Add(["pan", "zc"], "pan")
+  cCommandsList.Add(["rotate", "rt"], "rotate")
+  cCommandsList.Add(["scale", "sc"], "scale")
+  cCommandsList.Add(["stretch", "s"], "stretch")
+  cCommandsList.Add(["trim", "tr"], "trim")
+  cCommandsList.Add(["zoome", "zx"], "zoome")
+  cCommandsList.Add(["zoomw", "z"], "zoomw")
+
+  cCommandsList.Add(["arc", "a"], "arc")
+  cCommandsList.Add(["circle", "cv"], "circle")
+  cCommandsList.Add(["dim", "dw"], "dim")
+  cCommandsList.Add(["ellipse", "ew"], "ellipse")
+  cCommandsList.Add(["hatch", "ht"], "hatch")
+  cCommandsList.Add(["insert", "b"], "insert")
+  cCommandsList.Add(["leader", "li"], "leader")
+  cCommandsList.Add(["line", "l"], "line")
+  cCommandsList.Add(["mtext", "tt"], "mtext")
+  cCommandsList.Add(["lwpolyline", "po"], "lwpolyline")
+  cCommandsList.Add(["rectangle", "re"], "rectangle")
+  cCommandsList.Add(["solid", "sa"], "solid")
+  cCommandsList.Add(["spline", "sq"], "spline")
+  cCommandsList.Add(["text", "t"], "text")
+
+  cCommandsList.Add(["beam", "w1"], "beam")
+  cCommandsList.Add(["column", "w2"], "column")
+  cCommandsList.Add(["slab3p", "w3"], "slab3p")
+  cCommandsList.Add(["slab4p", "w4"], "slab4p")
+  cCommandsList.Add(["wallcolumn", "w5"], "wallcolumn")
+
+  cCommandsList.Add(["layers", "lk"], "layers")
+
+
+End
+
 
 ' Private Function LoadColors() As Collection
 '

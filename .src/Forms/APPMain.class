@@ -3173,12 +3173,6 @@ Public Sub LoadDrawingMap2()
 
 End
 
-Public Sub tmr500_Timer()
-
-  If DrawingAids.PromtSlash = "|" Then DrawingAids.PromtSlash = "" Else DrawingAids.PromtSlash = "|"
-  DrawingAids.DibujaHelper
-
-End
 
 Public Sub cboDrawing_Click()
 
