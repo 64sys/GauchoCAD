@@ -199,7 +199,7 @@ Public Sub ReBuildBlock(E As Entity) As Block
 
   fRotXY = puntos.RotateFromPointWithAngle(E.P[0], E.P[1], (eLineaPpal.fParam[2] - eLineaPpal.fParam[1]) / 180 * Pi / 2, E.P[2], E.P[3])
   '
-  flxTextExt = glPlus.MTextExtends(eText.StringData[cadMText.sdaText], 0, 0, eText.fParam[1])
+  flxTextExt = glPlus.TextExtends(eText.StringData[cadMText.sdaText], 0, 0, eText.fParam[1])
   '
   eText.P[0] = fRotXY[0] - E.P[0]
   eText.P[1] = fRotXY[1] - E.P[1]

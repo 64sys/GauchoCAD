@@ -331,7 +331,13 @@ Public Sub ProcessPart(s As String)
   Dim angulo As Float, hText As New PaintExtents, lText As String
   Dim FontScalePrev As Float, ctex As New CairoTextExtents
 
+
   s2 = s
+
+  s2 = Replace(s2, "%%D", "U+00B0")
+  s2 = Replace(s2, "%%P", "U+00B1")
+  s2 = Replace(s2, "%%C", "U+2205")
+
   'If Left$(s2, 1) = "\\" Then
   's2 = Mid(s2, 2)
   Select Case Mid$(s2, 1, 2)

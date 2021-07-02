@@ -239,7 +239,7 @@ Public Sub ReBuildBlock(E As Entity, Optional Stage As Integer) As Block
 
   E.fParam[cadDimension.ipaRealMeasure] = d
 
-  flxTextExt = glPlus.MTextExtends(eText.StringData[0], 0, 0, eText.fParam[1])
+  flxTextExt = glPlus.TextExtends(eText.StringData[0], 0, 0, eText.fParam[1])
 
   ' la cuarta y quinta son las flechas , tengo que verificar si entran, o el texto
   If flxTextExt[2] * 1.1 > d Then                      ' no entra

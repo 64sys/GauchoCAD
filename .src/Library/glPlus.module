@@ -46,20 +46,23 @@
 Public Struct letterSt
 
   Code As Integer
-  FontGlyps As Float[]             ' las lineas que dibujan uns letra
+  FontGlyps As Single[][]             ' las lineas que dibujan uns letra
+  FontBulges As Single[][]
+
 End Struct
 
 Public Struct fontSt
   FileName As String
   FontName As String
-  LetterSpacing As Float
-  WordSpacing As Float
-  LineSpacingFactor As Float
-  Letter As LetterSt[]                ' Codigo UTF-8 de las letras
+  LetterSpacing As Single
+  WordSpacing As Single
+  LineSpacingFactor As Single
+  Letter As Collection ' de LetterSt                ' Codigo UTF-8 de las letras
 
 End Struct
 
 Public ActualFont As FontSt                         ' the class
+Public UnicodeFont As FontSt
 Public ActualFontName As String = "romanc"          ' the name
 Public ActualFontHeigth As Float = 1                ' the letter heigth
 Public FontScale As Float = 0.1                     ' the general scale factor
@@ -878,8 +881,40 @@ Public Function LoadFonts(DirPath As String) As String[]
   ' 0.428572, 6.00001; 0, 5.57144
   ' 0, 5.571
 
-  Dim sFilename As String, fFile As File, sData, sCoord As String
+  ' - Is there any documentation about the LFF file format?
+  ' I coped this from a mail:
+  '
+  ' Attached a proposal of new fonts, and below a explanation:
+  '
+  ' [0041] A
+  ' 0.0000,0.0000;3.0000,9.0000;6.0000,9.000          <---CADA LINEA ES UNA POLY INDEPENDIENTE DE LA ANTERIOR
+  ' 1.0800,2.5500;4.7300,2.5500
+  '
+  ' line 1 => utf-8 code + letter (same as QCAD)
+  ' line 2 & 3 =>sequence like polyline vertex with ";" seperating vertex
+  ' and "," separating x,y coords
+  '
+  ' [0066] f
+  ' 1.2873,0;1.2873,7.2945;A0.5590,3.4327,9.0000
+  ' 0.000000,6.0000,3.0000,6.0000
+  '
+  ' line 2  =>sequence like polyline vertex with ";" seperating vertex and
+  ' "," separating x,y coords, if vertex is prefixed with "A"
+  ' the first field is a bulge
+  '
+  ' [00C1] Á
+  ' C0041
+  ' 2.000000,9.0000,4.0000,10.0000
+
+
+  Dim sFilename As String, fFile As File, sData, sCoord, aVert As String
   Dim sPuntos As String[], Lista As New String[]
+  Dim p1 As Integer
+  Dim BulgeAdded As Boolean
+  Dim sVert As String[]
+  Dim fltb As Single[]
+  Dim flt1, flt3 As Single[]
+  Dim flt2 As Single
 
   For Each sFilename In Dir(DirPath, "*.lff")
 
@@ -889,7 +924,7 @@ Public Function LoadFonts(DirPath As String) As String[]
     fntNuevas.WordSpacing = 6.75
     fntNuevas.LetterSpacing = 3
     fntNuevas.LineSpacingFactor = 1
-    fntNuevas.Letter = New LetterSt[]
+    fntNuevas.Letter = New Collection
 
     ffile = Open DirPath &/ sFilename For Input
     Do
@@ -897,25 +932,65 @@ Public Function LoadFonts(DirPath As String) As String[]
       If Left$(sData, 1) = "[" Then                           ' nueva letra
         Dim Letra As New LetterSt
         letra.Code = Val("&H0000" & Mid(sData, 2, 4))       ' [0021]!
-        letra.FontGlyps = New Float[]
+        letra.FontGlyps = New Single[][]
+        letra.FontBulges = New Single[][]
+
         While sdata <> ""
           Line Input #fFile, sDAta                        ' 0.428572, 0.857143; 0, 0.428572
           If Left(sData, 1) = "C" Then                       ' Copio datos de otra letra
             Dim CopyCode As Integer
             CopyCode = Val("&H0000" & Mid(sData, 2, 4))       ' C0021
-            CopyCode = GetCodeIndex(fntNuevas, CopyCode)
-            Dim flt1 As Float
+            'CopyCode = GetCodeIndex(fntNuevas, CopyCode)
+            flt1 = New Single[]
+            flt3 = New Single[]
+
             For Each flt1 In fntNuevas.Letter[CopyCode].FontGlyps
-              letra.FontGlyps.Add(flt1)
+              letra.FontGlyps.Add(flt3)
+              For Each flt2 In flt1
+                flt3.Add(flt2)
+              Next
             Next
+            flt3 = New Single[]
+            For Each flt1 In fntNuevas.Letter[CopyCode].FontBulges
+              letra.FontBulges.Add(flt3)
+              For Each flt2 In flt1
+                flt3.Add(flt2)
+              Next
+            Next
+
           Else
-            sPuntos = Split(sDAta, ";,")
+            flt1 = New Single[]
+            fltb = New Single[]
+
+            letra.FontGlyps.Add(flt1)
+            letra.FontBulges.Add(fltb)
+
+            sPuntos = Split(sDAta, ";")
+
             For Each sCoord In sPuntos
-              Try letra.FontGlyps.Add(CFloat(sCoord))
+              sVert = Split(sCoord, ",")
+              BulgeAdded = False
+              For Each aVert In sVert
+                p1 = InStr(avert, "A")
+                If p1 > 0 Then
+
+                  ' Try letra.FontBulges.Add(CFloat(Mid$(aVert, p1 + 1)))
+                  Try fltb.Add(CSingle(Mid$(aVert, p1 + 1)))
+                  BulgeAdded = True
+
+
+                Else
+
+                  ' Try letra.FontGlyps.Add(CFloat(aVert))
+                  flt1.Add(CSingle(aVert))
+
+                Endif
+              Next
+              If Not BulgeAdded Then fltb.Add(0)
             Next
           End If
         Wend                                                ' fin de la letra
-        fntNuevas.Letter.Add(letra)
+        fntNuevas.Letter.Add(letra, letra.Code)
 
       Endif                                                   ' ignoro todos los comentarios
 
@@ -923,6 +998,7 @@ Public Function LoadFonts(DirPath As String) As String[]
     fntNuevas.FontName = Left$(sFilename, -4)
     glFont.Add(fntNuevas)
     ActualFont = fntNuevas
+    If fntNuevas.FontName = "unicode" Then UnicodeFont = fntNuevas
 
     Debug "Leidas ", fntNuevas.Letter.Count, " letras en ", sFilename
     lista.Add(fntNuevas.FontName)
@@ -933,26 +1009,36 @@ Public Function LoadFonts(DirPath As String) As String[]
 
 End
 
-'' Busca el codigo UTF y devuelve la posicion en el indice de letras
-Public Function GetCodeIndex(LaFont As FontSt, UTFcode As Integer) As Integer
-
-  Dim i As Integer
-
-  If Not LaFont Then Return 0
-
-  For i = 0 To LaFont.Letter.Max
-    If LaFont.Letter[i].Code = UTFcode Then Return i
-
-  Next
-
-End
+' '' Busca el codigo UTF y devuelve la posicion en el indice de letras
+' Public Function GetCodeIndex(LaFont As FontSt, UTFcode As Integer) As Integer
+'
+'   Dim i As Integer
+'
+'   If Not LaFont Then Return 0
+'
+'   For i = 0 To LaFont.Letter.Max
+'     If LaFont.Letter[i].Code = UTFcode Then Return i
+'   Next
+'
+'   ' si estamos aca es porque no lo encontramos, buscamos en unicode
+'   For i = 0 To UnicodeFont.Letter.Max
+'     If UnicodeFont.Letter[i].Code = UTFcode Then Return -i
+'   Next
+'
+' End
 
 '' Grafica un texto en el contexto actual de acuerdo a los parametros pasados
 '' Debe estar definida la Font con nombre y altura
 ''
-Fast Unsafe Public Function DrawText(UTFstring As String, posX As Float, posY As Float, Optional angle As Float = 0, textH As Float = 1, colour As Integer = -14, linewidth As Float = 1, rectW As Float = 0, rectH As Float = 0, alignHoriz As Integer = 0, alignVert As Integer = 0) As Boolean
+Public Function DrawText(UTFstring As String, posX As Float, posY As Float, Optional angle As Float = 0, textH As Float = 1, colour As Integer = -14, linewidth As Float = 1, rectW As Float = 0, rectH As Float = 0, alignHoriz As Integer = 0, alignVert As Integer = 0) As Boolean
 
-  Dim i, iii, UTFcode, LetterIndex As Integer, Xadvance As Float
+  Dim i, iii, i2, UTFcode, LetterIndex As Integer, Xadvance As Float
+  Dim fArcParams As New Single[]
+  Dim Glyps, Bulges As New Single[]
+  Dim TGlyps, TBulges As Single[][]
+  Dim Ang, m1, m2, b, bx, by, mx, my, ang1, lt As Single
+  Dim iBulge As Integer
+
 
   gl.PushMatrix                                                               ' para evitar peleas, guardo la matriz de trnasformacion
   gl.Translatef(posX, posY, 0)
@@ -964,74 +1050,109 @@ Fast Unsafe Public Function DrawText(UTFstring As String, posX As Float, posY As
     If UTFcode = 32 Then                                                    ' es un espacio
       gl.Translatef(ActualFont.LetterSpacing, 0, 0)                       ' muevo el puntero a la siguiente posicion
     Else
-      LetterIndex = GetCodeIndex(ActualFont, UTFcode)                     ' obtengo el indice de la letra
-      Lines(ActualFont.Letter[LetterIndex].FontGlyps, colour)                     ' la dibujo
-      For iii = 0 To ActualFont.Letter[LetterIndex].FontGlyps.Max Step 2  ' calculo cuanto tiene que avanzar el puntero
-        If ActualFont.Letter[LetterIndex].FontGlyps[iii] > Xadvance Then Xadvance = ActualFont.Letter[LetterIndex].FontGlyps[iii]
+      ' DEPRE LetterIndex = GetCodeIndex(ActualFont, UTFcode)                     ' obtengo el indice de la letra
+      If ActualFont.Letter.Exist(UTFcode) Then
+        TGlyps = ActualFont.Letter[UTFcode].FontGlyps
+        TBulges = ActualFont.Letter[UTFcode].FontBulges
+
+      Else If UnicodeFont.Letter.Exist(UTFcode) Then ' is unicode
+        TGlyps = UnicodeFont.Letter[UTFcode].FontGlyps
+        TBulges = UnicodeFont.Letter[UTFcode].FontBulges
+
+      Else
+        ' descarto la letra
+        Continue
+
+      End If
+
+      ' con bulges
+      '============================================================================
+      iBulge = 0
+
+      For Each Glyps In TGlyps
+        Bulges = TBulges[iBulge]
+
+        For i2 = 0 To Glyps.Count / 2 - 2
+
+          ' no todos los tramos pueden tener bulges
+          If Abs(Bulges[i2 + 1]) > 0.001 Then
+            ang1 = Ang(Glyps[(i2 + 1) * 2] - Glyps[i2 * 2], Glyps[(i2 + 1) * 2 + 1] - Glyps[i2 * 2 + 1])    ' angulo del tramo
+            Lt = puntos.distancia(Glyps[i2 * 2], Glyps[i2 * 2 + 1], Glyps[(i2 + 1) * 2], Glyps[(i2 + 1) * 2 + 1])
+            If Lt = 0 Then Continue
+            mx = (Glyps[(i2 + 1) * 2] + Glyps[i2 * 2]) / 2          ' punto medio del tramo
+            my = (Glyps[(i2 + 1) * 2 + 1] + Glyps[i2 * 2 + 1]) / 2
+            B = Bulges[i2 + 1] * Lt / 2
+            bx = mx + B * Sin(ang1)                             ' Tercer punto del Bulge
+            by = my - B * Cos(ang1)
+
+            ' aqui podria usar una rutina de arco entre 3 puntos
+            fArcParams = puntos.Arc3Point(Glyps[i2 * 2], Glyps[i2 * 2 + 1], bx, by, Glyps[(i2 + 1) * 2], Glyps[(i2 + 1) * 2 + 1])
+            ' traslado el centro
+
+            gl.Translatef(fArcParams[0], fArcParams[1], 0)
+
+            ' verifico Start_Angle y End_Angle (esta parte esta intimamente ligada a Arc3Point)
+            ' las combinaciones de angulos son diversas, Arc3Point puede no funcionar bien en otra circunstancia
+
+            If fArcParams[3] > 0 And fArcParams[4] > 0 Then
+
+            Else If fArcParams[3] > 0 And fArcParams[4] < 0 Then
+
+              Swap fArcParams[3], fArcParams[4]
+
+            Else If fArcParams[3] < 0 And fArcParams[4] < 0 Then
+              fArcParams[3] += 2 * Pi
+              fArcParams[4] += 2 * Pi
+
+            Else If fArcParams[3] < 0 And fArcParams[4] > 0 Then
+              fArcParams[3] += 2 * Pi
+
+            Endif
+
+            If fArcParams[3] > fArcParams[4] Then Swap fArcParams[3], fArcParams[4]
+
+            glPlus.Arc(fArcParams[2], fArcParams[3], fArcParams[4] - fArcParams[3], colour)
+            gl.Translatef(-fArcParams[0], -fArcParams[1], 0)
+            fArcParams = Null
+
+          Else    ' dibujo la linea normalmente
+
+            glPlus.Lines([Glyps[i2 * 2], Glyps[i2 * 2 + 1], Glyps[(i2 + 1) * 2], Glyps[(i2 + 1) * 2 + 1]], Colour)
+          End If
+
+        Next
+        For iii = 0 To Glyps.Max Step 2  ' calculo cuanto tiene que avanzar el puntero
+          If Glyps[iii] > Xadvance Then Xadvance = Glyps[iii]
+        Next
+
+        Inc iBulge
       Next
       gl.Translatef(Xadvance + ActualFont.LetterSpacing, 0, 0)                                       ' muevo el puntero a la siguiente posicion
       'Debug Xadvance
       Xadvance = 0
+      '================================================================================
+
+
     End If
   Next
   gl.PopMatrix
 
 End
 
-'' Grafica un texto de varias lineas en el contexto actual de acuerdo a los parametros pasados
-'' Debe estar definida la Font con nombre y altura
-''
-Fast Unsafe Public Function DrawMultilineText(UTFMultiString As String, posX As Float, posY As Float, Optional angle As Float = 0, textH As Float = 1, colour As Integer = -14, linewidth As Float = 1, rectW As Float = 0, rectH As Float = 0, alignHoriz As Integer = 0, alignVert As Integer = 0) As Boolean
 
-  Dim i, iii, UTFcode, LetterIndex As Integer, Xadvance, xtotaladvance, Yadvance, ytotaladvance As Float
-  Dim mLines As String[], dH As Float, tLine As String
-  Dim tRect As New Float[]
 
-  tRect.Insert([0.0, 0.0])
-  mlines = Split(UTFMultiString, gb.CrLf & gb.Cr & gb.lf)
 
-  gl.PushMatrix                                                               ' para evitar peleas, guardo la matriz de trnasformacion
-  gl.Translatef(posX, posY, 0)
-  gl.Rotatef(angle, 0, 0, 1)
-  gl.Scalef(textH * FontScale, textH * FontScale, 1)
-  If colour <> -14 Then Me.glColorRGB(colour)
-  For Each tLine In mLines
 
-    For i = 1 To String.Len(tLine)                                                 ' para cada letra
-      UTFcode = String.Code(tLine, i)                                     ' obtengo el UTF code
-      If UTFcode = 32 Then                                                    ' es un espacio
-        gl.Translatef(ActualFont.LetterSpacing, 0, 0)                       ' muevo el puntero a la siguiente posicion
-        xtotaladvance += ActualFont.LetterSpacing
-      Else
-        LetterIndex = GetCodeIndex(ActualFont, UTFcode)                     ' obtengo el indice de la letra
-        Lines(ActualFont.Letter[LetterIndex].FontGlyps, colour)                     ' la dibujo
-        For iii = 0 To ActualFont.Letter[LetterIndex].FontGlyps.Max Step 2  ' calculo cuanto tiene que avanzar el puntero
-          If ActualFont.Letter[LetterIndex].FontGlyps[iii] > Xadvance Then Xadvance = ActualFont.Letter[LetterIndex].FontGlyps[iii]
-          If ActualFont.Letter[LetterIndex].FontGlyps[iii + 1] > tRect[1] Then tRect[1] = ActualFont.Letter[LetterIndex].FontGlyps[iii + 1]
-        Next
-        tRect[0] += (Xadvance + ActualFont.LetterSpacing) * textH * FontScale
-        gl.Translatef(Xadvance + ActualFont.LetterSpacing, 0, 0)                                       ' muevo el puntero a la siguiente posicion
-
-        xtotaladvance += Xadvance + ActualFont.LetterSpacing
-        'Debug Xadvance
-        Xadvance = 0
-      End If
-    Next
-
-    gl.Translatef(-xtotaladvance, -(ActualFont.WordSpacing + tRect[1]), 0)
-    xtotaladvance = 0
-  Next
-
-  gl.PopMatrix
-
-End
 
 '' devuelve un rectangulo que contiene al texto
 '' [ancho,alto]
 Fast Unsafe Public Function TextExtends(UTFstring As String, textH As Float) As Float[]
 
-  Dim i, iii, UTFcode, LetterIndex As Integer, Xadvance As Float
+  Dim ibulge, i, iii, UTFcode, LetterIndex As Integer, Xadvance As Float
   Dim tRect As New Float[]
+  Dim fArcParams As New Single[]
+  Dim Glyps, Bulges As New Single[]
+  Dim TGlyps, TBulges As New Single[][]
 
   tRect.Insert([0.0, 0.0])
 
@@ -1040,15 +1161,36 @@ Fast Unsafe Public Function TextExtends(UTFstring As String, textH As Float) As 
     If UTFcode = 32 Then                                                    ' es un espacio
       tRect[0] += ActualFont.LetterSpacing * textH * FontScale
     Else
-      LetterIndex = GetCodeIndex(ActualFont, UTFcode)                     ' obtengo el indice de la letra
-      For iii = 0 To ActualFont.Letter[LetterIndex].FontGlyps.Max Step 2  ' calculo cuanto tiene que avanzar el puntero
-        If ActualFont.Letter[LetterIndex].FontGlyps[iii] > Xadvance Then Xadvance = ActualFont.Letter[LetterIndex].FontGlyps[iii]
-        If ActualFont.Letter[LetterIndex].FontGlyps[iii + 1] > tRect[1] Then tRect[1] = ActualFont.Letter[LetterIndex].FontGlyps[iii + 1]
-      Next
-      tRect[0] += (Xadvance + ActualFont.LetterSpacing) * textH * FontScale
+      ' DEPRE LetterIndex = GetCodeIndex(ActualFont, UTFcode)                     ' obtengo el indice de la letra
 
-      Xadvance = 0
+
+      If ActualFont.Letter.Exist(UTFcode) Then
+        TGlyps = ActualFont.Letter[UTFcode].FontGlyps
+        TBulges = ActualFont.Letter[UTFcode].FontBulges
+
+      Else If UnicodeFont.Letter.Exist(UTFcode) Then ' is unicode
+        TGlyps = UnicodeFont.Letter[UTFcode].FontGlyps
+        TBulges = UnicodeFont.Letter[UTFcode].FontBulges
+      End If
+
+      iBulge = 0
+
+      For Each Glyps In TGlyps
+        Bulges = TBulges[iBulge]
+        For iii = 0 To Glyps.Max Step 2  ' calculo cuanto tiene que avanzar el puntero
+          If Glyps[iii] > Xadvance Then Xadvance = Glyps[iii]
+          If Glyps[iii + 1] > tRect[1] Then tRect[1] = Glyps[iii + 1]
+        Next
+
+
+      Next
+      Inc iBulge
+
+
     End If
+    tRect[0] += (Xadvance + ActualFont.LetterSpacing) * textH * FontScale
+
+    Xadvance = 0
   Next
 
   tRect[1] *= textH * FontScale * 1.2
@@ -1059,43 +1201,7 @@ End
 
 '' devuelve un rectangulo que contiene al texto
 '' [x,y,ancho,alto]
-Fast Unsafe Public Function MTextExtends(UTFMultiString As String, posX As Float, posY As Float, textH As Float) As Float[]
 
-  Dim i, iii, UTFcode, LetterIndex As Integer, Yadvance, Xadvance, xtotaladvance, xmaxadvance As Float
-  Dim mLines As String[], dH As Float, tLine As String, FirstYadvance As Boolean = False
-  Dim tRect As New Float[]
-
-  tRect.Insert([posX, posY, 0, 0])
-  mlines = Split(UTFMultiString, gb.CrLf & gb.Cr & gb.lf)
-
-  For Each tLine In mLines
-    For i = 1 To String.Len(tLine)                                                 ' para cada letra
-      UTFcode = String.Code(tLine, i)                                         ' obtengo el UTF code
-      If UTFcode = 32 Then                                                    ' es un espacio
-        tRect[2] += ActualFont.LetterSpacing * textH * FontScale
-      Else
-        LetterIndex = GetCodeIndex(ActualFont, UTFcode)                     ' obtengo el indice de la letra
-        For iii = 0 To ActualFont.Letter[LetterIndex].FontGlyps.Max Step 2  ' calculo cuanto tiene que avanzar el puntero
-          If ActualFont.Letter[LetterIndex].FontGlyps[iii] > Xadvance Then Xadvance = ActualFont.Letter[LetterIndex].FontGlyps[iii]
-          If ActualFont.Letter[LetterIndex].FontGlyps[iii + 1] > Yadvance Then Yadvance = ActualFont.Letter[LetterIndex].FontGlyps[iii + 1]
-        Next
-        xtotaladvance += (Xadvance + ActualFont.LetterSpacing) * textH * FontScale
-        Xadvance = 0
-      End If
-    Next
-    If Not FirstYadvance Then
-
-      tRect[1] = ((Yadvance) * textH * FontScale)
-      FirstYadvance = True
-    Endif
-    If xtotaladvance > tRect[2] Then tRect[2] = xtotaladvance
-    xtotaladvance = 0
-    tRect[3] -= ((Yadvance + ActualFont.WordSpacing) * textH * FontScale)
-    Yadvance = 0
-  Next
-  Return tRect
-
-End
 
 '' Lee todas las texturas del directorio provisto y devuelve un listado con sus nombres
 Public Function LoadTextures(DirPath As String) As String[]

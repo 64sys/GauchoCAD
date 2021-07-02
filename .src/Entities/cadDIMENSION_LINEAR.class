@@ -274,7 +274,7 @@ Public Sub ReBuildBlock(E As Entity) As Block
   Endif
   ' el texto
   eText.StringData[cadMText.sdaText] = "\\A1;" & sDim
-  flxTextExt = glPlus.MTextExtends(sDim, 0, 0, eText.fParam[cadMText.ipaTextHeight])
+  flxTextExt = glPlus.TextExtends(sDim, 0, 0, eText.fParam[cadMText.ipaTextHeight])
 
   ' la cuarta y quinta son las flechas , tengo que verificar si entran, o el texto
   If flxTextExt[2] * 1.1 > Abs(d) Then                      ' no entra
