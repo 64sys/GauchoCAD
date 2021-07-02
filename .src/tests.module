@@ -1,0 +1,88 @@
+' Gambas module file
+
+Public Sub TEst1() ' SVG
+
+  '==============================ACTUAL PRINT==========================================
+  Dim svgTopaint As New SvgImage(297, 210)
+  Dim com As Variant
+  Dim umx As Integer     '' Index in undo array
+  Dim uEnty As Entity    '' Undo entity
+  Dim aEnty As Entity    '' Actual entity
+  Dim imx As Integer     '' Index in Entities array
+  Dim SelectMode As Boolean
+  Dim e As Entity
+  Dim i As Integer
+  Dim flxLimits As New Float[]
+  Dim scaleX, scale, scaleY As Float
+  Dim jPrint As New JSONCollection
+  Dim t As Float = Timer
+
+  'SvgImage = New SvgImage(297 * 150, 210 * 150)
+  flxLimits = clsEntities.ComputeLimits(gcd.CurrentDrawing.oEntities, True)
+
+  Paint.Begin(svgTopaint)
+  Paint.Reset ' vuelvo escalas y traslados a cero
+  Paint.Translate(Paint.W / 2, Paint.H / 2) ' centro el dibujo
+  ' trato de meter centrado
+  scaleX = Paint.w / (flxLimits[2] - flxLimits[0])
+  scaleY = Paint.H / (flxLimits[3] - flxLimits[1])
+
+  If scaleX < scaleY Then Scale = scaleX Else Scale = scaley
+  Paint.Scale(scale * 0.85, -scale * 0.85)
+
+  ' centro el dibujo
+  Paint.Translate(-(flxLimits[2] + flxLimits[0]) / 2, -(flxLimits[3] + flxLimits[1]) / 2)
+
+  If Exist(FPrint.sConfig) Then
+    jPrint = JSON.FromString(File.Load(FPrint.sConfig), True)
+
+  Endif
+
+  For Each e As Entity In gcd.CurrentDrawing.oEntities
+    If e.LineWidth = 0 Then e.LineWidth = 1
+    If jPrint.Exist("Monochrome") Then
+      If jPrint["Monochrome"] Then
+        e.colour = 255
+      Endif
+    Endif
+    Paint.Brush = Paint.Color(Color.Black)
+
+    ' TODO: aplicar las puntas segun color de la entidad
+    Paint.LineWidth = e.LineWidth / scale
+
+    Paint.Save  ' guardamos la matriz de transformacion por si la entidad la modifica
+    e.ClassHandler.draw2(e)
+    Paint.Restore ' restauramos la matriz
+  Next
+
+  Paint.End
+
+  Dim s As String
+
+  s = User.Home &/ "tincho.svg"
+
+  Try Kill s
+
+  svgTopaint.Save(s)
+
+  Debug "Print done"
+
+End
+
+Public Sub TestFonts()
+
+  Dim fFont As LFFFonts
+  Dim sText As String
+  Dim y As Integer
+
+  For Each fFont In glPlus.glFont
+
+    sText = fFont.FontName & "     The quick brown fox jumps over the lazy dog"
+    glPlus.SelectFont(fFont.FontName)
+    glPlus.DrawText(stext, 0, y, 0, 0.3, Color.Blue)
+    y += 1
+
+
+  Next
+
+End

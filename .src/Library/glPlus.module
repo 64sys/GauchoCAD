@@ -43,26 +43,12 @@
 'Fast Unsafe
 ' una lbreria de funciones para pasar de Paint a OpenGL
 
-Public Struct letterSt
 
-  Code As Integer
-  FontGlyps As Single[][]             ' las lineas que dibujan uns letra
-  FontBulges As Single[][]
 
-End Struct
 
-Public Struct fontSt
-  FileName As String
-  FontName As String
-  LetterSpacing As Single
-  WordSpacing As Single
-  LineSpacingFactor As Single
-  Letter As Collection ' de LetterSt                ' Codigo UTF-8 de las letras
 
-End Struct
-
-Public ActualFont As FontSt                         ' the class
-Public UnicodeFont As FontSt
+Public ActualFont As LFFFonts                      ' the class
+Public UnicodeFont As LFFFonts
 Public ActualFontName As String = "romanc"          ' the name
 Public ActualFontHeigth As Float = 1                ' the letter heigth
 Public FontScale As Float = 0.1                     ' the general scale factor
@@ -71,7 +57,7 @@ Public FontsNameList As String[]            ' lista de fuentes LFF disponibles y
 
 Public FontsCAllLists As Integer[]          ' listas de listas de caracteres
 
-Public glFont As New FontSt[]
+Public glFont As New LFFFonts[]
 
 Public Struct textureSt
   FileName As String
@@ -836,9 +822,9 @@ End
 '' Establece la fuente con que se dibujaran los textos
 Public Function SelectFont(FontName As String) As Boolean
 
-  Dim f As FontSt
 
-  For Each f In glFont
+
+  For Each f As LFFFonts In glFont
     If LCase(f.FontName) = LCase(FontName) Then
       ActualFont = f
       Return True ' fuente encontrada
@@ -918,7 +904,7 @@ Public Function LoadFonts(DirPath As String) As String[]
 
   For Each sFilename In Dir(DirPath, "*.lff")
 
-    Dim fntNuevas As New FontSt
+    Dim fntNuevas As New LFFFonts
 
     fntNuevas.FileName = sFilename
     fntNuevas.WordSpacing = 6.75
@@ -930,7 +916,7 @@ Public Function LoadFonts(DirPath As String) As String[]
     Do
       Line Input #fFile, sDAta
       If Left$(sData, 1) = "[" Then                           ' nueva letra
-        Dim Letra As New LetterSt
+        Dim Letra As New Letters
         letra.Code = Val("&H0000" & Mid(sData, 2, 4))       ' [0021]!
         letra.FontGlyps = New Single[][]
         letra.FontBulges = New Single[][]

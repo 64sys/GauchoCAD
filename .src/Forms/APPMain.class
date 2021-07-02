@@ -693,6 +693,7 @@ Public Sub GLArea1_draw()
 
   ' Primero la grid
   ' clsDrawingAids.DrawGrid
+  tests.TestFonts
 
   If gcd.DrawBounds Then DrawingAids.DrawPolygons
 
@@ -2458,58 +2459,7 @@ Public Sub Form_KeyPress()
       KeysAccumulator = ""
 
     Case Key.f2 ' for runing tests
-      '==============================ACTUAL PRINT==========================================
-      Dim svgTopaint As New SvgImage(297, 210)
 
-      'SvgImage = New SvgImage(297 * 150, 210 * 150)
-      flxLimits = clsEntities.ComputeLimits(gcd.CurrentDrawing.oEntities, True)
-
-      Paint.Begin(svgTopaint)
-      Paint.Reset ' vuelvo escalas y traslados a cero
-      Paint.Translate(Paint.W / 2, Paint.H / 2) ' centro el dibujo
-      ' trato de meter centrado
-      scaleX = Paint.w / (flxLimits[2] - flxLimits[0])
-      scaleY = Paint.H / (flxLimits[3] - flxLimits[1])
-
-      If scaleX < scaleY Then Scale = scaleX Else Scale = scaley
-      Paint.Scale(scale * 0.85, -scale * 0.85)
-
-      ' centro el dibujo
-      Paint.Translate(-(flxLimits[2] + flxLimits[0]) / 2, -(flxLimits[3] + flxLimits[1]) / 2)
-
-      If Exist(FPrint.sConfig) Then
-        jPrint = JSON.FromString(File.Load(FPrint.sConfig), True)
-
-      Endif
-
-      For Each e As Entity In gcd.CurrentDrawing.oEntities
-        If e.LineWidth = 0 Then e.LineWidth = 1
-        If jPrint.Exist("Monochrome") Then
-          If jPrint["Monochrome"] Then
-            e.colour = 255
-          Endif
-        Endif
-        Paint.Brush = Paint.Color(Color.Black)
-
-        ' TODO: aplicar las puntas segun color de la entidad
-        Paint.LineWidth = e.LineWidth / scale
-
-        Paint.Save  ' guardamos la matriz de transformacion por si la entidad la modifica
-        e.ClassHandler.draw2(e)
-        Paint.Restore ' restauramos la matriz
-      Next
-
-      Paint.End
-
-      Dim s As String
-
-      s = User.Home &/ "tincho.svg"
-
-      Try Kill s
-
-      svgTopaint.Save(s)
-
-      Debug "Print done"
 
     Case Key.f6
 
