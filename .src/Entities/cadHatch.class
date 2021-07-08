@@ -48,6 +48,11 @@ Public Const sdaTotalParams As Integer = 2
 Public Const sdaPattern As Integer = 0
 Public Const sdaPaternFile As Integer = 1
 
+Public Xmenor As Float = 1e10
+Public Ymenor As Float = 1e10
+Public Xmayor As Float = -1e10
+Public Ymayor As Float = -1e10
+
 ' Parametros de la entidad:
 
 ' P[]:        son los puntos de la polilinea que define el contorno del sombreado
@@ -61,16 +66,16 @@ Public Function BuildGeometry(E As Entity, Optional density As Float)
 
   If LCase(e.StringData[Me.sdaPattern]) <> "solid" Then
 
-    cadHatchBuilder.FillEntityWithHatch2(e)
+    FillEntityWithHatch2(e)
 
   Else
 
     ' para solidos, tengo que hacer una llamada para cada loop de borde
     ' tengo q ver cuantos puntos tiene cada loop
     ' Ojo con LibreCAD
-    For Each oLoop In e.pBlock.oBoundaryPath '= 0 To oe.fParam[cadHatch.ipaTotalLoops] - 1
+    For Each oLoop In e.pBlock.oBoundaryPath
 
-      oLoop.Polyline = cadHatchBuilder.MakeBorder2(oLoop)
+      oLoop.Polyline = MakeBorder2(oLoop)
 
       oLoop.Triangles = puntos.PolygonTriangulation(oLoop.Polyline)
 
@@ -100,7 +105,7 @@ Public Sub Draw(oE As Entity)
     ' para solidos, tengo que hacer una llamada para cada loop de borde
     ' tengo q ver cuantos puntos tiene cada loop
     ' Ojo con LibreCAD
-    For Each oLoop In oe.pBlock.oBoundaryPath '= 0 To oe.fParam[cadHatch.ipaTotalLoops] - 1
+    For Each oLoop In oe.pBlock.oBoundaryPath
       ' obtengo el poligono de bordes
       ' fBorder.Clear
       ' fBorder.Insert(oLoop.e.PolyLine.Copy(iStart, oe.iParam[iLoop]))
@@ -632,14 +637,11 @@ Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
   '       ]
   '     },
 
-
   Return True
 
   ' catch
 
   Return False
-
-
 
 End
 
@@ -656,5 +658,208 @@ Public Function OverMe(e As Entity, Xr As Float, Yr As Float, tolerance As Float
   Next
 
   Return False
+
+End
+
+Public Sub MakeBorder2(oPath As Boundary) As Float[]
+
+  Dim eBorder, eFind As Entity
+  Dim drwPath As New Float[]
+  Dim i As Integer
+
+  ' armo ese contorno
+
+  For Each eBorder In oPath.eSegments
+
+    If Not eBorder Then Continue 'por si es Null
+
+    If eBorder.Gender = "" Then
+      ' eFind = gcd.FindEntity(eborder.Handle, True)
+      ' If IsNull(eFind) Then
+      '
+      Debug "Borde de hatch no encntrado", eborder.Handle
+      Continue
+      Stop
+      '
+      ' Else
+      '   eborder = eFind
+      ' End If
+    End If
+    Select Case eBorder.ClassHandler.Gender
+
+      Case cadLWPolyline.Gender
+        drwPath.Insert(eborder.P.Copy())
+        'If eborder.iParam[cadLWPolyline.iiiPolylineClosed] Then ' agrego el punto inicial
+        'drwPath.Insert(eborder.P.Copy(0, 2))
+        'Endif
+      Case "Arc", "Circle", "Ellipse", "SPLine"
+        ' FIXME: puede haber entidades como Text como bordes
+        Try eBorder.ClassHandler.MakePolyline(eborder)
+        drwPath.Insert(eborder.PolyLine.Copy())
+
+      Case "Text", "MText"
+        ' FIXME: puede haber entidades como Text como bordes
+
+        drwPath.Insert(eborder.Polygon.Copy())
+      Case "Line"
+        drwPath.Insert(eborder.P.Copy())
+        ' drwPath.Insert(eborder.P.Copy())
+    End Select
+
+  Next
+
+  ' antes de cerrar, agrego el primer punto
+
+  ' drwPath.Add(drwPath[0])
+  ' drwPath.Add(drwPath[1])
+
+  ' For i = 0 To drwPath.max Step 2
+  '   If CInt(drwPath[i]) = 179 And CInt(drwPath[i + 1]) = -314 Then Stop
+  '   If CInt(drwPath[i]) = 179 And CInt(drwPath[i + 1]) = -315 Then Stop
+  ' Next
+
+  Return drwPath
+
+End
+
+Public Sub FillEntityWithHatch2(entToFill As Entity)
+
+  ' Parametros de la entidad:
+
+  ' P[]:        son los puntos de la polilinea que define el contorno del sombreado
+  ' fParam[0]:  escala del sombreado
+  ' fParam[1]:  angulo
+  ' StringData[0]: nombre del patron del sombreado
+
+  Dim e As Entity
+  Dim fPAtternSide As Float
+  Dim iPatternNx, iPatternNy As Integer
+  Dim nx As Integer
+  Dim ny As Integer
+  Dim ie As Integer
+  Dim flxPatternLimits, flxContorno As Float[]
+  Dim iLoop As Integer
+  Dim enxPattern As New Collection
+  Dim cPattern As New Collection
+  Dim enxPatternScaled As New Collection
+  Dim eBorder As Entity
+  Dim sPAtternFile As String
+  Dim oLoop As Boundary
+
+  ' este valor intenta commpensar un problema de compatibilidad entre DWG y DXF
+  ' para estar de acuerdo a LibreCAD, debe ser =1, pero algunos DWG se represetan
+  ' con una densidad de relleno menor (mas disperso el relleno)
+  Dim CorrectionScale As Float = 1 '0.01 ' 0.1
+
+  sPAtternFile = entToFill.StringData[cadHatch.sdaPaternFile]
+
+  ' verifico si tengo el pattern
+  If Not Exist(sPAtternFile) Then ' lo reemplazo
+
+    sPAtternFile = Application.Path &/ "patterns" &/ "ansi31.dxf"
+
+  End If
+
+  ' cargo el sombreado en un array auxiliar
+  Dxf.LoadFile(sPAtternFile, cPattern, True, True, True) ' lo cargo
+  gcd.DXFtoEntity(cPattern["ENTITIES"], enxPattern, True)
+
+  ' necesito saber cuanto mide el contorno para aplicar la escala y multiplicar hasta cubrir todo el contorno
+
+  flxPatternLimits = clsEntities.ComputeLimits(enxPattern)
+
+  ' los patrones son cuadrados, computo el lado
+  fPatternSide = 100 ' flxPatternLimits[2] - flxPatternLimits[0]
+
+  If entToFill.fParam[cadHatch.ipaScale] = 0 Then
+    entToFill.fParam[cadHatch.ipaScale] = 1
+  Else
+    ''entToFill.fParam[cadHatch.ipaScale] /= 12  ' TODO: verificar esta escala
+  Endif
+
+  For Each oLoop In entToFill.pBlock.oBoundaryPath
+
+    flxContorno = MakeBorder2(oLoop)
+
+    GetBoundLimits2(flxContorno)    ' veo los limites del contorno
+
+    ' este borde es nulo
+    If flxContorno.Count < 6 Then Continue
+
+    ' vamos a mentir un poco
+    ' xmenor -= 1
+    ' ymenor -= 1
+    ' Xmayor += 1
+    ' ymayor += 1
+
+    ' calculo cuantos patrones necesito
+    iPatternNx = (Xmayor - Xmenor) / fPAtternSide / entToFill.fParam[cadHatch.ipaScale] / CorrectionScale + 1
+    iPatternNy = (ymayor - ymenor) / fPAtternSide / entToFill.fParam[cadHatch.ipaScale] / CorrectionScale + 1
+
+    ' creo un array para el sombreado total  <---No mas
+
+    ' Muevo el pattern y filtro
+
+    For nx = 0 To iPatternNx - 1
+      For ny = 0 To iPatternNy - 1
+        For Each e In enxPattern
+
+          e.ClassHandler.scale(e, entToFill.fParam[cadHatch.ipaScale] * CorrectionScale, entToFill.fParam[cadHatch.ipaScale] * CorrectionScale)
+
+          e.ClassHandler.translate(e, nx * fPAtternSide * entToFill.fParam[cadHatch.ipaScale] * CorrectionScale + Xmenor, ny * fPAtternSide * entToFill.fParam[cadHatch.ipaScale] * CorrectionScale + ymenor)
+
+          ' ahora lo dibujo
+          ' ahora tengo que filtrar las entidades que quedan fuera del contorno y generar lineas sueltas que forman
+          ' el sombreado (por ahora seran solo lineas)
+          ' esas lineas las acumulo en un array
+
+          Select Case e.Gender
+            Case "Line", "LWPolyline"
+              entToFill.PolyLine.Insert(puntos.PolyPolyIntersection(e.p, flxContorno))
+
+              ' this is test to see if the pattern is made correctly
+              'entToFill.PolyLine.Insert(e.p.Copy())
+
+            Case "Circle", "Arc", "Ellipse"
+              ' estas entidades deben dibujarse primero
+              e.ClassHandler.MakePolyline(e, 6)
+              entToFill.PolyLine.Insert(puntos.PolyPolyIntersection(e.PolyLine, flxContorno))
+          End Select
+
+          ' Vuelvo a la posicion original
+
+          e.ClassHandler.translate(e, -(nx * fPAtternSide * entToFill.fParam[cadHatch.ipaScale] * CorrectionScale + Xmenor), -(ny * fPAtternSide * entToFill.fParam[cadHatch.ipaScale] * CorrectionScale + ymenor))
+
+          e.ClassHandler.scale(e, 1 / entToFill.fParam[cadHatch.ipaScale] * CorrectionScale, 1 / entToFill.fParam[cadHatch.ipaScale] * CorrectionScale)
+
+        Next
+
+      Next
+    Next
+
+  Next
+
+End
+
+Public Sub GetBoundLimits2(fxlPoints As Float[])
+
+  Dim i As Integer
+
+  Xmenor = 1e10
+  Ymenor = 1e10
+  Xmayor = -1e10
+  Ymayor = -1e10
+
+  For i = 0 To fxlPoints.max Step 2
+
+    If fxlPoints[i] < Xmenor Then Xmenor = fxlPoints[i]
+
+    If fxlPoints[i + 1] < Ymenor Then Ymenor = fxlPoints[i + 1]
+
+    If fxlPoints[i] > Xmayor Then Xmayor = fxlPoints[i]
+
+    If fxlPoints[i + 1] > Ymayor Then Ymayor = fxlPoints[i + 1]
+
+  Next
 
 End

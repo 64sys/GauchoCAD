@@ -58,7 +58,7 @@ End
 
 '' Carga el DXF y lo mete en cModel del dibujo actual
 ' Verbose=0 nada, 1=minimo, 2=grupos, 3=todo
-Public Function LoadFile(sFile As String, cToFill As Collection, Optional IgnoreTables As Boolean = False, IgnoreBlocks As Boolean = False, IgnoreHeader As Boolean = False, VerboseLevel As Integer = 0)
+Public Function LoadFile(sFile As String, cToFill As Collection, Optional IgnoreTables As Boolean = False, IgnoreBlocks As Boolean = False, IgnoreHeader As Boolean = False, VerboseLevel As Integer = 0) As Integer
 
   Dim t As Float = Timer
   Dim cLlaveActual, cSectionActual, cTable As Collection
@@ -88,7 +88,7 @@ Public Function LoadFile(sFile As String, cToFill As Collection, Optional Ignore
           cLlaveActual = cToFill["HEADER"]
         End If
 
-        Load1Headers(cLlaveActual)
+        Load1HeadersDirect(gcd.CurrentDrawing.oHeader)
 
       End If
 
@@ -172,6 +172,7 @@ Public Function LoadFile(sFile As String, cToFill As Collection, Optional Ignore
     End If
     Print "DXF: fin lectura en ", Timer - t
   End If
+  Return 0
 
 End
 
@@ -188,7 +189,47 @@ Private Sub ReadData()
 
 End
 
-Private Sub Load1Headers(cVars As Collection)
+' Private Sub Load1Headers(cVars As Collection)
+'
+'   ' Los header se guardan asi
+'   '   9                     Indica que es una variable
+'   ' $EXTMAX                 Nombre de la variable
+'   '  10                     Tipo de dato1
+'   ' 198.0411690635561       Dato1
+'   '  20                     Tipo de dato2
+'   ' 178.7767572407179       Dato2
+'   '  30                     etc
+'   '   0
+'
+'   ' Yo usare dos colecciones
+'
+'   Dim sVarName As String
+'   Dim cVariable As Collection
+'
+'   ReadData
+'   Do
+'
+'     If lpCode = "0" And lpValue = "ENDSEC" Then Break
+'
+'     If lpcode = "9" Then ' nueva variable
+'       cVariable = New Collection
+'       cVars.Add(cVariable, lpValue)
+'       Do                          ' este bucle es por si la variable es un array
+'         ReadData
+'         If lpcode = "0" Or lpCode = "9" Then Break
+'         cVariable.Add(lpvalue, lpcode)
+'
+'       Loop
+'
+'     Endif
+'
+'   Loop
+'
+'   'Print "DXF: Leidas", gcd.CurrDrawing.cModel["HEADER"].Count, "variables de ambiente"
+'
+' End
+
+Private Sub Load1HeadersDirect(oHeader As Headers)
 
   ' Los header se guardan asi
   '   9                     Indica que es una variable
@@ -203,7 +244,11 @@ Private Sub Load1Headers(cVars As Collection)
   ' Yo usare dos colecciones
 
   Dim sVarName As String
-  Dim cVariable As Collection
+  Dim cVariable As Variant[]
+  Dim v As Variant
+  Dim slx As New Single[]
+  Dim inx As New Integer[]
+  Dim i As Integer
 
   ReadData
   Do
@@ -211,20 +256,22 @@ Private Sub Load1Headers(cVars As Collection)
     If lpCode = "0" And lpValue = "ENDSEC" Then Break
 
     If lpcode = "9" Then ' nueva variable
-      cVariable = New Collection
-      cVars.Add(cVariable, lpValue)
+      cVariable = New Variant[]
+      sVarName = Mid(lpvalue, 2)
+
       Do                          ' este bucle es por si la variable es un array
         ReadData
         If lpcode = "0" Or lpCode = "9" Then Break
-        cVariable.Add(lpvalue, lpcode)
-
+        cVariable.Add(lpvalue)
       Loop
+      If Not oHeader.SetValues(sVarName, cVariable) Then Debug "Var ", sVarName, " not found."
+      Inc i
 
     Endif
 
   Loop
 
-  'Print "DXF: Leidas", gcd.CurrDrawing.cModel["HEADER"].Count, "variables de ambiente"
+  Print "DXF: Leidas", i, "variables de ambiente"
 
 End
 
@@ -299,6 +346,7 @@ Private Sub Load3Tables(cTables As Collection)
       While lpcode <> "0"
 
         If lpcode = "5" Then sTableHandle = lpvalue
+
         If lpcode = "2" Then sTableName = lpvalue
         If lpcode = "330" Then sTableOwner = lpvalue
 
@@ -306,6 +354,7 @@ Private Sub Load3Tables(cTables As Collection)
 
         ' WARNING: este dato no es valido para todas las versiones de DXF
         ' en algunos archivos hay mas tablas que lo que indica este numero
+        ' No hay que darle importancia a este numero!!!
         If lpcode = "70" Then iTableEntries = CInt(lpvalue)
 
         ReadData
@@ -319,13 +368,17 @@ Private Sub Load3Tables(cTables As Collection)
       cTables.Add(cTable, sTableName)
 
       ' verifico que la tabla no tenga entradas, lo que me altera la carga
-      If lpvalue <> "ENDTAB" Then Load31Table(cTable, iTableEntries)
-
+      If lpvalue <> "ENDTAB" Then
+        NewObject(cTable, sTableHandle)
+        Load31Table(cTable, iTableEntries)
+      End If
     End If
     ReadData
   Loop
 
-  gcd.ReadLayers
+  ' FIXME: esto no anda en Gauncho, es necesario en m-designer?
+
+  ' gcd.ReadLayers
 
   Try Print "DXF: Leidas", gcd.CurrentDrawing.cModel["LAYERS"].count, " tablas"
 
@@ -336,7 +389,7 @@ Private Sub Load31Table(cVars As Collection, iEntries As Integer)
 
   ' Yo usare dos colecciones
 
-  Dim sTableName As String
+  Dim sTableName, sHandle As String
   Dim cTable As Collection
   Dim i As Integer
 
@@ -376,11 +429,19 @@ Private Sub Load31Table(cVars As Collection, iEntries As Integer)
     If cTable.Count > 0 Then
       If sTableName = "" Then sTableName = CStr(i)
       cVars.Add(cTable, sTableName)
+
     Endif
 
     If lpcode = "0" And lpValue = "ENDTAB" Then Break
 
   Loop
+
+  If Not cTable.Exist("5") Then
+    If cTable.Exist("105") Then sHandle = cTable["105"] Else Stop
+  Else
+    sHandle = cTable["5"]
+  Endif
+  NewObject(cTable, sHandle)
 
   'gcd.JSONtoLayers
 
@@ -429,7 +490,7 @@ Private Sub Load4Blocks(cBlocks As Collection)
         ReadData
 
       Wend    ' fin del encabezado del Block, siguen sus entidades
-
+      NewObject(cTable, cTable["5"])
       ' si estoy leyendo bloques, significa que estoy abriendo un plano
       cEntities = New Collection
       cTable.Add(cEntities, "entities")
@@ -498,6 +559,8 @@ Private Sub Load5Entities(cEntities As Collection)
 
     Wend
 
+    NewObject(cEntity, cEntity[dxf.codHandle])
+
     If cEntity.Exist(dxf.codHandle) Then
       sKey = cEntity[dxf.codHandle]
     Else
@@ -563,6 +626,7 @@ Private Sub Load6Objects(cObjects As Collection)
       ReadData
 
     Wend
+    NewObject(cObject, cObject["5"])
 
     If sEntidad = "ENDBLK" Or sEntidad = "" Then Return
 
@@ -601,34 +665,48 @@ Private Sub Load7Thumbnail(cThumbnail As Collection)
 
 End
 
-Public Function SaveFile(sName As String, cData As Collection) As Integer
+Public Function SaveFile(sName As String, Optional cDrwData As Collection, drwToSAve As Drawing, LoadMinimal As Boolean = False) As Integer
+
+  Dim cData As Collection
+  Dim f As String
+
+  If Not cDrwData Then ' necesito cargar el minimal para tener los datos basicos
+    cData = New Collection              ' instanciamos la coleccion
+    f = "./minimal/minimal.dxf"
+    If Not Exist(f) Then Goto Error1
+    LoadFile(f, cData)
+
+  Else
+    cData = cDrwData
+  End If
 
   hFile = Open sName For Write Create
 
   LastHandle = 0          ' creamos las handles desde cero
 
-  If Save1HeadersAndVars(cData["HEADER"]) Then Return False
+  If Save1HeadersAndVarsDirect(drwToSAve.oHeader) Then Return False
   If Save2Classes(cData["CLASSES"]) Then Return False
-  If Save3Tables(cData["TABLES"]) Then Return False
-  If Save4BlocksDirect(gcd.CurrentDrawing.oBlocks) Then Return False
-  'If Save4Blocks(cData["BLOCKS"]) Then Return False
-  'If Save5Entities(cData["ENTITIES"]) Then Return False
-  If Save5EntitiesDirect(gcd.CurrentDrawing.oEntities) Then Return False
-  'If Save6Objects(cData["OBJECTS"]) Then Return False
-  'If Save7ThumbNail(cData["THUMBNAILIMAGE"]) Then Return False
+  If Save3Tables(cData["TABLES"], drwToSAve) Then Return False
+  If Save4BlocksDirect(drwToSAve.oBlocks) Then Return False
+  If Save5EntitiesDirect(drwToSAve.oEntities) Then Return False
+  If Save6Objects(cData["OBJECTS"]) Then Return False
+  If cData.Exist("THUMBNAILIMAGE") Then Save7ThumbNail(cData["THUMBNAILIMAGE"])
+
   hFile.Close
   Return gcd.CurrentDrawing.oEntities.Count
   'Catch
   hFile.Close
+Error1:
+
   Message.Error(("Error saving file"))
   Return -1
 
 End
 
-Private Function Save1HeadersAndVars(cVars As Collection) As Integer
+Private Function Save1HeadersAndVarsDirect(oHeader As Headers) As Integer
 
-  Dim cVar, cValues As Collection
   Dim sValues As String
+  Dim stxHeaders As String[]
 
   Print #hFIle, "999"
   Print #hFIle, "m-designer"
@@ -636,19 +714,19 @@ Private Function Save1HeadersAndVars(cVars As Collection) As Integer
   Print #hFIle, "SECTION"
   Print #hFIle, "2"
   Print #hFIle, "HEADER"
-  For Each cVar In cVars
-    Print #hFile, "9"
-    Print #hFile, cVars.Key
-    For Each sValues In cVar
-      Print #hFile, cVar.Key
-      Print #hFile, sValues
-    Next
+
+  stxHeaders = oHeader.ExportDXF()
+
+  For Each sValues In stxHeaders
+    Print #hFile, sValues
   Next
   Print #hFIle, "  0"
   Print #hFIle, "ENDSEC"
 
 End
 
+' Las classes de cad no las usamos. En teoria, no tienen ninguna utilidad fuera de AutoCAD.
+' Abriendo un DXF, se guadaran todas las classes a efectos de recosntruir el DXF.
 Private Function Save2Classes(cClasses As Collection) As Integer
 
   Dim cClass As Collection
@@ -676,7 +754,7 @@ Private Function Save2Classes(cClasses As Collection) As Integer
 
 End
 
-Private Function Save3Tables(cTables As Collection) As Integer
+Private Function Save3Tables(cTables As Collection, drw As Drawing) As Integer
 
   Dim cTable, cTableEntry, cVar, cVars As Collection
   Dim sValues, lpclave As String
@@ -714,7 +792,7 @@ Private Function Save3Tables(cTables As Collection) As Integer
       Print #hFIle, CStr(cTable.Count)
     End If
     If sTableName = "BLOCK_RECORD" Then
-      save31BlockRecord(gcd.CurrentDrawing.oBlocks)
+      save31BlockRecord(drw.oBlocks)
 
     Else
 
@@ -742,58 +820,7 @@ Private Function Save3Tables(cTables As Collection) As Integer
 
 End
 
-Private Function Save4Blocks(cBlocks As Collection) As Integer
-
-  Dim i As Integer
-  Dim iii As Integer
-  Dim cBlock, cBlockEntry, cVar, cVars As Collection
-  Dim sValues, lpclave As String
-
-  Print #hFIle, "  0"
-  Print #hFIle, "SECTION"
-  Print #hFIle, "2"
-  Print #hFIle, "BLOCKS"
-  For Each cBlock In cBlocks
-    Print #hFIle, "  0"
-    Print #hFIle, "BLOCK"
-    Print #hFIle, "  5"         ' handle
-    Print #hFIle, cBlock["5"]           ' valor de la handle
-    Print #hFIle, "  330"
-    Print #hFIle, "0"
-    Print #hFIle, "  100"
-    Print #hFIle, "AcDbEntity"
-    Print #hFIle, " 8"          ' layer name
-    Print #hFIle, cBlock["8"]
-    Print #hFIle, "100"
-    Print #hFIle, "AcDbBlockBegin"
-    Print #hFIle, "  2"
-    Print #hFIle, cBlock["2"]
-    Print #hFIle, "  70"
-    Print #hFIle, "0"       ' block flags
-    If cBlock["entities"].Count > 0 Then
-      For Each cBlockEntry In cBlock["entities"]
-        ' Print #hFIle, "  0"
-        ' Print #hFIle, cTables.Key
-        ' Print #hFIle, "  2"
-        ' Print #hFIle, cTable.Key
-        For Each sValues In cBlockEntry
-          lpclave = cBlockEntry.Key
-          I = InStr(lpclave, "_")
-          If i > 0 Then lpclave = Left(lpclave, i - 1)
-          Print #hFile, lpclave
-          Print #hFIle, sValues
-        Next
-      Next
-      ' Print #hFIle, "  0"
-      ' Print #hFIle, "ENDBLK"
-    Endif
-  Next
-  Print #hFIle, "  0"
-  Print #hFIle, "ENDSEC"
-
-End
-
-Private Function Save4BlocksDirect(eBlocks As Block[]) As Integer
+Private Function Save4BlocksDirect(eBlocks As Collection) As Integer
 
   Dim i As Integer, bCan As Boolean
   Dim iii As Integer
@@ -864,7 +891,7 @@ Private Function Save4BlocksDirect(eBlocks As Block[]) As Integer
 
 End
 
-Private Function save31BlockRecord(eBlocks As Block[]) As Integer
+Private Function save31BlockRecord(eBlocks As Collection) As Integer
 
   Dim i As Integer
   Dim iii As Integer
@@ -897,34 +924,7 @@ Private Function save31BlockRecord(eBlocks As Block[]) As Integer
 
 End
 
-Private Function Save5Entities(cEntys As Collection) As Integer
-
-  Dim cEnty As Collection
-  Dim sValues, lpclave As String
-  Dim i As Integer
-
-  Print #hFIle, "  0"
-  Print #hFIle, "SECTION"
-  Print #hFIle, "  2"
-  Print #hFIle, "ENTITIES"
-
-  ' here go all entities
-  For Each cEnty In cEntys
-    For Each sValues In cEnty
-      lpclave = cEnty.Key
-      I = InStr(lpclave, "_")
-      If i > 0 Then lpclave = Left(lpclave, i - 1)
-      Print #hFile, lpclave
-      Print #hFIle, sValues
-    Next
-  Next
-  ' end section code
-  Print #hFIle, "  0"
-  Print #hFIle, "ENDSEC"
-
-End
-
-Private Function Save5EntitiesDirect(eEntys As Entity[]) As Integer
+Private Function Save5EntitiesDirect(eEntys As Collection) As Integer
 
   Dim cEnty As Collection
   Dim eEnty As Entity
@@ -941,7 +941,7 @@ Private Function Save5EntitiesDirect(eEntys As Entity[]) As Integer
     cEnty = New Collection
     ' veo si lo tengo
 
-    Try bCan = eEnty.ClassHandler.DXF_export
+    bCan = eEnty.ClassHandler.DXF_export
     If bCan Then
       clsEntities.DXFExportCommonCol(eEnty, cEnty)
       eEnty.ClassHandler.ExportDXFCol(eEnty, cEnty)
@@ -961,6 +961,10 @@ Private Function Save5EntitiesDirect(eEntys As Entity[]) As Integer
   ' end section code
   Print #hFIle, "  0"
   Print #hFIle, "ENDSEC"
+
+End
+
+Public Function CheckRepeatedHandles()
 
 End
 
@@ -1025,7 +1029,7 @@ Private Function NextHandle() As String
 
 End
 
-' Helper para leer DXF: retorna la posicion en la que encontro la clave o -1 si no la encontro
+'   Helper para leer DXF: retorna la posicion en la que encontro la clave o -1 si no la encontro
 '   iCode = el codigo DXF
 '   stxClaves = array de claves DXF
 '   stxValues = array de valores DXF
@@ -1058,5 +1062,19 @@ Public Function ReadCode(iCode As Integer, stxClaves As String[], stxValues As S
     Endif
   Next
   Return -1
+
+End
+
+'' Adds a new object to object by handle collection
+Private Sub NewObject(oNew As Variant, sHandle As String)
+
+  If sHandle = "" Then Return
+
+  If gcd.CurrentDrawing.Handles.Exist(sHandle) Then
+    Debug "WARNING: Handle repedida", sHandle
+  Else
+
+    gcd.CurrentDrawing.handles.Add(oNew, sHandle)
+  End If
 
 End

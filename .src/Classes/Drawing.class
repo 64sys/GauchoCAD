@@ -57,8 +57,10 @@ Public CurrDimStyle As Styles   ' ojo Style es una clase nativa
 ' ===============================================================================================================================
 ' MODEL
 ' ===============================================================================================================================
+
 Public cModel As New Collection     '' All data from a dwg file is loaded here
 
+Public Handles As New Collection    '' A list of objects pointers
 Public cLayers As New Collection    '' All layers data from dwg is listed here
 Public cLtypes As New Collection    '' All linetypes data from dwg is listed here
 Public cBlocks As New Collection    '' All Blocks data from dwg is listed here
@@ -84,7 +86,7 @@ Public HandSeed As Integer      '' Last available handle for this drawing
 ' Public arrEntities As New Entity[]              ' were al elements live
 ' Public arrVisibleEntities As New Integer[]      ' set at view change
 Public VisibleEntitiesMax As Integer            ' para acelerar no redimensiono arrVis.. uso esto
-
+Public oHeader As New Headers
 Public oLTYpes As New Collection                ' de objetos LTypes
 Public oLayers As New Collection              ' de objetos Layer
 Public oExtras As New Collection                ' For entities

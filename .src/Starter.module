@@ -262,8 +262,6 @@ Private Sub SetCommandsList()
 
 End
 
-
-
 Private Sub SetCommandsClasses()
 
   ' trato de cargar dinamicamente las classes
@@ -307,9 +305,7 @@ Private Sub SetCommandsClasses()
 
   cCommandsList.Add(["layers", "lk"], "layers")
 
-
 End
-
 
 ' Private Function LoadColors() As Collection
 '
