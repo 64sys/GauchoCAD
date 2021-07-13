@@ -336,10 +336,10 @@ Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
 
   'e.fParam[Me.ipaRotacion] = CFloat(c["text_rotation"]) * 180 / Pi
 
-  Try e.pBlock = gcd.CurrentDrawing.oBlocks[gcd.CurrentDrawing.cmodel["BLOCKS"][c["block"][3]]["block_entity"][3]]
+  e.pBlock = gcd.CurrentDrawing.oBlocks[gcd.CurrentDrawing.cmodel["BLOCKS"][c["block"][3]]["block_entity"][3]]
   Return True
 
-Catch
+  'Catch
 
   Return False
 

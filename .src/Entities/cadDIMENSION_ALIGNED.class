@@ -74,19 +74,19 @@ Public Function ImportDXF(e As Entity, sClaves As String[], sValues As String[])
 
   Next
 
-  ' ahora recosntruyo el bloque segun mis propios metodos
-  e.P[0] = Me.pointDefPoint1.x
-  e.P[1] = Me.pointDefPoint1.y
+  ' ' ahora recosntruyo el bloque segun mis propios metodos
+  ' e.P[0] = Me.pointDefPoint1.x
+  ' e.P[1] = Me.pointDefPoint1.y
+  '
+  ' e.P[2] = Me.pointDefPoint2.x
+  ' e.P[3] = Me.pointDefPoint2.y
+  '
+  ' e.P.Add(Me.pointTextMidPoint.x)
+  ' e.P.Add(Me.pointTextMidPoint.y)
+  '
+  ' e.fParam[cadDimension.ipaExtension] = -puntos.distancia(Me.pointDefPoint0.x, Me.pointDefPoint0.y, Me.pointDefPoint2.x, Me.pointDefPoint2.y)
 
-  e.P[2] = Me.pointDefPoint2.x
-  e.P[3] = Me.pointDefPoint2.y
-
-  e.P.Add(Me.pointTextMidPoint.x)
-  e.P.Add(Me.pointTextMidPoint.y)
-
-  e.fParam[cadDimension.ipaExtension] = -puntos.distancia(Me.pointDefPoint0.x, Me.pointDefPoint0.y, Me.pointDefPoint2.x, Me.pointDefPoint2.y)
-
-  e.pBlock = Me.ReBuildBlock(e)
+  'e.pBlock = Me.ReBuildBlock(e)
 
   Return True
 
@@ -371,10 +371,10 @@ Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
   'e.fParam[Me.ipaRotacion] = CFloat(c["dim_rotation"]) * 180 / Pi
   ' "_subclass": "AcDbRotatedDimension",
   ' "dimstyle": [5, 1, 57, 57],
-  Try e.pBlock = gcd.CurrentDrawing.oBlocks[gcd.CurrentDrawing.cmodel["BLOCKS"][c["block"][3]]["block_entity"][3]]
+  e.pBlock = gcd.CurrentDrawing.oBlocks[gcd.CurrentDrawing.cmodel["BLOCKS"][c["block"][3]]["block_entity"][3]]
   Return True
 
-Catch
+  'Catch
 
   Return False
 

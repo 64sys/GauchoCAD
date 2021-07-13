@@ -240,8 +240,6 @@ Public Function KeyText(EnteredText As String)
       gcd.regen
     Case "redraw"
       gcd.Redraw
-    Case "save"
-      AppMain.gTask("save")
 
     Case Else
       'o = cadDimension ' a test
@@ -253,7 +251,6 @@ Public Function KeyText(EnteredText As String)
         DrawingAids.ErrorMessage = "Command not recognized"
         Return
       Endif
-
 
       ' check if the class needs to be run trough other
       If o.usewith = "" Then                        ' its a tool

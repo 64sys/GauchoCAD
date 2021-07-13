@@ -325,7 +325,7 @@ Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
 
   'e.fParam[Me.ipaRotacion] = CFloat(c["dim_rotation"]) * 180 / Pi
 
-  Try e.pBlock = gcd.CurrentDrawing.oBlocks[gcd.CurrentDrawing.cmodel["BLOCKS"][c["block"][3]]["block_entity"][3]]
+  e.pBlock = gcd.CurrentDrawing.oBlocks[gcd.CurrentDrawing.cmodel["BLOCKS"][c["block"][3]]["block_entity"][3]]
   'e.pBlock = clsEntities.FIndBlock(gcd.CurrentDrawing.cModel["BLOCKS"][c["block_header"][3]]["name"])
 
   ' e.pBlock = ReBuildBlock(e)
@@ -334,7 +334,7 @@ Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
 
   Return True
 
-Catch
+  'Catch
 
   Return False
 
