@@ -42,11 +42,7 @@
 '       +-------------------------------------------------------------------------------------------+           = pixeles
 'Fast Unsafe
 ' una lbreria de funciones para pasar de Paint a OpenGL
-
-
-
-
-
+Public Initialized As Boolean = False
 Public ActualFont As LFFFonts                      ' the class
 Public UnicodeFont As LFFFonts
 Public ActualFontName As String = "romanc"          ' the name
@@ -133,6 +129,9 @@ Public Sub Resize(drwContext As Object) ' only glArea for now
   ' establecemos adonde vamos a dibujar, porque puede ser en algun lugar mas chico de la misma glDrawingArea
   ' pero en general sera en todo el control
   gl.Viewport(0, 0, drwContext.W, drwContext.h)
+
+  If Not Me.Initialized Then Me.Init(drwContext)
+  Me.Initialized = True
   ' le avisamos a GL que queremos usar texturas
   gl.Enable(gl.TEXTURE_2D)
 
@@ -205,16 +204,16 @@ Public Sub Init(drwContext As Object) ' only glArea for now
   ' Divide
   LineStipples.Add(&X00000000000000000011001100111111)
   LineStippleScales.Add(1)
-  Print "Support VBO?", gl.CheckExtensions("GL_ARB_vertex_buffer_object")
-  Print "Support GLSL?", gl.CheckExtensions("GL_ARB_vertex_program")
-  Print "Shading version", GL.GetString(gl.SHADING_LANGUAGE_VERSION)
-  Print "GL version", GL.GetString(gl.VERSION)
-  Print "Chipset vendor", GL.GetString(gl.VENDOR)
-  'Print "Extensions", GL.GetString(gl.EXTENSIONS)
+  gcd.debuginfo("Support VBO: " & gl.CheckExtensions("GL_ARB_vertex_buffer_object"))
+  gcd.debuginfo("Support GLSL: " & gl.CheckExtensions("GL_ARB_vertex_program"))
+  gcd.debuginfo("Shading version: " & GL.GetString(gl.SHADING_LANGUAGE_VERSION))
+  gcd.debuginfo("GL version: " & GL.GetString(gl.VERSION))
+  gcd.debuginfo("Chipset vendor: " & GL.GetString(gl.VENDOR))
+  'gcd.debuginfo("Extensions" &  GL.GetString(gl.EXTENSIONS))
 
   ' lets make shaders
   'Me.shaderProgram = Me.LoadShader("VertexShader1.txt", "FragmentShader1.txt")
-  ' Print "Shader loading result:", gl.GetShaderInfoLog(Me.shaderProgram)
+  ' gcd.debuginfo("Shader loading result:", gl.GetShaderInfoLog(Me.shaderProgram)
 
 End
 
@@ -438,7 +437,7 @@ Public Sub Arrow(fBase As Float[], fPunta As Float[], Optional colour As Integer
   '
   '     Case Else
   '
-  '         Print "Error mas puntos"
+  '         gcd.debuginfo("Error mas puntos"
   '
   ' End Select
   ' '
@@ -490,7 +489,7 @@ Fast Unsafe Public Function PolyLines(vertices As Float[], Optional colour As In
   '
   '     Case Else
   '
-  '         Print "Error mas puntos"
+  '         gcd.debuginfo("Error mas puntos"
   '
   ' End Select
   '
@@ -822,8 +821,6 @@ End
 '' Establece la fuente con que se dibujaran los textos
 Public Function SelectFont(FontName As String) As Boolean
 
-
-
   For Each f As LFFFonts In glFont
     If LCase(f.FontName) = LCase(FontName) Then
       ActualFont = f
@@ -891,7 +888,6 @@ Public Function LoadFonts(DirPath As String) As String[]
   ' [00C1] Á
   ' C0041
   ' 2.000000,9.0000,4.0000,10.0000
-
 
   Dim sFilename As String, fFile As File, sData, sCoord, aVert As String
   Dim sPuntos As String[], Lista As New String[]
@@ -964,7 +960,6 @@ Public Function LoadFonts(DirPath As String) As String[]
                   Try fltb.Add(CSingle(Mid$(aVert, p1 + 1)))
                   BulgeAdded = True
 
-
                 Else
 
                   ' Try letra.FontGlyps.Add(CFloat(aVert))
@@ -986,7 +981,7 @@ Public Function LoadFonts(DirPath As String) As String[]
     ActualFont = fntNuevas
     If fntNuevas.FontName = "unicode" Then UnicodeFont = fntNuevas
 
-    Debug "Leidas ", fntNuevas.Letter.Count, " letras en ", sFilename
+    gcd.debugInfo("Leidas " & fntNuevas.Letter.Count & " letras en " & sFilename)
     lista.Add(fntNuevas.FontName)
 
   Next
@@ -1024,7 +1019,6 @@ Public Function DrawText(UTFstring As String, posX As Float, posY As Float, Opti
   Dim TGlyps, TBulges As Single[][]
   Dim Ang, m1, m2, b, bx, by, mx, my, ang1, lt As Single
   Dim iBulge As Integer
-
 
   gl.PushMatrix                                                               ' para evitar peleas, guardo la matriz de trnasformacion
   gl.Translatef(posX, posY, 0)
@@ -1118,17 +1112,11 @@ Public Function DrawText(UTFstring As String, posX As Float, posY As Float, Opti
       Xadvance = 0
       '================================================================================
 
-
     End If
   Next
   gl.PopMatrix
 
 End
-
-
-
-
-
 
 '' devuelve un rectangulo que contiene al texto
 '' [ancho,alto]
@@ -1149,7 +1137,6 @@ Fast Unsafe Public Function TextExtends(UTFstring As String, textH As Float) As 
     Else
       ' DEPRE LetterIndex = GetCodeIndex(ActualFont, UTFcode)                     ' obtengo el indice de la letra
 
-
       If ActualFont.Letter.Exist(UTFcode) Then
         TGlyps = ActualFont.Letter[UTFcode].FontGlyps
         TBulges = ActualFont.Letter[UTFcode].FontBulges
@@ -1168,10 +1155,8 @@ Fast Unsafe Public Function TextExtends(UTFstring As String, textH As Float) As 
           If Glyps[iii + 1] > tRect[1] Then tRect[1] = Glyps[iii + 1]
         Next
 
-
       Next
       Inc iBulge
-
 
     End If
     tRect[0] += (Xadvance + ActualFont.LetterSpacing) * textH * FontScale
@@ -1187,7 +1172,6 @@ End
 
 '' devuelve un rectangulo que contiene al texto
 '' [x,y,ancho,alto]
-
 
 '' Lee todas las texturas del directorio provisto y devuelve un listado con sus nombres
 Public Function LoadTextures(DirPath As String) As String[]
@@ -1227,7 +1211,7 @@ Public Function LoadTextures(DirPath As String) As String[]
     Break
   Next
 
-  Debug "Leidas ", iTexture, " texturas en ", sFilename
+  gcd.debugInfo("Leidas " & iTexture & " texturas en " & sFilename)
 
   Return lista
 

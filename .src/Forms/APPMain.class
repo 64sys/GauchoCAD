@@ -663,8 +663,6 @@ End
 
 Public Sub Form_Activate()
 
-  GLplus.Init(glarea1)
-
 End
 
 Public Sub glarea1_Resize()

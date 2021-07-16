@@ -195,7 +195,7 @@ Public Sub Main()
 
   Me.DrawingReady = True
 
-  Debug Utils.ProcessTabs("Acatbab^Iluego^I123^I2")
+  ' Debug Utils.ProcessTabs("Acatbab^Iluego^I123^I2")
 
 End
 
@@ -249,7 +249,7 @@ Public Sub JSONtoBlocks(colData As Collection) ', obxEntities As Entity[]) As In
       cEntyList.Clear
     Else
 
-      Debug "Error loading block", newBlock.name
+      gcd.debugInfo("Error loading block " & newBlock.name)
 
     End If
     gcd.CurrentDrawing.oBlocks.Add(newBlock, newBlock.handle)
@@ -651,5 +651,11 @@ End
 Public Function CurrentColor() As Integer
 
   Return appmain.CurrentColor
+
+End
+'' hacia texarea con numero indefinido de parámetros
+
+Public Sub debugInfo(txt As String, Optional MismaLineaAnterior As Boolean = False, Optional forzar As Boolean = False)
+  ' TODO: para compatibilidad
 
 End

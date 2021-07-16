@@ -82,7 +82,6 @@ Public Sub TestFonts()
     glPlus.DrawText(stext, 0, y, 0, 0.3, Color.Blue)
     y += 1
 
-
   Next
 
 End

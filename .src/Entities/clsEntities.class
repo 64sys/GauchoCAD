@@ -33,13 +33,13 @@ Public Sub DrawArrays()
   glx.glBindBuffer(glc.ARRAY_BUFFER, inxBuffersID[0])
 
   iError = glx.glGetError()
-  If iError <> 0 Then Print "GL Error:", iError
+  If iError <> 0 Then gcd.debuginfo("GL Error: " & iError)
   glx.glEnableClientState(glc.VERTEX_ARRAY)
   glx.glEnableClientState(glc.NORMAL_ARRAY)
   glx.glEnableClientState(glc.COLOR_ARRAY)
 
   iError = glx.glGetError()
-  If iError <> 0 Then Print "GL Error:", iError
+  If iError <> 0 Then gcd.debuginfo("GL Error: " & iError)
 
   vOffset = 0
   nOffset = glPlus.VBO_vertex.Count * SizeOf(gb.Single)
@@ -51,7 +51,7 @@ Public Sub DrawArrays()
   glx.glColorPointer(3, glc.FLOAT, 0, cOffset)
 
   iError = glx.glGetError()
-  If iError <> 0 Then Print "GL Error:", iError
+  If iError <> 0 Then gcd.debuginfo("GL Error: " & iError)
 
   glx.glDrawArrays(glc.LINES, 0, glPlus.VBO_vertex.Count * 3)
 
@@ -112,7 +112,7 @@ Public Function ReconstruirBloques() As Boolean
   Dim i, i2 As Integer, PartesEncontradas As Boolean, iStart As Integer
   Dim t As Float = Timer
 
-  Print "Recostruyendo bloques"
+  gcd.debuginfo("Recostruyendo bloques")
 
   For i = 0 To gcd.CurrentDrawing.oEntities
     DrawingAids.HelperTrabajo = ("Loading blocks ") & Format$(i / gcd.CurrentDrawing.oEntities, "0.00%")
@@ -199,15 +199,15 @@ Public Sub glGenBuffers(Optional eEntity As Entity = Null)
     inxBuffersID.Resize(3)
 
     iError = glx.glGetError()
-    If iError <> 0 Then Print "GL Error:", Hex(iError)
+    If iError <> 0 Then gcd.debuginfo("GL Error: " & Hex(iError))
 
     'glx.glGenBuffers(1, VarPtr(oneBufferID))
     glx.glGenBuffers(3, inxBuffersID.Data)                      ' genero un buffer ID
     iError = glx.glGetError()
-    If iError <> 0 Then Print "GL Error:", Hex(iError)
+    If iError <> 0 Then gcd.debuginfo("GL Error: " & Hex(iError))
     glx.glBindBuffer(glc.ARRAY_BUFFER, inxBuffersID[0])      ' lo conecto como Vertex Buffer
     iError = glx.glGetError()
-    If iError <> 0 Then Print "GL Error:", Hex(iError)
+    If iError <> 0 Then gcd.debuginfo("GL Error: " & Hex(iError))
     Dim BytesTotales As Integer
     BytesTotales = glPlus.VBO_vertex.Count + glPlus.VBO_normals.Count + glPlus.VBO_colors.Count
     BytesTotales *= SizeOf(gb.Single)
@@ -215,7 +215,7 @@ Public Sub glGenBuffers(Optional eEntity As Entity = Null)
     ' Reservo espacio. 0 significa que despues le mando la data
     glx.glBufferData(glc.ARRAY_BUFFER, BytesTotales, 0, glc.STATIC_DRAW)
     iError = glx.glGetError()
-    If iError <> 0 Then Print "GL Error:", Hex(iError)
+    If iError <> 0 Then gcd.debuginfo("GL Error: " & Hex(iError))
     ' mando vertices
     glx.glBufferSubData(glc.ARRAY_BUFFER, 0, glPlus.VBO_vertex.Count * SizeOf(gb.Single), glPlus.VBO_vertex.Data)
 
@@ -225,7 +225,7 @@ Public Sub glGenBuffers(Optional eEntity As Entity = Null)
     ' mando colores
     glx.glBufferSubData(glc.ARRAY_BUFFER, (glPlus.VBO_vertex.Count + glPlus.VBO_normals.Count) * SizeOf(gb.Single), glPlus.VBO_colors.Count * SizeOf(gb.Single), glPlus.VBO_colors.Data)
     iError = glx.glGetError()
-    If iError <> 0 Then Print "GL Error:", Hex(iError)
+    If iError <> 0 Then gcd.debuginfo("GL Error: " & Hex(iError))
     glx.glBindBuffer(glc.ARRAY_BUFFER, 0)      ' finlizo transferencia de datos a la GPU
 
     ' ' lista de entidaes seleccionadas

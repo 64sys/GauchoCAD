@@ -167,7 +167,6 @@ Public Sub Draw(oE As Entity)
   s2 = Replace(s2, "%%P", "±", gb.IgnoreCase)
   s2 = Replace(s2, "%%C", "∅", gb.IgnoreCase)
 
-
   glPlus.DrawText(s2, oE.p[0], oE.p[1], oE.fParam[Me.ipaTextAngle], oE.fParam[Me.ipaTextHeight], gcd.GetGBColor(oE.Colour, oe.pLayer))
 
 End

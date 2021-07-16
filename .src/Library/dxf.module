@@ -1,5 +1,10 @@
 ' Gambas module file
 
+Public LoadingPercent As Single
+Private LoadLastPercent As Single
+Private LoadTotalBytes As Integer
+Private LoadedBytes As Integer
+
 Private fp As File
 Private hFile As File
 
@@ -51,7 +56,7 @@ Public Function DWGtoDXF(sDwgFile As String) As String
   If Exist(tmpfile) Then Kill tmpfile
   ' convierte DWG a DXF version 2010
   Shell "/usr/local/bin/dwgread '" & sDwgFile & "' -O DXF -a r2010 -o '" & tmpfile & "'" Wait To str
-  Print "Resultados de la conversion DWG a DXF ", Str
+  gcd.debuginfo("Resultados de la conversion DWG a DXF " & Str)
   Return tmpfile
 
 End
@@ -68,6 +73,10 @@ Public Function LoadFile(sFile As String, cToFill As Collection, Optional Ignore
   fp = Open sFile For Read
 
   If Not fp Then Error.Raise("Error !")
+
+  LoadedBytes = 0
+  LoadTotalBytes = Lof(fp)
+
   cEntitiesUnread = New Collection
   nEntitiesUnread = 0
   nEntitiesRead = 0
@@ -161,16 +170,16 @@ Public Function LoadFile(sFile As String, cToFill As Collection, Optional Ignore
 
   If VerboseLevel > 1 Then
     If VerboseLevel > 2 Then
-      Print "DXF: Leidas", nEntitiesread, " entidades"
+      gcd.debuginfo("DXF: Leidas " & nEntitiesread & " entidades")
       If cEntitiesUnread.Count > 0 Then
-        Print "DXF: Un total de", nEntitiesUnread, " entidades no pudieron ser leidas:"
+        gcd.debuginfo("DXF: Un total de" & nEntitiesUnread & " entidades no pudieron ser leidas:")
         For Each unread As String In cEntitiesUnread
           Print unread
         Next
       Endif
       Print
     End If
-    Print "DXF: fin lectura en ", Timer - t
+    gcd.debuginfo("DXF: fin lectura en " & Str(Timer - t))
   End If
   Return 0
 
@@ -181,11 +190,23 @@ Private Sub ReadData()
   Line Input #fp, lpcode
   Line Input #fp, lpValue
 
+  LoadedBytes += Len(lpcode)
+  LoadedBytes += Len(lpvalue)
+
   If Right(lpcode, 1) = gb.Cr Then lpcode = Left(lpcode, -1)
   If Right(lpvalue, 1) = gb.cr Then lpvalue = Left(lpvalue, -1)
 
   lpcode = Trim$(lpcode)
   lpvalue = Trim$(lpvalue)
+
+  ' updating percentage
+
+  LoadingPercent = LoadedBytes / LoadTotalBytes
+
+  If LoadingPercent - LoadLastPercent > 0.01 Then
+    gcd.debugInfo("Loging file " & CInt(LoadingPercent * 100) & "%", True)
+    LoadLastPercent = LoadingPercent
+  End If
 
 End
 
@@ -225,7 +246,7 @@ End
 '
 '   Loop
 '
-'   'Print "DXF: Leidas", gcd.CurrDrawing.cModel["HEADER"].Count, "variables de ambiente"
+'   'gcd.debuginfo("DXF: Leidas", gcd.CurrDrawing.cModel["HEADER"].Count, "variables de ambiente"
 '
 ' End
 
@@ -264,14 +285,14 @@ Private Sub Load1HeadersDirect(oHeader As Headers)
         If lpcode = "0" Or lpCode = "9" Then Break
         cVariable.Add(lpvalue)
       Loop
-      If Not oHeader.SetValues(sVarName, cVariable) Then Debug "Var ", sVarName, " not found."
+      If Not oHeader.SetValues(sVarName, cVariable) Then gcd.debugInfo("Var " & sVarName & " not found.")
       Inc i
 
     Endif
 
   Loop
 
-  Print "DXF: Leidas", i, "variables de ambiente"
+  gcd.debuginfo("DXF: Leidas " & i & " variables de ambiente")
 
 End
 
@@ -380,7 +401,7 @@ Private Sub Load3Tables(cTables As Collection)
 
   ' gcd.ReadLayers
 
-  Try Print "DXF: Leidas", gcd.CurrentDrawing.cModel["LAYERS"].count, " tablas"
+  Try gcd.debuginfo("DXF: Leidas" & gcd.CurrentDrawing.cModel["LAYERS"].count & " tablas")
 
 End
 '' Lee todas las tables de esta table
@@ -445,7 +466,7 @@ Private Sub Load31Table(cVars As Collection, iEntries As Integer)
 
   'gcd.JSONtoLayers
 
-  Try Print "DXF: Leidas", gcd.CurrentDrawing.cModel["LAYERS"].count, " tablas"
+  Try gcd.debuginfo("DXF: Leidas" & gcd.CurrentDrawing.cModel["LAYERS"].count & " tablas")
 
 End
 
@@ -504,7 +525,7 @@ Private Sub Load4Blocks(cBlocks As Collection)
     Endif
   Loop
 
-  Print "DXF: Leidos", gcd.CurrentDrawing.oBlocks.Count, " bloques"
+  gcd.debuginfo("DXF: Leidos " & gcd.CurrentDrawing.oBlocks.Count & " bloques")
 
 End
 
@@ -1071,7 +1092,7 @@ Private Sub NewObject(oNew As Variant, sHandle As String)
   If sHandle = "" Then Return
 
   If gcd.CurrentDrawing.Handles.Exist(sHandle) Then
-    Debug "WARNING: Handle repedida", sHandle
+    gcd.debugInfo("WARNING: Handle repedida " & sHandle)
   Else
 
     gcd.CurrentDrawing.handles.Add(oNew, sHandle)
