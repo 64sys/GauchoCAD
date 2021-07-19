@@ -115,6 +115,8 @@ Public flgSearchingPOI As Boolean
 Public flgShowingLayers As Boolean
 Public flgNewPosition As Boolean        ' seteada cuando hay un cambio en pan o zoom
 
+Public dirResources As String   '' para compatibilidad con GambasCAD
+
 ' 2021 pongo esto por compatibilidad
 Public flgWindowBackColor As Integer '= Color.Blac  '' Window backgrount color
 Public flgWindowTextColor As Integer   '' Window helper text color
@@ -186,11 +188,9 @@ Public Sub Main()
 
   'FileName = User.Home &/ "autosaveV5.xml"
 
-  'FontList = glPlus.LoadFonts(Application.Path &/ "Fonts/LFF")
   FontList = glPlus.LoadFonts(Starter.sFonts)
   glPlus.SelectFont("romand")
 
-  'texturelist = glPlus.LoadTextures(Application.Path &/ "Textures")
   texturelist = glPlus.LoadTextures(Starter.sTextures)
 
   Me.DrawingReady = True
@@ -655,7 +655,7 @@ Public Function CurrentColor() As Integer
 End
 '' hacia texarea con numero indefinido de parámetros
 
-Public Sub debugInfo(txt As String, Optional MismaLineaAnterior As Boolean = False, Optional forzar As Boolean = False)
+Public Sub debugInfo(txt As String, Optional MismaLineaAnterior As Boolean = False, Optional forzar As Boolean = False, DebugToFile As Boolean = False)
   ' TODO: para compatibilidad
 
 End

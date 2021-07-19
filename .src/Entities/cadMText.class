@@ -329,7 +329,7 @@ Public Sub ProcessPart(s As String)
   Dim fAlign, fAlignR, fRect As New Float[]
 
   Dim angulo As Float, hText As New PaintExtents, lText As String
-  Dim FontScalePrev As Float, ctex As New CairoTextExtents
+  Dim FontScalePrev As Float
 
   s2 = s
 

@@ -170,6 +170,7 @@ Public Sub Init(drwContext As Object) ' only glArea for now
   Dim bREt As Boolean
 
   'Resize(drwContext)
+  gcd.debuginfo("Init OpenGL",,, True)
 
   Dim gbcolor As Integer
   Dim r, g, b, a As Float
@@ -204,11 +205,11 @@ Public Sub Init(drwContext As Object) ' only glArea for now
   ' Divide
   LineStipples.Add(&X00000000000000000011001100111111)
   LineStippleScales.Add(1)
-  gcd.debuginfo("Support VBO: " & gl.CheckExtensions("GL_ARB_vertex_buffer_object"))
-  gcd.debuginfo("Support GLSL: " & gl.CheckExtensions("GL_ARB_vertex_program"))
-  gcd.debuginfo("Shading version: " & GL.GetString(gl.SHADING_LANGUAGE_VERSION))
-  gcd.debuginfo("GL version: " & GL.GetString(gl.VERSION))
-  gcd.debuginfo("Chipset vendor: " & GL.GetString(gl.VENDOR))
+  gcd.debuginfo("Support VBO: " & gl.CheckExtensions("GL_ARB_vertex_buffer_object"),,, True)
+  gcd.debuginfo("Support GLSL: " & gl.CheckExtensions("GL_ARB_vertex_program"),,, True)
+  gcd.debuginfo("Shading version: " & GL.GetString(gl.SHADING_LANGUAGE_VERSION),,, True)
+  gcd.debuginfo("GL version: " & GL.GetString(gl.VERSION),,, True)
+  gcd.debuginfo("Chipset vendor: " & GL.GetString(gl.VENDOR),,, True)
   'gcd.debuginfo("Extensions" &  GL.GetString(gl.EXTENSIONS))
 
   ' lets make shaders

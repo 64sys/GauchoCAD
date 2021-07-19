@@ -454,7 +454,7 @@ Public Function ImportDXF(e As Entity, sClaves As String[], sValues As String[])
   If e.fParam[Me.ipaSolid] Then
     e.StringData[Me.sdaPaternFile] = "Solid"
   Else
-    e.StringData[Me.sdaPaternFile] = Application.Path &/ "patterns" &/ LCase(e.StringData[Me.sdaPattern]) & ".dxf"
+    e.StringData[Me.sdaPaternFile] = gcd.dirResources &/ "patterns" &/ LCase(e.StringData[Me.sdaPattern]) & ".dxf"
   End If
 
   Return True
@@ -533,7 +533,7 @@ Public Function ImportJsonCol(c As Collection, e As Entity) As Boolean
   If e.fParam[Me.ipaSolid] Then
     e.StringData[Me.sdaPaternFile] = "Solid"
   Else
-    e.StringData[Me.sdaPaternFile] = Application.Path &/ "patterns" &/ LCase(e.StringData[Me.sdaPattern]) & ".dxf"
+    e.StringData[Me.sdaPaternFile] = gcd.dirResources &/ "patterns" &/ LCase(e.StringData[Me.sdaPattern]) & ".dxf"
   End If
 
   '       "is_associative": 0,
@@ -756,7 +756,7 @@ Public Sub FillEntityWithHatch2(entToFill As Entity)
   ' verifico si tengo el pattern
   If Not Exist(sPAtternFile) Then ' lo reemplazo
 
-    sPAtternFile = Application.Path &/ "patterns" &/ "ansi31.dxf"
+    sPAtternFile = gcd.dirResources &/ "patterns" &/ "ansi31.dxf"
 
   End If
 

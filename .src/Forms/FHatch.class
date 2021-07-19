@@ -7,7 +7,7 @@ Public Sub form_Open()
   Dim sFilename As String
 
   ComboBox1.Add("Solid")
-  For Each sFilename In Dir(Application.Path &/ "patterns", "*.dxf")
+  For Each sFilename In Dir(gcd.dirResources &/ "patterns", "*.dxf")
 
     ComboBox1.Add(Left$(sFilename, -4))
   Next
@@ -35,12 +35,12 @@ Public Sub ComboBox1_Click()
 
   entyHatch.Clear
 
-  Dxf.LoadFile(Application.Path &/ "patterns" &/ ComboBox1.Text & ".dxf", entyHatch, True, True, True)
+  Dxf.LoadFile(gcd.dirResources &/ "patterns" &/ ComboBox1.Text & ".dxf", entyHatch, True, True, True)
 
   DrawingArea1.Refresh
 
   gcd.CurrentDrawing.LastHatch = ComboBox1.Index
-  gcd.CurrentDrawing.LastHatchFile = Application.Path &/ "patterns" &/ ComboBox1.Text & ".dxf"
+  gcd.CurrentDrawing.LastHatchFile = gcd.dirResources &/ "patterns" &/ ComboBox1.Text & ".dxf"
   gcd.CurrentDrawing.LastHatchPattern = ComboBox1.Text
 
 End
@@ -97,7 +97,7 @@ End
 Public Sub btnOK_Click()
 
   ' cadHatchBuilder.LastHatch = ComboBox1.Index
-  ' cadHatchBuilder.LastHatchFile = Application.Path &/ "patterns" &/ ComboBox1.Text & ".dxf"
+  ' cadHatchBuilder.LastHatchFile = gcd.dirresources &/ "patterns" &/ ComboBox1.Text & ".dxf"
   gcd.CurrentDrawing.LastAngle = utils.CPval(txtRotation.Text)
 
   gcd.CurrentDrawing.LastScale = utils.CPval(txtScale.Text)
