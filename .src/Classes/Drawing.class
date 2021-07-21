@@ -54,6 +54,7 @@ Public CurrColor As Integer
 Public CurrLineType As LType
 Public CurrLineWt As Float          ' in mm, stored 100x in DXF
 Public CurrDimStyle As Styles   ' ojo Style es una clase nativa
+Public CurrPrintStyle As PrintStyle
 ' ===============================================================================================================================
 ' MODEL
 ' ===============================================================================================================================

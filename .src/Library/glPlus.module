@@ -1012,7 +1012,7 @@ End
 '' Grafica un texto en el contexto actual de acuerdo a los parametros pasados
 '' Debe estar definida la Font con nombre y altura
 ''
-Public Function DrawText(UTFstring As String, posX As Float, posY As Float, Optional angle As Float = 0, textH As Float = 1, colour As Integer = -14, linewidth As Float = 1, rectW As Float = 0, rectH As Float = 0, alignHoriz As Integer = 0, alignVert As Integer = 0) As Boolean
+Fast Unsafe Public Function DrawText(UTFstring As String, posX As Float, posY As Float, Optional angle As Float = 0, textH As Float = 1, colour As Integer = -14, linewidth As Float = 1, rectW As Float = 0, rectH As Float = 0, alignHoriz As Integer = 0, alignVert As Integer = 0) As Boolean
 
   Dim i, iii, i2, UTFcode, LetterIndex As Integer, Xadvance As Float
   Dim fArcParams As New Single[]

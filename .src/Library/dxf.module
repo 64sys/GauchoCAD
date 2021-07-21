@@ -204,7 +204,7 @@ Private Sub ReadData()
   LoadingPercent = LoadedBytes / LoadTotalBytes
 
   If LoadingPercent - LoadLastPercent > 0.01 Then
-    gcd.debugInfo("Loging file " & CInt(LoadingPercent * 100) & "%", True)
+    gcd.debugInfo("Loging file " & CInt(LoadingPercent * 100) & "%", True, True)
     LoadLastPercent = LoadingPercent
   End If
 
