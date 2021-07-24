@@ -582,6 +582,29 @@ Fast Unsafe Public Sub glColorRGB(gbColor As Integer)
 
 End
 
+Fast Unsafe Public Function GetColorRGBA(gbColor As Integer) As Single[]
+  ' set the color to GL
+
+  Dim r, g, b, a As Float
+
+  a = 1 - Color.GetAlpha(gbColor) / 255
+  r = (Shr(gbColor, 16) And 255) / 255
+  g = (Shr(gbColor, 8) And 255) / 255
+  b = (gbColor And 255) / 255
+
+  Return [r, g, b, a]
+
+End
+
+Public Sub ClearColor(iColor As Integer)
+
+  Dim rgba As Single[]
+
+  rgba = glPlus.GetColorRGBA(iColor)
+  gl.ClearColor(rgba[0], rgba[1], rgba[2], rgba[3])
+
+End
+
 Public Sub glMaterial(gbColor As Integer, Optional Alpha As Float = 0)
   ' set the color to GL
 
