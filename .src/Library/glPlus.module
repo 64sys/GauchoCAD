@@ -1194,9 +1194,6 @@ Fast Unsafe Public Function TextExtends(UTFstring As String, textH As Float) As 
 
 End
 
-'' devuelve un rectangulo que contiene al texto
-'' [x,y,ancho,alto]
-
 '' Lee todas las texturas del directorio provisto y devuelve un listado con sus nombres
 Public Function LoadTextures(DirPath As String) As String[]
 
