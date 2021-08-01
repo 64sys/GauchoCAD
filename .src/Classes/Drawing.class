@@ -41,7 +41,7 @@ Public Ymayor As Float = -1E100
 Public FileName As String
 Public PanX As Integer = 0              '' trnaslation of th 0,0 from the corner of the drawing area
 Public PanY As Integer = 0              '' in pixels
-Public ScaleZoom As Float
+Public ScaleZoom As Float = 1
 Public Propiedadtest As String
 
 Public RequiresFileRename As Boolean = True   ' para dibujos nuevo o formatos no soportados para save

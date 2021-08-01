@@ -55,34 +55,50 @@ Public Sub Lines(flxPoints As Float[])
 
 End
 
+Public Sub RelLines(flxPoints As Float[])
+
+  Dim i As Integer
+
+  If flxPoints.Count < 3 Then Return
+  paint.Relmoveto(flxPoints[0], flxPoints[1])
+  For i = 2 To flxPoints.Max Step 2
+    paint.Rellineto(flxPoints[i], flxPoints[i + 1])
+
+  Next
+
+  paint.Stroke
+
+End
+
 '' Grafica un texto en el contexto actual de acuerdo a los parametros pasados
 '' Debe estar definida la Font con nombre y altura
 ''
-Fast Unsafe Public Function DrawText(UTFstring As String, posX As Float, posY As Float, Optional angle As Float = 0, textH As Float = 1, colour As Integer = -14, linewidth As Float = 1, rectW As Float = 0, rectH As Float = 0, alignHoriz As Integer = 0, alignVert As Integer = 0) As Boolean
+'Fast Unsafe
+Public Function DrawText(UTFstring As String, posX As Float, posY As Float, Optional angle As Float = 0, textH As Float = 1, colour As Integer = -14, linewidth As Float = 1, rectW As Float = 0, rectH As Float = 0, alignHoriz As Integer = 0, alignVert As Integer = 0) As Boolean
 
   Dim i, iii, i2, UTFcode, LetterIndex As Integer, Xadvance As Float
-  Dim fArcParams As New Single[]
-  Dim Glyps, Bulges As New Single[]
-  Dim TGlyps, TBulges As Single[][]
-  Dim Ang, m1, m2, b, bx, by, mx, my, ang1, lt As Single
+  Dim fArcParams As New Float[]
+  Dim Glyps, Bulges As New Float[]
+  Dim TGlyps, TBulges As Float[][]
+  Dim Ang, m1, m2, b, bx, by, mx, my, ang1, lt As Float
   Dim iBulge As Integer
 
   Paint.Save 'gl.PushMatrix                                                               ' para evitar peleas, guardo la matriz de trnasformacion
-  Paint.MoveTo(posX, posY) ' gl.Translatef(posX, posY, 0)
+  Paint.Translate(posX, posY) ' gl.Translatef(posX, posY, 0)
   Paint.Rotate(angle * Pi / 180) 'gl.Rotatef(angle, 0, 0, 1)                                                  ' en grados
   Paint.Scale(textH * glPlus.FontScale) ' gl.Scalef(textH * FontScale, textH * FontScale, 1)
-  If colour <> -14 Then Me.glColorRGB(colour)
+  'If colour <> -14 Then Me.glColorRGB(colour)
   For i = 1 To String.Len(UTFstring)                                                 ' para cada letra
     UTFcode = String.Code(UTFstring, i)                                     ' obtengo el UTF code
     If UTFcode = 32 Then                                                    ' es un espacio
-      gl.Translatef(glplus.actualfont.LetterSpacing, 0, 0)                       ' muevo el puntero a la siguiente posicion
+      Paint.Translate(glplus.actualfont.LetterSpacing, 0)'  gl.Translatef(glplus.actualfont.LetterSpacing, 0, 0)                       ' muevo el puntero a la siguiente posicion
     Else
       ' DEPRE LetterIndex = GetCodeIndex(glplus.actualfont, UTFcode)                     ' obtengo el indice de la letra
       If glplus.actualfont.Letter.Exist(UTFcode) Then
         TGlyps = glplus.actualfont.Letter[UTFcode].FontGlyps
         TBulges = glplus.actualfont.Letter[UTFcode].FontBulges
 
-    Else If glplus.unicodefont.Letter.Exist(UTFcode) Then ' is unicode
+      Else If glplus.unicodefont.Letter.Exist(UTFcode) Then ' is unicode
         TGlyps = glplus.unicodefont.Letter[UTFcode].FontGlyps
         TBulges = glplus.unicodefont.Letter[UTFcode].FontBulges
 
@@ -116,7 +132,7 @@ Fast Unsafe Public Function DrawText(UTFstring As String, posX As Float, posY As
             fArcParams = puntos.Arc3Point(Glyps[i2 * 2], Glyps[i2 * 2 + 1], bx, by, Glyps[(i2 + 1) * 2], Glyps[(i2 + 1) * 2 + 1])
             ' traslado el centro
 
-            gl.Translatef(fArcParams[0], fArcParams[1], 0)
+            Paint.Translate(fArcParams[0], fArcParams[1]) '  gl.Translatef(fArcParams[0], fArcParams[1], 0)
 
             ' verifico Start_Angle y End_Angle (esta parte esta intimamente ligada a Arc3Point)
             ' las combinaciones de angulos son diversas, Arc3Point puede no funcionar bien en otra circunstancia
@@ -138,13 +154,13 @@ Fast Unsafe Public Function DrawText(UTFstring As String, posX As Float, posY As
 
             If fArcParams[3] > fArcParams[4] Then Swap fArcParams[3], fArcParams[4]
 
-            glPlus.Arc(fArcParams[2], fArcParams[3], fArcParams[4] - fArcParams[3], colour)
-            gl.Translatef(-fArcParams[0], -fArcParams[1], 0)
+            Paint.Arc(fArcParams[0], fArcParams[1], fArcParams[2], fArcParams[3], fArcParams[4] - fArcParams[3]) 'glPlus.Arc(fArcParams[2], fArcParams[3], fArcParams[4] - fArcParams[3], colour)
+            Paint.Translate(-fArcParams[0], -fArcParams[1])' gl.Translatef(-fArcParams[0], -fArcParams[1], 0)
             fArcParams = Null
 
           Else    ' dibujo la linea normalmente
 
-            glPlus.Lines([Glyps[i2 * 2], Glyps[i2 * 2 + 1], Glyps[(i2 + 1) * 2], Glyps[(i2 + 1) * 2 + 1]], Colour)
+            paintPlus.Lines([Glyps[i2 * 2], Glyps[i2 * 2 + 1], Glyps[(i2 + 1) * 2], Glyps[(i2 + 1) * 2 + 1]])
           End If
 
         Next
@@ -154,13 +170,13 @@ Fast Unsafe Public Function DrawText(UTFstring As String, posX As Float, posY As
 
         Inc iBulge
       Next
-      gl.Translatef(Xadvance + glplus.actualfont.LetterSpacing, 0, 0)                                       ' muevo el puntero a la siguiente posicion
+      Paint.Translate(Xadvance + glplus.actualfont.LetterSpacing, 0)'  gl.Translatef(Xadvance + glplus.actualfont.LetterSpacing, 0, 0)                                       ' muevo el puntero a la siguiente posicion
       'Debug Xadvance
       Xadvance = 0
       '================================================================================
 
     End If
   Next
-  gl.PopMatrix
+  Paint.Restore() 'gl.PopMatrix
 
 End

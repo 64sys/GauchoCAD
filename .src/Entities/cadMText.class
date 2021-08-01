@@ -486,7 +486,7 @@ Public Sub ProcessPart(s As String)
         glPlus.DrawText(s4, CurrentTextPosX, CurrentTextPosY, CurrentTextangle, CurrentTextHeigth, CurrentTextColor)
         If Printing Then
           sPrint = s4
-          GoSub PrintText
+          GoSub PrintText2
         End If
 
         fRect = glPlus.TextExtends(s4, CurrentTextHeigth)
@@ -506,7 +506,7 @@ Public Sub ProcessPart(s As String)
         glPlus.DrawText(s2, CurrentTextPosX, CurrentTextPosY, CurrentTextAngle, CurrentTextHeigth, CurrentTextColor)
         If Printing Then
           sPrint = s2
-          GoSub PrintText
+          GoSub PrintText2
         End If
 
         fRect = glPlus.TextExtends(s2, CurrentTextHeigth)
@@ -534,6 +534,12 @@ PrintText:
   paint.DrawText(sPrint)
   paint.Stroke
   paint.Restore
+
+  Return
+
+PrintText2:
+
+  paintPlus.DrawText(sPrint, CurrentTextPosX, CurrentTextPosY, CurrentTextAngle, CurrentTextHeigth, CurrentTextColor)
 
   Return
 

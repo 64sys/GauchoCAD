@@ -194,19 +194,20 @@ Public Function Draw2(oE As Entity)
   Dim angulo As Float, hText As New PaintExtents, lText As String
   Dim FontScalePrev As Float
 
-  angulo = oE.fParam[Me.ipaTextAngle] / 180 * Pi    ' ojo OPENGL--> GRADOS, GAMBAS-->RADIANESDXF
-
-  htext = paint.TextExtents(oe.StringData[Me.sdaText])
-  paint.save
-  paint.Translate(oE.p[0], oE.p[1])
-  paint.Rotate(-angulo)
-  paint.Scale(1, -1)
-  Paint.Font.Size = oe.fParam[Me.ipaTextHeight] / gcd.PrintingScale * 2
-  paint.DrawText(oe.StringData[Me.sdaText])
+  ' angulo = oE.fParam[Me.ipaTextAngle] / 180 * Pi    ' ojo OPENGL--> GRADOS, GAMBAS-->RADIANESDXF
+  '
+  ' htext = paint.TextExtents(oe.StringData[Me.sdaText])
+  ' paint.save
+  ' paint.Translate(oE.p[0], oE.p[1])
+  ' paint.Rotate(-angulo)
+  ' paint.Scale(1, -1)
+  ' Paint.Font.Size = oe.fParam[Me.ipaTextHeight] / gcd.PrintingScale * 2
+  ' 'paint.DrawText(oe.StringData[Me.sdaText])
+  paintPlus.DrawText(oe.StringData[Me.sdaText], oE.p[0], oE.p[1], -angulo, oe.fParam[Me.ipaTextHeight])
 
   paint.Stroke
 
-  paint.Restore
+  ' paint.Restore
 
 End
 

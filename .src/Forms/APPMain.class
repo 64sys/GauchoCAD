@@ -1163,6 +1163,7 @@ Public Sub gTask(sTask As String)
       gcd.CurrentDrawing.FileName = f
       gcd.CurrentDrawing.cModel = dwg.Raw(f)
       gcd.CurrentDrawing.HandSeed = 20000
+      gcd.CurrentDrawing.iEntity.Insert([0, 0, 0, 0])
       Me.Text = f
       LoadMenu()
 
@@ -1170,6 +1171,7 @@ Public Sub gTask(sTask As String)
       NewDrawing = New Drawing
       gcd.Drawings.Add(NewDrawing)
       gcd.CurrentDrawing = gcd.Drawings.Last
+      gcd.CurrentDrawing.iEntity.Insert([0, 0, 0, 0])
       fx = dsk.FileChooser(Settings["LastDir", User.Home], ["dwg", "json"])
       If fx.Count > 0 Then
         f = fx[0]
@@ -1255,6 +1257,7 @@ Public Sub gTask(sTask As String)
       NewDrawing = New Drawing
       gcd.Drawings.Add(NewDrawing)
       gcd.CurrentDrawing = gcd.Drawings.Last
+      gcd.CurrentDrawing.iEntity.Insert([0, 0, 0, 0])
       gcd.CurrentDrawing.FileName = f
       gcd.CurrentDrawing.cModel = dwg.Raw(f)
       fx = dsk.FileChooser(Settings["LastDir", User.Home], ["dxf"])
